@@ -1,0 +1,9 @@
+{
+  "name": "Sales Performance Hub",
+  "short_name": "Sales Hub",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#080a0d",
+  "theme_color": "#0b0d10",
+  "description": "Daily sales, monthly planning, incentive and manager task app"
+}
