@@ -1,245 +1,553 @@
 <!doctype html>
+
 <html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0b0d10" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
 
-  <title>Sales Performance Hub</title>
+  <meta charset="utf-8">
 
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#0b0d10"
+  >
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  >
+
+  <meta
+    name="description"
+    content="Modern Trade Sales Performance Management App"
+  >
+
+  <title>
+    Sales Performance Hub
+  </title>
+
+  <link
+    rel="manifest"
+    href="manifest.json"
+  >
+
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
+
 </head>
+
 
 <body>
 
-  <div id="toast" class="toast"></div>
 
-  <!-- LOGIN SCREEN -->
-  <section id="loginView" class="screen login-screen">
+  <!-- =====================================================
+       TOAST MESSAGE
+       ===================================================== -->
+
+  <div
+    id="toast"
+    class="toast"
+  >
+  </div>
+
+
+
+  <!-- =====================================================
+       LOGIN SCREEN
+       ===================================================== -->
+
+  <section
+    id="loginView"
+    class="screen login-screen"
+  >
+
 
     <div class="login-card">
 
-      <div class="logo-mark">SP</div>
+
+      <div class="logo-mark">
+
+        SP
+
+      </div>
+
 
       <p class="eyebrow">
+
         MODERN TRADE • SALES APP
+
       </p>
+
 
       <h1>
-        Sales Performance Hub
+
+        Sales Performance
+        <br>
+        Hub
+
       </h1>
 
-      <p class="muted">
-        Daily update • Monthly planning • Incentive • Shortfall • Tasks
+
+      <p class="muted login-description">
+
+        Daily Sales • Monthly Planning •
+        Outlet Performance • SKU Tracking •
+        Incentive • Shortfall • Tasks
+
       </p>
 
-      <form id="loginForm" class="stack">
+
+
+      <form
+        id="loginForm"
+        class="stack"
+      >
+
 
         <label>
-          Username
+
+          Staff ID / Username
 
           <input
             id="loginUser"
+            type="text"
             autocomplete="username"
+            placeholder="e.g. M22075"
             required
-            placeholder="e.g. ayon"
-          />
+          >
 
         </label>
 
+
+
         <label>
-          PIN
+
+          Password
 
           <input
             id="loginPin"
             type="password"
-            inputmode="numeric"
             autocomplete="current-password"
+            placeholder="Password = Staff ID"
             required
-            placeholder="4-digit PIN"
-          />
+          >
 
         </label>
+
+
 
         <button
           class="btn primary"
           type="submit"
         >
+
           Enter App
+
         </button>
 
+
       </form>
+
+
+
+      <div class="login-help">
+
+        <span class="security-dot">
+          ●
+        </span>
+
+        Secure Staff Access
+
+      </div>
+
+
 
       <details class="demo-box">
 
         <summary>
-          Demo login
+
+          Login Information
+
         </summary>
 
-        <div>
-          Manager:
-          <b>manager / 2468</b>
 
-          <br>
+        <div class="login-info">
 
-          SR:
-          <b>sayem / 1111</b>,
-          <b>bappi / 2222</b>,
-          <b>wasif / 3333</b>,
-          <b>jamil / 4444</b>
+
+          <p>
+
+            <strong>
+              Manager Access
+            </strong>
+
+            <br>
+
+            Username:
+            <b>manager</b>
+
+            <br>
+
+            Password:
+            <b>M21954</b>
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Mohammad Bodruddaza Emon
+            </strong>
+
+            <br>
+
+            Staff ID:
+            <b>M22075</b>
+
+            <br>
+
+            Password:
+            <b>M22075</b>
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Md Limon Majumder
+            </strong>
+
+            <br>
+
+            Staff ID:
+            <b>M22268</b>
+
+            <br>
+
+            Password:
+            <b>M22268</b>
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              MD Munnaf Ali
+            </strong>
+
+            <br>
+
+            Staff ID:
+            <b>M22328</b>
+
+            <br>
+
+            Password:
+            <b>M22328</b>
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Mehedi Alim Ayon
+            </strong>
+
+            <br>
+
+            SR Staff ID:
+            <b>M21954</b>
+
+            <br>
+
+            Password:
+            <b>M21954</b>
+
+          </p>
+
+
         </div>
 
       </details>
 
+
     </div>
+
 
   </section>
 
 
-  <!-- MAIN APP -->
+
+  <!-- =====================================================
+       MAIN APP
+       ===================================================== -->
+
   <section
     id="appView"
     class="app hidden"
   >
 
-    <!-- TOP HEADER -->
+
+
+    <!-- ===================================================
+         APP HEADER
+         =================================================== -->
+
     <header class="topbar">
 
-      <div>
+
+      <div class="topbar-user">
+
 
         <p
           class="eyebrow"
           id="roleLabel"
         >
+
           SALES REPRESENTATIVE
+
         </p>
 
-        <h2 id="welcomeName">
+
+        <h2
+          id="welcomeName"
+        >
+
           Welcome
+
         </h2>
+
 
       </div>
 
 
+
       <div class="top-actions">
+
 
         <button
           id="notifBtn"
           class="icon-btn"
-          title="Tasks"
+          type="button"
+          aria-label="Notifications"
+          title="Tasks & Notifications"
         >
-          🔔
+
+          <span class="notification-icon">
+
+            🔔
+
+          </span>
+
 
           <span
             id="notifBadge"
             class="badge hidden"
           >
+
             0
+
           </span>
 
+
         </button>
+
 
 
         <button
           id="logoutBtn"
           class="icon-btn"
+          type="button"
+          aria-label="Logout"
           title="Logout"
         >
+
           ↪
+
         </button>
 
+
       </div>
+
 
     </header>
 
 
-    <!-- MAIN CONTENT -->
+
+    <!-- ===================================================
+         MAIN CONTENT AREA
+         =================================================== -->
+
     <main
       id="mainContent"
       class="content"
     >
+
+
+      <div class="card">
+
+        <p class="muted">
+
+          Loading dashboard...
+
+        </p>
+
+      </div>
+
+
     </main>
 
 
-    <!-- BOTTOM NAVIGATION -->
+
+    <!-- ===================================================
+         BOTTOM NAVIGATION
+         =================================================== -->
+
     <nav
       class="bottom-nav"
       id="bottomNav"
     >
 
+
+
       <button
         data-page="dashboard"
         class="active"
+        type="button"
       >
 
-        <span>⌂</span>
+        <span class="nav-icon">
+
+          ⌂
+
+        </span>
 
         <small>
+
           Home
+
         </small>
 
       </button>
+
 
 
       <button
         data-page="daily"
+        type="button"
       >
 
-        <span>＋</span>
+        <span class="nav-icon">
+
+          ＋
+
+        </span>
 
         <small>
+
           Update
+
         </small>
 
       </button>
+
 
 
       <button
         data-page="planning"
+        type="button"
       >
 
-        <span>◎</span>
+        <span class="nav-icon">
+
+          ◎
+
+        </span>
 
         <small>
+
           Plan
+
         </small>
 
       </button>
+
 
 
       <button
         data-page="incentive"
+        type="button"
       >
 
-        <span>🏆</span>
+        <span class="nav-icon">
+
+          🏆
+
+        </span>
 
         <small>
+
           Incentive
+
         </small>
 
       </button>
+
 
 
       <button
         data-page="summary"
+        type="button"
       >
 
-        <span>▦</span>
+        <span class="nav-icon">
+
+          ▦
+
+        </span>
 
         <small>
+
           Summary
+
         </small>
 
       </button>
 
+
     </nav>
+
 
   </section>
 
 
+
+  <!-- =====================================================
+       JAVASCRIPT
+       ===================================================== -->
+
   <script src="app.js"></script>
 
+
 </body>
+
 </html>
