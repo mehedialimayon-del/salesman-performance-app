@@ -3,150 +3,88 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#090909">
-
+  <meta name="theme-color" content="#0b0d10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <title>Sales Performance Hub</title>
-
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
-
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-  <!-- Real XLSX export -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
-
 <body>
 
-<div id="toast" class="toast hidden"></div>
+<div id="toast" class="toast"></div>
 
-<!-- =========================================================
-     LOGIN
-========================================================= -->
-<section id="loginScreen" class="login-screen">
+<section id="loginView" class="screen login-screen">
+  <div class="login-card">
+    <div class="logo-mark">SP</div>
 
-  <div class="login-wrap">
+    <p class="eyebrow">MODERN TRADE • SALES APP</p>
 
-    <div class="brand-mark">
-      <div class="brand-icon">
-        <i class="fa-solid fa-chart-line"></i>
-      </div>
+    <h1>Sales Performance Hub</h1>
 
-      <div>
-        <h1>Sales Performance Hub</h1>
-        <p>Plan • Perform • Achieve</p>
-      </div>
-    </div>
+    <p class="muted">
+      Daily sales • Route target • SKU planning • Income • Incentive • Tasks
+    </p>
 
-    <div class="login-card">
+    <form id="loginForm" class="stack">
 
-      <div class="login-title">
-        <span class="eyebrow">SECURE ACCESS</span>
-        <h2>Welcome Back</h2>
-        <p>Sign in using your Staff ID.</p>
-      </div>
+      <label>
+        Staff ID / Username
+        <input id="loginUser" required placeholder="e.g. M22075">
+      </label>
 
-      <label class="field-label">Staff ID</label>
-
-      <div class="input-shell">
-        <i class="fa-regular fa-id-card"></i>
+      <label>
+        Password
         <input
-          id="loginStaffId"
-          type="text"
-          autocomplete="username"
-          placeholder="Example: M22075">
-      </div>
-
-      <label class="field-label">Password</label>
-
-      <div class="input-shell">
-        <i class="fa-solid fa-lock"></i>
-
-        <input
-          id="loginPassword"
+          id="loginPin"
           type="password"
-          autocomplete="current-password"
-          placeholder="Enter password">
+          required
+          placeholder="Password = Staff ID">
+      </label>
 
-        <button
-          id="togglePasswordBtn"
-          type="button"
-          class="icon-btn"
-          aria-label="Show password">
-          <i class="fa-regular fa-eye"></i>
-        </button>
-      </div>
-
-      <button id="loginBtn" class="primary-btn full-btn">
-        <i class="fa-solid fa-right-to-bracket"></i>
-        Sign In
+      <button class="btn primary">
+        Enter App
       </button>
 
-      <details class="login-help">
-        <summary>Login Help</summary>
+    </form>
 
-        <div class="help-grid">
-          <div>
-            <strong>M22075</strong>
-            <span>Mohammad Bodruddaza Emon</span>
-          </div>
-
-          <div>
-            <strong>M22268</strong>
-            <span>Md Limon Majumder</span>
-          </div>
-
-          <div>
-            <strong>M22328</strong>
-            <span>Md Munnaf Ali</span>
-          </div>
-
-          <div>
-            <strong>M21954</strong>
-            <span>Mehedi Alim Ayon</span>
-          </div>
-        </div>
-      </details>
-
+    <div class="login-help">
+      <span class="security-dot">●</span>
+      Staff access
     </div>
 
   </div>
-
 </section>
 
 
-<!-- =========================================================
-     MAIN APP
-========================================================= -->
-<div id="appShell" class="app-shell hidden">
+<section id="appView" class="app hidden">
 
-  <!-- TOPBAR -->
   <header class="topbar">
 
-    <div class="topbar-left">
+    <div class="topbar-user">
+      <p class="eyebrow" id="roleLabel">
+        SALES REPRESENTATIVE
+      </p>
 
-      <div class="mini-logo">
-        <i class="fa-solid fa-chart-line"></i>
-      </div>
-
-      <div>
-        <span class="topbar-caption">SALES PERFORMANCE HUB</span>
-        <h2 id="topbarUserName">User</h2>
-      </div>
-
+      <h2 id="welcomeName">
+        Welcome
+      </h2>
     </div>
 
-    <div class="topbar-right">
+    <div class="top-actions">
 
-      <button id="notificationBtn" class="top-icon-btn">
-        <i class="fa-regular fa-bell"></i>
-        <span id="notificationBadge" class="badge hidden">0</span>
+      <button
+        id="notifBtn"
+        class="icon-btn"
+        title="Notifications">
+        🔔
+        <span id="notifBadge" class="badge hidden">0</span>
       </button>
 
-      <button id="logoutBtn" class="top-icon-btn">
-        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      <button
+        id="logoutBtn"
+        class="icon-btn"
+        title="Logout">
+        ↪
       </button>
 
     </div>
@@ -154,1012 +92,41 @@
   </header>
 
 
-  <!-- USER HEADER -->
-  <section class="user-strip">
+  <main id="mainContent" class="content"></main>
 
-    <div>
-      <span id="userRoleBadge" class="role-badge">SR</span>
 
-      <h3 id="welcomeText">
-        Welcome
-      </h3>
+  <nav class="bottom-nav" id="bottomNav">
 
-      <p id="monthLabel">
-        Current Month
-      </p>
-    </div>
-
-    <div class="month-picker-wrap">
-      <label for="globalMonthSelector">Month</label>
-      <input id="globalMonthSelector" type="month">
-    </div>
-
-  </section>
-
-
-  <!-- CONTENT -->
-  <main class="main-content">
-
-
-    <!-- =====================================================
-         HOME
-    ====================================================== -->
-    <section id="viewHome" class="app-view active">
-
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">LIVE PERFORMANCE</span>
-          <h2>Dashboard</h2>
-        </div>
-
-        <button id="refreshDashboardBtn" class="ghost-btn small-btn">
-          <i class="fa-solid fa-rotate"></i>
-          Refresh
-        </button>
-      </div>
-
-
-      <div class="stats-grid">
-
-        <article class="metric-card">
-          <span>Monthly Target</span>
-          <strong id="dashMonthlyTarget">RM 0.00</strong>
-          <small>Route Target</small>
-        </article>
-
-        <article class="metric-card positive">
-          <span>Achievement</span>
-          <strong id="dashAchievement">RM 0.00</strong>
-          <small id="dashAchievementPercent">0%</small>
-        </article>
-
-        <article class="metric-card negative">
-          <span>Shortfall</span>
-          <strong id="dashShortfall">RM 0.00</strong>
-          <small id="dashRemainingPercent">100% remaining</small>
-        </article>
-
-        <article class="metric-card">
-          <span>Required / Day</span>
-          <strong id="dashRequiredPerDay">RM 0.00</strong>
-          <small id="dashDaysRemaining">0 days remaining</small>
-        </article>
-
-        <article class="metric-card">
-          <span>Today Sales</span>
-          <strong id="dashTodaySales">RM 0.00</strong>
-          <small id="dashTodayTargetStatus">Daily performance</small>
-        </article>
-
-        <article class="metric-card">
-          <span>Growth / Degrowth</span>
-          <strong id="dashGrowth">0%</strong>
-          <small id="dashLastMonthComparison">vs previous month</small>
-        </article>
-
-        <article class="metric-card">
-          <span>Active</span>
-          <strong id="dashActive">0</strong>
-          <small>Monthly Active</small>
-        </article>
-
-        <article class="metric-card">
-          <span>Prepare for Trip</span>
-          <strong id="dashPrepareTrip">0</strong>
-          <small>Monthly Total</small>
-        </article>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">ZERO SALES CONTROL</span>
-            <h3>Outlet Coverage</h3>
-          </div>
-
-          <strong id="coveragePercent">0%</strong>
-        </div>
-
-        <div class="progress-shell">
-          <div id="coverageProgressBar" class="progress-bar"></div>
-        </div>
-
-        <div class="coverage-meta">
-          <span>
-            Covered:
-            <strong id="coveredOutletCount">0</strong>
-          </span>
-
-          <span>
-            Total:
-            <strong id="totalOutletCount">0</strong>
-          </span>
-
-          <span class="danger-text">
-            Zero Sales:
-            <strong id="zeroOutletCount">0</strong>
-          </span>
-        </div>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">SMART ALERTS</span>
-            <h3>Action Required</h3>
-          </div>
-        </div>
-
-        <div id="smartAlertList" class="alert-list">
-
-          <div class="empty-state">
-            <i class="fa-regular fa-circle-check"></i>
-            <p>No alerts yet.</p>
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">RECENT ACTIVITY</span>
-            <h3>Latest Sales Updates</h3>
-          </div>
-        </div>
-
-        <div id="recentActivityList" class="activity-list">
-
-          <div class="empty-state">
-            <i class="fa-regular fa-clipboard"></i>
-            <p>No sales entry yet.</p>
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         DAILY UPDATE
-    ====================================================== -->
-    <section id="viewDaily" class="app-view">
-
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">DAY-BY-DAY</span>
-          <h2>Daily Update</h2>
-        </div>
-      </div>
-
-
-      <div class="panel">
-
-        <div class="form-grid">
-
-          <div class="form-group">
-            <label>Date</label>
-            <input id="dailyDate" type="date">
-          </div>
-
-          <div class="form-group">
-            <label>Outlet</label>
-            <select id="dailyOutlet">
-              <option value="">Select Outlet</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Today Sales (RM)</label>
-            <input
-              id="dailyTodaySales"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="0.00">
-          </div>
-
-          <div class="form-group">
-            <label>Last Month Same Day (RM)</label>
-            <input
-              id="dailyLastMonthSameDay"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="0.00">
-          </div>
-
-          <div class="form-group">
-            <label>Active</label>
-            <input
-              id="dailyActive"
-              type="number"
-              min="0"
-              step="1"
-              placeholder="0">
-          </div>
-
-          <div class="form-group">
-            <label>Prepare for Trip</label>
-            <input
-              id="dailyPrepareTrip"
-              type="number"
-              min="0"
-              step="1"
-              placeholder="0">
-          </div>
-
-          <div class="form-group full-span">
-            <label>Order Amount (RM)</label>
-            <input
-              id="dailyOrderAmount"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="0.00">
-          </div>
-
-          <div class="form-group full-span">
-            <label>Note</label>
-            <textarea
-              id="dailyNote"
-              rows="3"
-              placeholder="Optional note"></textarea>
-          </div>
-
-        </div>
-
-
-        <div class="subsection-title">
-          <div>
-            <h3>SKU Sales</h3>
-            <p>Add product sales for this outlet.</p>
-          </div>
-
-          <button id="addSkuSaleRowBtn" class="ghost-btn small-btn">
-            <i class="fa-solid fa-plus"></i>
-            Add SKU
-          </button>
-        </div>
-
-
-        <div id="dailySkuRows" class="dynamic-list"></div>
-
-
-        <button id="saveDailyBtn" class="primary-btn full-btn">
-          <i class="fa-solid fa-floppy-disk"></i>
-          Save Daily Update
-        </button>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">HISTORY</span>
-            <h3>Daily Records</h3>
-          </div>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Outlet</th>
-                <th>Sales</th>
-                <th>Last Month</th>
-                <th>Growth</th>
-                <th>Active</th>
-                <th>Prepare Trip</th>
-                <th>Order</th>
-              </tr>
-            </thead>
-
-            <tbody id="dailyHistoryBody">
-            </tbody>
-          </table>
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         PLAN
-    ====================================================== -->
-    <section id="viewPlan" class="app-view">
-
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">MONTHLY STRATEGY</span>
-          <h2>Planning</h2>
-        </div>
-      </div>
-
-
-      <div class="panel">
-
-        <div class="form-grid">
-
-          <div class="form-group">
-            <label>Monthly Route Target (RM)</label>
-            <input
-              id="planRouteTarget"
-              type="number"
-              min="50000"
-              step="100"
-              placeholder="Minimum RM50,000">
-          </div>
-
-          <div class="form-group">
-            <label>Expected Monthly Income (RM)</label>
-            <input
-              id="planExpectedIncome"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Example: 4000">
-          </div>
-
-        </div>
-
-        <button id="saveMonthlyPlanBtn" class="primary-btn full-btn">
-          <i class="fa-solid fa-bullseye"></i>
-          Save Monthly Target
-        </button>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">OUTLET TARGET</span>
-            <h3>Outlet Planning</h3>
-          </div>
-        </div>
-
-
-        <div class="form-grid">
-
-          <div class="form-group">
-            <label>Outlet</label>
-            <select id="planOutlet">
-              <option value="">Select Outlet</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Outlet Sales Target (RM)</label>
-            <input
-              id="planOutletTarget"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="0.00">
-          </div>
-
-        </div>
-
-
-        <div class="subsection-title">
-
-          <div>
-            <h3>Targeted SKU Plan</h3>
-            <p>Select products, carton target and RM target.</p>
-          </div>
-
-          <button id="addPlanSkuRowBtn" class="ghost-btn small-btn">
-            <i class="fa-solid fa-plus"></i>
-            Add SKU
-          </button>
-
-        </div>
-
-
-        <div id="planSkuRows" class="dynamic-list"></div>
-
-
-        <button id="saveOutletPlanBtn" class="primary-btn full-btn">
-          <i class="fa-solid fa-list-check"></i>
-          Save Outlet & SKU Plan
-        </button>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">OUTLET PERFORMANCE</span>
-            <h3>Plan vs Achievement</h3>
-          </div>
-        </div>
-
-        <div id="outletPlanCards" class="card-list"></div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         INCENTIVE / SALARY
-    ====================================================== -->
-    <section id="viewIncentive" class="app-view">
-
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">INCOME TRACKER</span>
-          <h2>Salary & Incentive</h2>
-        </div>
-      </div>
-
-
-      <div class="salary-hero">
-
-        <span>Projected Income</span>
-
-        <strong id="projectedIncome">
-          RM 0.00
-        </strong>
-
-        <small id="expectedIncomeStatus">
-          Expected income not set
-        </small>
-
-      </div>
-
-
-      <div class="salary-grid">
-
-        <article>
-          <span>Basic Salary</span>
-          <strong id="salaryBasic">RM 1,700.00</strong>
-        </article>
-
-        <article>
-          <span>Commission</span>
-          <strong id="salaryCommission">RM 0.00</strong>
-        </article>
-
-        <article>
-          <span>Fuel / Oil</span>
-          <strong id="salaryFuel">RM 300.00</strong>
-        </article>
-
-        <article>
-          <span>House Rent</span>
-          <strong id="salaryRent">RM 250.00</strong>
-        </article>
-
-        <article>
-          <span>Food Allowance</span>
-          <strong id="salaryFood">RM 100.00</strong>
-        </article>
-
-        <article>
-          <span>Zero Sales Incentive</span>
-          <strong id="salaryZeroSales">RM 0.00</strong>
-        </article>
-
-        <article>
-          <span>Product Incentive</span>
-          <strong id="salaryProductIncentive">RM 0.00</strong>
-        </article>
-
-        <article>
-          <span>Growth Incentive</span>
-          <strong id="salaryGrowthIncentive">RM 0.00</strong>
-        </article>
-
-        <article>
-          <span>Manager Incentive</span>
-          <strong id="salaryManagerIncentive">RM 0.00</strong>
-        </article>
-
-        <article>
-          <span>Others</span>
-          <strong id="salaryOthersIncentive">RM 0.00</strong>
-        </article>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">PRODUCT INCENTIVE</span>
-            <h3>Create Incentive Target</h3>
-          </div>
-        </div>
-
-
-        <div class="form-grid">
-
-          <div class="form-group full-span">
-            <label>Product</label>
-
-            <input
-              id="incentiveProductSearch"
-              type="text"
-              list="productDatalist"
-              placeholder="Search product">
-          </div>
-
-          <div class="form-group">
-            <label>Target Carton</label>
-
-            <input
-              id="incentiveTargetQty"
-              type="number"
-              min="1"
-              step="1"
-              placeholder="Example: 50">
-          </div>
-
-          <div class="form-group">
-            <label>Reward (RM)</label>
-
-            <input
-              id="incentiveReward"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Example: 50">
-          </div>
-
-        </div>
-
-
-        <button id="saveProductIncentiveBtn" class="primary-btn full-btn">
-          <i class="fa-solid fa-trophy"></i>
-          Save Product Incentive
-        </button>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">INCENTIVE PROGRESS</span>
-            <h3>Unlock Status</h3>
-          </div>
-        </div>
-
-        <div id="incentiveProgressList" class="card-list"></div>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">OTHER INCENTIVES</span>
-            <h3>Additional Income</h3>
-          </div>
-        </div>
-
-
-        <div class="form-grid">
-
-          <div class="form-group">
-            <label>Growth Incentive (RM)</label>
-            <input id="growthIncentiveInput"
-                   type="number"
-                   min="0"
-                   step="0.01"
-                   placeholder="0.00">
-          </div>
-
-          <div class="form-group">
-            <label>Manager Incentive (RM)</label>
-            <input id="managerIncentiveInput"
-                   type="number"
-                   min="0"
-                   step="0.01"
-                   placeholder="0.00">
-          </div>
-
-          <div class="form-group full-span">
-            <label>Others Incentive (RM)</label>
-            <input id="othersIncentiveInput"
-                   type="number"
-                   min="0"
-                   step="0.01"
-                   placeholder="0.00">
-          </div>
-
-        </div>
-
-
-        <button id="saveOtherIncentiveBtn" class="primary-btn full-btn">
-          <i class="fa-solid fa-coins"></i>
-          Save Additional Incentives
-        </button>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         SUMMARY
-    ====================================================== -->
-    <section id="viewSummary" class="app-view">
-
-      <div class="section-head">
-
-        <div>
-          <span class="eyebrow">MONTHLY REPORT</span>
-          <h2>Summary</h2>
-        </div>
-
-        <button id="exportExcelBtn" class="primary-btn small-btn">
-          <i class="fa-solid fa-file-excel"></i>
-          Excel
-        </button>
-
-      </div>
-
-
-      <div class="stats-grid compact">
-
-        <article class="metric-card">
-          <span>Total Sales</span>
-          <strong id="summarySales">RM 0.00</strong>
-        </article>
-
-        <article class="metric-card">
-          <span>Target</span>
-          <strong id="summaryTarget">RM 0.00</strong>
-        </article>
-
-        <article class="metric-card">
-          <span>Shortfall</span>
-          <strong id="summaryShortfall">RM 0.00</strong>
-        </article>
-
-        <article class="metric-card">
-          <span>Projected Salary</span>
-          <strong id="summarySalary">RM 0.00</strong>
-        </article>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">DAILY TRACKER</span>
-            <h3>Day Wise Report</h3>
-          </div>
-        </div>
-
-        <div class="table-wrap">
-
-          <table id="summaryDailyTable">
-
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Outlet</th>
-                <th>Sales</th>
-                <th>Last Month</th>
-                <th>Shortfall / Growth</th>
-                <th>Active</th>
-                <th>Prepare for Trip</th>
-                <th>Order Amount</th>
-              </tr>
-            </thead>
-
-            <tbody id="summaryDailyBody">
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">OUTLET REPORT</span>
-            <h3>Outlet Wise Performance</h3>
-          </div>
-        </div>
-
-        <div class="table-wrap">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>Outlet</th>
-                <th>Target</th>
-                <th>Actual</th>
-                <th>Shortfall</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-
-            <tbody id="summaryOutletBody">
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">SKU REPORT</span>
-            <h3>SKU Wise Performance</h3>
-          </div>
-        </div>
-
-        <div class="table-wrap">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>Outlet</th>
-                <th>SKU</th>
-                <th>Target CTN</th>
-                <th>Actual CTN</th>
-                <th>Remaining</th>
-                <th>Target RM</th>
-                <th>Actual RM</th>
-              </tr>
-            </thead>
-
-            <tbody id="summarySkuBody">
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         MANAGER
-    ====================================================== -->
-    <section id="viewManager" class="app-view">
-
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">MANAGER CONTROL</span>
-          <h2>Team Performance</h2>
-        </div>
-      </div>
-
-
-      <div id="teamPerformanceCards" class="team-grid"></div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">ASSIGNMENT</span>
-            <h3>Special Task</h3>
-          </div>
-        </div>
-
-
-        <div class="form-grid">
-
-          <div class="form-group">
-            <label>Sales Representative</label>
-
-            <select id="taskStaff">
-              <option value="">Select SR</option>
-              <option value="M22075">Mohammad Bodruddaza Emon</option>
-              <option value="M22268">Md Limon Majumder</option>
-              <option value="M22328">Md Munnaf Ali</option>
-              <option value="M21954">Mehedi Alim Ayon</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Due Date</label>
-            <input id="taskDueDate" type="date">
-          </div>
-
-          <div class="form-group full-span">
-            <label>Task Title</label>
-            <input
-              id="taskTitle"
-              type="text"
-              placeholder="Example: Recover zero-sales outlets">
-          </div>
-
-          <div class="form-group full-span">
-            <label>Instruction</label>
-
-            <textarea
-              id="taskInstruction"
-              rows="4"
-              placeholder="Write task details"></textarea>
-          </div>
-
-        </div>
-
-
-        <button id="assignTaskBtn" class="primary-btn full-btn">
-          <i class="fa-solid fa-paper-plane"></i>
-          Assign Task
-        </button>
-
-      </div>
-
-
-      <div class="panel">
-
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">TASK STATUS</span>
-            <h3>Team Tasks</h3>
-          </div>
-        </div>
-
-        <div id="managerTaskList" class="card-list"></div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         MY TASKS
-    ====================================================== -->
-    <section id="viewTasks" class="app-view">
-
-      <div class="section-head">
-
-        <div>
-          <span class="eyebrow">SPECIAL ASSIGNMENT</span>
-          <h2>My Tasks</h2>
-        </div>
-
-      </div>
-
-      <div id="myTaskList" class="card-list">
-
-        <div class="empty-state">
-          <i class="fa-regular fa-clipboard"></i>
-          <p>No task assigned.</p>
-        </div>
-
-      </div>
-
-    </section>
-
-
-  </main>
-
-
-  <!-- =====================================================
-       BOTTOM NAVIGATION
-  ====================================================== -->
-  <nav class="bottom-nav">
-
-    <button class="nav-btn active" data-view="Home">
-      <i class="fa-solid fa-house"></i>
-      <span>Home</span>
+    <button data-page="dashboard" class="active">
+      <span class="nav-icon">⌂</span>
+      <small>Home</small>
     </button>
 
-    <button class="nav-btn" data-view="Daily">
-      <i class="fa-solid fa-plus-circle"></i>
-      <span>Update</span>
+    <button data-page="daily">
+      <span class="nav-icon">＋</span>
+      <small>Update</small>
     </button>
 
-    <button class="nav-btn" data-view="Plan">
-      <i class="fa-solid fa-bullseye"></i>
-      <span>Plan</span>
+    <button data-page="planning">
+      <span class="nav-icon">◎</span>
+      <small>Plan</small>
     </button>
 
-    <button class="nav-btn" data-view="Incentive">
-      <i class="fa-solid fa-trophy"></i>
-      <span>Income</span>
+    <button data-page="income">
+      <span class="nav-icon">RM</span>
+      <small>Income</small>
     </button>
 
-    <button class="nav-btn" data-view="Summary">
-      <i class="fa-solid fa-chart-column"></i>
-      <span>Summary</span>
-    </button>
-
-    <button id="tasksNavBtn" class="nav-btn" data-view="Tasks">
-      <i class="fa-solid fa-list-check"></i>
-      <span>Tasks</span>
-    </button>
-
-    <button id="managerNavBtn"
-            class="nav-btn manager-only hidden"
-            data-view="Manager">
-      <i class="fa-solid fa-user-tie"></i>
-      <span>Manager</span>
+    <button data-page="summary">
+      <span class="nav-icon">▦</span>
+      <small>Summary</small>
     </button>
 
   </nav>
 
-</div>
+</section>
 
 
-<!-- =========================================================
-     PRODUCT SEARCH DATALIST
-========================================================= -->
-<datalist id="productDatalist"></datalist>
-
-
-<!-- =========================================================
-     NOTIFICATION DRAWER
-========================================================= -->
-<div id="notificationOverlay"
-     class="drawer-overlay hidden">
-
-  <aside class="notification-drawer">
-
-    <div class="drawer-head">
-
-      <div>
-        <span class="eyebrow">NOTIFICATIONS</span>
-        <h3>Performance Alerts</h3>
-      </div>
-
-      <button id="closeNotificationBtn"
-              class="icon-btn">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-    </div>
-
-    <div id="notificationList"
-         class="notification-list">
-    </div>
-
-  </aside>
-
-</div>
-
-
-<!-- =========================================================
-     SCRIPTS
-========================================================= -->
 <script src="data.js"></script>
 <script src="app.js"></script>
 
