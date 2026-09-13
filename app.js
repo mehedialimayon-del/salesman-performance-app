@@ -1,8291 +1,6255 @@
-/* =========================================================
-   SALES PERFORMANCE HUB — FINAL CONCEPT BUILD
-   Works with current index.html + data.js + styles.css
-   NO DEMO DATA — EVERY MONTH STARTS FROM ZERO
-========================================================= */
+const D=window.APP_DATA||{users:[],salaryRules:{},categoryProducts:{},products:[],outlets:{}};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const STORAGE='sph.final.v3',SESSION='sph.session.final.v3',BACKEND='sph.backendUrl';
+let session=null,page='dashboard',selectedMonth=new Date().toISOString().slice(0,7),managerView='M21954',selectedSkus=[];
 
-const D = window.APP_DATA || {
-  users: [],
-  salaryRules: {},
-  categoryProducts: {},
-  products: [],
-  outlets: {}
-};
+const n=v=>Number.isFinite(Number(v))?Number(v):0;
+const money=v=>'RM '+n(v).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=(v='')=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const idGen=()=>window.crypto?.randomUUID?crypto.randomUUID():'id-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+const today=()=>new Date().toISOString().slice(0,10);
 
-const $ = (s, root = document) => root.querySelector(s);
-const $$ = (s, root = document) => [...root.querySelectorAll(s)];
-
-const STORAGE_KEY = 'SPH_CONCEPT_FINAL_20260912_V1';
-const BACKEND_URL_KEY = 'sph.backendUrl';
-const SESSION_KEY = 'sph.session.final';
-
-let session = null;
-let page = 'dashboard';
-let selectedMonth = new Date().toISOString().slice(0, 7);
-let managerView = 'M21954';
-let planSelectedSkus = [];
-
-
-/* =========================================================
-   BASIC HELPERS
-========================================================= */
-
-function number(v) {
-  const x = Number(v);
-  return Number.isFinite(x) ? x : 0;
+function toast(m){
+    const t=$('#toast');
+    if(!t)return;
+    t.textContent=m;
+    t.classList.add('show');
+    clearTimeout(window.__tt);
+    window.__tt=setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-function money(v) {
-  return 'RM ' + number(v).toLocaleString('en-MY', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
+function emptyState(){
+    return{
+        daily:[],
+        outletSales:[],
+        skuSales:[],
+        plans:[],
+        incentives:[],
+        tasks:[],
+        incomePlans:[],
+        customOutlets:{}
+    };
 }
 
-function esc(v = '') {
-  return String(v).replace(/[&<>"']/g, c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }[c]));
+function state(){
+    try{
+        return Object.assign(
+            emptyState(),
+            JSON.parse(localStorage.getItem(STORAGE)||'{}')
+        );
+    }catch{
+        return emptyState();
+    }
 }
 
-function idGen() {
-  if (window.crypto && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-
-  return 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2);
-}
-
-function todayISO() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function monthName(m) {
-  const [y, mo] = m.split('-').map(Number);
-
-  return new Date(y, mo - 1, 1).toLocaleDateString('en-MY', {
-    month: 'long',
-    year: 'numeric'
-  });
-}
-
-function daysInMonth(m) {
-  const [y, mo] = m.split('-').map(Number);
-  return new Date(y, mo, 0).getDate();
-}
-
-function remainingDays(m) {
-
-  const now = new Date();
-
-  const [y, mo] = m.split('-').map(Number);
-
-  const end = new Date(y, mo, 0);
-
-  if (
-    now.getFullYear() !== y ||
-    now.getMonth() + 1 !== mo
-  ) {
-
-    if (now > end) return 0;
-
-    return daysInMonth(m);
-  }
-
-  return Math.max(
-    1,
-    end.getDate() - now.getDate() + 1
-  );
-}
-
-function toast(message) {
-
-  const el = $('#toast');
-
-  if (!el) return;
-
-  el.textContent = message;
-
-  el.classList.add('show');
-
-  clearTimeout(window.__toastTimer);
-
-  window.__toastTimer = setTimeout(() => {
-    el.classList.remove('show');
-  }, 2300);
-}
-
-function userById(id) {
-
-  return (D.users || []).find(
-    u =>
-      String(u.id).toUpperCase() ===
-      String(id).toUpperCase()
-  );
-}
-
-function allSalesUsers() {
-
-  return (D.users || []).filter(
-    u =>
-      u.role === 'SR' ||
-      String(u.role).includes('MANAGER')
-  );
-}
-
-function currentStaffId() {
-
-  if (!session) return '';
-
-  return session.mode === 'manager'
-    ? managerView
-    : session.id;
-}
-
-function fixedRouteTarget(id) {
-
-  const u = userById(id);
-
-  const minimum =
-    number(
-      D.salaryRules?.minMonthlyTarget || 50000
+function save(s){
+    localStorage.setItem(
+        STORAGE,
+        JSON.stringify(s)
     );
-
-  return Math.max(
-    minimum,
-    number(u?.target)
-  );
 }
 
-
-/* =========================================================
-   STORAGE
-========================================================= */
-
-function blankState() {
-
-  return {
-
-    daily: [],
-
-    outletSales: [],
-
-    skuSales: [],
-
-    plans: [],
-
-    incentives: [],
-
-    tasks: [],
-
-    incomePlans: [],
-
-    customOutlets: {},
-
-    lastCloudSync: null
-  };
+function user(id){
+    return (D.users||[])
+        .find(
+            x=>
+                String(x.id).toUpperCase()===
+                String(id).toUpperCase()
+        );
 }
 
-function getState() {
+function salesUsers(){
+    return (D.users||[])
+        .filter(
+            x=>
+                x.role==='SR'||
+                String(x.role).includes('MANAGER')
+        );
+}
 
-  try {
+function uid(){
+    return session?.mode==='manager'
+        ?managerView
+        :session?.id;
+}
 
-    const saved =
-      JSON.parse(
-        localStorage.getItem(STORAGE_KEY) || '{}'
-      );
-
-    return Object.assign(
-      blankState(),
-      saved
+function routeTarget(id){
+    return Math.max(
+        n(D.salaryRules?.minMonthlyTarget||50000),
+        n(user(id)?.target)
     );
-
-  } catch (e) {
-
-    return blankState();
-  }
 }
 
-function setState(st) {
-
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(st)
-  );
+function daysInMonth(m){
+    const[y,mo]=m.split('-').map(Number);
+    return new Date(y,mo,0).getDate();
 }
 
-function parseJSON(value, fallback) {
+function daysRemain(m){
 
-  try {
+    const now=new Date();
 
-    if (typeof value === 'string') {
-      return JSON.parse(value);
+    const[y,mo]=m
+        .split('-')
+        .map(Number);
+
+    const end=
+        new Date(y,mo,0);
+
+    if(
+        now.getFullYear()!==y||
+        now.getMonth()+1!==mo
+    ){
+        return now>end
+            ?0
+            :daysInMonth(m);
     }
 
-    return value ?? fallback;
+    return Math.max(
+        1,
+        end.getDate()-now.getDate()+1
+    );
+}
 
-  } catch {
+function monthName(m){
 
-    return fallback;
-  }
+    const[y,mo]=m
+        .split('-')
+        .map(Number);
+
+    return new Date(
+        y,
+        mo-1,
+        1
+    ).toLocaleDateString(
+        'en-MY',
+        {
+            month:'long',
+            year:'numeric'
+        }
+    );
 }
 
 
 /* =========================================================
-   BACKEND / CLOUD
+   CLOUD
 ========================================================= */
 
-function backendUrl() {
-
-  return (
-    localStorage.getItem(BACKEND_URL_KEY) || ''
-  ).trim();
+function backendUrl(){
+    return(
+        localStorage.getItem(BACKEND)||''
+    ).trim();
 }
 
 async function apiGet(
-  action,
-  viewStaffId = currentStaffId(),
-  month = selectedMonth
-) {
-
-  const base = backendUrl();
-
-  if (!base || !session) return null;
-
-  const qs = new URLSearchParams({
-
     action,
+    targetId=uid(),
+    month=selectedMonth
+){
 
-    staffId: session.id,
+    const base=backendUrl();
 
-    password: session.password,
+    if(!base||!session)
+        return null;
 
-    viewStaffId,
+    const q=
+        new URLSearchParams({
+            action,
+            staffId:session.id,
+            password:session.password,
+            viewStaffId:targetId,
+            month
+        });
 
-    month
-  });
+    const r=
+        await fetch(
+            base+'?'+q.toString(),
+            {
+                cache:'no-store'
+            }
+        );
 
-  const res = await fetch(
-    base + '?' + qs.toString(),
-    {
-      cache: 'no-store'
+    return r.json();
+}
+
+async function apiPost(
+    action,
+    payload
+){
+
+    const base=backendUrl();
+
+    if(!base||!session)
+        return null;
+
+    const r=
+        await fetch(
+            base,
+            {
+                method:'POST',
+                headers:{
+                    'Content-Type':
+                        'text/plain;charset=utf-8'
+                },
+                body:JSON.stringify({
+                    action,
+                    staffId:session.id,
+                    password:session.password,
+                    payload
+                })
+            }
+        );
+
+    return r.json();
+}
+
+async function pushCloud(
+    action,
+    payload
+){
+
+    if(!backendUrl())
+        return;
+
+    try{
+
+        const r=
+            await apiPost(
+                action,
+                payload
+            );
+
+        if(!r?.ok)
+            throw new Error(
+                r?.error||
+                'Cloud save failed'
+            );
+
+    }catch(e){
+
+        console.warn(e);
+
+        toast(
+            'Saved on phone • cloud not connected'
+        );
     }
-  );
-
-  return res.json();
 }
 
-async function apiPost(action, payload) {
+function parseJSON(v,f=[]){
 
-  const base = backendUrl();
+    try{
 
-  if (!base || !session) return null;
+        return typeof v==='string'
+            ?JSON.parse(v)
+            :(v||f);
 
-  const res = await fetch(base, {
+    }catch{
 
-    method: 'POST',
-
-    headers: {
-      'Content-Type':
-        'text/plain;charset=utf-8'
-    },
-
-    body: JSON.stringify({
-
-      action,
-
-      staffId: session.id,
-
-      password: session.password,
-
-      payload
-    })
-  });
-
-  return res.json();
-}
-
-async function safeCloudPost(
-  action,
-  payload
-) {
-
-  if (!backendUrl()) return;
-
-  try {
-
-    const r =
-      await apiPost(
-        action,
-        payload
-      );
-
-    if (!r?.ok) {
-
-      throw new Error(
-        r?.error ||
-        'Cloud save failed'
-      );
+        return f;
     }
-
-  } catch (err) {
-
-    console.warn(err);
-
-    toast(
-      'Saved on this phone. Cloud sync is not connected yet.'
-    );
-  }
-}
-
-function normalizeSheetDate(v) {
-
-  if (!v) return '';
-
-  if (typeof v === 'string') {
-    return v.slice(0, 10);
-  }
-
-  try {
-
-    return new Date(v)
-      .toISOString()
-      .slice(0, 10);
-
-  } catch {
-
-    return '';
-  }
 }
 
 async function syncCloud(
-  staffId = currentStaffId(),
-  month = selectedMonth
-) {
-
-  if (!backendUrl()) return false;
-
-  try {
-
-    const res =
-      await apiGet(
-        'bootstrap',
-        staffId,
-        month
-      );
-
-    if (!res?.ok) {
-
-      throw new Error(
-        res?.error ||
-        'Cloud read failed'
-      );
-    }
-
-    const d = res.data || {};
-
-    const st = getState();
-
-
-    if (
-      Array.isArray(d.outlets) &&
-      d.outlets.length
-    ) {
-
-      st.customOutlets[staffId] =
-        d.outlets
-          .map(x => ({
-
-            code:
-              String(
-                x['Outlet Code'] || ''
-              ),
-
-            name:
-              String(
-                x['Outlet Name'] || ''
-              ),
-
-            category:
-              String(
-                x.Category || 'Other'
-              ),
-
-            totalSku:
-              number(
-                x['Total SKU']
-              )
-
-          }))
-          .filter(x => x.name);
-    }
-
-
-    st.daily =
-      st.daily.filter(
-        x =>
-          !(
-            x.staffId === staffId &&
-            x.month === month
-          )
-      );
-
-    st.daily.push(
-      ...(d.daily || []).map(x => ({
-
-        id: idGen(),
-
-        staffId,
-
-        month:
-          String(
-            x.Month || month
-          ),
-
-        date:
-          normalizeSheetDate(
-            x.Date
-          ),
-
-        todaySales:
-          number(
-            x['Today Sales']
-          ),
-
-        lastMonthSameDay:
-          number(
-            x['Last Month Same Day']
-          ),
-
-        active:
-          number(
-            x.Active
-          ),
-
-        prepareTrip:
-          number(
-            x['Prepare for Trip']
-          ),
-
-        orderAmount:
-          number(
-            x['Order Amount']
-          ),
-
-        note:
-          String(
-            x.Note || ''
-          )
-
-      }))
-    );
-
-
-    st.outletSales =
-      st.outletSales.filter(
-        x =>
-          !(
-            x.staffId === staffId &&
-            x.month === month
-          )
-      );
-
-    st.outletSales.push(
-      ...(d.outletSales || []).map(x => ({
-
-        id: idGen(),
-
-        staffId,
-
-        month:
-          String(
-            x.Month || month
-          ),
-
-        date:
-          normalizeSheetDate(
-            x.Date
-          ),
-
-        outletCode:
-          String(
-            x['Outlet Code'] || ''
-          ),
-
-        outletName:
-          String(
-            x['Outlet Name'] || ''
-          ),
-
-        sales:
-          number(
-            x['Sales Value']
-          ),
-
-        note:
-          String(
-            x.Note || ''
-          )
-
-      }))
-    );
-
-
-    st.skuSales =
-      st.skuSales.filter(
-        x =>
-          !(
-            x.staffId === staffId &&
-            x.month === month
-          )
-      );
-
-    st.skuSales.push(
-      ...(d.skuSales || []).map(x => ({
-
-        id: idGen(),
-
-        staffId,
-
-        month:
-          String(
-            x.Month || month
-          ),
-
-        date:
-          normalizeSheetDate(
-            x.Date
-          ),
-
-        outletCode:
-          String(
-            x['Outlet Code'] || ''
-          ),
-
-        outletName:
-          String(
-            x['Outlet Name'] || ''
-          ),
-
-        skuName:
-          String(
-            x['SKU Name'] || ''
-          ),
-
-        cartons:
-          number(
-            x.Cartons
-          ),
-
-        salesValue:
-          number(
-            x['Sales Value']
-          )
-
-      }))
-    );
-
-
-    st.plans =
-      st.plans.filter(
-        x =>
-          !(
-            x.staffId === staffId &&
-            x.month === month
-          )
-      );
-
-    st.plans.push(
-      ...(d.plans || []).map(x => {
-
-        const raw =
-          parseJSON(
-            x['Targeted SKU List'],
-            []
-          );
-
-        const skuTargets = {};
-
-        const targetSkus = [];
-
-        (
-          Array.isArray(raw)
-            ? raw
-            : []
-        ).forEach(item => {
-
-          if (
-            typeof item === 'string'
-          ) {
-
-            targetSkus.push(item);
-
-            skuTargets[item] = {
-              cartons: 0,
-              value: 0
-            };
-
-          } else if (
-            item &&
-            item.name
-          ) {
-
-            targetSkus.push(
-              item.name
+    targetId=uid(),
+    month=selectedMonth
+){
+
+    if(!backendUrl())
+        return false;
+
+    try{
+
+        const r=
+            await apiGet(
+                'bootstrap',
+                targetId,
+                month
             );
 
-            skuTargets[item.name] = {
+        if(!r?.ok)
+            throw new Error(
+                r?.error||
+                'Cloud read failed'
+            );
 
-              cartons:
-                number(
-                  item.cartons
-                ),
+        const d=r.data||{};
+        const s=state();
 
-              value:
-                number(
-                  item.value
+
+        if(
+            Array.isArray(d.outlets)&&
+            d.outlets.length
+        ){
+
+            s.customOutlets[targetId]=
+                d.outlets
+                    .map(
+                        x=>({
+                            code:String(
+                                x['Outlet Code']||''
+                            ),
+                            name:String(
+                                x['Outlet Name']||''
+                            ),
+                            category:String(
+                                x.Category||'Other'
+                            ),
+                            totalSku:n(
+                                x['Total SKU']
+                            )
+                        })
+                    )
+                    .filter(x=>x.name);
+        }
+
+
+        s.daily=
+            s.daily
+                .filter(
+                    x=>!(
+                        x.staffId===targetId&&
+                        x.month===month
+                    )
                 )
-            };
-          }
-        });
-
-        return {
-
-          id: idGen(),
-
-          staffId,
-
-          month:
-            String(
-              x.Month || month
-            ),
-
-          outletCode:
-            String(
-              x['Outlet Code'] || ''
-            ),
-
-          outletName:
-            String(
-              x['Outlet Name'] || ''
-            ),
-
-          outletTarget:
-            number(
-              x['Outlet Target']
-            ),
-
-          targetSkuCount:
-            number(
-              x['Targeted SKU Count']
-            ) ||
-            targetSkus.length,
-
-          targetSkus,
-
-          skuTargets
-        };
-      })
-    );
+                .concat(
+                    (d.daily||[])
+                        .map(
+                            x=>({
+                                id:idGen(),
+                                staffId:targetId,
+                                month:String(
+                                    x.Month||month
+                                ),
+                                date:String(
+                                    x.Date||''
+                                ).slice(0,10),
+                                todaySales:n(
+                                    x['Today Sales']
+                                ),
+                                lastMonthSameDay:n(
+                                    x['Last Month Same Day']
+                                ),
+                                active:n(
+                                    x.Active
+                                ),
+                                prepareTrip:n(
+                                    x['Prepare for Trip']
+                                ),
+                                orderAmount:n(
+                                    x['Order Amount']
+                                ),
+                                note:String(
+                                    x.Note||''
+                                )
+                            })
+                        )
+                );
 
 
-    st.tasks =
-      st.tasks.filter(
-        x =>
-          x.staffId !== staffId
-      );
-
-    st.tasks.push(
-      ...(d.tasks || []).map(x => ({
-
-        id:
-          String(
-            x['Task ID'] ||
-            idGen()
-          ),
-
-        staffId,
-
-        title:
-          String(
-            x.Title || ''
-          ),
-
-        note:
-          String(
-            x.Instruction || ''
-          ),
-
-        due:
-          normalizeSheetDate(
-            x['Due Date']
-          ),
-
-        done:
-          String(
-            x.Status || ''
-          ).toUpperCase() ===
-          'DONE',
-
-        createdAt:
-          String(
-            x['Created At'] || ''
-          )
-
-      }))
-    );
+        s.outletSales=
+            s.outletSales
+                .filter(
+                    x=>!(
+                        x.staffId===targetId&&
+                        x.month===month
+                    )
+                )
+                .concat(
+                    (d.outletSales||[])
+                        .map(
+                            x=>({
+                                id:idGen(),
+                                staffId:targetId,
+                                month:String(
+                                    x.Month||month
+                                ),
+                                date:String(
+                                    x.Date||''
+                                ).slice(0,10),
+                                outletCode:String(
+                                    x['Outlet Code']||''
+                                ),
+                                outletName:String(
+                                    x['Outlet Name']||''
+                                ),
+                                sales:n(
+                                    x['Sales Value']
+                                ),
+                                note:String(
+                                    x.Note||''
+                                )
+                            })
+                        )
+                );
 
 
-    if (
-      Array.isArray(d.income) &&
-      d.income.length
-    ) {
+        s.skuSales=
+            s.skuSales
+                .filter(
+                    x=>!(
+                        x.staffId===targetId&&
+                        x.month===month
+                    )
+                )
+                .concat(
+                    (d.skuSales||[])
+                        .map(
+                            x=>({
+                                id:idGen(),
+                                staffId:targetId,
+                                month:String(
+                                    x.Month||month
+                                ),
+                                date:String(
+                                    x.Date||''
+                                ).slice(0,10),
+                                outletCode:String(
+                                    x['Outlet Code']||''
+                                ),
+                                outletName:String(
+                                    x['Outlet Name']||''
+                                ),
+                                skuName:String(
+                                    x['SKU Name']||''
+                                ),
+                                cartons:n(
+                                    x.Cartons
+                                ),
+                                salesValue:n(
+                                    x['Sales Value']
+                                )
+                            })
+                        )
+                );
 
-      const x =
-        d.income[
-          d.income.length - 1
-        ];
 
-      st.incomePlans =
-        st.incomePlans.filter(
-          y =>
-            !(
-              y.staffId === staffId &&
-              y.month === month
-            )
+        s.plans=
+            s.plans
+                .filter(
+                    x=>!(
+                        x.staffId===targetId&&
+                        x.month===month
+                    )
+                )
+                .concat(
+                    (d.plans||[])
+                        .map(
+                            x=>{
+
+                                const raw=
+                                    parseJSON(
+                                        x['Targeted SKU List'],
+                                        []
+                                    );
+
+                                const targetSkus=[];
+                                const skuTargets={};
+
+                                (
+                                    Array.isArray(raw)
+                                    ?raw
+                                    :[]
+                                ).forEach(
+                                    it=>{
+
+                                        if(
+                                            typeof it===
+                                            'string'
+                                        ){
+
+                                            targetSkus.push(
+                                                it
+                                            );
+
+                                            skuTargets[it]={
+                                                cartons:0,
+                                                value:0
+                                            };
+
+                                        }else if(it?.name){
+
+                                            targetSkus.push(
+                                                it.name
+                                            );
+
+                                            skuTargets[it.name]={
+                                                cartons:n(
+                                                    it.cartons
+                                                ),
+                                                value:n(
+                                                    it.value
+                                                )
+                                            };
+                                        }
+                                    }
+                                );
+
+                                return{
+                                    id:idGen(),
+                                    staffId:targetId,
+                                    month:String(
+                                        x.Month||month
+                                    ),
+                                    outletCode:String(
+                                        x['Outlet Code']||''
+                                    ),
+                                    outletName:String(
+                                        x['Outlet Name']||''
+                                    ),
+                                    outletTarget:n(
+                                        x['Outlet Target']
+                                    ),
+                                    targetSkuCount:
+                                        n(
+                                            x['Targeted SKU Count']
+                                        )||
+                                        targetSkus.length,
+                                    targetSkus,
+                                    skuTargets
+                                };
+                            }
+                        )
+                );
+
+
+        s.tasks=
+            s.tasks
+                .filter(
+                    x=>
+                        x.staffId!==targetId
+                )
+                .concat(
+                    (d.tasks||[])
+                        .map(
+                            x=>({
+                                id:String(
+                                    x['Task ID']||
+                                    idGen()
+                                ),
+                                staffId:targetId,
+                                title:String(
+                                    x.Title||''
+                                ),
+                                note:String(
+                                    x.Instruction||''
+                                ),
+                                due:String(
+                                    x['Due Date']||''
+                                ).slice(0,10),
+                                done:String(
+                                    x.Status||''
+                                ).toUpperCase()==='DONE',
+                                createdAt:String(
+                                    x['Created At']||''
+                                )
+                            })
+                        )
+                );
+
+
+        if(
+            Array.isArray(d.income)&&
+            d.income.length
+        ){
+
+            const x=
+                d.income[
+                    d.income.length-1
+                ];
+
+            s.incomePlans=
+                s.incomePlans
+                    .filter(
+                        y=>!(
+                            y.staffId===targetId&&
+                            y.month===month
+                        )
+                    );
+
+            s.incomePlans.push({
+                staffId:targetId,
+                month,
+                expected:n(
+                    x['Expected Total Income']
+                ),
+                growthActual:n(
+                    x['Growth Incentive Target']
+                ),
+                productManual:n(
+                    x['Product Incentive Target']
+                ),
+                managerActual:n(
+                    x['Manager Incentive Target']
+                ),
+                otherActual:n(
+                    x['Other Incentive Target']
+                )
+            });
+        }
+
+        save(s);
+
+        return true;
+
+    }catch(e){
+
+        console.warn(e);
+
+        toast(
+            'Cloud sync unavailable • local mode continues'
         );
 
-      st.incomePlans.push({
-
-        staffId,
-
-        month,
-
-        expected:
-          number(
-            x['Expected Total Income']
-          ),
-
-        growthActual:
-          number(
-            x['Growth Incentive Target']
-          ),
-
-        productManual:
-          number(
-            x['Product Incentive Target']
-          ),
-
-        managerActual:
-          number(
-            x['Manager Incentive Target']
-          ),
-
-        otherActual:
-          number(
-            x['Other Incentive Target']
-          )
-      });
+        return false;
     }
-
-    st.lastCloudSync =
-      new Date().toISOString();
-
-    setState(st);
-
-    return true;
-
-  } catch (err) {
-
-    console.warn(err);
-
-    toast(
-      'Cloud sync unavailable. Local app continues.'
-    );
-
-    return false;
-  }
 }
 
 
 /* =========================================================
-   OUTLET / PRODUCT MASTER
+   MASTER DATA
 ========================================================= */
 
-function outletsFor(staffId) {
+function outletsFor(id){
 
-  const st = getState();
+    const s=state();
 
-  const base =
-    Array.isArray(
-      D.outlets?.[staffId]
-    )
-      ? D.outlets[staffId]
-      : [];
+    const all=[
+        ...(D.outlets?.[id]||[]),
+        ...(s.customOutlets?.[id]||[])
+    ];
 
-  const custom =
-    Array.isArray(
-      st.customOutlets?.[staffId]
-    )
-      ? st.customOutlets[staffId]
-      : [];
+    const m=new Map();
 
-  const map = new Map();
+    all.forEach(
+        o=>{
 
-  [
-    ...base,
-    ...custom
-  ].forEach(o => {
+            const k=
+                String(
+                    o.code||
+                    o.name||
+                    ''
+                )
+                .trim()
+                .toUpperCase();
 
-    const key =
-      String(
-        o.code ||
-        o.name ||
-        ''
-      )
-        .trim()
-        .toUpperCase();
+            if(k)
+                m.set(k,o);
+        }
+    );
 
-    if (key) {
-      map.set(
-        key,
-        o
-      );
-    }
-  });
-
-  return [...map.values()]
-    .sort(
-      (a, b) =>
-        String(a.name)
-          .localeCompare(
-            String(b.name)
-          )
+    return[
+        ...m.values()
+    ].sort(
+        (a,b)=>
+            String(a.name)
+                .localeCompare(
+                    String(b.name)
+                )
     );
 }
 
 function productsForOutlet(
-  staffId,
-  outletName
-) {
+    id,
+    outletName
+){
 
-  const o =
-    outletsFor(staffId)
-      .find(
-        x =>
-          x.name === outletName
-      );
+    const o=
+        outletsFor(id)
+            .find(
+                x=>
+                    x.name===outletName
+            );
 
-  const category =
-    o?.category ||
-    'Other';
+    const list=
+        D.categoryProducts?.[
+            o?.category
+        ];
 
-  const chain =
-    D.categoryProducts?.[
-      category
-    ];
-
-  return (
-    Array.isArray(chain) &&
-    chain.length
-  )
-    ? chain
-    : (D.products || []);
+    return(
+        Array.isArray(list)&&
+        list.length
+    )
+        ?list
+        :(D.products||[]);
 }
 
 function outletOptions(
-  staffId,
-  selected = ''
-) {
+    id,
+    selected='',
+    filter=''
+){
 
-  const list =
-    outletsFor(staffId);
+    const q=
+        filter
+            .trim()
+            .toLowerCase();
 
-  if (!list.length) {
+    const list=
+        outletsFor(id)
+            .filter(
+                o=>
+                    !q||
+                    o.name
+                        .toLowerCase()
+                        .includes(q)||
+                    String(
+                        o.code||''
+                    ).includes(q)
+            );
 
-    return `
-      <option value="">
-        No outlet master yet — add outlet in Plan
-      </option>
-    `;
-  }
-
-  return (
-    '<option value="">Select outlet</option>' +
-
-    list
-      .map(o => `
-
-        <option
-          value="${esc(o.name)}"
-          ${selected === o.name
-            ? 'selected'
-            : ''}
-        >
-          ${esc(o.name)}
-        </option>
-
-      `)
-      .join('')
-  );
+    return(
+        '<option value="">Select outlet</option>'+
+        list
+            .map(
+                o=>`
+                    <option
+                        value="${esc(o.name)}"
+                        ${
+                            o.name===selected
+                            ?'selected'
+                            :''
+                        }
+                    >
+                        ${esc(o.name)}
+                    </option>
+                `
+            )
+            .join('')
+    );
 }
 
-function addCustomOutlet(
-  staffId,
-  code,
-  name,
-  category,
-  totalSku
-) {
+function skuOptions(
+    id,
+    outletName,
+    selected='',
+    filter=''
+){
 
-  const st = getState();
-
-  if (
-    !st.customOutlets[
-      staffId
-    ]
-  ) {
-
-    st.customOutlets[
-      staffId
-    ] = [];
-  }
-
-  const exists =
-    outletsFor(staffId)
-      .some(
-        o =>
-          String(o.name)
+    const q=
+        filter
             .trim()
-            .toLowerCase() ===
-          String(name)
-            .trim()
-            .toLowerCase()
-      );
+            .toLowerCase();
 
-  if (exists) {
-    return false;
-  }
+    const list=
+        productsForOutlet(
+            id,
+            outletName
+        )
+        .filter(
+            x=>
+                !q||
+                x.toLowerCase()
+                    .includes(q)
+        );
 
-  st.customOutlets[
-    staffId
-  ].push({
-
-    code:
-      String(
-        code || ''
-      ).trim(),
-
-    name:
-      String(
-        name || ''
-      ).trim(),
-
-    category:
-      String(
-        category || 'Other'
-      ).trim(),
-
-    totalSku:
-      number(totalSku)
-  });
-
-  setState(st);
-
-  return true;
+    return(
+        '<option value="">Select SKU</option>'+
+        list
+            .map(
+                x=>`
+                    <option
+                        value="${esc(x)}"
+                        ${
+                            x===selected
+                            ?'selected'
+                            :''
+                        }
+                    >
+                        ${esc(x)}
+                    </option>
+                `
+            )
+            .join('')
+    );
 }
 
 
 /* =========================================================
-   PERFORMANCE CALCULATIONS
+   PERFORMANCE DATA
 ========================================================= */
 
 function monthDaily(
-  staffId,
-  month = selectedMonth
-) {
+    id,
+    m=selectedMonth
+){
 
-  return getState()
-    .daily
-    .filter(
-      x =>
-        x.staffId === staffId &&
-        x.month === month
-    );
+    return state()
+        .daily
+        .filter(
+            x=>
+                x.staffId===id&&
+                x.month===m
+        );
 }
 
 function monthOutletSales(
-  staffId,
-  month = selectedMonth
-) {
+    id,
+    m=selectedMonth
+){
 
-  return getState()
-    .outletSales
-    .filter(
-      x =>
-        x.staffId === staffId &&
-        x.month === month
-    );
+    return state()
+        .outletSales
+        .filter(
+            x=>
+                x.staffId===id&&
+                x.month===m
+        );
 }
 
 function monthSkuSales(
-  staffId,
-  month = selectedMonth
-) {
+    id,
+    m=selectedMonth
+){
 
-  return getState()
-    .skuSales
-    .filter(
-      x =>
-        x.staffId === staffId &&
-        x.month === month
-    );
+    return state()
+        .skuSales
+        .filter(
+            x=>
+                x.staffId===id&&
+                x.month===m
+        );
 }
 
 function monthPlans(
-  staffId,
-  month = selectedMonth
-) {
+    id,
+    m=selectedMonth
+){
 
-  return getState()
-    .plans
-    .filter(
-      x =>
-        x.staffId === staffId &&
-        x.month === month
-    );
+    return state()
+        .plans
+        .filter(
+            x=>
+                x.staffId===id&&
+                x.month===m
+        );
 }
 
-function routeAchievement(
-  staffId,
-  month = selectedMonth
-) {
+function outletAch(
+    id,
+    name,
+    m=selectedMonth
+){
 
-  return monthDaily(
-    staffId,
-    month
-  ).reduce(
-    (sum, x) =>
-      sum +
-      number(
-        x.todaySales
-      ),
-    0
-  );
-}
-
-function previousComparable(
-  staffId,
-  month = selectedMonth
-) {
-
-  return monthDaily(
-    staffId,
-    month
-  ).reduce(
-    (sum, x) =>
-      sum +
-      number(
-        x.lastMonthSameDay
-      ),
-    0
-  );
-}
-
-function latestField(
-  staffId,
-  field,
-  month = selectedMonth
-) {
-
-  const list =
-    monthDaily(
-      staffId,
-      month
+    return monthOutletSales(
+        id,
+        m
     )
-      .slice()
-      .sort(
-        (a, b) =>
-          String(a.date)
-            .localeCompare(
-              String(b.date)
-            )
-      );
-
-  return list.length
-    ? number(
-        list[
-          list.length - 1
-        ][field]
-      )
-    : 0;
-}
-
-function outletAchievement(
-  staffId,
-  outletName,
-  month = selectedMonth
-) {
-
-  return monthOutletSales(
-    staffId,
-    month
-  )
     .filter(
-      x =>
-        x.outletName ===
-        outletName
+        x=>
+            x.outletName===name
     )
     .reduce(
-      (sum, x) =>
-        sum +
-        number(
-          x.sales
-        ),
-      0
+        (a,x)=>
+            a+n(x.sales),
+        0
     );
 }
 
-function skuAchievement(
-  staffId,
-  outletName,
-  skuName,
-  month = selectedMonth
-) {
+function skuAch(
+    id,
+    outlet,
+    sku,
+    m=selectedMonth
+){
 
-  const list =
-    monthSkuSales(
-      staffId,
-      month
-    )
-      .filter(
-        x =>
-          x.outletName ===
-            outletName &&
-          x.skuName ===
-            skuName
-      );
-
-  return {
-
-    cartons:
-      list.reduce(
-        (sum, x) =>
-          sum +
-          number(
-            x.cartons
-          ),
-        0
-      ),
-
-    value:
-      list.reduce(
-        (sum, x) =>
-          sum +
-          number(
-            x.salesValue
-          ),
-        0
-      )
-  };
-}
-
-function skuTotalAcrossRoute(
-  staffId,
-  skuName,
-  month = selectedMonth
-) {
-
-  const list =
-    monthSkuSales(
-      staffId,
-      month
-    )
-      .filter(
-        x =>
-          x.skuName ===
-          skuName
-      );
-
-  return {
-
-    cartons:
-      list.reduce(
-        (sum, x) =>
-          sum +
-          number(
-            x.cartons
-          ),
-        0
-      ),
-
-    value:
-      list.reduce(
-        (sum, x) =>
-          sum +
-          number(
-            x.salesValue
-          ),
-        0
-      )
-  };
-}
-
-function performance(
-  staffId,
-  month = selectedMonth
-) {
-
-  const target =
-    fixedRouteTarget(
-      staffId
-    );
-
-  const achievement =
-    routeAchievement(
-      staffId,
-      month
-    );
-
-  const shortfall =
-    Math.max(
-      0,
-      target - achievement
-    );
-
-  const previous =
-    previousComparable(
-      staffId,
-      month
-    );
-
-  const growth =
-    previous > 0
-      ? (
-          (
-            achievement -
-            previous
-          ) /
-          previous
-        ) * 100
-      : 0;
-
-  const days =
-    remainingDays(
-      month
-    );
-
-  const requiredPerDay =
-    days > 0
-      ? shortfall / days
-      : shortfall;
-
-  const dailyTarget =
-    target /
-    daysInMonth(month);
-
-  const todaySales =
-    monthDaily(
-      staffId,
-      month
-    )
-      .filter(
-        x =>
-          x.date ===
-          todayISO()
-      )
-      .reduce(
-        (sum, x) =>
-          sum +
-          number(
-            x.todaySales
-          ),
-        0
-      );
-
-  const routeOutlets =
-    outletsFor(
-      staffId
-    );
-
-  const outletSales =
-    monthOutletSales(
-      staffId,
-      month
-    );
-
-  const coveredKeys =
-    new Set(
-
-      outletSales
-
+    const a=
+        monthSkuSales(
+            id,
+            m
+        )
         .filter(
-          x =>
-            number(
-              x.sales
-            ) > 0
+            x=>
+                x.outletName===outlet&&
+                x.skuName===sku
+        );
+
+    return{
+        cartons:
+            a.reduce(
+                (s,x)=>
+                    s+n(x.cartons),
+                0
+            ),
+        value:
+            a.reduce(
+                (s,x)=>
+                    s+n(x.salesValue),
+                0
+            )
+    };
+}
+
+function routeSkuAch(
+    id,
+    sku,
+    m=selectedMonth
+){
+
+    const a=
+        monthSkuSales(
+            id,
+            m
         )
+        .filter(
+            x=>
+                x.skuName===sku
+        );
 
-        .map(
-          x =>
-            String(
-              x.outletCode ||
-              x.outletName
+    return{
+        cartons:
+            a.reduce(
+                (s,x)=>
+                    s+n(x.cartons),
+                0
+            ),
+        value:
+            a.reduce(
+                (s,x)=>
+                    s+n(x.salesValue),
+                0
             )
-              .trim()
-              .toUpperCase()
+    };
+}
+
+function metric(
+    id,
+    m=selectedMonth
+){
+
+    const daily=
+        monthDaily(
+            id,
+            m
         )
-    );
+        .slice()
+        .sort(
+            (a,b)=>
+                String(a.date)
+                    .localeCompare(
+                        String(b.date)
+                    )
+        );
 
-  const covered =
-    routeOutlets
-      .filter(
-        o =>
-          coveredKeys.has(
-            String(
-              o.code ||
-              o.name
-            )
-              .trim()
-              .toUpperCase()
-          )
-      );
+    const os=
+        monthOutletSales(
+            id,
+            m
+        );
 
-  const zeroSales =
-    routeOutlets
-      .filter(
-        o =>
-          !coveredKeys.has(
-            String(
-              o.code ||
-              o.name
-            )
-              .trim()
-              .toUpperCase()
-          )
-      );
+    const ss=
+        monthSkuSales(
+            id,
+            m
+        );
 
-  const coverage =
-    routeOutlets.length
-      ? (
-          covered.length /
-          routeOutlets.length
-        ) * 100
-      : 0;
+    const plans=
+        monthPlans(
+            id,
+            m
+        );
 
-  return {
+    const target=
+        routeTarget(id);
 
-    target,
+    const ach=
+        daily.reduce(
+            (a,x)=>
+                a+n(x.todaySales),
+            0
+        );
 
-    achievement,
+    const short=
+        Math.max(
+            0,
+            target-ach
+        );
 
-    shortfall,
+    const prev=
+        daily.reduce(
+            (a,x)=>
+                a+n(
+                    x.lastMonthSameDay
+                ),
+            0
+        );
 
-    previous,
+    const growth=
+        prev
+        ?(
+            (ach-prev)/
+            prev*
+            100
+        )
+        :0;
 
-    growth,
+    const last=
+        daily[
+            daily.length-1
+        ]||{};
 
-    requiredPerDay,
+    const routeOutlets=
+        outletsFor(id);
 
-    dailyTarget,
+    const coveredKeys=
+        new Set(
+            os
+                .filter(
+                    x=>
+                        n(x.sales)>0
+                )
+                .map(
+                    x=>
+                        String(
+                            x.outletCode||
+                            x.outletName
+                        )
+                        .trim()
+                        .toUpperCase()
+                )
+        );
 
-    todaySales,
+    const covered=
+        routeOutlets
+            .filter(
+                o=>
+                    coveredKeys
+                        .has(
+                            String(
+                                o.code||
+                                o.name
+                            )
+                            .trim()
+                            .toUpperCase()
+                        )
+            );
 
-    active:
-      latestField(
-        staffId,
-        'active',
-        month
-      ),
+    const zeroSales=
+        routeOutlets
+            .filter(
+                o=>
+                    !coveredKeys
+                        .has(
+                            String(
+                                o.code||
+                                o.name
+                            )
+                            .trim()
+                            .toUpperCase()
+                        )
+            );
 
-    prepareTrip:
-      latestField(
-        staffId,
-        'prepareTrip',
-        month
-      ),
-
-    orderAmount:
-      latestField(
-        staffId,
-        'orderAmount',
-        month
-      ),
-
-    routeOutlets,
-
-    covered,
-
-    zeroSales,
-
-    coverage
-  };
+    return{
+        daily,
+        os,
+        ss,
+        plans,
+        target,
+        ach,
+        short,
+        prev,
+        growth,
+        active:n(last.active),
+        trip:n(last.prepareTrip),
+        order:n(last.orderAmount),
+        routeOutlets,
+        covered,
+        zeroSales,
+        coverage:
+            routeOutlets.length
+            ?covered.length/
+                routeOutlets.length*
+                100
+            :0,
+        required:
+            daysRemain(m)
+            ?short/daysRemain(m)
+            :short,
+        dailyTarget:
+            target/
+            daysInMonth(m),
+        todaySales:
+            daily
+                .filter(
+                    x=>
+                        x.date===today()
+                )
+                .reduce(
+                    (a,x)=>
+                        a+n(
+                            x.todaySales
+                        ),
+                    0
+                )
+    };
 }
 
 
 /* =========================================================
-   SALARY / INCENTIVE
+   SALARY
 ========================================================= */
 
-function commissionAmount(
-  sales,
-  target
-) {
+function commission(
+    ach,
+    target
+){
 
-  const pct =
-    target > 0
-      ? sales / target
-      : 0;
+    const p=
+        target
+        ?ach/target
+        :0;
 
-  if (pct < 0.8) {
+    if(p<.8)
+        return ach*.005;
 
-    return (
-      sales *
-      0.005
+    if(p<=1)
+        return ach*.01;
+
+    return(
+        target*.01+
+        (ach-target)*.02
     );
-  }
-
-  if (pct <= 1) {
-
-    return (
-      sales *
-      0.01
-    );
-  }
-
-  return (
-    target * 0.01
-  ) + (
-    sales - target
-  ) * 0.02;
 }
 
 function incomePlan(
-  staffId,
-  month = selectedMonth
-) {
+    id,
+    m=selectedMonth
+){
 
-  return (
-    getState()
-      .incomePlans
-      .find(
-        x =>
-          x.staffId === staffId &&
-          x.month === month
-      )
-  ) || {
-
-    staffId,
-
-    month,
-
-    expected: 0,
-
-    growthActual: 0,
-
-    productManual: 0,
-
-    managerActual: 0,
-
-    otherActual: 0
-  };
+    return state()
+        .incomePlans
+        .find(
+            x=>
+                x.staffId===id&&
+                x.month===m
+        )||{
+            staffId:id,
+            month:m,
+            expected:0,
+            growthActual:0,
+            productManual:0,
+            managerActual:0,
+            otherActual:0
+        };
 }
 
-function productIncentives(
-  staffId,
-  month = selectedMonth
-) {
+function productRules(
+    id,
+    m=selectedMonth
+){
 
-  return getState()
-    .incentives
-    .filter(
-      x =>
-        x.staffId === staffId &&
-        x.month === month &&
-        x.type === 'PRODUCT'
-    );
+    return state()
+        .incentives
+        .filter(
+            x=>
+                x.staffId===id&&
+                x.month===m&&
+                x.type==='PRODUCT'
+        );
 }
 
-function productIncentiveUnlocked(
-  staffId,
-  month = selectedMonth
-) {
+function unlockedProduct(
+    id,
+    m=selectedMonth
+){
 
-  return productIncentives(
-    staffId,
-    month
-  )
-    .reduce(
-      (sum, inc) => {
-
-        const sold =
-          skuTotalAcrossRoute(
-            staffId,
-            inc.skuName,
-            month
-          ).cartons;
-
-        return sum +
-          (
-            sold >=
-            number(
-              inc.targetQty
-            )
-              ? number(
-                  inc.reward
-                )
-              : 0
-          );
-      },
-      0
+    return productRules(
+        id,
+        m
+    ).reduce(
+        (a,i)=>
+            a+(
+                routeSkuAch(
+                    id,
+                    i.skuName,
+                    m
+                ).cartons>=
+                n(i.targetQty)
+                ?n(i.reward)
+                :0
+            ),
+        0
     );
 }
 
-function salary(
-  staffId,
-  month = selectedMonth
-) {
+function incomeCalc(
+    id,
+    m=selectedMonth
+){
 
-  const r =
-    D.salaryRules || {};
-
-  const p =
-    performance(
-      staffId,
-      month
-    );
-
-  const plan =
-    incomePlan(
-      staffId,
-      month
-    );
-
-  const basic =
-    number(
-      r.basic || 1700
-    );
-
-  const fuel =
-    number(
-      r.fuel || 300
-    );
-
-  const rent =
-    number(
-      r.houseRent || 250
-    );
-
-  const food =
-    p.achievement >=
-      number(
-        r.foodThreshold || 50000
-      )
-      ? number(
-          r.foodHigh || 250
-        )
-      : number(
-          r.foodLow || 100
+    const mt=
+        metric(
+            id,
+            m
         );
 
-  let zeroSales = 0;
+    const r=
+        D.salaryRules||{};
 
-  if (
-    p.routeOutlets.length > 0 &&
-    p.zeroSales.length === 0
-  ) {
+    const p=
+        incomePlan(
+            id,
+            m
+        );
 
-    zeroSales =
-      (
-        p.achievement /
-        p.target
-      ) >= 0.8
+    const basic=
+        n(r.basic||1700);
 
-        ? number(
-            r.zeroSalesHigh || 200
-          )
+    const fuel=
+        n(r.fuel||300);
 
-        : number(
-            r.zeroSalesLow || 100
-          );
-  }
+    const rent=
+        n(r.houseRent||250);
 
-  const commission =
-    commissionAmount(
-      p.achievement,
-      p.target
-    );
+    const food=
+        mt.ach>=
+        n(
+            r.foodThreshold||
+            50000
+        )
+        ?n(r.foodHigh||250)
+        :n(r.foodLow||100);
 
-  const product =
-    productIncentiveUnlocked(
-      staffId,
-      month
-    ) +
-    number(
-      plan.productManual
-    );
+    let zero=0;
 
-  const growth =
-    number(
-      plan.growthActual
-    );
+    if(
+        mt.routeOutlets.length&&
+        mt.zeroSales.length===0
+    ){
 
-  const manager =
-    number(
-      plan.managerActual
-    );
+        zero=
+            (
+                mt.ach/
+                mt.target
+            )>=.8
+            ?n(r.zeroSalesHigh||200)
+            :n(r.zeroSalesLow||100);
+    }
 
-  const other =
-    number(
-      plan.otherActual
-    );
+    const comm=
+        commission(
+            mt.ach,
+            mt.target
+        );
 
-  const total =
-    basic +
-    fuel +
-    rent +
-    food +
-    zeroSales +
-    commission +
-    product +
-    growth +
-    manager +
-    other;
+    const product=
+        unlockedProduct(
+            id,
+            m
+        )+
+        n(p.productManual);
 
-  return {
+    const growth=
+        n(p.growthActual);
 
-    basic,
+    const manager=
+        n(p.managerActual);
 
-    fuel,
+    const other=
+        n(p.otherActual);
 
-    rent,
+    const total=
+        basic+
+        fuel+
+        rent+
+        food+
+        zero+
+        comm+
+        product+
+        growth+
+        manager+
+        other;
 
-    food,
-
-    zeroSales,
-
-    commission,
-
-    product,
-
-    growth,
-
-    manager,
-
-    other,
-
-    total,
-
-    expected:
-      number(
-        plan.expected
-      )
-  };
+    return{
+        basic,
+        fuel,
+        rent,
+        food,
+        zero,
+        comm,
+        product,
+        growth,
+        manager,
+        other,
+        total,
+        expected:n(p.expected)
+    };
 }
 
 
 /* =========================================================
-   SMART ALERTS
+   ALERTS
 ========================================================= */
 
-function smartAlerts(
-  staffId,
-  month = selectedMonth
-) {
+function alerts(id){
 
-  const st = getState();
+    const mt=
+        metric(id);
 
-  const p =
-    performance(
-      staffId,
-      month
+    const arr=[];
+
+    if(mt.short>0){
+
+        arr.push({
+            bad:true,
+            text:
+                `Need ${money(mt.short)} more • `+
+                `about ${money(mt.required)} per remaining day.`
+        });
+
+    }else{
+
+        arr.push({
+            text:
+                'Monthly target achieved. Keep outlet coverage strong.'
+        });
+    }
+
+    if(mt.zeroSales.length){
+
+        arr.push({
+            bad:true,
+            text:
+                `${mt.zeroSales.length} outlet(s) still have zero sales.`
+        });
+    }
+
+    monthPlans(id)
+        .forEach(
+            p=>{
+
+                const sf=
+                    Math.max(
+                        0,
+                        n(
+                            p.outletTarget
+                        )-
+                        outletAch(
+                            id,
+                            p.outletName
+                        )
+                    );
+
+                if(sf){
+
+                    arr.push({
+                        bad:true,
+                        text:
+                            `${p.outletName}: ${money(sf)} short.`
+                    });
+                }
+
+                (
+                    p.targetSkus||
+                    []
+                ).forEach(
+                    sku=>{
+
+                        const t=
+                            p.skuTargets?.[
+                                sku
+                            ]||{
+                                cartons:0,
+                                value:0
+                            };
+
+                        const a=
+                            skuAch(
+                                id,
+                                p.outletName,
+                                sku
+                            );
+
+                        const c=
+                            Math.max(
+                                0,
+                                n(
+                                    t.cartons
+                                )-
+                                a.cartons
+                            );
+
+                        const v=
+                            Math.max(
+                                0,
+                                n(
+                                    t.value
+                                )-
+                                a.value
+                            );
+
+                        if(c){
+
+                            arr.push({
+                                bad:true,
+                                text:
+                                    `${sku}: ${c} CTN left at ${p.outletName}.`
+                            });
+
+                        }else if(v){
+
+                            arr.push({
+                                bad:true,
+                                text:
+                                    `${sku}: ${money(v)} value left.`
+                            });
+                        }
+                    }
+                );
+            }
+        );
+
+    state()
+        .tasks
+        .filter(
+            t=>
+                t.staffId===id&&
+                !t.done
+        )
+        .forEach(
+            t=>
+                arr.push({
+                    bad:true,
+                    text:
+                        `Task: ${t.title}`+
+                        (
+                            t.due
+                            ?' • Due '+t.due
+                            :''
+                        )
+                })
+        );
+
+    return arr.slice(
+        0,
+        10
     );
-
-  const alerts = [];
-
-
-  if (
-    p.shortfall > 0
-  ) {
-
-    alerts.push({
-
-      bad: true,
-
-      text:
-        `Route shortfall ${money(p.shortfall)}. ` +
-        `Required around ${money(p.requiredPerDay)} per remaining day.`
-    });
-
-  } else {
-
-    alerts.push({
-
-      bad: false,
-
-      text:
-        'Monthly route target achieved. Keep outlet coverage at 100%.'
-    });
-  }
-
-
-  if (
-    p.zeroSales.length
-  ) {
-
-    alerts.push({
-
-      bad: true,
-
-      text:
-        `${p.zeroSales.length} outlet(s) still have zero sales this month.`
-    });
-  }
-
-
-  monthPlans(
-    staffId,
-    month
-  ).forEach(plan => {
-
-    const actual =
-      outletAchievement(
-        staffId,
-        plan.outletName,
-        month
-      );
-
-    const short =
-      Math.max(
-        0,
-        number(
-          plan.outletTarget
-        ) - actual
-      );
-
-    if (
-      short > 0
-    ) {
-
-      alerts.push({
-
-        bad: true,
-
-        text:
-          `${plan.outletName}: ${money(short)} outlet shortfall remains.`
-      });
-    }
-
-
-    (
-      plan.targetSkus || []
-    ).forEach(sku => {
-
-      const target =
-        plan.skuTargets?.[
-          sku
-        ] || {
-          cartons: 0,
-          value: 0
-        };
-
-      const actualSku =
-        skuAchievement(
-          staffId,
-          plan.outletName,
-          sku,
-          month
-        );
-
-      const ctnLeft =
-        Math.max(
-          0,
-          number(
-            target.cartons
-          ) -
-          actualSku.cartons
-        );
-
-      const valueLeft =
-        Math.max(
-          0,
-          number(
-            target.value
-          ) -
-          actualSku.value
-        );
-
-      if (
-        ctnLeft > 0
-      ) {
-
-        alerts.push({
-
-          bad: true,
-
-          text:
-            `${plan.outletName} • ${sku}: ${ctnLeft} CTN remaining.`
-        });
-
-      } else if (
-        valueLeft > 0
-      ) {
-
-        alerts.push({
-
-          bad: true,
-
-          text:
-            `${plan.outletName} • ${sku}: ${money(valueLeft)} value remaining.`
-        });
-      }
-    });
-  });
-
-
-  productIncentives(
-    staffId,
-    month
-  ).forEach(inc => {
-
-    const sold =
-      skuTotalAcrossRoute(
-        staffId,
-        inc.skuName,
-        month
-      ).cartons;
-
-    const left =
-      Math.max(
-        0,
-        number(
-          inc.targetQty
-        ) - sold
-      );
-
-    if (
-      left > 0
-    ) {
-
-      alerts.push({
-
-        bad: true,
-
-        text:
-          `আর মাত্র ${left} CTN ${inc.skuName} লাগবে — ${money(inc.reward)} incentive unlock হবে.`
-      });
-
-    } else {
-
-      alerts.push({
-
-        bad: false,
-
-        text:
-          `${inc.skuName}: ${money(inc.reward)} product incentive unlocked.`
-      });
-    }
-  });
-
-
-  st.tasks
-
-    .filter(
-      t =>
-        t.staffId === staffId &&
-        !t.done
-    )
-
-    .forEach(t => {
-
-      alerts.push({
-
-        bad: true,
-
-        text:
-          `Manager task: ${t.title}` +
-          (
-            t.due
-              ? ' • Due ' + t.due
-              : ''
-          )
-      });
-    });
-
-
-  return alerts.slice(
-    0,
-    12
-  );
 }
 
-async function pushBrowserAlert() {
+async function notifyAlerts(){
 
-  if (
-    !(
-      'Notification'
-      in window
-    )
-  ) {
+    if(
+        !(
+            'Notification'
+            in window
+        )
+    ){
 
-    toast(
-      'Browser notification is not supported on this device.'
-    );
+        toast(
+            'Notification not supported'
+        );
 
-    return;
-  }
-
-  if (
-    Notification.permission ===
-    'default'
-  ) {
-
-    try {
-
-      await Notification
-        .requestPermission();
-
-    } catch {}
-  }
-
-  if (
-    Notification.permission !==
-    'granted'
-  ) {
-
-    toast(
-      'Notification permission is not enabled.'
-    );
-
-    return;
-  }
-
-  const a =
-    smartAlerts(
-      currentStaffId()
-    )
-      .find(
-        x =>
-          x.bad
-      );
-
-  new Notification(
-    'Sales Performance Hub',
-    {
-      body:
-        a
-          ? a.text
-          : 'No urgent sales alert right now.'
+        return;
     }
-  );
+
+    if(
+        Notification.permission===
+        'default'
+    ){
+
+        await Notification
+            .requestPermission();
+    }
+
+    if(
+        Notification.permission!==
+        'granted'
+    ){
+
+        toast(
+            'Notification permission not enabled'
+        );
+
+        return;
+    }
+
+    const a=
+        alerts(
+            uid()
+        )
+        .find(
+            x=>x.bad
+        );
+
+    new Notification(
+        'Sales Performance Hub',
+        {
+            body:
+                a?.text||
+                'No urgent alert right now.'
+        }
+    );
 }
 
 
 /* =========================================================
-   AUTHENTICATION
+   LOGIN
 ========================================================= */
 
 async function login(
-  username,
-  password
-) {
+    v,
+    p
+){
 
-  const rawUser =
-    String(
-      username || ''
-    ).trim();
+    const raw=
+        String(v||'')
+            .trim();
 
-  const rawPass =
-    String(
-      password || ''
-    )
-      .trim()
-      .toUpperCase();
+    const sid=
+        raw.toLowerCase()==='manager'
+        ?'M21954'
+        :raw.toUpperCase();
 
-  const managerLogin =
-    rawUser
-      .toLowerCase() ===
-    'manager';
+    const u=
+        user(sid);
 
-  const staffId =
-    managerLogin
-      ? 'M21954'
-      : rawUser
-          .toUpperCase();
+    if(
+        !u||
+        String(p||'')
+            .trim()
+            .toUpperCase()!==sid
+    ){
 
-  const u =
-    userById(
-      staffId
+        toast(
+            'Wrong Staff ID / Password'
+        );
+
+        return;
+    }
+
+    session={
+        ...u,
+        password:sid,
+        mode:
+            raw.toLowerCase()==='manager'
+            ?'manager'
+            :'sr'
+    };
+
+    managerView=
+        'M21954';
+
+    sessionStorage.setItem(
+        SESSION,
+        JSON.stringify(session)
     );
 
+    openApp();
 
-  /*
-    FINAL LOGIN:
+    if(backendUrl()){
 
-    MANAGER
-    Username: manager
-    Password: M21954
+        await syncCloud(
+            uid(),
+            selectedMonth
+        );
 
-    AYON SR
-    Username: M21954
-    Password: M21954
+        render();
+    }
+}
 
-    EMON
-    M22075 / M22075
+function logout(){
 
-    LIMON
-    M22268 / M22268
+    sessionStorage
+        .removeItem(
+            SESSION
+        );
 
-    MUNNAF
-    M22328 / M22328
-  */
+    session=null;
+    page='dashboard';
 
-  if (
-    !u ||
-    rawPass !== staffId
-  ) {
+    $('#appView')
+        ?.classList
+        .add('hidden');
 
-    toast(
-      'Wrong Staff ID / Password'
-    );
+    $('#loginView')
+        ?.classList
+        .remove('hidden');
 
-    return;
-  }
+    if($('#loginPin'))
+        $('#loginPin').value='';
+}
 
+function openApp(){
 
-  if (
-    managerLogin &&
-    !String(
-      u.role
-    ).includes(
-      'MANAGER'
-    )
-  ) {
+    $('#loginView')
+        ?.classList
+        .add('hidden');
 
-    toast(
-      'Manager access not allowed'
-    );
+    $('#appView')
+        ?.classList
+        .remove('hidden');
 
-    return;
-  }
-
-
-  session = {
-
-    ...u,
-
-    password:
-      staffId,
-
-    mode:
-      managerLogin
-        ? 'manager'
-        : 'sr'
-  };
-
-
-  managerView =
-    'M21954';
-
-
-  sessionStorage.setItem(
-    SESSION_KEY,
-    JSON.stringify(session)
-  );
-
-
-  openApp();
-
-
-  if (
-    backendUrl()
-  ) {
-
-    await syncCloud(
-      currentStaffId(),
-      selectedMonth
-    );
+    refreshTop();
 
     render();
-  }
 }
 
-function openApp() {
+function refreshTop(){
 
-  $('#loginView')
-    ?.classList
-    .add('hidden');
+    if(!session)
+        return;
 
-  $('#appView')
-    ?.classList
-    .remove('hidden');
+    const viewed=
+        user(
+            uid()
+        );
 
-  refreshTopBar();
+    if($('#roleLabel')){
 
-  render();
-}
+        $('#roleLabel')
+            .textContent=
+                session.mode==='manager'
+                ?'MANAGER ACCESS • M21954'
+                :`SALES REPRESENTATIVE • ${session.id}`;
+    }
 
-function refreshTopBar() {
+    if($('#welcomeName')){
 
-  if (!session) return;
-
-  const target =
-    userById(
-      currentStaffId()
-    );
-
-
-  if (
-    $('#welcomeName')
-  ) {
-
-    $('#welcomeName')
-      .textContent =
-        session.mode ===
-        'manager'
-
-          ? 'Team Control Center'
-
-          : session.name;
-  }
-
-
-  if (
-    $('#roleLabel')
-  ) {
-
-    $('#roleLabel')
-      .textContent =
-        session.mode ===
-        'manager'
-
-          ? 'MANAGER ACCESS • M21954'
-
-          : `SALES REPRESENTATIVE • ${session.id}`;
-  }
-
-
-  if (
-    session.mode ===
-      'manager' &&
-    target &&
-    $('#welcomeName')
-  ) {
-
-    $('#welcomeName')
-      .textContent =
-        `Manager • ${target.name}`;
-  }
-}
-
-function logout() {
-
-  sessionStorage
-    .removeItem(
-      SESSION_KEY
-    );
-
-  session = null;
-
-  page =
-    'dashboard';
-
-  $('#appView')
-    ?.classList
-    .add('hidden');
-
-  $('#loginView')
-    ?.classList
-    .remove('hidden');
-
-  if (
-    $('#loginPin')
-  ) {
-
-    $('#loginPin').value =
-      '';
-  }
+        $('#welcomeName')
+            .textContent=
+                session.mode==='manager'
+                ?`Manager • ${viewed?.name||uid()}`
+                :session.name;
+    }
 }
 
 
 /* =========================================================
-   COMMON BAR
+   COMMON
 ========================================================= */
 
-function monthAndModeBar() {
+function monthBar(){
 
-  return `
+    return`
+        <div class="monthbar">
 
-    <div class="monthbar">
-
-      <label
-        style="
-          margin:0;
-          flex:1;
-          min-width:150px
-        "
-      >
-
-        View month
-
-        <input
-          id="monthPick"
-          type="month"
-          value="${selectedMonth}"
-        >
-
-      </label>
-
-
-      ${
-        session?.role
-          ?.includes(
-            'MANAGER'
-          )
-
-          ? `
-
-            <div
-              class="mode-toggle"
-              style="
-                flex:1;
-                min-width:190px
-              "
+            <label
+                style="
+                    margin:0;
+                    flex:1;
+                    min-width:145px
+                "
             >
+                Month
 
-              <button
-                id="srMode"
-                class="${
-                  session.mode ===
-                  'sr'
-                    ? 'active'
-                    : ''
-                }"
-              >
-                My SR
-              </button>
-
-              <button
-                id="mgrMode"
-                class="${
-                  session.mode ===
-                  'manager'
-                    ? 'active'
-                    : ''
-                }"
-              >
-                Manager
-              </button>
-
-            </div>
-
-          `
-
-          : ''
-      }
-
-    </div>
-
-
-    ${
-      session?.mode ===
-      'manager'
-
-        ? `
-
-          <div
-            class="card"
-            style="margin-bottom:12px"
-          >
-
-            <label>
-
-              Viewing Sales Representative
-
-              <select
-                id="managerPick"
-              >
-
-                ${
-                  allSalesUsers()
-                    .map(
-                      u => `
-
-                        <option
-                          value="${u.id}"
-                          ${
-                            currentStaffId() ===
-                            u.id
-                              ? 'selected'
-                              : ''
-                          }
-                        >
-
-                          ${esc(u.name)}
-                          •
-                          ${u.id}
-
-                        </option>
-
-                      `
-                    )
-                    .join('')
-                }
-
-              </select>
-
+                <input
+                    id="monthPick"
+                    type="month"
+                    value="${selectedMonth}"
+                >
             </label>
 
-          </div>
+            ${
+                String(
+                    session?.role
+                ).includes('MANAGER')
+
+                ?`
+                    <div
+                        class="mode-toggle"
+                        style="
+                            flex:1;
+                            min-width:190px
+                        "
+                    >
+
+                        <button
+                            id="srMode"
+                            class="${
+                                session.mode==='sr'
+                                ?'active'
+                                :''
+                            }"
+                        >
+                            My SR
+                        </button>
+
+                        <button
+                            id="mgrMode"
+                            class="${
+                                session.mode==='manager'
+                                ?'active'
+                                :''
+                            }"
+                        >
+                            Manager
+                        </button>
+
+                    </div>
+                `
+                :''
+            }
 
-        `
-
-        : ''
-    }
-  `;
-}
-
-function bindCommon() {
-
-  const monthPick =
-    $('#monthPick');
-
-  if (
-    monthPick
-  ) {
-
-    monthPick.onchange =
-      async e => {
-
-        selectedMonth =
-          e.target.value;
-
-        if (
-          backendUrl()
-        ) {
-
-          await syncCloud(
-            currentStaffId(),
-            selectedMonth
-          );
-        }
-
-        render();
-      };
-  }
-
-
-  const srMode =
-    $('#srMode');
-
-  if (
-    srMode
-  ) {
-
-    srMode.onclick =
-      () => {
-
-        session.mode =
-          'sr';
-
-        managerView =
-          session.id;
-
-        refreshTopBar();
-
-        page =
-          'dashboard';
-
-        render();
-      };
-  }
-
-
-  const mgrMode =
-    $('#mgrMode');
-
-  if (
-    mgrMode
-  ) {
-
-    mgrMode.onclick =
-      () => {
-
-        session.mode =
-          'manager';
-
-        managerView =
-          'M21954';
-
-        refreshTopBar();
-
-        page =
-          'team';
-
-        render();
-      };
-  }
-
-
-  const managerPick =
-    $('#managerPick');
-
-  if (
-    managerPick
-  ) {
-
-    managerPick.onchange =
-      async e => {
-
-        managerView =
-          e.target.value;
-
-        refreshTopBar();
-
-        if (
-          backendUrl()
-        ) {
-
-          await syncCloud(
-            currentStaffId(),
-            selectedMonth
-          );
-        }
-
-        render();
-      };
-  }
-
-
-  $$('[data-go]')
-    .forEach(
-      btn => {
-
-        btn.onclick =
-          () => {
-
-            page =
-              btn.dataset.go;
-
-            render();
-          };
-      }
-    );
-}
-
-function render() {
-
-  if (!session) return;
-
-
-  $$('#bottomNav button[data-page]')
-    .forEach(
-      b => {
-
-        const activePage =
-          [
-            'tasks',
-            'zero',
-            'sku',
-            'team'
-          ].includes(page)
-
-            ? 'dashboard'
-
-            : page;
-
-        b.classList.toggle(
-          'active',
-          b.dataset.page ===
-            activePage
-        );
-      }
-    );
-
-
-  const pages = {
-
-    dashboard:
-      renderDashboard,
-
-    daily:
-      renderDaily,
-
-    planning:
-      renderPlanning,
-
-    income:
-      renderIncome,
-
-    summary:
-      renderSummary,
-
-    tasks:
-      renderTasks,
-
-    zero:
-      renderZeroSales,
-
-    sku:
-      renderSkuPerformance,
-
-    team:
-      renderTeamControl
-  };
-
-
-  (
-    pages[page] ||
-    renderDashboard
-  )();
-}
-
-
-/* =========================================================
-   PAGE 1 — DASHBOARD
-========================================================= */
-
-function renderDashboard() {
-
-  const id =
-    currentStaffId();
-
-  const u =
-    userById(id);
-
-  const p =
-    performance(id);
-
-  const pct =
-    p.target
-      ? Math.min(
-          100,
-          (
-            p.achievement /
-            p.target
-          ) * 100
-        )
-      : 0;
-
-  const alerts =
-    smartAlerts(id);
-
-
-  $('#mainContent').innerHTML = `
-
-    ${monthAndModeBar()}
-
-
-    <section class="hero">
-
-      <p class="eyebrow">
-
-        ${monthName(selectedMonth).toUpperCase()}
-
-      </p>
-
-      <h3>
-
-        ${esc(u?.name || id)}
-        Performance
-
-      </h3>
-
-      <p class="muted">
-
-        ${money(p.achievement)}
-        achieved from
-        ${money(p.target)}
-        target.
-
-        ${
-          p.shortfall > 0
-
-            ? `${money(p.shortfall)} remaining.`
-
-            : 'Target achieved.'
-        }
-
-      </p>
-
-      <div class="progress-wrap">
-
-        <div
-          class="progress ${
-            pct >= 100
-              ? 'goodbar'
-              : ''
-          }"
-          style="
-            width:${pct}%
-          "
-        >
         </div>
 
-      </div>
+        ${
+            session?.mode==='manager'
 
+            ?`
+                <div
+                    class="card"
+                    style="margin-bottom:12px"
+                >
 
-      <div
-        class="row"
-        style="margin-top:8px"
-      >
+                    <label>
+                        View Sales Representative
 
-        <small class="muted">
+                        <select id="managerPick">
 
-          ${money(p.achievement)}
-          achieved
+                            ${
+                                salesUsers()
+                                    .map(
+                                        u=>`
+                                            <option
+                                                value="${u.id}"
+                                                ${
+                                                    uid()===u.id
+                                                    ?'selected'
+                                                    :''
+                                                }
+                                            >
+                                                ${esc(u.name)}
+                                                •
+                                                ${u.id}
+                                            </option>
+                                        `
+                                    )
+                                    .join('')
+                            }
 
-        </small>
+                        </select>
+                    </label>
 
-        <strong>
+                </div>
+            `
+            :''
+        }
+    `;
+}
 
-          ${
-            (
-              p.target
-                ? (
-                    p.achievement /
-                    p.target *
-                    100
-                  )
-                : 0
-            ).toFixed(1)
-          }%
+function bindCommon(){
 
-        </strong>
+    if($('#monthPick')){
 
-      </div>
+        $('#monthPick')
+            .onchange=
+                async e=>{
 
-    </section>
+                    selectedMonth=
+                        e.target.value;
 
+                    if(backendUrl()){
 
-    <div class="grid kpi-grid">
+                        await syncCloud(
+                            uid(),
+                            selectedMonth
+                        );
+                    }
 
-      ${kpi(
-        'MONTH TARGET',
-        money(p.target),
-        'Fixed route target'
-      )}
+                    render();
+                };
+    }
 
-      ${kpi(
-        'MTD ACHIEVEMENT',
-        money(p.achievement),
-        'Daily updates combined',
-        p.achievement >= p.target
-          ? 'good'
-          : ''
-      )}
+    if($('#srMode')){
 
-      ${kpi(
-        'SHORTFALL',
-        money(p.shortfall),
-        'Remaining to target',
-        p.shortfall > 0
-          ? 'bad'
-          : 'good'
-      )}
+        $('#srMode')
+            .onclick=
+                ()=>{
 
-      ${kpi(
-        'REQUIRED / DAY',
-        money(p.requiredPerDay),
-        `${remainingDays(selectedMonth)} day(s) remaining`,
-        p.shortfall > 0
-          ? 'warn'
-          : 'good'
-      )}
+                    session.mode='sr';
 
-      ${kpi(
-        'DAILY TARGET',
-        money(p.dailyTarget),
-        'Average monthly target'
-      )}
+                    managerView=
+                        session.id;
 
-      ${kpi(
-        'TODAY SALES',
-        money(p.todaySales),
-        'Today entered amount'
-      )}
+                    page=
+                        'dashboard';
 
-      ${kpi(
-        'VS LAST MONTH',
-        `${
-          p.growth >= 0
-            ? '+'
-            : ''
-        }${p.growth.toFixed(1)}%`,
-        `Comparable: ${money(p.previous)}`,
-        p.growth >= 0
-          ? 'good'
-          : 'bad'
-      )}
+                    refreshTop();
+                    render();
+                };
+    }
 
-      ${kpi(
-        'ZERO SALES COVER',
-        `${p.coverage.toFixed(0)}%`,
-        `${p.covered.length}/${p.routeOutlets.length} outlets`,
-        p.coverage >= 100
-          ? 'good'
-          : 'bad'
-      )}
+    if($('#mgrMode')){
 
-      ${kpi(
-        'ACTIVE',
-        money(p.active),
-        'Latest entered value'
-      )}
+        $('#mgrMode')
+            .onclick=
+                ()=>{
 
-      ${kpi(
-        'PREPARE FOR TRIP',
-        money(p.prepareTrip),
-        'Latest entered value'
-      )}
+                    session.mode=
+                        'manager';
 
-      ${kpi(
-        'ORDER AMOUNT',
-        money(p.orderAmount),
-        'Latest entered value'
-      )}
+                    managerView=
+                        'M21954';
 
-      ${kpi(
-        'PROJECTED INCOME',
-        money(
-          salary(id).total
-        ),
-        'Salary + current incentives'
-      )}
+                    page=
+                        'team';
 
-    </div>
+                    refreshTop();
+                    render();
+                };
+    }
 
+    if($('#managerPick')){
 
-    <div class="section-title">
+        $('#managerPick')
+            .onchange=
+                async e=>{
 
-      <h3>
-        Quick Actions
-      </h3>
+                    managerView=
+                        e.target.value;
 
-    </div>
+                    refreshTop();
 
+                    if(backendUrl()){
 
-    <div class="mini-grid">
+                        await syncCloud(
+                            uid(),
+                            selectedMonth
+                        );
+                    }
 
-      <button
-        class="btn secondary"
-        data-go="zero"
-      >
-        Zero Sales Outlets
-      </button>
+                    render();
+                };
+    }
 
-      <button
-        class="btn secondary"
-        data-go="sku"
-      >
-        SKU Performance
-      </button>
+    $$('[data-go]')
+        .forEach(
+            b=>
+                b.onclick=
+                    ()=>{
 
-      <button
-        class="btn secondary"
-        data-go="tasks"
-      >
-        My Tasks
-      </button>
+                        page=
+                            b.dataset.go;
 
-      ${
-        session.mode ===
-        'manager'
-
-          ? `
-
-            <button
-              class="btn secondary"
-              data-go="team"
-            >
-              Team Control
-            </button>
-
-          `
-
-          : `
-
-            <button
-              class="btn secondary"
-              data-go="planning"
-            >
-              Monthly Plan
-            </button>
-
-          `
-      }
-
-    </div>
-
-
-    <div class="section-title">
-
-      <h3>
-        Smart Push
-      </h3>
-
-    </div>
-
-
-    <div class="card">
-
-      ${
-        alerts.length
-
-          ? alerts
-              .map(
-                a => `
-
-                  <div
-                    class="
-                      alert-card
-                      ${
-                        a.bad
-                          ? ''
-                          : 'goodalert'
-                      }
-                    "
-                  >
-                    ${esc(a.text)}
-                  </div>
-
-                `
-              )
-              .join('')
-
-          : `
-
-            <div class="empty">
-              No alert yet.
-            </div>
-
-          `
-      }
-
-
-      <button
-        id="phoneNotifyBtn"
-        class="btn secondary"
-        style="margin-top:8px"
-      >
-        Enable / Test Phone Notification
-      </button>
-
-    </div>
-  `;
-
-
-  bindCommon();
-
-
-  $('#phoneNotifyBtn')
-    .onclick =
-      pushBrowserAlert;
+                        render();
+                    }
+        );
 }
 
 function kpi(
-  label,
-  value,
-  sub,
-  cls = ''
-) {
+    l,
+    v,
+    s,
+    c=''
+){
 
-  return `
+    return`
+        <div class="kpi">
 
-    <div class="kpi">
+            <div class="label">
+                ${esc(l)}
+            </div>
 
-      <div class="label">
+            <div class="value ${c}">
+                ${esc(v)}
+            </div>
 
-        ${esc(label)}
+            <div class="sub">
+                ${esc(s)}
+            </div>
 
-      </div>
-
-      <div
-        class="value ${cls}"
-      >
-
-        ${esc(value)}
-
-      </div>
-
-      <div class="sub">
-
-        ${esc(sub)}
-
-      </div>
-
-    </div>
-  `;
+        </div>
+    `;
 }
 
+function render(){
 
-/* =========================================================
-   PAGE 2 — DAILY UPDATE
-========================================================= */
-
-function renderDaily() {
-
-  if (
-    session.mode ===
-    'manager'
-  ) {
-
-    $('#mainContent')
-      .innerHTML = `
-
-        ${monthAndModeBar()}
-
-        <div class="card">
-
-          <p class="eyebrow">
-            MANAGER MODE
-          </p>
-
-          <h2>
-            Entry is locked
-          </h2>
-
-          <p class="muted">
-
-            Switch to
-            <b>My SR</b>
-            to enter your own daily sales.
-
-            Manager mode is for reviewing the team.
-
-          </p>
-
-        </div>
-      `;
-
-    bindCommon();
-
-    return;
-  }
-
-
-  const id =
-    currentStaffId();
-
-
-  const recent =
-    monthDaily(id)
-
-      .slice()
-
-      .sort(
-        (a, b) =>
-          b.date
-            .localeCompare(
-              a.date
-            )
-      )
-
-      .slice(
-        0,
-        10
-      );
-
-
-  $('#mainContent')
-    .innerHTML = `
-
-      ${monthAndModeBar()}
-
-
-      <div class="card">
-
-        <p class="eyebrow">
-          DAY-BY-DAY ROUTE TRACKER
-        </p>
-
-        <h2>
-          Daily Summary
-        </h2>
-
-        <p class="muted">
-
-          Every new month starts from zero.
-
-          Add only that month's real data.
-
-        </p>
-
-
-        <form
-          id="dailyForm"
-          class="stack"
-        >
-
-          <label>
-
-            Date
-
-            <input
-              name="date"
-              type="date"
-              value="${todayISO()}"
-              required
-            >
-
-          </label>
-
-
-          <label>
-
-            Today Sales (RM)
-
-            <input
-              name="todaySales"
-              type="number"
-              min="0"
-              step="0.01"
-              value="0"
-              required
-            >
-
-          </label>
-
-
-          <label>
-
-            Last Month Same Day (RM)
-
-            <input
-              name="lastMonthSameDay"
-              type="number"
-              min="0"
-              step="0.01"
-              value="0"
-            >
-
-          </label>
-
-
-          <label>
-
-            Active (RM)
-
-            <input
-              name="active"
-              type="number"
-              min="0"
-              step="0.01"
-              value="0"
-            >
-
-          </label>
-
-
-          <label>
-
-            Prepare for Trip (RM)
-
-            <input
-              name="prepareTrip"
-              type="number"
-              min="0"
-              step="0.01"
-              value="0"
-            >
-
-          </label>
-
-
-          <label>
-
-            Order Amount (RM)
-
-            <input
-              name="orderAmount"
-              type="number"
-              min="0"
-              step="0.01"
-              value="0"
-            >
-
-          </label>
-
-
-          <label>
-
-            Note
-
-            <textarea
-              name="note"
-              placeholder="Optional note"
-            ></textarea>
-
-          </label>
-
-
-          <button
-            class="btn primary"
-          >
-
-            Save Daily Summary
-
-          </button>
-
-        </form>
-
-      </div>
-
-
-      <div
-        class="card"
-        style="margin-top:12px"
-      >
-
-        <p class="eyebrow">
-          OUTLET SALES
-        </p>
-
-        <h2>
-          Outlet Update
-        </h2>
-
-
-        <form
-          id="outletSaleForm"
-          class="stack"
-        >
-
-          <label>
-
-            Date
-
-            <input
-              name="date"
-              type="date"
-              value="${todayISO()}"
-              required
-            >
-
-          </label>
-
-
-          <label>
-
-            Outlet
-
-            <select
-              name="outlet"
-              required
-            >
-
-              ${outletOptions(id)}
-
-            </select>
-
-          </label>
-
-
-          <label>
-
-            Outlet Sales Value (RM)
-
-            <input
-              name="sales"
-              type="number"
-              min="0"
-              step="0.01"
-              value="0"
-              required
-            >
-
-          </label>
-
-
-          <label>
-
-            Note
-
-            <textarea
-              name="note"
-              placeholder="Optional"
-            ></textarea>
-
-          </label>
-
-
-          <button
-            class="btn primary"
-          >
-
-            Save Outlet Sales
-
-          </button>
-
-        </form>
-
-      </div>
-
-
-      <div
-        class="card"
-        style="margin-top:12px"
-      >
-
-        <p class="eyebrow">
-          SKU SALES
-        </p>
-
-        <h2>
-          Product / Carton Update
-        </h2>
-
-
-        <form
-          id="skuSaleForm"
-          class="stack"
-        >
-
-          <label>
-
-            Date
-
-            <input
-              name="date"
-              type="date"
-              value="${todayISO()}"
-              required
-            >
-
-          </label>
-
-
-          <label>
-
-            Outlet
-
-            <select
-              name="outlet"
-              id="skuOutlet"
-              required
-            >
-
-              ${outletOptions(id)}
-
-            </select>
-
-          </label>
-
-
-          <label>
-
-            Search SKU
-
-            <input
-              id="skuSearch"
-              placeholder="Type mango, noodles, biscuit..."
-            >
-
-          </label>
-
-
-          <div
-            id="skuResults"
-            class="search-results"
-          >
-          </div>
-
-
-          <label>
-
-            Selected SKU
-
-            <input
-              name="skuName"
-              id="skuChosen"
-              readonly
-              required
-              placeholder="Select from search result"
-            >
-
-          </label>
-
-
-          <label>
-
-            Cartons Sold
-
-            <input
-              name="cartons"
-              type="number"
-              min="0"
-              step="1"
-              value="0"
-            >
-
-          </label>
-
-
-          <label>
-
-            SKU Sales Value (RM)
-
-            <input
-              name="salesValue"
-              type="number"
-              min="0"
-              step="0.01"
-              value="0"
-            >
-
-          </label>
-
-
-          <button
-            class="btn primary"
-          >
-
-            Save SKU Sales
-
-          </button>
-
-        </form>
-
-      </div>
-
-
-      <div class="section-title">
-
-        <h3>
-          Recent Daily Records
-        </h3>
-
-      </div>
-
-
-      <div class="list">
-
-        ${
-          recent.length
-
-            ? recent
-                .map(
-                  x => `
-
-                    <div class="list-item">
-
-                      <div class="row">
-
-                        <div>
-
-                          <h4>
-                            ${esc(x.date)}
-                          </h4>
-
-                          <p>
-
-                            Today
-                            ${money(x.todaySales)}
-
-                            •
-
-                            Last Month
-                            ${money(x.lastMonthSameDay)}
-
-                          </p>
-
-                        </div>
-
-                        <span class="pill orange">
-
-                          ${money(x.orderAmount)}
-
-                        </span>
-
-                      </div>
-
-                    </div>
-
-                  `
-                )
-                .join('')
-
-            : `
-
-              <div class="empty">
-                No daily entry for this month yet.
-              </div>
-
-            `
-        }
-
-      </div>
-    `;
-
-
-  bindCommon();
-
-
-  $('#dailyForm')
-    .onsubmit = e => {
-
-      e.preventDefault();
-
-      const fd =
-        new FormData(
-          e.target
-        );
-
-      const date =
-        String(
-          fd.get('date')
-        );
-
-      const month =
-        date.slice(
-          0,
-          7
-        );
-
-      const st2 =
-        getState();
-
-
-      st2.daily =
-        st2.daily.filter(
-          x =>
-            !(
-              x.staffId === id &&
-              x.date === date
-            )
-        );
-
-
-      const record = {
-
-        id:
-          idGen(),
-
-        staffId:
-          id,
-
-        month,
-
-        date,
-
-        todaySales:
-          number(
-            fd.get(
-              'todaySales'
-            )
-          ),
-
-        lastMonthSameDay:
-          number(
-            fd.get(
-              'lastMonthSameDay'
-            )
-          ),
-
-        active:
-          number(
-            fd.get(
-              'active'
-            )
-          ),
-
-        prepareTrip:
-          number(
-            fd.get(
-              'prepareTrip'
-            )
-          ),
-
-        orderAmount:
-          number(
-            fd.get(
-              'orderAmount'
-            )
-          ),
-
-        note:
-          String(
-            fd.get(
-              'note'
-            ) || ''
-          )
-      };
-
-
-      st2.daily.push(
-        record
-      );
-
-      setState(st2);
-
-
-      safeCloudPost(
-        'saveDaily',
-        record
-      );
-
-
-      toast(
-        'Daily summary saved'
-      );
-
-
-      selectedMonth =
-        month;
-
-
-      render();
-    };
-
-
-  $('#outletSaleForm')
-    .onsubmit = e => {
-
-      e.preventDefault();
-
-      const fd =
-        new FormData(
-          e.target
-        );
-
-      const outletName =
-        String(
-          fd.get(
-            'outlet'
-          )
-        );
-
-      const o =
-        outletsFor(id)
-          .find(
-            x =>
-              x.name ===
-              outletName
-          ) || {};
-
-      const date =
-        String(
-          fd.get(
-            'date'
-          )
-        );
-
-
-      const record = {
-
-        id:
-          idGen(),
-
-        staffId:
-          id,
-
-        month:
-          date.slice(
-            0,
-            7
-          ),
-
-        date,
-
-        outletCode:
-          o.code || '',
-
-        outletName,
-
-        sales:
-          number(
-            fd.get(
-              'sales'
-            )
-          ),
-
-        note:
-          String(
-            fd.get(
-              'note'
-            ) || ''
-          )
-      };
-
-
-      const st2 =
-        getState();
-
-      st2.outletSales
-        .push(
-          record
-        );
-
-      setState(st2);
-
-
-      safeCloudPost(
-        'saveOutlet',
-        record
-      );
-
-
-      toast(
-        'Outlet sales saved'
-      );
-
-
-      selectedMonth =
-        record.month;
-
-
-      render();
-    };
-
-
-  const skuOutlet =
-    $('#skuOutlet');
-
-  const skuSearch =
-    $('#skuSearch');
-
-  const skuResults =
-    $('#skuResults');
-
-  const skuChosen =
-    $('#skuChosen');
-
-
-  function paintSkuSearch() {
-
-    const outletName =
-      skuOutlet.value;
-
-    const q =
-      skuSearch.value
-        .trim()
-        .toLowerCase();
-
-
-    if (
-      !outletName ||
-      !q
-    ) {
-
-      skuResults
-        .innerHTML = '';
-
-      return;
-    }
-
-
-    const list =
-      productsForOutlet(
-        id,
-        outletName
-      )
-        .filter(
-          x =>
-            x
-              .toLowerCase()
-              .includes(q)
-        )
-        .slice(
-          0,
-          35
-        );
-
-
-    skuResults
-      .innerHTML =
-        list.length
-
-          ? list
-              .map(
-                x => `
-
-                  <div
-                    class="search-result"
-                    data-sku="${esc(x)}"
-                  >
-
-                    ${esc(x)}
-
-                  </div>
-
-                `
-              )
-              .join('')
-
-          : `
-
-            <div class="search-result">
-              No product found
-            </div>
-
-          `;
-  }
-
-
-  skuSearch.oninput =
-    paintSkuSearch;
-
-
-  skuOutlet.onchange =
-    () => {
-
-      skuSearch.value =
-        '';
-
-      skuChosen.value =
-        '';
-
-      skuResults
-        .innerHTML = '';
-    };
-
-
-  skuResults.onclick =
-    e => {
-
-      const el =
-        e.target
-          .closest(
-            '[data-sku]'
-          );
-
-      if (!el) return;
-
-
-      skuChosen.value =
-        el.dataset.sku;
-
-      skuSearch.value =
-        el.dataset.sku;
-
-      skuResults
-        .innerHTML = '';
-    };
-
-
-  $('#skuSaleForm')
-    .onsubmit = e => {
-
-      e.preventDefault();
-
-      const fd =
-        new FormData(
-          e.target
-        );
-
-      const outletName =
-        String(
-          fd.get(
-            'outlet'
-          )
-        );
-
-      const o =
-        outletsFor(id)
-          .find(
-            x =>
-              x.name ===
-              outletName
-          ) || {};
-
-      const date =
-        String(
-          fd.get(
-            'date'
-          )
-        );
-
-      const skuName =
-        String(
-          fd.get(
-            'skuName'
-          ) || ''
-        ).trim();
-
-
-      if (!skuName) {
-
-        toast(
-          'Select a SKU first'
-        );
-
+    if(!session)
         return;
-      }
 
-
-      const record = {
-
-        id:
-          idGen(),
-
-        staffId:
-          id,
-
-        month:
-          date.slice(
-            0,
-            7
-          ),
-
-        date,
-
-        outletCode:
-          o.code || '',
-
-        outletName,
-
-        skuName,
-
-        cartons:
-          number(
-            fd.get(
-              'cartons'
-            )
-          ),
-
-        salesValue:
-          number(
-            fd.get(
-              'salesValue'
-            )
-          )
-      };
-
-
-      const st2 =
-        getState();
-
-      st2.skuSales
-        .push(
-          record
-        );
-
-      setState(st2);
-
-
-      safeCloudPost(
-        'saveSku',
-        record
-      );
-
-
-      toast(
-        'SKU sales saved'
-      );
-
-
-      selectedMonth =
-        record.month;
-
-
-      render();
-    };
-}
-
-
-/* =========================================================
-   PAGE 3 — MONTHLY / OUTLET / SKU PLAN
-========================================================= */
-
-function renderPlanning() {
-
-  if (
-    session.mode ===
-    'manager'
-  ) {
-
-    $('#mainContent')
-      .innerHTML = `
-
-        ${monthAndModeBar()}
-
-        <div class="card">
-
-          <p class="eyebrow">
-            MANAGER REVIEW
-          </p>
-
-          <h2>
-
-            ${esc(
-              userById(
-                currentStaffId()
-              )?.name || ''
-            )}
-
-            Planning
-
-          </h2>
-
-          ${planningPerformanceHtml(
-            currentStaffId()
-          )}
-
-        </div>
-      `;
-
-
-    bindCommon();
-
-    return;
-  }
-
-
-  const id =
-    currentStaffId();
-
-
-  $('#mainContent')
-    .innerHTML = `
-
-      ${monthAndModeBar()}
-
-
-      <div class="card">
-
-        <p class="eyebrow">
-          FIXED MONTHLY TARGET
-        </p>
-
-        <h2>
-
-          ${money(
-            fixedRouteTarget(id)
-          )}
-
-        </h2>
-
-        <p class="muted">
-
-          This route target is fixed for
-
-          ${esc(
-            userById(id)?.name ||
-            id
-          )}.
-
-          Monthly transactional data starts from zero.
-
-        </p>
-
-      </div>
-
-
-      <div
-        class="card"
-        style="margin-top:12px"
-      >
-
-        <p class="eyebrow">
-          ADD ROUTE OUTLET
-        </p>
-
-        <h3>
-          Only use this if your outlet is missing
-        </h3>
-
-
-        <form
-          id="addOutletForm"
-          class="stack"
-        >
-
-          <label>
-
-            Outlet Code
-
-            <input
-              name="code"
-              placeholder="Optional code"
-            >
-
-          </label>
-
-
-          <label>
-
-            Outlet Name
-
-            <input
-              name="name"
-              required
-              placeholder="Outlet name"
-            >
-
-          </label>
-
-
-          <label>
-
-            Chain / Category
-
-            <select
-              name="category"
-            >
-
-              ${
-                [
-                  'KK Supermart',
-                  'NSK Grocer',
-                  'Giant Hypermarket',
-                  'The Store',
-                  'TF Value Mart',
-                  'Aneka',
-                  'Jaya Grocer',
-                  'Econsave',
-                  'MR DIY',
-                  'Other'
-                ]
-                  .map(
-                    x =>
-                      `<option>${x}</option>`
-                  )
-                  .join('')
-              }
-
-            </select>
-
-          </label>
-
-
-          <label>
-
-            Total Listed SKU
-
-            <input
-              name="totalSku"
-              type="number"
-              min="0"
-              step="1"
-              value="0"
-            >
-
-          </label>
-
-
-          <button
-            class="btn secondary"
-          >
-            Add Outlet
-          </button>
-
-        </form>
-
-      </div>
-
-
-      <div
-        class="card"
-        style="margin-top:12px"
-      >
-
-        <p class="eyebrow">
-          OUTLET + SKU TARGET
-        </p>
-
-        <h2>
-          Monthly Planning
-        </h2>
-
-
-        <form
-          id="planForm"
-          class="stack"
-        >
-
-          <label>
-
-            Outlet
-
-            <select
-              name="outlet"
-              id="planOutlet"
-              required
-            >
-
-              ${outletOptions(id)}
-
-            </select>
-
-          </label>
-
-
-          <label>
-
-            Outlet Sales Target (RM)
-
-            <input
-              name="outletTarget"
-              type="number"
-              min="0"
-              step="0.01"
-              required
-              value="0"
-            >
-
-          </label>
-
-
-          <label>
-
-            How many SKUs will you target?
-
-            <input
-              name="targetSkuCount"
-              id="targetSkuCount"
-              type="number"
-              min="0"
-              step="1"
-              value="0"
-            >
-
-          </label>
-
-
-          <label>
-
-            Search SKU
-
-            <input
-              id="planSkuSearch"
-              placeholder="Search product name"
-            >
-
-          </label>
-
-
-          <div
-            id="planSkuResults"
-            class="search-results"
-          >
-          </div>
-
-
-          <div
-            id="chosenSkus"
-            class="chipbox"
-          >
-          </div>
-
-
-          <div
-            id="skuTargetInputs"
-            class="list"
-          >
-          </div>
-
-
-          <button
-            class="btn primary"
-          >
-            Save Outlet & SKU Plan
-          </button>
-
-        </form>
-
-      </div>
-
-
-      <div class="section-title">
-
-        <h3>
-          Plan vs Achievement
-        </h3>
-
-      </div>
-
-
-      ${planningPerformanceHtml(id)}
-    `;
-
-
-  bindCommon();
-
-
-  planSelectedSkus =
-    [];
-
-
-  $('#addOutletForm')
-    .onsubmit = e => {
-
-      e.preventDefault();
-
-      const fd =
-        new FormData(
-          e.target
-        );
-
-      const ok =
-        addCustomOutlet(
-
-          id,
-
-          fd.get('code'),
-
-          fd.get('name'),
-
-          fd.get('category'),
-
-          fd.get('totalSku')
-        );
-
-
-      toast(
-        ok
-          ? 'Outlet added to route'
-          : 'Outlet already exists'
-      );
-
-
-      render();
-    };
-
-
-  const outletEl =
-    $('#planOutlet');
-
-  const q =
-    $('#planSkuSearch');
-
-  const results =
-    $('#planSkuResults');
-
-  const chips =
-    $('#chosenSkus');
-
-  const targetInputs =
-    $('#skuTargetInputs');
-
-
-  function paintSelected() {
-
-    const oldTargets = {};
-
-    planSelectedSkus
-      .forEach(
-        sku => {
-
-          const c =
-            document.querySelector(
-              `[data-cartons-for="${cssEscape(sku)}"]`
-            );
-
-          const v =
-            document.querySelector(
-              `[data-value-for="${cssEscape(sku)}"]`
-            );
-
-          oldTargets[sku] = {
-
-            cartons:
-              number(
-                c?.value
-              ),
-
-            value:
-              number(
-                v?.value
-              )
-          };
-        }
-      );
-
-
-    chips.innerHTML =
-      planSelectedSkus
-
-        .map(
-          sku => `
-
-            <span class="chip">
-
-              ${esc(sku)}
-
-              <button
-                type="button"
-                data-remove-sku="${esc(sku)}"
-              >
-                ×
-              </button>
-
-            </span>
-
-          `
-        )
-
-        .join('');
-
-
-    targetInputs.innerHTML =
-      planSelectedSkus
-
-        .map(
-          (sku, i) => `
-
-            <div class="list-item">
-
-              <h4>
-
-                ${i + 1}.
-                ${esc(sku)}
-
-              </h4>
-
-
-              <div
-                class="form-grid"
-                style="margin-top:10px"
-              >
-
-                <label>
-
-                  Target Cartons
-
-                  <input
-                    data-cartons-for="${esc(sku)}"
-                    type="number"
-                    min="0"
-                    step="1"
-                    value="${oldTargets[sku]?.cartons || 0}"
-                  >
-
-                </label>
-
-
-                <label>
-
-                  Target Sales Value (RM)
-
-                  <input
-                    data-value-for="${esc(sku)}"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value="${oldTargets[sku]?.value || 0}"
-                  >
-
-                </label>
-
-              </div>
-
-            </div>
-
-          `
-        )
-
-        .join('');
-  }
-
-
-  function paintSearch() {
-
-    const outletName =
-      outletEl.value;
-
-    const search =
-      q.value
-        .trim()
-        .toLowerCase();
-
-
-    if (
-      !outletName ||
-      !search
-    ) {
-
-      results.innerHTML =
-        '';
-
-      return;
-    }
-
-
-    const list =
-      productsForOutlet(
-        id,
-        outletName
-      )
-
-        .filter(
-          x =>
-            x
-              .toLowerCase()
-              .includes(search) &&
-            !planSelectedSkus
-              .includes(x)
-        )
-
-        .slice(
-          0,
-          40
-        );
-
-
-    results.innerHTML =
-      list
-        .map(
-          x => `
-
-            <div
-              class="search-result"
-              data-plan-sku="${esc(x)}"
-            >
-
-              ${esc(x)}
-
-            </div>
-
-          `
-        )
-        .join('') ||
-
-      `
-
-        <div class="search-result">
-          No product found
-        </div>
-
-      `;
-  }
-
-
-  q.oninput =
-    paintSearch;
-
-
-  outletEl.onchange =
-    () => {
-
-      q.value =
-        '';
-
-      results.innerHTML =
-        '';
-
-      planSelectedSkus =
-        [];
-
-      paintSelected();
-    };
-
-
-  results.onclick =
-    e => {
-
-      const el =
-        e.target
-          .closest(
-            '[data-plan-sku]'
-          );
-
-      if (!el) return;
-
-
-      const max =
-        number(
-          $('#targetSkuCount')
-            .value
-        );
-
-
-      if (
-        max > 0 &&
-        planSelectedSkus.length >=
-          max
-      ) {
-
-        toast(
-          `You selected the maximum ${max} SKU(s)`
-        );
-
-        return;
-      }
-
-
-      planSelectedSkus
-        .push(
-          el.dataset.planSku
-        );
-
-
-      q.value =
-        '';
-
-      results.innerHTML =
-        '';
-
-
-      paintSelected();
-    };
-
-
-  chips.onclick =
-    e => {
-
-      const b =
-        e.target
-          .closest(
-            '[data-remove-sku]'
-          );
-
-      if (!b) return;
-
-
-      planSelectedSkus =
-        planSelectedSkus
-          .filter(
-            x =>
-              x !==
-              b.dataset.removeSku
-          );
-
-
-      paintSelected();
-    };
-
-
-  $('#planForm')
-    .onsubmit = e => {
-
-      e.preventDefault();
-
-
-      const fd =
-        new FormData(
-          e.target
-        );
-
-
-      const outletName =
-        String(
-          fd.get(
-            'outlet'
-          )
-        );
-
-
-      const o =
-        outletsFor(id)
-          .find(
-            x =>
-              x.name ===
-              outletName
-          ) || {};
-
-
-      const count =
-        number(
-          fd.get(
-            'targetSkuCount'
-          )
-        );
-
-
-      if (
-        count > 0 &&
-        planSelectedSkus.length !==
-          count
-      ) {
-
-        toast(
-          `Please select exactly ${count} targeted SKU(s)`
-        );
-
-        return;
-      }
-
-
-      const skuTargets = {};
-
-
-      planSelectedSkus
+    $$('#bottomNav button[data-page]')
         .forEach(
-          sku => {
-
-            skuTargets[sku] = {
-
-              cartons:
-                number(
-                  document
-                    .querySelector(
-                      `[data-cartons-for="${cssEscape(sku)}"]`
+            b=>
+                b.classList.toggle(
+                    'active',
+                    b.dataset.page===
+                    (
+                        [
+                            'tasks',
+                            'zero',
+                            'sku',
+                            'team'
+                        ].includes(page)
+                        ?'dashboard'
+                        :page
                     )
-                    ?.value
-                ),
-
-              value:
-                number(
-                  document
-                    .querySelector(
-                      `[data-value-for="${cssEscape(sku)}"]`
-                    )
-                    ?.value
                 )
-            };
-          }
         );
 
-
-      const plan = {
-
-        id:
-          idGen(),
-
-        staffId:
-          id,
-
-        month:
-          selectedMonth,
-
-        outletCode:
-          o.code || '',
-
-        outletName,
-
-        outletTarget:
-          number(
-            fd.get(
-              'outletTarget'
-            )
-          ),
-
-        targetSkuCount:
-          count ||
-          planSelectedSkus.length,
-
-        targetSkus:
-          [
-            ...planSelectedSkus
-          ],
-
-        skuTargets
-      };
-
-
-      const st2 =
-        getState();
-
-
-      st2.plans =
-        st2.plans.filter(
-          x =>
-            !(
-              x.staffId === id &&
-              x.month === selectedMonth &&
-              x.outletName === outletName
-            )
-        );
-
-
-      st2.plans.push(
-        plan
-      );
-
-
-      setState(st2);
-
-
-      const cloudSkuPayload =
-        plan.targetSkus
-          .map(
-            name => ({
-
-              name,
-
-              cartons:
-                number(
-                  plan
-                    .skuTargets[
-                      name
-                    ]
-                    ?.cartons
-                ),
-
-              value:
-                number(
-                  plan
-                    .skuTargets[
-                      name
-                    ]
-                    ?.value
-                )
-            })
-          );
-
-
-      safeCloudPost(
-        'savePlan',
+    (
         {
-
-          month:
-            selectedMonth,
-
-          routeTarget:
-            fixedRouteTarget(id),
-
-          outletCode:
-            plan.outletCode,
-
-          outletName:
-            plan.outletName,
-
-          outletTarget:
-            plan.outletTarget,
-
-          targetedSkuCount:
-            plan.targetSkuCount,
-
-          targetSkus:
-            cloudSkuPayload,
-
-          skuSalesPlan:
-            cloudSkuPayload
-              .reduce(
-                (s, x) =>
-                  s +
-                  number(
-                    x.value
-                  ),
-                0
-              )
-        }
-      );
-
-
-      toast(
-        'Outlet + SKU plan saved'
-      );
-
-
-      render();
-    };
+            dashboard:renderDashboard,
+            daily:renderDaily,
+            planning:renderPlanning,
+            income:renderIncome,
+            summary:renderSummary,
+            tasks:renderTasks,
+            zero:renderZero,
+            sku:renderSku,
+            team:renderTeam
+        }[page]||
+        renderDashboard
+    )();
 }
 
-function cssEscape(v) {
 
-  if (
-    window.CSS &&
-    CSS.escape
-  ) {
+/* =========================================================
+   DASHBOARD
+========================================================= */
 
-    return CSS.escape(v);
-  }
+function renderDashboard(){
 
-  return String(v)
-    .replace(
-      /["\\]/g,
-      '\\$&'
-    );
-}
+    const id=
+        uid();
 
-function planningPerformanceHtml(
-  staffId
-) {
+    const u=
+        user(id);
 
-  const plans =
-    monthPlans(
-      staffId
-    );
+    const m=
+        metric(id);
 
+    const pct=
+        m.target
+        ?m.ach/m.target*100
+        :0;
 
-  if (
-    !plans.length
-  ) {
+    const a=
+        alerts(id);
 
-    return `
+    const inc=
+        incomeCalc(id);
 
-      <div class="card">
+    $('#mainContent')
+        .innerHTML=`
 
-        <div class="empty">
+        ${monthBar()}
 
-          No outlet plan saved for this month.
+        <section class="hero">
 
-        </div>
+            <p class="eyebrow">
+                ${monthName(selectedMonth).toUpperCase()}
+            </p>
 
-      </div>
+            <h3>
+                ${esc(u?.name||id)}
+            </h3>
 
-    `;
-  }
+            <p class="muted">
+                ${money(m.ach)}
+                achieved from
+                ${money(m.target)}
+                target.
+            </p>
 
+            <div class="progress-wrap">
 
-  return `
-
-    <div class="list">
-
-      ${
-        plans
-          .map(
-            plan => {
-
-              const actual =
-                outletAchievement(
-                  staffId,
-                  plan.outletName
-                );
-
-              const short =
-                Math.max(
-                  0,
-                  number(
-                    plan.outletTarget
-                  ) -
-                  actual
-                );
-
-              const pct =
-                number(
-                  plan.outletTarget
-                )
-
-                  ? Math.min(
-                      100,
-                      actual /
-                      number(
-                        plan.outletTarget
-                      ) *
-                      100
-                    )
-
-                  : 0;
-
-
-              const skuHtml =
-                (
-                  plan.targetSkus ||
-                  []
-                )
-
-                  .map(
-                    sku => {
-
-                      const target =
-                        plan
-                          .skuTargets?.[
-                            sku
-                          ] || {
-
-                          cartons: 0,
-
-                          value: 0
-                        };
-
-
-                      const got =
-                        skuAchievement(
-
-                          staffId,
-
-                          plan.outletName,
-
-                          sku
-                        );
-
-
-                      const leftCtn =
-                        Math.max(
-
-                          0,
-
-                          number(
-                            target.cartons
-                          ) -
-
-                          got.cartons
-                        );
-
-
-                      const leftValue =
-                        Math.max(
-
-                          0,
-
-                          number(
-                            target.value
-                          ) -
-
-                          got.value
-                        );
-
-
-                      return `
-
-                        <div
-                          class="list-item"
-                          style="margin-top:8px"
-                        >
-
-                          <h4>
-
-                            ${esc(sku)}
-
-                          </h4>
-
-                          <p>
-
-                            CTN
-                            ${got.cartons}
-                            /
-                            ${number(target.cartons)}
-
-                            •
-
-                            Remaining
-
-                            <span
-                              class="${
-                                leftCtn > 0
-                                  ? 'bad'
-                                  : 'good'
-                              }"
-                            >
-
-                              ${leftCtn}
-
-                            </span>
-
-                            <br>
-
-                            Value
-
-                            ${money(got.value)}
-                            /
-                            ${money(target.value)}
-
-                            •
-
-                            Remaining
-
-                            <span
-                              class="${
-                                leftValue > 0
-                                  ? 'bad'
-                                  : 'good'
-                              }"
-                            >
-
-                              ${money(leftValue)}
-
-                            </span>
-
-                          </p>
-
-                        </div>
-
-                      `;
-                    }
-                  )
-
-                  .join('');
-
-
-              return `
-
-                <div class="card">
-
-                  <div class="row">
-
-                    <div>
-
-                      <h3
-                        style="margin:0"
-                      >
-
-                        ${esc(plan.outletName)}
-
-                      </h3>
-
-                      <p
-                        class="muted"
-                        style="margin:4px 0 0"
-                      >
-
-                        ${
-                          (
-                            plan.targetSkus ||
-                            []
-                          ).length
-                        }
-                        targeted SKU(s)
-
-                      </p>
-
-                    </div>
-
-
-                    <span
-                      class="
-                        pill
-                        ${
-                          short > 0
-                            ? 'red'
-                            : 'green'
-                        }
-                      "
-                    >
-
-                      ${
-                        short > 0
-
-                          ? money(short) +
-                            ' short'
-
-                          : 'Achieved'
-                      }
-
-                    </span>
-
-                  </div>
-
-
-                  <div
-                    class="progress-wrap"
-                    style="margin-top:12px"
-                  >
-
-                    <div
-                      class="
+                <div
+                    class="
                         progress
                         ${
-                          pct >= 100
-                            ? 'goodbar'
-                            : ''
+                            pct>=100
+                            ?'goodbar'
+                            :''
                         }
-                      "
-                      style="
-                        width:${pct}%
-                      "
+                    "
+                    style="
+                        width:${Math.min(100,pct)}%
+                    "
+                >
+                </div>
+
+            </div>
+
+            <div
+                class="row"
+                style="margin-top:8px"
+            >
+
+                <small class="muted">
+                    ${money(m.short)}
+                    remaining
+                </small>
+
+                <strong>
+                    ${pct.toFixed(1)}%
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <div class="grid kpi-grid">
+
+            ${kpi(
+                'TARGET',
+                money(m.target),
+                'Monthly route target'
+            )}
+
+            ${kpi(
+                'ACHIEVEMENT',
+                money(m.ach),
+                'Month-to-date',
+                m.ach>=m.target
+                ?'good'
+                :''
+            )}
+
+            ${kpi(
+                'SHORTFALL',
+                money(m.short),
+                'Remaining',
+                m.short
+                ?'bad'
+                :'good'
+            )}
+
+            ${kpi(
+                'NEED / DAY',
+                money(m.required),
+                `${daysRemain(selectedMonth)} day(s) left`,
+                m.short
+                ?'warn'
+                :'good'
+            )}
+
+            ${kpi(
+                'TODAY SALES',
+                money(m.todaySales),
+                'Today entered'
+            )}
+
+            ${kpi(
+                'GROWTH',
+                `${m.growth>=0?'+':''}${m.growth.toFixed(1)}%`,
+                `Last month comparable ${money(m.prev)}`,
+                m.growth>=0
+                ?'good'
+                :'bad'
+            )}
+
+            ${kpi(
+                'OUTLET COVERAGE',
+                `${m.coverage.toFixed(0)}%`,
+                `${m.covered.length}/${m.routeOutlets.length} outlets`,
+                m.coverage>=100
+                ?'good'
+                :'bad'
+            )}
+
+            ${kpi(
+                'PROJECTED SALARY',
+                money(inc.total),
+                'Salary + current incentives'
+            )}
+
+        </div>
+
+
+        <div class="section-title">
+            <h3>
+                Quick Actions
+            </h3>
+        </div>
+
+
+        <div class="mini-grid">
+
+            <button
+                class="btn secondary"
+                data-go="daily"
+            >
+                ➕ Add Sales
+            </button>
+
+            <button
+                class="btn secondary"
+                data-go="planning"
+            >
+                🎯 Monthly Plan
+            </button>
+
+            <button
+                class="btn secondary"
+                data-go="zero"
+            >
+                🏪 Zero Sales
+            </button>
+
+            <button
+                class="btn secondary"
+                data-go="sku"
+            >
+                📦 SKU Performance
+            </button>
+
+            <button
+                class="btn secondary"
+                data-go="tasks"
+            >
+                ✅ Tasks
+            </button>
+
+            ${
+                session.mode==='manager'
+
+                ?`
+                    <button
+                        class="btn secondary"
+                        data-go="team"
                     >
+                        👥 Team Control
+                    </button>
+                `
+                :''
+            }
+
+        </div>
+
+
+        <div class="section-title">
+            <h3>
+                Smart Alerts
+            </h3>
+        </div>
+
+
+        <div class="card">
+
+            ${
+                a.length
+
+                ?a
+                    .map(
+                        x=>`
+                            <div
+                                class="
+                                    alert-card
+                                    ${
+                                        x.bad
+                                        ?''
+                                        :'goodalert'
+                                    }
+                                "
+                            >
+                                ${esc(x.text)}
+                            </div>
+                        `
+                    )
+                    .join('')
+
+                :`
+                    <div class="empty">
+                        No alert
                     </div>
+                `
+            }
 
-                  </div>
+            <button
+                id="notifyBtn2"
+                class="btn secondary"
+                style="margin-top:8px"
+            >
+                🔔 Enable / Test Notification
+            </button>
 
+        </div>
+    `;
 
-                  <div
-                    class="row"
-                    style="margin-top:8px"
-                  >
+    bindCommon();
 
-                    <small class="muted">
-
-                      Target
-                      ${money(plan.outletTarget)}
-
-                    </small>
-
-                    <small>
-
-                      ${money(actual)}
-
-                    </small>
-
-                  </div>
+    $('#notifyBtn2')
+        .onclick=
+            notifyAlerts;
+}
 
 
-                  ${skuHtml}
+/* =========================================================
+   DAILY UPDATE
+========================================================= */
+
+function renderDaily(){
+
+    const id=
+        uid();
+
+    if(
+        session.mode===
+        'manager'
+    ){
+
+        $('#mainContent')
+            .innerHTML=`
+
+            ${monthBar()}
+
+            <div class="card">
+
+                <p class="eyebrow">
+                    MANAGER MODE
+                </p>
+
+                <h2>
+                    Entry is locked
+                </h2>
+
+                <p class="muted">
+
+                    Use Manager mode only
+                    to review the team.
+
+                    Switch to My SR
+                    to enter your own sales.
+
+                </p>
+
+            </div>
+        `;
+
+        bindCommon();
+
+        return;
+    }
+
+    const recent=
+        monthOutletSales(id)
+            .slice()
+            .sort(
+                (a,b)=>
+                    String(b.date)
+                        .localeCompare(
+                            String(a.date)
+                        )
+            )
+            .slice(0,8);
+
+    $('#mainContent')
+        .innerHTML=`
+
+        ${monthBar()}
+
+
+        <div class="card">
+
+            <p class="eyebrow">
+                STEP 1 • DAILY TOTAL
+            </p>
+
+            <h2>
+                Daily Route Summary
+            </h2>
+
+            <p class="muted">
+
+                Enter the total route sales
+                for the day.
+
+                This drives target achievement.
+
+            </p>
+
+
+            <form
+                id="dailyForm"
+                class="stack"
+            >
+
+                <label>
+
+                    Date
+
+                    <input
+                        name="date"
+                        type="date"
+                        value="${today()}"
+                        required
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Today Total Sales (RM)
+
+                    <input
+                        name="todaySales"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        inputmode="decimal"
+                        value="0"
+                        required
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Last Month Same Day (RM)
+
+                    <input
+                        name="lastMonthSameDay"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        inputmode="decimal"
+                        value="0"
+                    >
+
+                </label>
+
+
+                <div class="form-grid">
+
+                    <label>
+
+                        Active (RM)
+
+                        <input
+                            name="active"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            inputmode="decimal"
+                            value="0"
+                        >
+
+                    </label>
+
+
+                    <label>
+
+                        Prepare for Trip (RM)
+
+                        <input
+                            name="prepareTrip"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            inputmode="decimal"
+                            value="0"
+                        >
+
+                    </label>
 
                 </div>
 
-              `;
-            }
-          )
-          .join('')
-      }
-
-    </div>
-  `;
-}
-
-
-/* =========================================================
-   PAGE 4 — SALARY / INCENTIVE
-========================================================= */
-
-function renderIncome() {
-
-  const id =
-    currentStaffId();
-
-  const s =
-    salary(id);
-
-  const plan =
-    incomePlan(id);
-
-  const productList =
-    productIncentives(id);
-
-
-  $('#mainContent')
-    .innerHTML = `
-
-      ${monthAndModeBar()}
-
-
-      <div class="card">
-
-        <p class="eyebrow">
-          PROJECTED CURRENT MONTH INCOME
-        </p>
-
-        <div class="salary-total">
-
-          ${money(s.total)}
-
-        </div>
-
-        <p class="muted">
-
-          ${
-            s.expected > 0
-
-              ? `Expected ${money(s.expected)} • ${
-                  s.total >= s.expected
-                    ? 'Goal achieved'
-                    : money(
-                        s.expected -
-                        s.total
-                      ) +
-                      ' remaining'
-                }`
-
-              : 'Set your expected income below.'
-          }
-
-        </p>
-
-      </div>
-
-
-      <div
-        class="card"
-        style="margin-top:12px"
-      >
-
-        ${incomeRow(
-          'Basic Salary',
-          s.basic
-        )}
-
-        ${incomeRow(
-          'Fuel / Oil',
-          s.fuel
-        )}
-
-        ${incomeRow(
-          'House Rent',
-          s.rent
-        )}
-
-        ${incomeRow(
-          'Food Allowance',
-          s.food
-        )}
-
-        ${incomeRow(
-          'Sales Commission',
-          s.commission
-        )}
-
-        ${incomeRow(
-          'Zero Sales Incentive',
-          s.zeroSales
-        )}
-
-        ${incomeRow(
-          'Product Incentive',
-          s.product
-        )}
-
-        ${incomeRow(
-          'Growth Incentive',
-          s.growth
-        )}
-
-        ${incomeRow(
-          'Manager Incentive',
-          s.manager
-        )}
-
-        ${incomeRow(
-          'Others Incentive',
-          s.other
-        )}
-
-
-        <hr
-          style="
-            border:0;
-            border-top:1px solid var(--line);
-            margin:14px 0
-          "
-        >
-
-
-        ${incomeRow(
-          'TOTAL PROJECTED',
-          s.total,
-          true
-        )}
-
-      </div>
-
-
-      <div
-        class="card"
-        style="margin-top:12px"
-      >
-
-        <p class="eyebrow">
-          EXPECTED INCOME + ACTUAL EXTRA INCENTIVES
-        </p>
-
-
-        <form
-          id="incomeForm"
-          class="stack"
-        >
-
-          <label>
-
-            Expected Total Income (RM)
-
-            <input
-              name="expected"
-              type="number"
-              min="0"
-              step="0.01"
-              value="${number(plan.expected)}"
-            >
-
-          </label>
-
-
-          <label>
-
-            Growth Incentive Actual (RM)
-
-            <input
-              name="growthActual"
-              type="number"
-              min="0"
-              step="0.01"
-              value="${number(plan.growthActual)}"
-            >
-
-          </label>
-
-
-          <label>
-
-            Manual Product Incentive (RM)
-
-            <input
-              name="productManual"
-              type="number"
-              min="0"
-              step="0.01"
-              value="${number(plan.productManual)}"
-            >
-
-          </label>
-
-
-          <label>
-
-            Manager Incentive Actual (RM)
-
-            <input
-              name="managerActual"
-              type="number"
-              min="0"
-              step="0.01"
-              value="${number(plan.managerActual)}"
-            >
-
-          </label>
-
-
-          <label>
-
-            Other Incentive Actual (RM)
-
-            <input
-              name="otherActual"
-              type="number"
-              min="0"
-              step="0.01"
-              value="${number(plan.otherActual)}"
-            >
-
-          </label>
-
-
-          <button
-            class="btn primary"
-          >
-            Save Income Details
-          </button>
-
-        </form>
-
-      </div>
-
-
-      ${
-        session.mode ===
-        'manager'
-
-          ? `
-
-            <div
-              class="card"
-              style="margin-top:12px"
-            >
-
-              <p class="eyebrow">
-                MANAGER • PRODUCT INCENTIVE RULE
-              </p>
-
-
-              <form
-                id="incentiveForm"
-                class="stack"
-              >
 
                 <label>
 
-                  Product SKU
+                    Order Amount (RM)
 
-                  <input
-                    name="skuName"
-                    list="allProductNames"
-                    required
-                    placeholder="Search product"
-                  >
-
-                </label>
-
-
-                <datalist
-                  id="allProductNames"
-                >
-
-                  ${
-                    (
-                      D.products ||
-                      []
-                    )
-                      .map(
-                        x => `
-
-                          <option
-                            value="${esc(x)}"
-                          >
-                          </option>
-
-                        `
-                      )
-                      .join('')
-                  }
-
-                </datalist>
-
-
-                <label>
-
-                  Target Cartons
-
-                  <input
-                    name="targetQty"
-                    type="number"
-                    min="1"
-                    step="1"
-                    required
-                  >
+                    <input
+                        name="orderAmount"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        inputmode="decimal"
+                        value="0"
+                    >
 
                 </label>
 
 
                 <label>
 
-                  Reward RM
+                    Note
 
-                  <input
-                    name="reward"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    required
-                  >
+                    <textarea
+                        name="note"
+                        placeholder="Optional"
+                    ></textarea>
 
                 </label>
 
 
                 <button
-                  class="btn primary"
+                    class="btn primary"
                 >
-                  Create Product Incentive
+                    SAVE DAILY TOTAL
                 </button>
 
-              </form>
-
-            </div>
-
-          `
-
-          : ''
-      }
-
-
-      <div class="section-title">
-
-        <h3>
-          Product Incentive Progress
-        </h3>
-
-      </div>
-
-
-      <div class="list">
-
-        ${
-          productList.length
-
-            ? productList
-                .map(
-                  inc =>
-                    incentiveProgressHtml(
-                      id,
-                      inc
-                    )
-                )
-                .join('')
-
-            : `
-
-              <div class="card">
-
-                <div class="empty">
-
-                  No product incentive set for this month.
-
-                </div>
-
-              </div>
-
-            `
-        }
-
-      </div>
-    `;
-
-
-  bindCommon();
-
-
-  $('#incomeForm')
-    .onsubmit = e => {
-
-      e.preventDefault();
-
-      const fd =
-        new FormData(
-          e.target
-        );
-
-      const st =
-        getState();
-
-
-      st.incomePlans =
-        st.incomePlans.filter(
-          x =>
-            !(
-              x.staffId === id &&
-              x.month ===
-                selectedMonth
-            )
-        );
-
-
-      const rec = {
-
-        staffId:
-          id,
-
-        month:
-          selectedMonth,
-
-        expected:
-          number(
-            fd.get(
-              'expected'
-            )
-          ),
-
-        growthActual:
-          number(
-            fd.get(
-              'growthActual'
-            )
-          ),
-
-        productManual:
-          number(
-            fd.get(
-              'productManual'
-            )
-          ),
-
-        managerActual:
-          number(
-            fd.get(
-              'managerActual'
-            )
-          ),
-
-        otherActual:
-          number(
-            fd.get(
-              'otherActual'
-            )
-          )
-      };
-
-
-      st.incomePlans.push(
-        rec
-      );
-
-
-      setState(st);
-
-
-      safeCloudPost(
-        'saveIncome',
-        {
-
-          month:
-            selectedMonth,
-
-          expected:
-            rec.expected,
-
-          growth:
-            rec.growthActual,
-
-          product:
-            rec.productManual,
-
-          manager:
-            rec.managerActual,
-
-          other:
-            rec.otherActual
-        }
-      );
-
-
-      toast(
-        'Income details saved'
-      );
-
-
-      render();
-    };
-
-
-  const incentiveForm =
-    $('#incentiveForm');
-
-
-  if (
-    incentiveForm
-  ) {
-
-    incentiveForm.onsubmit =
-      e => {
-
-        e.preventDefault();
-
-
-        const fd =
-          new FormData(
-            e.target
-          );
-
-
-        const st =
-          getState();
-
-
-        st.incentives.push({
-
-          id:
-            idGen(),
-
-          staffId:
-            id,
-
-          month:
-            selectedMonth,
-
-          type:
-            'PRODUCT',
-
-          skuName:
-            String(
-              fd.get(
-                'skuName'
-              )
-            ),
-
-          targetQty:
-            number(
-              fd.get(
-                'targetQty'
-              )
-            ),
-
-          reward:
-            number(
-              fd.get(
-                'reward'
-              )
-            )
-        });
-
-
-        setState(st);
-
-
-        toast(
-          'Product incentive created'
-        );
-
-
-        render();
-      };
-  }
-}
-
-function incomeRow(
-  label,
-  value,
-  strong = false
-) {
-
-  return `
-
-    <div
-      class="row"
-      style="padding:8px 0"
-    >
-
-      <span class="muted">
-
-        ${esc(label)}
-
-      </span>
-
-      <${strong
-        ? 'strong'
-        : 'span'}>
-
-        ${money(value)}
-
-      </${strong
-        ? 'strong'
-        : 'span'}>
-
-    </div>
-  `;
-}
-
-function incentiveProgressHtml(
-  staffId,
-  inc
-) {
-
-  const sold =
-    skuTotalAcrossRoute(
-      staffId,
-      inc.skuName
-    ).cartons;
-
-  const target =
-    number(
-      inc.targetQty
-    );
-
-  const left =
-    Math.max(
-      0,
-      target - sold
-    );
-
-  const pct =
-    target > 0
-      ? Math.min(
-          100,
-          sold /
-          target *
-          100
-        )
-      : 0;
-
-  const unlocked =
-    sold >= target;
-
-
-  return `
-
-    <div class="card">
-
-      <div class="row">
-
-        <div>
-
-          <h3
-            style="margin:0"
-          >
-
-            ${esc(inc.skuName)}
-
-          </h3>
-
-          <p
-            class="muted"
-            style="margin:4px 0 0"
-          >
-
-            Reward
-            ${money(inc.reward)}
-
-          </p>
+            </form>
 
         </div>
 
-
-        <span
-          class="
-            pill
-            ${
-              unlocked
-                ? 'green'
-                : 'red'
-            }
-          "
-        >
-
-          ${
-            unlocked
-              ? 'UNLOCKED'
-              : left +
-                ' CTN LEFT'
-          }
-
-        </span>
-
-      </div>
-
-
-      <div
-        class="progress-wrap"
-        style="margin-top:12px"
-      >
 
         <div
-          class="
-            progress
-            ${
-              unlocked
-                ? 'goodbar'
-                : ''
-            }
-          "
-          style="
-            width:${pct}%
-          "
-        >
-        </div>
-
-      </div>
-
-
-      <div
-        class="row"
-        style="margin-top:8px"
-      >
-
-        <small class="muted">
-
-          ${sold}/${target}
-          CTN achieved
-
-        </small>
-
-        <strong
-          class="${
-            unlocked
-              ? 'good'
-              : 'bad'
-          }"
+            class="card"
+            style="margin-top:12px"
         >
 
-          ${pct.toFixed(0)}%
+            <p class="eyebrow">
+                STEP 2 • OUTLET & SKU
+            </p>
 
-        </strong>
+            <h2>
+                What Did You Sell?
+            </h2>
 
-      </div>
+            <p class="muted">
 
-    </div>
-  `;
-}
+                Find your outlet,
+                enter outlet sales,
+                then add SKU if needed.
 
+            </p>
 
-/* =========================================================
-   PAGE 5 — SUMMARY
-========================================================= */
 
-function renderSummary() {
+            <form
+                id="saleForm"
+                class="stack"
+            >
 
-  const id =
-    currentStaffId();
+                <label>
 
-  const p =
-    performance(id);
+                    Date
 
-  const sal =
-    salary(id);
+                    <input
+                        name="date"
+                        type="date"
+                        value="${today()}"
+                        required
+                    >
 
-  const daily =
-    monthDaily(id)
+                </label>
 
-      .slice()
 
-      .sort(
-        (a, b) =>
-          a.date
-            .localeCompare(
-              b.date
-            )
-      );
+                <label>
 
-  const plans =
-    monthPlans(id);
+                    Search Outlet
 
+                    <input
+                        id="outletSearch"
+                        placeholder="Type outlet name or code"
+                    >
 
-  $('#mainContent')
-    .innerHTML = `
+                </label>
 
-      ${monthAndModeBar()}
 
+                <label>
 
-      <div class="hero">
+                    Select Outlet
 
-        <p class="eyebrow">
+                    <select
+                        id="outletSel"
+                        name="outlet"
+                        required
+                    >
+                        ${outletOptions(id)}
+                    </select>
 
-          ${monthName(selectedMonth).toUpperCase()}
-          SUMMARY
+                </label>
 
-        </p>
 
-        <h3>
+                <label>
 
-          ${esc(
-            userById(id)?.name ||
-            id
-          )}
+                    Outlet Sales (RM)
 
-        </h3>
+                    <input
+                        name="sales"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        inputmode="decimal"
+                        value="0"
+                        required
+                    >
 
-        <p class="muted">
+                </label>
 
-          Target
-          ${money(p.target)}
 
-          •
+                <div
+                    class="card"
+                    style="
+                        padding:12px;
+                        background:#0a0d11
+                    "
+                >
 
-          Achievement
-          ${money(p.achievement)}
+                    <p
+                        class="eyebrow"
+                        style="margin-top:0"
+                    >
+                        OPTIONAL SKU DETAIL
+                    </p>
 
-          •
 
-          Shortfall
-          ${money(p.shortfall)}
+                    <label>
 
-        </p>
+                        Search SKU
 
-      </div>
-
-
-      <div class="grid kpi-grid">
-
-        ${kpi(
-          'TARGET',
-          money(p.target),
-          'Fixed route target'
-        )}
-
-        ${kpi(
-          'ACHIEVEMENT',
-          money(p.achievement),
-          'MTD sales',
-          p.achievement >=
-          p.target
-            ? 'good'
-            : ''
-        )}
-
-        ${kpi(
-          'SHORTFALL',
-          money(p.shortfall),
-          'Remaining',
-          p.shortfall > 0
-            ? 'bad'
-            : 'good'
-        )}
-
-        ${kpi(
-          'PROJECTED INCOME',
-          money(sal.total),
-          'Salary + incentives'
-        )}
-
-      </div>
-
-
-      <div
-        class="card"
-        style="
-          margin-top:12px;
-          overflow:auto
-        "
-      >
-
-        <h3>
-          Day-by-Day Tracker
-        </h3>
-
-
-        <table
-          class="summary-table"
-          style="min-width:760px"
-        >
-
-          <thead>
-
-            <tr>
-
-              <th>Date</th>
-
-              <th>Sales</th>
-
-              <th>Last Month</th>
-
-              <th>Growth</th>
-
-              <th>Active</th>
-
-              <th>Prepare Trip</th>
-
-              <th>Order</th>
-
-            </tr>
-
-          </thead>
-
-
-          <tbody>
-
-            ${
-              daily.length
-
-                ? daily
-                    .map(
-                      x => {
-
-                        const g =
-                          number(
-                            x.lastMonthSameDay
-                          ) > 0
-
-                            ? (
-                                (
-                                  number(
-                                    x.todaySales
-                                  ) -
-                                  number(
-                                    x.lastMonthSameDay
-                                  )
-                                ) /
-                                number(
-                                  x.lastMonthSameDay
-                                ) *
-                                100
-                              )
-
-                            : 0;
-
-
-                        return `
-
-                          <tr>
-
-                            <td>
-                              ${esc(x.date)}
-                            </td>
-
-                            <td>
-                              ${money(x.todaySales)}
-                            </td>
-
-                            <td>
-                              ${money(x.lastMonthSameDay)}
-                            </td>
-
-                            <td
-                              class="${
-                                g >= 0
-                                  ? 'good'
-                                  : 'bad'
-                              }"
-                            >
-
-                              ${
-                                g >= 0
-                                  ? '+'
-                                  : ''
-                              }
-
-                              ${g.toFixed(1)}%
-
-                            </td>
-
-                            <td>
-                              ${money(x.active)}
-                            </td>
-
-                            <td>
-                              ${money(x.prepareTrip)}
-                            </td>
-
-                            <td>
-                              ${money(x.orderAmount)}
-                            </td>
-
-                          </tr>
-
-                        `;
-                      }
-                    )
-                    .join('')
-
-                : `
-
-                  <tr>
-
-                    <td colspan="7">
-                      No daily data
-                    </td>
-
-                  </tr>
-
-                `
-            }
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-
-      <div
-        class="card"
-        style="
-          margin-top:12px;
-          overflow:auto
-        "
-      >
-
-        <h3>
-          Outlet Target vs Actual
-        </h3>
-
-
-        <table
-          class="summary-table"
-          style="min-width:620px"
-        >
-
-          <thead>
-
-            <tr>
-
-              <th>Outlet</th>
-
-              <th>Target</th>
-
-              <th>Actual</th>
-
-              <th>Shortfall</th>
-
-              <th>Status</th>
-
-            </tr>
-
-          </thead>
-
-
-          <tbody>
-
-            ${
-              plans.length
-
-                ? plans
-                    .map(
-                      plan => {
-
-                        const actual =
-                          outletAchievement(
-                            id,
-                            plan.outletName
-                          );
-
-                        const short =
-                          Math.max(
-                            0,
-                            number(
-                              plan.outletTarget
-                            ) -
-                            actual
-                          );
-
-
-                        return `
-
-                          <tr>
-
-                            <td>
-                              ${esc(plan.outletName)}
-                            </td>
-
-                            <td>
-                              ${money(plan.outletTarget)}
-                            </td>
-
-                            <td>
-                              ${money(actual)}
-                            </td>
-
-                            <td
-                              class="${
-                                short > 0
-                                  ? 'bad'
-                                  : 'good'
-                              }"
-                            >
-
-                              ${money(short)}
-
-                            </td>
-
-                            <td>
-
-                              ${
-                                short > 0
-                                  ? 'PUSH'
-                                  : 'ACHIEVED'
-                              }
-
-                            </td>
-
-                          </tr>
-
-                        `;
-                      }
-                    )
-                    .join('')
-
-                : `
-
-                  <tr>
-
-                    <td colspan="5">
-                      No outlet plan
-                    </td>
-
-                  </tr>
-
-                `
-            }
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-
-      <div
-        class="card"
-        style="
-          margin-top:12px;
-          overflow:auto
-        "
-      >
-
-        <h3>
-          SKU Target vs Actual
-        </h3>
-
-
-        <table
-          class="summary-table"
-          style="min-width:920px"
-        >
-
-          <thead>
-
-            <tr>
-
-              <th>Outlet</th>
-
-              <th>SKU</th>
-
-              <th>Target CTN</th>
-
-              <th>Actual CTN</th>
-
-              <th>CTN Left</th>
-
-              <th>Target RM</th>
-
-              <th>Actual RM</th>
-
-              <th>RM Left</th>
-
-            </tr>
-
-          </thead>
-
-
-          <tbody>
-
-            ${skuSummaryRows(id)}
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-
-      <div
-        class="card"
-        style="margin-top:12px"
-      >
-
-        <button
-          id="xlsxBtn"
-          class="btn primary"
-        >
-
-          Download Real Excel (.xlsx)
-
-        </button>
-
-
-        ${
-          session.mode ===
-          'manager'
-
-            ? `
-
-              <button
-                id="cloudSetupBtn"
-                class="btn secondary"
-                style="margin-top:10px"
-              >
-
-                Cloud Setup / Sync
-
-              </button>
-
-            `
-
-            : ''
-        }
-
-      </div>
-
-
-      ${
-        session.mode ===
-        'manager'
-
-          ? managerTaskForm(id)
-
-          : ''
-      }
-    `;
-
-
-  bindCommon();
-
-
-  $('#xlsxBtn')
-    .onclick =
-      () =>
-        exportXlsx(id);
-
-
-  if (
-    $('#cloudSetupBtn')
-  ) {
-
-    $('#cloudSetupBtn')
-      .onclick =
-        cloudSetup;
-  }
-
-
-  bindManagerTaskForm(id);
-}
-
-function skuSummaryRows(
-  staffId
-) {
-
-  const rows = [];
-
-
-  monthPlans(
-    staffId
-  ).forEach(
-    plan => {
-
-      (
-        plan.targetSkus ||
-        []
-      ).forEach(
-        sku => {
-
-          const target =
-            plan
-              .skuTargets?.[
-                sku
-              ] || {
-
-              cartons: 0,
-
-              value: 0
-            };
-
-
-          const actual =
-            skuAchievement(
-
-              staffId,
-
-              plan.outletName,
-
-              sku
-            );
-
-
-          rows.push(`
-
-            <tr>
-
-              <td>
-
-                ${esc(plan.outletName)}
-
-              </td>
-
-              <td>
-
-                ${esc(sku)}
-
-              </td>
-
-              <td>
-
-                ${number(target.cartons)}
-
-              </td>
-
-              <td>
-
-                ${actual.cartons}
-
-              </td>
-
-              <td
-                class="${
-                  Math.max(
-                    0,
-                    number(
-                      target.cartons
-                    ) -
-                    actual.cartons
-                  ) > 0
-
-                    ? 'bad'
-                    : 'good'
-                }"
-              >
-
-                ${
-                  Math.max(
-                    0,
-                    number(
-                      target.cartons
-                    ) -
-                    actual.cartons
-                  )
-                }
-
-              </td>
-
-              <td>
-
-                ${money(target.value)}
-
-              </td>
-
-              <td>
-
-                ${money(actual.value)}
-
-              </td>
-
-              <td
-                class="${
-                  Math.max(
-                    0,
-                    number(
-                      target.value
-                    ) -
-                    actual.value
-                  ) > 0
-
-                    ? 'bad'
-                    : 'good'
-                }"
-              >
-
-                ${
-                  money(
-                    Math.max(
-                      0,
-                      number(
-                        target.value
-                      ) -
-                      actual.value
-                    )
-                  )
-                }
-
-              </td>
-
-            </tr>
-
-          `);
-        }
-      );
-    }
-  );
-
-
-  return rows.join('') ||
-
-    `
-
-      <tr>
-
-        <td colspan="8">
-          No SKU plan
-        </td>
-
-      </tr>
-
-    `;
-}
-
-
-/* =========================================================
-   REAL XLSX EXPORT
-========================================================= */
-
-async function loadXlsxLibrary() {
-
-  if (
-    window.XLSX
-  ) {
-
-    return true;
-  }
-
-
-  return new Promise(
-    resolve => {
-
-      const s =
-        document
-          .createElement(
-            'script'
-          );
-
-
-      s.src =
-        'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
-
-
-      s.onload =
-        () =>
-          resolve(true);
-
-
-      s.onerror =
-        () =>
-          resolve(false);
-
-
-      document.head
-        .appendChild(s);
-    }
-  );
-}
-
-async function exportXlsx(
-  staffId
-) {
-
-  toast(
-    'Preparing Excel report...'
-  );
-
-
-  const ok =
-    await loadXlsxLibrary();
-
-
-  if (
-    !ok ||
-    !window.XLSX
-  ) {
-
-    toast(
-      'Excel library could not load. Check internet and try again.'
-    );
-
-    return;
-  }
-
-
-  const p =
-    performance(
-      staffId
-    );
-
-  const sal =
-    salary(
-      staffId
-    );
-
-  const st =
-    getState();
-
-
-  const wb =
-    XLSX.utils
-      .book_new();
-
-
-  const dailyRows =
-    monthDaily(
-      staffId
-    )
-
-      .slice()
-
-      .sort(
-        (a, b) =>
-          a.date
-            .localeCompare(
-              b.date
-            )
-      )
-
-      .map(
-        x => ({
-
-          Date:
-            x.date,
-
-          'Staff ID':
-            staffId,
-
-          Salesman:
-            userById(
-              staffId
-            )?.name || '',
-
-          'Today Sales':
-            number(
-              x.todaySales
-            ),
-
-          'Last Month Same Day':
-            number(
-              x.lastMonthSameDay
-            ),
-
-          Active:
-            number(
-              x.active
-            ),
-
-          'Prepare for Trip':
-            number(
-              x.prepareTrip
-            ),
-
-          'Order Amount':
-            number(
-              x.orderAmount
-            ),
-
-          Note:
-            x.note || ''
-        })
-      );
-
-
-  const outletRows =
-    outletsFor(
-      staffId
-    )
-      .map(
-        o => {
-
-          const plan =
-            monthPlans(
-              staffId
-            )
-              .find(
-                x =>
-                  x.outletName ===
-                  o.name
-              );
-
-          const actual =
-            outletAchievement(
-              staffId,
-              o.name
-            );
-
-
-          return {
-
-            'Outlet Code':
-              o.code || '',
-
-            'Outlet Name':
-              o.name,
-
-            Category:
-              o.category || '',
-
-            'Total SKU':
-              number(
-                o.totalSku
-              ),
-
-            'Outlet Target':
-              number(
-                plan?.outletTarget
-              ),
-
-            'Actual Sales':
-              actual,
-
-            Shortfall:
-              Math.max(
-                0,
-                number(
-                  plan?.outletTarget
-                ) -
-                actual
-              ),
-
-            'Zero Sales':
-              actual > 0
-                ? 'NO'
-                : 'YES'
-          };
-        }
-      );
-
-
-  const skuRows = [];
-
-
-  monthPlans(
-    staffId
-  ).forEach(
-    plan => {
-
-      (
-        plan.targetSkus ||
-        []
-      ).forEach(
-        sku => {
-
-          const target =
-            plan
-              .skuTargets?.[
-                sku
-              ] || {
-
-              cartons: 0,
-
-              value: 0
-            };
-
-
-          const actual =
-            skuAchievement(
-
-              staffId,
-
-              plan.outletName,
-
-              sku
-            );
-
-
-          skuRows.push({
-
-            Outlet:
-              plan.outletName,
-
-            SKU:
-              sku,
-
-            'Target CTN':
-              number(
-                target.cartons
-              ),
-
-            'Actual CTN':
-              actual.cartons,
-
-            'Remaining CTN':
-              Math.max(
-                0,
-                number(
-                  target.cartons
-                ) -
-                actual.cartons
-              ),
-
-            'Target RM':
-              number(
-                target.value
-              ),
-
-            'Actual RM':
-              actual.value,
-
-            'Remaining RM':
-              Math.max(
-                0,
-                number(
-                  target.value
-                ) -
-                actual.value
-              )
-          });
-        }
-      );
-    }
-  );
-
-
-  const incomeRows = [
-
-    {
-      Component:
-        'Basic Salary',
-
-      Amount:
-        sal.basic
-    },
-
-    {
-      Component:
-        'Fuel / Oil',
-
-      Amount:
-        sal.fuel
-    },
-
-    {
-      Component:
-        'House Rent',
-
-      Amount:
-        sal.rent
-    },
-
-    {
-      Component:
-        'Food Allowance',
-
-      Amount:
-        sal.food
-    },
-
-    {
-      Component:
-        'Commission',
-
-      Amount:
-        sal.commission
-    },
-
-    {
-      Component:
-        'Zero Sales Incentive',
-
-      Amount:
-        sal.zeroSales
-    },
-
-    {
-      Component:
-        'Product Incentive',
-
-      Amount:
-        sal.product
-    },
-
-    {
-      Component:
-        'Growth Incentive',
-
-      Amount:
-        sal.growth
-    },
-
-    {
-      Component:
-        'Manager Incentive',
-
-      Amount:
-        sal.manager
-    },
-
-    {
-      Component:
-        'Others',
-
-      Amount:
-        sal.other
-    },
-
-    {
-      Component:
-        'TOTAL PROJECTED',
-
-      Amount:
-        sal.total
-    }
-  ];
-
-
-  const summaryRows = [{
-
-    Month:
-      selectedMonth,
-
-    'Staff ID':
-      staffId,
-
-    Salesman:
-      userById(
-        staffId
-      )?.name || '',
-
-    'Route Target':
-      p.target,
-
-    Achievement:
-      p.achievement,
-
-    Shortfall:
-      p.shortfall,
-
-    'Required Per Day':
-      p.requiredPerDay,
-
-    Growth:
-      p.growth,
-
-    'Total Route Outlets':
-      p.routeOutlets.length,
-
-    'Covered Outlets':
-      p.covered.length,
-
-    'Zero Sales Outlets':
-      p.zeroSales.length,
-
-    'Projected Income':
-      sal.total
-  }];
-
-
-  const taskRows =
-    st.tasks
-
-      .filter(
-        t =>
-          t.staffId ===
-          staffId
-      )
-
-      .map(
-        t => ({
-
-          Title:
-            t.title,
-
-          Instruction:
-            t.note,
-
-          'Due Date':
-            t.due,
-
-          Status:
-            t.done
-              ? 'DONE'
-              : 'PENDING'
-        })
-      );
-
-
-  addSheet(
-    wb,
-    'Summary',
-    summaryRows
-  );
-
-  addSheet(
-    wb,
-    'Daily Tracker',
-    dailyRows
-  );
-
-  addSheet(
-    wb,
-    'Outlet Performance',
-    outletRows
-  );
-
-  addSheet(
-    wb,
-    'SKU Performance',
-    skuRows
-  );
-
-  addSheet(
-    wb,
-    'Salary Incentive',
-    incomeRows
-  );
-
-  addSheet(
-    wb,
-    'Tasks',
-    taskRows
-  );
-
-
-  XLSX.writeFile(
-    wb,
-    `${staffId}_${selectedMonth}_Sales_Performance.xlsx`
-  );
-
-
-  toast(
-    'Excel downloaded'
-  );
-}
-
-function addSheet(
-  wb,
-  name,
-  rows
-) {
-
-  const safeRows =
-    rows.length
-
-      ? rows
-
-      : [
-          {
-            Info:
-              'No data'
-          }
-        ];
-
-
-  const ws =
-    XLSX.utils
-      .json_to_sheet(
-        safeRows
-      );
-
-
-  XLSX.utils
-    .book_append_sheet(
-
-      wb,
-
-      ws,
-
-      name.slice(
-        0,
-        31
-      )
-    );
-}
-
-
-/* =========================================================
-   PAGE 6 — TASKS
-========================================================= */
-
-function renderTasks() {
-
-  const id =
-    currentStaffId();
-
-
-  const tasks =
-    getState()
-      .tasks
-
-      .filter(
-        t =>
-          t.staffId ===
-          id
-      )
-
-      .slice()
-
-      .sort(
-        (a, b) =>
-          String(
-            b.createdAt
-          )
-            .localeCompare(
-              String(
-                a.createdAt
-              )
-            )
-      );
-
-
-  $('#mainContent')
-    .innerHTML = `
-
-      ${monthAndModeBar()}
-
-
-      <div class="card">
-
-        <p class="eyebrow">
-          SPECIAL ASSIGNMENTS
-        </p>
-
-        <h2>
-
-          ${
-            session.mode ===
-            'manager'
-
-              ? 'Selected SR Tasks'
-
-              : 'My Tasks'
-          }
-
-        </h2>
-
-      </div>
-
-
-      <div
-        class="list"
-        style="margin-top:12px"
-      >
-
-        ${
-          tasks.length
-
-            ? tasks
-                .map(
-                  t => `
-
-                    <div class="list-item">
-
-                      <div class="row">
-
-                        <div>
-
-                          <h4>
-
-                            ${esc(t.title)}
-
-                          </h4>
-
-                          <p>
-
-                            ${esc(
-                              t.note ||
-                              'No instruction'
-                            )}
-
-                            ${
-                              t.due
-
-                                ? '<br>Due: ' +
-                                  esc(t.due)
-
-                                : ''
-                            }
-
-                          </p>
-
-                        </div>
-
-
-                        <span
-                          class="
-                            pill
-                            ${
-                              t.done
-                                ? 'green'
-                                : 'red'
-                            }
-                          "
+                        <input
+                            id="skuSearch"
+                            placeholder="Type basil, noodles, biscuit..."
                         >
 
-                          ${
-                            t.done
-                              ? 'DONE'
-                              : 'PENDING'
-                          }
-
-                        </span>
-
-                      </div>
+                    </label>
 
 
-                      ${
-                        session.mode !==
-                          'manager' &&
-                        !t.done
+                    <label>
 
-                          ? `
+                        Select SKU
 
-                            <button
-                              class="btn secondary"
-                              data-complete-task="${esc(t.id)}"
-                              style="margin-top:10px"
+                        <select
+                            id="skuSel"
+                            name="skuName"
+                        >
+                            <option value="">
+                                Select outlet first
+                            </option>
+                        </select>
+
+                    </label>
+
+
+                    <div class="form-grid">
+
+                        <label>
+
+                            Cartons Sold
+
+                            <input
+                                name="cartons"
+                                type="number"
+                                min="0"
+                                step="1"
+                                inputmode="numeric"
+                                value="0"
                             >
 
-                              Mark Complete
+                        </label>
 
-                            </button>
 
-                          `
+                        <label>
 
-                          : ''
-                      }
+                            SKU Sales Value (RM)
+
+                            <input
+                                name="skuValue"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                inputmode="decimal"
+                                value="0"
+                            >
+
+                        </label>
 
                     </div>
 
-                  `
-                )
-                .join('')
-
-            : `
-
-              <div class="card">
-
-                <div class="empty">
-                  No task assigned.
                 </div>
 
-              </div>
 
-            `
-        }
+                <label>
 
-      </div>
+                    Note
 
+                    <textarea
+                        name="note"
+                        placeholder="Optional"
+                    ></textarea>
 
-      ${
-        session.mode ===
-        'manager'
+                </label>
 
-          ? managerTaskForm(id)
 
-          : ''
-      }
-    `;
+                <button
+                    class="btn primary"
+                >
+                    SAVE OUTLET / SKU SALE
+                </button>
 
-
-  bindCommon();
-
-
-  bindManagerTaskForm(
-    id
-  );
-
-
-  $$('[data-complete-task]')
-    .forEach(
-      b => {
-
-        b.onclick =
-          () => {
-
-            const st =
-              getState();
-
-
-            const task =
-              st.tasks
-                .find(
-                  t =>
-                    t.id ===
-                    b.dataset
-                      .completeTask
-                );
-
-
-            if (
-              task
-            ) {
-
-              task.done =
-                true;
-            }
-
-
-            setState(st);
-
-
-            toast(
-              'Task completed'
-            );
-
-
-            render();
-          };
-      }
-    );
-}
-
-function managerTaskForm(
-  staffId
-) {
-
-  if (
-    session.mode !==
-    'manager'
-  ) {
-
-    return '';
-  }
-
-
-  return `
-
-    <div
-      class="card"
-      style="margin-top:12px"
-    >
-
-      <p class="eyebrow">
-        MANAGER SPECIAL TASK
-      </p>
-
-      <h3>
-
-        Assign to
-
-        ${esc(
-          userById(
-            staffId
-          )?.name ||
-          staffId
-        )}
-
-      </h3>
-
-
-      <form
-        id="managerTaskForm"
-        class="stack"
-      >
-
-        <label>
-
-          Task Title
-
-          <input
-            name="title"
-            required
-          >
-
-        </label>
-
-
-        <label>
-
-          Instruction
-
-          <textarea
-            name="note"
-            required
-          ></textarea>
-
-        </label>
-
-
-        <label>
-
-          Due Date
-
-          <input
-            name="due"
-            type="date"
-          >
-
-        </label>
-
-
-        <button
-          class="btn primary"
-        >
-
-          Send Task
-
-        </button>
-
-      </form>
-
-    </div>
-  `;
-}
-
-function bindManagerTaskForm(
-  staffId
-) {
-
-  const form =
-    $('#managerTaskForm');
-
-
-  if (!form) return;
-
-
-  form.onsubmit =
-    e => {
-
-      e.preventDefault();
-
-
-      const fd =
-        new FormData(
-          e.target
-        );
-
-
-      const st =
-        getState();
-
-
-      const record = {
-
-        id:
-          idGen(),
-
-        staffId,
-
-        title:
-          String(
-            fd.get(
-              'title'
-            )
-          ),
-
-        note:
-          String(
-            fd.get(
-              'note'
-            )
-          ),
-
-        due:
-          String(
-            fd.get(
-              'due'
-            ) || ''
-          ),
-
-        done:
-          false,
-
-        createdAt:
-          new Date()
-            .toISOString()
-      };
-
-
-      st.tasks.push(
-        record
-      );
-
-
-      setState(st);
-
-
-      safeCloudPost(
-        'saveTask',
-        {
-
-          staffId,
-
-          title:
-            record.title,
-
-          instruction:
-            record.note,
-
-          due:
-            record.due
-        }
-      );
-
-
-      toast(
-        'Task assigned'
-      );
-
-
-      render();
-    };
-}
-
-
-/* =========================================================
-   PAGE 7 — ZERO SALES
-========================================================= */
-
-function renderZeroSales() {
-
-  const id =
-    currentStaffId();
-
-  const p =
-    performance(id);
-
-
-  $('#mainContent')
-    .innerHTML = `
-
-      ${monthAndModeBar()}
-
-
-      <div class="hero">
-
-        <p class="eyebrow">
-          ZERO SALES COVERAGE
-        </p>
-
-        <h3>
-
-          ${p.coverage.toFixed(0)}%
-          Covered
-
-        </h3>
-
-        <p class="muted">
-
-          ${p.covered.length}
-          covered
-
-          •
-
-          ${p.zeroSales.length}
-          zero sales
-
-          •
-
-          ${p.routeOutlets.length}
-          total route outlets
-
-        </p>
-
-
-        <div class="progress-wrap">
-
-          <div
-            class="
-              progress
-              ${
-                p.coverage >= 100
-                  ? 'goodbar'
-                  : ''
-              }
-            "
-            style="
-              width:${p.coverage}%
-            "
-          >
-          </div>
+            </form>
 
         </div>
 
-      </div>
+
+        <div class="section-title">
+
+            <h3>
+                Recent Outlet Entries
+            </h3>
+
+        </div>
 
 
-      <div class="section-title">
+        <div class="list">
 
-        <h3>
-          Zero Sales Outlets
-        </h3>
+            ${
+                recent.length
 
-      </div>
+                ?recent
+                    .map(
+                        x=>`
+                            <div class="list-item">
 
+                                <div class="row">
 
-      <div class="list">
+                                    <div>
 
-        ${
-          p.zeroSales.length
+                                        <h4>
+                                            ${esc(x.outletName)}
+                                        </h4>
 
-            ? p.zeroSales
-                .map(
-                  o => `
+                                        <p>
+                                            ${esc(x.date)}
+                                            •
+                                            ${money(x.sales)}
+                                        </p>
 
-                    <div class="list-item">
+                                    </div>
 
-                      <div class="row">
+                                    <span class="pill green">
+                                        SAVED
+                                    </span>
 
-                        <div>
+                                </div>
 
-                          <h4>
-                            ${esc(o.name)}
-                          </h4>
+                            </div>
+                        `
+                    )
+                    .join('')
 
-                          <p>
-
-                            ${esc(
-                              o.category ||
-                              'Other'
-                            )}
-
-                            •
-
-                            ${esc(
-                              o.code ||
-                              'No code'
-                            )}
-
-                          </p>
-
-                        </div>
-
-
-                        <span class="pill red">
-
-                          ZERO
-
-                        </span>
-
-                      </div>
-
+                :`
+                    <div class="empty">
+                        No outlet entry yet.
                     </div>
+                `
+            }
 
-                  `
-                )
-                .join('')
-
-            : `
-
-              <div class="card">
-
-                <div class="empty">
-
-                  ${
-                    p.routeOutlets.length
-
-                      ? 'Excellent — all outlets have sales.'
-
-                      : 'Outlet master is not loaded yet.'
-                  }
-
-                </div>
-
-              </div>
-
-            `
-        }
-
-      </div>
-
-
-      <div class="section-title">
-
-        <h3>
-          Covered Outlets
-        </h3>
-
-      </div>
-
-
-      <div class="list">
-
-        ${
-          p.covered
-            .map(
-              o => `
-
-                <div class="list-item">
-
-                  <div class="row">
-
-                    <div>
-
-                      <h4>
-                        ${esc(o.name)}
-                      </h4>
-
-                      <p>
-
-                        ${money(
-                          outletAchievement(
-                            id,
-                            o.name
-                          )
-                        )}
-
-                      </p>
-
-                    </div>
-
-
-                    <span class="pill green">
-
-                      COVERED
-
-                    </span>
-
-                  </div>
-
-                </div>
-
-              `
-            )
-            .join('') ||
-
-          `
-
-            <div class="empty">
-              No covered outlet yet.
-            </div>
-
-          `
-        }
-
-      </div>
+        </div>
     `;
 
+    bindCommon();
 
-  bindCommon();
+    const oSearch=
+        $('#outletSearch');
+
+    const oSel=
+        $('#outletSel');
+
+    const sSearch=
+        $('#skuSearch');
+
+    const sSel=
+        $('#skuSel');
+
+
+    function refreshOutlets(){
+
+        const before=
+            oSel.value;
+
+        oSel.innerHTML=
+            outletOptions(
+                id,
+                before,
+                oSearch.value
+            );
+
+        if(
+            before&&
+            [...oSel.options]
+                .some(
+                    o=>
+                        o.value===before
+                )
+        ){
+
+            oSel.value=
+                before;
+        }
+
+        refreshSkus();
+    }
+
+
+    function refreshSkus(){
+
+        const before=
+            sSel.value;
+
+        if(!oSel.value){
+
+            sSel.innerHTML=
+                '<option value="">Select outlet first</option>';
+
+            return;
+        }
+
+        sSel.innerHTML=
+            skuOptions(
+                id,
+                oSel.value,
+                before,
+                sSearch.value
+            );
+
+        if(
+            before&&
+            [...sSel.options]
+                .some(
+                    o=>
+                        o.value===before
+                )
+        ){
+
+            sSel.value=
+                before;
+        }
+    }
+
+
+    oSearch.oninput=
+        refreshOutlets;
+
+
+    oSel.onchange=
+        ()=>{
+
+            sSearch.value='';
+
+            refreshSkus();
+        };
+
+
+    sSearch.oninput=
+        refreshSkus;
+
+
+    refreshSkus();
+
+
+    $('#dailyForm')
+        .onsubmit=
+            e=>{
+
+                e.preventDefault();
+
+                const fd=
+                    new FormData(
+                        e.target
+                    );
+
+                const date=
+                    String(
+                        fd.get('date')
+                    );
+
+                const month=
+                    date.slice(
+                        0,
+                        7
+                    );
+
+                const s=
+                    state();
+
+                s.daily=
+                    s.daily
+                        .filter(
+                            x=>!(
+                                x.staffId===id&&
+                                x.date===date
+                            )
+                        );
+
+                const rec={
+                    id:idGen(),
+                    staffId:id,
+                    month,
+                    date,
+                    todaySales:n(
+                        fd.get(
+                            'todaySales'
+                        )
+                    ),
+                    lastMonthSameDay:n(
+                        fd.get(
+                            'lastMonthSameDay'
+                        )
+                    ),
+                    active:n(
+                        fd.get(
+                            'active'
+                        )
+                    ),
+                    prepareTrip:n(
+                        fd.get(
+                            'prepareTrip'
+                        )
+                    ),
+                    orderAmount:n(
+                        fd.get(
+                            'orderAmount'
+                        )
+                    ),
+                    note:String(
+                        fd.get(
+                            'note'
+                        )||''
+                    )
+                };
+
+                s.daily.push(
+                    rec
+                );
+
+                save(s);
+
+                selectedMonth=
+                    month;
+
+                pushCloud(
+                    'saveDaily',
+                    rec
+                );
+
+                toast(
+                    `Saved ${money(rec.todaySales)} for ${date}`
+                );
+
+                render();
+            };
+
+
+    $('#saleForm')
+        .onsubmit=
+            e=>{
+
+                e.preventDefault();
+
+                const fd=
+                    new FormData(
+                        e.target
+                    );
+
+                const date=
+                    String(
+                        fd.get('date')
+                    );
+
+                const month=
+                    date.slice(
+                        0,
+                        7
+                    );
+
+                const outletName=
+                    String(
+                        fd.get(
+                            'outlet'
+                        )||''
+                    );
+
+                const o=
+                    outletsFor(id)
+                        .find(
+                            x=>
+                                x.name===outletName
+                        );
+
+                if(!o){
+
+                    toast(
+                        'Please select an outlet'
+                    );
+
+                    return;
+                }
+
+                const s=
+                    state();
+
+                const outRec={
+                    id:idGen(),
+                    staffId:id,
+                    month,
+                    date,
+                    outletCode:
+                        o.code||'',
+                    outletName,
+                    sales:n(
+                        fd.get(
+                            'sales'
+                        )
+                    ),
+                    note:String(
+                        fd.get(
+                            'note'
+                        )||''
+                    )
+                };
+
+                s.outletSales.push(
+                    outRec
+                );
+
+                const skuName=
+                    String(
+                        fd.get(
+                            'skuName'
+                        )||''
+                    ).trim();
+
+                let skuRec=null;
+
+                if(skuName){
+
+                    skuRec={
+                        id:idGen(),
+                        staffId:id,
+                        month,
+                        date,
+                        outletCode:
+                            o.code||'',
+                        outletName,
+                        skuName,
+                        cartons:n(
+                            fd.get(
+                                'cartons'
+                            )
+                        ),
+                        salesValue:n(
+                            fd.get(
+                                'skuValue'
+                            )
+                        )
+                    };
+
+                    s.skuSales.push(
+                        skuRec
+                    );
+                }
+
+                save(s);
+
+                selectedMonth=
+                    month;
+
+                pushCloud(
+                    'saveOutlet',
+                    outRec
+                );
+
+                if(skuRec){
+
+                    pushCloud(
+                        'saveSku',
+                        skuRec
+                    );
+                }
+
+                toast(
+                    skuRec
+                    ?`Saved ${o.name} • ${skuName}`
+                    :`Saved ${o.name} • ${money(outRec.sales)}`
+                );
+
+                render();
+            };
 }
 
 
 /* =========================================================
-   PAGE 8 — SKU PERFORMANCE
+   PLANNING
 ========================================================= */
 
-function renderSkuPerformance() {
+function renderPlanning(){
 
-  const id =
-    currentStaffId();
+    const id=
+        uid();
 
-  const plans =
-    monthPlans(id);
+    const plans=
+        monthPlans(id);
 
+    if(
+        session.mode===
+        'manager'
+    ){
 
-  $('#mainContent')
-    .innerHTML = `
+        $('#mainContent')
+            .innerHTML=`
 
-      ${monthAndModeBar()}
+            ${monthBar()}
 
+            <div class="card">
 
-      <div class="card">
+                <p class="eyebrow">
+                    MANAGER REVIEW
+                </p>
 
-        <p class="eyebrow">
-          SKU-WISE TARGET
-        </p>
+                <h2>
+                    Monthly Planning
+                </h2>
 
-        <h2>
-          Product Performance
-        </h2>
+                ${planningHtml(id)}
 
-        <p class="muted">
+            </div>
+        `;
 
-          Target cartons and sales value update automatically from daily SKU entries.
+        bindCommon();
 
-        </p>
-
-      </div>
-
-
-      <div
-        class="list"
-        style="margin-top:12px"
-      >
-
-        ${
-          plans.length
-
-            ? plans
-                .map(
-                  plan => `
-
-                    <div class="card">
-
-                      <h3>
-
-                        ${esc(plan.outletName)}
-
-                      </h3>
+        return;
+    }
 
 
-                      ${
-                        (
-                          plan.targetSkus ||
-                          []
-                        ).length
+    $('#mainContent')
+        .innerHTML=`
 
-                          ? (
-                              plan.targetSkus ||
-                              []
+        ${monthBar()}
+
+
+        <div class="card">
+
+            <p class="eyebrow">
+                ROUTE TARGET
+            </p>
+
+            <h2>
+                ${money(routeTarget(id))}
+            </h2>
+
+            <p class="muted">
+
+                Choose an outlet and set
+                its monthly target.
+
+                Then choose targeted SKUs
+                and carton/value targets.
+
+            </p>
+
+        </div>
+
+
+        <div
+            class="card"
+            style="margin-top:12px"
+        >
+
+            <form
+                id="planForm"
+                class="stack"
+            >
+
+                <label>
+
+                    Search Outlet
+
+                    <input
+                        id="planOutletSearch"
+                        placeholder="Type outlet name or code"
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Select Outlet
+
+                    <select
+                        id="planOutlet"
+                        name="outlet"
+                        required
+                    >
+                        ${outletOptions(id)}
+                    </select>
+
+                </label>
+
+
+                <label>
+
+                    Outlet Monthly Target (RM)
+
+                    <input
+                        name="outletTarget"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        inputmode="decimal"
+                        value="0"
+                        required
+                    >
+
+                </label>
+
+
+                <label>
+
+                    How Many SKUs to Target?
+
+                    <input
+                        id="targetSkuCount"
+                        name="targetSkuCount"
+                        type="number"
+                        min="0"
+                        step="1"
+                        inputmode="numeric"
+                        value="0"
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Search SKU
+
+                    <input
+                        id="planSkuSearch"
+                        placeholder="Type product name"
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Select SKU
+
+                    <select id="planSkuSelect">
+
+                        <option value="">
+                            Select outlet first
+                        </option>
+
+                    </select>
+
+                </label>
+
+
+                <button
+                    type="button"
+                    id="addSkuBtn"
+                    class="btn secondary"
+                >
+                    + ADD SELECTED SKU
+                </button>
+
+
+                <div
+                    id="chosenSkus"
+                    class="chipbox"
+                >
+                </div>
+
+
+                <div
+                    id="skuTargetInputs"
+                    class="list"
+                >
+                </div>
+
+
+                <button
+                    class="btn primary"
+                >
+                    SAVE MONTHLY PLAN
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <div class="section-title">
+
+            <h3>
+                Plan vs Achievement
+            </h3>
+
+        </div>
+
+
+        ${planningHtml(id)}
+    `;
+
+    bindCommon();
+
+    selectedSkus=[];
+
+    const oSearch=
+        $('#planOutletSearch');
+
+    const oSel=
+        $('#planOutlet');
+
+    const q=
+        $('#planSkuSearch');
+
+    const skuSel=
+        $('#planSkuSelect');
+
+    const chips=
+        $('#chosenSkus');
+
+    const inputs=
+        $('#skuTargetInputs');
+
+
+    function refreshPlanOutlets(){
+
+        const before=
+            oSel.value;
+
+        oSel.innerHTML=
+            outletOptions(
+                id,
+                before,
+                oSearch.value
+            );
+
+        if(
+            before&&
+            [...oSel.options]
+                .some(
+                    o=>
+                        o.value===before
+                )
+        ){
+
+            oSel.value=
+                before;
+        }
+
+        refreshPlanSkus();
+    }
+
+
+    function refreshPlanSkus(){
+
+        const before=
+            skuSel.value;
+
+        if(!oSel.value){
+
+            skuSel.innerHTML=
+                '<option value="">Select outlet first</option>';
+
+            return;
+        }
+
+        const list=
+            productsForOutlet(
+                id,
+                oSel.value
+            )
+            .filter(
+                x=>
+                    (
+                        !q.value||
+                        x.toLowerCase()
+                            .includes(
+                                q.value.toLowerCase()
                             )
-                              .map(
-                                sku => {
+                    )&&
+                    !selectedSkus.includes(x)
+            );
 
-                                  const target =
-                                    plan
-                                      .skuTargets?.[
-                                        sku
-                                      ] || {
+        skuSel.innerHTML=
+            '<option value="">Select SKU</option>'+
+            list
+                .map(
+                    x=>`
+                        <option value="${esc(x)}">
+                            ${esc(x)}
+                        </option>
+                    `
+                )
+                .join('');
 
-                                      cartons: 0,
+        if(
+            before&&
+            list.includes(before)
+        ){
 
-                                      value: 0
-                                    };
-
-
-                                  const actual =
-                                    skuAchievement(
-
-                                      id,
-
-                                      plan.outletName,
-
-                                      sku
-                                    );
-
-
-                                  const targetC =
-                                    number(
-                                      target.cartons
-                                    );
+            skuSel.value=
+                before;
+        }
+    }
 
 
-                                  const pct =
-                                    targetC > 0
+    function paintSelected(){
 
-                                      ? Math.min(
-                                          100,
-                                          actual.cartons /
-                                          targetC *
-                                          100
-                                        )
+        const cache={};
 
-                                      : 0;
+        selectedSkus
+            .forEach(
+                sku=>{
+
+                    cache[sku]={
+                        cartons:n(
+                            document.querySelector(
+                                `[data-c="${CSS.escape(sku)}"]`
+                            )?.value
+                        ),
+                        value:n(
+                            document.querySelector(
+                                `[data-v="${CSS.escape(sku)}"]`
+                            )?.value
+                        )
+                    };
+                }
+            );
+
+        chips.innerHTML=
+            selectedSkus
+                .map(
+                    sku=>`
+                        <span class="chip">
+
+                            ${esc(sku)}
+
+                            <button
+                                type="button"
+                                data-rm="${esc(sku)}"
+                            >
+                                ×
+                            </button>
+
+                        </span>
+                    `
+                )
+                .join('');
 
 
-                                  const left =
-                                    Math.max(
-                                      0,
-                                      targetC -
-                                      actual.cartons
-                                    );
+        inputs.innerHTML=
+            selectedSkus
+                .map(
+                    (sku,i)=>`
+                        <div class="list-item">
 
+                            <h4>
+                                ${i+1}. ${esc(sku)}
+                            </h4>
 
-                                  return `
+                            <div
+                                class="form-grid"
+                                style="margin-top:8px"
+                            >
 
-                                    <div
-                                      class="list-item"
-                                      style="margin-top:9px"
+                                <label>
+
+                                    Target Cartons
+
+                                    <input
+                                        data-c="${esc(sku)}"
+                                        type="number"
+                                        min="0"
+                                        step="1"
+                                        value="${cache[sku]?.cartons||0}"
                                     >
 
-                                      <div class="row">
+                                </label>
+
+
+                                <label>
+
+                                    Target Sales Value (RM)
+
+                                    <input
+                                        data-v="${esc(sku)}"
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value="${cache[sku]?.value||0}"
+                                    >
+
+                                </label>
+
+                            </div>
+
+                        </div>
+                    `
+                )
+                .join('');
+    }
+
+
+    oSearch.oninput=
+        refreshPlanOutlets;
+
+
+    oSel.onchange=
+        ()=>{
+
+            q.value='';
+
+            selectedSkus=[];
+
+            paintSelected();
+
+            refreshPlanSkus();
+        };
+
+
+    q.oninput=
+        refreshPlanSkus;
+
+
+    $('#addSkuBtn')
+        .onclick=
+            ()=>{
+
+                const sku=
+                    skuSel.value;
+
+                if(!sku){
+
+                    toast(
+                        'Select a SKU'
+                    );
+
+                    return;
+                }
+
+                const max=
+                    n(
+                        $('#targetSkuCount')
+                            .value
+                    );
+
+                if(
+                    max&&
+                    selectedSkus.length>=max
+                ){
+
+                    toast(
+                        `Maximum ${max} SKU(s)`
+                    );
+
+                    return;
+                }
+
+                if(
+                    !selectedSkus
+                        .includes(sku)
+                ){
+
+                    selectedSkus
+                        .push(sku);
+                }
+
+                paintSelected();
+
+                q.value='';
+
+                refreshPlanSkus();
+            };
+
+
+    chips.onclick=
+        e=>{
+
+            const b=
+                e.target
+                    .closest(
+                        '[data-rm]'
+                    );
+
+            if(!b)
+                return;
+
+            selectedSkus=
+                selectedSkus
+                    .filter(
+                        x=>
+                            x!==b.dataset.rm
+                    );
+
+            paintSelected();
+
+            refreshPlanSkus();
+        };
+
+
+    refreshPlanSkus();
+
+
+    $('#planForm')
+        .onsubmit=
+            e=>{
+
+                e.preventDefault();
+
+                const fd=
+                    new FormData(
+                        e.target
+                    );
+
+                const outletName=
+                    String(
+                        fd.get(
+                            'outlet'
+                        )||''
+                    );
+
+                const o=
+                    outletsFor(id)
+                        .find(
+                            x=>
+                                x.name===outletName
+                        );
+
+                const cnt=
+                    n(
+                        fd.get(
+                            'targetSkuCount'
+                        )
+                    );
+
+                if(!o){
+
+                    toast(
+                        'Select an outlet'
+                    );
+
+                    return;
+                }
+
+                if(
+                    cnt&&
+                    selectedSkus.length!==cnt
+                ){
+
+                    toast(
+                        `Please add exactly ${cnt} SKU(s)`
+                    );
+
+                    return;
+                }
+
+
+                const skuTargets={};
+
+                selectedSkus
+                    .forEach(
+                        sku=>{
+
+                            skuTargets[sku]={
+                                cartons:n(
+                                    document
+                                        .querySelector(
+                                            `[data-c="${CSS.escape(sku)}"]`
+                                        )
+                                        ?.value
+                                ),
+                                value:n(
+                                    document
+                                        .querySelector(
+                                            `[data-v="${CSS.escape(sku)}"]`
+                                        )
+                                        ?.value
+                                )
+                            };
+                        }
+                    );
+
+
+                const rec={
+                    id:idGen(),
+                    staffId:id,
+                    month:selectedMonth,
+                    outletCode:
+                        o.code||'',
+                    outletName,
+                    outletTarget:n(
+                        fd.get(
+                            'outletTarget'
+                        )
+                    ),
+                    targetSkuCount:
+                        cnt||
+                        selectedSkus.length,
+                    targetSkus:[
+                        ...selectedSkus
+                    ],
+                    skuTargets
+                };
+
+
+                const s=
+                    state();
+
+
+                s.plans=
+                    s.plans
+                        .filter(
+                            x=>!(
+                                x.staffId===id&&
+                                x.month===selectedMonth&&
+                                x.outletName===outletName
+                            )
+                        );
+
+
+                s.plans.push(
+                    rec
+                );
+
+                save(s);
+
+
+                pushCloud(
+                    'savePlan',
+                    {
+                        month:
+                            selectedMonth,
+                        routeTarget:
+                            routeTarget(id),
+                        outletCode:
+                            rec.outletCode,
+                        outletName:
+                            rec.outletName,
+                        outletTarget:
+                            rec.outletTarget,
+                        targetedSkuCount:
+                            rec.targetSkuCount,
+                        targetSkus:
+                            rec.targetSkus
+                                .map(
+                                    name=>({
+                                        name,
+                                        ...rec.skuTargets[name]
+                                    })
+                                ),
+                        skuSalesPlan:
+                            rec.targetSkus
+                                .reduce(
+                                    (a,name)=>
+                                        a+n(
+                                            rec.skuTargets[
+                                                name
+                                            ]?.value
+                                        ),
+                                    0
+                                )
+                    }
+                );
+
+                toast(
+                    'Monthly plan saved'
+                );
+
+                render();
+            };
+}
+
+
+function planningHtml(id){
+
+    const plans=
+        monthPlans(id);
+
+    if(!plans.length){
+
+        return`
+            <div class="card">
+
+                <div class="empty">
+                    No monthly plan yet.
+                </div>
+
+            </div>
+        `;
+    }
+
+    return`
+        <div class="list">
+
+            ${
+                plans
+                    .map(
+                        p=>{
+
+                            const actual=
+                                outletAch(
+                                    id,
+                                    p.outletName
+                                );
+
+                            const short=
+                                Math.max(
+                                    0,
+                                    n(
+                                        p.outletTarget
+                                    )-
+                                    actual
+                                );
+
+                            const pct=
+                                n(
+                                    p.outletTarget
+                                )
+                                ?Math.min(
+                                    100,
+                                    actual/
+                                    n(
+                                        p.outletTarget
+                                    )*
+                                    100
+                                )
+                                :0;
+
+                            return`
+                                <div class="card">
+
+                                    <div class="row">
 
                                         <div>
 
-                                          <h4>
+                                            <h3
+                                                style="margin:0"
+                                            >
+                                                ${esc(p.outletName)}
+                                            </h3>
 
-                                            ${esc(sku)}
-
-                                          </h4>
-
-                                          <p>
-
-                                            ${actual.cartons}/${targetC}
-                                            CTN
-
-                                            •
-
-                                            ${money(actual.value)}
-                                            /
-                                            ${money(target.value)}
-
-                                          </p>
+                                            <p
+                                                class="muted"
+                                                style="margin:4px 0 0"
+                                            >
+                                                ${
+                                                    (
+                                                        p.targetSkus||
+                                                        []
+                                                    ).length
+                                                }
+                                                targeted SKU(s)
+                                            </p>
 
                                         </div>
 
 
                                         <span
-                                          class="
-                                            pill
-                                            ${
-                                              left > 0
-                                                ? 'red'
-                                                : 'green'
-                                            }
-                                          "
+                                            class="
+                                                pill
+                                                ${
+                                                    short
+                                                    ?'red'
+                                                    :'green'
+                                                }
+                                            "
                                         >
-
-                                          ${
-                                            left > 0
-                                              ? left +
-                                                ' LEFT'
-                                              : 'DONE'
-                                          }
-
+                                            ${
+                                                short
+                                                ?money(short)+' short'
+                                                :'Achieved'
+                                            }
                                         </span>
-
-                                      </div>
-
-
-                                      <div
-                                        class="progress-wrap"
-                                        style="margin-top:9px"
-                                      >
-
-                                        <div
-                                          class="
-                                            progress
-                                            ${
-                                              pct >= 100
-                                                ? 'goodbar'
-                                                : ''
-                                            }
-                                          "
-                                          style="
-                                            width:${pct}%
-                                          "
-                                        >
-                                        </div>
-
-                                      </div>
 
                                     </div>
 
-                                  `;
-                                }
-                              )
-                              .join('')
 
-                          : `
+                                    <div
+                                        class="progress-wrap"
+                                        style="margin-top:10px"
+                                    >
 
-                            <p class="muted">
-                              No targeted SKU selected.
-                            </p>
+                                        <div
+                                            class="
+                                                progress
+                                                ${
+                                                    pct>=100
+                                                    ?'goodbar'
+                                                    :''
+                                                }
+                                            "
+                                            style="
+                                                width:${pct}%
+                                            "
+                                        >
+                                        </div>
 
-                          `
-                      }
+                                    </div>
 
-                    </div>
 
-                  `
-                )
-                .join('')
+                                    ${
+                                        (
+                                            p.targetSkus||
+                                            []
+                                        )
+                                        .map(
+                                            sku=>{
 
-            : `
+                                                const t=
+                                                    p.skuTargets?.[
+                                                        sku
+                                                    ]||{
+                                                        cartons:0,
+                                                        value:0
+                                                    };
 
-              <div class="card">
+                                                const a=
+                                                    skuAch(
+                                                        id,
+                                                        p.outletName,
+                                                        sku
+                                                    );
 
-                <div class="empty">
+                                                const lc=
+                                                    Math.max(
+                                                        0,
+                                                        n(
+                                                            t.cartons
+                                                        )-
+                                                        a.cartons
+                                                    );
 
-                  No SKU plan for this month.
+                                                const lv=
+                                                    Math.max(
+                                                        0,
+                                                        n(
+                                                            t.value
+                                                        )-
+                                                        a.value
+                                                    );
 
-                </div>
+                                                return`
+                                                    <div
+                                                        class="list-item"
+                                                        style="margin-top:8px"
+                                                    >
 
-              </div>
+                                                        <h4>
+                                                            ${esc(sku)}
+                                                        </h4>
 
-            `
-        }
+                                                        <p>
 
-      </div>
+                                                            CTN
+                                                            ${a.cartons}
+                                                            /
+                                                            ${n(t.cartons)}
+
+                                                            •
+
+                                                            <span
+                                                                class="${
+                                                                    lc
+                                                                    ?'bad'
+                                                                    :'good'
+                                                                }"
+                                                            >
+                                                                ${lc} left
+                                                            </span>
+
+                                                            <br>
+
+                                                            Value
+                                                            ${money(a.value)}
+                                                            /
+                                                            ${money(t.value)}
+
+                                                            •
+
+                                                            <span
+                                                                class="${
+                                                                    lv
+                                                                    ?'bad'
+                                                                    :'good'
+                                                                }"
+                                                            >
+                                                                ${money(lv)} left
+                                                            </span>
+
+                                                        </p>
+
+                                                    </div>
+                                                `;
+                                            }
+                                        )
+                                        .join('')
+                                    }
+
+                                </div>
+                            `;
+                        }
+                    )
+                    .join('')
+            }
+
+        </div>
     `;
-
-
-  bindCommon();
 }
 
 
 /* =========================================================
-   PAGE 9 — MANAGER TEAM CONTROL
+   INCOME
 ========================================================= */
 
-function renderTeamControl() {
+function renderIncome(){
 
-  if (
-    session.mode !==
-    'manager'
-  ) {
+    const id=
+        uid();
 
-    page =
-      'dashboard';
+    const s=
+        incomeCalc(id);
 
-    render();
+    const p=
+        incomePlan(id);
 
-    return;
-  }
+    const rules=
+        productRules(id);
 
+    $('#mainContent')
+        .innerHTML=`
 
-  $('#mainContent')
-    .innerHTML = `
-
-      ${monthAndModeBar()}
+        ${monthBar()}
 
 
-      <div class="card manager-banner">
+        <div class="card">
 
-        <p class="eyebrow">
-          MANAGER ACCESS
-        </p>
+            <p class="eyebrow">
+                PROJECTED INCOME
+            </p>
 
-        <h2>
-          Team Control Center
-        </h2>
+            <div class="salary-total">
+                ${money(s.total)}
+            </div>
 
-        <p class="muted">
+            <p class="muted">
 
-          Review all four routes.
+                ${
+                    s.expected
 
-          Select any SR to open detailed performance.
+                    ?`
+                        Expected
+                        ${money(s.expected)}
+                        •
 
-        </p>
+                        ${
+                            s.total>=s.expected
+                            ?'Goal achieved'
+                            :money(
+                                s.expected-
+                                s.total
+                            )+
+                            ' remaining'
+                        }
+                    `
 
-      </div>
+                    :'Set expected income below.'
+                }
+
+            </p>
+
+        </div>
 
 
-      <div class="section-title">
+        <div
+            class="card"
+            style="margin-top:12px"
+        >
 
-        <h3>
-          Team Performance
-        </h3>
+            ${incomeRow(
+                'Basic Salary',
+                s.basic
+            )}
 
-      </div>
+            ${incomeRow(
+                'Fuel / Oil',
+                s.fuel
+            )}
+
+            ${incomeRow(
+                'House Rent',
+                s.rent
+            )}
+
+            ${incomeRow(
+                'Food Allowance',
+                s.food
+            )}
+
+            ${incomeRow(
+                'Sales Commission',
+                s.comm
+            )}
+
+            ${incomeRow(
+                'Zero Sales Incentive',
+                s.zero
+            )}
+
+            ${incomeRow(
+                'Product Incentive',
+                s.product
+            )}
+
+            ${incomeRow(
+                'Growth Incentive',
+                s.growth
+            )}
+
+            ${incomeRow(
+                'Manager Incentive',
+                s.manager
+            )}
+
+            ${incomeRow(
+                'Other Incentive',
+                s.other
+            )}
 
 
-      <div class="list">
+            <hr
+                style="
+                    border:0;
+                    border-top:1px solid var(--line);
+                    margin:14px 0
+                "
+            >
+
+
+            ${incomeRow(
+                'TOTAL PROJECTED',
+                s.total,
+                true
+            )}
+
+        </div>
+
+
+        <div
+            class="card"
+            style="margin-top:12px"
+        >
+
+            <form
+                id="incomeForm"
+                class="stack"
+            >
+
+                <label>
+
+                    Expected Total Income (RM)
+
+                    <input
+                        name="expected"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="${n(p.expected)}"
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Growth Incentive Actual (RM)
+
+                    <input
+                        name="growthActual"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="${n(p.growthActual)}"
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Manual Product Incentive (RM)
+
+                    <input
+                        name="productManual"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="${n(p.productManual)}"
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Manager Incentive Actual (RM)
+
+                    <input
+                        name="managerActual"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="${n(p.managerActual)}"
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Other Incentive Actual (RM)
+
+                    <input
+                        name="otherActual"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="${n(p.otherActual)}"
+                    >
+
+                </label>
+
+
+                <button class="btn primary">
+                    SAVE INCOME DETAILS
+                </button>
+
+            </form>
+
+        </div>
+
 
         ${
-          allSalesUsers()
+            session.mode==='manager'
 
-            .map(
-              u => {
+            ?`
+                <div
+                    class="card"
+                    style="margin-top:12px"
+                >
 
-                const p =
-                  performance(
-                    u.id
-                  );
+                    <p class="eyebrow">
+                        PRODUCT INCENTIVE RULE
+                    </p>
 
-
-                const pct =
-                  p.target
-
-                    ? p.achievement /
-                      p.target *
-                      100
-
-                    : 0;
-
-
-                return `
-
-                  <div class="card">
-
-                    <div class="row">
-
-                      <div>
-
-                        <h3
-                          style="margin:0"
-                        >
-
-                          ${esc(u.name)}
-
-                        </h3>
-
-                        <p
-                          class="muted"
-                          style="margin:4px 0 0"
-                        >
-
-                          ${u.id}
-
-                          •
-
-                          Target
-                          ${money(p.target)}
-
-                        </p>
-
-                      </div>
-
-
-                      <span
-                        class="
-                          pill
-                          ${
-                            pct >= 100
-
-                              ? 'green'
-
-                              : pct >= 80
-
-                                ? 'orange'
-
-                                : 'red'
-                          }
-                        "
-                      >
-
-                        ${pct.toFixed(0)}%
-
-                      </span>
-
-                    </div>
-
-
-                    <div
-                      class="progress-wrap"
-                      style="margin-top:12px"
+                    <form
+                        id="incForm"
+                        class="stack"
                     >
 
-                      <div
-                        class="
-                          progress
-                          ${
-                            pct >= 100
-                              ? 'goodbar'
-                              : ''
-                          }
-                        "
-                        style="
-                          width:${
-                            Math.min(
-                              100,
-                              pct
-                            )
-                          }%
-                        "
-                      >
-                      </div>
+                        <label>
 
-                    </div>
+                            SKU
 
+                            <select name="skuName">
 
-                    <div
-                      class="mini-grid"
-                      style="margin-top:10px"
-                    >
+                                ${
+                                    (
+                                        D.products||
+                                        []
+                                    )
+                                    .map(
+                                        x=>`
+                                            <option
+                                                value="${esc(x)}"
+                                            >
+                                                ${esc(x)}
+                                            </option>
+                                        `
+                                    )
+                                    .join('')
+                                }
 
-                      <div class="metric-box">
+                            </select>
 
-                        <small>
-                          Achievement
-                        </small>
-
-                        <br>
-
-                        <b>
-                          ${money(p.achievement)}
-                        </b>
-
-                      </div>
+                        </label>
 
 
-                      <div class="metric-box">
+                        <label>
 
-                        <small>
-                          Shortfall
-                        </small>
+                            Target Cartons
 
-                        <br>
+                            <input
+                                name="targetQty"
+                                type="number"
+                                min="1"
+                                step="1"
+                                required
+                            >
 
-                        <b
-                          class="${
-                            p.shortfall > 0
-                              ? 'bad'
-                              : 'good'
-                          }"
-                        >
-
-                          ${money(p.shortfall)}
-
-                        </b>
-
-                      </div>
+                        </label>
 
 
-                      <div class="metric-box">
+                        <label>
 
-                        <small>
-                          Required / Day
-                        </small>
+                            Reward RM
 
-                        <br>
+                            <input
+                                name="reward"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                required
+                            >
 
-                        <b>
-
-                          ${money(p.requiredPerDay)}
-
-                        </b>
-
-                      </div>
+                        </label>
 
 
-                      <div class="metric-box">
+                        <button class="btn primary">
+                            CREATE INCENTIVE
+                        </button>
 
-                        <small>
-                          Coverage
-                        </small>
+                    </form>
 
-                        <br>
-
-                        <b>
-
-                          ${p.coverage.toFixed(0)}%
-
-                        </b>
-
-                      </div>
-
-                    </div>
-
-
-                    <button
-                      class="btn secondary"
-                      data-select-team="${u.id}"
-                      style="margin-top:12px"
-                    >
-
-                      Open
-                      ${esc(
-                        u.name
-                          .split(' ')[0]
-                      )}
-                      Detail
-
-                    </button>
-
-                  </div>
-
-                `;
-              }
-            )
-
-            .join('')
+                </div>
+            `
+            :''
         }
 
-      </div>
-    `;
+
+        <div class="section-title">
+
+            <h3>
+                Product Incentive Progress
+            </h3>
+
+        </div>
 
 
-  bindCommon();
+        <div class="list">
 
+            ${
+                rules.length
 
-  $$('[data-select-team]')
-    .forEach(
-      btn => {
+                ?rules
+                    .map(
+                        i=>
+                            incProgress(
+                                id,
+                                i
+                            )
+                    )
+                    .join('')
 
-        btn.onclick =
-          async () => {
-
-            managerView =
-              btn.dataset
-                .selectTeam;
-
-
-            refreshTopBar();
-
-
-            if (
-              backendUrl()
-            ) {
-
-              await syncCloud(
-                managerView,
-                selectedMonth
-              );
+                :`
+                    <div class="empty">
+                        No product incentive set.
+                    </div>
+                `
             }
 
+        </div>
+    `;
 
-            page =
-              'dashboard';
+    bindCommon();
 
+
+    $('#incomeForm')
+        .onsubmit=
+            e=>{
+
+                e.preventDefault();
+
+                const fd=
+                    new FormData(
+                        e.target
+                    );
+
+                const rec={
+                    staffId:id,
+                    month:selectedMonth,
+                    expected:n(
+                        fd.get(
+                            'expected'
+                        )
+                    ),
+                    growthActual:n(
+                        fd.get(
+                            'growthActual'
+                        )
+                    ),
+                    productManual:n(
+                        fd.get(
+                            'productManual'
+                        )
+                    ),
+                    managerActual:n(
+                        fd.get(
+                            'managerActual'
+                        )
+                    ),
+                    otherActual:n(
+                        fd.get(
+                            'otherActual'
+                        )
+                    )
+                };
+
+                const st=
+                    state();
+
+                st.incomePlans=
+                    st.incomePlans
+                        .filter(
+                            x=>!(
+                                x.staffId===id&&
+                                x.month===selectedMonth
+                            )
+                        );
+
+                st.incomePlans.push(
+                    rec
+                );
+
+                save(st);
+
+                pushCloud(
+                    'saveIncome',
+                    {
+                        month:selectedMonth,
+                        expected:rec.expected,
+                        growth:rec.growthActual,
+                        product:rec.productManual,
+                        manager:rec.managerActual,
+                        other:rec.otherActual
+                    }
+                );
+
+                toast(
+                    'Income details saved'
+                );
+
+                render();
+            };
+
+
+    if($('#incForm')){
+
+        $('#incForm')
+            .onsubmit=
+                e=>{
+
+                    e.preventDefault();
+
+                    const fd=
+                        new FormData(
+                            e.target
+                        );
+
+                    const st=
+                        state();
+
+                    st.incentives.push({
+                        id:idGen(),
+                        staffId:id,
+                        month:selectedMonth,
+                        type:'PRODUCT',
+                        skuName:String(
+                            fd.get(
+                                'skuName'
+                            )
+                        ),
+                        targetQty:n(
+                            fd.get(
+                                'targetQty'
+                            )
+                        ),
+                        reward:n(
+                            fd.get(
+                                'reward'
+                            )
+                        )
+                    });
+
+                    save(st);
+
+                    toast(
+                        'Product incentive created'
+                    );
+
+                    render();
+                };
+    }
+}
+
+function incomeRow(
+    l,
+    v,
+    strong=false
+){
+
+    return`
+        <div
+            class="row"
+            style="padding:8px 0"
+        >
+
+            <span class="muted">
+                ${esc(l)}
+            </span>
+
+            <${strong?'strong':'span'}>
+                ${money(v)}
+            </${strong?'strong':'span'}>
+
+        </div>
+    `;
+}
+
+function incProgress(
+    id,
+    i
+){
+
+    const sold=
+        routeSkuAch(
+            id,
+            i.skuName
+        ).cartons;
+
+    const t=
+        n(i.targetQty);
+
+    const left=
+        Math.max(
+            0,
+            t-sold
+        );
+
+    const pct=
+        t
+        ?Math.min(
+            100,
+            sold/t*100
+        )
+        :0;
+
+    const ok=
+        sold>=t;
+
+    return`
+        <div class="card">
+
+            <div class="row">
+
+                <div>
+
+                    <h3 style="margin:0">
+                        ${esc(i.skuName)}
+                    </h3>
+
+                    <p
+                        class="muted"
+                        style="margin:4px 0 0"
+                    >
+                        Reward
+                        ${money(i.reward)}
+                    </p>
+
+                </div>
+
+                <span
+                    class="
+                        pill
+                        ${
+                            ok
+                            ?'green'
+                            :'red'
+                        }
+                    "
+                >
+                    ${
+                        ok
+                        ?'UNLOCKED'
+                        :left+' CTN LEFT'
+                    }
+                </span>
+
+            </div>
+
+            <div
+                class="progress-wrap"
+                style="margin-top:10px"
+            >
+
+                <div
+                    class="
+                        progress
+                        ${
+                            ok
+                            ?'goodbar'
+                            :''
+                        }
+                    "
+                    style="
+                        width:${pct}%
+                    "
+                >
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+function renderSummary(){
+
+    const id=
+        uid();
+
+    const m=
+        metric(id);
+
+    const inc=
+        incomeCalc(id);
+
+    const os=
+        monthOutletSales(id)
+            .slice()
+            .sort(
+                (a,b)=>
+                    String(b.date)
+                        .localeCompare(
+                            String(a.date)
+                        )
+            );
+
+    const ss=
+        monthSkuSales(id)
+            .slice()
+            .sort(
+                (a,b)=>
+                    String(b.date)
+                        .localeCompare(
+                            String(a.date)
+                        )
+            );
+
+    const plans=
+        monthPlans(id);
+
+
+    $('#mainContent')
+        .innerHTML=`
+
+        ${monthBar()}
+
+
+        <div class="hero">
+
+            <p class="eyebrow">
+                COMPLETE MONTHLY SUMMARY
+            </p>
+
+            <h3>
+                ${esc(user(id)?.name||id)}
+            </h3>
+
+            <p class="muted">
+
+                Everything submitted for
+                ${monthName(selectedMonth)}
+                in one place.
+
+            </p>
+
+        </div>
+
+
+        <div class="grid kpi-grid">
+
+            ${kpi(
+                'TARGET',
+                money(m.target),
+                'Route target'
+            )}
+
+            ${kpi(
+                'TOTAL SALES',
+                money(m.ach),
+                'Achievement'
+            )}
+
+            ${kpi(
+                'SHORTFALL',
+                money(m.short),
+                'Remaining',
+                m.short
+                ?'bad'
+                :'good'
+            )}
+
+            ${kpi(
+                'ACHIEVEMENT',
+                `${
+                    (
+                        m.target
+                        ?m.ach/m.target*100
+                        :0
+                    ).toFixed(1)
+                }%`,
+                'Performance'
+            )}
+
+            ${kpi(
+                'GROWTH',
+                `${
+                    m.growth>=0
+                    ?'+'
+                    :''
+                }${m.growth.toFixed(1)}%`,
+                'Vs comparable month',
+                m.growth>=0
+                ?'good'
+                :'bad'
+            )}
+
+            ${kpi(
+                'COVERAGE',
+                `${m.coverage.toFixed(0)}%`,
+                `${m.covered.length}/${m.routeOutlets.length} outlets`
+            )}
+
+            ${kpi(
+                'PROJECTED SALARY',
+                money(inc.total),
+                'All salary + incentives'
+            )}
+
+            ${kpi(
+                'NEED / DAY',
+                money(m.required),
+                'Remaining daily requirement'
+            )}
+
+        </div>
+
+
+        ${summaryTable(
+            'Daily Sales History',
+            [
+                'Date',
+                'Sales',
+                'Last Month',
+                'Active',
+                'Prepare Trip',
+                'Order'
+            ],
+            m.daily.map(
+                x=>[
+                    x.date,
+                    money(x.todaySales),
+                    money(
+                        x.lastMonthSameDay
+                    ),
+                    money(x.active),
+                    money(
+                        x.prepareTrip
+                    ),
+                    money(
+                        x.orderAmount
+                    )
+                ]
+            )
+        )}
+
+
+        ${summaryTable(
+            'Outlet Sales History',
+            [
+                'Date',
+                'Outlet',
+                'Sales',
+                'Note'
+            ],
+            os.map(
+                x=>[
+                    x.date,
+                    x.outletName,
+                    money(x.sales),
+                    x.note||''
+                ]
+            )
+        )}
+
+
+        ${summaryTable(
+            'Outlet Target vs Actual',
+            [
+                'Outlet',
+                'Target',
+                'Actual',
+                'Shortfall',
+                'Status'
+            ],
+            plans.map(
+                p=>{
+
+                    const a=
+                        outletAch(
+                            id,
+                            p.outletName
+                        );
+
+                    const sf=
+                        Math.max(
+                            0,
+                            n(
+                                p.outletTarget
+                            )-
+                            a
+                        );
+
+                    return[
+                        p.outletName,
+                        money(
+                            p.outletTarget
+                        ),
+                        money(a),
+                        money(sf),
+                        sf
+                        ?'PUSH'
+                        :'ACHIEVED'
+                    ];
+                }
+            )
+        )}
+
+
+        ${summaryTable(
+            'SKU Submission History',
+            [
+                'Date',
+                'Outlet',
+                'SKU',
+                'Cartons',
+                'Sales Value'
+            ],
+            ss.map(
+                x=>[
+                    x.date,
+                    x.outletName,
+                    x.skuName,
+                    String(x.cartons),
+                    money(
+                        x.salesValue
+                    )
+                ]
+            )
+        )}
+
+
+        ${summaryTable(
+            'SKU Target vs Actual',
+            [
+                'Outlet',
+                'SKU',
+                'Target CTN',
+                'Sold CTN',
+                'CTN Left',
+                'Target RM',
+                'Actual RM',
+                'RM Left'
+            ],
+            skuTargetRows(id)
+        )}
+
+
+        <div
+            class="card"
+            style="margin-top:12px"
+        >
+
+            <h3>
+                Salary & Incentive Breakdown
+            </h3>
+
+            ${incomeRow(
+                'Basic Salary',
+                inc.basic
+            )}
+
+            ${incomeRow(
+                'Fuel / Oil',
+                inc.fuel
+            )}
+
+            ${incomeRow(
+                'House Rent',
+                inc.rent
+            )}
+
+            ${incomeRow(
+                'Food Allowance',
+                inc.food
+            )}
+
+            ${incomeRow(
+                'Sales Commission',
+                inc.comm
+            )}
+
+            ${incomeRow(
+                'Zero Sales Incentive',
+                inc.zero
+            )}
+
+            ${incomeRow(
+                'Product Incentive',
+                inc.product
+            )}
+
+            ${incomeRow(
+                'Growth Incentive',
+                inc.growth
+            )}
+
+            ${incomeRow(
+                'Manager Incentive',
+                inc.manager
+            )}
+
+            ${incomeRow(
+                'Other Incentive',
+                inc.other
+            )}
+
+            <hr
+                style="
+                    border:0;
+                    border-top:1px solid var(--line);
+                    margin:14px 0
+                "
+            >
+
+            ${incomeRow(
+                'TOTAL PROJECTED',
+                inc.total,
+                true
+            )}
+
+        </div>
+
+
+        <div
+            class="card"
+            style="margin-top:12px"
+        >
+
+            <button
+                id="xlsx"
+                class="btn primary"
+            >
+                DOWNLOAD REAL EXCEL (.xlsx)
+            </button>
+
+            ${
+                session.mode==='manager'
+
+                ?`
+                    <button
+                        id="setup"
+                        class="btn secondary"
+                        style="margin-top:10px"
+                    >
+                        CLOUD SETUP / SYNC
+                    </button>
+                `
+                :''
+            }
+
+        </div>
+
+
+        ${
+            session.mode==='manager'
+            ?managerTaskBox(id)
+            :''
+        }
+    `;
+
+    bindCommon();
+
+    if(
+        session.mode==='manager'
+    ){
+
+        bindTask(id);
+    }
+
+    $('#xlsx')
+        .onclick=
+            ()=>exportXlsx(id);
+
+    if($('#setup')){
+
+        $('#setup')
+            .onclick=
+                cloudSetup;
+    }
+}
+
+function summaryTable(
+    title,
+    heads,
+    rows
+){
+
+    return`
+        <div
+            class="card"
+            style="
+                margin-top:12px;
+                overflow:auto
+            "
+        >
+
+            <h3>
+                ${esc(title)}
+            </h3>
+
+            <table
+                class="summary-table"
+                style="
+                    min-width:${
+                        Math.max(
+                            620,
+                            heads.length*120
+                        )
+                    }px
+                "
+            >
+
+                <thead>
+
+                    <tr>
+
+                        ${
+                            heads
+                                .map(
+                                    h=>`
+                                        <th>
+                                            ${esc(h)}
+                                        </th>
+                                    `
+                                )
+                                .join('')
+                        }
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    ${
+                        rows.length
+
+                        ?rows
+                            .map(
+                                r=>`
+                                    <tr>
+                                        ${
+                                            r.map(
+                                                c=>`
+                                                    <td>
+                                                        ${esc(c)}
+                                                    </td>
+                                                `
+                                            )
+                                            .join('')
+                                        }
+                                    </tr>
+                                `
+                            )
+                            .join('')
+
+                        :`
+                            <tr>
+                                <td
+                                    colspan="${heads.length}"
+                                >
+                                    No data
+                                </td>
+                            </tr>
+                        `
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    `;
+}
+
+function skuTargetRows(id){
+
+    const rows=[];
+
+    monthPlans(id)
+        .forEach(
+            p=>
+                (
+                    p.targetSkus||
+                    []
+                )
+                .forEach(
+                    sku=>{
+
+                        const t=
+                            p.skuTargets?.[
+                                sku
+                            ]||{
+                                cartons:0,
+                                value:0
+                            };
+
+                        const a=
+                            skuAch(
+                                id,
+                                p.outletName,
+                                sku
+                            );
+
+                        rows.push([
+                            p.outletName,
+                            sku,
+                            String(
+                                n(
+                                    t.cartons
+                                )
+                            ),
+                            String(
+                                a.cartons
+                            ),
+                            String(
+                                Math.max(
+                                    0,
+                                    n(
+                                        t.cartons
+                                    )-
+                                    a.cartons
+                                )
+                            ),
+                            money(
+                                t.value
+                            ),
+                            money(
+                                a.value
+                            ),
+                            money(
+                                Math.max(
+                                    0,
+                                    n(
+                                        t.value
+                                    )-
+                                    a.value
+                                )
+                            )
+                        ]);
+                    }
+                )
+        );
+
+    return rows;
+}
+
+
+/* =========================================================
+   XLSX EXPORT
+========================================================= */
+
+async function loadXlsx(){
+
+    if(window.XLSX)
+        return true;
+
+    return new Promise(
+        resolve=>{
+
+            const s=
+                document
+                    .createElement(
+                        'script'
+                    );
+
+            s.src=
+                'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+
+            s.onload=
+                ()=>resolve(true);
+
+            s.onerror=
+                ()=>resolve(false);
+
+            document.head
+                .appendChild(s);
+        }
+    );
+}
+
+async function exportXlsx(id){
+
+    toast(
+        'Preparing Excel...'
+    );
+
+    if(
+        !await loadXlsx()
+    ){
+
+        toast(
+            'Could not load Excel library'
+        );
+
+        return;
+    }
+
+    const m=
+        metric(id);
+
+    const inc=
+        incomeCalc(id);
+
+    const wb=
+        XLSX.utils
+            .book_new();
+
+    const plans=
+        monthPlans(id);
+
+
+    addSheet(
+        wb,
+        'Summary',
+        [{
+            Month:selectedMonth,
+            'Staff ID':id,
+            Salesman:
+                user(id)?.name||'',
+            Target:m.target,
+            Achievement:m.ach,
+            Shortfall:m.short,
+            'Achievement %':
+                m.target
+                ?m.ach/m.target*100
+                :0,
+            Growth:m.growth,
+            Coverage:m.coverage,
+            'Projected Salary':
+                inc.total
+        }]
+    );
+
+
+    addSheet(
+        wb,
+        'Daily',
+        m.daily.map(
+            x=>({
+                Date:x.date,
+                Sales:x.todaySales,
+                'Last Month':
+                    x.lastMonthSameDay,
+                Active:x.active,
+                'Prepare for Trip':
+                    x.prepareTrip,
+                Order:x.orderAmount,
+                Note:x.note||''
+            })
+        )
+    );
+
+
+    addSheet(
+        wb,
+        'Outlet Sales',
+        monthOutletSales(id)
+            .map(
+                x=>({
+                    Date:x.date,
+                    'Outlet Code':
+                        x.outletCode,
+                    'Outlet Name':
+                        x.outletName,
+                    Sales:x.sales,
+                    Note:x.note||''
+                })
+            )
+    );
+
+
+    addSheet(
+        wb,
+        'SKU Sales',
+        monthSkuSales(id)
+            .map(
+                x=>({
+                    Date:x.date,
+                    Outlet:
+                        x.outletName,
+                    SKU:
+                        x.skuName,
+                    Cartons:
+                        x.cartons,
+                    'Sales Value':
+                        x.salesValue
+                })
+            )
+    );
+
+
+    const skuRows=[];
+
+    plans.forEach(
+        p=>
+            (
+                p.targetSkus||
+                []
+            )
+            .forEach(
+                sku=>{
+
+                    const t=
+                        p.skuTargets?.[
+                            sku
+                        ]||{
+                            cartons:0,
+                            value:0
+                        };
+
+                    const a=
+                        skuAch(
+                            id,
+                            p.outletName,
+                            sku
+                        );
+
+                    skuRows.push({
+                        Outlet:
+                            p.outletName,
+                        SKU:
+                            sku,
+                        'Target CTN':
+                            n(
+                                t.cartons
+                            ),
+                        'Actual CTN':
+                            a.cartons,
+                        'CTN Left':
+                            Math.max(
+                                0,
+                                n(
+                                    t.cartons
+                                )-
+                                a.cartons
+                            ),
+                        'Target RM':
+                            n(
+                                t.value
+                            ),
+                        'Actual RM':
+                            a.value,
+                        'RM Left':
+                            Math.max(
+                                0,
+                                n(
+                                    t.value
+                                )-
+                                a.value
+                            )
+                    });
+                }
+            )
+    );
+
+
+    addSheet(
+        wb,
+        'SKU Target',
+        skuRows
+    );
+
+
+    addSheet(
+        wb,
+        'Income',
+        [
+            {
+                Component:'Basic',
+                Amount:inc.basic
+            },
+            {
+                Component:'Fuel',
+                Amount:inc.fuel
+            },
+            {
+                Component:'House Rent',
+                Amount:inc.rent
+            },
+            {
+                Component:'Food',
+                Amount:inc.food
+            },
+            {
+                Component:'Commission',
+                Amount:inc.comm
+            },
+            {
+                Component:'Zero Sales Incentive',
+                Amount:inc.zero
+            },
+            {
+                Component:'Product Incentive',
+                Amount:inc.product
+            },
+            {
+                Component:'Growth Incentive',
+                Amount:inc.growth
+            },
+            {
+                Component:'Manager Incentive',
+                Amount:inc.manager
+            },
+            {
+                Component:'Other Incentive',
+                Amount:inc.other
+            },
+            {
+                Component:'TOTAL',
+                Amount:inc.total
+            }
+        ]
+    );
+
+
+    XLSX.writeFile(
+        wb,
+        `${id}_${selectedMonth}_Sales_Performance.xlsx`
+    );
+
+    toast(
+        'Excel downloaded'
+    );
+}
+
+function addSheet(
+    wb,
+    name,
+    rows
+){
+
+    const ws=
+        XLSX.utils
+            .json_to_sheet(
+                rows.length
+                ?rows
+                :[
+                    {
+                        Info:'No data'
+                    }
+                ]
+            );
+
+    XLSX.utils
+        .book_append_sheet(
+            wb,
+            ws,
+            name.slice(0,31)
+        );
+}
+
+
+/* =========================================================
+   TASKS
+========================================================= */
+
+function renderTasks(){
+
+    const id=
+        uid();
+
+    const tasks=
+        state()
+            .tasks
+            .filter(
+                t=>
+                    t.staffId===id
+            )
+            .slice()
+            .sort(
+                (a,b)=>
+                    String(
+                        b.createdAt
+                    )
+                    .localeCompare(
+                        String(
+                            a.createdAt
+                        )
+                    )
+            );
+
+
+    $('#mainContent')
+        .innerHTML=`
+
+        ${monthBar()}
+
+        <div class="card">
+
+            <p class="eyebrow">
+                TASKS
+            </p>
+
+            <h2>
+                ${
+                    session.mode==='manager'
+                    ?'Selected SR Tasks'
+                    :'My Tasks'
+                }
+            </h2>
+
+        </div>
+
+
+        <div
+            class="list"
+            style="margin-top:12px"
+        >
+
+            ${
+                tasks.length
+
+                ?tasks
+                    .map(
+                        t=>`
+                            <div class="list-item">
+
+                                <div class="row">
+
+                                    <div>
+
+                                        <h4>
+                                            ${esc(t.title)}
+                                        </h4>
+
+                                        <p>
+
+                                            ${esc(
+                                                t.note||
+                                                'No instruction'
+                                            )}
+
+                                            ${
+                                                t.due
+                                                ?'<br>Due: '+
+                                                    esc(t.due)
+                                                :''
+                                            }
+
+                                        </p>
+
+                                    </div>
+
+
+                                    <span
+                                        class="
+                                            pill
+                                            ${
+                                                t.done
+                                                ?'green'
+                                                :'red'
+                                            }
+                                        "
+                                    >
+                                        ${
+                                            t.done
+                                            ?'DONE'
+                                            :'PENDING'
+                                        }
+                                    </span>
+
+                                </div>
+
+
+                                ${
+                                    session.mode!=='manager'&&
+                                    !t.done
+
+                                    ?`
+                                        <button
+                                            class="btn secondary"
+                                            data-done="${esc(t.id)}"
+                                            style="margin-top:8px"
+                                        >
+                                            MARK COMPLETE
+                                        </button>
+                                    `
+                                    :''
+                                }
+
+                            </div>
+                        `
+                    )
+                    .join('')
+
+                :`
+                    <div class="empty">
+                        No task assigned.
+                    </div>
+                `
+            }
+
+        </div>
+
+
+        ${
+            session.mode==='manager'
+            ?managerTaskBox(id)
+            :''
+        }
+    `;
+
+    bindCommon();
+
+    bindTask(id);
+
+
+    $$('[data-done]')
+        .forEach(
+            b=>
+                b.onclick=
+                    ()=>{
+
+                        const s=
+                            state();
+
+                        const t=
+                            s.tasks
+                                .find(
+                                    x=>
+                                        x.id===
+                                        b.dataset.done
+                                );
+
+                        if(t)
+                            t.done=true;
+
+                        save(s);
+
+                        toast(
+                            'Task completed'
+                        );
+
+                        render();
+                    }
+        );
+}
+
+
+function managerTaskBox(id){
+
+    return`
+        <div
+            class="card"
+            style="margin-top:12px"
+        >
+
+            <p class="eyebrow">
+                MANAGER TASK
+            </p>
+
+
+            <form
+                id="managerTaskForm"
+                class="stack"
+            >
+
+                <label>
+
+                    Task Title
+
+                    <input
+                        name="title"
+                        required
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Instruction
+
+                    <textarea
+                        name="note"
+                        required
+                    ></textarea>
+
+                </label>
+
+
+                <label>
+
+                    Due Date
+
+                    <input
+                        name="due"
+                        type="date"
+                    >
+
+                </label>
+
+
+                <button class="btn primary">
+                    SEND TASK
+                </button>
+
+            </form>
+
+        </div>
+    `;
+}
+
+function bindTask(id){
+
+    const f=
+        $('#managerTaskForm');
+
+    if(!f)
+        return;
+
+    f.onsubmit=
+        e=>{
+
+            e.preventDefault();
+
+            const fd=
+                new FormData(
+                    e.target
+                );
+
+            const rec={
+                id:idGen(),
+                staffId:id,
+                title:String(
+                    fd.get(
+                        'title'
+                    )
+                ),
+                note:String(
+                    fd.get(
+                        'note'
+                    )
+                ),
+                due:String(
+                    fd.get(
+                        'due'
+                    )||''
+                ),
+                done:false,
+                createdAt:
+                    new Date()
+                        .toISOString()
+            };
+
+            const s=
+                state();
+
+            s.tasks.push(
+                rec
+            );
+
+            save(s);
+
+            pushCloud(
+                'saveTask',
+                {
+                    staffId:id,
+                    title:rec.title,
+                    instruction:
+                        rec.note,
+                    due:rec.due
+                }
+            );
+
+            toast(
+                'Task assigned'
+            );
 
             render();
-          };
-      }
-    );
+        };
+}
+
+
+/* =========================================================
+   ZERO SALES
+========================================================= */
+
+function renderZero(){
+
+    const id=
+        uid();
+
+    const m=
+        metric(id);
+
+    $('#mainContent')
+        .innerHTML=`
+
+        ${monthBar()}
+
+
+        <div class="hero">
+
+            <p class="eyebrow">
+                ZERO SALES COVERAGE
+            </p>
+
+            <h3>
+                ${m.coverage.toFixed(0)}%
+                Covered
+            </h3>
+
+            <p class="muted">
+
+                ${m.covered.length}
+                covered
+
+                •
+
+                ${m.zeroSales.length}
+                zero sales
+
+                •
+
+                ${m.routeOutlets.length}
+                total outlets
+
+            </p>
+
+
+            <div class="progress-wrap">
+
+                <div
+                    class="
+                        progress
+                        ${
+                            m.coverage>=100
+                            ?'goodbar'
+                            :''
+                        }
+                    "
+                    style="
+                        width:${m.coverage}%
+                    "
+                >
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="section-title">
+
+            <h3>
+                Zero Sales Outlets
+            </h3>
+
+        </div>
+
+
+        <div class="list">
+
+            ${
+                m.zeroSales.length
+
+                ?m.zeroSales
+                    .map(
+                        o=>`
+                            <div class="list-item">
+
+                                <div class="row">
+
+                                    <div>
+
+                                        <h4>
+                                            ${esc(o.name)}
+                                        </h4>
+
+                                        <p>
+
+                                            ${esc(
+                                                o.category||
+                                                'Other'
+                                            )}
+
+                                            •
+
+                                            ${esc(
+                                                o.code||
+                                                'No code'
+                                            )}
+
+                                        </p>
+
+                                    </div>
+
+
+                                    <span class="pill red">
+                                        ZERO
+                                    </span>
+
+                                </div>
+
+                            </div>
+                        `
+                    )
+                    .join('')
+
+                :`
+                    <div class="empty">
+                        Excellent — all outlets have sales.
+                    </div>
+                `
+            }
+
+        </div>
+    `;
+
+    bindCommon();
+}
+
+
+/* =========================================================
+   SKU PERFORMANCE
+========================================================= */
+
+function renderSku(){
+
+    const id=
+        uid();
+
+    const plans=
+        monthPlans(id);
+
+    $('#mainContent')
+        .innerHTML=`
+
+        ${monthBar()}
+
+
+        <div class="card">
+
+            <p class="eyebrow">
+                SKU PERFORMANCE
+            </p>
+
+            <h2>
+                Target vs Actual
+            </h2>
+
+        </div>
+
+
+        <div
+            class="list"
+            style="margin-top:12px"
+        >
+
+            ${
+                plans.length
+
+                ?plans
+                    .map(
+                        p=>`
+                            <div class="card">
+
+                                <h3>
+                                    ${esc(p.outletName)}
+                                </h3>
+
+                                ${
+                                    (
+                                        p.targetSkus||
+                                        []
+                                    ).length
+
+                                    ?(
+                                        p.targetSkus||
+                                        []
+                                    )
+                                    .map(
+                                        sku=>{
+
+                                            const t=
+                                                p.skuTargets?.[
+                                                    sku
+                                                ]||{
+                                                    cartons:0,
+                                                    value:0
+                                                };
+
+                                            const a=
+                                                skuAch(
+                                                    id,
+                                                    p.outletName,
+                                                    sku
+                                                );
+
+                                            const left=
+                                                Math.max(
+                                                    0,
+                                                    n(
+                                                        t.cartons
+                                                    )-
+                                                    a.cartons
+                                                );
+
+                                            const pct=
+                                                n(
+                                                    t.cartons
+                                                )
+                                                ?Math.min(
+                                                    100,
+                                                    a.cartons/
+                                                    n(
+                                                        t.cartons
+                                                    )*
+                                                    100
+                                                )
+                                                :0;
+
+                                            return`
+                                                <div
+                                                    class="list-item"
+                                                    style="margin-top:8px"
+                                                >
+
+                                                    <div class="row">
+
+                                                        <div>
+
+                                                            <h4>
+                                                                ${esc(sku)}
+                                                            </h4>
+
+                                                            <p>
+
+                                                                ${a.cartons}
+                                                                /
+                                                                ${n(t.cartons)}
+                                                                CTN
+
+                                                                •
+
+                                                                ${money(a.value)}
+                                                                /
+                                                                ${money(t.value)}
+
+                                                            </p>
+
+                                                        </div>
+
+
+                                                        <span
+                                                            class="
+                                                                pill
+                                                                ${
+                                                                    left
+                                                                    ?'red'
+                                                                    :'green'
+                                                                }
+                                                            "
+                                                        >
+                                                            ${
+                                                                left
+                                                                ?left+' LEFT'
+                                                                :'DONE'
+                                                            }
+                                                        </span>
+
+                                                    </div>
+
+
+                                                    <div
+                                                        class="progress-wrap"
+                                                        style="margin-top:8px"
+                                                    >
+
+                                                        <div
+                                                            class="
+                                                                progress
+                                                                ${
+                                                                    pct>=100
+                                                                    ?'goodbar'
+                                                                    :''
+                                                                }
+                                                            "
+                                                            style="
+                                                                width:${pct}%
+                                                            "
+                                                        >
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            `;
+                                        }
+                                    )
+                                    .join('')
+
+                                    :`
+                                        <p class="muted">
+                                            No targeted SKU.
+                                        </p>
+                                    `
+                                }
+
+                            </div>
+                        `
+                    )
+                    .join('')
+
+                :`
+                    <div class="empty">
+                        No SKU plan this month.
+                    </div>
+                `
+            }
+
+        </div>
+    `;
+
+    bindCommon();
+}
+
+
+/* =========================================================
+   TEAM
+========================================================= */
+
+function renderTeam(){
+
+    if(
+        session.mode!==
+        'manager'
+    ){
+
+        page='dashboard';
+
+        render();
+
+        return;
+    }
+
+
+    $('#mainContent')
+        .innerHTML=`
+
+        ${monthBar()}
+
+
+        <div class="card manager-banner">
+
+            <p class="eyebrow">
+                MANAGER ACCESS
+            </p>
+
+            <h2>
+                Team Control Center
+            </h2>
+
+            <p class="muted">
+
+                Tap a salesman
+                to review full performance.
+
+            </p>
+
+        </div>
+
+
+        <div
+            class="list"
+            style="margin-top:12px"
+        >
+
+            ${
+                salesUsers()
+                    .map(
+                        u=>{
+
+                            const m=
+                                metric(
+                                    u.id
+                                );
+
+                            const pct=
+                                m.target
+                                ?m.ach/m.target*100
+                                :0;
+
+                            return`
+                                <div class="card">
+
+                                    <div class="row">
+
+                                        <div>
+
+                                            <h3
+                                                style="margin:0"
+                                            >
+                                                ${esc(u.name)}
+                                            </h3>
+
+                                            <p
+                                                class="muted"
+                                                style="margin:4px 0 0"
+                                            >
+
+                                                ${u.id}
+
+                                                •
+
+                                                Target
+                                                ${money(m.target)}
+
+                                            </p>
+
+                                        </div>
+
+
+                                        <span
+                                            class="
+                                                pill
+                                                ${
+                                                    pct>=100
+                                                    ?'green'
+                                                    :pct>=80
+                                                        ?'orange'
+                                                        :'red'
+                                                }
+                                            "
+                                        >
+                                            ${pct.toFixed(0)}%
+                                        </span>
+
+                                    </div>
+
+
+                                    <div
+                                        class="mini-grid"
+                                        style="margin-top:10px"
+                                    >
+
+                                        <div class="metric-box">
+
+                                            <small>
+                                                Sales
+                                            </small>
+
+                                            <br>
+
+                                            <b>
+                                                ${money(m.ach)}
+                                            </b>
+
+                                        </div>
+
+
+                                        <div class="metric-box">
+
+                                            <small>
+                                                Shortfall
+                                            </small>
+
+                                            <br>
+
+                                            <b>
+                                                ${money(m.short)}
+                                            </b>
+
+                                        </div>
+
+
+                                        <div class="metric-box">
+
+                                            <small>
+                                                Need / Day
+                                            </small>
+
+                                            <br>
+
+                                            <b>
+                                                ${money(m.required)}
+                                            </b>
+
+                                        </div>
+
+
+                                        <div class="metric-box">
+
+                                            <small>
+                                                Coverage
+                                            </small>
+
+                                            <br>
+
+                                            <b>
+                                                ${m.coverage.toFixed(0)}%
+                                            </b>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <button
+                                        class="btn secondary"
+                                        data-open="${u.id}"
+                                        style="margin-top:10px"
+                                    >
+                                        OPEN FULL DETAILS
+                                    </button>
+
+                                </div>
+                            `;
+                        }
+                    )
+                    .join('')
+            }
+
+        </div>
+    `;
+
+    bindCommon();
+
+
+    $$('[data-open]')
+        .forEach(
+            b=>
+                b.onclick=
+                    async ()=>{
+
+                        managerView=
+                            b.dataset.open;
+
+                        refreshTop();
+
+                        if(backendUrl()){
+
+                            await syncCloud(
+                                uid(),
+                                selectedMonth
+                            );
+                        }
+
+                        page=
+                            'dashboard';
+
+                        render();
+                    }
+        );
 }
 
 
@@ -8293,74 +6257,48 @@ function renderTeamControl() {
    CLOUD SETUP
 ========================================================= */
 
-async function cloudSetup() {
+async function cloudSetup(){
 
-  const current =
-    backendUrl();
+    const url=
+        prompt(
+            'Paste Google Apps Script Web App URL ending with /exec.\n\nLeave blank for local-only mode.',
+            backendUrl()
+        );
 
+    if(url===null)
+        return;
 
-  const url =
-    prompt(
-
-      'Paste the deployed Google Apps Script Web App URL ending with /exec.\n\nLeave blank to keep local mode.',
-
-      current
+    localStorage.setItem(
+        BACKEND,
+        url.trim()
     );
 
+    if(!url.trim()){
 
-  if (
-    url === null
-  ) {
+        toast(
+            'Local mode enabled'
+        );
 
-    return;
-  }
-
-
-  localStorage.setItem(
-
-    BACKEND_URL_KEY,
-
-    url.trim()
-  );
-
-
-  if (
-    !url.trim()
-  ) {
+        return;
+    }
 
     toast(
-      'Local mode kept'
+        'Cloud URL saved • syncing...'
     );
 
-    return;
-  }
+    const ok=
+        await syncCloud(
+            uid(),
+            selectedMonth
+        );
 
-
-  toast(
-    'Cloud URL saved. Syncing...'
-  );
-
-
-  const ok =
-    await syncCloud(
-
-      currentStaffId(),
-
-      selectedMonth
+    toast(
+        ok
+        ?'Cloud sync connected'
+        :'Cloud connection failed'
     );
 
-
-  toast(
-
-    ok
-
-      ? 'Cloud sync connected'
-
-      : 'Cloud connection failed'
-  );
-
-
-  render();
+    render();
 }
 
 
@@ -8369,146 +6307,128 @@ async function cloudSetup() {
 ========================================================= */
 
 $('#loginForm')
-  .onsubmit =
-    e => {
+    .onsubmit=
+        e=>{
 
-      e.preventDefault();
+            e.preventDefault();
 
-      login(
-        $('#loginUser').value,
-        $('#loginPin').value
-      );
-    };
+            login(
+                $('#loginUser').value,
+                $('#loginPin').value
+            );
+        };
 
 
 $('#logoutBtn')
-  .onclick =
-    logout;
+    .onclick=
+        logout;
 
 
 $('#notifBtn')
-  .onclick =
-    () => {
+    .onclick=
+        ()=>{
 
-      page =
-        'dashboard';
+            page=
+                'dashboard';
 
-      render();
+            render();
 
-      pushBrowserAlert();
-    };
+            notifyAlerts();
+        };
 
 
 $('#bottomNav')
-  .onclick =
-    e => {
+    .onclick=
+        e=>{
 
-      const btn =
-        e.target
-          .closest(
-            'button[data-page]'
-          );
+            const b=
+                e.target
+                    .closest(
+                        'button[data-page]'
+                    );
 
-      if (!btn) return;
+            if(!b)
+                return;
 
-      page =
-        btn.dataset.page;
+            page=
+                b.dataset.page;
 
-      render();
-    };
-
-
-/*
-  IMPORTANT:
-  This FINAL build uses a NEW storage key.
-
-  Therefore old Sayem / demo sales /
-  RM9000 / RM1870 data are NOT loaded.
-*/
-
-const savedSession =
-  sessionStorage.getItem(
-    SESSION_KEY
-  );
+            render();
+        };
 
 
-if (
-  savedSession
-) {
-
-  try {
-
-    session =
-      JSON.parse(
-        savedSession
-      );
-
-
-    if (
-      session &&
-      userById(
-        session.id
-      )
-    ) {
-
-      if (
-        session.mode ===
-        'manager'
-      ) {
-
-        managerView =
-          'M21954';
-      }
-
-
-      openApp();
-
-    } else {
-
-      sessionStorage
-        .removeItem(
-          SESSION_KEY
+const saved=
+    sessionStorage
+        .getItem(
+            SESSION
         );
 
-      session =
-        null;
+
+if(saved){
+
+    try{
+
+        session=
+            JSON.parse(
+                saved
+            );
+
+        if(
+            session&&
+            user(
+                session.id
+            )
+        ){
+
+            if(
+                session.mode===
+                'manager'
+            ){
+
+                managerView=
+                    'M21954';
+            }
+
+            openApp();
+
+        }else{
+
+            sessionStorage
+                .removeItem(
+                    SESSION
+                );
+
+            session=null;
+        }
+
+    }catch{
+
+        sessionStorage
+            .removeItem(
+                SESSION
+            );
     }
-
-  } catch {
-
-    sessionStorage
-      .removeItem(
-        SESSION_KEY
-      );
-  }
 }
 
 
-/*
-  Force service worker to check latest files.
-*/
+if(
+    'serviceWorker'
+    in navigator
+){
 
-if (
-  'serviceWorker'
-  in navigator
-) {
-
-  navigator
-    .serviceWorker
-    .register(
-      './sw.js',
-      {
-        updateViaCache:
-          'none'
-      }
-    )
-
-    .then(
-      reg =>
-        reg.update()
-    )
-
-    .catch(
-      () => {}
-    );
+    navigator
+        .serviceWorker
+        .register(
+            './sw.js',
+            {
+                updateViaCache:
+                    'none'
+            }
+        )
+        .then(
+            r=>r.update()
+        )
+        .catch(
+            ()=>{}
+        );
 }
