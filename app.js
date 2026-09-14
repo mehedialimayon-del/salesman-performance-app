@@ -2706,7 +2706,7 @@ function installShell() {
           font-weight:800
         "
       >
-        CAM Ayon
+        KAM AYON
       </a>
     `;
 
