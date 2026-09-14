@@ -1,5 +1,3 @@
 window.APP_CONFIG = {
-  // After Google Apps Script deployment, paste the /exec URL here ONE TIME.
-  // Example: https://script.google.com/macros/s/XXXXXXXXXXXX/exec
-  BACKEND_URL: ''
+  BACKEND_URL: 'https://script.google.com/macros/s/AKfycbzW2BMUGVpNj2VmrSVj9XlZ2nlJm4XA55-M1L_wZqkS9fSfXUQVt3XCOzJhTd7jbSB2/exec'
 };
