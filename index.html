@@ -1,1 +1,526 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b0d10"><meta name="apple-mobile-web-app-capable" content="yes"><title>Sales Performance Hub</title><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=4"><link rel="icon" href="icons/icon-192.png"><script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script></head><body><div id="toast" class="toast"></div><section id="loginView" class="screen login-screen"><div class="login-card"><div class="logo-mark">SP</div><p class="eyebrow">MODERN TRADE • SALES APP</p><h1>Sales Performance Hub</h1><p class="muted">Daily sales • Route target • SKU planning • Income • Incentive • Tasks</p><form id="loginForm" class="stack"><label>Staff ID / Username<input id="loginUser" required placeholder="e.g. M22075"></label><label>Password<input id="loginPin" type="password" required placeholder="Password = Staff ID"></label><button class="btn primary">Enter App</button></form><div class="login-help"><span class="security-dot">●</span> Staff access</div></div></section><section id="appView" class="app hidden"><header class="topbar"><div class="topbar-user"><p class="eyebrow" id="roleLabel">SALES REPRESENTATIVE</p><h2 id="welcomeName">Welcome</h2></div><div class="top-actions"><button id="notifBtn" class="icon-btn" title="Notifications">🔔<span id="notifBadge" class="badge hidden">0</span></button><button id="logoutBtn" class="icon-btn" title="Logout">↪</button></div></header><main id="mainContent" class="content"></main><nav class="bottom-nav" id="bottomNav"><button data-page="dashboard" class="active"><span class="nav-icon">⌂</span><small>Home</small></button><button data-page="daily"><span class="nav-icon">＋</span><small>Update</small></button><button data-page="planning"><span class="nav-icon">◎</span><small>Plan</small></button><button data-page="income"><span class="nav-icon">RM</span><small>Income</small></button><button data-page="summary"><span class="nav-icon">▦</span><small>Summary</small></button></nav></section><script src="config.js?v=4"></script><script src="data.js?v=4"></script><script src="app.js?v=4"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#080a0d"
+  >
+
+  <meta
+    name="background-color"
+    content="#06080b"
+  >
+
+  <meta
+    name="description"
+    content="Sales Performance Hub — Live Sales, Target, SKU, Incentive, Tasks, Income and Manager Database."
+  >
+
+  <meta
+    name="mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  >
+
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Sales Hub"
+  >
+
+  <meta
+    name="application-name"
+    content="Sales Hub"
+  >
+
+  <title>
+    Sales Performance Hub
+  </title>
+
+  <!-- PWA -->
+  <link
+    rel="manifest"
+    href="./manifest.json?v=20260915-final"
+  >
+
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="192x192"
+    href="./icons/icon-192.png"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="./icons/icon-192.png"
+  >
+
+  <!-- FINAL PREMIUM STYLE -->
+  <link
+    rel="stylesheet"
+    href="./styles.css?v=20260915-final-3"
+  >
+
+  <!-- OneSignal v16 -->
+  <script>
+    window.OneSignalDeferred =
+      window.OneSignalDeferred || [];
+  </script>
+
+  <script
+    src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+    defer
+  ></script>
+</head>
+
+
+<body>
+
+  <!-- =====================================================
+       TOAST
+  ====================================================== -->
+
+  <div
+    id="toast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+  ></div>
+
+
+  <!-- =====================================================
+       LOGIN
+  ====================================================== -->
+
+  <section
+    id="loginView"
+    class="screen login-screen"
+  >
+
+    <div class="login-card">
+
+      <div class="logo-mark">
+        SP
+      </div>
+
+      <p class="eyebrow">
+        MODERN TRADE • LIVE SALES APP
+      </p>
+
+      <h1>
+        Sales Performance Hub
+      </h1>
+
+      <p class="muted">
+        Sales • Target • SKU • Incentive • Tasks • Income
+      </p>
+
+      <form
+        id="loginForm"
+        class="stack"
+        autocomplete="on"
+      >
+
+        <label>
+          Staff ID / Username
+
+          <input
+            id="loginUser"
+            name="username"
+            autocomplete="username"
+            autocapitalize="characters"
+            spellcheck="false"
+            required
+            placeholder="e.g. M22075"
+          >
+        </label>
+
+
+        <label>
+          Password
+
+          <input
+            id="loginPin"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+            placeholder="Enter password"
+          >
+        </label>
+
+
+        <button
+          class="btn primary big-action"
+          type="submit"
+        >
+          ENTER SALES HUB
+        </button>
+
+      </form>
+
+
+      <div class="login-help">
+
+        <div
+          style="
+            display:flex;
+            align-items:center;
+            gap:7px;
+            margin-bottom:7px
+          "
+        >
+          <span class="security-dot">
+            ●
+          </span>
+
+          <span>
+            Secure staff access
+          </span>
+        </div>
+
+        <div
+          style="
+            display:flex;
+            align-items:center;
+            gap:7px
+          "
+        >
+          <span
+            style="
+              color:#37d67a
+            "
+          >
+            ☁
+          </span>
+
+          <span>
+            Google Sheets live database
+          </span>
+        </div>
+
+      </div>
+
+
+      <div
+        style="
+          margin-top:22px;
+          padding-top:15px;
+          border-top:1px solid #1b222a;
+          text-align:center;
+          color:#737e8a;
+          font-size:10px;
+          letter-spacing:.45px
+        "
+      >
+
+        Developed by
+
+        <a
+          href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/"
+          target="_blank"
+          rel="noopener noreferrer"
+          style="
+            color:#ff7414;
+            text-decoration:none;
+            font-weight:900;
+            letter-spacing:.8px
+          "
+        >
+          KAM AYON
+        </a>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       MAIN APP
+  ====================================================== -->
+
+  <section
+    id="appView"
+    class="app hidden"
+  >
+
+
+    <!-- ===================================================
+         TOP BAR
+    ==================================================== -->
+
+    <header class="topbar">
+
+      <div class="topbar-user">
+
+        <p
+          class="eyebrow"
+          id="roleLabel"
+        >
+          SALES REPRESENTATIVE
+        </p>
+
+        <h2 id="welcomeName">
+          Welcome
+        </h2>
+
+      </div>
+
+
+      <div class="top-actions">
+
+        <!-- Notifications -->
+        <button
+          id="notifBtn"
+          class="icon-btn"
+          type="button"
+          title="Notifications"
+          aria-label="Notifications"
+        >
+
+          🔔
+
+          <span
+            id="notifBadge"
+            class="badge hidden"
+          >
+            0
+          </span>
+
+        </button>
+
+
+        <!-- Settings / Logout lives inside Settings -->
+        <button
+          id="logoutBtn"
+          class="icon-btn"
+          type="button"
+          title="Settings"
+          aria-label="Settings"
+        >
+          ⚙
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <!-- ===================================================
+         DYNAMIC CONTENT
+    ==================================================== -->
+
+    <main
+      id="mainContent"
+      class="content"
+    ></main>
+
+
+    <!-- ===================================================
+         BOTTOM NAVIGATION
+         Proposal button is added by app.js
+    ==================================================== -->
+
+    <nav
+      class="bottom-nav"
+      id="bottomNav"
+      aria-label="Main Navigation"
+    >
+
+      <button
+        type="button"
+        data-page="dashboard"
+        class="active"
+      >
+        <span class="nav-icon">
+          ⌂
+        </span>
+
+        <small>
+          Home
+        </small>
+      </button>
+
+
+      <button
+        type="button"
+        data-page="daily"
+      >
+        <span class="nav-icon">
+          ＋
+        </span>
+
+        <small>
+          Update
+        </small>
+      </button>
+
+
+      <button
+        type="button"
+        data-page="planning"
+      >
+        <span class="nav-icon">
+          ◎
+        </span>
+
+        <small>
+          Plan
+        </small>
+      </button>
+
+
+      <button
+        type="button"
+        data-page="income"
+      >
+        <span class="nav-icon">
+          RM
+        </span>
+
+        <small>
+          Income
+        </small>
+      </button>
+
+
+      <button
+        type="button"
+        data-page="summary"
+      >
+        <span class="nav-icon">
+          ▦
+        </span>
+
+        <small>
+          Summary
+        </small>
+      </button>
+
+    </nav>
+
+  </section>
+
+
+  <!-- =====================================================
+       APP CONFIG
+       IMPORTANT: LOAD BEFORE APP.JS
+  ====================================================== -->
+
+  <script
+    src="./config.js?v=20260915-final-3"
+  ></script>
+
+
+  <!-- =====================================================
+       MASTER DATA
+  ====================================================== -->
+
+  <script
+    src="./data.js?v=20260915-final-3"
+  ></script>
+
+
+  <!-- =====================================================
+       FINAL APP
+  ====================================================== -->
+
+  <script
+    src="./app.js?v=20260915-final-3"
+  ></script>
+
+
+  <!-- =====================================================
+       SERVICE WORKER REGISTRATION
+  ====================================================== -->
+
+  <script>
+
+    if (
+      'serviceWorker' in navigator
+    ) {
+
+      window.addEventListener(
+        'load',
+        async () => {
+
+          try {
+
+            const registration =
+              await navigator
+                .serviceWorker
+                .register(
+                  './sw.js',
+                  {
+                    scope: './',
+                    updateViaCache: 'none'
+                  }
+                );
+
+
+            try {
+
+              await registration
+                .update();
+
+            } catch (_) {}
+
+
+            console.log(
+              'Sales Hub Service Worker ready',
+              registration.scope
+            );
+
+
+          } catch (error) {
+
+            console.warn(
+              'Service Worker registration failed',
+              error
+            );
+
+          }
+
+        }
+      );
+
+    }
+
+  </script>
+
+
+  <!-- =====================================================
+       APP VERSION
+  ====================================================== -->
+
+  <script>
+
+    window.SPH_BUILD =
+      'FINAL-2026.09.15-3';
+
+    console.log(
+      'Sales Performance Hub',
+      window.SPH_BUILD
+    );
+
+  </script>
+
+</body>
+</html>
