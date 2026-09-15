@@ -1,3 +1,13 @@
+'use strict';
+
+/* =========================================================
+   SALES PERFORMANCE HUB — FINAL FRONTEND
+   Developed by KAM AYON
+   Backend: Google Apps Script / Google Sheets source of truth
+========================================================= */
+
+const APP_BUILD = 'FINAL-2026.09.15-2';
+const TZ = 'Asia/Kuala_Lumpur';
 const D = window.APP_DATA || {
   users: [],
   salaryRules: {},
@@ -9,61 +19,46 @@ const D = window.APP_DATA || {
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
-const STORE = 'sph.v5.state';
-const SESSION = 'sph.v5.session';
-const BACKEND = 'sph.backendUrl';
-const TZ = 'Asia/Kuala_Lumpur';
+const SESSION_KEY = 'sph.final.session.v6';
+const PREF_KEY = 'sph.final.pref.v6';
+const BACKEND_KEY = 'sph.backendUrl';
 
 let session = null;
 let page = 'dashboard';
-let managerView = 'M21954';
-
 let selectedMonth = localDate().slice(0, 7);
-let selectedDay = localDate();
-
-let summaryMode = 'month';
-let selectedSkus = [];
-
-let proposalFormsCache = [];
-let lastCloudSyncAt = '';
-
-let liveSyncTimer = null;
-
+let selectedDate = localDate();
+let managerView = 'M21954';
+let current = null;
+let teamSnapshot = [];
+let lastSyncAt = '';
+let syncing = false;
+let liveTimer = null;
+let selectedPlanningSkus = [];
 let oneSignalSdk = null;
 
 let pushConfig = {
-  ready: false,
   configured: false,
   appId: '',
-  appUrl: ''
+  ready: false
 };
 
-
-/* =========================================================
-   BASIC HELPERS
-========================================================= */
-
-function n(v) {
-  return Number.isFinite(Number(v))
+const n = v =>
+  Number.isFinite(Number(v))
     ? Number(v)
     : 0;
-}
 
+const money = v =>
+  'RM ' +
+  n(v).toLocaleString(
+    'en-MY',
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }
+  );
 
-function money(v) {
-  return 'RM ' +
-    n(v).toLocaleString(
-      'en-MY',
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }
-    );
-}
-
-
-function esc(v = '') {
-  return String(v).replace(
+const esc = (v = '') =>
+  String(v).replace(
     /[&<>"']/g,
     c => ({
       '&': '&amp;',
@@ -73,11 +68,9 @@ function esc(v = '') {
       "'": '&#39;'
     }[c])
   );
-}
 
-
-function idGen() {
-  return crypto?.randomUUID
+const idGen = () =>
+  crypto?.randomUUID
     ? crypto.randomUUID()
     : 'id-' +
       Date.now() +
@@ -85,11 +78,8 @@ function idGen() {
       Math.random()
         .toString(36)
         .slice(2);
-}
-
 
 function localDate() {
-
   return new Intl.DateTimeFormat(
     'en-CA',
     {
@@ -98,16 +88,27 @@ function localDate() {
       month: '2-digit',
       day: '2-digit'
     }
-  ).format(
-    new Date()
-  );
+  ).format(new Date());
 }
 
+function localTime() {
+  return new Intl.DateTimeFormat(
+    'en-MY',
+    {
+      timeZone: TZ,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    }
+  ).format(new Date());
+}
 
 function dateLabel(d) {
+  if (!d) return '—';
 
   const [y, m, day] =
     String(d)
+      .slice(0, 10)
       .split('-')
       .map(Number);
 
@@ -125,11 +126,10 @@ function dateLabel(d) {
   );
 }
 
-
 function monthName(m) {
-
   const [y, mo] =
-    m.split('-')
+    String(m)
+      .split('-')
       .map(Number);
 
   return new Date(
@@ -145,88 +145,86 @@ function monthName(m) {
   );
 }
 
+function pct(v) {
+  return n(v).toFixed(1) + '%';
+}
 
-function toast(msg) {
-
-  const t = $('#toast');
+function toast(
+  msg,
+  ms = 2400
+) {
+  const t =
+    $('#toast');
 
   if (!t) return;
 
-  t.textContent = msg;
+  t.textContent =
+    msg;
 
   t.classList.add(
     'show'
   );
 
   clearTimeout(
-    window.__toast
+    window.__sphToast
   );
 
-  window.__toast =
+  window.__sphToast =
     setTimeout(
       () =>
         t.classList.remove(
           'show'
         ),
-      2300
+      ms
     );
 }
 
-
-/* =========================================================
-   LOCAL STATE
-========================================================= */
-
-function emptyState() {
-
-  return {
-    daily: [],
-    outletSales: [],
-    skuSales: [],
-    plans: [],
-    incentives: [],
-    tasks: [],
-    incomePlans: [],
-    customOutlets: {}
-  };
-}
-
-
-function state() {
-
+function getPref() {
   try {
-
-    return Object.assign(
-      emptyState(),
-      JSON.parse(
-        localStorage.getItem(
-          STORE
-        ) || '{}'
-      )
+    return JSON.parse(
+      localStorage.getItem(
+        PREF_KEY
+      ) || '{}'
     );
-
   } catch {
-
-    return emptyState();
+    return {};
   }
 }
 
-
-function save(s) {
-
+function setPref(patch) {
   localStorage.setItem(
-    STORE,
-    JSON.stringify(s)
+    PREF_KEY,
+    JSON.stringify({
+      ...getPref(),
+      ...patch
+    })
   );
 }
 
+function backendUrl() {
+  return String(
+    window.APP_CONFIG
+      ?.BACKEND_URL ||
+    localStorage.getItem(
+      BACKEND_KEY
+    ) ||
+    ''
+  ).trim();
+}
 
-/* =========================================================
-   USERS
-========================================================= */
+function normalizeId(v) {
+  const x =
+    String(
+      v || ''
+    ).trim();
 
-function user(id) {
+  return x.toLowerCase() ===
+    'manager'
+      ? 'M21954'
+      : x.toUpperCase();
+}
 
+function localUser(id) {
   return (
     D.users ||
     []
@@ -241,155 +239,167 @@ function user(id) {
   );
 }
 
-
-function salesUsers() {
-
-  return (
-    D.users ||
-    []
-  ).filter(
-    x =>
-      x.role === 'SR' ||
-      String(
-        x.role || ''
-      ).includes(
-        'MANAGER'
-      )
-  );
-}
-
-
-function uid() {
-
+function viewedId() {
   return session?.mode ===
     'manager'
       ? managerView
       : session?.id;
 }
 
+function isManager() {
+  return (
+    session?.mode ===
+      'manager' ||
 
-function routeTarget(id) {
+    String(
+      session?.role ||
+      ''
+    )
+    .toUpperCase()
+    .includes(
+      'MANAGER'
+    ) ||
 
-  return Math.max(
-    n(
-      D.salaryRules
-        ?.minMonthlyTarget ||
-        50000
-    ),
-    n(
-      user(id)
-        ?.target
+    String(
+      session?.role ||
+      ''
+    )
+    .toUpperCase()
+    .includes(
+      'HR'
     )
   );
 }
 
-
-function daysInMonth(m) {
-
-  const [y, mo] =
-    m.split('-')
-      .map(Number);
-
-  return new Date(
-    y,
-    mo,
-    0
-  ).getDate();
+function isManagerMode() {
+  return session?.mode ===
+    'manager';
 }
 
+function sessionName() {
+  return (
+    session?.name ||
+    localUser(
+      session?.id
+    )?.name ||
+    session?.id ||
+    ''
+  );
+}
 
-function daysRemain(m) {
-
-  const now =
-    new Date();
-
-  const [y, mo] =
-    m.split('-')
-      .map(Number);
-
-  const end =
-    new Date(
-      y,
-      mo,
-      0
-    );
-
+function viewedName() {
   if (
-    now.getFullYear() !== y ||
-    now.getMonth() + 1 !== mo
+    current?.user?.[
+      'Full Name'
+    ]
   ) {
-
-    return now > end
-      ? 0
-      : daysInMonth(m);
+    return current
+      .user[
+        'Full Name'
+      ];
   }
 
-  return Math.max(
-    1,
-    end.getDate() -
-      now.getDate() +
-      1
+  if (
+    current?.user
+      ?.name
+  ) {
+    return current
+      .user
+      .name;
+  }
+
+  return (
+    localUser(
+      viewedId()
+    )?.name ||
+    viewedId()
   );
 }
 
 
-function parseJSON(
-  v,
-  f = []
+/* =========================================================
+   NETWORK
+========================================================= */
+
+async function fetchJson(
+  url,
+  options = {},
+  timeout = 25000
 ) {
+  const controller =
+    new AbortController();
+
+  const timer =
+    setTimeout(
+      () =>
+        controller.abort(),
+      timeout
+    );
 
   try {
+    const r =
+      await fetch(
+        url,
+        {
+          cache:
+            'no-store',
+          ...options,
+          signal:
+            controller.signal
+        }
+      );
 
-    return typeof v ===
-      'string'
-        ? JSON.parse(v)
-        : (v || f);
+    const text =
+      await r.text();
 
-  } catch {
+    let data;
 
-    return f;
+    try {
+      data =
+        JSON.parse(
+          text
+        );
+    } catch {
+      throw new Error(
+        'Server returned invalid response'
+      );
+    }
+
+    return data;
+
+  } catch (e) {
+    if (
+      e?.name ===
+      'AbortError'
+    ) {
+      throw new Error(
+        'Server timeout'
+      );
+    }
+
+    throw e;
+
+  } finally {
+    clearTimeout(
+      timer
+    );
   }
 }
 
-
-/* =========================================================
-   BACKEND
-========================================================= */
-
-function backendUrl() {
-
-  const bundled =
-    String(
-      window.APP_CONFIG
-        ?.BACKEND_URL ||
-      ''
-    ).trim();
-
-  const local =
-    String(
-      localStorage.getItem(
-        BACKEND
-      ) || ''
-    ).trim();
-
-  return bundled || local;
-}
-
-
 async function apiGet(
   action,
-  targetId = uid(),
-  month = selectedMonth
+  extra = {}
 ) {
+  if (!backendUrl()) {
+    throw new Error(
+      'Backend URL is missing'
+    );
+  }
 
-  const base =
-    backendUrl();
-
-  if (
-    !base ||
-    !session
-  ) {
-    return null;
+  if (!session) {
+    throw new Error(
+      'Please login'
+    );
   }
 
   const q =
@@ -399,44 +409,78 @@ async function apiGet(
         session.id,
       password:
         session.password,
-      viewStaffId:
-        targetId,
-      month
+      ...extra
     });
 
-  const r =
-    await fetch(
-      base +
-        '?' +
-        q.toString(),
-      {
-        cache:
-          'no-store'
-      }
-    );
-
-  return r.json();
+  return fetchJson(
+    backendUrl() +
+    '?' +
+    q.toString()
+  );
 }
-
 
 async function apiPost(
   action,
-  payload
+  payload = {}
 ) {
-
-  const base =
-    backendUrl();
-
-  if (
-    !base ||
-    !session
-  ) {
-    return null;
+  if (!backendUrl()) {
+    throw new Error(
+      'Backend URL is missing'
+    );
   }
 
+  if (!session) {
+    throw new Error(
+      'Please login'
+    );
+  }
+
+  return fetchJson(
+    backendUrl(),
+    {
+      method:
+        'POST',
+
+      headers: {
+        'Content-Type':
+          'text/plain;charset=utf-8'
+      },
+
+      body:
+        JSON.stringify({
+          action,
+          staffId:
+            session.id,
+          password:
+            session.password,
+          payload
+        })
+    },
+    40000
+  );
+}
+
+async function backendLogin(
+  rawId,
+  password
+) {
+  const id =
+    normalizeId(
+      rawId
+    );
+
+  const body = {
+    action:
+      'login',
+    staffId:
+      id,
+    password,
+    payload: {}
+  };
+
   const r =
-    await fetch(
-      base,
+    await fetchJson(
+      backendUrl(),
       {
         method:
           'POST',
@@ -447,2192 +491,561 @@ async function apiPost(
         },
 
         body:
-          JSON.stringify({
-            action,
-            staffId:
-              session.id,
-            password:
-              session.password,
-            payload
-          }),
-
-        keepalive:
-          true,
-
-        cache:
-          'no-store'
-      }
+          JSON.stringify(
+            body
+          )
+      },
+      25000
     );
 
-  return r.json();
-}
-
-
-async function pushCloud(
-  action,
-  payload
-) {
-
-  if (!backendUrl()) {
-
-    toast(
-      'Saved on phone • cloud URL missing'
+  if (!r?.ok) {
+    throw new Error(
+      r?.error ||
+      'Login failed'
     );
-
-    return {
-      ok: false
-    };
   }
 
-  try {
-
-    const r =
-      await apiPost(
-        action,
-        payload
-      );
-
-    if (!r?.ok) {
-
-      throw new Error(
-        r?.error ||
-        'Cloud save failed'
-      );
-    }
-
-    return r;
-
-  } catch (e) {
-
-    console.warn(e);
-
-    toast(
-      'Saved on phone • cloud sync failed'
-    );
-
-    return {
-      ok: false,
-      error:
-        String(e)
-    };
-  }
+  return {
+    id,
+    user:
+      r.user ||
+      {}
+  };
 }
 
-
-/* =========================================================
-   CLOUD READ
-========================================================= */
-
-async function syncCloud(
-  targetId = uid(),
-  month = selectedMonth
+function setBusy(
+  on,
+  message =
+    'Loading live data…'
 ) {
+  syncing =
+    on;
+
+  document.body
+    .classList
+    .toggle(
+      'sph-busy',
+      !!on
+    );
+
+  let box =
+    $('#sphLoading');
 
   if (
-    !backendUrl() ||
-    !session
+    on &&
+    !box
+  ) {
+    box =
+      document
+        .createElement(
+          'div'
+        );
+
+    box.id =
+      'sphLoading';
+
+    box.style.cssText =
+      'position:fixed;inset:0;z-index:999;background:rgba(5,7,9,.68);backdrop-filter:blur(4px);display:grid;place-items:center;padding:24px';
+
+    box.innerHTML = `
+      <div
+        class="card"
+        style="
+          max-width:360px;
+          width:100%;
+          text-align:center
+        "
+      >
+        <div
+          style="
+            font-size:30px;
+            margin-bottom:10px
+          "
+        >
+          ↻
+        </div>
+
+        <strong>
+          ${esc(message)}
+        </strong>
+
+        <p
+          class="muted"
+          style="
+            margin:8px 0 0
+          "
+        >
+          Please keep this page open.
+        </p>
+      </div>
+    `;
+
+    document.body
+      .appendChild(
+        box
+      );
+  }
+
+  if (
+    box &&
+    on
+  ) {
+    box.querySelector(
+      'strong'
+    ).textContent =
+      message;
+  }
+
+  if (
+    !on &&
+    box
+  ) {
+    box.remove();
+  }
+}
+
+async function loadCurrent({
+  quiet = false
+} = {}) {
+  if (
+    !session ||
+    !backendUrl()
   ) {
     return false;
   }
 
-  try {
+  if (!quiet) {
+    setBusy(
+      true,
+      'Loading live database…'
+    );
+  }
 
+  try {
     const r =
       await apiGet(
         'bootstrap',
-        targetId,
-        month
+        {
+          viewStaffId:
+            viewedId(),
+          month:
+            selectedMonth,
+          date:
+            selectedDate
+        }
       );
 
     if (!r?.ok) {
-
       throw new Error(
         r?.error ||
         'Cloud read failed'
       );
     }
 
-    const d =
-      r.data || {};
-
-    const s =
-      state();
-
-
-    if (
-      Array.isArray(
-        d.outlets
-      ) &&
-      d.outlets.length
-    ) {
-
-      s.customOutlets[
-        targetId
-      ] =
-        d.outlets
-          .map(
-            x => ({
-              code:
-                String(
-                  x[
-                    'Outlet Code'
-                  ] || ''
-                ),
-
-              name:
-                String(
-                  x[
-                    'Outlet Name'
-                  ] || ''
-                ),
-
-              category:
-                String(
-                  x.Category ||
-                  'Other'
-                ),
-
-              totalSku:
-                n(
-                  x[
-                    'Total SKU'
-                  ]
-                )
-            })
-          )
-          .filter(
-            x =>
-              x.name
-          );
-    }
-
-
-    s.daily =
-      s.daily
-        .filter(
-          x =>
-            !(
-              x.staffId ===
-                targetId &&
-              x.month ===
-                month
-            )
-        )
-        .concat(
-          (
-            d.daily ||
-            []
-          ).map(
-            x => ({
-              id:
-                idGen(),
-
-              staffId:
-                targetId,
-
-              month:
-                String(
-                  x.Month ||
-                  month
-                ),
-
-              date:
-                String(
-                  x.Date ||
-                  ''
-                ).slice(
-                  0,
-                  10
-                ),
-
-              todaySales:
-                n(
-                  x[
-                    'Today Sales'
-                  ]
-                ),
-
-              lastMonthSameDay:
-                n(
-                  x[
-                    'Last Month Same Day'
-                  ]
-                ),
-
-              active:
-                n(
-                  x.Active
-                ),
-
-              prepareTrip:
-                n(
-                  x[
-                    'Prepare for Trip'
-                  ]
-                ),
-
-              orderAmount:
-                n(
-                  x[
-                    'Order Amount'
-                  ]
-                ),
-
-              note:
-                String(
-                  x.Note ||
-                  ''
-                )
-            })
-          )
-        );
-
-
-    s.outletSales =
-      s.outletSales
-        .filter(
-          x =>
-            !(
-              x.staffId ===
-                targetId &&
-              x.month ===
-                month
-            )
-        )
-        .concat(
-          (
-            d.outletSales ||
-            []
-          ).map(
-            x => ({
-              id:
-                idGen(),
-
-              staffId:
-                targetId,
-
-              month:
-                String(
-                  x.Month ||
-                  month
-                ),
-
-              date:
-                String(
-                  x.Date ||
-                  ''
-                ).slice(
-                  0,
-                  10
-                ),
-
-              outletCode:
-                String(
-                  x[
-                    'Outlet Code'
-                  ] || ''
-                ),
-
-              outletName:
-                String(
-                  x[
-                    'Outlet Name'
-                  ] || ''
-                ),
-
-              sales:
-                n(
-                  x[
-                    'Sales Value'
-                  ]
-                ),
-
-              note:
-                String(
-                  x.Note ||
-                  ''
-                )
-            })
-          )
-        );
-
-
-    s.skuSales =
-      s.skuSales
-        .filter(
-          x =>
-            !(
-              x.staffId ===
-                targetId &&
-              x.month ===
-                month
-            )
-        )
-        .concat(
-          (
-            d.skuSales ||
-            []
-          ).map(
-            x => ({
-              id:
-                idGen(),
-
-              staffId:
-                targetId,
-
-              month:
-                String(
-                  x.Month ||
-                  month
-                ),
-
-              date:
-                String(
-                  x.Date ||
-                  ''
-                ).slice(
-                  0,
-                  10
-                ),
-
-              outletCode:
-                String(
-                  x[
-                    'Outlet Code'
-                  ] || ''
-                ),
-
-              outletName:
-                String(
-                  x[
-                    'Outlet Name'
-                  ] || ''
-                ),
-
-              skuName:
-                String(
-                  x[
-                    'SKU Name'
-                  ] || ''
-                ),
-
-              cartons:
-                n(
-                  x.Cartons
-                ),
-
-              salesValue:
-                n(
-                  x[
-                    'Sales Value'
-                  ]
-                )
-            })
-          )
-        );
-
-
-    s.plans =
-      s.plans
-        .filter(
-          x =>
-            !(
-              x.staffId ===
-                targetId &&
-              x.month ===
-                month
-            )
-        )
-        .concat(
-          (
-            d.plans ||
-            []
-          ).map(
-            x => {
-
-              const raw =
-                parseJSON(
-                  x[
-                    'Targeted SKU List'
-                  ],
-                  []
-                );
-
-              const targetSkus =
-                [];
-
-              const skuTargets =
-                {};
-
-
-              (
-                Array.isArray(
-                  raw
-                )
-                  ? raw
-                  : []
-              ).forEach(
-                it => {
-
-                  if (
-                    typeof it ===
-                    'string'
-                  ) {
-
-                    targetSkus
-                      .push(it);
-
-                    skuTargets[
-                      it
-                    ] = {
-                      cartons:
-                        0,
-
-                      value:
-                        0
-                    };
-
-                  } else if (
-                    it?.name
-                  ) {
-
-                    targetSkus
-                      .push(
-                        it.name
-                      );
-
-                    skuTargets[
-                      it.name
-                    ] = {
-                      cartons:
-                        n(
-                          it.cartons
-                        ),
-
-                      value:
-                        n(
-                          it.value
-                        )
-                    };
-                  }
-                }
-              );
-
-
-              return {
-                id:
-                  idGen(),
-
-                staffId:
-                  targetId,
-
-                month:
-                  String(
-                    x.Month ||
-                    month
-                  ),
-
-                outletCode:
-                  String(
-                    x[
-                      'Outlet Code'
-                    ] || ''
-                  ),
-
-                outletName:
-                  String(
-                    x[
-                      'Outlet Name'
-                    ] || ''
-                  ),
-
-                outletTarget:
-                  n(
-                    x[
-                      'Outlet Target'
-                    ]
-                  ),
-
-                targetSkuCount:
-                  n(
-                    x[
-                      'Targeted SKU Count'
-                    ]
-                  ) ||
-                  targetSkus.length,
-
-                targetSkus,
-
-                skuTargets
-              };
-            }
-          )
-        );
-
-
-    s.tasks =
-      s.tasks
-        .filter(
-          x =>
-            x.staffId !==
-              targetId
-        )
-        .concat(
-          (
-            d.tasks ||
-            []
-          ).map(
-            x => ({
-              id:
-                String(
-                  x[
-                    'Task ID'
-                  ] ||
-                  idGen()
-                ),
-
-              staffId:
-                targetId,
-
-              title:
-                String(
-                  x.Title ||
-                  ''
-                ),
-
-              note:
-                String(
-                  x.Instruction ||
-                  ''
-                ),
-
-              due:
-                String(
-                  x[
-                    'Due Date'
-                  ] || ''
-                ).slice(
-                  0,
-                  10
-                ),
-
-              done:
-                String(
-                  x.Status ||
-                  ''
-                ).toUpperCase() ===
-                'DONE',
-
-              createdAt:
-                String(
-                  x[
-                    'Created At'
-                  ] || ''
-                )
-            })
-          )
-        );
-
-
-    s.incentives =
-      s.incentives
-        .filter(
-          x =>
-            !(
-              x.staffId ===
-                targetId &&
-              x.month ===
-                month
-            )
-        )
-        .concat(
-          (
-            d.incentives ||
-            []
-          ).map(
-            x => ({
-              id:
-                idGen(),
-
-              staffId:
-                targetId,
-
-              month:
-                String(
-                  x.Month ||
-                  month
-                ),
-
-              type:
-                String(
-                  x[
-                    'Incentive Type'
-                  ] ||
-                  'PRODUCT'
-                ).toUpperCase(),
-
-              skuName:
-                String(
-                  x[
-                    'SKU Name'
-                  ] || ''
-                ),
-
-              targetQty:
-                n(
-                  x[
-                    'Target Qty'
-                  ]
-                ),
-
-              reward:
-                n(
-                  x[
-                    'Reward RM'
-                  ]
-                ),
-
-              manualTarget:
-                n(
-                  x[
-                    'Manual Target RM'
-                  ]
-                ),
-
-              actual:
-                n(
-                  x[
-                    'Actual RM'
-                  ]
-                ),
-
-              status:
-                String(
-                  x.Status ||
-                  'ACTIVE'
-                )
-            })
-          )
-        );
-
-
-    if (
-      Array.isArray(
-        d.income
-      ) &&
-      d.income.length
-    ) {
-
-      const x =
-        d.income[
-          d.income.length - 1
-        ];
-
-      s.incomePlans =
-        s.incomePlans
-          .filter(
-            y =>
-              !(
-                y.staffId ===
-                  targetId &&
-                y.month ===
-                  month
-              )
-          );
-
-      s.incomePlans
-        .push({
-          staffId:
-            targetId,
-
-          month,
-
-          expected:
-            n(
-              x[
-                'Expected Total Income'
-              ]
-            ),
-
-          growthActual:
-            n(
-              x[
-                'Growth Incentive Target'
-              ]
-            ),
-
-          productManual:
-            n(
-              x[
-                'Product Incentive Target'
-              ]
-            ),
-
-          managerActual:
-            n(
-              x[
-                'Manager Incentive Target'
-              ]
-            ),
-
-          otherActual:
-            n(
-              x[
-                'Other Incentive Target'
-              ]
-            )
-        });
-    }
-
-
-    save(s);
-
-
-    lastCloudSyncAt =
-      new Date()
-        .toLocaleTimeString(
-          'en-MY',
-          {
-            hour:
-              '2-digit',
-
-            minute:
-              '2-digit'
-          }
-        );
-
+    current =
+      r.data ||
+      {};
+
+    lastSyncAt =
+      localTime();
 
     return true;
 
   } catch (e) {
-
     console.warn(e);
 
-    toast(
-      'Cloud sync unavailable'
-    );
+    if (!quiet) {
+      toast(
+        'Sync failed: ' +
+        e.message,
+        3500
+      );
+    }
 
     return false;
+
+  } finally {
+    if (!quiet) {
+      setBusy(false);
+    }
   }
 }
 
-
-/* =========================================================
-   IMPORTANT FIX:
-   MANAGER TEAM SYNC IS SEQUENTIAL
-========================================================= */
-
-async function syncAllTeam() {
-
+async function loadTeam({
+  quiet = false
+} = {}) {
   if (
-    !backendUrl() ||
-    session?.mode !==
-      'manager'
+    !session ||
+    !isManager()
   ) {
     return false;
   }
 
-
-  for (
-    const u
-    of salesUsers()
-  ) {
-
-    await syncCloud(
-      u.id,
-      selectedMonth
+  if (!quiet) {
+    setBusy(
+      true,
+      'Loading team database…'
     );
   }
 
+  try {
+    const r =
+      await apiGet(
+        'teamSnapshot',
+        {
+          month:
+            selectedMonth,
+          date:
+            selectedDate
+        }
+      );
 
-  return true;
+    if (!r?.ok) {
+      throw new Error(
+        r?.error ||
+        'Team database failed'
+      );
+    }
+
+    teamSnapshot =
+      Array.isArray(
+        r.data
+      )
+        ? r.data
+        : [];
+
+    lastSyncAt =
+      localTime();
+
+    return true;
+
+  } catch (e) {
+    console.warn(e);
+
+    if (!quiet) {
+      toast(
+        'Team sync failed: ' +
+        e.message,
+        3500
+      );
+    }
+
+    return false;
+
+  } finally {
+    if (!quiet) {
+      setBusy(false);
+    }
+  }
 }
 
-
-async function syncCurrent(
-  show = false
+async function refreshCloud(
+  showToast = false
 ) {
-
   const ok =
-    session?.mode ===
-      'manager'
-      ? await syncAllTeam()
-      : await syncCloud(
-          uid(),
-          selectedMonth
-        );
+    isManagerMode() &&
+    page ===
+      'team'
 
+      ? await loadTeam({
+          quiet:
+            !showToast
+        })
+
+      : await loadCurrent({
+          quiet:
+            !showToast
+        });
 
   if (
     ok &&
-    show
+    showToast
   ) {
-
     toast(
-      'Live data synced'
+      'Live database updated'
     );
   }
 
+  if (ok) {
+    render();
+  }
 
   return ok;
 }
 
 
 /* =========================================================
-   MASTER DATA
+   SESSION
 ========================================================= */
 
-function outletsFor(id) {
+function saveSession() {
+  if (!session) return;
 
-  const s =
-    state();
-
-  const all = [
-    ...(
-      D.outlets?.[
-        id
-      ] || []
-    ),
-
-    ...(
-      s.customOutlets?.[
-        id
-      ] || []
+  localStorage.setItem(
+    SESSION_KEY,
+    JSON.stringify(
+      session
     )
-  ];
+  );
+}
 
+function restoreSession() {
+  try {
+    const x =
+      JSON.parse(
+        localStorage.getItem(
+          SESSION_KEY
+        ) ||
+        'null'
+      );
 
-  const m =
-    new Map();
-
-
-  all.forEach(
-    o => {
-
-      const k =
-        String(
-          o.code ||
-          o.name ||
-          ''
-        )
-        .trim()
-        .toUpperCase();
-
-
-      if (k) {
-
-        m.set(
-          k,
-          o
-        );
-      }
+    if (
+      !x?.id ||
+      !x?.password
+    ) {
+      return false;
     }
-  );
 
+    session =
+      x;
 
-  return [
-    ...m.values()
-  ].sort(
-    (
-      a,
-      b
-    ) =>
-      String(
-        a.name
-      ).localeCompare(
-        String(
-          b.name
-        )
-      )
-  );
-}
-
-
-function productsForOutlet(
-  id,
-  outletName
-) {
-
-  const o =
-    outletsFor(id)
-      .find(
-        x =>
-          x.name ===
-          outletName
-      );
-
-
-  const list =
-    D.categoryProducts?.[
-      o?.category
-    ];
-
-
-  return (
-    Array.isArray(
-      list
-    ) &&
-    list.length
-  )
-    ? list
-    : (
-        D.products ||
-        []
-      );
-}
-
-
-function outletOptions(
-  id,
-  selected = '',
-  filter = ''
-) {
-
-  const q =
-    filter
-      .trim()
-      .toLowerCase();
-
-
-  return (
-    '<option value="">Select outlet</option>' +
-
-    outletsFor(id)
-      .filter(
-        o =>
-          !q ||
-          o.name
-            .toLowerCase()
-            .includes(q) ||
-          String(
-            o.code ||
-            ''
-          ).includes(q)
-      )
-      .map(
-        o => `
-          <option
-            value="${esc(o.name)}"
-            ${
-              o.name ===
-                selected
-                ? 'selected'
-                : ''
-            }
-          >
-            ${esc(o.name)}
-          </option>
-        `
-      )
-      .join('')
-  );
-}
-
-
-function skuOptions(
-  id,
-  outletName,
-  selected = '',
-  filter = ''
-) {
-
-  const q =
-    filter
-      .trim()
-      .toLowerCase();
-
-
-  return (
-    '<option value="">Select SKU</option>' +
-
-    productsForOutlet(
-      id,
-      outletName
-    )
-    .filter(
-      x =>
-        !q ||
-        x
-          .toLowerCase()
-          .includes(q)
-    )
-    .map(
-      x => `
-        <option
-          value="${esc(x)}"
-          ${
-            x === selected
-              ? 'selected'
-              : ''
-          }
-        >
-          ${esc(x)}
-        </option>
-      `
-    )
-    .join('')
-  );
-}
-
-
-/* =========================================================
-   PERFORMANCE DATA
-========================================================= */
-
-function monthDaily(
-  id,
-  m = selectedMonth
-) {
-
-  return state()
-    .daily
-    .filter(
-      x =>
-        x.staffId === id &&
-        x.month === m
-    );
-}
-
-
-function monthOutletSales(
-  id,
-  m = selectedMonth
-) {
-
-  return state()
-    .outletSales
-    .filter(
-      x =>
-        x.staffId === id &&
-        x.month === m
-    );
-}
-
-
-function monthSkuSales(
-  id,
-  m = selectedMonth
-) {
-
-  return state()
-    .skuSales
-    .filter(
-      x =>
-        x.staffId === id &&
-        x.month === m
-    );
-}
-
-
-function monthPlans(
-  id,
-  m = selectedMonth
-) {
-
-  return state()
-    .plans
-    .filter(
-      x =>
-        x.staffId === id &&
-        x.month === m
-    );
-}
-
-
-function outletAch(
-  id,
-  name,
-  m = selectedMonth
-) {
-
-  return monthOutletSales(
-    id,
-    m
-  )
-  .filter(
-    x =>
-      x.outletName ===
-      name
-  )
-  .reduce(
-    (
-      a,
-      x
-    ) =>
-      a +
-      n(
-        x.sales
-      ),
-    0
-  );
-}
-
-
-function outletDaySales(
-  id,
-  name,
-  d = selectedDay,
-  m = selectedMonth
-) {
-
-  return monthOutletSales(
-    id,
-    m
-  )
-  .filter(
-    x =>
-      x.outletName ===
-        name &&
-      x.date === d
-  )
-  .reduce(
-    (
-      a,
-      x
-    ) =>
-      a +
-      n(
-        x.sales
-      ),
-    0
-  );
-}
-
-
-function skuAch(
-  id,
-  outlet,
-  sku,
-  m = selectedMonth
-) {
-
-  const a =
-    monthSkuSales(
-      id,
-      m
-    )
-    .filter(
-      x =>
-        x.outletName ===
-          outlet &&
-        x.skuName ===
-          sku
-    );
-
-
-  return {
-    cartons:
-      a.reduce(
-        (
-          s,
-          x
-        ) =>
-          s +
-          n(
-            x.cartons
-          ),
-        0
-      ),
-
-    value:
-      a.reduce(
-        (
-          s,
-          x
-        ) =>
-          s +
-          n(
-            x.salesValue
-          ),
-        0
-      )
-  };
-}
-
-
-function routeSkuAch(
-  id,
-  sku,
-  m = selectedMonth
-) {
-
-  const a =
-    monthSkuSales(
-      id,
-      m
-    )
-    .filter(
-      x =>
-        x.skuName ===
-          sku
-    );
-
-
-  return {
-    cartons:
-      a.reduce(
-        (
-          s,
-          x
-        ) =>
-          s +
-          n(
-            x.cartons
-          ),
-        0
-      ),
-
-    value:
-      a.reduce(
-        (
-          s,
-          x
-        ) =>
-          s +
-          n(
-            x.salesValue
-          ),
-        0
-      )
-  };
-}
-
-
-function outletMonthTarget(
-  id,
-  name,
-  m = selectedMonth
-) {
-
-  return n(
-    monthPlans(
-      id,
-      m
-    )
-    .find(
-      x =>
-        x.outletName ===
-        name
-    )
-    ?.outletTarget
-  );
-}
-
-
-function metric(
-  id,
-  m = selectedMonth
-) {
-
-  const daily =
-    monthDaily(
-      id,
-      m
-    )
-    .slice()
-    .sort(
+    managerView =
+      x.managerView ||
       (
-        a,
-        b
-      ) =>
-        String(
-          a.date
-        ).localeCompare(
-          String(
-            b.date
-          )
-        )
-    );
-
-
-  const os =
-    monthOutletSales(
-      id,
-      m
-    );
-
-
-  const target =
-    routeTarget(id);
-
-
-  const ach =
-    daily.reduce(
-      (
-        a,
-        x
-      ) =>
-        a +
-        n(
-          x.todaySales
-        ),
-      0
-    );
-
-
-  const short =
-    Math.max(
-      0,
-      target - ach
-    );
-
-
-  const prev =
-    daily.reduce(
-      (
-        a,
-        x
-      ) =>
-        a +
-        n(
-          x.lastMonthSameDay
-        ),
-      0
-    );
-
-
-  const growth =
-    prev
-      ? (
-          (
-            ach -
-            prev
-          ) /
-          prev *
-          100
-        )
-      : 0;
-
-
-  const routeOutlets =
-    outletsFor(id);
-
-
-  const coveredKeys =
-    new Set(
-      os
-        .filter(
-          x =>
-            n(
-              x.sales
-            ) > 0
-        )
-        .map(
-          x =>
-            String(
-              x.outletCode ||
-              x.outletName
-            )
-            .trim()
-            .toUpperCase()
-        )
-    );
-
-
-  const covered =
-    routeOutlets
-      .filter(
-        o =>
-          coveredKeys.has(
-            String(
-              o.code ||
-              o.name
-            )
-            .trim()
-            .toUpperCase()
-          )
-      );
-
-
-  const zeroSales =
-    routeOutlets
-      .filter(
-        o =>
-          !coveredKeys.has(
-            String(
-              o.code ||
-              o.name
-            )
-            .trim()
-            .toUpperCase()
-          )
-      );
-
-
-  return {
-    daily,
-    target,
-    ach,
-    short,
-    prev,
-    growth,
-    routeOutlets,
-    covered,
-    zeroSales,
-
-    coverage:
-      routeOutlets.length
-        ? covered.length /
-          routeOutlets.length *
-          100
-        : 0,
-
-    required:
-      daysRemain(m)
-        ? short /
-          daysRemain(m)
-        : short,
-
-    todaySales:
-      daily
-        .filter(
-          x =>
-            x.date ===
-            localDate()
-        )
-        .reduce(
-          (
-            a,
-            x
-          ) =>
-            a +
-            n(
-              x.todaySales
-            ),
-          0
-        )
-  };
-}
-
-
-/* =========================================================
-   SALARY
-========================================================= */
-
-function commission(
-  ach,
-  target
-) {
-
-  const p =
-    target
-      ? ach /
-        target
-      : 0;
-
-
-  if (p < .8) {
-
-    return ach *
-      .005;
-  }
-
-
-  if (p <= 1) {
-
-    return ach *
-      .01;
-  }
-
-
-  return (
-    target *
-      .01 +
-
-    (
-      ach -
-      target
-    ) *
-      .02
-  );
-}
-
-
-function incomePlan(
-  id,
-  m = selectedMonth
-) {
-
-  return state()
-    .incomePlans
-    .find(
-      x =>
-        x.staffId ===
-          id &&
-        x.month ===
-          m
-    ) || {
-      staffId:
-        id,
-
-      month:
-        m,
-
-      expected:
-        0,
-
-      growthActual:
-        0,
-
-      productManual:
-        0,
-
-      managerActual:
-        0,
-
-      otherActual:
-        0
-    };
-}
-
-
-function productRules(
-  id,
-  m = selectedMonth
-) {
-
-  return state()
-    .incentives
-    .filter(
-      x =>
-        x.staffId ===
-          id &&
-        x.month ===
-          m &&
-        x.type ===
-          'PRODUCT'
-    );
-}
-
-
-function incomeCalc(
-  id,
-  m = selectedMonth
-) {
-
-  const mt =
-    metric(
-      id,
-      m
-    );
-
-
-  const r =
-    D.salaryRules ||
-    {};
-
-
-  const p =
-    incomePlan(
-      id,
-      m
-    );
-
-
-  const basic =
-    n(
-      r.basic ||
-      1700
-    );
-
-
-  const fuel =
-    n(
-      r.fuel ||
-      300
-    );
-
-
-  const rent =
-    n(
-      r.houseRent ||
-      250
-    );
-
-
-  const food =
-    mt.ach >=
-    n(
-      r.foodThreshold ||
-      50000
-    )
-      ? n(
-          r.foodHigh ||
-          250
-        )
-      : n(
-          r.foodLow ||
-          100
-        );
-
-
-  let zero =
-    0;
-
-
-  if (
-    mt.routeOutlets.length &&
-    mt.zeroSales.length ===
-      0
-  ) {
-
-    zero =
-      (
-        mt.ach /
-        mt.target
-      ) >= .8
-        ? n(
-            r.zeroSalesHigh ||
-            200
-          )
-        : n(
-            r.zeroSalesLow ||
-            100
-          );
-  }
-
-
-  const comm =
-    commission(
-      mt.ach,
-      mt.target
-    );
-
-
-  const product =
-    productRules(
-      id,
-      m
-    )
-    .reduce(
-      (
-        a,
-        i
-      ) =>
-        a +
-        (
-          routeSkuAch(
-            id,
-            i.skuName,
-            m
-          ).cartons >=
-          n(
-            i.targetQty
-          )
-            ? n(
-                i.reward
-              )
-            : 0
-        ),
-      0
-    ) +
-    n(
-      p.productManual
-    );
-
-
-  const growth =
-    n(
-      p.growthActual
-    );
-
-
-  const manager =
-    n(
-      p.managerActual
-    );
-
-
-  const other =
-    n(
-      p.otherActual
-    );
-
-
-  const total =
-    basic +
-    fuel +
-    rent +
-    food +
-    zero +
-    comm +
-    product +
-    growth +
-    manager +
-    other;
-
-
-  return {
-    basic,
-    fuel,
-    rent,
-    food,
-    zero,
-    comm,
-    product,
-    growth,
-    manager,
-    other,
-    total,
-    expected:
-      n(
-        p.expected
-      )
-  };
-}
-
-
-/* =========================================================
-   UI HELPERS
-========================================================= */
-
-function kpi(
-  l,
-  v,
-  s,
-  c = ''
-) {
-
-  return `
-    <div class="kpi">
-
-      <div class="label">
-        ${esc(l)}
-      </div>
-
-      <div class="value ${c}">
-        ${esc(v)}
-      </div>
-
-      <div class="sub">
-        ${esc(s)}
-      </div>
-
-    </div>
-  `;
-}
-
-
-function incomeRow(
-  l,
-  v,
-  strong = false
-) {
-
-  return `
-    <div
-      class="row"
-      style="padding:8px 0"
-    >
-
-      <span class="muted">
-        ${esc(l)}
-      </span>
-
-      <${strong
-        ? 'strong'
-        : 'span'
-      }>
-        ${money(v)}
-      </${strong
-        ? 'strong'
-        : 'span'
-      }>
-
-    </div>
-  `;
-}
-
-
-function summaryTable(
-  title,
-  heads,
-  rows
-) {
-
-  return `
-    <div
-      class="card"
-      style="
-        margin-top:12px;
-        overflow:auto
-      "
-    >
-
-      <h3>
-        ${esc(title)}
-      </h3>
-
-      <table
-        class="summary-table"
-        style="
-          min-width:${
-            Math.max(
-              620,
-              heads.length *
-              120
-            )
-          }px
-        "
-      >
-
-        <thead>
-
-          <tr>
-
-            ${
-              heads
-                .map(
-                  h => `
-                    <th>
-                      ${esc(h)}
-                    </th>
-                  `
-                )
-                .join('')
-            }
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          ${
-            rows.length
-
-              ? rows
-                  .map(
-                    r => `
-                      <tr>
-                        ${
-                          r.map(
-                            c => `
-                              <td>
-                                ${esc(c)}
-                              </td>
-                            `
-                          )
-                          .join('')
-                        }
-                      </tr>
-                    `
-                  )
-                  .join('')
-
-              : `
-                  <tr>
-                    <td
-                      colspan="${heads.length}"
-                    >
-                      No data
-                    </td>
-                  </tr>
-                `
-          }
-
-        </tbody>
-
-      </table>
-
-    </div>
-  `;
-}
-
-
-/* =========================================================
-   MONTH / MANAGER BAR
-========================================================= */
-
-function monthBar() {
-
-  return `
-    <div class="monthbar">
-
-      <label
-        style="
-          margin:0;
-          flex:1;
-          min-width:145px
-        "
-      >
-
-        Month
-
-        <input
-          id="monthPick"
-          type="month"
-          value="${selectedMonth}"
-        >
-
-      </label>
-
-
-      ${
-        String(
-          session?.role ||
-          ''
-        ).includes(
-          'MANAGER'
-        )
-
-          ? `
-              <div
-                class="mode-toggle"
-                style="
-                  flex:1;
-                  min-width:190px
-                "
-              >
-
-                <button
-                  id="srMode"
-                  class="${
-                    session.mode ===
-                      'sr'
-                      ? 'active'
-                      : ''
-                  }"
-                >
-                  My SR
-                </button>
-
-                <button
-                  id="mgrMode"
-                  class="${
-                    session.mode ===
-                      'manager'
-                      ? 'active'
-                      : ''
-                  }"
-                >
-                  Manager
-                </button>
-
-              </div>
-            `
-
-          : ''
-      }
-
-    </div>
-
-
-    ${
-      session?.mode ===
+        x.mode ===
         'manager'
+          ? 'M21954'
+          : x.id
+      );
 
-        ? `
-            <div
-              class="card"
-              style="
-                margin-bottom:12px
-              "
-            >
+    return true;
 
-              <label>
-
-                View Sales Representative
-
-                <select
-                  id="managerPick"
-                >
-
-                  ${
-                    salesUsers()
-                      .map(
-                        u => `
-                          <option
-                            value="${u.id}"
-                            ${
-                              uid() ===
-                                u.id
-                                ? 'selected'
-                                : ''
-                            }
-                          >
-                            ${esc(u.name)}
-                            •
-                            ${u.id}
-                          </option>
-                        `
-                      )
-                      .join('')
-                  }
-
-                </select>
-
-              </label>
-
-            </div>
-          `
-
-        : ''
-    }
-  `;
+  } catch {
+    return false;
+  }
 }
 
+function logout() {
+  localStorage.removeItem(
+    SESSION_KEY
+  );
 
-function bindCommon() {
+  session =
+    null;
 
-  if (
-    $('#monthPick')
-  ) {
+  current =
+    null;
 
-    $('#monthPick')
-      .onchange =
-        async e => {
+  teamSnapshot =
+    [];
 
-          selectedMonth =
-            e.target.value;
-
-          if (
-            selectedDay
-              .slice(
-                0,
-                7
-              ) !==
-            selectedMonth
-          ) {
-
-            selectedDay =
-              selectedMonth +
-              '-01';
-          }
-
-          await syncCurrent(
-            false
-          );
-
-          render();
-        };
-  }
-
-
-  if (
-    $('#srMode')
-  ) {
-
-    $('#srMode')
-      .onclick =
-        async () => {
-
-          session.mode =
-            'sr';
-
-          managerView =
-            session.id;
-
-          localStorage
-            .setItem(
-              SESSION,
-              JSON.stringify(
-                session
-              )
-            );
-
-          page =
-            'dashboard';
-
-          await syncCloud(
-            uid(),
-            selectedMonth
-          );
-
-          render();
-        };
-  }
-
-
-  if (
-    $('#mgrMode')
-  ) {
-
-    $('#mgrMode')
-      .onclick =
-        async () => {
-
-          session.mode =
-            'manager';
-
-          managerView =
-            'M21954';
-
-          localStorage
-            .setItem(
-              SESSION,
-              JSON.stringify(
-                session
-              )
-            );
-
-          page =
-            'team';
-
-          await syncAllTeam();
-
-          render();
-        };
-  }
-
-
-  if (
-    $('#managerPick')
-  ) {
-
-    $('#managerPick')
-      .onchange =
-        async e => {
-
-          managerView =
-            e.target.value;
-
-          await syncCloud(
-            managerView,
-            selectedMonth
-          );
-
-          render();
-        };
-  }
-
-
-  $$('[data-go]')
-    .forEach(
-      b =>
-        b.onclick =
-          () => {
-
-            page =
-              b.dataset.go;
-
-            render();
-          }
+  if (liveTimer) {
+    clearInterval(
+      liveTimer
     );
+  }
+
+  liveTimer =
+    null;
+
+  try {
+    oneSignalSdk
+      ?.logout
+      ?.();
+  } catch {}
+
+  $('#appView')
+    ?.classList
+    .add(
+      'hidden'
+    );
+
+  $('#loginView')
+    ?.classList
+    .remove(
+      'hidden'
+    );
+
+  if (
+    $('#loginPin')
+  ) {
+    $('#loginPin')
+      .value =
+        '';
+  }
+}
+
+async function login(
+  rawId,
+  password
+) {
+  if (!backendUrl()) {
+    toast(
+      'Backend URL missing in config.js',
+      3500
+    );
+    return;
+  }
+
+  setBusy(
+    true,
+    'Signing in…'
+  );
+
+  try {
+    const result =
+      await backendLogin(
+        rawId,
+        password
+      );
+
+    const u =
+      result.user ||
+      {};
+
+    const role =
+      String(
+        u.Role ||
+        u.role ||
+        localUser(
+          result.id
+        )?.role ||
+        'SR'
+      );
+
+    const managerAlias =
+      String(
+        rawId ||
+        ''
+      )
+      .trim()
+      .toLowerCase() ===
+      'manager';
+
+    session = {
+      id:
+        result.id,
+
+      password,
+
+      name:
+        u[
+          'Full Name'
+        ] ||
+        u.name ||
+        localUser(
+          result.id
+        )?.name ||
+        result.id,
+
+      role,
+
+      mode:
+        managerAlias ||
+        (
+          role
+            .toUpperCase()
+            .includes(
+              'HR'
+            )
+        )
+          ? 'manager'
+          : 'sr',
+
+      managerView:
+        managerAlias
+          ? 'M21954'
+          : result.id
+    };
+
+    managerView =
+      session.mode ===
+        'manager'
+        ? (
+            session.managerView ||
+            'M21954'
+          )
+        : session.id;
+
+    page =
+      session.mode ===
+        'manager'
+        ? 'team'
+        : 'dashboard';
+
+    saveSession();
+
+    openApp();
+
+    if (
+      session.mode ===
+      'manager'
+    ) {
+      await loadTeam({
+        quiet: true
+      });
+
+      await loadCurrent({
+        quiet: true
+      });
+    } else {
+      await loadCurrent({
+        quiet: true
+      });
+    }
+
+    initPushSystem();
+
+    render();
+
+  } catch (e) {
+    toast(
+      e.message ||
+      'Login failed',
+      3500
+    );
+
+  } finally {
+    setBusy(false);
+  }
+}
+
+function openApp() {
+  $('#loginView')
+    ?.classList
+    .add(
+      'hidden'
+    );
+
+  $('#appView')
+    ?.classList
+    .remove(
+      'hidden'
+    );
+
+  installShell();
+  refreshTop();
+  startLiveSync();
 }
 
 
 /* =========================================================
-   APP SHELL
+   SHELL / NAVIGATION
 ========================================================= */
 
 function installShell() {
-
-  const old =
+  const settingsBtn =
     $('#logoutBtn');
 
-
-  if (old) {
-
-    old.textContent =
+  if (settingsBtn) {
+    settingsBtn.textContent =
       '⚙';
 
-    old.title =
+    settingsBtn.title =
       'Settings';
 
-    old.onclick =
+    settingsBtn.onclick =
       () => {
-
         page =
           'settings';
 
@@ -2640,10 +1053,8 @@ function installShell() {
       };
   }
 
-
   const nav =
     $('#bottomNav');
-
 
   if (
     nav &&
@@ -2651,7 +1062,6 @@ function installShell() {
       '[data-page="proposal"]'
     )
   ) {
-
     const b =
       document
         .createElement(
@@ -2671,16 +1081,13 @@ function installShell() {
         'repeat(6,1fr)';
   }
 
-
   const app =
     $('#appView');
-
 
   if (
     app &&
     !$('#developerCredit')
   ) {
-
     const c =
       document
         .createElement(
@@ -2691,8 +1098,7 @@ function installShell() {
       'developerCredit';
 
     c.style.cssText =
-      'text-align:center;font-size:10px;color:#77818d;padding:6px 8px 84px';
-
+      'text-align:center;font-size:10px;color:#78828d;padding:8px 10px 90px;letter-spacing:.45px';
 
     c.innerHTML = `
       Developed by
@@ -2701,15 +1107,15 @@ function installShell() {
         target="_blank"
         rel="noopener"
         style="
-          color:#ff9b51;
+          color:#ff7414;
           text-decoration:none;
-          font-weight:800
+          font-weight:900;
+          letter-spacing:.8px
         "
       >
         KAM AYON
       </a>
     `;
-
 
     app.insertBefore(
       c,
@@ -2718,365 +1124,1180 @@ function installShell() {
   }
 }
 
-
 function refreshTop() {
-
   if (!session) return;
-
-
-  const viewed =
-    user(
-      uid()
-    );
-
 
   if (
     $('#roleLabel')
   ) {
-
     $('#roleLabel')
       .textContent =
-        session.mode ===
-          'manager'
-
-          ? 'MANAGER ACCESS • M21954'
-
-          : `SALES REPRESENTATIVE • ${session.id}`;
+        isManagerMode()
+          ? (
+              'MANAGER ACCESS • ' +
+              session.id
+            )
+          : (
+              String(
+                session.role ||
+                'SR'
+              ).toUpperCase() +
+              ' • ' +
+              session.id
+            );
   }
-
 
   if (
     $('#welcomeName')
   ) {
-
     $('#welcomeName')
       .textContent =
-        session.mode ===
-          'manager'
-
-          ? `Manager • ${viewed?.name || uid()}`
-
-          : session.name;
+        isManagerMode()
+          ? (
+              'Manager • ' +
+              viewedName()
+            )
+          : sessionName();
   }
+
+  updateNotificationBadge();
 }
 
-
-/* =========================================================
-   LOGIN
-========================================================= */
-
-async function login(
-  v,
-  p
-) {
-
-  const raw =
-    String(
-      v ||
-      ''
-    ).trim();
-
-
-  const sid =
-    raw.toLowerCase() ===
-      'manager'
-
-      ? 'M21954'
-
-      : raw.toUpperCase();
-
-
-  const u =
-    user(sid);
-
-
-  if (
-    !u ||
-    String(
-      p ||
-      ''
-    )
-    .trim()
-    .toUpperCase() !==
-    sid
-  ) {
-
-    toast(
-      'Wrong Staff ID / Password'
-    );
-
-    return;
-  }
-
-
-  session = {
-    ...u,
-
-    password:
-      sid,
-
-    mode:
-      raw.toLowerCase() ===
-        'manager'
-        ? 'manager'
-        : 'sr'
-  };
-
-
-  managerView =
-    session.mode ===
-      'manager'
-      ? 'M21954'
-      : sid;
-
-
+function setPage(next) {
   page =
-    session.mode ===
-      'manager'
-      ? 'team'
-      : 'dashboard';
-
-
-  localStorage
-    .setItem(
-      SESSION,
-      JSON.stringify(
-        session
-      )
-    );
-
-
-  openApp();
-
-
-  await initPush();
-
-
-  await syncCurrent(
-    false
-  );
-
+    next;
 
   render();
 }
 
-
-function logout() {
-
-  localStorage
-    .removeItem(
-      SESSION
-    );
-
-
-  session =
-    null;
-
-
-  page =
-    'dashboard';
-
-
-  if (
-    liveSyncTimer
-  ) {
-
-    clearInterval(
-      liveSyncTimer
-    );
-  }
-
-
-  $('#appView')
-    ?.classList
-    .add(
-      'hidden'
-    );
-
-
-  $('#loginView')
-    ?.classList
-    .remove(
-      'hidden'
-    );
-
-
-  if (
-    $('#loginPin')
-  ) {
-
-    $('#loginPin')
-      .value =
-        '';
-  }
-
-
-  if (
-    oneSignalSdk
-  ) {
-
-    oneSignalSdk
-      .logout()
-      .catch(
-        () => {}
-      );
-  }
-}
-
-
-function openApp() {
-
-  $('#loginView')
-    ?.classList
-    .add(
-      'hidden'
-    );
-
-
-  $('#appView')
-    ?.classList
-    .remove(
-      'hidden'
-    );
-
-
-  installShell();
-
-  refreshTop();
-
-  render();
-
-  startLiveSync();
-}
-
-
-/* =========================================================
-   AUTOMATIC LIVE SYNC
-========================================================= */
-
-function startLiveSync() {
-
-  if (
-    liveSyncTimer
-  ) {
-
-    clearInterval(
-      liveSyncTimer
-    );
-  }
-
-
-  liveSyncTimer =
-    setInterval(
-      async () => {
-
-        if (
-          !session ||
-          document.hidden ||
-          !backendUrl()
-        ) {
-          return;
-        }
-
-
-        await syncCurrent(
-          false
-        );
-
-
-        if (
-          [
-            'dashboard',
-            'team',
-            'summary',
-            'zero',
-            'tasks'
-          ].includes(
-            page
-          )
-        ) {
-
-          render();
-        }
-
-      },
-      30000
-    );
-}
-
-
-/* =========================================================
-   RENDER ROUTER
-========================================================= */
-
-function render() {
-
-  if (!session) return;
-
-
-  installShell();
-
-  refreshTop();
-
-
+function bindNav() {
   $$(
     '#bottomNav button[data-page]'
   ).forEach(
-    b =>
+    b => {
       b.classList
         .toggle(
           'active',
           b.dataset.page ===
-            page
-        )
+          page
+        );
+
+      b.onclick =
+        () =>
+          setPage(
+            b.dataset.page
+          );
+    }
   );
+}
+
+function pushHistoryState() {
+  if (
+    !history.state?.sph
+  ) {
+    history.replaceState(
+      {
+        sph: true
+      },
+      '',
+      location.href
+    );
+  }
+}
+
+window.addEventListener(
+  'popstate',
+  () => {
+    if (!session) return;
+
+    page =
+      'dashboard';
+
+    render();
+
+    history.pushState(
+      {
+        sph: true
+      },
+      '',
+      location.href
+    );
+  }
+);
 
 
-  const map = {
-    dashboard:
-      renderDashboard,
+/* =========================================================
+   COMMON DATA HELPERS
+========================================================= */
 
-    daily:
-      renderDaily,
+function routeOutlets() {
+  return Array.isArray(
+    current?.outlets
+  )
+    ? current.outlets
+    : [];
+}
 
-    planning:
-      renderPlanning,
+function skuMaster() {
+  return Array.isArray(
+    current?.sku
+  )
+    ? current.sku
+    : [];
+}
 
-    income:
-      renderIncome,
+function productsForOutlet(
+  outletName
+) {
+  const outlet =
+    routeOutlets()
+      .find(
+        x =>
+          String(
+            x[
+              'Outlet Name'
+            ]
+          ) ===
+          String(
+            outletName
+          )
+      );
 
-    summary:
-      renderSummary,
+  const category =
+    outlet?.Category ||
+    '';
 
-    tasks:
-      renderTasks,
+  const cloudList =
+    skuMaster()
+      .filter(
+        x => {
+          const c =
+            String(
+              x[
+                'Outlet Category'
+              ] ||
+              ''
+            ).trim();
 
-    zero:
-      renderZero,
+          return (
+            !c ||
+            !category ||
+            c.toLowerCase() ===
+              String(
+                category
+              ).toLowerCase()
+          );
+        }
+      )
+      .map(
+        x =>
+          String(
+            x[
+              'Product Name'
+            ] ||
+            ''
+          )
+      )
+      .filter(Boolean);
 
-    sku:
-      renderSku,
+  if (
+    cloudList.length
+  ) {
+    return [
+      ...new Set(
+        cloudList
+      )
+    ].sort();
+  }
 
-    team:
-      renderTeam,
+  const localList =
+    D.categoryProducts?.[
+      category
+    ];
 
-    proposal:
-      renderProposal,
+  return (
+    Array.isArray(
+      localList
+    ) &&
+    localList.length
+  )
+    ? [...localList]
+    : [...(
+        D.products ||
+        []
+      )];
+}
 
-    notifications:
-      renderNotifications,
+function outletOptions(
+  selected = '',
+  filter = ''
+) {
+  const q =
+    String(
+      filter ||
+      ''
+    )
+    .trim()
+    .toLowerCase();
 
-    settings:
-      renderSettings
+  return (
+    '<option value="">Select outlet</option>' +
+
+    routeOutlets()
+      .filter(
+        x =>
+          !q ||
+          String(
+            x[
+              'Outlet Name'
+            ] ||
+            ''
+          )
+          .toLowerCase()
+          .includes(q) ||
+          String(
+            x[
+              'Outlet Code'
+            ] ||
+            ''
+          )
+          .toLowerCase()
+          .includes(q)
+      )
+      .map(
+        x => `
+          <option
+            value="${esc(
+              x[
+                'Outlet Name'
+              ]
+            )}"
+            ${
+              String(
+                x[
+                  'Outlet Name'
+                ]
+              ) ===
+              String(
+                selected
+              )
+                ? 'selected'
+                : ''
+            }
+          >
+            ${esc(
+              x[
+                'Outlet Name'
+              ]
+            )}
+          </option>
+        `
+      )
+      .join('')
+  );
+}
+
+function skuOptions(
+  outletName,
+  selected = '',
+  filter = ''
+) {
+  const q =
+    String(
+      filter ||
+      ''
+    )
+    .trim()
+    .toLowerCase();
+
+  return (
+    '<option value="">Select SKU</option>' +
+
+    productsForOutlet(
+      outletName
+    )
+    .filter(
+      x =>
+        !q ||
+        String(x)
+          .toLowerCase()
+          .includes(q)
+    )
+    .map(
+      x => `
+        <option
+          value="${esc(x)}"
+          ${
+            String(x) ===
+            String(selected)
+              ? 'selected'
+              : ''
+          }
+        >
+          ${esc(x)}
+        </option>
+      `
+    )
+    .join('')
+  );
+}
+
+function planByOutlet(name) {
+  return (
+    current?.plans ||
+    []
+  ).find(
+    x =>
+      String(
+        x[
+          'Outlet Name'
+        ]
+      ) ===
+      String(name)
+  );
+}
+
+function dayOutletSales(
+  name,
+  date = selectedDate
+) {
+  return (
+    current
+      ?.outletSales ||
+    []
+  )
+  .filter(
+    x =>
+      String(
+        x[
+          'Outlet Name'
+        ]
+      ) ===
+        String(name) &&
+
+      String(
+        x.Date
+      )
+      .slice(
+        0,
+        10
+      ) ===
+      date
+  )
+  .reduce(
+    (
+      a,
+      x
+    ) =>
+      a +
+      n(
+        x[
+          'Sales Value'
+        ]
+      ),
+    0
+  );
+}
+
+function monthOutletSales(name) {
+  return (
+    current
+      ?.outletSales ||
+    []
+  )
+  .filter(
+    x =>
+      String(
+        x[
+          'Outlet Name'
+        ]
+      ) ===
+      String(name)
+  )
+  .reduce(
+    (
+      a,
+      x
+    ) =>
+      a +
+      n(
+        x[
+          'Sales Value'
+        ]
+      ),
+    0
+  );
+}
+
+function taskDone(x) {
+  return String(
+    x.Status ||
+    ''
+  ).toUpperCase() ===
+  'DONE';
+}
+
+function activePenalty(x) {
+  return String(
+    x.Status ||
+    'ACTIVE'
+  ).toUpperCase() ===
+  'ACTIVE';
+}
+
+function selectedDayData() {
+  return (
+    current?.dayData ||
+    {
+      daily: [],
+      outletSales: [],
+      skuSales: []
+    }
+  );
+}
+
+function personalTargetProgress(t) {
+  const metric =
+    String(
+      t.Metric ||
+      'SALES_RM'
+    ).toUpperCase();
+
+  const start =
+    String(
+      t[
+        'Start Date'
+      ] ||
+      selectedMonth +
+      '-01'
+    ).slice(
+      0,
+      10
+    );
+
+  const end =
+    String(
+      t[
+        'End Date'
+      ] ||
+      '9999-12-31'
+    ).slice(
+      0,
+      10
+    );
+
+  const sku =
+    String(
+      t[
+        'SKU Name'
+      ] ||
+      ''
+    );
+
+  let actual =
+    0;
+
+  if (
+    metric ===
+    'CARTONS'
+  ) {
+    actual =
+      (
+        current
+          ?.skuSales ||
+        []
+      )
+      .filter(
+        x =>
+          String(
+            x.Date
+          )
+          .slice(
+            0,
+            10
+          ) >=
+            start &&
+
+          String(
+            x.Date
+          )
+          .slice(
+            0,
+            10
+          ) <=
+            end &&
+
+          (
+            !sku ||
+            String(
+              x[
+                'SKU Name'
+              ]
+            ) ===
+            sku
+          )
+      )
+      .reduce(
+        (
+          a,
+          x
+        ) =>
+          a +
+          n(
+            x.Cartons
+          ),
+        0
+      );
+
+  } else if (
+    metric ===
+    'SKU_SALES_RM'
+  ) {
+    actual =
+      (
+        current
+          ?.skuSales ||
+        []
+      )
+      .filter(
+        x =>
+          String(
+            x.Date
+          )
+          .slice(
+            0,
+            10
+          ) >=
+            start &&
+
+          String(
+            x.Date
+          )
+          .slice(
+            0,
+            10
+          ) <=
+            end &&
+
+          (
+            !sku ||
+            String(
+              x[
+                'SKU Name'
+              ]
+            ) ===
+            sku
+          )
+      )
+      .reduce(
+        (
+          a,
+          x
+        ) =>
+          a +
+          n(
+            x[
+              'Sales Value'
+            ]
+          ),
+        0
+      );
+
+  } else {
+    actual =
+      (
+        current
+          ?.daily ||
+        []
+      )
+      .filter(
+        x =>
+          String(
+            x.Date
+          )
+          .slice(
+            0,
+            10
+          ) >=
+            start &&
+
+          String(
+            x.Date
+          )
+          .slice(
+            0,
+            10
+          ) <=
+            end
+      )
+      .reduce(
+        (
+          a,
+          x
+        ) =>
+          a +
+          n(
+            x[
+              'Today Sales'
+            ]
+          ),
+        0
+      );
+  }
+
+  const target =
+    n(
+      t[
+        'Target Value'
+      ]
+    );
+
+  return {
+    actual,
+    target,
+
+    remaining:
+      Math.max(
+        0,
+        target -
+        actual
+      ),
+
+    percent:
+      target
+        ? actual /
+          target *
+          100
+        : 0
   };
+}
 
 
-  (
-    map[
-      page
-    ] ||
-    renderDashboard
-  )();
+/* =========================================================
+   COMPONENTS
+========================================================= */
+
+function kpi(
+  label,
+  value,
+  sub = '',
+  cls = ''
+) {
+  return `
+    <div class="kpi">
+      <div class="label">
+        ${esc(label)}
+      </div>
+
+      <div class="value ${cls}">
+        ${esc(value)}
+      </div>
+
+      <div class="sub">
+        ${esc(sub)}
+      </div>
+    </div>
+  `;
+}
+
+function progressBar(value) {
+  const v =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        n(value)
+      )
+    );
+
+  return `
+    <div class="progress-wrap">
+      <div
+        class="
+          progress
+          ${
+            v >= 100
+              ? 'goodbar'
+              : ''
+          }
+        "
+        style="width:${v}%"
+      >
+      </div>
+    </div>
+  `;
+}
+
+function empty(message) {
+  return `
+    <div class="empty">
+      ${esc(message)}
+    </div>
+  `;
+}
+
+function table(
+  title,
+  heads,
+  rows
+) {
+  return `
+    <div
+      class="card"
+      style="
+        margin-top:12px;
+        overflow:auto
+      "
+    >
+      <h3>
+        ${esc(title)}
+      </h3>
+
+      <table
+        class="summary-table"
+        style="
+          min-width:${
+            Math.max(
+              620,
+              heads.length *
+              120
+            )
+          }px
+        "
+      >
+        <thead>
+          <tr>
+            ${
+              heads
+                .map(
+                  h =>
+                    `<th>${esc(h)}</th>`
+                )
+                .join('')
+            }
+          </tr>
+        </thead>
+
+        <tbody>
+          ${
+            rows.length
+              ? rows
+                  .map(
+                    r => `
+                      <tr>
+                        ${
+                          r
+                            .map(
+                              c =>
+                                `<td>${esc(c)}</td>`
+                            )
+                            .join('')
+                        }
+                      </tr>
+                    `
+                  )
+                  .join('')
+              : `
+                  <tr>
+                    <td
+                      colspan="${heads.length}"
+                    >
+                      No data
+                    </td>
+                  </tr>
+                `
+          }
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function syncStatus() {
+  const online =
+    navigator.onLine;
+
+  return `
+    <div class="status-strip">
+      <span
+        class="
+          status-chip
+          ${online ? 'ok' : 'bad'}
+        "
+      >
+        <span
+          class="
+            sync-dot
+            ${online ? 'ok' : ''}
+          "
+        >
+        </span>
+
+        ${
+          online
+            ? 'Online'
+            : 'Offline'
+        }
+      </span>
+
+      <span
+        class="
+          status-chip
+          ${
+            backendUrl()
+              ? 'ok'
+              : 'bad'
+          }
+        "
+      >
+        ☁
+        ${
+          backendUrl()
+            ? 'Cloud connected'
+            : 'Cloud missing'
+        }
+      </span>
+
+      <span class="status-chip">
+        ↻
+        ${
+          lastSyncAt
+            ? 'Synced ' +
+              lastSyncAt
+            : 'Not synced yet'
+        }
+      </span>
+
+      <span class="status-chip">
+        Build ${APP_BUILD}
+      </span>
+    </div>
+  `;
+}
+
+function monthBar({
+  showManager = true
+} = {}) {
+  const managerChooser =
+    showManager &&
+    isManagerMode()
+      ? `
+          <label
+            style="
+              flex:1;
+              min-width:190px;
+              margin:0
+            "
+          >
+            View SR
+
+            <select
+              id="managerPick"
+            >
+              ${
+                teamUsers()
+                  .map(
+                    u => `
+                      <option
+                        value="${esc(u.id)}"
+                        ${
+                          u.id ===
+                          managerView
+                            ? 'selected'
+                            : ''
+                        }
+                      >
+                        ${esc(u.name)}
+                        •
+                        ${u.id}
+                      </option>
+                    `
+                  )
+                  .join('')
+              }
+            </select>
+          </label>
+        `
+      : '';
+
+  const mode =
+    String(
+      session?.role ||
+      ''
+    )
+    .toUpperCase()
+    .includes(
+      'MANAGER'
+    )
+      ? `
+          <div
+            class="mode-toggle"
+            style="
+              flex:1;
+              min-width:190px
+            "
+          >
+            <button
+              id="mySrMode"
+              class="${
+                session.mode ===
+                  'sr'
+                  ? 'active'
+                  : ''
+              }"
+            >
+              My SR
+            </button>
+
+            <button
+              id="managerMode"
+              class="${
+                session.mode ===
+                  'manager'
+                  ? 'active'
+                  : ''
+              }"
+            >
+              Manager
+            </button>
+          </div>
+        `
+      : '';
+
+  return `
+    <div class="monthbar">
+      <label
+        style="
+          margin:0;
+          flex:1;
+          min-width:145px
+        "
+      >
+        Month
+
+        <input
+          id="monthPick"
+          type="month"
+          value="${selectedMonth}"
+        >
+      </label>
+
+      ${mode}
+
+      ${managerChooser}
+    </div>
+  `;
+}
+
+function dateFilter(
+  label =
+    'Report Date'
+) {
+  return `
+    <label>
+      ${esc(label)}
+
+      <input
+        id="datePick"
+        type="date"
+        value="${selectedDate}"
+      >
+    </label>
+  `;
+}
+
+function teamUsers() {
+  const fromTeam =
+    teamSnapshot
+      .map(
+        x => ({
+          id:
+            x.staffId,
+          name:
+            x.name
+        })
+      );
+
+  if (
+    fromTeam.length
+  ) {
+    return fromTeam;
+  }
+
+  return (
+    D.users ||
+    []
+  )
+  .filter(
+    x =>
+      x.role ===
+        'SR' ||
+      String(
+        x.role
+      ).includes(
+        'MANAGER'
+      )
+  )
+  .map(
+    x => ({
+      id:
+        x.id,
+      name:
+        x.name
+    })
+  );
+}
+
+async function handleCommonFilterChange() {
+  setPref({
+    month:
+      selectedMonth,
+    date:
+      selectedDate
+  });
+
+  if (
+    isManagerMode() &&
+    page ===
+      'team'
+  ) {
+    await loadTeam();
+  } else {
+    await loadCurrent();
+  }
+
+  render();
+}
+
+function bindCommon() {
+  const mp =
+    $('#monthPick');
+
+  if (mp) {
+    mp.onchange =
+      async e => {
+        selectedMonth =
+          e.target.value;
+
+        if (
+          !selectedDate
+            .startsWith(
+              selectedMonth
+            )
+        ) {
+          selectedDate =
+            selectedMonth +
+            '-01';
+        }
+
+        await handleCommonFilterChange();
+      };
+  }
+
+  const dp =
+    $('#datePick');
+
+  if (dp) {
+    dp.onchange =
+      async e => {
+        selectedDate =
+          e.target.value ||
+          localDate();
+
+        selectedMonth =
+          selectedDate
+            .slice(
+              0,
+              7
+            );
+
+        await handleCommonFilterChange();
+      };
+  }
+
+  const mm =
+    $('#managerPick');
+
+  if (mm) {
+    mm.onchange =
+      async e => {
+        managerView =
+          e.target.value;
+
+        session.managerView =
+          managerView;
+
+        saveSession();
+
+        await loadCurrent();
+
+        render();
+      };
+  }
+
+  const sr =
+    $('#mySrMode');
+
+  if (sr) {
+    sr.onclick =
+      async () => {
+        session.mode =
+          'sr';
+
+        managerView =
+          session.id;
+
+        session.managerView =
+          managerView;
+
+        saveSession();
+
+        page =
+          'dashboard';
+
+        await loadCurrent();
+
+        render();
+      };
+  }
+
+  const mgr =
+    $('#managerMode');
+
+  if (mgr) {
+    mgr.onclick =
+      async () => {
+        session.mode =
+          'manager';
+
+        managerView =
+          session.managerView ||
+          'M21954';
+
+        saveSession();
+
+        page =
+          'team';
+
+        await loadTeam();
+
+        await loadCurrent({
+          quiet: true
+        });
+
+        render();
+      };
+  }
+
+  $$('[data-go]')
+    .forEach(
+      b =>
+        b.onclick =
+          () =>
+            setPage(
+              b.dataset.go
+            )
+    );
 }
 
 
@@ -3084,179 +2305,316 @@ function render() {
    DASHBOARD
 ========================================================= */
 
-function renderDashboard() {
+function alertsForCurrent() {
+  if (!current) {
+    return [];
+  }
 
-  const id =
-    uid();
+  const a = [];
 
+  const perf =
+    current.performance ||
+    {};
 
-  const m =
-    metric(id);
+  const pending =
+    (
+      current.tasks ||
+      []
+    )
+    .filter(
+      x =>
+        !taskDone(x)
+    );
 
+  if (
+    pending.length
+  ) {
+    a.push({
+      icon: '✅',
+      title:
+        pending.length +
+        ' pending task(s)',
+      text:
+        'Open Tasks to review manager instructions.',
+      page:
+        'tasks'
+    });
+  }
+
+  if (
+    n(
+      perf.shortfall
+    ) > 0
+  ) {
+    a.push({
+      icon: '🎯',
+      title:
+        money(
+          perf.shortfall
+        ) +
+        ' shortfall',
+      text:
+        'Current achievement ' +
+        pct(
+          perf.percent
+        ) +
+        '.',
+      page:
+        'summary'
+    });
+  }
+
+  if (
+    n(
+      perf.zeroOutlets
+    ) > 0
+  ) {
+    a.push({
+      icon: '🏪',
+      title:
+        perf.zeroOutlets +
+        ' zero-sales outlet(s)',
+      text:
+        'Use Outlet Report to prioritize coverage.',
+      page:
+        'zero'
+    });
+  }
 
   const inc =
-    incomeCalc(id);
+    current.incentives ||
+    [];
 
+  inc
+    .filter(
+      x =>
+        !x.fulfilled &&
+        n(
+          x.remaining
+        ) > 0
+    )
+    .slice(
+      0,
+      3
+    )
+    .forEach(
+      x =>
+        a.push({
+          icon: '🏆',
+          title:
+            x.name ||
+            'Incentive',
+          text:
+            `${x.actual} / ${x.target} • ${x.remaining} remaining • RM ${n(x.rewardRM).toFixed(2)} reward`,
+          page:
+            'incentives'
+        })
+    );
 
-  const pct =
-    m.target
-      ? m.ach /
-        m.target *
-        100
-      : 0;
+  return a;
+}
 
+function renderDashboard() {
+  if (!current) {
+    $('#mainContent')
+      .innerHTML =
+        monthBar() +
+        `
+          <div class="card">
+            ${empty(
+              'Live database is not loaded yet.'
+            )}
+
+            <button
+              id="loadNow"
+              class="btn primary"
+            >
+              LOAD DATABASE
+            </button>
+          </div>
+        `;
+
+    bindCommon();
+
+    $('#loadNow')
+      .onclick =
+        () =>
+          refreshCloud(
+            true
+          );
+
+    return;
+  }
+
+  const p =
+    current.performance ||
+    {};
+
+  const f =
+    current.forecast ||
+    {};
+
+  const inc =
+    current.incomeSummary ||
+    {};
+
+  const alerts =
+    alertsForCurrent();
 
   $('#mainContent')
     .innerHTML = `
-
       ${monthBar()}
 
       <section class="hero">
-
         <p class="eyebrow">
-          ${monthName(selectedMonth).toUpperCase()}
+          LIVE SALES DATABASE
         </p>
 
         <h3>
-          ${esc(user(id)?.name || id)}
+          ${esc(
+            viewedName()
+          )}
         </h3>
 
         <p class="muted">
-
-          ${money(m.ach)}
-          achieved from
-          ${money(m.target)}
-          target.
-
+          ${monthName(selectedMonth)}
+          •
+          Source of truth:
+          Google Sheets
         </p>
 
+        ${progressBar(
+          p.percent
+        )}
 
-        <div class="progress-wrap">
+        ${syncStatus()}
 
-          <div
-            class="
-              progress
-              ${
-                pct >= 100
-                  ? 'goodbar'
-                  : ''
-              }
-            "
-            style="
-              width:${Math.min(100,pct)}%
-            "
+        <div class="form-actions">
+          <button
+            id="syncNow"
+            class="btn secondary"
           >
-          </div>
+            ↻ REFRESH LIVE
+          </button>
 
+          ${
+            isManagerMode()
+              ? `
+                  <button
+                    class="btn secondary"
+                    data-go="team"
+                  >
+                    👥 TEAM
+                  </button>
+                `
+              : ''
+          }
         </div>
-
-
-        <button
-          id="dashSync"
-          class="btn secondary"
-          style="margin-top:12px"
-        >
-          ↻ REFRESH LIVE DATA
-        </button>
-
       </section>
 
-
       <div class="grid kpi-grid">
-
         ${kpi(
-          'TARGET',
-          money(m.target),
-          'Monthly route target'
+          'MONTH TARGET',
+          money(
+            p.target
+          ),
+          monthName(
+            selectedMonth
+          )
         )}
 
         ${kpi(
           'ACHIEVEMENT',
-          money(m.ach),
-          'Month-to-date',
-          m.ach >= m.target
+          money(
+            p.achievement
+          ),
+          pct(
+            p.percent
+          ),
+          p.percent >= 100
             ? 'good'
             : ''
         )}
 
         ${kpi(
           'SHORTFALL',
-          money(m.short),
+          money(
+            p.shortfall
+          ),
           'Remaining',
-          m.short
+          p.shortfall
             ? 'bad'
             : 'good'
         )}
 
         ${kpi(
-          'NEED / DAY',
-          money(m.required),
-          `${daysRemain(selectedMonth)} day(s) left`,
-          m.short
+          'TODAY SALES',
+          money(
+            p.todaySales
+          ),
+          dateLabel(
+            selectedDate
+          )
+        )}
+
+        ${kpi(
+          'OUTLET COVERAGE',
+          pct(
+            p.coverage
+          ),
+          `${n(p.coveredOutlets)}/${n(p.routeOutlets)} outlets`,
+          p.zeroOutlets
             ? 'warn'
             : 'good'
         )}
 
         ${kpi(
-          'TODAY SALES',
-          money(m.todaySales),
-          dateLabel(localDate())
+          'ZERO OUTLETS',
+          String(
+            n(
+              p.zeroOutlets
+            )
+          ),
+          'Month-to-date',
+          p.zeroOutlets
+            ? 'bad'
+            : 'good'
         )}
 
         ${kpi(
-          'GROWTH',
-          `${
-            m.growth >= 0
-              ? '+'
-              : ''
-          }${m.growth.toFixed(1)}%`,
-          'Vs comparable month',
-          m.growth >= 0
+          'PROJECTED MONTH',
+          money(
+            f.projectedSales
+          ),
+          f.onTrack
+            ? 'On track'
+            : 'Needs acceleration',
+          f.onTrack
             ? 'good'
-            : 'bad'
+            : 'warn'
         )}
 
         ${kpi(
-          'OUTLET COVERAGE',
-          `${m.coverage.toFixed(0)}%`,
-          `${m.covered.length}/${m.routeOutlets.length} outlets`,
-          m.coverage >= 100
-            ? 'good'
-            : 'bad'
+          'FINAL INCOME',
+          money(
+            inc.finalIncome
+          ),
+          'After incentive & penalty'
         )}
-
-        ${kpi(
-          'PROJECTED SALARY',
-          money(inc.total),
-          'Salary + incentives'
-        )}
-
       </div>
-
 
       <div class="section-title">
-
         <h3>
-          Quick Actions
+          Smart Actions
         </h3>
-
       </div>
 
-
       <div class="mini-grid">
-
         <button
           class="btn secondary"
           data-go="daily"
         >
-          ➕ Add Sales
-        </button>
-
-        <button
-          class="btn secondary"
-          data-go="planning"
-        >
-          🎯 Monthly Plan
+          ＋ Add Sales
         </button>
 
         <button
@@ -3268,9 +2626,16 @@ function renderDashboard() {
 
         <button
           class="btn secondary"
-          data-go="sku"
+          data-go="incentives"
         >
-          📦 SKU Performance
+          🏆 Incentives
+        </button>
+
+        <button
+          class="btn secondary"
+          data-go="opportunity"
+        >
+          ⚡ Opportunity
         </button>
 
         <button
@@ -3280,93 +2645,135 @@ function renderDashboard() {
           ✅ Tasks
         </button>
 
-        ${
-          session.mode ===
-            'manager'
+        <button
+          class="btn secondary"
+          data-go="activity"
+        >
+          🕘 Timeline
+        </button>
 
-            ? `
-                <button
-                  class="btn secondary"
-                  data-go="team"
-                >
-                  👥 Team Control
-                </button>
-              `
+        <button
+          class="btn secondary"
+          data-go="planning"
+        >
+          ◎ Monthly Plan
+        </button>
 
-            : ''
-        }
-
+        <button
+          class="btn secondary"
+          data-go="summary"
+        >
+          ▦ Full Summary
+        </button>
       </div>
-    `;
 
+      <div class="section-title">
+        <h3>
+          Attention
+        </h3>
+      </div>
+
+      ${
+        alerts.length
+          ? `
+              <div class="notification-list">
+                ${
+                  alerts
+                    .map(
+                      x => `
+                        <button
+                          class="notification-item"
+                          data-go="${x.page}"
+                          style="
+                            text-align:left;
+                            width:100%;
+                            color:inherit
+                          "
+                        >
+                          <div class="notification-icon">
+                            ${x.icon}
+                          </div>
+
+                          <div>
+                            <h4>
+                              ${esc(x.title)}
+                            </h4>
+
+                            <p>
+                              ${esc(x.text)}
+                            </p>
+                          </div>
+                        </button>
+                      `
+                    )
+                    .join('')
+                }
+              </div>
+            `
+          : `
+              <div class="card">
+                <span class="pill green">
+                  ALL CLEAR
+                </span>
+
+                <p
+                  class="muted"
+                  style="margin:10px 0 0"
+                >
+                  No urgent item found
+                  for the selected period.
+                </p>
+              </div>
+            `
+      }
+    `;
 
   bindCommon();
 
-
-  $('#dashSync')
+  $('#syncNow')
     .onclick =
-      async () => {
-
-        await syncCurrent(
+      () =>
+        refreshCloud(
           true
         );
-
-        render();
-      };
 }
 
 
 /* =========================================================
-   DAILY SALES
+   DAILY / OUTLET / SKU ENTRY
 ========================================================= */
 
 function renderDaily() {
-
-  const id =
-    uid();
-
-
   if (
-    session.mode ===
-      'manager'
+    isManagerMode()
   ) {
-
     $('#mainContent')
       .innerHTML = `
-
         ${monthBar()}
 
         <div class="card">
-
           <h2>
             Manager mode is view-only
           </h2>
 
           <p class="muted">
-
             Switch to My SR
             to enter your own sales.
-
           </p>
-
         </div>
       `;
 
-
     bindCommon();
-
     return;
   }
 
-
   $('#mainContent')
     .innerHTML = `
-
-      ${monthBar()}
-
+      ${monthBar({
+        showManager: false
+      })}
 
       <div class="card">
-
         <p class="eyebrow">
           STEP 1
         </p>
@@ -3375,28 +2782,22 @@ function renderDaily() {
           Daily Route Total
         </h2>
 
-
         <form
           id="dailyForm"
           class="stack"
         >
-
           <label>
-
             Date
 
             <input
               name="date"
               type="date"
-              value="${localDate()}"
+              value="${selectedDate}"
               required
             >
-
           </label>
 
-
           <label>
-
             Today Total Sales (RM)
 
             <input
@@ -3404,15 +2805,11 @@ function renderDaily() {
               type="number"
               min="0"
               step="0.01"
-              value="0"
               required
             >
-
           </label>
 
-
           <label>
-
             Last Month Same Day (RM)
 
             <input
@@ -3422,14 +2819,10 @@ function renderDaily() {
               step="0.01"
               value="0"
             >
-
           </label>
 
-
           <div class="form-grid">
-
             <label>
-
               Active (RM)
 
               <input
@@ -3439,13 +2832,10 @@ function renderDaily() {
                 step="0.01"
                 value="0"
               >
-
             </label>
 
-
             <label>
-
-              Prepare for Trip (RM)
+              Prepare for Trip / PPR (RM)
 
               <input
                 name="prepareTrip"
@@ -3454,14 +2844,10 @@ function renderDaily() {
                 step="0.01"
                 value="0"
               >
-
             </label>
-
           </div>
 
-
           <label>
-
             Order Amount (RM)
 
             <input
@@ -3471,37 +2857,28 @@ function renderDaily() {
               step="0.01"
               value="0"
             >
-
           </label>
 
-
           <label>
-
             Note
 
             <textarea
               name="note"
             ></textarea>
-
           </label>
 
-
           <button
-            class="btn primary"
+            class="btn primary big-action"
           >
             SAVE DAILY TOTAL
           </button>
-
         </form>
-
       </div>
-
 
       <div
         class="card"
         style="margin-top:12px"
       >
-
         <p class="eyebrow">
           STEP 2
         </p>
@@ -3510,40 +2887,31 @@ function renderDaily() {
           Outlet & SKU Sale
         </h2>
 
-
         <form
-          id="saleForm"
+          id="outletForm"
           class="stack"
         >
-
           <label>
-
             Date
 
             <input
               name="date"
               type="date"
-              value="${localDate()}"
+              value="${selectedDate}"
               required
             >
-
           </label>
 
-
           <label>
-
             Search Outlet
 
             <input
               id="outletSearch"
               placeholder="Type outlet name or code"
             >
-
           </label>
 
-
           <label>
-
             Select Outlet
 
             <select
@@ -3551,14 +2919,11 @@ function renderDaily() {
               name="outlet"
               required
             >
-              ${outletOptions(id)}
+              ${outletOptions()}
             </select>
-
           </label>
 
-
           <label>
-
             Outlet Sales (RM)
 
             <input
@@ -3566,47 +2931,34 @@ function renderDaily() {
               type="number"
               min="0"
               step="0.01"
-              value="0"
               required
             >
-
           </label>
 
-
           <label>
-
             Search SKU
 
             <input
               id="skuSearch"
               placeholder="Type SKU name"
             >
-
           </label>
 
-
           <label>
-
             Select SKU
 
             <select
               id="skuSel"
-              name="skuName"
+              name="sku"
             >
-
               <option value="">
                 Select outlet first
               </option>
-
             </select>
-
           </label>
 
-
           <div class="form-grid">
-
             <label>
-
               Cartons Sold
 
               <input
@@ -3616,12 +2968,9 @@ function renderDaily() {
                 step="1"
                 value="0"
               >
-
             </label>
 
-
             <label>
-
               SKU Sales Value (RM)
 
               <input
@@ -3631,37 +2980,27 @@ function renderDaily() {
                 step="0.01"
                 value="0"
               >
-
             </label>
-
           </div>
 
-
           <label>
-
             Note
 
             <textarea
               name="note"
             ></textarea>
-
           </label>
 
-
           <button
-            class="btn primary"
+            class="btn primary big-action"
           >
             SAVE OUTLET / SKU SALE
           </button>
-
         </form>
-
       </div>
     `;
 
-
   bindCommon();
-
 
   const oSearch =
     $('#outletSearch');
@@ -3675,113 +3014,68 @@ function renderDaily() {
   const sSel =
     $('#skuSel');
 
-
-  function refreshOut() {
-
-    const before =
-      oSel.value;
-
-
-    oSel.innerHTML =
-      outletOptions(
-        id,
-        before,
-        oSearch.value
-      );
-
-
-    if (
-      [...oSel.options]
-        .some(
-          o =>
-            o.value ===
-            before
-        )
-    ) {
-
-      oSel.value =
-        before;
-    }
-
-
-    refreshSku();
-  }
-
-
-  function refreshSku() {
-
-    if (
-      !oSel.value
-    ) {
-
+  const refreshSku =
+    () => {
       sSel.innerHTML =
-        '<option value="">Select outlet first</option>';
-
-      return;
-    }
-
-
-    const before =
-      sSel.value;
-
-
-    sSel.innerHTML =
-      skuOptions(
-        id,
-        oSel.value,
-        before,
-        sSearch.value
-      );
-
-
-    if (
-      [...sSel.options]
-        .some(
-          o =>
-            o.value ===
-            before
-        )
-    ) {
-
-      sSel.value =
-        before;
-    }
-  }
-
+        oSel.value
+          ? skuOptions(
+              oSel.value,
+              sSel.value,
+              sSearch.value
+            )
+          : `
+              <option value="">
+                Select outlet first
+              </option>
+            `;
+    };
 
   oSearch.oninput =
-    refreshOut;
+    () => {
+      const old =
+        oSel.value;
 
+      oSel.innerHTML =
+        outletOptions(
+          old,
+          oSearch.value
+        );
+
+      if (
+        [...oSel.options]
+          .some(
+            x =>
+              x.value ===
+              old
+          )
+      ) {
+        oSel.value =
+          old;
+      }
+
+      refreshSku();
+    };
 
   oSel.onchange =
     () => {
-
       sSearch.value =
         '';
 
       refreshSku();
     };
 
-
   sSearch.oninput =
     refreshSku;
-
-
-  refreshSku();
-
 
   $('#dailyForm')
     .onsubmit =
       async e => {
-
         e.preventDefault();
-
 
         const fd =
           new FormData(
             e.target
           );
-
 
         const date =
           String(
@@ -3790,41 +3084,17 @@ function renderDaily() {
             )
           );
 
-
-        const month =
-          date.slice(
-            0,
-            7
-          );
-
-
-        const s =
-          state();
-
-
-        s.daily =
-          s.daily
-            .filter(
-              x =>
-                !(
-                  x.staffId ===
-                    id &&
-                  x.date ===
-                    date
-                )
-            );
-
-
-        const rec = {
-          id:
+        const payload = {
+          requestId:
             idGen(),
 
-          staffId:
-            id,
-
-          month,
-
           date,
+
+          month:
+            date.slice(
+              0,
+              7
+            ),
 
           todaySales:
             n(
@@ -3865,55 +3135,71 @@ function renderDaily() {
             String(
               fd.get(
                 'note'
-              ) || ''
+              ) ||
+              ''
             )
         };
 
-
-        s.daily
-          .push(rec);
-
-
-        save(s);
-
-
-        selectedMonth =
-          month;
-
-        selectedDay =
-          date;
-
-
-        const r =
-          await pushCloud(
-            'saveDaily',
-            rec
-          );
-
-
-        toast(
-          r?.ok
-            ? 'Daily total saved to cloud'
-            : 'Saved locally • cloud failed'
+        setBusy(
+          true,
+          'Saving daily sales…'
         );
 
+        try {
+          const r =
+            await apiPost(
+              'saveDaily',
+              payload
+            );
 
-        render();
+          if (!r?.ok) {
+            throw new Error(
+              r?.error ||
+              'Save failed'
+            );
+          }
+
+          selectedDate =
+            date;
+
+          selectedMonth =
+            date.slice(
+              0,
+              7
+            );
+
+          await loadCurrent({
+            quiet: true
+          });
+
+          toast(
+            r.duplicate
+              ? 'Already saved — duplicate ignored'
+              : 'Daily sales saved to cloud'
+          );
+
+          render();
+
+        } catch (err) {
+          toast(
+            err.message,
+            3500
+          );
+
+        } finally {
+          setBusy(false);
+        }
       };
 
-
-  $('#saleForm')
+  $('#outletForm')
     .onsubmit =
       async e => {
-
         e.preventDefault();
-
 
         const fd =
           new FormData(
             e.target
           );
-
 
         const date =
           String(
@@ -3922,403 +3208,669 @@ function renderDaily() {
             )
           );
 
-
-        const month =
-          date.slice(
-            0,
-            7
-          );
-
-
         const outletName =
           String(
             fd.get(
               'outlet'
-            ) || ''
+            ) ||
+            ''
           );
-
-
-        const o =
-          outletsFor(id)
-            .find(
-              x =>
-                x.name ===
-                outletName
-            );
-
-
-        if (!o) {
-
-          toast(
-            'Select an outlet'
-          );
-
-          return;
-        }
-
-
-        const s =
-          state();
-
-
-        const outRec = {
-          id:
-            idGen(),
-
-          staffId:
-            id,
-
-          month,
-
-          date,
-
-          outletCode:
-            o.code || '',
-
-          outletName,
-
-          sales:
-            n(
-              fd.get(
-                'sales'
-              )
-            ),
-
-          note:
-            String(
-              fd.get(
-                'note'
-              ) || ''
-            )
-        };
-
-
-        s.outletSales
-          .push(
-            outRec
-          );
-
 
         const skuName =
           String(
             fd.get(
-              'skuName'
-            ) || ''
-          ).trim();
-
-
-        let skuRec =
-          null;
-
-
-        if (
-          skuName
-        ) {
-
-          skuRec = {
-            id:
-              idGen(),
-
-            staffId:
-              id,
-
-            month,
-
-            date,
-
-            outletCode:
-              o.code || '',
-
-            outletName,
-
-            skuName,
-
-            cartons:
-              n(
-                fd.get(
-                  'cartons'
-                )
-              ),
-
-            salesValue:
-              n(
-                fd.get(
-                  'skuValue'
-                )
-              )
-          };
-
-
-          s.skuSales
-            .push(
-              skuRec
-            );
-        }
-
-
-        save(s);
-
-
-        selectedMonth =
-          month;
-
-        selectedDay =
-          date;
-
-
-        const a =
-          await pushCloud(
-            'saveOutlet',
-            outRec
+              'sku'
+            ) ||
+            ''
           );
 
-
-        let b = {
-          ok: true
-        };
-
-
-        if (
-          skuRec
-        ) {
-
-          b =
-            await pushCloud(
-              'saveSku',
-              skuRec
+        const outlet =
+          routeOutlets()
+            .find(
+              x =>
+                String(
+                  x[
+                    'Outlet Name'
+                  ]
+                ) ===
+                outletName
             );
+
+        if (!outlet) {
+          return toast(
+            'Select an outlet'
+          );
         }
 
-
-        toast(
-          a?.ok &&
-          b?.ok
-
-            ? 'Outlet/SKU sale saved to cloud'
-
-            : 'Saved locally • cloud failed'
+        setBusy(
+          true,
+          'Saving outlet / SKU sale…'
         );
 
+        try {
+          const baseId =
+            idGen();
 
-        render();
+          const ro =
+            await apiPost(
+              'saveOutlet',
+              {
+                requestId:
+                  baseId +
+                  '-O',
+
+                date,
+
+                month:
+                  date.slice(
+                    0,
+                    7
+                  ),
+
+                outletCode:
+                  outlet[
+                    'Outlet Code'
+                  ] ||
+                  '',
+
+                outletName,
+
+                sales:
+                  n(
+                    fd.get(
+                      'sales'
+                    )
+                  ),
+
+                note:
+                  String(
+                    fd.get(
+                      'note'
+                    ) ||
+                    ''
+                  )
+              }
+            );
+
+          if (!ro?.ok) {
+            throw new Error(
+              ro?.error ||
+              'Outlet sale failed'
+            );
+          }
+
+          if (skuName) {
+            const rs =
+              await apiPost(
+                'saveSku',
+                {
+                  requestId:
+                    baseId +
+                    '-S',
+
+                  date,
+
+                  month:
+                    date.slice(
+                      0,
+                      7
+                    ),
+
+                  outletCode:
+                    outlet[
+                      'Outlet Code'
+                    ] ||
+                    '',
+
+                  outletName,
+
+                  skuName,
+
+                  cartons:
+                    n(
+                      fd.get(
+                        'cartons'
+                      )
+                    ),
+
+                  salesValue:
+                    n(
+                      fd.get(
+                        'skuValue'
+                      )
+                    )
+                }
+              );
+
+            if (!rs?.ok) {
+              throw new Error(
+                rs?.error ||
+                'SKU sale failed'
+              );
+            }
+          }
+
+          selectedDate =
+            date;
+
+          selectedMonth =
+            date.slice(
+              0,
+              7
+            );
+
+          await loadCurrent({
+            quiet: true
+          });
+
+          toast(
+            'Outlet / SKU sale saved to cloud'
+          );
+
+          render();
+
+        } catch (err) {
+          toast(
+            err.message,
+            3500
+          );
+
+        } finally {
+          setBusy(false);
+        }
       };
 }
 
 
 /* =========================================================
-   PLANNING
+   OUTLET REPORT / ZERO SALES
 ========================================================= */
 
-function planningHtml(id) {
+function renderZero() {
+  const rows =
+    routeOutlets()
+      .map(
+        o => {
+          const name =
+            String(
+              o[
+                'Outlet Name'
+              ] ||
+              ''
+            );
 
-  const plans =
-    monthPlans(id);
+          const d =
+            dayOutletSales(
+              name
+            );
 
+          const mtd =
+            monthOutletSales(
+              name
+            );
 
-  return plans.length
+          const plan =
+            planByOutlet(
+              name
+            );
 
-    ? `
-        <div class="list">
+          const target =
+            n(
+              plan?.[
+                'Outlet Target'
+              ]
+            );
 
-          ${
-            plans
-              .map(
-                p => {
+          return {
+            name,
 
-                  const a =
-                    outletAch(
-                      id,
-                      p.outletName
-                    );
+            code:
+              o[
+                'Outlet Code'
+              ] ||
+              '',
 
+            category:
+              o.Category ||
+              '',
 
-                  const sf =
-                    Math.max(
-                      0,
-                      p.outletTarget -
-                      a
-                    );
+            day:
+              d,
 
+            mtd,
 
-                  return `
-                    <div class="card">
+            target,
 
+            gap:
+              target
+                ? Math.max(
+                    0,
+                    target -
+                    mtd
+                  )
+                : 0
+          };
+        }
+      );
+
+  const q =
+    getPref()
+      .zeroSearch ||
+    '';
+
+  $('#mainContent')
+    .innerHTML = `
+      ${monthBar()}
+
+      <div
+        class="card"
+        style="margin-bottom:12px"
+      >
+        <div class="form-grid">
+          ${dateFilter(
+            'Daily Sale Date'
+          )}
+
+          <label>
+            Search Outlet
+
+            <input
+              id="zeroSearch"
+              value="${esc(q)}"
+              placeholder="Outlet name / code"
+            >
+          </label>
+        </div>
+      </div>
+
+      <section class="hero">
+        <p class="eyebrow">
+          OUTLET SALES / ZERO SALES
+        </p>
+
+        <h3>
+          ${dateLabel(
+            selectedDate
+          )}
+        </h3>
+
+        <p class="muted">
+          Daily sale + MTD sale +
+          monthly outlet target
+          stay visible together.
+        </p>
+
+        ${syncStatus()}
+
+        <button
+          id="zeroRefresh"
+          class="btn secondary"
+          style="margin-top:10px"
+        >
+          ↻ REFRESH LIVE
+        </button>
+      </section>
+
+      <div
+        id="zeroList"
+        class="list"
+        style="margin-top:12px"
+      >
+      </div>
+    `;
+
+  bindCommon();
+
+  const paint =
+    () => {
+      const query =
+        String(
+          $('#zeroSearch')
+            ?.value ||
+          ''
+        ).toLowerCase();
+
+      const list =
+        rows.filter(
+          x =>
+            !query ||
+            x.name
+              .toLowerCase()
+              .includes(
+                query
+              ) ||
+            String(
+              x.code
+            )
+            .toLowerCase()
+            .includes(
+              query
+            )
+        );
+
+      $('#zeroList')
+        .innerHTML =
+          list.length
+            ? list
+                .map(
+                  x => `
+                    <div class="list-item">
                       <div class="row">
-
                         <div>
+                          <h4>
+                            ${esc(x.name)}
+                          </h4>
 
-                          <h3>
-                            ${esc(p.outletName)}
-                          </h3>
-
-                          <p class="muted">
-
-                            Target
-                            ${money(p.outletTarget)}
+                          <p>
+                            ${esc(x.category)}
                             •
-
-                            Actual
-                            ${money(a)}
-
+                            ${esc(
+                              x.code ||
+                              'No code'
+                            )}
                           </p>
 
-                        </div>
+                          <p
+                            style="margin-top:7px"
+                          >
+                            <strong
+                              style="color:#fff"
+                            >
+                              Today
+                              ${money(x.day)}
+                            </strong>
 
+                            •
+                            MTD
+                            ${money(x.mtd)}
+
+                            •
+                            Target
+                            ${
+                              x.target
+                                ? money(
+                                    x.target
+                                  )
+                                : 'Not set'
+                            }
+
+                            ${
+                              x.target
+                                ? ' • Gap ' +
+                                  money(
+                                    x.gap
+                                  )
+                                : ''
+                            }
+                          </p>
+                        </div>
 
                         <span
                           class="
                             pill
                             ${
-                              sf
-                                ? 'red'
-                                : 'green'
+                              x.day > 0
+                                ? 'green'
+                                : 'red'
                             }
                           "
                         >
                           ${
-                            sf
-                              ? money(sf) +
-                                ' short'
-                              : 'Achieved'
+                            x.day > 0
+                              ? 'SALE'
+                              : 'ZERO'
                           }
                         </span>
-
                       </div>
-
-
-                      ${
-                        (
-                          p.targetSkus ||
-                          []
-                        )
-                        .map(
-                          sku => {
-
-                            const t =
-                              p.skuTargets?.[
-                                sku
-                              ] || {};
-
-
-                            const x =
-                              skuAch(
-                                id,
-                                p.outletName,
-                                sku
-                              );
-
-
-                            return `
-                              <div
-                                class="list-item"
-                                style="margin-top:8px"
-                              >
-
-                                <h4>
-                                  ${esc(sku)}
-                                </h4>
-
-                                <p>
-
-                                  ${x.cartons}
-                                  /
-                                  ${n(t.cartons)}
-                                  CTN
-
-                                  •
-
-                                  ${money(x.value)}
-                                  /
-                                  ${money(t.value)}
-
-                                </p>
-
-                              </div>
-                            `;
-                          }
-                        )
-                        .join('')
-                      }
-
                     </div>
-                  `;
-                }
-              )
-              .join('')
-          }
+                  `
+                )
+                .join('')
+            : empty(
+                'No outlet found'
+              );
+    };
 
-        </div>
-      `
+  paint();
 
-    : `
-        <div class="empty">
-          No monthly plan yet.
-        </div>
-      `;
+  $('#zeroSearch')
+    .oninput =
+      () => {
+        setPref({
+          zeroSearch:
+            $('#zeroSearch')
+              .value
+        });
+
+        paint();
+      };
+
+  $('#zeroRefresh')
+    .onclick =
+      () =>
+        refreshCloud(
+          true
+        );
 }
 
 
+/* =========================================================
+   MONTHLY PLANNING
+========================================================= */
+
+function parsePlanSkus(p) {
+  const raw =
+    typeof p?.[
+      'Targeted SKU List'
+    ] ===
+      'string'
+      ? (
+          () => {
+            try {
+              return JSON.parse(
+                p[
+                  'Targeted SKU List'
+                ]
+              );
+            } catch {
+              return [];
+            }
+          }
+        )()
+      : (
+          p?.[
+            'Targeted SKU List'
+          ] ||
+          []
+        );
+
+  return Array.isArray(
+    raw
+  )
+    ? raw
+    : [];
+}
+
+function planningList() {
+  const plans =
+    current?.plans ||
+    [];
+
+  if (!plans.length) {
+    return empty(
+      'No monthly plan yet.'
+    );
+  }
+
+  return `
+    <div class="list">
+      ${
+        plans
+          .map(
+            p => {
+              const mtd =
+                monthOutletSales(
+                  p[
+                    'Outlet Name'
+                  ]
+                );
+
+              const target =
+                n(
+                  p[
+                    'Outlet Target'
+                  ]
+                );
+
+              const list =
+                parsePlanSkus(
+                  p
+                );
+
+              return `
+                <div class="card">
+                  <div class="row">
+                    <div>
+                      <h3>
+                        ${esc(
+                          p[
+                            'Outlet Name'
+                          ]
+                        )}
+                      </h3>
+
+                      <p class="muted">
+                        ${money(mtd)}
+                        /
+                        ${money(target)}
+                        •
+                        ${
+                          target
+                            ? pct(
+                                mtd /
+                                target *
+                                100
+                              )
+                            : 'No target'
+                        }
+                      </p>
+                    </div>
+
+                    <span
+                      class="
+                        pill
+                        ${
+                          mtd >= target &&
+                          target
+                            ? 'green'
+                            : 'orange'
+                        }
+                      "
+                    >
+                      ${
+                        target
+                          ? money(
+                              Math.max(
+                                0,
+                                target -
+                                mtd
+                              )
+                            ) +
+                            ' left'
+                          : 'PLAN'
+                      }
+                    </span>
+                  </div>
+
+                  ${
+                    list.length
+                      ? `
+                          <div class="status-strip">
+                            ${
+                              list
+                                .map(
+                                  x => `
+                                    <span class="status-chip">
+                                      ${esc(
+                                        typeof x ===
+                                          'string'
+                                          ? x
+                                          : x.name ||
+                                            ''
+                                      )}
+                                    </span>
+                                  `
+                                )
+                                .join('')
+                            }
+                          </div>
+                        `
+                      : ''
+                  }
+                </div>
+              `;
+            }
+          )
+          .join('')
+      }
+    </div>
+  `;
+}
+
 function renderPlanning() {
-
-  const id =
-    uid();
-
-
   if (
-    session.mode ===
-      'manager'
+    isManagerMode()
   ) {
-
     $('#mainContent')
       .innerHTML = `
-
         ${monthBar()}
 
-        ${planningHtml(id)}
+        <div class="card">
+          <h2>
+            ${esc(
+              viewedName()
+            )}
+            • Monthly Plan
+          </h2>
+        </div>
+
+        <div style="margin-top:12px">
+          ${planningList()}
+        </div>
       `;
 
-
     bindCommon();
-
     return;
   }
 
-
-  selectedSkus =
+  selectedPlanningSkus =
     [];
-
 
   $('#mainContent')
     .innerHTML = `
-
-      ${monthBar()}
-
+      ${monthBar({
+        showManager: false
+      })}
 
       <div class="card">
-
         <h2>
           Monthly Outlet & SKU Plan
         </h2>
-
 
         <form
           id="planForm"
           class="stack"
         >
-
           <label>
-
             Search Outlet
 
             <input
               id="planOutletSearch"
+              placeholder="Outlet name"
             >
-
           </label>
 
-
           <label>
-
             Select Outlet
 
             <select
@@ -4326,14 +3878,11 @@ function renderPlanning() {
               name="outlet"
               required
             >
-              ${outletOptions(id)}
+              ${outletOptions()}
             </select>
-
           </label>
 
-
           <label>
-
             Outlet Monthly Target (RM)
 
             <input
@@ -4341,581 +3890,1692 @@ function renderPlanning() {
               type="number"
               min="0"
               step="0.01"
-              value="0"
               required
             >
-
           </label>
 
-
           <label>
-
             Target SKU Count
 
             <input
-              id="targetSkuCount"
               name="targetSkuCount"
               type="number"
               min="0"
               step="1"
               value="0"
             >
-
           </label>
 
-
           <label>
-
             Search SKU
 
             <input
               id="planSkuSearch"
+              placeholder="SKU name"
             >
-
           </label>
 
-
           <label>
-
             Select SKU
 
             <select
-              id="planSkuSelect"
+              id="planSku"
             >
-
               <option value="">
                 Select outlet first
               </option>
-
             </select>
-
           </label>
-
 
           <button
             type="button"
-            id="addSkuBtn"
+            id="addPlanSku"
             class="btn secondary"
           >
-            + ADD SELECTED SKU
+            + ADD SKU
           </button>
 
-
           <div
-            id="chosenSkus"
+            id="planSkuChips"
             class="chipbox"
           >
           </div>
-
-
-          <div
-            id="skuTargetInputs"
-            class="list"
-          >
-          </div>
-
 
           <button
             class="btn primary"
           >
             SAVE MONTHLY PLAN
           </button>
-
         </form>
-
       </div>
 
-
       <div class="section-title">
-
         <h3>
           Plan vs Achievement
         </h3>
-
       </div>
 
-
-      ${planningHtml(id)}
+      ${planningList()}
     `;
-
 
   bindCommon();
 
-
-  const oSearch =
+  const os =
     $('#planOutletSearch');
 
-  const oSel =
+  const o =
     $('#planOutlet');
 
-  const q =
+  const ss =
     $('#planSkuSearch');
 
-  const skuSel =
-    $('#planSkuSelect');
+  const s =
+    $('#planSku');
 
   const chips =
-    $('#chosenSkus');
+    $('#planSkuChips');
 
-  const inputs =
-    $('#skuTargetInputs');
-
-
-  function refreshOut() {
-
-    const before =
-      oSel.value;
-
-
-    oSel.innerHTML =
-      outletOptions(
-        id,
-        before,
-        oSearch.value
-      );
-
-
-    if (
-      [...oSel.options]
-        .some(
-          o =>
-            o.value ===
-            before
-        )
-    ) {
-
-      oSel.value =
-        before;
-    }
-
-
-    refreshSku();
-  }
-
-
-  function refreshSku() {
-
-    if (
-      !oSel.value
-    ) {
-
-      skuSel.innerHTML =
-        '<option value="">Select outlet first</option>';
-
-      return;
-    }
-
-
-    const list =
-      productsForOutlet(
-        id,
-        oSel.value
-      )
-      .filter(
-        x =>
-          (
-            !q.value ||
-            x
-              .toLowerCase()
-              .includes(
-                q.value
-                  .toLowerCase()
-              )
-          ) &&
-          !selectedSkus
-            .includes(x)
-      );
-
-
-    skuSel.innerHTML =
-      '<option value="">Select SKU</option>' +
-
-      list
-        .map(
-          x => `
-            <option value="${esc(x)}">
-              ${esc(x)}
-            </option>
-          `
-        )
-        .join('');
-  }
-
-
-  function paint() {
-
-    chips.innerHTML =
-      selectedSkus
-        .map(
-          x => `
-            <span class="chip">
-
-              ${esc(x)}
-
-              <button
-                type="button"
-                data-rm="${esc(x)}"
-              >
-                ×
-              </button>
-
-            </span>
-          `
-        )
-        .join('');
-
-
-    inputs.innerHTML =
-      selectedSkus
-        .map(
-          (
-            x,
-            i
-          ) => `
-            <div class="list-item">
-
-              <h4>
-                ${i + 1}.
-                ${esc(x)}
-              </h4>
-
-
-              <div class="form-grid">
-
-                <label>
-
-                  Target Cartons
-
-                  <input
-                    data-c="${esc(x)}"
-                    type="number"
-                    min="0"
-                    step="1"
-                    value="0"
-                  >
-
-                </label>
-
-
-                <label>
-
-                  Target Sales Value (RM)
-
-                  <input
-                    data-v="${esc(x)}"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value="0"
-                  >
-
-                </label>
-
-              </div>
-
-            </div>
-          `
-        )
-        .join('');
-
-
-    $$('[data-rm]')
-      .forEach(
-        b =>
-          b.onclick =
-            () => {
-
-              selectedSkus =
-                selectedSkus
-                  .filter(
-                    x =>
-                      x !==
-                      b.dataset.rm
-                  );
-
-              paint();
-
-              refreshSku();
-            }
-      );
-  }
-
-
-  oSearch.oninput =
-    refreshOut;
-
-
-  oSel.onchange =
+  const paintSkus =
     () => {
+      chips.innerHTML =
+        selectedPlanningSkus
+          .map(
+            x => `
+              <span class="chip">
+                ${esc(x)}
 
-      selectedSkus =
-        [];
+                <button
+                  type="button"
+                  data-rmsku="${esc(x)}"
+                >
+                  ×
+                </button>
+              </span>
+            `
+          )
+          .join('');
 
-      paint();
+      $$('[data-rmsku]')
+        .forEach(
+          b =>
+            b.onclick =
+              () => {
+                selectedPlanningSkus =
+                  selectedPlanningSkus
+                    .filter(
+                      x =>
+                        x !==
+                        b.dataset.rmsku
+                    );
+
+                paintSkus();
+                refreshSku();
+              }
+        );
+    };
+
+  const refreshSku =
+    () => {
+      s.innerHTML =
+        o.value
+          ? skuOptions(
+              o.value,
+              s.value,
+              ss.value
+            )
+          : `
+              <option value="">
+                Select outlet first
+              </option>
+            `;
+
+      [...s.options]
+        .forEach(
+          opt => {
+            if (
+              selectedPlanningSkus
+                .includes(
+                  opt.value
+                )
+            ) {
+              opt.disabled =
+                true;
+            }
+          }
+        );
+    };
+
+  os.oninput =
+    () => {
+      const old =
+        o.value;
+
+      o.innerHTML =
+        outletOptions(
+          old,
+          os.value
+        );
 
       refreshSku();
     };
 
+  o.onchange =
+    () => {
+      selectedPlanningSkus =
+        [];
 
-  q.oninput =
+      paintSkus();
+      refreshSku();
+    };
+
+  ss.oninput =
     refreshSku;
 
-
-  $('#addSkuBtn')
+  $('#addPlanSku')
     .onclick =
       () => {
-
-        if (
-          !skuSel.value
-        ) {
-
-          toast(
-            'Select a SKU'
+        if (!s.value) {
+          return toast(
+            'Select SKU'
           );
-
-          return;
         }
 
-
-        const max =
-          n(
-            $('#targetSkuCount')
-              .value
-          );
-
-
         if (
-          max &&
-          selectedSkus.length >=
-            max
+          !selectedPlanningSkus
+            .includes(
+              s.value
+            )
         ) {
-
-          toast(
-            `Maximum ${max} SKU(s)`
-          );
-
-          return;
+          selectedPlanningSkus
+            .push(
+              s.value
+            );
         }
 
-
-        selectedSkus
-          .push(
-            skuSel.value
-          );
-
-
-        paint();
-
+        paintSkus();
         refreshSku();
       };
-
-
-  refreshSku();
-
 
   $('#planForm')
     .onsubmit =
       async e => {
-
         e.preventDefault();
-
 
         const fd =
           new FormData(
             e.target
           );
 
-
-        const name =
+        const outletName =
           String(
             fd.get(
               'outlet'
-            ) || ''
+            ) ||
+            ''
           );
 
-
-        const o =
-          outletsFor(id)
+        const outlet =
+          routeOutlets()
             .find(
               x =>
-                x.name ===
-                name
+                String(
+                  x[
+                    'Outlet Name'
+                  ]
+                ) ===
+                outletName
             );
 
-
-        if (!o) {
-
-          toast(
+        if (!outlet) {
+          return toast(
             'Select outlet'
           );
-
-          return;
         }
 
+        setBusy(
+          true,
+          'Saving monthly plan…'
+        );
 
-        const skuTargets =
-          {};
+        try {
+          const r =
+            await apiPost(
+              'savePlan',
+              {
+                month:
+                  selectedMonth,
 
+                routeTarget:
+                  current
+                    ?.performance
+                    ?.target ||
+                  0,
 
-        selectedSkus
-          .forEach(
-            x => {
+                outletCode:
+                  outlet[
+                    'Outlet Code'
+                  ] ||
+                  '',
 
-              skuTargets[
-                x
-              ] = {
+                outletName,
 
-                cartons:
+                outletTarget:
                   n(
-                    document
-                      .querySelector(
-                        `[data-c="${CSS.escape(x)}"]`
-                      )
-                      ?.value
+                    fd.get(
+                      'outletTarget'
+                    )
                   ),
 
-                value:
+                targetedSkuCount:
                   n(
-                    document
-                      .querySelector(
-                        `[data-v="${CSS.escape(x)}"]`
-                      )
-                      ?.value
-                  )
-              };
-            }
-          );
+                    fd.get(
+                      'targetSkuCount'
+                    )
+                  ) ||
+                  selectedPlanningSkus
+                    .length,
 
+                targetSkus:
+                  selectedPlanningSkus,
 
-        const rec = {
-          id:
-            idGen(),
-
-          staffId:
-            id,
-
-          month:
-            selectedMonth,
-
-          outletCode:
-            o.code || '',
-
-          outletName:
-            name,
-
-          outletTarget:
-            n(
-              fd.get(
-                'outletTarget'
-              )
-            ),
-
-          targetSkuCount:
-            n(
-              fd.get(
-                'targetSkuCount'
-              )
-            ) ||
-            selectedSkus.length,
-
-          targetSkus:
-            [
-              ...selectedSkus
-            ],
-
-          skuTargets
-        };
-
-
-        const s =
-          state();
-
-
-        s.plans =
-          s.plans
-            .filter(
-              x =>
-                !(
-                  x.staffId ===
-                    id &&
-                  x.month ===
-                    selectedMonth &&
-                  x.outletName ===
-                    name
-                )
+                skuSalesPlan:
+                  0
+              }
             );
 
+          if (!r?.ok) {
+            throw new Error(
+              r?.error ||
+              'Plan save failed'
+            );
+          }
 
-        s.plans
-          .push(rec);
+          await loadCurrent({
+            quiet: true
+          });
+
+          toast(
+            'Monthly plan saved'
+          );
+
+          render();
+
+        } catch (err) {
+          toast(
+            err.message,
+            3500
+          );
+
+        } finally {
+          setBusy(false);
+        }
+      };
+
+  refreshSku();
+}
 
 
-        save(s);
+/* =========================================================
+   INCENTIVES
+========================================================= */
 
+function incentiveCard(x) {
+  const v =
+    n(
+      x.percent
+    );
 
+  return `
+    <div class="card">
+      <div class="row">
+        <div>
+          <span
+            class="
+              pill
+              ${
+                x.fulfilled
+                  ? 'green'
+                  : 'orange'
+              }
+            "
+          >
+            ${esc(
+              String(
+                x.category ||
+                'INCENTIVE'
+              ).toUpperCase()
+            )}
+          </span>
+
+          <h3
+            style="
+              margin:9px 0 5px
+            "
+          >
+            ${esc(
+              x.name ||
+              'Incentive'
+            )}
+          </h3>
+
+          <p class="muted">
+            ${esc(
+              x.description ||
+              ''
+            )}
+          </p>
+        </div>
+
+        <div style="text-align:right">
+          <strong>
+            ${money(
+              x.rewardRM
+            )}
+          </strong>
+
+          <p class="muted">
+            reward
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        ${progressBar(v)}
+      </div>
+
+      <div
+        class="row"
+        style="margin-top:8px"
+      >
+        <small class="muted">
+          ${esc(
+            String(
+              x.metric ||
+              ''
+            )
+          )}
+
+          ${
+            x.skuName
+              ? ' • ' +
+                esc(
+                  x.skuName
+                )
+              : ''
+          }
+        </small>
+
+        <strong>
+          ${n(x.actual)}
+          /
+          ${n(x.target)}
+        </strong>
+      </div>
+
+      <p
+        class="muted"
+        style="margin:8px 0 0"
+      >
+        ${
+          x.fulfilled
+            ? '✓ Fulfilled • Earned ' +
+              money(
+                x.earnedRM
+              )
+            : n(
+                x.remaining
+              ) +
+              ' remaining'
+        }
+
+        •
+
+        ${dateLabel(
+          x.startDate
+        )}
+
+        →
+
+        ${
+          x.endDate
+            ? dateLabel(
+                x.endDate
+              )
+            : 'Open end'
+        }
+      </p>
+
+      ${
+        x.bannerFileId
+          ? `
+              <button
+                class="btn secondary"
+                data-banner="${esc(
+                  x.bannerFileId
+                )}"
+                style="margin-top:10px"
+              >
+                VIEW BANNER
+              </button>
+            `
+          : ''
+      }
+    </div>
+  `;
+}
+
+function renderIncentives() {
+  const list =
+    current?.incentives ||
+    [];
+
+  const managerForm =
+    isManagerMode()
+      ? `
+          <div
+            class="card"
+            style="margin-bottom:12px"
+          >
+            <p class="eyebrow">
+              MANAGER ONLY
+            </p>
+
+            <h2>
+              Create Incentive
+            </h2>
+
+            <form
+              id="incForm"
+              class="stack"
+            >
+              <label>
+                Incentive Name
+
+                <input
+                  name="name"
+                  required
+                >
+              </label>
+
+              <label>
+                Description
+
+                <textarea
+                  name="description"
+                ></textarea>
+              </label>
+
+              <div class="form-grid">
+                <label>
+                  Category
+
+                  <select name="category">
+                    <option value="PRODUCT">
+                      Product
+                    </option>
+
+                    <option value="OTHER">
+                      Other
+                    </option>
+
+                    <option value="INDIVIDUAL">
+                      Individual
+                    </option>
+
+                    <option value="GROWTH">
+                      Growth
+                    </option>
+                  </select>
+                </label>
+
+                <label>
+                  Metric
+
+                  <select name="metric">
+                    <option value="CARTONS">
+                      Cartons
+                    </option>
+
+                    <option value="SKU_SALES_RM">
+                      SKU Sales RM
+                    </option>
+
+                    <option value="SALES_RM">
+                      Total Sales RM
+                    </option>
+
+                    <option value="OUTLETS">
+                      Outlet Coverage Count
+                    </option>
+                  </select>
+                </label>
+              </div>
+
+              <label>
+                Product / SKU (optional)
+
+                <select name="skuName">
+                  <option value="">
+                    No specific SKU
+                  </option>
+
+                  ${
+                    [
+                      ...new Set(
+                        skuMaster()
+                          .map(
+                            x =>
+                              x[
+                                'Product Name'
+                              ]
+                          )
+                          .filter(Boolean)
+                      )
+                    ]
+                    .sort()
+                    .map(
+                      x => `
+                        <option value="${esc(x)}">
+                          ${esc(x)}
+                        </option>
+                      `
+                    )
+                    .join('')
+                  }
+                </select>
+              </label>
+
+              <div class="form-grid">
+                <label>
+                  Target
+
+                  <input
+                    name="target"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    required
+                  >
+                </label>
+
+                <label>
+                  Reward RM
+
+                  <input
+                    name="reward"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    required
+                  >
+                </label>
+              </div>
+
+              <div class="form-grid">
+                <label>
+                  Start Date
+
+                  <input
+                    name="startDate"
+                    type="date"
+                    value="${selectedMonth + '-01'}"
+                    required
+                  >
+                </label>
+
+                <label>
+                  End Date
+
+                  <input
+                    name="endDate"
+                    type="date"
+                  >
+                </label>
+              </div>
+
+              <label>
+                Assign To
+
+                <select
+                  name="scope"
+                  id="incScope"
+                >
+                  <option value="SPECIFIC">
+                    Selected SR
+                  </option>
+
+                  <option value="ALL">
+                    All SR
+                  </option>
+                </select>
+              </label>
+
+              <label id="incStaffWrap">
+                Selected SR
+
+                <select name="staffId">
+                  ${
+                    teamUsers()
+                      .map(
+                        u => `
+                          <option
+                            value="${u.id}"
+                            ${
+                              u.id ===
+                                managerView
+                                ? 'selected'
+                                : ''
+                            }
+                          >
+                            ${esc(u.name)}
+                            •
+                            ${u.id}
+                          </option>
+                        `
+                      )
+                      .join('')
+                  }
+                </select>
+              </label>
+
+              <label>
+                Banner / Image
+                (optional, max 3 MB)
+
+                <input
+                  name="banner"
+                  type="file"
+                  accept="image/*"
+                >
+              </label>
+
+              <button class="btn primary">
+                CREATE INCENTIVE
+              </button>
+            </form>
+          </div>
+        `
+      : '';
+
+  $('#mainContent')
+    .innerHTML = `
+      ${monthBar()}
+
+      ${managerForm}
+
+      <section class="hero">
+        <p class="eyebrow">
+          INCENTIVE CENTER
+        </p>
+
+        <h3>
+          ${esc(
+            viewedName()
+          )}
+        </h3>
+
+        <p class="muted">
+          Double / triple /
+          multiple incentives
+          can run at the same time.
+        </p>
+      </section>
+
+      <div
+        class="list"
+        style="margin-top:12px"
+      >
+        ${
+          list.length
+            ? list
+                .map(
+                  incentiveCard
+                )
+                .join('')
+            : empty(
+                'No active incentive for this month.'
+              )
+        }
+      </div>
+
+      ${
+        !isManagerMode()
+          ? personalTargetsSection()
+          : ''
+      }
+    `;
+
+  bindCommon();
+
+  $$('[data-banner]')
+    .forEach(
+      b =>
+        b.onclick =
+          () =>
+            downloadCloudFile(
+              'downloadBanner',
+              b.dataset.banner,
+              true
+            )
+    );
+
+  const scope =
+    $('#incScope');
+
+  if (scope) {
+    scope.onchange =
+      () => {
+        $('#incStaffWrap')
+          .style
+          .display =
+            scope.value ===
+              'ALL'
+              ? 'none'
+              : '';
+      };
+  }
+
+  if (
+    $('#incForm')
+  ) {
+    $('#incForm')
+      .onsubmit =
+        async e => {
+          e.preventDefault();
+
+          const fd =
+            new FormData(
+              e.target
+            );
+
+          const file =
+            fd.get(
+              'banner'
+            );
+
+          setBusy(
+            true,
+            'Creating incentive…'
+          );
+
+          try {
+            let bannerBase64 =
+              '';
+
+            let bannerFileName =
+              '';
+
+            let bannerMimeType =
+              '';
+
+            if (
+              file instanceof
+                File &&
+              file.size
+            ) {
+              if (
+                file.size >
+                3 *
+                1024 *
+                1024
+              ) {
+                throw new Error(
+                  'Banner must be under 3 MB'
+                );
+              }
+
+              bannerBase64 =
+                await fileToBase64(
+                  file
+                );
+
+              bannerFileName =
+                file.name;
+
+              bannerMimeType =
+                file.type;
+            }
+
+            const scopeValue =
+              String(
+                fd.get(
+                  'scope'
+                )
+              );
+
+            const payload = {
+              name:
+                String(
+                  fd.get(
+                    'name'
+                  ) ||
+                  ''
+                ),
+
+              description:
+                String(
+                  fd.get(
+                    'description'
+                  ) ||
+                  ''
+                ),
+
+              category:
+                String(
+                  fd.get(
+                    'category'
+                  ) ||
+                  'OTHER'
+                ),
+
+              metric:
+                String(
+                  fd.get(
+                    'metric'
+                  ) ||
+                  'CARTONS'
+                ),
+
+              skuName:
+                String(
+                  fd.get(
+                    'skuName'
+                  ) ||
+                  ''
+                ),
+
+              targetValue:
+                n(
+                  fd.get(
+                    'target'
+                  )
+                ),
+
+              rewardRM:
+                n(
+                  fd.get(
+                    'reward'
+                  )
+                ),
+
+              startDate:
+                String(
+                  fd.get(
+                    'startDate'
+                  ) ||
+                  ''
+                ),
+
+              endDate:
+                String(
+                  fd.get(
+                    'endDate'
+                  ) ||
+                  ''
+                ),
+
+              scope:
+                scopeValue,
+
+              assignedStaff:
+                scopeValue ===
+                  'ALL'
+                  ? []
+                  : [
+                      String(
+                        fd.get(
+                          'staffId'
+                        ) ||
+                        managerView
+                      )
+                    ],
+
+              bannerBase64,
+              bannerFileName,
+              bannerMimeType
+            };
+
+            const r =
+              await apiPost(
+                'createIncentive',
+                payload
+              );
+
+            if (!r?.ok) {
+              throw new Error(
+                r?.error ||
+                'Incentive save failed'
+              );
+            }
+
+            await loadCurrent({
+              quiet: true
+            });
+
+            toast(
+              'Incentive created'
+            );
+
+            render();
+
+          } catch (err) {
+            toast(
+              err.message,
+              3500
+            );
+
+          } finally {
+            setBusy(false);
+          }
+        };
+  }
+
+  bindPersonalTargetForm();
+}
+
+function personalTargetsSection() {
+  const list =
+    current
+      ?.personalTargets ||
+    [];
+
+  return `
+    <div class="section-title">
+      <h3>
+        My Additional /
+        Personal Target
+      </h3>
+    </div>
+
+    <div class="card">
+      <form
+        id="personalTargetForm"
+        class="stack"
+      >
+        <label>
+          Target Name
+
+          <input
+            name="name"
+            required
+            placeholder="e.g. My Extra Mango Target"
+          >
+        </label>
+
+        <label>
+          Description
+
+          <textarea
+            name="description"
+          ></textarea>
+        </label>
+
+        <label>
+          SKU (optional)
+
+          <select name="skuName">
+            <option value="">
+              No specific SKU
+            </option>
+
+            ${
+              [
+                ...new Set(
+                  skuMaster()
+                    .map(
+                      x =>
+                        x[
+                          'Product Name'
+                        ]
+                    )
+                    .filter(Boolean)
+                )
+              ]
+              .sort()
+              .map(
+                x => `
+                  <option value="${esc(x)}">
+                    ${esc(x)}
+                  </option>
+                `
+              )
+              .join('')
+            }
+          </select>
+        </label>
+
+        <div class="form-grid">
+          <label>
+            Metric
+
+            <select name="metric">
+              <option value="SALES_RM">
+                Total Sales RM
+              </option>
+
+              <option value="CARTONS">
+                Cartons
+              </option>
+
+              <option value="SKU_SALES_RM">
+                SKU Sales RM
+              </option>
+            </select>
+          </label>
+
+          <label>
+            Target
+
+            <input
+              name="targetValue"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+            >
+          </label>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            Start Date
+
+            <input
+              name="startDate"
+              type="date"
+              value="${selectedMonth + '-01'}"
+            >
+          </label>
+
+          <label>
+            End Date
+
+            <input
+              name="endDate"
+              type="date"
+            >
+          </label>
+        </div>
+
+        <button class="btn secondary">
+          SAVE PERSONAL TARGET
+        </button>
+      </form>
+    </div>
+
+    <div
+      class="list"
+      style="margin-top:12px"
+    >
+      ${
+        list.length
+          ? list
+              .map(
+                t => {
+                  const p =
+                    personalTargetProgress(
+                      t
+                    );
+
+                  return `
+                    <div class="list-item">
+                      <div class="row">
+                        <div>
+                          <h4>
+                            ${esc(
+                              t.Name
+                            )}
+                          </h4>
+
+                          <p>
+                            ${esc(
+                              t.Description ||
+                              ''
+                            )}
+                          </p>
+                        </div>
+
+                        <span
+                          class="
+                            pill
+                            ${
+                              p.actual >=
+                                p.target &&
+                              p.target
+                                ? 'green'
+                                : 'orange'
+                            }
+                          "
+                        >
+                          ${p.actual.toFixed(1)}
+                          /
+                          ${p.target.toFixed(1)}
+                        </span>
+                      </div>
+
+                      ${progressBar(
+                        p.percent
+                      )}
+
+                      <p
+                        style="margin-top:7px"
+                      >
+                        ${p.remaining.toFixed(1)}
+                        remaining
+                      </p>
+                    </div>
+                  `;
+                }
+              )
+              .join('')
+          : empty(
+              'No personal target yet.'
+            )
+      }
+    </div>
+  `;
+}
+
+function bindPersonalTargetForm() {
+  const form =
+    $('#personalTargetForm');
+
+  if (!form) return;
+
+  form.onsubmit =
+    async e => {
+      e.preventDefault();
+
+      const fd =
+        new FormData(
+          e.target
+        );
+
+      setBusy(
+        true,
+        'Saving personal target…'
+      );
+
+      try {
         const r =
-          await pushCloud(
-            'savePlan',
+          await apiPost(
+            'savePersonalTarget',
             {
               month:
                 selectedMonth,
 
-              routeTarget:
-                routeTarget(id),
+              name:
+                String(
+                  fd.get(
+                    'name'
+                  ) ||
+                  ''
+                ),
 
-              outletCode:
-                rec.outletCode,
+              description:
+                String(
+                  fd.get(
+                    'description'
+                  ) ||
+                  ''
+                ),
 
-              outletName:
-                name,
+              category:
+                'PERSONAL',
 
-              outletTarget:
-                rec.outletTarget,
+              skuName:
+                String(
+                  fd.get(
+                    'skuName'
+                  ) ||
+                  ''
+                ),
 
-              targetedSkuCount:
-                rec.targetSkuCount,
+              metric:
+                String(
+                  fd.get(
+                    'metric'
+                  ) ||
+                  'SALES_RM'
+                ),
 
-              targetSkus:
-                rec.targetSkus
-                  .map(
-                    k => ({
-                      name:
-                        k,
-
-                      ...rec.skuTargets[
-                        k
-                      ]
-                    })
-                  ),
-
-              skuSalesPlan:
-                rec.targetSkus
-                  .reduce(
-                    (
-                      a,
-                      k
-                    ) =>
-                      a +
-                      n(
-                        rec.skuTargets[
-                          k
-                        ]?.value
-                      ),
-                    0
+              targetValue:
+                n(
+                  fd.get(
+                    'targetValue'
                   )
+                ),
+
+              startDate:
+                String(
+                  fd.get(
+                    'startDate'
+                  ) ||
+                  ''
+                ),
+
+              endDate:
+                String(
+                  fd.get(
+                    'endDate'
+                  ) ||
+                  ''
+                )
             }
           );
 
+        if (!r?.ok) {
+          throw new Error(
+            r?.error ||
+            'Save failed'
+          );
+        }
+
+        await loadCurrent({
+          quiet: true
+        });
 
         toast(
-          r?.ok
-            ? 'Monthly plan saved'
-            : 'Saved locally • cloud failed'
+          'Personal target saved'
         );
 
-
         render();
-      };
+
+      } catch (err) {
+        toast(
+          err.message,
+          3500
+        );
+
+      } finally {
+        setBusy(false);
+      }
+    };
+}
+
+
+/* =========================================================
+   PENALTIES
+========================================================= */
+
+function renderPenalties() {
+  const list =
+    current?.penalties ||
+    [];
+
+  const form =
+    isManagerMode()
+      ? `
+          <div class="card">
+            <p class="eyebrow">
+              MANAGER / HR
+            </p>
+
+            <h2>
+              Add Penalty
+            </h2>
+
+            <form
+              id="penaltyForm"
+              class="stack"
+            >
+              <label>
+                Assigned SR
+
+                <select name="staffId">
+                  ${
+                    teamUsers()
+                      .map(
+                        u => `
+                          <option
+                            value="${u.id}"
+                            ${
+                              u.id ===
+                                managerView
+                                ? 'selected'
+                                : ''
+                            }
+                          >
+                            ${esc(u.name)}
+                            •
+                            ${u.id}
+                          </option>
+                        `
+                      )
+                      .join('')
+                  }
+                </select>
+              </label>
+
+              <div class="form-grid">
+                <label>
+                  Date
+
+                  <input
+                    name="date"
+                    type="date"
+                    value="${selectedDate}"
+                    required
+                  >
+                </label>
+
+                <label>
+                  Type
+
+                  <select name="type">
+                    <option>
+                      Late attendance
+                    </option>
+
+                    <option>
+                      Poor display
+                    </option>
+
+                    <option>
+                      Product unavailable
+                    </option>
+
+                    <option>
+                      Other company penalty
+                    </option>
+                  </select>
+                </label>
+              </div>
+
+              <label>
+                Reason
+
+                <input
+                  name="reason"
+                  required
+                >
+              </label>
+
+              <label>
+                Description
+
+                <textarea
+                  name="description"
+                ></textarea>
+              </label>
+
+              <label>
+                Amount RM
+
+                <input
+                  name="amount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  required
+                >
+              </label>
+
+              <button class="btn danger">
+                ADD PENALTY
+              </button>
+            </form>
+          </div>
+        `
+      : '';
+
+  $('#mainContent')
+    .innerHTML = `
+      ${monthBar()}
+
+      ${form}
+
+      <div class="section-title">
+        <h3>
+          Penalty History
+        </h3>
+      </div>
+
+      <div class="list">
+        ${
+          list.length
+            ? list
+                .map(
+                  x => `
+                    <div class="list-item">
+                      <div class="row">
+                        <div>
+                          <h4>
+                            ${esc(
+                              x.Reason ||
+                              x.Type ||
+                              'Penalty'
+                            )}
+                          </h4>
+
+                          <p>
+                            ${dateLabel(
+                              x.Date
+                            )}
+                            •
+                            ${esc(
+                              x.Type ||
+                              ''
+                            )}
+
+                            ${
+                              x.Description
+                                ? '<br>' +
+                                  esc(
+                                    x.Description
+                                  )
+                                : ''
+                            }
+                          </p>
+                        </div>
+
+                        <div style="text-align:right">
+                          <strong class="bad">
+                            -${money(
+                              x.Amount
+                            )}
+                          </strong>
+
+                          <br>
+
+                          <span
+                            class="
+                              pill
+                              ${
+                                activePenalty(
+                                  x
+                                )
+                                  ? 'red'
+                                  : ''
+                              }
+                            "
+                          >
+                            ${esc(
+                              x.Status ||
+                              'ACTIVE'
+                            )}
+                          </span>
+                        </div>
+                      </div>
+
+                      ${
+                        isManagerMode() &&
+                        activePenalty(
+                          x
+                        )
+                          ? `
+                              <button
+                                class="btn secondary"
+                                data-voidpen="${esc(
+                                  x[
+                                    'Penalty ID'
+                                  ]
+                                )}"
+                                style="margin-top:8px"
+                              >
+                                VOID PENALTY
+                              </button>
+                            `
+                          : ''
+                      }
+                    </div>
+                  `
+                )
+                .join('')
+            : empty(
+                'No penalty record for this month.'
+              )
+        }
+      </div>
+    `;
+
+  bindCommon();
+
+  if (
+    $('#penaltyForm')
+  ) {
+    $('#penaltyForm')
+      .onsubmit =
+        async e => {
+          e.preventDefault();
+
+          const fd =
+            new FormData(
+              e.target
+            );
+
+          setBusy(
+            true,
+            'Saving penalty…'
+          );
+
+          try {
+            const r =
+              await apiPost(
+                'savePenalty',
+                {
+                  staffId:
+                    String(
+                      fd.get(
+                        'staffId'
+                      )
+                    ),
+
+                  date:
+                    String(
+                      fd.get(
+                        'date'
+                      )
+                    ),
+
+                  type:
+                    String(
+                      fd.get(
+                        'type'
+                      )
+                    ),
+
+                  reason:
+                    String(
+                      fd.get(
+                        'reason'
+                      )
+                    ),
+
+                  description:
+                    String(
+                      fd.get(
+                        'description'
+                      ) ||
+                      ''
+                    ),
+
+                  amount:
+                    n(
+                      fd.get(
+                        'amount'
+                      )
+                    )
+                }
+              );
+
+            if (!r?.ok) {
+              throw new Error(
+                r?.error ||
+                'Penalty failed'
+              );
+            }
+
+            managerView =
+              String(
+                fd.get(
+                  'staffId'
+                )
+              );
+
+            await loadCurrent({
+              quiet: true
+            });
+
+            toast(
+              'Penalty added'
+            );
+
+            render();
+
+          } catch (err) {
+            toast(
+              err.message,
+              3500
+            );
+
+          } finally {
+            setBusy(false);
+          }
+        };
+  }
+
+  $$('[data-voidpen]')
+    .forEach(
+      b =>
+        b.onclick =
+          async () => {
+            if (
+              !confirm(
+                'Void this penalty?'
+              )
+            ) {
+              return;
+            }
+
+            const r =
+              await apiPost(
+                'voidPenalty',
+                {
+                  penaltyId:
+                    b.dataset
+                      .voidpen
+                }
+              );
+
+            if (r?.ok) {
+              await loadCurrent({
+                quiet: true
+              });
+
+              toast(
+                'Penalty voided'
+              );
+
+              render();
+            } else {
+              toast(
+                r?.error ||
+                'Failed'
+              );
+            }
+          }
+    );
 }
 
 
@@ -4923,94 +5583,107 @@ function renderPlanning() {
    INCOME
 ========================================================= */
 
+function incomeRow(
+  label,
+  value,
+  cls = ''
+) {
+  return `
+    <div
+      class="row"
+      style="padding:9px 0"
+    >
+      <span class="muted">
+        ${esc(label)}
+      </span>
+
+      <strong class="${cls}">
+        ${money(value)}
+      </strong>
+    </div>
+  `;
+}
+
 function renderIncome() {
-
-  const id =
-    uid();
-
-
-  const inc =
-    incomeCalc(id);
-
-
-  const p =
-    incomePlan(id);
-
+  const x =
+    current
+      ?.incomeSummary ||
+    {};
 
   $('#mainContent')
     .innerHTML = `
-
       ${monthBar()}
 
-
-      <div class="hero">
-
+      <section class="hero">
         <p class="eyebrow">
-          PROJECTED INCOME
+          FINAL MONTHLY INCOME
         </p>
 
         <div class="salary-total">
-          ${money(inc.total)}
+          ${money(
+            x.finalIncome
+          )}
         </div>
 
-      </div>
-
+        <p class="muted">
+          Automatically calculated
+          from sales,
+          incentive and penalty.
+        </p>
+      </section>
 
       <div
         class="card"
         style="margin-top:12px"
       >
-
         ${incomeRow(
           'Basic Salary',
-          inc.basic
+          x.baseSalary
         )}
 
         ${incomeRow(
           'Fuel / Oil',
-          inc.fuel
+          x.fuel
         )}
 
         ${incomeRow(
           'House Rent',
-          inc.rent
+          x.houseRent
         )}
 
         ${incomeRow(
           'Food Allowance',
-          inc.food
+          x.food
         )}
 
         ${incomeRow(
           'Sales Commission',
-          inc.comm
+          x.salesCommission
         )}
 
         ${incomeRow(
           'Zero Sales Incentive',
-          inc.zero
+          x.zeroSalesIncentive,
+          'good'
         )}
 
         ${incomeRow(
           'Product Incentive',
-          inc.product
-        )}
-
-        ${incomeRow(
-          'Growth Incentive',
-          inc.growth
-        )}
-
-        ${incomeRow(
-          'Manager Incentive',
-          inc.manager
+          x.productIncentive,
+          'good'
         )}
 
         ${incomeRow(
           'Other Incentive',
-          inc.other
+          x.otherIncentive,
+          'good'
         )}
 
+        ${incomeRow(
+          'Individual Incentive',
+          x.individualIncentive,
+          'good'
+        )}
 
         <hr
           style="
@@ -5019,994 +5692,52 @@ function renderIncome() {
           "
         >
 
+        ${incomeRow(
+          'TOTAL INCENTIVE',
+          x.totalIncentive,
+          'good'
+        )}
 
         ${incomeRow(
-          'TOTAL PROJECTED',
-          inc.total,
-          true
+          'PENALTY',
+          -n(
+            x.penalty
+          ),
+          'bad'
         )}
 
-      </div>
-
-
-      <div
-        class="card"
-        style="margin-top:12px"
-      >
-
-        <form
-          id="incomeForm"
-          class="stack"
+        <hr
+          style="
+            border:0;
+            border-top:1px solid var(--line)
+          "
         >
 
-          <label>
-
-            Expected Total Income (RM)
-
-            <input
-              name="expected"
-              type="number"
-              value="${p.expected}"
-            >
-
-          </label>
-
-
-          <label>
-
-            Growth Incentive Actual (RM)
-
-            <input
-              name="growthActual"
-              type="number"
-              value="${p.growthActual}"
-            >
-
-          </label>
-
-
-          <label>
-
-            Manual Product Incentive (RM)
-
-            <input
-              name="productManual"
-              type="number"
-              value="${p.productManual}"
-            >
-
-          </label>
-
-
-          <label>
-
-            Manager Incentive Actual (RM)
-
-            <input
-              name="managerActual"
-              type="number"
-              value="${p.managerActual}"
-            >
-
-          </label>
-
-
-          <label>
-
-            Other Incentive Actual (RM)
-
-            <input
-              name="otherActual"
-              type="number"
-              value="${p.otherActual}"
-            >
-
-          </label>
-
-
-          <button
-            class="btn primary"
-          >
-            SAVE INCOME DETAILS
-          </button>
-
-        </form>
-
+        ${incomeRow(
+          'FINAL SALARY / INCOME',
+          x.finalIncome
+        )}
       </div>
-    `;
-
-
-  bindCommon();
-
-
-  $('#incomeForm')
-    .onsubmit =
-      async e => {
-
-        e.preventDefault();
-
-
-        const fd =
-          new FormData(
-            e.target
-          );
-
-
-        const rec = {
-          staffId:
-            id,
-
-          month:
-            selectedMonth,
-
-          expected:
-            n(
-              fd.get(
-                'expected'
-              )
-            ),
-
-          growthActual:
-            n(
-              fd.get(
-                'growthActual'
-              )
-            ),
-
-          productManual:
-            n(
-              fd.get(
-                'productManual'
-              )
-            ),
-
-          managerActual:
-            n(
-              fd.get(
-                'managerActual'
-              )
-            ),
-
-          otherActual:
-            n(
-              fd.get(
-                'otherActual'
-              )
-            )
-        };
-
-
-        const s =
-          state();
-
-
-        s.incomePlans =
-          s.incomePlans
-            .filter(
-              x =>
-                !(
-                  x.staffId ===
-                    id &&
-                  x.month ===
-                    selectedMonth
-                )
-            );
-
-
-        s.incomePlans
-          .push(rec);
-
-
-        save(s);
-
-
-        await pushCloud(
-          'saveIncome',
-          {
-            month:
-              selectedMonth,
-
-            expected:
-              rec.expected,
-
-            growth:
-              rec.growthActual,
-
-            product:
-              rec.productManual,
-
-            manager:
-              rec.managerActual,
-
-            other:
-              rec.otherActual
-          }
-        );
-
-
-        toast(
-          'Income details saved'
-        );
-
-
-        render();
-      };
-}
-
-
-/* =========================================================
-   SUMMARY — MONTH / SPECIFIC DAY
-========================================================= */
-
-function renderSummary() {
-
-  const id =
-    uid();
-
-
-  const m =
-    metric(id);
-
-
-  const inc =
-    incomeCalc(id);
-
-
-  const dayMode =
-    summaryMode ===
-      'day';
-
-
-  const daily =
-    dayMode
-
-      ? monthDaily(id)
-          .filter(
-            x =>
-              x.date ===
-              selectedDay
-          )
-
-      : monthDaily(id);
-
-
-  const os =
-    dayMode
-
-      ? monthOutletSales(id)
-          .filter(
-            x =>
-              x.date ===
-              selectedDay
-          )
-
-      : monthOutletSales(id);
-
-
-  const ss =
-    dayMode
-
-      ? monthSkuSales(id)
-          .filter(
-            x =>
-              x.date ===
-              selectedDay
-          )
-
-      : monthSkuSales(id);
-
-
-  const show =
-    dayMode
-
-      ? daily.reduce(
-          (
-            a,
-            x
-          ) =>
-            a +
-            n(
-              x.todaySales
-            ),
-          0
-        )
-
-      : m.ach;
-
-
-  $('#mainContent')
-    .innerHTML = `
-
-      ${monthBar()}
-
 
       <div
-        class="card"
-        style="margin-bottom:12px"
+        class="mini-grid"
+        style="margin-top:12px"
       >
-
-        <div class="form-grid">
-
-          <label>
-
-            View Mode
-
-            <select
-              id="summaryMode"
-            >
-
-              <option
-                value="month"
-                ${
-                  summaryMode ===
-                    'month'
-                    ? 'selected'
-                    : ''
-                }
-              >
-                Whole Month
-              </option>
-
-              <option
-                value="day"
-                ${
-                  summaryMode ===
-                    'day'
-                    ? 'selected'
-                    : ''
-                }
-              >
-                Specific Day
-              </option>
-
-            </select>
-
-          </label>
-
-
-          <label>
-
-            Date
-
-            <input
-              id="summaryDay"
-              type="date"
-              value="${selectedDay}"
-              ${
-                summaryMode ===
-                  'month'
-                  ? 'disabled'
-                  : ''
-              }
-            >
-
-          </label>
-
-        </div>
-
-      </div>
-
-
-      <div class="hero">
-
-        <p class="eyebrow">
-          ${
-            dayMode
-              ? 'DAILY DATABASE'
-              : 'COMPLETE MONTHLY SUMMARY'
-          }
-        </p>
-
-        <h3>
-          ${esc(user(id)?.name || id)}
-        </h3>
-
-        <p class="muted">
-
-          ${
-            dayMode
-              ? dateLabel(selectedDay)
-              : monthName(selectedMonth)
-          }
-
-        </p>
-
-
         <button
-          id="summarySync"
           class="btn secondary"
-          style="margin-top:10px"
+          data-go="incentives"
         >
-          ↻ REFRESH LIVE DATA
+          🏆 INCENTIVE DETAILS
         </button>
 
-      </div>
-
-
-      <div class="grid kpi-grid">
-
-        ${kpi(
-          dayMode
-            ? 'DAY SALES'
-            : 'TOTAL SALES',
-          money(show),
-          dayMode
-            ? 'Selected date'
-            : 'MTD'
-        )}
-
-        ${kpi(
-          'MONTH TARGET',
-          money(m.target),
-          monthName(selectedMonth)
-        )}
-
-        ${kpi(
-          'MONTH ACHIEVEMENT',
-          money(m.ach),
-          `${
-            (
-              m.target
-                ? m.ach /
-                  m.target *
-                  100
-                : 0
-            ).toFixed(1)
-          }%`
-        )}
-
-        ${kpi(
-          'SHORTFALL',
-          money(m.short),
-          'Remaining',
-          m.short
-            ? 'bad'
-            : 'good'
-        )}
-
-        ${kpi(
-          'COVERAGE',
-          `${m.coverage.toFixed(0)}%`,
-          `${m.covered.length}/${m.routeOutlets.length}`
-        )}
-
-        ${kpi(
-          'PROJECTED SALARY',
-          money(inc.total),
-          'Current'
-        )}
-
-      </div>
-
-
-      ${summaryTable(
-        'Daily Sales',
-        [
-          'Date',
-          'Sales',
-          'Last Month',
-          'Active',
-          'Prepare Trip',
-          'Order'
-        ],
-        daily.map(
-          x => [
-            x.date,
-            money(
-              x.todaySales
-            ),
-            money(
-              x.lastMonthSameDay
-            ),
-            money(
-              x.active
-            ),
-            money(
-              x.prepareTrip
-            ),
-            money(
-              x.orderAmount
-            )
-          ]
-        )
-      )}
-
-
-      ${summaryTable(
-        'Outlet Sales',
-        [
-          'Date',
-          'Outlet',
-          'Sales',
-          'Note'
-        ],
-        os.map(
-          x => [
-            x.date,
-            x.outletName,
-            money(
-              x.sales
-            ),
-            x.note ||
-            ''
-          ]
-        )
-      )}
-
-
-      ${summaryTable(
-        'SKU Sales',
-        [
-          'Date',
-          'Outlet',
-          'SKU',
-          'Cartons',
-          'Value'
-        ],
-        ss.map(
-          x => [
-            x.date,
-            x.outletName,
-            x.skuName,
-            String(
-              x.cartons
-            ),
-            money(
-              x.salesValue
-            )
-          ]
-        )
-      )}
-
-
-      <div
-        class="card"
-        style="margin-top:12px"
-      >
-
         <button
-          id="xlsx"
-          class="btn primary"
-        >
-          DOWNLOAD REAL EXCEL (.xlsx)
-        </button>
-
-      </div>
-    `;
-
-
-  bindCommon();
-
-
-  $('#summaryMode')
-    .onchange =
-      e => {
-
-        summaryMode =
-          e.target.value;
-
-        render();
-      };
-
-
-  $('#summaryDay')
-    .onchange =
-      e => {
-
-        selectedDay =
-          e.target.value ||
-          localDate();
-
-        selectedMonth =
-          selectedDay.slice(
-            0,
-            7
-          );
-
-        render();
-      };
-
-
-  $('#summarySync')
-    .onclick =
-      async () => {
-
-        await syncCurrent(
-          true
-        );
-
-        render();
-      };
-
-
-  $('#xlsx')
-    .onclick =
-      () =>
-        exportXlsx(id);
-}
-
-
-/* =========================================================
-   OUTLET / ZERO SALES REPORT
-========================================================= */
-
-function renderZero() {
-
-  const id =
-    uid();
-
-
-  const m =
-    metric(id);
-
-
-  const rows =
-    m.routeOutlets
-      .map(
-        o => ({
-          o,
-
-          day:
-            outletDaySales(
-              id,
-              o.name,
-              selectedDay
-            ),
-
-          mtd:
-            outletAch(
-              id,
-              o.name
-            ),
-
-          target:
-            outletMonthTarget(
-              id,
-              o.name
-            )
-        })
-      );
-
-
-  $('#mainContent')
-    .innerHTML = `
-
-      ${monthBar()}
-
-
-      <div
-        class="card"
-        style="margin-bottom:12px"
-      >
-
-        <label>
-
-          Report Date
-
-          <input
-            id="zeroDate"
-            type="date"
-            value="${selectedDay}"
-          >
-
-        </label>
-
-      </div>
-
-
-      <div class="hero">
-
-        <p class="eyebrow">
-          OUTLET SALES / ZERO SALES REPORT
-        </p>
-
-        <h3>
-          ${dateLabel(selectedDay)}
-        </h3>
-
-        <p class="muted">
-
-          Every route outlet stays visible
-          with daily sale,
-          MTD sale and monthly outlet target.
-
-        </p>
-
-
-        <button
-          id="zeroSync"
           class="btn secondary"
-          style="margin-top:10px"
+          data-go="penalties"
         >
-          ↻ REFRESH LIVE DATA
+          − PENALTY HISTORY
         </button>
-
-      </div>
-
-
-      <div
-        class="list"
-        style="margin-top:12px"
-      >
-
-        ${
-          rows
-            .map(
-              x => `
-
-                <div class="list-item">
-
-                  <div class="row">
-
-                    <div>
-
-                      <h4>
-                        ${esc(x.o.name)}
-                      </h4>
-
-                      <p>
-
-                        ${esc(
-                          x.o.category ||
-                          'Other'
-                        )}
-
-                        •
-
-                        ${esc(
-                          x.o.code ||
-                          'No code'
-                        )}
-
-                      </p>
-
-
-                      <p
-                        style="margin-top:6px"
-                      >
-
-                        <strong
-                          style="color:#fff"
-                        >
-                          Today
-                          ${money(x.day)}
-                        </strong>
-
-                        •
-
-                        MTD
-                        ${money(x.mtd)}
-
-                        •
-
-                        Target
-                        ${
-                          x.target
-                            ? money(x.target)
-                            : 'Not set'
-                        }
-
-                      </p>
-
-                    </div>
-
-
-                    <span
-                      class="
-                        pill
-                        ${
-                          x.day > 0
-                            ? 'green'
-                            : 'red'
-                        }
-                      "
-                    >
-                      ${
-                        x.day > 0
-                          ? 'SALE'
-                          : 'ZERO'
-                      }
-                    </span>
-
-                  </div>
-
-                </div>
-              `
-            )
-            .join('')
-        }
-
       </div>
     `;
-
-
-  bindCommon();
-
-
-  $('#zeroDate')
-    .onchange =
-      e => {
-
-        selectedDay =
-          e.target.value ||
-          localDate();
-
-        selectedMonth =
-          selectedDay.slice(
-            0,
-            7
-          );
-
-        render();
-      };
-
-
-  $('#zeroSync')
-    .onclick =
-      async () => {
-
-        await syncCurrent(
-          true
-        );
-
-        render();
-      };
-}
-
-
-/* =========================================================
-   SKU PERFORMANCE
-========================================================= */
-
-function renderSku() {
-
-  const id =
-    uid();
-
-
-  const plans =
-    monthPlans(id);
-
-
-  $('#mainContent')
-    .innerHTML = `
-
-      ${monthBar()}
-
-
-      <div class="card">
-
-        <h2>
-          SKU Target vs Actual
-        </h2>
-
-      </div>
-
-
-      <div
-        class="list"
-        style="margin-top:12px"
-      >
-
-        ${
-          plans.length
-
-            ? plans
-                .map(
-                  p => `
-
-                    <div class="card">
-
-                      <h3>
-                        ${esc(p.outletName)}
-                      </h3>
-
-
-                      ${
-                        (
-                          p.targetSkus ||
-                          []
-                        )
-                        .map(
-                          sku => {
-
-                            const t =
-                              p.skuTargets?.[
-                                sku
-                              ] ||
-                              {};
-
-
-                            const a =
-                              skuAch(
-                                id,
-                                p.outletName,
-                                sku
-                              );
-
-
-                            const left =
-                              Math.max(
-                                0,
-                                n(
-                                  t.cartons
-                                ) -
-                                a.cartons
-                              );
-
-
-                            return `
-
-                              <div class="list-item">
-
-                                <div class="row">
-
-                                  <div>
-
-                                    <h4>
-                                      ${esc(sku)}
-                                    </h4>
-
-                                    <p>
-
-                                      ${a.cartons}
-                                      /
-                                      ${n(t.cartons)}
-                                      CTN
-
-                                      •
-
-                                      ${money(a.value)}
-                                      /
-                                      ${money(t.value)}
-
-                                    </p>
-
-                                  </div>
-
-
-                                  <span
-                                    class="
-                                      pill
-                                      ${
-                                        left
-                                          ? 'red'
-                                          : 'green'
-                                      }
-                                    "
-                                  >
-                                    ${
-                                      left
-                                        ? left +
-                                          ' LEFT'
-                                        : 'DONE'
-                                    }
-                                  </span>
-
-                                </div>
-
-                              </div>
-                            `;
-                          }
-                        )
-                        .join('')
-                      }
-
-                    </div>
-                  `
-                )
-                .join('')
-
-            : `
-                <div class="empty">
-                  No SKU plan this month.
-                </div>
-              `
-        }
-
-      </div>
-    `;
-
 
   bindCommon();
 }
@@ -6016,717 +5747,727 @@ function renderSku() {
    TASKS
 ========================================================= */
 
-function managerTaskBox(id) {
-
-  return `
-    <div
-      class="card"
-      style="margin-top:12px"
-    >
-
-      <p class="eyebrow">
-        MANAGER TASK
-      </p>
-
-
-      <form
-        id="managerTaskForm"
-        class="stack"
-      >
-
-        <label>
-
-          Task Title
-
-          <input
-            name="title"
-            required
-          >
-
-        </label>
-
-
-        <label>
-
-          Instruction
-
-          <textarea
-            name="note"
-            required
-          ></textarea>
-
-        </label>
-
-
-        <label>
-
-          Due Date
-
-          <input
-            name="due"
-            type="date"
-          >
-
-        </label>
-
-
-        <button
-          class="btn primary"
-        >
-          SEND TASK
-        </button>
-
-      </form>
-
-    </div>
-  `;
-}
-
-
 function renderTasks() {
-
-  const id =
-    uid();
-
-
   const tasks =
-    state()
-      .tasks
-      .filter(
-        t =>
-          t.staffId ===
-          id
-      )
-      .slice()
-      .sort(
-        (
-          a,
-          b
-        ) =>
+    (
+      current?.tasks ||
+      []
+    )
+    .slice()
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        String(
+          b[
+            'Created At'
+          ] ||
+          ''
+        )
+        .localeCompare(
           String(
-            b.createdAt
-          ).localeCompare(
-            String(
-              a.createdAt
-            )
+            a[
+              'Created At'
+            ] ||
+            ''
           )
-      );
+        )
+    );
 
+  const form =
+    isManagerMode()
+      ? `
+          <div class="card">
+            <p class="eyebrow">
+              MANAGER TASK
+            </p>
+
+            <form
+              id="taskForm"
+              class="stack"
+            >
+              <label>
+                Assign To
+
+                <select name="staffId">
+                  ${
+                    teamUsers()
+                      .map(
+                        u => `
+                          <option
+                            value="${u.id}"
+                            ${
+                              u.id ===
+                                managerView
+                                ? 'selected'
+                                : ''
+                            }
+                          >
+                            ${esc(u.name)}
+                            •
+                            ${u.id}
+                          </option>
+                        `
+                      )
+                      .join('')
+                  }
+                </select>
+              </label>
+
+              <label>
+                Task Title
+
+                <input
+                  name="title"
+                  required
+                >
+              </label>
+
+              <label>
+                Instruction
+
+                <textarea
+                  name="instruction"
+                  required
+                ></textarea>
+              </label>
+
+              <label>
+                Due Date
+
+                <input
+                  name="due"
+                  type="date"
+                >
+              </label>
+
+              <button class="btn primary">
+                SEND TASK
+              </button>
+            </form>
+          </div>
+        `
+      : '';
 
   $('#mainContent')
     .innerHTML = `
-
       ${monthBar()}
 
+      ${form}
 
-      <div class="card">
-
-        <h2>
-          ${
-            session.mode ===
-              'manager'
-              ? 'Selected SR Tasks'
-              : 'My Tasks'
-          }
-        </h2>
-
+      <div class="section-title">
+        <h3>
+          Complete Task History
+        </h3>
       </div>
 
-
-      <div
-        class="list"
-        style="margin-top:12px"
-      >
-
+      <div class="list">
         ${
           tasks.length
-
             ? tasks
                 .map(
                   t => `
-
                     <div class="list-item">
-
                       <div class="row">
-
                         <div>
-
                           <h4>
-                            ${esc(t.title)}
+                            ${esc(
+                              t.Title ||
+                              ''
+                            )}
                           </h4>
 
                           <p>
+                            ${esc(
+                              t.Instruction ||
+                              ''
+                            )}
 
-                            ${esc(t.note || '')}
+                            <br>
+
+                            Created:
+                            ${esc(
+                              String(
+                                t[
+                                  'Created At'
+                                ] ||
+                                ''
+                              )
+                            )}
 
                             ${
-                              t.due
-                                ? '<br>Due ' +
-                                  esc(t.due)
+                              t[
+                                'Due Date'
+                              ]
+                                ? ' • Due: ' +
+                                  dateLabel(
+                                    t[
+                                      'Due Date'
+                                    ]
+                                  )
                                 : ''
                             }
 
+                            ${
+                              t[
+                                'Completed At'
+                              ]
+                                ? '<br>Completed: ' +
+                                  esc(
+                                    String(
+                                      t[
+                                        'Completed At'
+                                      ]
+                                    )
+                                  )
+                                : ''
+                            }
                           </p>
-
                         </div>
-
 
                         <span
                           class="
                             pill
                             ${
-                              t.done
+                              taskDone(t)
                                 ? 'green'
                                 : 'red'
                             }
                           "
                         >
                           ${
-                            t.done
+                            taskDone(t)
                               ? 'DONE'
                               : 'PENDING'
                           }
                         </span>
-
                       </div>
 
-
                       ${
-                        session.mode !==
-                          'manager' &&
-                        !t.done
-
+                        !isManagerMode() &&
+                        !taskDone(t)
                           ? `
                               <button
                                 class="btn secondary"
-                                data-done="${esc(t.id)}"
+                                data-taskdone="${esc(
+                                  t[
+                                    'Task ID'
+                                  ]
+                                )}"
+                                data-tasktitle="${esc(
+                                  t.Title ||
+                                  ''
+                                )}"
                                 style="margin-top:8px"
                               >
                                 MARK COMPLETE
                               </button>
                             `
-
                           : ''
                       }
-
                     </div>
                   `
                 )
                 .join('')
-
-            : `
-                <div class="empty">
-                  No task assigned.
-                </div>
-              `
+            : empty(
+                'No task history yet.'
+              )
         }
-
       </div>
-
-
-      ${
-        session.mode ===
-          'manager'
-
-          ? managerTaskBox(id)
-
-          : ''
-      }
     `;
-
 
   bindCommon();
 
-
   if (
-    $('#managerTaskForm')
+    $('#taskForm')
   ) {
-
-    $('#managerTaskForm')
+    $('#taskForm')
       .onsubmit =
         async e => {
-
           e.preventDefault();
-
 
           const fd =
             new FormData(
               e.target
             );
 
-
-          const rec = {
-            id:
-              idGen(),
-
-            staffId:
-              id,
-
-            title:
-              String(
-                fd.get(
-                  'title'
-                )
-              ),
-
-            note:
-              String(
-                fd.get(
-                  'note'
-                )
-              ),
-
-            due:
-              String(
-                fd.get(
-                  'due'
-                ) || ''
-              ),
-
-            done:
-              false,
-
-            createdAt:
-              new Date()
-                .toISOString()
-          };
-
-
-          const s =
-            state();
-
-
-          s.tasks
-            .push(rec);
-
-
-          save(s);
-
-
-          const r =
-            await pushCloud(
-              'saveTask',
-              {
-                taskId:
-                  rec.id,
-
-                staffId:
-                  id,
-
-                title:
-                  rec.title,
-
-                instruction:
-                  rec.note,
-
-                due:
-                  rec.due
-              }
-            );
-
-
-          toast(
-            r?.ok
-              ? 'Task sent'
-              : 'Saved locally • cloud failed'
+          setBusy(
+            true,
+            'Sending task…'
           );
 
+          try {
+            const r =
+              await apiPost(
+                'saveTask',
+                {
+                  staffId:
+                    String(
+                      fd.get(
+                        'staffId'
+                      )
+                    ),
 
-          render();
+                  title:
+                    String(
+                      fd.get(
+                        'title'
+                      )
+                    ),
+
+                  instruction:
+                    String(
+                      fd.get(
+                        'instruction'
+                      )
+                    ),
+
+                  due:
+                    String(
+                      fd.get(
+                        'due'
+                      ) ||
+                      ''
+                    )
+                }
+              );
+
+            if (!r?.ok) {
+              throw new Error(
+                r?.error ||
+                'Task failed'
+              );
+            }
+
+            managerView =
+              String(
+                fd.get(
+                  'staffId'
+                )
+              );
+
+            await loadCurrent({
+              quiet: true
+            });
+
+            toast(
+              'Task sent'
+            );
+
+            render();
+
+          } catch (err) {
+            toast(
+              err.message,
+              3500
+            );
+
+          } finally {
+            setBusy(false);
+          }
         };
   }
 
-
-  $$('[data-done]')
+  $$('[data-taskdone]')
     .forEach(
       b =>
         b.onclick =
           async () => {
-
-            const s =
-              state();
-
-
-            const t =
-              s.tasks
-                .find(
-                  x =>
-                    x.id ===
-                    b.dataset.done
-                );
-
-
-            if (t) {
-
-              t.done =
-                true;
-            }
-
-
-            save(s);
-
-
-            if (t) {
-
-              await pushCloud(
-                'completeTask',
-                {
-                  taskId:
-                    t.id,
-
-                  staffId:
-                    id,
-
-                  title:
-                    t.title
-                }
-              );
-            }
-
-
-            toast(
-              'Task completed'
+            setBusy(
+              true,
+              'Completing task…'
             );
 
+            try {
+              const r =
+                await apiPost(
+                  'completeTask',
+                  {
+                    taskId:
+                      b.dataset
+                        .taskdone,
 
-            render();
+                    title:
+                      b.dataset
+                        .tasktitle
+                  }
+                );
+
+              if (!r?.ok) {
+                throw new Error(
+                  r?.error ||
+                  'Failed'
+                );
+              }
+
+              await loadCurrent({
+                quiet: true
+              });
+
+              toast(
+                'Task completed'
+              );
+
+              render();
+
+            } catch (err) {
+              toast(
+                err.message,
+                3500
+              );
+
+            } finally {
+              setBusy(false);
+            }
           }
     );
 }
 
 
 /* =========================================================
-   MANAGER TEAM
+   OPPORTUNITY ENGINE
 ========================================================= */
 
-function renderTeam() {
-
-  if (
-    session.mode !==
-      'manager'
-  ) {
-
-    page =
-      'dashboard';
-
-    render();
-
-    return;
-  }
-
+function renderOpportunity() {
+  const data =
+    current
+      ?.opportunity ||
+    [];
 
   $('#mainContent')
     .innerHTML = `
-
       ${monthBar()}
 
-
-      <div class="card manager-banner">
-
+      <section class="hero">
         <p class="eyebrow">
-          MANAGER LIVE DATABASE
+          OPPORTUNITY ENGINE
         </p>
 
-        <h2>
-          Team Control Center
-        </h2>
+        <h3>
+          Where should I push next?
+        </h3>
 
         <p class="muted">
-
-          Each SR has a separate database.
-
-          Last sync:
-          ${esc(lastCloudSyncAt || 'not yet')}
-
+          Priority is calculated
+          from incentive SKU sales
+          by outlet.
         </p>
-
-
-        <button
-          id="syncTeam"
-          class="btn primary"
-        >
-          ↻ SYNC ALL TEAM NOW
-        </button>
-
-      </div>
-
+      </section>
 
       <div
         class="list"
         style="margin-top:12px"
       >
-
         ${
-          salesUsers()
-            .map(
-              u => {
+          data.length
+            ? data
+                .map(
+                  i => `
+                    <div class="card">
+                      <div class="row">
+                        <div>
+                          <h3>
+                            ${esc(
+                              i.name
+                            )}
+                          </h3>
 
-                const m =
-                  metric(
-                    u.id
-                  );
+                          <p class="muted">
+                            ${esc(
+                              i.skuName
+                            )}
+                            •
+                            ${n(i.actual)}
+                            /
+                            ${n(i.target)}
+                            CTN
+                            •
+                            ${n(i.remaining)}
+                            remaining
+                          </p>
+                        </div>
 
-
-                const pct =
-                  m.target
-                    ? m.ach /
-                      m.target *
-                      100
-                    : 0;
-
-
-                const today =
-                  monthDaily(
-                    u.id
-                  )
-                  .filter(
-                    x =>
-                      x.date ===
-                      localDate()
-                  )
-                  .reduce(
-                    (
-                      a,
-                      x
-                    ) =>
-                      a +
-                      n(
-                        x.todaySales
-                      ),
-                    0
-                  );
-
-
-                return `
-
-                  <div class="card">
-
-                    <div class="row">
-
-                      <div>
-
-                        <h3>
-                          ${esc(u.name)}
-                        </h3>
-
-                        <p class="muted">
-
-                          ${u.id}
-
-                          •
-
-                          ${money(m.ach)}
-                          /
-                          ${money(m.target)}
-
-                        </p>
-
+                        <strong>
+                          ${money(
+                            i.rewardRM
+                          )}
+                        </strong>
                       </div>
 
+                      ${progressBar(
+                        i.target
+                          ? i.actual /
+                            i.target *
+                            100
+                          : 0
+                      )}
 
-                      <span
-                        class="
-                          pill
-                          ${
-                            pct >= 100
-                              ? 'green'
-                              : pct >= 80
-                                  ? 'orange'
-                                  : 'red'
-                          }
-                        "
+                      <div
+                        class="list"
+                        style="margin-top:12px"
                       >
-                        ${pct.toFixed(0)}%
-                      </span>
+                        ${
+                          (
+                            i.outlets ||
+                            []
+                          )
+                          .slice(
+                            0,
+                            50
+                          )
+                          .map(
+                            o => `
+                              <div class="list-item">
+                                <div class="row">
+                                  <div>
+                                    <h4>
+                                      ${esc(
+                                        o.outletName
+                                      )}
+                                    </h4>
 
+                                    <p>
+                                      ${n(
+                                        o.cartons
+                                      )}
+                                      CTN
+                                      •
+                                      ${esc(
+                                        o.category ||
+                                        ''
+                                      )}
+                                    </p>
+                                  </div>
+
+                                  <span
+                                    class="
+                                      pill
+                                      ${
+                                        o.status ===
+                                          'HIGH_OPPORTUNITY'
+                                          ? 'red'
+                                          : o.status ===
+                                              'OPPORTUNITY'
+                                            ? 'orange'
+                                            : 'green'
+                                      }
+                                    "
+                                  >
+                                    ${
+                                      o.status ===
+                                        'HIGH_OPPORTUNITY'
+                                        ? '🔴 HIGH'
+                                        : o.status ===
+                                            'OPPORTUNITY'
+                                          ? '🟠 OPPORTUNITY'
+                                          : '🟢 PERFORMING'
+                                    }
+                                  </span>
+                                </div>
+                              </div>
+                            `
+                          )
+                          .join('')
+                        }
+                      </div>
                     </div>
-
-
-                    <div class="mini-grid">
-
-                      <div class="metric-box">
-
-                        <small>
-                          Today
-                        </small>
-
-                        <br>
-
-                        <b>
-                          ${money(today)}
-                        </b>
-
-                      </div>
-
-
-                      <div class="metric-box">
-
-                        <small>
-                          MTD
-                        </small>
-
-                        <br>
-
-                        <b>
-                          ${money(m.ach)}
-                        </b>
-
-                      </div>
-
-
-                      <div class="metric-box">
-
-                        <small>
-                          Shortfall
-                        </small>
-
-                        <br>
-
-                        <b>
-                          ${money(m.short)}
-                        </b>
-
-                      </div>
-
-
-                      <div class="metric-box">
-
-                        <small>
-                          Coverage
-                        </small>
-
-                        <br>
-
-                        <b>
-                          ${m.coverage.toFixed(0)}%
-                        </b>
-
-                      </div>
-
-                    </div>
-
-
-                    <button
-                      class="btn secondary"
-                      data-open="${u.id}"
-                      style="margin-top:10px"
-                    >
-                      OPEN DATABASE
-                    </button>
-
-                  </div>
-                `;
-              }
-            )
-            .join('')
+                  `
+                )
+                .join('')
+            : empty(
+                'Opportunity Engine becomes active when a carton-based SKU incentive is running.'
+              )
         }
-
       </div>
     `;
 
-
   bindCommon();
-
-
-  $('#syncTeam')
-    .onclick =
-      async () => {
-
-        toast(
-          'Syncing all team data...'
-        );
-
-
-        await syncAllTeam();
-
-
-        toast(
-          'Team synced'
-        );
-
-
-        render();
-      };
-
-
-  $$('[data-open]')
-    .forEach(
-      b =>
-        b.onclick =
-          async () => {
-
-            managerView =
-              b.dataset.open;
-
-
-            await syncCloud(
-              managerView,
-              selectedMonth
-            );
-
-
-            page =
-              'summary';
-
-
-            summaryMode =
-              'month';
-
-
-            render();
-          }
-    );
 }
 
 
 /* =========================================================
-   PROPOSAL ORDER FORMS
+   ACTIVITY TIMELINE
 ========================================================= */
 
-async function fetchProposalForms() {
+function renderActivity() {
+  const list =
+    current?.activity ||
+    [];
 
-  try {
+  $('#mainContent')
+    .innerHTML = `
+      ${monthBar()}
 
-    const r =
-      await apiGet(
-        'proposalForms',
-        uid(),
-        selectedMonth
-      );
+      <section class="hero">
+        <p class="eyebrow">
+          PROOF / HISTORY
+        </p>
 
+        <h3>
+          Activity Timeline
+        </h3>
 
-    proposalFormsCache =
-      r?.ok
-        ? (
-            r.data ||
-            []
-          )
-        : [];
+        <p class="muted">
+          Sales, tasks, incentive,
+          penalty and important records
+          with date/time.
+        </p>
+      </section>
 
-  } catch {
+      <div class="notification-list">
+        ${
+          list.length
+            ? list
+                .map(
+                  x => `
+                    <div class="notification-item">
+                      <div class="notification-icon">
+                        ${activityIcon(
+                          x.Type
+                        )}
+                      </div>
 
-    proposalFormsCache =
-      [];
-  }
+                      <div style="flex:1">
+                        <div class="row">
+                          <h4>
+                            ${esc(
+                              x.Title ||
+                              x.Type ||
+                              'Activity'
+                            )}
+                          </h4>
 
+                          ${
+                            n(
+                              x.Amount
+                            )
+                              ? `
+                                  <strong
+                                    class="${
+                                      n(
+                                        x.Amount
+                                      ) < 0
+                                        ? 'bad'
+                                        : 'good'
+                                    }"
+                                  >
+                                    ${
+                                      n(
+                                        x.Amount
+                                      ) < 0
+                                        ? '-'
+                                        : ''
+                                    }
+                                    ${money(
+                                      Math.abs(
+                                        n(
+                                          x.Amount
+                                        )
+                                      )
+                                    )}
+                                  </strong>
+                                `
+                              : ''
+                          }
+                        </div>
 
-  return proposalFormsCache;
+                        <p>
+                          ${esc(
+                            x.Description ||
+                            ''
+                          )}
+
+                          <br>
+
+                          ${esc(
+                            String(
+                              x.Timestamp ||
+                              x.Date ||
+                              ''
+                            )
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  `
+                )
+                .join('')
+            : empty(
+                'No activity record for this month.'
+              )
+        }
+      </div>
+    `;
+
+  bindCommon();
+}
+
+function activityIcon(type) {
+  const t =
+    String(
+      type ||
+      ''
+    ).toUpperCase();
+
+  if (
+    t.includes(
+      'TASK'
+    )
+  ) return '✅';
+
+  if (
+    t.includes(
+      'PENALTY'
+    )
+  ) return '−';
+
+  if (
+    t.includes(
+      'INCENTIVE'
+    )
+  ) return '🏆';
+
+  if (
+    t.includes(
+      'SKU'
+    )
+  ) return '📦';
+
+  if (
+    t.includes(
+      'OUTLET'
+    )
+  ) return '🏪';
+
+  if (
+    t.includes(
+      'SALE'
+    )
+  ) return 'RM';
+
+  if (
+    t.includes(
+      'PROPOSAL'
+    )
+  ) return '▤';
+
+  return '•';
 }
 
 
-function fileToBase64(
-  file
-) {
+/* =========================================================
+   PROPOSAL ORDER FORM
+========================================================= */
 
+function fileToBase64(file) {
   return new Promise(
     (
       resolve,
       reject
     ) => {
-
       const r =
         new FileReader();
-
 
       r.onload =
         () =>
@@ -6740,10 +6481,8 @@ function fileToBase64(
             ''
           );
 
-
       r.onerror =
         reject;
-
 
       r.readAsDataURL(
         file
@@ -6752,28 +6491,227 @@ function fileToBase64(
   );
 }
 
+function base64ToBlob(
+  base64,
+  mime
+) {
+  const bytes =
+    atob(base64);
 
-function renderProposal() {
+  const chunks = [];
 
-  const manager =
-    session.mode ===
-      'manager' ||
-    String(
-      session.role ||
-      ''
-    ).includes(
-      'MANAGER'
+  for (
+    let i = 0;
+    i < bytes.length;
+    i += 1024
+  ) {
+    const slice =
+      bytes.slice(
+        i,
+        i + 1024
+      );
+
+    const arr =
+      new Uint8Array(
+        slice.length
+      );
+
+    for (
+      let j = 0;
+      j < slice.length;
+      j++
+    ) {
+      arr[j] =
+        slice.charCodeAt(j);
+    }
+
+    chunks.push(arr);
+  }
+
+  return new Blob(
+    chunks,
+    {
+      type:
+        mime ||
+        'application/octet-stream'
+    }
+  );
+}
+
+async function downloadCloudFile(
+  action,
+  fileId,
+  preview = false
+) {
+  if (!fileId) {
+    return toast(
+      'File missing'
+    );
+  }
+
+  setBusy(
+    true,
+    'Preparing file…'
+  );
+
+  try {
+    const r =
+      await apiPost(
+        action,
+        {
+          fileId
+        }
+      );
+
+    if (!r?.ok) {
+      throw new Error(
+        r?.error ||
+        'Download failed'
+      );
+    }
+
+    const blob =
+      base64ToBlob(
+        r.base64,
+        r.mimeType
+      );
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+    if (
+      preview &&
+      String(
+        r.mimeType ||
+        ''
+      ).startsWith(
+        'image/'
+      )
+    ) {
+      window.open(
+        url,
+        '_blank',
+        'noopener'
+      );
+
+    } else {
+      const a =
+        document
+          .createElement(
+            'a'
+          );
+
+      a.href =
+        url;
+
+      a.download =
+        r.fileName ||
+        'file';
+
+      document.body
+        .appendChild(a);
+
+      a.click();
+      a.remove();
+    }
+
+    setTimeout(
+      () =>
+        URL.revokeObjectURL(
+          url
+        ),
+      20000
     );
 
+  } catch (e) {
+    toast(
+      e.message,
+      3500
+    );
+
+  } finally {
+    setBusy(false);
+  }
+}
+
+function renderProposal() {
+  const list =
+    current
+      ?.proposalForms ||
+    [];
+
+  const form =
+    isManagerMode()
+      ? `
+          <div class="card">
+            <p class="eyebrow">
+              MANAGER UPLOAD
+            </p>
+
+            <h2>
+              Upload Proposal Order Form
+            </h2>
+
+            <form
+              id="poForm"
+              class="stack"
+            >
+              <label>
+                Title
+
+                <input
+                  name="title"
+                  required
+                >
+              </label>
+
+              <label>
+                File
+                (PDF / Excel / Word / Image,
+                max 6 MB)
+
+                <input
+                  name="file"
+                  type="file"
+                  accept=".pdf,.xlsx,.xls,.doc,.docx,.jpg,.jpeg,.png"
+                  required
+                >
+              </label>
+
+              <label>
+                Note
+
+                <textarea
+                  name="note"
+                ></textarea>
+              </label>
+
+              <button class="btn primary">
+                UPLOAD FORM
+              </button>
+            </form>
+          </div>
+        `
+      : '';
 
   $('#mainContent')
     .innerHTML = `
-
       ${monthBar()}
 
+      ${form}
 
-      <div class="hero">
-
+      <section
+        class="hero"
+        style="
+          margin-top:${
+            form
+              ? '12px'
+              : '0'
+          }
+        "
+      >
         <p class="eyebrow">
           PROPOSAL ORDER FORM
         </p>
@@ -6783,131 +6721,33 @@ function renderProposal() {
         </h3>
 
         <p class="muted">
-
-          Manager uploads once.
-
+          Manager uploads.
           Authorized app users
           can download.
-
         </p>
+      </section>
 
-
-        <button
-          id="refreshForms"
-          class="btn secondary"
-          style="margin-top:10px"
-        >
-          ↻ REFRESH FORMS
-        </button>
-
-      </div>
-
-
-      ${
-        manager
-
-          ? `
-              <div
-                class="card"
-                style="margin-top:12px"
-              >
-
-                <form
-                  id="uploadForm"
-                  class="stack"
-                >
-
-                  <label>
-
-                    Form Title
-
-                    <input
-                      name="title"
-                      required
-                    >
-
-                  </label>
-
-
-                  <label>
-
-                    Select File
-
-                    <input
-                      name="file"
-                      type="file"
-                      required
-                      accept=".pdf,.xlsx,.xls,.doc,.docx,.jpg,.jpeg,.png"
-                    >
-
-                  </label>
-
-
-                  <label>
-
-                    Note
-
-                    <textarea
-                      name="note"
-                    ></textarea>
-
-                  </label>
-
-
-                  <button
-                    class="btn primary"
-                  >
-                    UPLOAD PROPOSAL FORM
-                  </button>
-
-
-                  <p class="help-note">
-                    Keep file under 8 MB.
-                  </p>
-
-                </form>
-
-              </div>
-            `
-
-          : ''
-      }
-
-
-      <div class="section-title">
-
-        <h3>
-          Available Forms
-        </h3>
-
-      </div>
-
-
-      <div class="list">
-
+      <div
+        class="list"
+        style="margin-top:12px"
+      >
         ${
-          proposalFormsCache.length
-
-            ? proposalFormsCache
+          list.length
+            ? list
                 .map(
                   f => `
-
                     <div class="list-item">
-
                       <div class="row">
-
                         <div>
-
                           <h4>
                             ${esc(
                               f.title ||
-                              f.name ||
+                              f.fileName ||
                               'Proposal Form'
                             )}
                           </h4>
 
                           <p>
-
                             ${esc(
                               f.note ||
                               ''
@@ -6915,98 +6755,68 @@ function renderProposal() {
 
                             ${
                               f.uploadedAt
-                                ? '• ' +
+                                ? '<br>' +
                                   esc(
-                                    f.uploadedAt
+                                    String(
+                                      f.uploadedAt
+                                    )
                                   )
                                 : ''
                             }
-
                           </p>
-
                         </div>
-
 
                         <button
                           class="btn secondary"
-                          data-url="${esc(f.url || '')}"
+                          data-podownload="${esc(
+                            f.fileId
+                          )}"
                         >
                           DOWNLOAD
                         </button>
-
                       </div>
-
                     </div>
                   `
                 )
                 .join('')
-
-            : `
-                <div class="empty">
-                  No proposal form uploaded yet.
-                </div>
-              `
+            : empty(
+                'No Proposal Order Form uploaded yet.'
+              )
         }
-
       </div>
     `;
 
-
   bindCommon();
 
-
-  $('#refreshForms')
-    .onclick =
-      async () => {
-
-        await fetchProposalForms();
-
-        render();
-      };
-
-
-  $$('[data-url]')
+  $$('[data-podownload]')
     .forEach(
       b =>
         b.onclick =
-          () => {
-
-            if (
-              b.dataset.url
-            ) {
-
-              window.open(
-                b.dataset.url,
-                '_blank',
-                'noopener'
-              );
-            }
-          }
+          () =>
+            downloadCloudFile(
+              'downloadProposal',
+              b.dataset
+                .podownload
+            )
     );
 
-
   if (
-    $('#uploadForm')
+    $('#poForm')
   ) {
-
-    $('#uploadForm')
+    $('#poForm')
       .onsubmit =
         async e => {
-
           e.preventDefault();
-
 
           const fd =
             new FormData(
               e.target
             );
 
-
           const file =
             fd.get(
               'file'
             );
-
 
           if (
             !(
@@ -7015,116 +6825,1100 @@ function renderProposal() {
             ) ||
             !file.size
           ) {
-
-            toast(
+            return toast(
               'Choose a file'
             );
-
-            return;
           }
-
 
           if (
             file.size >
-            8 *
+            6 *
             1024 *
             1024
           ) {
-
-            toast(
-              'File too large'
+            return toast(
+              'File must be under 6 MB'
             );
-
-            return;
           }
 
-
-          toast(
-            'Uploading...'
+          setBusy(
+            true,
+            'Uploading Proposal Order Form…'
           );
 
+          try {
+            const base64 =
+              await fileToBase64(
+                file
+              );
 
-          const base64 =
-            await fileToBase64(
-              file
-            );
+            const r =
+              await apiPost(
+                'uploadProposal',
+                {
+                  title:
+                    String(
+                      fd.get(
+                        'title'
+                      ) ||
+                      file.name
+                    ),
 
+                  note:
+                    String(
+                      fd.get(
+                        'note'
+                      ) ||
+                      ''
+                    ),
 
-          const r =
-            await apiPost(
-              'uploadProposal',
-              {
-                title:
-                  String(
-                    fd.get(
-                      'title'
-                    ) ||
-                    file.name
-                  ),
+                  fileName:
+                    file.name,
 
-                note:
-                  String(
-                    fd.get(
-                      'note'
-                    ) ||
-                    ''
-                  ),
+                  mimeType:
+                    file.type ||
+                    'application/octet-stream',
 
-                fileName:
-                  file.name,
+                  base64
+                }
+              );
 
-                mimeType:
-                  file.type ||
-                  'application/octet-stream',
+            if (!r?.ok) {
+              throw new Error(
+                r?.error ||
+                'Upload failed'
+              );
+            }
 
-                base64
-              }
-            );
-
-
-          if (
-            r?.ok
-          ) {
+            await loadCurrent({
+              quiet: true
+            });
 
             toast(
-              'Proposal form uploaded'
+              'Proposal Order Form uploaded'
             );
-
-
-            await fetchProposalForms();
-
 
             render();
 
-          } else {
-
+          } catch (err) {
             toast(
-              r?.error ||
-              'Upload failed'
+              err.message,
+              4000
             );
+
+          } finally {
+            setBusy(false);
           }
         };
   }
+}
 
 
+/* =========================================================
+   SUMMARY / DAY FILTER / EXCEL
+========================================================= */
+
+function renderSummary() {
+  const p =
+    current
+      ?.performance ||
+    {};
+
+  const d =
+    selectedDayData();
+
+  const inc =
+    current
+      ?.incomeSummary ||
+    {};
+
+  $('#mainContent')
+    .innerHTML = `
+      ${monthBar()}
+
+      <div
+        class="card"
+        style="margin-bottom:12px"
+      >
+        ${dateFilter(
+          'Specific Day'
+        )}
+      </div>
+
+      <section class="hero">
+        <p class="eyebrow">
+          COMPLETE DATABASE SUMMARY
+        </p>
+
+        <h3>
+          ${esc(
+            viewedName()
+          )}
+        </h3>
+
+        <p class="muted">
+          ${monthName(selectedMonth)}
+          •
+          Day view:
+          ${dateLabel(selectedDate)}
+        </p>
+
+        ${syncStatus()}
+
+        <div class="form-actions">
+          <button
+            id="summaryRefresh"
+            class="btn secondary"
+          >
+            ↻ REFRESH LIVE
+          </button>
+
+          <button
+            id="xlsx"
+            class="btn primary"
+          >
+            DOWNLOAD EXCEL
+          </button>
+        </div>
+      </section>
+
+      <div class="grid kpi-grid">
+        ${kpi(
+          'TARGET',
+          money(
+            p.target
+          ),
+          'Month'
+        )}
+
+        ${kpi(
+          'MTD SALES',
+          money(
+            p.achievement
+          ),
+          pct(
+            p.percent
+          )
+        )}
+
+        ${kpi(
+          'DAY SALES',
+          money(
+            (
+              d.daily ||
+              []
+            )
+            .reduce(
+              (
+                a,
+                x
+              ) =>
+                a +
+                n(
+                  x[
+                    'Today Sales'
+                  ]
+                ),
+              0
+            )
+          ),
+          dateLabel(
+            selectedDate
+          )
+        )}
+
+        ${kpi(
+          'SHORTFALL',
+          money(
+            p.shortfall
+          ),
+          'Remaining'
+        )}
+
+        ${kpi(
+          'COVERAGE',
+          pct(
+            p.coverage
+          ),
+          `${n(p.coveredOutlets)}/${n(p.routeOutlets)}`
+        )}
+
+        ${kpi(
+          'FINAL INCOME',
+          money(
+            inc.finalIncome
+          ),
+          'After penalty'
+        )}
+      </div>
+
+      ${table(
+        'Day-by-Day Sales',
+        [
+          'Date',
+          'Sales',
+          'Last Month',
+          'Active',
+          'PPR',
+          'Order'
+        ],
+        (
+          current?.daily ||
+          []
+        )
+        .map(
+          x => [
+            String(
+              x.Date
+            ).slice(
+              0,
+              10
+            ),
+            money(
+              x[
+                'Today Sales'
+              ]
+            ),
+            money(
+              x[
+                'Last Month Same Day'
+              ]
+            ),
+            money(
+              x.Active
+            ),
+            money(
+              x[
+                'Prepare for Trip'
+              ]
+            ),
+            money(
+              x[
+                'Order Amount'
+              ]
+            )
+          ]
+        )
+      )}
+
+      ${table(
+        'Outlet Sales',
+        [
+          'Date',
+          'Outlet',
+          'Sales',
+          'Note'
+        ],
+        (
+          current
+            ?.outletSales ||
+          []
+        )
+        .map(
+          x => [
+            String(
+              x.Date
+            ).slice(
+              0,
+              10
+            ),
+            x[
+              'Outlet Name'
+            ],
+            money(
+              x[
+                'Sales Value'
+              ]
+            ),
+            x.Note ||
+            ''
+          ]
+        )
+      )}
+
+      ${table(
+        'SKU Sales',
+        [
+          'Date',
+          'Outlet',
+          'SKU',
+          'Cartons',
+          'Value'
+        ],
+        (
+          current
+            ?.skuSales ||
+          []
+        )
+        .map(
+          x => [
+            String(
+              x.Date
+            ).slice(
+              0,
+              10
+            ),
+            x[
+              'Outlet Name'
+            ],
+            x[
+              'SKU Name'
+            ],
+            String(
+              n(
+                x.Cartons
+              )
+            ),
+            money(
+              x[
+                'Sales Value'
+              ]
+            )
+          ]
+        )
+      )}
+
+      ${table(
+        'Selected Day Outlet Sales',
+        [
+          'Outlet',
+          'Sales'
+        ],
+        (
+          d.outletSales ||
+          []
+        )
+        .map(
+          x => [
+            x[
+              'Outlet Name'
+            ],
+            money(
+              x[
+                'Sales Value'
+              ]
+            )
+          ]
+        )
+      )}
+
+      ${table(
+        'Selected Day SKU Sales',
+        [
+          'Outlet',
+          'SKU',
+          'Cartons',
+          'Value'
+        ],
+        (
+          d.skuSales ||
+          []
+        )
+        .map(
+          x => [
+            x[
+              'Outlet Name'
+            ],
+            x[
+              'SKU Name'
+            ],
+            String(
+              n(
+                x.Cartons
+              )
+            ),
+            money(
+              x[
+                'Sales Value'
+              ]
+            )
+          ]
+        )
+      )}
+    `;
+
+  bindCommon();
+
+  $('#summaryRefresh')
+    .onclick =
+      () =>
+        refreshCloud(
+          true
+        );
+
+  $('#xlsx')
+    .onclick =
+      exportXlsx;
+}
+
+async function loadXlsx() {
   if (
-    !proposalFormsCache.length
+    window.XLSX
   ) {
+    return true;
+  }
 
-    fetchProposalForms()
-      .then(
-        () => {
+  return new Promise(
+    resolve => {
+      const s =
+        document
+          .createElement(
+            'script'
+          );
 
-          if (
-            page ===
-            'proposal'
-          ) {
+      s.src =
+        'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+
+      s.onload =
+        () =>
+          resolve(
+            true
+          );
+
+      s.onerror =
+        () =>
+          resolve(
+            false
+          );
+
+      document.head
+        .appendChild(s);
+    }
+  );
+}
+
+async function exportXlsx() {
+  if (
+    !await loadXlsx()
+  ) {
+    return toast(
+      'Excel library unavailable'
+    );
+  }
+
+  const wb =
+    XLSX.utils
+      .book_new();
+
+  const add =
+    (
+      name,
+      rows
+    ) =>
+      XLSX.utils
+        .book_append_sheet(
+          wb,
+          XLSX.utils
+            .json_to_sheet(
+              rows.length
+                ? rows
+                : [
+                    {
+                      Info:
+                        'No data'
+                    }
+                  ]
+            ),
+          name.slice(
+            0,
+            31
+          )
+        );
+
+  add(
+    'Summary',
+    [
+      {
+        Month:
+          selectedMonth,
+
+        Date:
+          selectedDate,
+
+        'Staff ID':
+          viewedId(),
+
+        Salesman:
+          viewedName(),
+
+        Target:
+          current
+            ?.performance
+            ?.target ||
+          0,
+
+        Achievement:
+          current
+            ?.performance
+            ?.achievement ||
+          0,
+
+        Shortfall:
+          current
+            ?.performance
+            ?.shortfall ||
+          0,
+
+        Coverage:
+          current
+            ?.performance
+            ?.coverage ||
+          0,
+
+        'Final Income':
+          current
+            ?.incomeSummary
+            ?.finalIncome ||
+          0
+      }
+    ]
+  );
+
+  add(
+    'Daily',
+    (
+      current?.daily ||
+      []
+    )
+    .map(
+      x => ({
+        Date:
+          x.Date,
+
+        Sales:
+          x[
+            'Today Sales'
+          ],
+
+        'Last Month':
+          x[
+            'Last Month Same Day'
+          ],
+
+        Active:
+          x.Active,
+
+        PPR:
+          x[
+            'Prepare for Trip'
+          ],
+
+        Order:
+          x[
+            'Order Amount'
+          ],
+
+        Note:
+          x.Note
+      })
+    )
+  );
+
+  add(
+    'Outlet Sales',
+    (
+      current
+        ?.outletSales ||
+      []
+    )
+    .map(
+      x => ({
+        Date:
+          x.Date,
+
+        Code:
+          x[
+            'Outlet Code'
+          ],
+
+        Outlet:
+          x[
+            'Outlet Name'
+          ],
+
+        Sales:
+          x[
+            'Sales Value'
+          ],
+
+        Note:
+          x.Note
+      })
+    )
+  );
+
+  add(
+    'SKU Sales',
+    (
+      current
+        ?.skuSales ||
+      []
+    )
+    .map(
+      x => ({
+        Date:
+          x.Date,
+
+        Outlet:
+          x[
+            'Outlet Name'
+          ],
+
+        SKU:
+          x[
+            'SKU Name'
+          ],
+
+        Cartons:
+          x.Cartons,
+
+        Value:
+          x[
+            'Sales Value'
+          ]
+      })
+    )
+  );
+
+  add(
+    'Tasks',
+    (
+      current?.tasks ||
+      []
+    )
+    .map(
+      x => ({
+        'Task ID':
+          x[
+            'Task ID'
+          ],
+
+        Created:
+          x[
+            'Created At'
+          ],
+
+        Due:
+          x[
+            'Due Date'
+          ],
+
+        Title:
+          x.Title,
+
+        Instruction:
+          x.Instruction,
+
+        Status:
+          x.Status,
+
+        Completed:
+          x[
+            'Completed At'
+          ]
+      })
+    )
+  );
+
+  add(
+    'Incentives',
+    (
+      current
+        ?.incentives ||
+      []
+    )
+    .map(
+      x => ({
+        Name:
+          x.name,
+
+        Category:
+          x.category,
+
+        SKU:
+          x.skuName,
+
+        Metric:
+          x.metric,
+
+        Target:
+          x.target,
+
+        Actual:
+          x.actual,
+
+        Remaining:
+          x.remaining,
+
+        Reward:
+          x.rewardRM,
+
+        Earned:
+          x.earnedRM,
+
+        Fulfilled:
+          x.fulfilled
+      })
+    )
+  );
+
+  add(
+    'Penalties',
+    (
+      current
+        ?.penalties ||
+      []
+    )
+    .map(
+      x => ({
+        Date:
+          x.Date,
+
+        Type:
+          x.Type,
+
+        Reason:
+          x.Reason,
+
+        Description:
+          x.Description,
+
+        Amount:
+          x.Amount,
+
+        Status:
+          x.Status
+      })
+    )
+  );
+
+  XLSX.writeFile(
+    wb,
+    `${viewedId()}_${selectedMonth}_Sales_Performance.xlsx`
+  );
+}
+
+
+/* =========================================================
+   MANAGER TEAM / ATTENTION
+========================================================= */
+
+function attentionScore(x) {
+  return (
+    n(
+      x.performance
+        ?.zeroOutlets
+    ) *
+      10 +
+
+    (
+      100 -
+      Math.min(
+        100,
+        n(
+          x.performance
+            ?.percent
+        )
+      )
+    ) +
+
+    n(
+      x.pendingTasks
+    ) *
+      5
+  );
+}
+
+function renderTeam() {
+  if (!isManager()) {
+    page =
+      'dashboard';
+
+    return render();
+  }
+
+  const sorted =
+    teamSnapshot
+      .slice()
+      .sort(
+        (
+          a,
+          b
+        ) =>
+          attentionScore(b) -
+          attentionScore(a)
+      );
+
+  $('#mainContent')
+    .innerHTML = `
+      ${monthBar({
+        showManager: false
+      })}
+
+      <div
+        class="card"
+        style="margin-bottom:12px"
+      >
+        ${dateFilter(
+          'Snapshot Date'
+        )}
+      </div>
+
+      <section class="hero">
+        <p class="eyebrow">
+          MANAGER LIVE DATABASE
+        </p>
+
+        <h3>
+          Team Control Center
+        </h3>
+
+        <p class="muted">
+          Every SR database is separate
+          and loaded from Google Sheets.
+        </p>
+
+        ${syncStatus()}
+
+        <button
+          id="teamRefresh"
+          class="btn primary"
+          style="margin-top:10px"
+        >
+          ↻ SYNC TEAM NOW
+        </button>
+      </section>
+
+      <div class="section-title">
+        <h3>
+          Manager Attention Panel
+        </h3>
+      </div>
+
+      <div class="list">
+        ${
+          sorted.length
+            ? sorted
+                .map(
+                  x => {
+                    const p =
+                      x.performance ||
+                      {};
+
+                    const f =
+                      x.forecast ||
+                      {};
+
+                    return `
+                      <div class="card">
+                        <div class="row">
+                          <div>
+                            <h3 style="margin:0">
+                              ${esc(
+                                x.name
+                              )}
+                            </h3>
+
+                            <p
+                              class="muted"
+                              style="margin:5px 0 0"
+                            >
+                              ${esc(
+                                x.staffId
+                              )}
+                              •
+                              ${money(
+                                p.achievement
+                              )}
+                              /
+                              ${money(
+                                p.target
+                              )}
+                            </p>
+                          </div>
+
+                          <span
+                            class="
+                              pill
+                              ${
+                                p.percent >= 100
+                                  ? 'green'
+                                  : p.percent >= 80
+                                    ? 'orange'
+                                    : 'red'
+                              }
+                            "
+                          >
+                            ${pct(
+                              p.percent
+                            )}
+                          </span>
+                        </div>
+
+                        <div
+                          class="mini-grid"
+                          style="margin-top:10px"
+                        >
+                          <div class="metric-box">
+                            <small>
+                              Today
+                            </small>
+
+                            <br>
+
+                            <b>
+                              ${money(
+                                p.todaySales
+                              )}
+                            </b>
+                          </div>
+
+                          <div class="metric-box">
+                            <small>
+                              Shortfall
+                            </small>
+
+                            <br>
+
+                            <b>
+                              ${money(
+                                p.shortfall
+                              )}
+                            </b>
+                          </div>
+
+                          <div class="metric-box">
+                            <small>
+                              Zero Outlet
+                            </small>
+
+                            <br>
+
+                            <b>
+                              ${n(
+                                p.zeroOutlets
+                              )}
+                            </b>
+                          </div>
+
+                          <div class="metric-box">
+                            <small>
+                              Pending Task
+                            </small>
+
+                            <br>
+
+                            <b>
+                              ${n(
+                                x.pendingTasks
+                              )}
+                            </b>
+                          </div>
+
+                          <div class="metric-box">
+                            <small>
+                              Coverage
+                            </small>
+
+                            <br>
+
+                            <b>
+                              ${pct(
+                                p.coverage
+                              )}
+                            </b>
+                          </div>
+
+                          <div class="metric-box">
+                            <small>
+                              Forecast
+                            </small>
+
+                            <br>
+
+                            <b
+                              class="${
+                                f.onTrack
+                                  ? 'good'
+                                  : 'warn'
+                              }"
+                            >
+                              ${
+                                f.onTrack
+                                  ? 'ON TRACK'
+                                  : 'WATCH'
+                              }
+                            </b>
+                          </div>
+                        </div>
+
+                        <div class="form-actions">
+                          <button
+                            class="btn secondary"
+                            data-openstaff="${esc(
+                              x.staffId
+                            )}"
+                            data-openpage="dashboard"
+                          >
+                            OPEN DASHBOARD
+                          </button>
+
+                          <button
+                            class="btn secondary"
+                            data-openstaff="${esc(
+                              x.staffId
+                            )}"
+                            data-openpage="summary"
+                          >
+                            SEE DATABASE
+                          </button>
+                        </div>
+                      </div>
+                    `;
+                  }
+                )
+                .join('')
+            : empty(
+                'No team data loaded.'
+              )
+        }
+      </div>
+    `;
+
+  bindCommon();
+
+  $('#teamRefresh')
+    .onclick =
+      async () => {
+        await loadTeam();
+
+        render();
+      };
+
+  $$('[data-openstaff]')
+    .forEach(
+      b =>
+        b.onclick =
+          async () => {
+            managerView =
+              b.dataset
+                .openstaff;
+
+            session.managerView =
+              managerView;
+
+            saveSession();
+
+            await loadCurrent();
+
+            page =
+              b.dataset
+                .openpage ||
+              'summary';
 
             render();
           }
-        }
-      );
-  }
+    );
 }
 
 
@@ -7132,239 +7926,195 @@ function renderProposal() {
    NOTIFICATIONS
 ========================================================= */
 
+function updateNotificationBadge() {
+  const badge =
+    $('#notifBadge');
+
+  if (
+    !badge ||
+    !current
+  ) {
+    return;
+  }
+
+  const count =
+    alertsForCurrent()
+      .length;
+
+  badge.textContent =
+    String(count);
+
+  badge.classList
+    .toggle(
+      'hidden',
+      !count
+    );
+}
+
 function renderNotifications() {
-
-  const id =
-    uid();
-
-
-  const m =
-    metric(id);
-
-
-  const pending =
-    state()
-      .tasks
-      .filter(
-        t =>
-          t.staffId ===
-            id &&
-          !t.done
-      );
-
+  const a =
+    alertsForCurrent();
 
   $('#mainContent')
     .innerHTML = `
-
       ${monthBar()}
 
-
-      <div class="hero">
-
+      <section class="hero">
         <p class="eyebrow">
-          NOTIFICATIONS
+          NOTIFICATION CENTER
         </p>
 
         <h3>
-          Alerts & Tasks
+          Tasks, Targets & Incentives
         </h3>
 
+        <p class="muted">
+          Only meaningful alerts
+          are shown.
+        </p>
+      </section>
+
+      <div class="notification-list">
+        ${
+          a.length
+            ? a
+                .map(
+                  x => `
+                    <button
+                      class="notification-item"
+                      data-go="${x.page}"
+                      style="
+                        text-align:left;
+                        width:100%;
+                        color:inherit
+                      "
+                    >
+                      <div class="notification-icon">
+                        ${x.icon}
+                      </div>
+
+                      <div>
+                        <h4>
+                          ${esc(
+                            x.title
+                          )}
+                        </h4>
+
+                        <p>
+                          ${esc(
+                            x.text
+                          )}
+                        </p>
+                      </div>
+                    </button>
+                  `
+                )
+                .join('')
+            : empty(
+                'No active alert.'
+              )
+        }
       </div>
-
-
-      <div
-        class="list"
-        style="margin-top:12px"
-      >
-
-        ${
-          pending
-            .map(
-              t => `
-                <div class="list-item">
-
-                  <h4>
-                    ✅ Manager Task
-                  </h4>
-
-                  <p>
-                    ${esc(t.title)}
-                  </p>
-
-                </div>
-              `
-            )
-            .join('')
-        }
-
-
-        ${
-          m.short > 0
-
-            ? `
-                <div class="list-item">
-
-                  <h4>
-                    🎯 Target Shortfall
-                  </h4>
-
-                  <p>
-                    ${money(m.short)}
-                    remaining
-                  </p>
-
-                </div>
-              `
-
-            : ''
-        }
-
-
-        ${
-          m.zeroSales.length
-
-            ? `
-                <div class="list-item">
-
-                  <h4>
-                    🏪 Zero Sales
-                  </h4>
-
-                  <p>
-
-                    ${m.zeroSales.length}
-                    outlet(s)
-                    still zero this month
-
-                  </p>
-
-                </div>
-              `
-
-            : ''
-        }
-
-      </div>
-
 
       <div
         class="card"
         style="margin-top:12px"
       >
-
         <button
-          id="enableNotif"
+          id="enablePush"
           class="btn primary"
         >
           ENABLE PHONE NOTIFICATIONS
         </button>
 
-
         <button
-          id="testNotif"
+          id="testPush"
           class="btn secondary"
           style="margin-top:8px"
         >
           SEND TEST PUSH
         </button>
-
       </div>
     `;
 
-
   bindCommon();
 
-
-  $('#enableNotif')
+  $('#enablePush')
     .onclick =
       async () => {
-
-        if (
-          oneSignalSdk
-        ) {
-
-          try {
-
+        try {
+          if (oneSignalSdk) {
             await oneSignalSdk
               .Notifications
               .requestPermission();
-
 
             await oneSignalSdk
               .login(
                 session.id
               );
 
-
             toast(
               'Notification permission updated'
             );
 
-          } catch {
-
+          } else if (
+            'Notification'
+            in window
+          ) {
             toast(
-              'Could not enable push'
+              'Permission: ' +
+              await Notification
+                .requestPermission()
+            );
+
+          } else {
+            toast(
+              'Notifications not supported'
             );
           }
 
-        } else if (
-          'Notification'
-          in window
-        ) {
-
-          const p =
-            await Notification
-              .requestPermission();
-
-
+        } catch {
           toast(
-            'Permission: ' +
-            p
-          );
-
-        } else {
-
-          toast(
-            'Notifications not supported'
+            'Could not enable push'
           );
         }
       };
 
-
-  $('#testNotif')
+  $('#testPush')
     .onclick =
       async () => {
+        try {
+          const r =
+            await apiPost(
+              'testPush',
+              {}
+            );
 
-        const r =
-          await apiPost(
-            'testPush',
-            {}
+          toast(
+            r?.result?.ok
+              ? 'Test push sent'
+              : 'Push is not configured yet'
           );
 
-
-        toast(
-          r?.ok
-            ? 'Test push sent'
-            : 'Push is not configured yet'
-        );
+        } catch (e) {
+          toast(
+            e.message
+          );
+        }
       };
 }
 
 
 /* =========================================================
-   SETTINGS / LOGOUT
+   SETTINGS
 ========================================================= */
 
 function renderSettings() {
-
   $('#mainContent')
     .innerHTML = `
-
       ${monthBar()}
 
-
-      <div class="hero">
-
+      <section class="hero">
         <p class="eyebrow">
           SETTINGS
         </p>
@@ -7374,76 +8124,66 @@ function renderSettings() {
         </h3>
 
         <p class="muted">
-
           This phone stays logged in
           until you press Logout.
-
         </p>
 
-      </div>
-
+        ${syncStatus()}
+      </section>
 
       <div
         class="card"
         style="margin-top:12px"
       >
-
         <div class="list-item">
-
           <h4>
             Signed in
           </h4>
 
           <p>
-
-            ${esc(session.name)}
-            •
-
-            ${esc(session.id)}
-            •
-
             ${esc(
-              session.mode
-                .toUpperCase()
+              sessionName()
             )}
-
+            •
+            ${esc(
+              session.id
+            )}
+            •
+            ${esc(
+              String(
+                session.mode
+              ).toUpperCase()
+            )}
           </p>
-
         </div>
-
 
         <div
           class="list-item"
           style="margin-top:8px"
         >
-
           <h4>
-            Cloud
+            Backend
           </h4>
 
           <p>
-
             ${
               backendUrl()
                 ? 'Connected'
-                : 'Not connected'
+                : 'Missing'
             }
 
             •
 
-            Last sync
+            Server
             ${esc(
-              lastCloudSyncAt ||
-              'not yet'
+              current?.version ||
+              '—'
             )}
-
           </p>
-
         </div>
 
-
         <button
-          id="syncNow"
+          id="settingsSync"
           class="btn secondary"
           style="
             margin-top:12px;
@@ -7452,7 +8192,6 @@ function renderSettings() {
         >
           ↻ SYNC LIVE DATA NOW
         </button>
-
 
         <button
           id="realLogout"
@@ -7464,9 +8203,7 @@ function renderSettings() {
         >
           LOG OUT
         </button>
-
       </div>
-
 
       <div
         class="card"
@@ -7475,12 +8212,10 @@ function renderSettings() {
           text-align:center
         "
       >
-
         <p
           class="muted"
           style="margin:0"
         >
-
           Developed by
 
           <a
@@ -7488,45 +8223,34 @@ function renderSettings() {
             target="_blank"
             rel="noopener"
             style="
-              color:#ff9b51;
+              color:#ff7414;
               text-decoration:none;
-              font-weight:800
+              font-weight:900
             "
           >
-            CAM Ayon
+            KAM AYON
           </a>
-
         </p>
-
       </div>
     `;
 
-
   bindCommon();
 
-
-  $('#syncNow')
+  $('#settingsSync')
     .onclick =
-      async () => {
-
-        await syncCurrent(
+      () =>
+        refreshCloud(
           true
         );
-
-        render();
-      };
-
 
   $('#realLogout')
     .onclick =
       () => {
-
         if (
           confirm(
             'Log out from Sales Performance Hub?'
           )
         ) {
-
           logout();
         }
       };
@@ -7534,299 +8258,235 @@ function renderSettings() {
 
 
 /* =========================================================
-   XLSX
+   RENDER ROUTER
 ========================================================= */
 
-async function loadXlsx() {
+function render() {
+  if (!session) return;
 
-  if (
-    window.XLSX
-  ) {
-    return true;
-  }
+  installShell();
+  refreshTop();
+  bindNav();
 
+  const map = {
+    dashboard:
+      renderDashboard,
 
-  return new Promise(
-    resolve => {
+    daily:
+      renderDaily,
 
-      const s =
-        document
-          .createElement(
-            'script'
-          );
+    planning:
+      renderPlanning,
 
+    income:
+      renderIncome,
 
-      s.src =
-        'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    summary:
+      renderSummary,
 
+    tasks:
+      renderTasks,
 
-      s.onload =
-        () =>
-          resolve(
-            true
-          );
+    zero:
+      renderZero,
 
+    incentives:
+      renderIncentives,
 
-      s.onerror =
-        () =>
-          resolve(
-            false
-          );
+    penalties:
+      renderPenalties,
 
+    opportunity:
+      renderOpportunity,
 
-      document.head
-        .appendChild(s);
-    }
-  );
+    activity:
+      renderActivity,
+
+    team:
+      renderTeam,
+
+    proposal:
+      renderProposal,
+
+    notifications:
+      renderNotifications,
+
+    settings:
+      renderSettings
+  };
+
+  (
+    map[
+      page
+    ] ||
+    renderDashboard
+  )();
+
+  refreshTop();
+  bindNav();
 }
 
 
-async function exportXlsx(id) {
+/* =========================================================
+   LIVE SYNC
+========================================================= */
 
-  if (
-    !await loadXlsx()
-  ) {
+function startLiveSync() {
+  if (liveTimer) {
+    clearInterval(
+      liveTimer
+    );
+  }
 
+  liveTimer =
+    setInterval(
+      async () => {
+        if (
+          !session ||
+          document.hidden ||
+          !navigator.onLine ||
+          syncing
+        ) {
+          return;
+        }
+
+        if (
+          page ===
+            'daily' ||
+          page ===
+            'planning'
+        ) {
+          return;
+        }
+
+        if (
+          isManagerMode() &&
+          page ===
+            'team'
+        ) {
+          await loadTeam({
+            quiet: true
+          });
+
+        } else {
+          await loadCurrent({
+            quiet: true
+          });
+        }
+
+        if (
+          [
+            'dashboard',
+            'summary',
+            'zero',
+            'team',
+            'tasks',
+            'incentives',
+            'penalties',
+            'opportunity',
+            'notifications'
+          ]
+          .includes(
+            page
+          )
+        ) {
+          render();
+        }
+      },
+      30000
+    );
+}
+
+document.addEventListener(
+  'visibilitychange',
+  async () => {
+    if (
+      !document.hidden &&
+      session &&
+      navigator.onLine &&
+      !syncing
+    ) {
+      if (
+        isManagerMode() &&
+        page ===
+          'team'
+      ) {
+        await loadTeam({
+          quiet: true
+        });
+
+      } else {
+        await loadCurrent({
+          quiet: true
+        });
+      }
+
+      render();
+    }
+  }
+);
+
+window.addEventListener(
+  'online',
+  () => {
     toast(
-      'Excel library unavailable'
+      'Back online • syncing…'
     );
 
-    return;
+    refreshCloud(
+      false
+    );
   }
+);
 
-
-  const wb =
-    XLSX.utils
-      .book_new();
-
-
-  const m =
-    metric(id);
-
-
-  const inc =
-    incomeCalc(id);
-
-
-  function add(
-    name,
-    rows
-  ) {
-
-    XLSX.utils
-      .book_append_sheet(
-        wb,
-
-        XLSX.utils
-          .json_to_sheet(
-            rows.length
-              ? rows
-              : [
-                  {
-                    Info:
-                      'No data'
-                  }
-                ]
-          ),
-
-        name.slice(
-          0,
-          31
-        )
-      );
-  }
-
-
-  add(
-    'Summary',
-    [
-      {
-        Month:
-          selectedMonth,
-
-        'Staff ID':
-          id,
-
-        Salesman:
-          user(id)?.name ||
-          '',
-
-        Target:
-          m.target,
-
-        Achievement:
-          m.ach,
-
-        Shortfall:
-          m.short,
-
-        Coverage:
-          m.coverage,
-
-        'Projected Salary':
-          inc.total
-      }
-    ]
-  );
-
-
-  add(
-    'Daily',
-    monthDaily(id)
-      .map(
-        x => ({
-          Date:
-            x.date,
-
-          Sales:
-            x.todaySales,
-
-          'Last Month':
-            x.lastMonthSameDay,
-
-          Active:
-            x.active,
-
-          'Prepare Trip':
-            x.prepareTrip,
-
-          Order:
-            x.orderAmount,
-
-          Note:
-            x.note ||
-            ''
-        })
-      )
-  );
-
-
-  add(
-    'Outlet Sales',
-    monthOutletSales(id)
-      .map(
-        x => ({
-          Date:
-            x.date,
-
-          'Outlet Code':
-            x.outletCode,
-
-          Outlet:
-            x.outletName,
-
-          Sales:
-            x.sales,
-
-          Note:
-            x.note ||
-            ''
-        })
-      )
-  );
-
-
-  add(
-    'SKU Sales',
-    monthSkuSales(id)
-      .map(
-        x => ({
-          Date:
-            x.date,
-
-          Outlet:
-            x.outletName,
-
-          SKU:
-            x.skuName,
-
-          Cartons:
-            x.cartons,
-
-          'Sales Value':
-            x.salesValue
-        })
-      )
-  );
-
-
-  add(
-    'Income',
-    [
-      {
-        Component:
-          'TOTAL PROJECTED',
-
-        Amount:
-          inc.total
-      }
-    ]
-  );
-
-
-  XLSX.writeFile(
-    wb,
-    `${id}_${selectedMonth}_Sales_Performance.xlsx`
-  );
-}
+window.addEventListener(
+  'offline',
+  () =>
+    toast(
+      'Offline • live database unavailable'
+    )
+);
 
 
 /* =========================================================
    ONESIGNAL
 ========================================================= */
 
-async function initPush() {
-
+async function initPushSystem() {
   if (
     !backendUrl() ||
-    !window.OneSignalDeferred
+    !window
+      .OneSignalDeferred
   ) {
     return;
   }
 
-
   try {
-
     const r =
-      await fetch(
+      await fetchJson(
         backendUrl() +
-        '?action=publicConfig',
-        {
-          cache:
-            'no-store'
-        }
-      )
-      .then(
-        x =>
-          x.json()
+        '?action=publicConfig'
       );
-
 
     const cfg =
       r?.data ||
       {};
 
-
     pushConfig = {
-      ready:
-        false,
-
       configured:
-        !!cfg.pushConfigured,
+        !!cfg
+          .pushConfigured,
 
       appId:
         String(
-          cfg.oneSignalAppId ||
+          cfg
+            .oneSignalAppId ||
           ''
         ),
 
-      appUrl:
-        String(
-          cfg.appUrl ||
-          ''
-        )
+      ready:
+        false
     };
-
 
     if (
       !pushConfig.appId
@@ -7834,19 +8494,15 @@ async function initPush() {
       return;
     }
 
-
     const path =
       location.pathname
         .endsWith('/')
-
         ? location.pathname
-
         : location.pathname
             .replace(
               /[^/]+$/,
               ''
             );
-
 
     const workerPath =
       path
@@ -7856,16 +8512,15 @@ async function initPush() {
         ) +
       'push/onesignal/OneSignalSDKWorker.js';
 
-
-    window.OneSignalDeferred
+    window
+      .OneSignalDeferred
       .push(
         async OneSignal => {
-
           try {
-
             await OneSignal.init({
               appId:
-                pushConfig.appId,
+                pushConfig
+                  .appId,
 
               serviceWorkerPath:
                 workerPath,
@@ -7877,19 +8532,13 @@ async function initPush() {
               }
             });
 
-
             oneSignalSdk =
               OneSignal;
-
 
             pushConfig.ready =
               true;
 
-
-            if (
-              session
-            ) {
-
+            if (session) {
               await OneSignal
                 .login(
                   session.id
@@ -7897,64 +8546,51 @@ async function initPush() {
             }
 
           } catch (e) {
-
-            console.warn(e);
+            console.warn(
+              'OneSignal',
+              e
+            );
           }
         }
       );
 
   } catch (e) {
-
-    console.warn(e);
+    console.warn(
+      'Push config',
+      e
+    );
   }
 }
 
 
 /* =========================================================
-   EVENTS
+   STARTUP
 ========================================================= */
 
-$('#loginForm')
-  .onsubmit =
-    e => {
-
-      e.preventDefault();
-
-
-      login(
-        $('#loginUser')
-          .value,
-
-        $('#loginPin')
-          .value
-      );
-    };
-
-
 if (
-  $('#logoutBtn')
+  $('#loginForm')
 ) {
+  $('#loginForm')
+    .onsubmit =
+      e => {
+        e.preventDefault();
 
-  $('#logoutBtn')
-    .onclick =
-      () => {
+        login(
+          $('#loginUser')
+            .value,
 
-        page =
-          'settings';
-
-        render();
+          $('#loginPin')
+            .value
+        );
       };
 }
 
-
 if (
   $('#notifBtn')
 ) {
-
   $('#notifBtn')
     .onclick =
       () => {
-
         page =
           'notifications';
 
@@ -7962,236 +8598,140 @@ if (
       };
 }
 
+async function forceServiceWorkerUpdate() {
+  if (
+    !(
+      'serviceWorker'
+      in navigator
+    )
+  ) {
+    return;
+  }
 
-if (
-  $('#bottomNav')
-) {
+  try {
+    const regs =
+      await navigator
+        .serviceWorker
+        .getRegistrations();
 
-  $('#bottomNav')
-    .onclick =
-      e => {
+    regs.forEach(
+      r =>
+        r.update()
+          .catch(
+            () => {}
+          )
+    );
 
-        const b =
-          e.target
-            .closest(
-              'button[data-page]'
-            );
-
-
-        if (!b) return;
-
-
-        page =
-          b.dataset.page;
-
-
-        render();
-      };
+  } catch {}
 }
 
-
-/* =========================================================
-   BACK BUTTON
-========================================================= */
-
-window.addEventListener(
-  'popstate',
-  () => {
-
-    if (!session) return;
-
-
-    page =
-      'dashboard';
-
-
-    render();
-
-
-    history.pushState(
-      {
-        sph:
-          true
-      },
-      '',
-      location.href
-    );
-  }
-);
-
-
-/* =========================================================
-   RETURN TO APP = SYNC
-========================================================= */
-
-document.addEventListener(
-  'visibilitychange',
-  async () => {
-
-    if (
-      document.hidden ||
-      !session ||
-      !backendUrl()
-    ) {
-      return;
-    }
-
-
-    await syncCurrent(
-      false
-    );
-
-
-    if (
-      [
-        'dashboard',
-        'team',
-        'summary',
-        'zero',
-        'tasks'
-      ].includes(
-        page
-      )
-    ) {
-
-      render();
-    }
-  }
-);
-
-
-/* =========================================================
-   START APP
-========================================================= */
-
 (async function start() {
+  const pref =
+    getPref();
 
-  installShell();
+  selectedMonth =
+    pref.month ||
+    localDate()
+      .slice(
+        0,
+        7
+      );
 
-
-  history.replaceState(
-    {
-      sph:
-        true
-    },
-    '',
-    location.href
-  );
-
-
-  history.pushState(
-    {
-      sph:
-        true
-    },
-    '',
-    location.href
-  );
-
-
-  const saved =
-    localStorage.getItem(
-      SESSION
-    );
-
-
-  if (saved) {
-
-    try {
-
-      const x =
-        JSON.parse(
-          saved
-        );
-
-
-      if (
-        x &&
-        user(
-          x.id
-        )
-      ) {
-
-        session =
-          x;
-
-
-        managerView =
-          session.mode ===
-            'manager'
-            ? 'M21954'
-            : session.id;
-
-
-        page =
-          session.mode ===
-            'manager'
-            ? 'team'
-            : 'dashboard';
-
-
-        openApp();
-
-
-        await initPush();
-
-
-        await syncCurrent(
-          false
-        );
-
-
-        render();
-
-
-        return;
-      }
-
-    } catch {
-
-      localStorage
-        .removeItem(
-          SESSION
-        );
-    }
-  }
-
-
-  $('#loginView')
-    ?.classList
-    .remove(
-      'hidden'
-    );
-
-
-  $('#appView')
-    ?.classList
-    .add(
-      'hidden'
-    );
-
+  selectedDate =
+    pref.date ||
+    localDate();
 
   if (
-    'serviceWorker'
-    in navigator
+    !selectedDate
+      .startsWith(
+        selectedMonth
+      )
   ) {
-
-    navigator
-      .serviceWorker
-      .register(
-        './sw.js',
-        {
-          updateViaCache:
-            'none'
-        }
-      )
-      .then(
-        r =>
-          r.update()
-      )
-      .catch(
-        () => {}
-      );
+    selectedDate =
+      selectedMonth +
+      '-01';
   }
 
+  installShell();
+  pushHistoryState();
+  forceServiceWorkerUpdate();
+
+  if (
+    !restoreSession()
+  ) {
+    $('#loginView')
+      ?.classList
+      .remove(
+        'hidden'
+      );
+
+    $('#appView')
+      ?.classList
+      .add(
+        'hidden'
+      );
+
+    return;
+  }
+
+  openApp();
+
+  try {
+    if (
+      session.mode ===
+      'manager'
+    ) {
+      await loadTeam({
+        quiet: true
+      });
+
+      await loadCurrent({
+        quiet: true
+      });
+
+    } else {
+      await loadCurrent({
+        quiet: true
+      });
+    }
+
+  } catch {}
+
+  initPushSystem();
+
+  const deep =
+    new URLSearchParams(
+      location.search
+    ).get(
+      'open'
+    );
+
+  const allowed = [
+    'dashboard',
+    'daily',
+    'planning',
+    'income',
+    'summary',
+    'tasks',
+    'zero',
+    'incentives',
+    'penalties',
+    'opportunity',
+    'activity',
+    'team',
+    'proposal',
+    'notifications',
+    'settings'
+  ];
+
+  if (
+    allowed.includes(
+      deep
+    )
+  ) {
+    page =
+      deep;
+  }
+
+  render();
 })();
