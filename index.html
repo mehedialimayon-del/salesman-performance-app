@@ -1,31 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width,initial-scale=1,viewport-fit=cover"
+    content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
   >
 
-  <meta
-    name="theme-color"
-    content="#080a0d"
-  >
-
-  <meta
-    name="background-color"
-    content="#06080b"
-  >
+  <meta name="theme-color" content="#080b0f">
+  <meta name="color-scheme" content="dark">
 
   <meta
     name="description"
-    content="Sales Performance Hub — Live Sales, Target, SKU, Incentive, Tasks, Income and Manager Database."
-  >
-
-  <meta
-    name="mobile-web-app-capable"
-    content="yes"
+    content="Sales Performance Hub by KAM AYON"
   >
 
   <meta
@@ -43,19 +31,11 @@
     content="Sales Hub"
   >
 
-  <meta
-    name="application-name"
-    content="Sales Hub"
-  >
+  <title>Sales Performance Hub</title>
 
-  <title>
-    Sales Performance Hub
-  </title>
-
-  <!-- PWA -->
   <link
     rel="manifest"
-    href="./manifest.json?v=20260915-final"
+    href="./manifest.json?v=20260918-final-6"
   >
 
   <link
@@ -70,65 +50,214 @@
     href="./icons/icon-192.png"
   >
 
-  <!-- FINAL PREMIUM STYLE -->
+  <!-- Critical first-paint protection -->
+  <style>
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #080b0f;
+      color: #f7f8fa;
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    body {
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #bootSplash {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(
+          circle at 50% 35%,
+          rgba(255, 116, 20, 0.14),
+          transparent 34%
+        ),
+        #080b0f;
+      transition:
+        opacity 0.22s ease,
+        visibility 0.22s ease;
+    }
+
+    #bootSplash.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .boot-card {
+      text-align: center;
+      padding: 24px;
+    }
+
+    .boot-logo {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 15px;
+      display: grid;
+      place-items: center;
+      border-radius: 22px;
+      background: linear-gradient(
+        135deg,
+        #ff7414,
+        #ff9d55
+      );
+      color: #090b0d;
+      font-size: 27px;
+      font-weight: 1000;
+      box-shadow:
+        0 18px 55px rgba(0, 0, 0, 0.42),
+        0 0 0 7px rgba(255, 116, 20, 0.08);
+    }
+
+    .boot-title {
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: -0.25px;
+    }
+
+    .boot-sub {
+      margin-top: 7px;
+      color: #8d99a7;
+      font-size: 12px;
+    }
+
+    .boot-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 18px;
+    }
+
+    .boot-dots span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ff7414;
+      animation: bootDot 1s infinite ease-in-out;
+    }
+
+    .boot-dots span:nth-child(2) {
+      animation-delay: 0.14s;
+    }
+
+    .boot-dots span:nth-child(3) {
+      animation-delay: 0.28s;
+    }
+
+    @keyframes bootDot {
+      0%,
+      80%,
+      100% {
+        opacity: 0.25;
+        transform: translateY(0);
+      }
+
+      40% {
+        opacity: 1;
+        transform: translateY(-5px);
+      }
+    }
+  </style>
+
   <link
     rel="stylesheet"
-    href="./styles.css?v=20260915-final-3"
+    href="./styles.css?v=20260918-final-6"
   >
-
-  <!-- OneSignal v16 -->
-  <script>
-    window.OneSignalDeferred =
-      window.OneSignalDeferred || [];
-  </script>
-
-  <script
-    src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
-    defer
-  ></script>
 </head>
-
 
 <body>
 
   <!-- =====================================================
-       TOAST
-  ====================================================== -->
+       FAST START SCREEN
+       ===================================================== -->
+  <div id="bootSplash">
+    <div class="boot-card">
 
-  <div
-    id="toast"
-    class="toast"
-    role="status"
-    aria-live="polite"
-  ></div>
+      <div class="boot-logo">
+        SP
+      </div>
+
+      <div class="boot-title">
+        Sales Performance Hub
+      </div>
+
+      <div class="boot-sub">
+        Loading your live sales workspace
+      </div>
+
+      <div class="boot-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+    </div>
+  </div>
 
 
   <!-- =====================================================
        LOGIN
-  ====================================================== -->
-
-  <section
+       ===================================================== -->
+  <main
     id="loginView"
-    class="screen login-screen"
+    class="login-screen hidden"
   >
 
-    <div class="login-card">
+    <section class="login-card">
 
-      <div class="logo-mark">
-        SP
+      <div class="brand-block">
+
+        <div class="brand-mark">
+          SP
+        </div>
+
+        <div>
+          <p class="eyebrow">
+            KAM AYON
+          </p>
+
+          <h1>
+            Sales Performance Hub
+          </h1>
+
+          <p class="muted">
+            Live Sales • SKU • Outlet • Incentive • Task • AI
+          </p>
+        </div>
+
       </div>
 
-      <p class="eyebrow">
-        MODERN TRADE • LIVE SALES APP
-      </p>
-
-      <h1>
-        Sales Performance Hub
-      </h1>
-
-      <p class="muted">
-        Sales • Target • SKU • Incentive • Tasks • Income
-      </p>
 
       <form
         id="loginForm"
@@ -137,16 +266,18 @@
       >
 
         <label>
-          Staff ID / Username
+          Staff ID
 
           <input
             id="loginUser"
             name="username"
+            type="text"
+            inputmode="text"
             autocomplete="username"
             autocapitalize="characters"
             spellcheck="false"
-            required
             placeholder="e.g. M22075"
+            required
           >
         </label>
 
@@ -158,148 +289,92 @@
             id="loginPin"
             name="password"
             type="password"
+            inputmode="text"
             autocomplete="current-password"
-            required
             placeholder="Enter password"
+            required
           >
         </label>
 
 
         <button
-          class="btn primary big-action"
           type="submit"
+          class="btn primary big-action"
         >
-          ENTER SALES HUB
+          SIGN IN
         </button>
 
       </form>
 
 
-      <div class="login-help">
+      <div class="login-note">
 
-        <div
-          style="
-            display:flex;
-            align-items:center;
-            gap:7px;
-            margin-bottom:7px
-          "
-        >
-          <span class="security-dot">
-            ●
-          </span>
+        <span class="sync-dot ok"></span>
 
-          <span>
-            Secure staff access
-          </span>
-        </div>
-
-        <div
-          style="
-            display:flex;
-            align-items:center;
-            gap:7px
-          "
-        >
-          <span
-            style="
-              color:#37d67a
-            "
-          >
-            ☁
-          </span>
-
-          <span>
-            Google Sheets live database
-          </span>
-        </div>
+        Google Sheets Live Database
 
       </div>
 
 
-      <div
-        style="
-          margin-top:22px;
-          padding-top:15px;
-          border-top:1px solid #1b222a;
-          text-align:center;
-          color:#737e8a;
-          font-size:10px;
-          letter-spacing:.45px
-        "
-      >
-
+      <p class="developer-line">
         Developed by
+        <strong>KAM AYON</strong>
+      </p>
 
-        <a
-          href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/"
-          target="_blank"
-          rel="noopener noreferrer"
-          style="
-            color:#ff7414;
-            text-decoration:none;
-            font-weight:900;
-            letter-spacing:.8px
-          "
-        >
-          KAM AYON
-        </a>
+    </section>
 
-      </div>
-
-    </div>
-
-  </section>
+  </main>
 
 
   <!-- =====================================================
        MAIN APP
-  ====================================================== -->
-
-  <section
+       ===================================================== -->
+  <div
     id="appView"
-    class="app hidden"
+    class="app-shell hidden"
   >
 
-
-    <!-- ===================================================
-         TOP BAR
-    ==================================================== -->
-
+    <!-- TOP BAR -->
     <header class="topbar">
 
-      <div class="topbar-user">
+      <div class="topbar-left">
 
-        <p
-          class="eyebrow"
-          id="roleLabel"
-        >
-          SALES REPRESENTATIVE
-        </p>
+        <div class="app-logo">
+          SP
+        </div>
 
-        <h2 id="welcomeName">
-          Welcome
-        </h2>
+        <div class="topbar-copy">
+
+          <small id="roleLabel">
+            SALES PERFORMANCE
+          </small>
+
+          <strong id="welcomeName">
+            Sales Performance Hub
+          </strong>
+
+        </div>
 
       </div>
 
 
-      <div class="top-actions">
+      <div class="topbar-actions">
 
-        <!-- Notifications -->
         <button
           id="notifBtn"
-          class="icon-btn"
           type="button"
-          title="Notifications"
+          class="icon-button notification-button"
           aria-label="Notifications"
+          title="Notifications"
         >
 
-          🔔
+          <span aria-hidden="true">
+            🔔
+          </span>
 
           <span
             id="notifBadge"
-            class="badge hidden"
+            class="notification-badge hidden"
           >
             0
           </span>
@@ -307,13 +382,12 @@
         </button>
 
 
-        <!-- Settings / Logout lives inside Settings -->
         <button
           id="logoutBtn"
-          class="icon-btn"
           type="button"
-          title="Settings"
+          class="icon-button"
           aria-label="Settings"
+          title="Settings"
         >
           ⚙
         </button>
@@ -323,25 +397,20 @@
     </header>
 
 
-    <!-- ===================================================
-         DYNAMIC CONTENT
-    ==================================================== -->
-
+    <!-- LIVE PAGE CONTENT -->
     <main
       id="mainContent"
-      class="content"
-    ></main>
+      class="main-content"
+      aria-live="polite"
+    >
+    </main>
 
 
-    <!-- ===================================================
-         BOTTOM NAVIGATION
-         Proposal button is added by app.js
-    ==================================================== -->
-
+    <!-- BOTTOM NAVIGATION -->
     <nav
-      class="bottom-nav"
       id="bottomNav"
-      aria-label="Main Navigation"
+      class="bottom-nav"
+      aria-label="Main navigation"
     >
 
       <button
@@ -368,7 +437,7 @@
         </span>
 
         <small>
-          Update
+          Sales
         </small>
       </button>
 
@@ -416,46 +485,138 @@
 
     </nav>
 
-  </section>
+  </div>
 
 
   <!-- =====================================================
-       APP CONFIG
-       IMPORTANT: LOAD BEFORE APP.JS
-  ====================================================== -->
+       GLOBAL TOAST
+       ===================================================== -->
+  <div
+    id="toast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+  >
+  </div>
+
+
+  <!-- =====================================================
+       APP CONFIG + DATA + CORE APP
+       ORDER IS IMPORTANT
+       ===================================================== -->
 
   <script
-    src="./config.js?v=20260915-final-3"
+    src="./config.js?v=20260918-final-6"
+    defer
+  ></script>
+
+  <script
+    src="./data.js?v=20260918-final-6"
+    defer
+  ></script>
+
+  <script
+    src="./app.js?v=20260918-final-6"
+    defer
+  ></script>
+
+  <!-- AYON AI loads after the main Sales App -->
+  <script
+    src="./ayon-ai.js?v=20260918-final-6"
+    defer
   ></script>
 
 
   <!-- =====================================================
-       MASTER DATA
-  ====================================================== -->
-
-  <script
-    src="./data.js?v=20260915-final-3"
-  ></script>
-
-
-  <!-- =====================================================
-       FINAL APP
-  ====================================================== -->
-
-  <script
-    src="./app.js?v=20260915-final-3"
-  ></script>
-
-
-  <!-- =====================================================
-       SERVICE WORKER REGISTRATION
-  ====================================================== -->
-
+       ONESIGNAL
+       Does not contain any private API key
+       ===================================================== -->
   <script>
+    window.OneSignalDeferred =
+      window.OneSignalDeferred || [];
+  </script>
 
-    if (
-      'serviceWorker' in navigator
-    ) {
+  <script
+    src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+    defer
+  ></script>
+
+
+  <!-- =====================================================
+       SERVICE WORKER / PWA
+       ===================================================== -->
+  <script>
+    (() => {
+
+      const VERSION =
+        '20260918-final-6';
+
+
+      function hideBoot() {
+
+        const splash =
+          document.getElementById(
+            'bootSplash'
+          );
+
+
+        if (!splash) {
+          return;
+        }
+
+
+        splash.classList.add(
+          'hide'
+        );
+
+
+        setTimeout(
+          () => splash.remove(),
+          300
+        );
+
+      }
+
+
+      /*
+        Do not keep the user waiting for
+        network/service-worker initialization.
+      */
+      window.addEventListener(
+        'DOMContentLoaded',
+        () => {
+
+          setTimeout(
+            hideBoot,
+            300
+          );
+
+        },
+        {
+          once: true
+        }
+      );
+
+
+      /*
+        Absolute fallback.
+        Splash can never block the app forever.
+      */
+      setTimeout(
+        hideBoot,
+        1600
+      );
+
+
+      if (
+        !(
+          'serviceWorker'
+          in navigator
+        )
+      ) {
+        return;
+      }
+
 
       window.addEventListener(
         'load',
@@ -463,63 +624,109 @@
 
           try {
 
-            const registration =
+            const reg =
               await navigator
                 .serviceWorker
                 .register(
                   './sw.js',
                   {
-                    scope: './',
-                    updateViaCache: 'none'
+                    scope:
+                      './',
+
+                    updateViaCache:
+                      'none'
                   }
                 );
 
 
-            try {
+            /*
+              Check newest worker immediately.
+            */
+            await reg
+              .update()
+              .catch(
+                () => {}
+              );
 
-              await registration
-                .update();
 
-            } catch (_) {}
+            /*
+              If a new worker is already waiting,
+              ask it to activate.
+            */
+            if (
+              reg.waiting
+            ) {
+
+              reg.waiting
+                .postMessage({
+                  type:
+                    'SKIP_WAITING',
+
+                  version:
+                    VERSION
+                });
+
+            }
 
 
-            console.log(
-              'Sales Hub Service Worker ready',
-              registration.scope
+            reg.addEventListener(
+              'updatefound',
+              () => {
+
+                const worker =
+                  reg.installing;
+
+
+                if (!worker) {
+                  return;
+                }
+
+
+                worker.addEventListener(
+                  'statechange',
+                  () => {
+
+                    if (
+                      worker.state ===
+                        'installed' &&
+                      navigator
+                        .serviceWorker
+                        .controller
+                    ) {
+
+                      worker
+                        .postMessage({
+                          type:
+                            'SKIP_WAITING',
+
+                          version:
+                            VERSION
+                        });
+
+                    }
+
+                  }
+                );
+
+              }
             );
-
 
           } catch (error) {
 
             console.warn(
-              'Service Worker registration failed',
+              'Service Worker:',
               error
             );
 
           }
 
+        },
+        {
+          once: true
         }
       );
 
-    }
-
-  </script>
-
-
-  <!-- =====================================================
-       APP VERSION
-  ====================================================== -->
-
-  <script>
-
-    window.SPH_BUILD =
-      'FINAL-2026.09.15-3';
-
-    console.log(
-      'Sales Performance Hub',
-      window.SPH_BUILD
-    );
-
+    })();
   </script>
 
 </body>
