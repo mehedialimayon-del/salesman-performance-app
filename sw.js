@@ -1,350 +1,379 @@
-/* =========================================================
-   SALES PERFORMANCE HUB — FINAL SERVICE WORKER
-   Developed by KAM AYON
-   Build: FINAL-2026.09.15-4
-
-   PURPOSE
-   - Remove all old Sales Hub caches
-   - Always prefer newest HTML / JS / CSS / config / data
-   - Keep safe offline fallback
-   - Prevent stale version on different phones
-========================================================= */
-
 'use strict';
 
-
 /* =========================================================
-   VERSION
+   SALES PERFORMANCE HUB — SERVICE WORKER
+   Build: sph-20260918-final-6
+   Developed by KAM AYON
 ========================================================= */
 
-const SW_VERSION =
-  'FINAL-2026.09.15-4';
-
-const CACHE_NAME =
-  'sph-final-' +
-  SW_VERSION;
-
-
-/* =========================================================
-   OFFLINE SHELL
-========================================================= */
+const CACHE_VERSION = 'sph-20260918-final-6';
+const RUNTIME_CACHE = 'sph-runtime-20260918-final-6';
 
 const APP_SHELL = [
   './',
-
   './index.html',
-
-  './styles.css?v=20260915-final-3',
-
-  './config.js?v=20260915-final-3',
-
-  './data.js?v=20260915-final-3',
-
-  './app.js?v=20260915-final-3',
-
-  './manifest.json?v=20260915-final',
-
+  './styles.css?v=20260918-final-6',
+  './config.js?v=20260918-final-6',
+  './data.js?v=20260918-final-6',
+  './app.js?v=20260918-final-6',
+  './ayon-ai.js?v=20260918-final-6',
+  './manifest.json?v=20260918-final-6',
   './icons/icon-192.png',
-
   './icons/icon-512.png',
-
-  './icons/notification-96.png'
+  './icons/notification-96.png',
+  './icons/ayon-avatar.jpg'
 ];
 
+function isSameOrigin(url) {
+  return url.origin === self.location.origin;
+}
 
-/* =========================================================
-   INSTALL
-========================================================= */
+function isOneSignalPath(url) {
+  return url.pathname.includes('/push/onesignal/');
+}
 
-self.addEventListener(
-  'install',
-  event => {
+function isAppAsset(url) {
+  return /\.(?:js|css|json|html)$/i.test(url.pathname);
+}
 
-    event.waitUntil(
-      (async () => {
+function isImage(url) {
+  return /\.(?:png|jpg|jpeg|webp|svg|ico)$/i.test(url.pathname);
+}
 
-        const cache =
-          await caches.open(
-            CACHE_NAME
-          );
-
-
-        /*
-         * Do not use cache.addAll().
-         *
-         * If one optional file is missing,
-         * addAll() would fail the entire
-         * Service Worker installation.
-         */
-
-        await Promise.allSettled(
-          APP_SHELL.map(
-            async url => {
-
-              try {
-
-                const request =
-                  new Request(
-                    url,
-                    {
-                      cache:
-                        'reload'
-                    }
-                  );
-
-
-                const response =
-                  await fetch(
-                    request
-                  );
-
-
-                if (
-                  response &&
-                  response.ok
-                ) {
-
-                  await cache.put(
-                    request,
-                    response.clone()
-                  );
-
-                }
-
-              } catch (error) {
-
-                console.warn(
-                  '[Sales Hub SW] Precache skipped:',
-                  url,
-                  error
-                );
-
-              }
-
-            }
-          )
-        );
-
-
-        /*
-         * Activate this version immediately.
-         */
-
-        await self.skipWaiting();
-
-      })()
-    );
-
+async function putIfOk(cache, request, response) {
+  if (response && response.ok) {
+    try {
+      await cache.put(request, response.clone());
+    } catch (_) {}
   }
-);
 
+  return response;
+}
 
-/* =========================================================
-   ACTIVATE
-========================================================= */
+self.addEventListener('install', event => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_VERSION);
 
-self.addEventListener(
-  'activate',
-  event => {
-
-    event.waitUntil(
-      (async () => {
-
-        const keys =
-          await caches.keys();
-
-
-        /*
-         * DELETE EVERY OLD SALES HUB CACHE.
-         *
-         * This is the key fix for:
-         * Phone A = newest version
-         * Phone B = old version
-         */
-
-        await Promise.all(
-          keys.map(
-            key => {
-
-              if (
-                key !==
-                  CACHE_NAME &&
-                (
-                  key.startsWith(
-                    'sph-'
-                  ) ||
-
-                  key.startsWith(
-                    'sales-'
-                  ) ||
-
-                  key
-                    .toLowerCase()
-                    .includes(
-                      'sales-performance'
-                    )
-                )
-              ) {
-
-                return caches.delete(
-                  key
-                );
-
-              }
-
-              return Promise.resolve(
-                false
-              );
-
-            }
-          )
-        );
-
-
-        /*
-         * Immediately control existing
-         * open tabs / installed PWA.
-         */
-
-        await self.clients.claim();
-
-
-        /*
-         * Inform currently open app pages
-         * that the new Service Worker exists.
-         */
-
-        const clients =
-          await self.clients.matchAll({
-            type:
-              'window',
-
-            includeUncontrolled:
-              true
+    await Promise.allSettled(
+      APP_SHELL.map(async asset => {
+        try {
+          const request = new Request(asset, {
+            cache: 'reload'
           });
 
+          const response = await fetch(request);
 
-        clients.forEach(
-          client => {
+          if (response.ok) {
+            await cache.put(
+              asset,
+              response.clone()
+            );
+          }
 
-            client.postMessage({
-              type:
-                'SPH_VERSION_READY',
+        } catch (_) {
+          // Missing optional asset must not block install.
+        }
+      })
+    );
 
-              version:
-                SW_VERSION
-            });
+    await self.skipWaiting();
+  })());
+});
 
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+
+    await Promise.all(
+      keys
+        .filter(
+          key =>
+            key.startsWith('sph-') &&
+            key !== CACHE_VERSION &&
+            key !== RUNTIME_CACHE
+        )
+        .map(
+          key =>
+            caches.delete(key)
+        )
+    );
+
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('message', event => {
+
+  if (
+    event.data?.type ===
+    'SKIP_WAITING'
+  ) {
+    self.skipWaiting();
+  }
+
+  if (
+    event.data?.type ===
+    'CLEAR_SPH_CACHE'
+  ) {
+
+    event.waitUntil((async () => {
+
+      const keys =
+        await caches.keys();
+
+      await Promise.all(
+        keys
+          .filter(
+            key =>
+              key.startsWith('sph-')
+          )
+          .map(
+            key =>
+              caches.delete(key)
+          )
+      );
+
+    })());
+  }
+
+});
+
+self.addEventListener('fetch', event => {
+
+  const request =
+    event.request;
+
+  if (
+    request.method !==
+    'GET'
+  ) {
+    return;
+  }
+
+  const url =
+    new URL(
+      request.url
+    );
+
+  /*
+    Never touch external API requests
+    or OneSignal worker traffic.
+  */
+  if (
+    !isSameOrigin(url) ||
+    isOneSignalPath(url)
+  ) {
+    return;
+  }
+
+  /*
+    Page navigation:
+    always try newest GitHub version first.
+  */
+  if (
+    request.mode ===
+    'navigate'
+  ) {
+
+    event.respondWith((async () => {
+
+      const cache =
+        await caches.open(
+          CACHE_VERSION
+        );
+
+      try {
+
+        const fresh =
+          await fetch(
+            new Request(
+              request,
+              {
+                cache:
+                  'no-store'
+              }
+            )
+          );
+
+        await putIfOk(
+          cache,
+          './index.html',
+          fresh
+        );
+
+        return fresh;
+
+      } catch (_) {
+
+        return (
+          await cache.match(
+            './index.html',
+            {
+              ignoreSearch:
+                true
+            }
+          ) ||
+
+          await cache.match(
+            './',
+            {
+              ignoreSearch:
+                true
+            }
+          ) ||
+
+          new Response(
+            `<!doctype html>
+            <html>
+              <body
+                style="
+                  background:#080b0f;
+                  color:white;
+                  font-family:sans-serif;
+                  padding:24px
+                "
+              >
+                <h2>
+                  Sales Performance Hub
+                </h2>
+
+                <p>
+                  You are offline.
+                  Please reconnect and reopen the app.
+                </p>
+              </body>
+            </html>`,
+            {
+              headers: {
+                'Content-Type':
+                  'text/html; charset=utf-8'
+              }
+            }
+          )
+        );
+
+      }
+
+    })());
+
+    return;
+  }
+
+  /*
+    JS / CSS / JSON / HTML:
+    Network-first prevents old phone cache
+    from keeping an outdated build.
+  */
+  if (
+    isAppAsset(url)
+  ) {
+
+    event.respondWith((async () => {
+
+      const cache =
+        await caches.open(
+          CACHE_VERSION
+        );
+
+      try {
+
+        const fresh =
+          await fetch(
+            new Request(
+              request,
+              {
+                cache:
+                  'no-store'
+              }
+            )
+          );
+
+        await putIfOk(
+          cache,
+          request,
+          fresh
+        );
+
+        return fresh;
+
+      } catch (_) {
+
+        return (
+          await cache.match(
+            request,
+            {
+              ignoreSearch:
+                true
+            }
+          ) ||
+          Response.error()
+        );
+
+      }
+
+    })());
+
+    return;
+  }
+
+  /*
+    Avatar/icons/images:
+    cached for instant UI,
+    updated silently in background.
+  */
+  if (
+    isImage(url)
+  ) {
+
+    event.respondWith((async () => {
+
+      const cache =
+        await caches.open(
+          RUNTIME_CACHE
+        );
+
+      const cached =
+        await cache.match(
+          request,
+          {
+            ignoreSearch:
+              true
           }
         );
 
-      })()
-    );
+      const refresh =
+        fetch(request)
+          .then(
+            response =>
+              putIfOk(
+                cache,
+                request,
+                response
+              )
+          )
+          .catch(
+            () => null
+          );
+
+      if (cached) {
+
+        event.waitUntil(
+          refresh
+        );
+
+        return cached;
+      }
+
+      const network =
+        await refresh;
+
+      return (
+        network ||
+        Response.error()
+      );
+
+    })());
 
   }
-);
 
-
-/* =========================================================
-   FETCH
-========================================================= */
-
-self.addEventListener(
-  'fetch',
-  event => {
-
-    const request =
-      event.request;
-
-
-    /*
-     * Never interfere with POST / write requests.
-     */
-
-    if (
-      request.method !==
-      'GET'
-    ) {
-
-      return;
-
-    }
-
-
-    const url =
-      new URL(
-        request.url
-      );
-
-
-    /*
-     * IMPORTANT:
-     *
-     * Do NOT cache Google Apps Script,
-     * OneSignal API,
-     * CDN,
-     * or other external services.
-     *
-     * Live database must always come
-     * directly from the real backend.
-     */
-
-    if (
-      url.origin !==
-      self.location.origin
-    ) {
-
-      return;
-
-    }
-
-
-    /*
-     * OneSignal has its own Service Worker
-     * under /push/onesignal/.
-     *
-     * Do not interfere with it.
-     */
-
-    if (
-      url.pathname.includes(
-        '/push/onesignal/'
-      )
-    ) {
-
-      return;
-
-    }
-
-
-    /*
-     * PAGE NAVIGATION
-     *
-     * NETWORK FIRST.
-     *
-     * Always ask GitHub Pages for newest
-     * index.html before using cache.
-     */
-
-    if (
-      request.mode ===
-        'navigate'
-    ) {
-
-      event.respondWith(
-        navigationNetworkFirst_(
-          request
-        )
-      );
-
-      return;
-
-    }
-
-
-    /*
-     * CODE / CONFIG FILES
-     *
-     * NETWORK FIRST + no-store.
-     *
-     * This prevents stale:
+});
