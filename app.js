@@ -510,18 +510,16 @@ function bindCommon() {
     managerView = session.id;
     session.managerView = managerView;
     saveSession();
-    page = 'dashboard';
     await loadCurrent();
-    render();
+    setPage('dashboard');
   };
   const mgr = $('#managerMode');
   if (mgr) mgr.onclick = async () => {
     session.mode = 'manager';
     managerView = session.managerView || 'M21954';
     saveSession();
-    page = 'team';
     await loadTeam();
-    render();
+    setPage('team');
   };
   $$('[data-go]').forEach(b => b.onclick = () => setPage(b.dataset.go));
 }
@@ -1128,6 +1126,27 @@ function renderSettings() {
   $('#realLogout').onclick = () => { if (confirm('Log out from Sales Performance Hub?')) logout(); };
 }
 
+
+/* ===== VISIBLE BACK NAVIGATION — FINAL ===== */
+function installVisibleBackButton() {
+  const main = document.querySelector('#mainContent');
+  if (!main) return;
+  const old = main.querySelector('.sph-visible-back');
+  if (old) old.remove();
+  if (page === 'dashboard' || (isManagerMode() && page === 'team')) return;
+
+  const bar = document.createElement('div');
+  bar.className = 'sph-visible-back';
+  bar.style.cssText = 'display:flex;align-items:center;gap:8px;margin:0 0 12px 0;';
+  bar.innerHTML = '<button type="button" class="btn secondary" id="sphBackBtn" style="min-width:96px;font-weight:900">← BACK</button>';
+  main.prepend(bar);
+
+  document.querySelector('#sphBackBtn').onclick = () => {
+    if (history.state?.sph && history.length > 1) history.back();
+    else setPage(isManagerMode() ? 'team' : 'dashboard', { fromHistory: true });
+  };
+}
+
 /* =========================================================
    RENDER ROUTER
 ========================================================= */
@@ -1155,6 +1174,7 @@ function render() {
     settings: renderSettings
   };
   (map[page] || renderDashboard)();
+  installVisibleBackButton();
   refreshTop(); bindNav();
 }
 
