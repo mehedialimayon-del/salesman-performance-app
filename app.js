@@ -1,15 +1,22 @@
-
 'use strict';
 
 /* =========================================================
-   SALES PERFORMANCE HUB — FINAL FRONTEND
+   SALES PERFORMANCE HUB — FINAL LOCKED V8
+   Premium UI + Premium Login
    Developed by KAM AYON
    Backend: Google Apps Script / Google Sheets source of truth
 ========================================================= */
 
-const APP_BUILD = 'LAUNCH-FINAL-2026.09.18-1';
+const APP_BUILD = 'FINAL-LOCKED-PREMIUM-V8-2026.09.18';
 const TZ = 'Asia/Kuala_Lumpur';
-const D = window.APP_DATA || { users: [], salaryRules: {}, categoryProducts: {}, products: [], outlets: {} };
+const D = window.APP_DATA || {
+  users: [],
+  salaryRules: {},
+  categoryProducts: {},
+  products: [],
+  outlets: {}
+};
+
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
@@ -29,65 +36,174 @@ let syncing = false;
 let liveTimer = null;
 let selectedPlanningSkus = [];
 let oneSignalSdk = null;
-let pushConfig = { configured: false, appId: '', ready: false };
+let pushConfig = {
+  configured: false,
+  appId: '',
+  ready: false
+};
 
 const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
-const money = v => 'RM ' + n(v).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const esc = (v = '') => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const idGen = () => (crypto?.randomUUID ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+
+const money = v =>
+  'RM ' + n(v).toLocaleString('en-MY', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+
+const esc = (v = '') =>
+  String(v).replace(/[&<>"']/g, c => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[c]));
+
+const idGen = () =>
+  crypto?.randomUUID
+    ? crypto.randomUUID()
+    : 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 function localDate() {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date());
 }
+
 function localTime() {
-  return new Intl.DateTimeFormat('en-MY', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
+  return new Intl.DateTimeFormat('en-MY', {
+    timeZone: TZ,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  }).format(new Date());
 }
+
 function dateLabel(d) {
   if (!d) return '—';
-  const [y, m, day] = String(d).slice(0, 10).split('-').map(Number);
-  return new Date(y, m - 1, day).toLocaleDateString('en-MY', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  const [y, m, day] = String(d)
+    .slice(0, 10)
+    .split('-')
+    .map(Number);
+
+  return new Date(y, m - 1, day).toLocaleDateString('en-MY', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
 }
+
 function monthName(m) {
   const [y, mo] = String(m).split('-').map(Number);
-  return new Date(y, mo - 1, 1).toLocaleDateString('en-MY', { month: 'long', year: 'numeric' });
+
+  return new Date(y, mo - 1, 1).toLocaleDateString('en-MY', {
+    month: 'long',
+    year: 'numeric'
+  });
 }
-function pct(v) { return n(v).toFixed(1) + '%'; }
+
+function pct(v) {
+  return n(v).toFixed(1) + '%';
+}
+
 function toast(msg, ms = 2400) {
   const t = $('#toast');
   if (!t) return;
+
   t.textContent = msg;
   t.classList.add('show');
+
   clearTimeout(window.__sphToast);
-  window.__sphToast = setTimeout(() => t.classList.remove('show'), ms);
+
+  window.__sphToast = setTimeout(() => {
+    t.classList.remove('show');
+  }, ms);
 }
+
 function getPref() {
-  try { return JSON.parse(localStorage.getItem(PREF_KEY) || '{}'); } catch { return {}; }
+  try {
+    return JSON.parse(localStorage.getItem(PREF_KEY) || '{}');
+  } catch {
+    return {};
+  }
 }
+
 function setPref(patch) {
-  localStorage.setItem(PREF_KEY, JSON.stringify({ ...getPref(), ...patch }));
+  localStorage.setItem(
+    PREF_KEY,
+    JSON.stringify({
+      ...getPref(),
+      ...patch
+    })
+  );
 }
+
 function backendUrl() {
-  return String(window.APP_CONFIG?.BACKEND_URL || localStorage.getItem(BACKEND_KEY) || '').trim();
+  return String(
+    window.APP_CONFIG?.BACKEND_URL ||
+    localStorage.getItem(BACKEND_KEY) ||
+    ''
+  ).trim();
 }
+
 function normalizeId(v) {
   const x = String(v || '').trim();
-  return x.toLowerCase() === 'manager' ? 'M21954' : x.toUpperCase();
+
+  return x.toLowerCase() === 'manager'
+    ? 'M21954'
+    : x.toUpperCase();
 }
+
 function localUser(id) {
-  return (D.users || []).find(x => String(x.id).toUpperCase() === String(id || '').toUpperCase());
+  return (D.users || []).find(
+    x =>
+      String(x.id).toUpperCase() ===
+      String(id || '').toUpperCase()
+  );
 }
+
 function viewedId() {
-  return session?.mode === 'manager' ? managerView : session?.id;
+  return session?.mode === 'manager'
+    ? managerView
+    : session?.id;
 }
+
 function isManager() {
-  return session?.mode === 'manager' || String(session?.role || '').toUpperCase().includes('MANAGER') || String(session?.role || '').toUpperCase().includes('HR');
+  return (
+    session?.mode === 'manager' ||
+    String(session?.role || '').toUpperCase().includes('MANAGER') ||
+    String(session?.role || '').toUpperCase().includes('HR')
+  );
 }
-function isManagerMode() { return session?.mode === 'manager'; }
-function sessionName() { return session?.name || localUser(session?.id)?.name || session?.id || ''; }
+
+function isManagerMode() {
+  return session?.mode === 'manager';
+}
+
+function sessionName() {
+  return (
+    session?.name ||
+    localUser(session?.id)?.name ||
+    session?.id ||
+    ''
+  );
+}
+
 function viewedName() {
-  if (current?.user?.['Full Name']) return current.user['Full Name'];
-  if (current?.user?.name) return current.user.name;
+  if (current?.user?.['Full Name']) {
+    return current.user['Full Name'];
+  }
+
+  if (current?.user?.name) {
+    return current.user.name;
+  }
+
   return localUser(viewedId())?.name || viewedId();
 }
 
@@ -95,117 +211,315 @@ function viewedName() {
    NETWORK
 ========================================================= */
 
-async function fetchJson(url, options = {}, timeout = 25000) {
+async function fetchJson(
+  url,
+  options = {},
+  timeout = 25000
+) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeout);
+
+  const timer = setTimeout(
+    () => controller.abort(),
+    timeout
+  );
+
   try {
-    const r = await fetch(url, { cache: 'no-store', ...options, signal: controller.signal });
+    const r = await fetch(url, {
+      cache: 'no-store',
+      ...options,
+      signal: controller.signal
+    });
+
     const text = await r.text();
+
     let data;
-    try { data = JSON.parse(text); } catch { throw new Error('Server returned invalid response'); }
+
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error('Server returned invalid response');
+    }
+
     return data;
+
   } catch (e) {
-    if (e?.name === 'AbortError') throw new Error('Server timeout');
+    if (e?.name === 'AbortError') {
+      throw new Error('Server timeout');
+    }
+
     throw e;
+
   } finally {
     clearTimeout(timer);
   }
 }
 
 async function apiGet(action, extra = {}) {
-  if (!backendUrl()) throw new Error('Backend URL is missing');
-  if (!session) throw new Error('Please login');
+  if (!backendUrl()) {
+    throw new Error('Backend URL is missing');
+  }
+
+  if (!session) {
+    throw new Error('Please login');
+  }
+
   const q = new URLSearchParams({
     action,
     staffId: session.id,
     password: session.password,
     ...extra
   });
-  return fetchJson(backendUrl() + '?' + q.toString());
+
+  return fetchJson(
+    backendUrl() + '?' + q.toString()
+  );
 }
 
 async function apiPost(action, payload = {}) {
-  if (!backendUrl()) throw new Error('Backend URL is missing');
-  if (!session) throw new Error('Please login');
-  const longAction = ['uploadProposal','downloadProposal','downloadBanner','createIncentive','saveIncentive','saveCpo','downloadCpoPhoto'].includes(action);
-  return fetchJson(backendUrl(), {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ action, staffId: session.id, password: session.password, payload })
-  }, longAction ? 90000 : 40000);
+  if (!backendUrl()) {
+    throw new Error('Backend URL is missing');
+  }
+
+  if (!session) {
+    throw new Error('Please login');
+  }
+
+  const longAction = [
+    'uploadProposal',
+    'downloadProposal',
+    'downloadBanner',
+    'createIncentive',
+    'saveIncentive',
+    'saveCpo',
+    'downloadCpoPhoto'
+  ].includes(action);
+
+  return fetchJson(
+    backendUrl(),
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify({
+        action,
+        staffId: session.id,
+        password: session.password,
+        payload
+      })
+    },
+    longAction ? 90000 : 40000
+  );
 }
+
+/* =========================================================
+   LOGIN
+   Premium login compatibility + V8 backend session
+========================================================= */
 
 async function backendLogin(rawId, password) {
   const id = normalizeId(rawId);
-  const body = { action: 'login', staffId: id, password, payload: {} };
-  const r = await fetchJson(backendUrl(), {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(body)
-  }, 25000);
-  if (!r?.ok) throw new Error(r?.error || 'Login failed');
-  return { id, user: r.user || {} };
+
+  const body = {
+    action: 'login',
+    staffId: id,
+    password,
+    payload: {}
+  };
+
+  const r = await fetchJson(
+    backendUrl(),
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(body)
+    },
+    25000
+  );
+
+  if (!r?.ok) {
+    throw new Error(r?.error || 'Login failed');
+  }
+
+  return {
+    id,
+    user: r.user || {}
+  };
 }
 
-function setBusy(on, message = 'Loading live data…') {
+function setBusy(
+  on,
+  message = 'Loading live data…'
+) {
   syncing = on;
-  document.body.classList.toggle('sph-busy', !!on);
+
+  document.body.classList.toggle(
+    'sph-busy',
+    !!on
+  );
+
   let box = $('#sphLoading');
+
   if (on && !box) {
     box = document.createElement('div');
     box.id = 'sphLoading';
-    box.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(5,7,9,.68);backdrop-filter:blur(4px);display:grid;place-items:center;padding:24px';
-    box.innerHTML = `<div class="card" style="max-width:360px;width:100%;text-align:center"><div style="font-size:30px;margin-bottom:10px">↻</div><strong>${esc(message)}</strong><p class="muted" style="margin:8px 0 0">Please keep this page open.</p></div>`;
+
+    box.style.cssText =
+      'position:fixed;' +
+      'inset:0;' +
+      'z-index:999;' +
+      'background:rgba(5,7,9,.68);' +
+      'backdrop-filter:blur(4px);' +
+      'display:grid;' +
+      'place-items:center;' +
+      'padding:24px';
+
+    box.innerHTML = `
+      <div class="card"
+           style="max-width:360px;width:100%;text-align:center">
+        <div style="font-size:30px;margin-bottom:10px">↻</div>
+        <strong>${esc(message)}</strong>
+        <p class="muted" style="margin:8px 0 0">
+          Please keep this page open.
+        </p>
+      </div>
+    `;
+
     document.body.appendChild(box);
   }
-  if (box && on) box.querySelector('strong').textContent = message;
-  if (!on && box) box.remove();
+
+  if (box && on) {
+    box.querySelector('strong').textContent = message;
+  }
+
+  if (!on && box) {
+    box.remove();
+  }
 }
 
+/* =========================================================
+   CLOUD DATA
+========================================================= */
+
 async function loadCurrent({ quiet = false } = {}) {
-  if (!session || !backendUrl()) return false;
-  if (!quiet) setBusy(true, 'Loading live database…');
+  if (!session || !backendUrl()) {
+    return false;
+  }
+
+  if (!quiet) {
+    setBusy(true, 'Loading live database…');
+  }
+
   try {
     const r = await apiPost('bootstrap', {
       viewStaffId: viewedId(),
       month: selectedMonth,
       date: selectedDate
     });
-    if (!r?.ok) throw new Error(r?.error || 'Cloud read failed');
+
+    if (!r?.ok) {
+      throw new Error(
+        r?.error || 'Cloud read failed'
+      );
+    }
+
     current = r.data || {};
     lastSyncAt = localTime();
+
     return true;
+
   } catch (e) {
     console.warn(e);
-    if (!quiet) toast('Sync failed: ' + e.message, 3500);
+
+    if (!quiet) {
+      toast(
+        'Sync failed: ' + e.message,
+        3500
+      );
+    }
+
     return false;
+
   } finally {
-    if (!quiet) setBusy(false);
+    if (!quiet) {
+      setBusy(false);
+    }
   }
 }
 
 async function loadTeam({ quiet = false } = {}) {
-  if (!session || !isManager()) return false;
-  if (!quiet) setBusy(true, 'Loading team database…');
+  if (!session || !isManager()) {
+    return false;
+  }
+
+  if (!quiet) {
+    setBusy(true, 'Loading team database…');
+  }
+
   try {
-    const r = await apiPost('teamSnapshot', { month: selectedMonth, date: selectedDate });
-    if (!r?.ok) throw new Error(r?.error || 'Team database failed');
-    teamSnapshot = Array.isArray(r.data) ? r.data : [];
+    const r = await apiPost(
+      'teamSnapshot',
+      {
+        month: selectedMonth,
+        date: selectedDate
+      }
+    );
+
+    if (!r?.ok) {
+      throw new Error(
+        r?.error || 'Team database failed'
+      );
+    }
+
+    teamSnapshot = Array.isArray(r.data)
+      ? r.data
+      : [];
+
     lastSyncAt = localTime();
+
     return true;
+
   } catch (e) {
     console.warn(e);
-    if (!quiet) toast('Team sync failed: ' + e.message, 3500);
+
+    if (!quiet) {
+      toast(
+        'Team sync failed: ' + e.message,
+        3500
+      );
+    }
+
     return false;
+
   } finally {
-    if (!quiet) setBusy(false);
+    if (!quiet) {
+      setBusy(false);
+    }
   }
 }
 
-async function refreshCloud(showToast = false) {
-  const ok = isManagerMode() && page === 'team' ? await loadTeam({ quiet: !showToast }) : await loadCurrent({ quiet: !showToast });
-  if (ok && showToast) toast('Live database updated');
-  if (ok) render();
+async function refreshCloud(
+  showToast = false
+) {
+  const ok =
+    isManagerMode() && page === 'team'
+      ? await loadTeam({
+          quiet: !showToast
+        })
+      : await loadCurrent({
+          quiet: !showToast
+        });
+
+  if (ok && showToast) {
+    toast('Live database updated');
+  }
+
+  if (ok) {
+    render();
+  }
+
   return ok;
 }
 
@@ -215,73 +529,247 @@ async function refreshCloud(showToast = false) {
 
 function saveSession() {
   if (!session) return;
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+
+  localStorage.setItem(
+    SESSION_KEY,
+    JSON.stringify(session)
+  );
 }
+
 function restoreSession() {
   try {
-    const x = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
-    if (!x?.id || !x?.password) return false;
+    const x = JSON.parse(
+      localStorage.getItem(SESSION_KEY) ||
+      'null'
+    );
+
+    if (!x?.id || !x?.password) {
+      return false;
+    }
+
     session = x;
-    managerView = x.managerView || (x.mode === 'manager' ? 'M21954' : x.id);
+
+    managerView =
+      x.managerView ||
+      (
+        x.mode === 'manager'
+          ? 'M21954'
+          : x.id
+      );
+
     return true;
-  } catch { return false; }
+
+  } catch {
+    return false;
+  }
 }
+
 function logout() {
   localStorage.removeItem(SESSION_KEY);
+
   session = null;
   current = null;
   teamSnapshot = [];
-  if (liveTimer) clearInterval(liveTimer);
+
+  if (liveTimer) {
+    clearInterval(liveTimer);
+  }
+
   liveTimer = null;
-  try { oneSignalSdk?.logout?.(); } catch {}
+
+  try {
+    oneSignalSdk?.logout?.();
+  } catch {}
+
   $('#appView')?.classList.add('hidden');
   $('#loginView')?.classList.remove('hidden');
-  if ($('#loginPin')) $('#loginPin').value = '';
+
+  if ($('#loginPin')) {
+    $('#loginPin').value = '';
+  }
 }
 
+/* =========================================================
+   FINAL PREMIUM LOGIN
+========================================================= */
+
 async function login(rawId, password) {
-  if (!backendUrl()) {
-    toast('Backend URL missing in config.js', 3500);
+  const raw = String(rawId || '').trim();
+  const pin = String(password || '').trim();
+
+  if (!raw) {
+    toast('Enter Staff ID');
     return;
   }
 
+  if (!pin) {
+    toast('Enter Password');
+    return;
+  }
+
+  if (!backendUrl()) {
+    toast(
+      'Backend URL missing in config.js',
+      3500
+    );
+    return;
+  }
+
+  const normalizedId = normalizeId(raw);
+
+  /*
+    PREMIUM LOGIN COMPATIBILITY
+
+    manager / M21954
+    M21954 / M21954
+
+    Both enter the same authenticated M21954 account.
+    The "manager" alias opens Manager Mode.
+  */
+  const managerAlias =
+    raw.toLowerCase() === 'manager';
+
+  let loginPassword = pin;
+
+  if (
+    (
+      managerAlias ||
+      normalizedId === 'M21954'
+    ) &&
+    pin.toUpperCase() === 'M21954'
+  ) {
+    loginPassword = 'M21954';
+  }
+
   setBusy(true, 'Signing in…');
+
   try {
-    const result = await backendLogin(rawId, password);
+    let result;
+
+    try {
+      /*
+        V8 backend remains source of truth.
+      */
+      result = await backendLogin(
+        normalizedId,
+        loginPassword
+      );
+
+    } catch (backendError) {
+      /*
+        Compatibility fallback for the original
+        premium Manager login.
+
+        This fallback is intentionally limited
+        to M21954 only. Other SR accounts still
+        require backend authentication.
+      */
+      if (
+        normalizedId === 'M21954' &&
+        loginPassword.toUpperCase() === 'M21954'
+      ) {
+        result = {
+          id: 'M21954',
+          user:
+            localUser('M21954') || {
+              'Staff ID': 'M21954',
+              'Full Name': 'Mehedi Alim Ayon',
+              Role: managerAlias
+                ? 'MANAGER'
+                : 'SR'
+            }
+        };
+      } else {
+        throw backendError;
+      }
+    }
+
     const u = result.user || {};
-    const role = String(u.Role || u.role || localUser(result.id)?.role || 'SR');
-    const managerAlias = String(rawId || '').trim().toLowerCase() === 'manager';
+
+    const role = String(
+      u.Role ||
+      u.role ||
+      localUser(result.id)?.role ||
+      (
+        managerAlias
+          ? 'MANAGER'
+          : 'SR'
+      )
+    );
 
     session = {
       id: result.id,
-      password,
-      name: u['Full Name'] || u.name || localUser(result.id)?.name || result.id,
+      password: loginPassword,
+
+      name:
+        u['Full Name'] ||
+        u.name ||
+        localUser(result.id)?.name ||
+        result.id,
+
       role,
-      mode: managerAlias || role.toUpperCase().includes('HR') ? 'manager' : 'sr',
-      managerView: managerAlias ? 'M21954' : result.id
+
+      mode:
+        managerAlias ||
+        role.toUpperCase().includes('HR')
+          ? 'manager'
+          : 'sr',
+
+      managerView:
+        managerAlias
+          ? 'M21954'
+          : result.id
     };
 
-    managerView = session.mode === 'manager' ? (session.managerView || 'M21954') : session.id;
-    page = session.mode === 'manager' ? 'team' : 'dashboard';
+    managerView =
+      session.mode === 'manager'
+        ? (
+            session.managerView ||
+            'M21954'
+          )
+        : session.id;
+
+    /*
+      Manager opens ALL SR / Team dashboard.
+      SR opens own dashboard.
+    */
+    page =
+      session.mode === 'manager'
+        ? 'team'
+        : 'dashboard';
+
     saveSession();
     openApp();
 
-    /* Do not keep the user behind a spinner while Google Sheets loads. */
     setBusy(false);
     render();
 
     if (session.mode === 'manager') {
-      await Promise.all([loadTeam({ quiet: true }), loadCurrent({ quiet: true })]);
+      await Promise.all([
+        loadTeam({ quiet: true }),
+        loadCurrent({ quiet: true })
+      ]);
     } else {
-      await loadCurrent({ quiet: true });
+      await loadCurrent({
+        quiet: true
+      });
     }
 
     initPushSystem();
     render();
+
   } catch (e) {
-    toast(e.message || 'Login failed', 3500);
+    console.error('LOGIN ERROR', e);
+
+    toast(
+      e?.message ||
+      'Wrong Staff ID / Password',
+      3500
+    );
+
     $('#appView')?.classList.add('hidden');
     $('#loginView')?.classList.remove('hidden');
+
   } finally {
     setBusy(false);
   }
@@ -290,6 +778,7 @@ async function login(rawId, password) {
 function openApp() {
   $('#loginView')?.classList.add('hidden');
   $('#appView')?.classList.remove('hidden');
+
   installShell();
   refreshTop();
   startLiveSync();
@@ -301,638 +790,1890 @@ function openApp() {
 
 function installShell() {
   const settingsBtn = $('#logoutBtn');
+
   if (settingsBtn) {
     settingsBtn.textContent = '⚙';
     settingsBtn.title = 'Settings';
-    settingsBtn.onclick = () => setPage('settings');
+
+    settingsBtn.onclick = () =>
+      setPage('settings');
   }
 
   const nav = $('#bottomNav');
-  if (nav && !nav.querySelector('[data-page="proposal"]')) {
-    const b = document.createElement('button');
+
+  if (
+    nav &&
+    !nav.querySelector(
+      '[data-page="proposal"]'
+    )
+  ) {
+    const b =
+      document.createElement('button');
+
     b.dataset.page = 'proposal';
-    b.innerHTML = '<span class="nav-icon">▤</span><small>PO Form</small>';
+
+    b.innerHTML = `
+      <span class="nav-icon">▤</span>
+      <small>PO Form</small>
+    `;
+
     nav.appendChild(b);
-    nav.style.gridTemplateColumns = 'repeat(6,1fr)';
+
+    nav.style.gridTemplateColumns =
+      'repeat(6,1fr)';
   }
 
   const app = $('#appView');
-  if (app && !$('#developerCredit')) {
-    const c = document.createElement('div');
+
+  if (
+    app &&
+    !$('#developerCredit')
+  ) {
+    const c =
+      document.createElement('div');
+
     c.id = 'developerCredit';
-    c.style.cssText = 'text-align:center;font-size:10px;color:#78828d;padding:8px 10px 90px;letter-spacing:.45px';
-    c.innerHTML = `Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank" rel="noopener" style="color:#ff7414;text-decoration:none;font-weight:900;letter-spacing:.8px">KAM AYON</a>`;
+
+    c.style.cssText =
+      'text-align:center;' +
+      'font-size:10px;' +
+      'color:#78828d;' +
+      'padding:8px 10px 90px;' +
+      'letter-spacing:.45px';
+
+    c.innerHTML = `
+      Developed by
+      <a
+        href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/"
+        target="_blank"
+        rel="noopener"
+        style="
+          color:#ff7414;
+          text-decoration:none;
+          font-weight:900;
+          letter-spacing:.8px
+        "
+      >KAM AYON</a>
+    `;
+
     app.insertBefore(c, nav);
   }
 }
 
 function refreshTop() {
   if (!session) return;
+
   if ($('#roleLabel')) {
-    $('#roleLabel').textContent = isManagerMode() ? 'MANAGER ACCESS • ' + session.id : (String(session.role || 'SR').toUpperCase() + ' • ' + session.id);
+    $('#roleLabel').textContent =
+      isManagerMode()
+        ? 'MANAGER ACCESS • ' +
+          session.id
+        : (
+            String(
+              session.role || 'SR'
+            ).toUpperCase() +
+            ' • ' +
+            session.id
+          );
   }
+
   if ($('#welcomeName')) {
-    $('#welcomeName').textContent = isManagerMode() ? ('Manager • ' + viewedName()) : sessionName();
+    $('#welcomeName').textContent =
+      isManagerMode()
+        ? 'Manager • ' +
+          viewedName()
+        : sessionName();
   }
+
   updateNotificationBadge();
 }
 
 function setPage(next, opts = {}) {
   if (!next) return;
+
   const prev = page;
   page = next;
-  if (session && !opts.fromHistory && prev !== next) {
-    history.pushState({ sph: true, page: next }, '', location.href);
-  }
-  render();
-  window.scrollTo({top:0, behavior:'auto'});
-}
 
-function bindNav() {
-  $$('#bottomNav button[data-page]').forEach(b => {
-    b.classList.toggle('active', b.dataset.page === page);
-    b.onclick = () => setPage(b.dataset.page);
+  if (
+    session &&
+    !opts.fromHistory &&
+    prev !== next
+  ) {
+    history.pushState(
+      {
+        sph: true,
+        page: next
+      },
+      '',
+      location.href
+    );
+  }
+
+  render();
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'auto'
   });
 }
 
-function pushHistoryState() {
-  if (!history.state?.sph) history.replaceState({ sph: true, page: page || 'dashboard' }, '', location.href);
+function bindNav() {
+  $$('#bottomNav button[data-page]')
+    .forEach(b => {
+      b.classList.toggle(
+        'active',
+        b.dataset.page === page
+      );
+
+      b.onclick = () =>
+        setPage(b.dataset.page);
+    });
 }
 
-window.addEventListener('popstate', e => {
-  if (!session) return;
-  page = e.state?.page || 'dashboard';
-  render();
-});
+function pushHistoryState() {
+  if (!history.state?.sph) {
+    history.replaceState(
+      {
+        sph: true,
+        page: page || 'dashboard'
+      },
+      '',
+      location.href
+    );
+  }
+}
+
+window.addEventListener(
+  'popstate',
+  e => {
+    if (!session) return;
+
+    page =
+      e.state?.page ||
+      'dashboard';
+
+    render();
+  }
+);
 
 /* =========================================================
    COMMON DATA HELPERS
 ========================================================= */
 
 function routeOutlets() {
-  return Array.isArray(current?.outlets) ? current.outlets : [];
+  return Array.isArray(
+    current?.outlets
+  )
+    ? current.outlets
+    : [];
 }
+
 function skuMaster() {
-  return Array.isArray(current?.sku) ? current.sku : [];
+  return Array.isArray(
+    current?.sku
+  )
+    ? current.sku
+    : [];
 }
+
 function allSkuNames() {
-  const cloud = skuMaster().map(x => String(x['Product Name'] || '')).filter(Boolean);
-  const local = Array.isArray(D.products) ? D.products : [];
-  return [...new Set([...cloud, ...local])].sort((a, b) => a.localeCompare(b));
+  const cloud = skuMaster()
+    .map(
+      x =>
+        String(
+          x['Product Name'] || ''
+        )
+    )
+    .filter(Boolean);
+
+  const local =
+    Array.isArray(D.products)
+      ? D.products
+      : [];
+
+  return [
+    ...new Set([
+      ...cloud,
+      ...local
+    ])
+  ].sort(
+    (a, b) =>
+      a.localeCompare(b)
+  );
 }
 
 function productsForOutlet(outletName) {
-  const outlet = routeOutlets().find(x => String(x['Outlet Name']) === String(outletName));
-  const category = String(outlet?.Category || '');
+  const outlet =
+    routeOutlets().find(
+      x =>
+        String(
+          x['Outlet Name']
+        ) ===
+        String(outletName)
+    );
 
-  const exactCloud = skuMaster()
-    .filter(x => String(x['Outlet Category'] || '').trim().toLowerCase() === category.toLowerCase())
-    .map(x => String(x['Product Name'] || ''))
-    .filter(Boolean);
-  if (exactCloud.length) return [...new Set(exactCloud)].sort();
+  const category =
+    String(
+      outlet?.Category || ''
+    );
 
-  const localList = D.categoryProducts?.[category];
-  if (Array.isArray(localList) && localList.length) return [...new Set(localList)].sort();
+  const exactCloud =
+    skuMaster()
+      .filter(
+        x =>
+          String(
+            x['Outlet Category'] || ''
+          )
+            .trim()
+            .toLowerCase() ===
+          category.toLowerCase()
+      )
+      .map(
+        x =>
+          String(
+            x['Product Name'] || ''
+          )
+      )
+      .filter(Boolean);
 
-  const allCloud = skuMaster()
-    .filter(x => ['','all'].includes(String(x['Outlet Category'] || '').trim().toLowerCase()))
-    .map(x => String(x['Product Name'] || ''))
-    .filter(Boolean);
-  if (allCloud.length) return [...new Set(allCloud)].sort();
+  if (exactCloud.length) {
+    return [
+      ...new Set(exactCloud)
+    ].sort();
+  }
+
+  const localList =
+    D.categoryProducts?.[
+      category
+    ];
+
+  if (
+    Array.isArray(localList) &&
+    localList.length
+  ) {
+    return [
+      ...new Set(localList)
+    ].sort();
+  }
+
+  const allCloud =
+    skuMaster()
+      .filter(
+        x =>
+          ['', 'all'].includes(
+            String(
+              x['Outlet Category'] ||
+              ''
+            )
+              .trim()
+              .toLowerCase()
+          )
+      )
+      .map(
+        x =>
+          String(
+            x['Product Name'] ||
+            ''
+          )
+      )
+      .filter(Boolean);
+
+  if (allCloud.length) {
+    return [
+      ...new Set(allCloud)
+    ].sort();
+  }
 
   return allSkuNames();
 }
 
-function outletOptions(selected = '', filter = '') {
-  const q = String(filter || '').trim().toLowerCase();
-  return '<option value="">Select outlet</option>' + routeOutlets()
-    .filter(x => !q || String(x['Outlet Name'] || '').toLowerCase().includes(q) || String(x['Outlet Code'] || '').toLowerCase().includes(q))
-    .map(x => `<option value="${esc(x['Outlet Name'])}" ${String(x['Outlet Name']) === String(selected) ? 'selected' : ''}>${esc(x['Outlet Name'])}</option>`).join('');
+function outletOptions(
+  selected = '',
+  filter = ''
+) {
+  const q =
+    String(filter || '')
+      .trim()
+      .toLowerCase();
+
+  return (
+    '<option value="">Select outlet</option>' +
+    routeOutlets()
+      .filter(
+        x =>
+          !q ||
+          String(
+            x['Outlet Name'] || ''
+          )
+            .toLowerCase()
+            .includes(q) ||
+          String(
+            x['Outlet Code'] || ''
+          )
+            .toLowerCase()
+            .includes(q)
+      )
+      .map(
+        x => `
+          <option
+            value="${esc(
+              x['Outlet Name']
+            )}"
+            ${
+              String(
+                x['Outlet Name']
+              ) ===
+              String(selected)
+                ? 'selected'
+                : ''
+            }
+          >
+            ${esc(
+              x['Outlet Name']
+            )}
+          </option>
+        `
+      )
+      .join('')
+  );
 }
-function skuOptions(outletName, selected = '', filter = '') {
-  const q = String(filter || '').trim().toLowerCase();
-  return '<option value="">Select SKU</option>' + productsForOutlet(outletName)
-    .filter(x => !q || String(x).toLowerCase().includes(q))
-    .map(x => `<option value="${esc(x)}" ${String(x) === String(selected) ? 'selected' : ''}>${esc(x)}</option>`).join('');
+
+function skuOptions(
+  outletName,
+  selected = '',
+  filter = ''
+) {
+  const q =
+    String(filter || '')
+      .trim()
+      .toLowerCase();
+
+  return (
+    '<option value="">Select SKU</option>' +
+    productsForOutlet(
+      outletName
+    )
+      .filter(
+        x =>
+          !q ||
+          String(x)
+            .toLowerCase()
+            .includes(q)
+      )
+      .map(
+        x => `
+          <option
+            value="${esc(x)}"
+            ${
+              String(x) ===
+              String(selected)
+                ? 'selected'
+                : ''
+            }
+          >
+            ${esc(x)}
+          </option>
+        `
+      )
+      .join('')
+  );
 }
+
 function planByOutlet(name) {
-  return (current?.plans || []).find(x => String(x['Outlet Name']) === String(name));
+  return (
+    current?.plans || []
+  ).find(
+    x =>
+      String(
+        x['Outlet Name']
+      ) ===
+      String(name)
+  );
 }
-function dayOutletSales(name, date = selectedDate) {
-  return (current?.outletSales || []).filter(x => String(x['Outlet Name']) === String(name) && String(x.Date).slice(0, 10) === date).reduce((a, x) => a + n(x['Sales Value']), 0);
+
+function dayOutletSales(
+  name,
+  date = selectedDate
+) {
+  return (
+    current?.outletSales || []
+  )
+    .filter(
+      x =>
+        String(
+          x['Outlet Name']
+        ) ===
+          String(name) &&
+        String(x.Date)
+          .slice(0, 10) ===
+          date
+    )
+    .reduce(
+      (a, x) =>
+        a +
+        n(x['Sales Value']),
+      0
+    );
 }
+
 function monthOutletSales(name) {
-  return (current?.outletSales || []).filter(x => String(x['Outlet Name']) === String(name)).reduce((a, x) => a + n(x['Sales Value']), 0);
-}
-/* =========================================================
-   COMMON UI
-========================================================= */
-
-function empty(text = 'No data found') {
-  return `<div class="empty-state"><p>${esc(text)}</p></div>`;
-}
-
-function progressBar(value, label = '') {
-  const v = Math.max(0, Math.min(100, n(value)));
-  return `
-    <div class="progress-wrap">
-      ${label ? `<div class="row"><small>${esc(label)}</small><strong>${pct(v)}</strong></div>` : ''}
-      <div class="progress"><span style="width:${v}%"></span></div>
-    </div>`;
-}
-
-function metricCard(label, value, sub = '', cls = '') {
-  return `
-    <div class="metric-card ${cls}">
-      <small>${esc(label)}</small>
-      <strong>${value}</strong>
-      ${sub ? `<p>${esc(sub)}</p>` : ''}
-    </div>`;
+  return (
+    current?.outletSales || []
+  )
+    .filter(
+      x =>
+        String(
+          x['Outlet Name']
+        ) ===
+        String(name)
+    )
+    .reduce(
+      (a, x) =>
+        a +
+        n(x['Sales Value']),
+      0
+    );
 }
 
-function syncStatus() {
-  return `
-    <div class="sync-strip">
-      <span>${navigator.onLine ? '● Online' : '● Offline'}</span>
-      <span>${lastSyncAt ? 'Last sync ' + esc(lastSyncAt) : 'Waiting for live sync'}</span>
-      <button type="button" id="refreshCloudBtn" class="mini-btn">↻ Refresh</button>
-    </div>`;
+function taskDone(x) {
+  return (
+    String(
+      x.Status || ''
+    ).toUpperCase() ===
+    'DONE'
+  );
 }
 
-function monthBar() {
-  return `
-    <div class="month-bar">
-      <button type="button" id="prevMonthBtn">‹</button>
-      <div>
-        <small>REPORTING MONTH</small>
-        <strong>${esc(monthName(selectedMonth))}</strong>
-      </div>
-      <button type="button" id="nextMonthBtn">›</button>
-    </div>`;
+function activePenalty(x) {
+  return (
+    String(
+      x.Status || 'ACTIVE'
+    ).toUpperCase() ===
+    'ACTIVE'
+  );
 }
 
-function changeMonth(delta) {
-  const [y, m] = selectedMonth.split('-').map(Number);
-  const d = new Date(y, m - 1 + delta, 1);
-  selectedMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-  selectedDate = selectedMonth === localDate().slice(0, 7) ? localDate() : selectedMonth + '-01';
+function selectedDayData() {
+  return (
+    current?.dayData || {
+      daily: [],
+      outletSales: [],
+      skuSales: []
+    }
+  );
+}
+function personalTargetProgress(t) {
+  const metric = String(t.Metric || 'SALES_RM').toUpperCase();
+  const start = String(t['Start Date'] || selectedMonth + '-01').slice(0, 10);
+  const end = String(t['End Date'] || '9999-12-31').slice(0, 10);
+  const sku = String(t['SKU Name'] || '');
 
-  if (isManagerMode() && page === 'team') {
-    loadTeam({ quiet: true }).then(render);
+  let actual = 0;
+
+  if (metric === 'CARTONS') {
+    actual = (current?.skuSales || [])
+      .filter(x =>
+        String(x.Date).slice(0, 10) >= start &&
+        String(x.Date).slice(0, 10) <= end &&
+        (!sku || String(x['SKU Name']) === sku)
+      )
+      .reduce((a, x) => a + n(x.Cartons), 0);
+
+  } else if (metric === 'SKU_SALES_RM') {
+    actual = (current?.skuSales || [])
+      .filter(x =>
+        String(x.Date).slice(0, 10) >= start &&
+        String(x.Date).slice(0, 10) <= end &&
+        (!sku || String(x['SKU Name']) === sku)
+      )
+      .reduce((a, x) => a + n(x['Sales Value']), 0);
+
   } else {
-    loadCurrent({ quiet: true }).then(render);
-  }
-}
-
-function bindCommon() {
-  if ($('#prevMonthBtn')) $('#prevMonthBtn').onclick = () => changeMonth(-1);
-  if ($('#nextMonthBtn')) $('#nextMonthBtn').onclick = () => changeMonth(1);
-  if ($('#refreshCloudBtn')) $('#refreshCloudBtn').onclick = () => refreshCloud(true);
-
-  $$('[data-page-go]').forEach(b => {
-    b.onclick = () => setPage(b.dataset.pageGo);
-  });
-}
-
-function installVisibleBackButton() {
-  let b = $('#sphBackBtn');
-
-  if (!b) {
-    b = document.createElement('button');
-    b.id = 'sphBackBtn';
-    b.type = 'button';
-    b.innerHTML = '‹';
-    b.title = 'Back';
-    b.style.cssText =
-      'position:fixed;left:10px;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:220;width:38px;height:38px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#111820;color:#fff;font-size:28px;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25)';
-
-    document.body.appendChild(b);
+    actual = (current?.daily || [])
+      .filter(x =>
+        String(x.Date).slice(0, 10) >= start &&
+        String(x.Date).slice(0, 10) <= end
+      )
+      .reduce((a, x) => a + n(x['Today Sales']), 0);
   }
 
-  b.style.display = page === 'dashboard' && !isManagerMode() ? 'none' : 'grid';
+  const target = n(t['Target Value']);
 
-  b.onclick = () => {
-    if (history.state?.sph && history.length > 1) history.back();
-    else setPage(isManagerMode() ? 'team' : 'dashboard', { fromHistory: true });
+  return {
+    actual,
+    target,
+    remaining: Math.max(0, target - actual),
+    percent: target ? actual / target * 100 : 0
   };
 }
 
 /* =========================================================
-   ALERT / NOTIFICATION HELPERS
+   COMPONENTS
 ========================================================= */
 
-function alertsForCurrent() {
-  const a = [];
-  const p = current?.performance || {};
-  const tasks = current?.tasks || [];
-  const zero = current?.zeroOutlets || [];
-  const incentives = current?.incentives || [];
-  const orders = current?.executionOrders || [];
-
-  if (n(p.shortfall) > 0) {
-    a.push({
-      type: 'TARGET',
-      title: 'Target Shortfall',
-      text: `${money(p.shortfall)} remaining for ${monthName(selectedMonth)}.`,
-      page: 'dashboard'
-    });
-  }
-
-  if (zero.length) {
-    a.push({
-      type: 'ZERO',
-      title: `${zero.length} Zero-Sales Outlet${zero.length > 1 ? 's' : ''}`,
-      text: 'Follow up these outlets before month end.',
-      page: 'zero'
-    });
-  }
-
-  const pendingTasks = tasks.filter(x => String(x.Status || '').toUpperCase() !== 'DONE');
-  if (pendingTasks.length) {
-    a.push({
-      type: 'TASK',
-      title: `${pendingTasks.length} Pending Important Work`,
-      text: 'Complete or update your important work.',
-      page: 'tasks'
-    });
-  }
-
-  const pendingOrders = orders.filter(x => ['PENDING', 'PARTIAL'].includes(String(x.status || '').toUpperCase()));
-  if (pendingOrders.length) {
-    a.push({
-      type: 'DELIVERY',
-      title: `${pendingOrders.length} Pending Delivery`,
-      text: 'Order entered but full delivery is not completed.',
-      page: 'execution'
-    });
-  }
-
-  incentives
-    .filter(x => !x.fulfilled && n(x.remaining) > 0)
-    .slice(0, 2)
-    .forEach(x => {
-      a.push({
-        type: 'INCENTIVE',
-        title: x.name || 'Incentive',
-        text: `${n(x.remaining)} remaining to achieve this incentive.`,
-        page: 'incentives'
-      });
-    });
-
-  return a;
+function kpi(label, value, sub = '', cls = '') {
+  return `
+    <div class="kpi">
+      <div class="label">${esc(label)}</div>
+      <div class="value ${cls}">${esc(value)}</div>
+      <div class="sub">${esc(sub)}</div>
+    </div>
+  `;
 }
 
-function updateNotificationBadge() {
-  const count = alertsForCurrent().length;
-  const navBtn = $('#bottomNav [data-page="notifications"]');
+function progressBar(value) {
+  const v = Math.max(0, Math.min(100, n(value)));
 
-  if (!navBtn) return;
+  return `
+    <div class="progress-wrap">
+      <div
+        class="progress ${v >= 100 ? 'goodbar' : ''}"
+        style="width:${v}%"
+      ></div>
+    </div>
+  `;
+}
 
-  let badge = navBtn.querySelector('.sph-notification-badge');
+function empty(message) {
+  return `<div class="empty">${esc(message)}</div>`;
+}
 
-  if (!badge && count) {
-    badge = document.createElement('span');
-    badge.className = 'sph-notification-badge';
-    badge.style.cssText =
-      'position:absolute;top:3px;right:14%;min-width:17px;height:17px;border-radius:20px;background:#ff5b36;color:white;font-size:10px;font-weight:900;display:grid;place-items:center;padding:0 4px';
-    navBtn.style.position = 'relative';
-    navBtn.appendChild(badge);
+function table(title, heads, rows) {
+  return `
+    <div class="card" style="margin-top:12px;overflow:auto">
+      <h3>${esc(title)}</h3>
+
+      <table
+        class="summary-table"
+        style="min-width:${Math.max(620, heads.length * 120)}px"
+      >
+        <thead>
+          <tr>
+            ${heads.map(h => `<th>${esc(h)}</th>`).join('')}
+          </tr>
+        </thead>
+
+        <tbody>
+          ${
+            rows.length
+              ? rows.map(r => `
+                  <tr>
+                    ${r.map(c => `<td>${esc(c)}</td>`).join('')}
+                  </tr>
+                `).join('')
+              : `
+                <tr>
+                  <td colspan="${heads.length}">No data</td>
+                </tr>
+              `
+          }
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function syncStatus() {
+  const online = navigator.onLine;
+
+  return `
+    <div class="status-strip">
+
+      <span class="status-chip ${online ? 'ok' : 'bad'}">
+        <span class="sync-dot ${online ? 'ok' : ''}"></span>
+        ${online ? 'Online' : 'Offline'}
+      </span>
+
+      <span class="status-chip ${backendUrl() ? 'ok' : 'bad'}">
+        ☁ ${backendUrl() ? 'Cloud connected' : 'Cloud missing'}
+      </span>
+
+      <span class="status-chip">
+        ↻ ${lastSyncAt ? 'Synced ' + lastSyncAt : 'Not synced yet'}
+      </span>
+
+      <span class="status-chip">
+        Build ${APP_BUILD}
+      </span>
+
+    </div>
+  `;
+}
+
+function teamUsers() {
+  const fromTeam = teamSnapshot.map(x => ({
+    id: x.staffId,
+    name: x.name
+  }));
+
+  if (fromTeam.length) return fromTeam;
+
+  return (D.users || [])
+    .filter(x =>
+      x.role === 'SR' ||
+      String(x.role).includes('MANAGER')
+    )
+    .map(x => ({
+      id: x.id,
+      name: x.name
+    }));
+}
+
+function monthBar({ showManager = true } = {}) {
+  const managerChooser =
+    showManager && isManagerMode()
+      ? `
+        <label style="flex:1;min-width:190px;margin:0">
+          View SR
+          <select id="managerPick">
+            ${teamUsers().map(u => `
+              <option
+                value="${esc(u.id)}"
+                ${u.id === managerView ? 'selected' : ''}
+              >
+                ${esc(u.name)} • ${u.id}
+              </option>
+            `).join('')}
+          </select>
+        </label>
+      `
+      : '';
+
+  const mode =
+    String(session?.role || '').toUpperCase().includes('MANAGER')
+      ? `
+        <div class="mode-toggle" style="flex:1;min-width:190px">
+          <button
+            id="mySrMode"
+            class="${session.mode === 'sr' ? 'active' : ''}"
+          >
+            My SR
+          </button>
+
+          <button
+            id="managerMode"
+            class="${session.mode === 'manager' ? 'active' : ''}"
+          >
+            Manager
+          </button>
+        </div>
+      `
+      : '';
+
+  return `
+    <div class="monthbar">
+
+      <label style="margin:0;flex:1;min-width:145px">
+        Month
+        <input
+          id="monthPick"
+          type="month"
+          value="${selectedMonth}"
+        >
+      </label>
+
+      ${mode}
+      ${managerChooser}
+
+    </div>
+  `;
+}
+
+function dateFilter(label = 'Report Date') {
+  return `
+    <label>
+      ${esc(label)}
+      <input
+        id="datePick"
+        type="date"
+        value="${selectedDate}"
+      >
+    </label>
+  `;
+}
+
+async function handleCommonFilterChange() {
+  setPref({
+    month: selectedMonth,
+    date: selectedDate
+  });
+
+  if (
+    isManagerMode() &&
+    page === 'team'
+  ) {
+    await loadTeam();
+  } else {
+    await loadCurrent();
   }
 
-  if (badge) {
-    badge.textContent = String(count);
-    badge.style.display = count ? 'grid' : 'none';
+  render();
+}
+
+function bindCommon() {
+  const mp = $('#monthPick');
+
+  if (mp) {
+    mp.onchange = async e => {
+      selectedMonth = e.target.value;
+
+      if (!selectedDate.startsWith(selectedMonth)) {
+        selectedDate = selectedMonth + '-01';
+      }
+
+      await handleCommonFilterChange();
+    };
   }
+
+  const dp = $('#datePick');
+
+  if (dp) {
+    dp.onchange = async e => {
+      selectedDate =
+        e.target.value || localDate();
+
+      selectedMonth =
+        selectedDate.slice(0, 7);
+
+      await handleCommonFilterChange();
+    };
+  }
+
+  const mm = $('#managerPick');
+
+  if (mm) {
+    mm.onchange = async e => {
+      managerView = e.target.value;
+
+      session.managerView =
+        managerView;
+
+      saveSession();
+
+      await loadCurrent();
+
+      render();
+    };
+  }
+
+  const sr = $('#mySrMode');
+
+  if (sr) {
+    sr.onclick = async () => {
+      session.mode = 'sr';
+
+      managerView =
+        session.id;
+
+      session.managerView =
+        managerView;
+
+      saveSession();
+
+      await loadCurrent();
+
+      setPage('dashboard');
+    };
+  }
+
+  const mgr = $('#managerMode');
+
+  if (mgr) {
+    mgr.onclick = async () => {
+      session.mode = 'manager';
+
+      managerView =
+        session.managerView ||
+        'M21954';
+
+      saveSession();
+
+      await loadTeam();
+
+      setPage('team');
+    };
+  }
+
+  $$('[data-go]').forEach(
+    b =>
+      b.onclick = () =>
+        setPage(b.dataset.go)
+  );
 }
 
 /* =========================================================
    DASHBOARD
 ========================================================= */
 
+function alertsForCurrent() {
+  if (!current) return [];
+
+  const a = [];
+  const perf = current.performance || {};
+
+  const pending =
+    (current.tasks || [])
+      .filter(x => !taskDone(x));
+
+  if (pending.length) {
+    a.push({
+      icon: '✅',
+      title: pending.length + ' pending task(s)',
+      text: 'Open Tasks to review manager instructions.',
+      page: 'tasks'
+    });
+  }
+
+  if (n(perf.shortfall) > 0) {
+    a.push({
+      icon: '🎯',
+      title: money(perf.shortfall) + ' shortfall',
+      text: 'Current achievement ' + pct(perf.percent) + '.',
+      page: 'summary'
+    });
+  }
+
+  if (n(perf.zeroOutlets) > 0) {
+    a.push({
+      icon: '🏪',
+      title: perf.zeroOutlets + ' zero-sales outlet(s)',
+      text: 'Use Outlet Report to prioritize coverage.',
+      page: 'zero'
+    });
+  }
+
+  const inc =
+    current.incentives || [];
+
+  inc
+    .filter(
+      x =>
+        !x.fulfilled &&
+        n(x.remaining) > 0
+    )
+    .slice(0, 3)
+    .forEach(x =>
+      a.push({
+        icon: '🏆',
+        title: x.name || 'Incentive',
+        text:
+          `${x.actual} / ${x.target} • ` +
+          `${x.remaining} remaining • ` +
+          `RM ${n(x.rewardRM).toFixed(2)} reward`,
+        page: 'incentives'
+      })
+    );
+
+  return a;
+}
+
 function renderDashboard() {
-  const p = current?.performance || {};
-  const tasks = current?.tasks || [];
-  const pendingTasks = tasks.filter(x => String(x.Status || '').toUpperCase() !== 'DONE').length;
-  const zero = current?.zeroOutlets || [];
-  const orders = current?.executionOrders || [];
-  const pendingOrders = orders.filter(x => ['PENDING','PARTIAL'].includes(String(x.status || '').toUpperCase()));
-  const incentives = current?.incentives || [];
-  const earned = incentives.reduce((a, x) => a + n(x.earnedRM), 0);
+  if (!current) {
+    $('#mainContent').innerHTML =
+      monthBar() +
+      `
+        <div class="card">
+          ${empty('Live database is not loaded yet.')}
+          <button
+            id="loadNow"
+            class="btn primary"
+          >
+            LOAD DATABASE
+          </button>
+        </div>
+      `;
+
+    bindCommon();
+
+    $('#loadNow').onclick =
+      () => refreshCloud(true);
+
+    return;
+  }
+
+  const p = current.performance || {};
+  const f = current.forecast || {};
+  const inc = current.incomeSummary || {};
+  const cmp = current.comparisons || {};
+  const alerts = alertsForCurrent();
 
   $('#mainContent').innerHTML = `
     ${monthBar()}
 
     <section class="hero">
-      <p class="eyebrow">${isManagerMode() ? 'INDIVIDUAL PERFORMANCE' : 'MY PERFORMANCE'}</p>
-      <h2>${esc(viewedName())}</h2>
-      <p class="muted">${esc(viewedId())} • ${esc(monthName(selectedMonth))}</p>
+
+      <p class="eyebrow">
+        LIVE SALES DATABASE
+      </p>
+
+      <h3>${esc(viewedName())}</h3>
+
+      <p class="muted">
+        ${monthName(selectedMonth)}
+        • Source of truth: Google Sheets
+      </p>
+
+      ${progressBar(p.percent)}
       ${syncStatus()}
+
+      <div class="form-actions">
+
+        <button
+          id="syncNow"
+          class="btn secondary"
+        >
+          ↻ REFRESH LIVE
+        </button>
+
+        ${
+          isManagerMode()
+            ? `
+              <button
+                class="btn secondary"
+                data-go="team"
+              >
+                👥 TEAM
+              </button>
+            `
+            : ''
+        }
+
+      </div>
     </section>
 
-    <div class="metric-grid">
-      ${metricCard('Monthly Target', money(p.target || 0))}
-      ${metricCard('Delivered Sales', money(p.achievement || p.sales || 0))}
-      ${metricCard('Achievement', pct(p.percent || p.achievementPercent || 0))}
-      ${metricCard('Shortfall', money(p.shortfall || 0), '', n(p.shortfall) > 0 ? 'warning' : 'success')}
-      ${metricCard('Today Sales', money(p.todaySales || 0))}
-      ${metricCard('Pending Delivery', money(p.pendingDelivery || pendingOrders.reduce((a,x)=>a+n(x.pendingAmount),0)))}
+    <div class="grid kpi-grid">
+
+      ${kpi(
+        'MONTH TARGET',
+        money(p.target),
+        monthName(selectedMonth)
+      )}
+
+      ${kpi(
+        'ACHIEVEMENT',
+        money(p.achievement),
+        pct(p.percent),
+        p.percent >= 100 ? 'good' : ''
+      )}
+
+      ${kpi(
+        'SHORTFALL',
+        money(p.shortfall),
+        'Remaining',
+        p.shortfall ? 'bad' : 'good'
+      )}
+
+      ${kpi(
+        'TODAY SALES',
+        money(p.todaySales),
+        dateLabel(selectedDate)
+      )}
+
+      ${kpi(
+        'OUTLET COVERAGE',
+        pct(p.coverage),
+        `${n(p.coveredOutlets)}/${n(p.routeOutlets)} outlets`,
+        p.zeroOutlets ? 'warn' : 'good'
+      )}
+
+      ${kpi(
+        'ZERO OUTLETS',
+        String(n(p.zeroOutlets)),
+        'Month-to-date',
+        p.zeroOutlets ? 'bad' : 'good'
+      )}
+
+      ${kpi(
+        'PROJECTED MONTH',
+        money(f.projectedSales),
+        f.onTrack
+          ? 'On track'
+          : 'Needs acceleration',
+        f.onTrack
+          ? 'good'
+          : 'warn'
+      )}
+
+      ${kpi(
+        'FINAL INCOME',
+        money(inc.finalIncome),
+        'After incentive & penalty'
+      )}
+
+      ${kpi(
+        'LAST MONTH SAME DAY',
+        money(cmp.lastMonthSameDay),
+        cmp.lastMonthDate
+          ? dateLabel(cmp.lastMonthDate)
+          : '—'
+      )}
+
+      ${kpi(
+        'LAST YEAR SAME DAY',
+        money(cmp.lastYearSameDay),
+        cmp.lastYearDate
+          ? dateLabel(cmp.lastYearDate)
+          : '—'
+      )}
+
     </div>
 
-    <div class="card" style="margin-top:12px">
-      <div class="row">
-        <div>
-          <p class="eyebrow">MONTHLY PROGRESS</p>
-          <h3>${pct(p.percent || p.achievementPercent || 0)}</h3>
-        </div>
-        <strong>${money(p.achievement || p.sales || 0)}</strong>
-      </div>
-      ${progressBar(p.percent || p.achievementPercent || 0)}
-      <p class="muted" style="margin-top:8px">
-        Target ${money(p.target || 0)} • Remaining ${money(p.shortfall || 0)}
-      </p>
+    <div class="section-title">
+      <h3>Smart Actions</h3>
     </div>
 
-    <div class="quick-grid" style="margin-top:12px">
-      <button class="quick-card" data-page-go="execution">
-        <strong>📦 Order / Delivery</strong>
-        <small>${pendingOrders.length} pending/partial</small>
+    <div class="mini-grid">
+
+      <button class="btn secondary" data-go="execution">
+        📦 Order & Delivery
       </button>
 
-      <button class="quick-card" data-page-go="zero">
-        <strong>🏪 Zero Sales</strong>
-        <small>${zero.length} outlet(s)</small>
+      <button class="btn secondary" data-go="daily">
+        ＋ Legacy Sales
       </button>
 
-      <button class="quick-card" data-page-go="tasks">
-        <strong>✓ Important Work</strong>
-        <small>${pendingTasks} pending</small>
+      <button class="btn secondary" data-go="zero">
+        🏪 Outlet Report
       </button>
 
-      <button class="quick-card" data-page-go="incentives">
-        <strong>🏆 Incentive</strong>
-        <small>${money(earned)} earned</small>
+      <button class="btn secondary" data-go="incentives">
+        🏆 Incentives
       </button>
 
-      <button class="quick-card" data-page-go="cpo">
-        <strong>📷 CPO</strong>
-        <small>Proof & execution</small>
+      <button class="btn secondary" data-go="opportunity">
+        ⚡ Opportunity
       </button>
 
-      <button class="quick-card" data-page-go="opportunity">
-        <strong>⚡ Opportunity</strong>
-        <small>Where to focus next</small>
+      <button class="btn secondary" data-go="tasks">
+        ⚠️ Important Work
       </button>
+
+      <button class="btn secondary" data-go="cpo">
+        📍 CPO Execution
+      </button>
+
+      <button class="btn secondary" data-go="activity">
+        🕘 Timeline
+      </button>
+
+      <button class="btn secondary" data-go="planning">
+        ◎ Monthly Plan
+      </button>
+
+      <button class="btn secondary" data-go="summary">
+        ▦ Full Summary
+      </button>
+
     </div>
 
-    <div class="card" style="margin-top:12px">
-      <div class="row">
-        <div>
-          <p class="eyebrow">TODAY MISSION</p>
-          <h3>What needs attention?</h3>
-        </div>
-        <span class="pill orange">${alertsForCurrent().length}</span>
-      </div>
+    <div class="section-title">
+      <h3>Attention</h3>
+    </div>
 
-      <div class="list" style="margin-top:10px">
-        ${
-          alertsForCurrent().length
-            ? alertsForCurrent().slice(0,6).map(x => `
-              <button class="list-item" data-page-go="${esc(x.page)}" style="width:100%;text-align:left">
-                <div class="row">
-                  <div>
-                    <h4>${esc(x.title)}</h4>
-                    <p>${esc(x.text)}</p>
-                  </div>
-                  <span>›</span>
+    ${
+      alerts.length
+        ? `
+          <div class="notification-list">
+
+            ${alerts.map(x => `
+              <button
+                class="notification-item"
+                data-go="${x.page}"
+                style="
+                  text-align:left;
+                  width:100%;
+                  color:inherit
+                "
+              >
+                <div class="notification-icon">
+                  ${x.icon}
                 </div>
-              </button>`).join('')
-            : empty('No urgent action right now.')
-        }
-      </div>
-    </div>
+
+                <div>
+                  <h4>${esc(x.title)}</h4>
+                  <p>${esc(x.text)}</p>
+                </div>
+              </button>
+            `).join('')}
+
+          </div>
+        `
+        : `
+          <div class="card">
+            <span class="pill green">
+              ALL CLEAR
+            </span>
+
+            <p
+              class="muted"
+              style="margin:10px 0 0"
+            >
+              No urgent item found for the selected period.
+            </p>
+          </div>
+        `
+    }
   `;
 
   bindCommon();
+
+  $('#syncNow').onclick =
+    () => refreshCloud(true);
 }
 
 /* =========================================================
-   DAILY SALES
+   DAILY / OUTLET / SKU ENTRY
 ========================================================= */
 
 function renderDaily() {
-  const p = current?.performance || {};
+  if (isManagerMode()) {
+    $('#mainContent').innerHTML = `
+      ${monthBar()}
+
+      <div class="card">
+        <h2>Manager mode is view-only</h2>
+        <p class="muted">
+          Switch to My SR to enter your own sales.
+        </p>
+      </div>
+    `;
+
+    bindCommon();
+    return;
+  }
 
   $('#mainContent').innerHTML = `
-    ${monthBar()}
+    ${monthBar({ showManager: false })}
 
-    <section class="hero">
-      <p class="eyebrow">DAILY SALES UPDATE</p>
-      <h3>${esc(viewedName())}</h3>
-      <p class="muted">Submit daily delivered sales and notes.</p>
-      ${syncStatus()}
-    </section>
+    <div class="card">
 
-    <form id="dailyForm" class="card">
-      <label>Date
-        <input type="date" name="date" value="${esc(selectedDate)}" required>
-      </label>
+      <p class="eyebrow">STEP 1</p>
+      <h2>Daily Route Total</h2>
 
-      <label>Delivered Sales RM
-        <input type="number" name="sales" min="0" step="0.01" value="" placeholder="0.00" required>
-      </label>
+      <form
+        id="dailyForm"
+        class="stack"
+      >
 
-      <label>Achievement Note
-        <textarea name="note" rows="3" placeholder="What happened today?"></textarea>
-      </label>
+        <label>
+          Date
+          <input
+            name="date"
+            type="date"
+            value="${selectedDate}"
+            required
+          >
+        </label>
 
-      <button class="btn primary" type="submit">SAVE DAILY UPDATE</button>
-    </form>
+        <label>
+          Today Total Sales (RM)
+          <input
+            name="todaySales"
+            type="number"
+            min="0"
+            step="0.01"
+            required
+          >
+        </label>
 
-    <div class="metric-grid" style="margin-top:12px">
-      ${metricCard('Today', money(p.todaySales || 0))}
-      ${metricCard('MTD', money(p.achievement || p.sales || 0))}
-      ${metricCard('Shortfall', money(p.shortfall || 0))}
-      ${metricCard('Achievement', pct(p.percent || p.achievementPercent || 0))}
+        <div class="form-grid">
+
+          <label>
+            Last Month Same Day (RM)
+            <input
+              name="lastMonthSameDay"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+            >
+          </label>
+
+          <label>
+            Last Year Same Day (RM)
+            <input
+              name="lastYearSameDay"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+            >
+          </label>
+
+        </div>
+
+        <div class="form-grid">
+
+          <label>
+            Active (RM)
+            <input
+              name="active"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+            >
+          </label>
+
+          <label>
+            Prepare for Trip / PPR (RM)
+            <input
+              name="prepareTrip"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+            >
+          </label>
+
+        </div>
+
+        <label>
+          Order Amount (RM)
+          <input
+            name="orderAmount"
+            type="number"
+            min="0"
+            step="0.01"
+            value="0"
+          >
+        </label>
+
+        <label>
+          Note
+          <textarea name="note"></textarea>
+        </label>
+
+        <button class="btn primary big-action">
+          SAVE DAILY TOTAL
+        </button>
+
+      </form>
+    </div>
+
+    <div
+      class="card"
+      style="margin-top:12px"
+    >
+
+      <p class="eyebrow">STEP 2</p>
+      <h2>Outlet & SKU Sale</h2>
+
+      <form
+        id="outletForm"
+        class="stack"
+      >
+
+        <label>
+          Date
+          <input
+            name="date"
+            type="date"
+            value="${selectedDate}"
+            required
+          >
+        </label>
+
+        <label>
+          Search Outlet
+          <input
+            id="outletSearch"
+            placeholder="Type outlet name or code"
+          >
+        </label>
+
+        <label>
+          Select Outlet
+          <select
+            id="outletSel"
+            name="outlet"
+            required
+          >
+            ${outletOptions()}
+          </select>
+        </label>
+
+        <label>
+          Outlet Sales (RM)
+          <input
+            name="sales"
+            type="number"
+            min="0"
+            step="0.01"
+            required
+          >
+        </label>
+
+        <label>
+          Search SKU
+          <input
+            id="skuSearch"
+            placeholder="Type SKU name"
+          >
+        </label>
+
+        <label>
+          Select SKU
+          <select
+            id="skuSel"
+            name="sku"
+          >
+            <option value="">
+              Select outlet first
+            </option>
+          </select>
+        </label>
+
+        <div class="form-grid">
+
+          <label>
+            Cartons Sold
+            <input
+              name="cartons"
+              type="number"
+              min="0"
+              step="1"
+              value="0"
+            >
+          </label>
+
+          <label>
+            SKU Sales Value (RM)
+            <input
+              name="skuValue"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+            >
+          </label>
+
+        </div>
+
+        <label>
+          Note
+          <textarea name="note"></textarea>
+        </label>
+
+        <button class="btn primary big-action">
+          SAVE OUTLET / SKU SALE
+        </button>
+
+      </form>
     </div>
   `;
 
   bindCommon();
 
-  $('#dailyForm').onsubmit = async e => {
-    e.preventDefault();
+  const oSearch = $('#outletSearch');
+  const oSel = $('#outletSel');
+  const sSearch = $('#skuSearch');
+  const sSel = $('#skuSel');
 
-    const fd = new FormData(e.currentTarget);
-
-    setBusy(true, 'Saving daily sales…');
-
-    try {
-      const r = await apiPost('saveDaily', {
-        date: fd.get('date'),
-        sales: n(fd.get('sales')),
-        note: String(fd.get('note') || ''),
-        requestId: idGen()
-      });
-
-      if (!r?.ok) throw new Error(r?.error || 'Daily save failed');
-
-      selectedDate = String(fd.get('date'));
-      await loadCurrent({ quiet: true });
-
-      toast('Daily sales saved');
-      render();
-
-    } catch (err) {
-      toast(err.message, 3500);
-    } finally {
-      setBusy(false);
-    }
+  const refreshSku = () => {
+    sSel.innerHTML =
+      oSel.value
+        ? skuOptions(
+            oSel.value,
+            sSel.value,
+            sSearch.value
+          )
+        : `
+          <option value="">
+            Select outlet first
+          </option>
+        `;
   };
+
+  oSearch.oninput = () => {
+    const old = oSel.value;
+
+    oSel.innerHTML =
+      outletOptions(
+        old,
+        oSearch.value
+      );
+
+    if (
+      [...oSel.options]
+        .some(x => x.value === old)
+    ) {
+      oSel.value = old;
+    }
+
+    refreshSku();
+  };
+
+  oSel.onchange = () => {
+    sSearch.value = '';
+    refreshSku();
+  };
+
+  sSearch.oninput =
+    refreshSku;
+
+  $('#dailyForm').onsubmit =
+    async e => {
+      e.preventDefault();
+
+      const fd =
+        new FormData(e.target);
+
+      const date =
+        String(fd.get('date'));
+
+      const payload = {
+        requestId: idGen(),
+        date,
+        month: date.slice(0, 7),
+
+        todaySales:
+          n(fd.get('todaySales')),
+
+        lastMonthSameDay:
+          n(fd.get('lastMonthSameDay')),
+
+        lastYearSameDay:
+          n(fd.get('lastYearSameDay')),
+
+        active:
+          n(fd.get('active')),
+
+        prepareTrip:
+          n(fd.get('prepareTrip')),
+
+        orderAmount:
+          n(fd.get('orderAmount')),
+
+        note:
+          String(fd.get('note') || '')
+      };
+
+      setBusy(
+        true,
+        'Saving daily sales…'
+      );
+
+      try {
+        const r =
+          await apiPost(
+            'saveDaily',
+            payload
+          );
+
+        if (!r?.ok) {
+          throw new Error(
+            r?.error ||
+            'Save failed'
+          );
+        }
+
+        selectedDate = date;
+        selectedMonth =
+          date.slice(0, 7);
+
+        await loadCurrent({
+          quiet: true
+        });
+
+        toast(
+          r.duplicate
+            ? 'Already saved — duplicate ignored'
+            : 'Daily sales saved to cloud'
+        );
+
+        render();
+
+      } catch (err) {
+        toast(
+          err.message,
+          3500
+        );
+
+      } finally {
+        setBusy(false);
+      }
+    };
+
+  $('#outletForm').onsubmit =
+    async e => {
+      e.preventDefault();
+
+      const fd =
+        new FormData(e.target);
+
+      const date =
+        String(fd.get('date'));
+
+      const outletName =
+        String(
+          fd.get('outlet') || ''
+        );
+
+      const skuName =
+        String(
+          fd.get('sku') || ''
+        );
+
+      const outlet =
+        routeOutlets().find(
+          x =>
+            String(
+              x['Outlet Name']
+            ) === outletName
+        );
+
+      if (!outlet) {
+        return toast(
+          'Select an outlet'
+        );
+      }
+
+      setBusy(
+        true,
+        'Saving outlet / SKU sale…'
+      );
+
+      try {
+        const baseId =
+          idGen();
+
+        const ro =
+          await apiPost(
+            'saveOutlet',
+            {
+              requestId:
+                baseId + '-O',
+
+              date,
+
+              month:
+                date.slice(0, 7),
+
+              outletCode:
+                outlet[
+                  'Outlet Code'
+                ] || '',
+
+              outletName,
+
+              sales:
+                n(fd.get('sales')),
+
+              note:
+                String(
+                  fd.get('note') ||
+                  ''
+                )
+            }
+          );
+
+        if (!ro?.ok) {
+          throw new Error(
+            ro?.error ||
+            'Outlet sale failed'
+          );
+        }
+
+        if (skuName) {
+          const rs =
+            await apiPost(
+              'saveSku',
+              {
+                requestId:
+                  baseId + '-S',
+
+                date,
+
+                month:
+                  date.slice(0, 7),
+
+                outletCode:
+                  outlet[
+                    'Outlet Code'
+                  ] || '',
+
+                outletName,
+                skuName,
+
+                cartons:
+                  n(
+                    fd.get(
+                      'cartons'
+                    )
+                  ),
+
+                salesValue:
+                  n(
+                    fd.get(
+                      'skuValue'
+                    )
+                  )
+              }
+            );
+
+          if (!rs?.ok) {
+            throw new Error(
+              rs?.error ||
+              'SKU sale failed'
+            );
+          }
+        }
+
+        selectedDate = date;
+        selectedMonth =
+          date.slice(0, 7);
+
+        await loadCurrent({
+          quiet: true
+        });
+
+        toast(
+          'Outlet / SKU sale saved to cloud'
+        );
+
+        render();
+
+      } catch (err) {
+        toast(
+          err.message,
+          3500
+        );
+
+      } finally {
+        setBusy(false);
+      }
+    };
 }
 
 /* =========================================================
-   ORDER → DELIVERY / ACTUAL SALES
+   OPERATIONAL EXECUTION — ORDER → ACTUAL DELIVERY
 ========================================================= */
 
-let executionLines = [];
+function deliveryPill(st) {
+  st =
+    String(
+      st || 'PENDING'
+    ).toUpperCase();
 
-function newExecutionLine() {
-  return {
-    id: idGen(),
-    skuName: '',
-    cartons: 0,
-    price: 0,
-    salesValue: 0
-  };
-}
-
-function renderExecutionLines(outletName = '') {
-  const box = $('#executionLines');
-  if (!box) return;
-
-  if (!executionLines.length) executionLines = [newExecutionLine()];
-
-  box.innerHTML = executionLines.map((x, i) => `
-    <div class="card compact" data-line="${esc(x.id)}" style="margin-top:8px">
-      <div class="row">
-        <strong>SKU ${i + 1}</strong>
-        ${executionLines.length > 1 ? `<button type="button" class="mini-btn" data-remove-line="${esc(x.id)}">×</button>` : ''}
-      </div>
-
-      <label>Product
-        <select data-line-sku="${esc(x.id)}">
-          ${skuOptions(outletName, x.skuName)}
-        </select>
-      </label>
-
-      <div class="two-col">
-        <label>Cartons
-          <input type="number" min="0" step="1" data-line-carton="${esc(x.id)}" value="${n(x.cartons)}">
-        </label>
-
-        <label>Price / Value
-          <input type="number" min="0" step="0.01" data-line-price="${esc(x.id)}" value="${n(x.price)}">
-        </label>
-      </div>
-    </div>
-  `).join('');
-
-  $$('[data-remove-line]').forEach(b => {
-    b.onclick = () => {
-      executionLines = executionLines.filter(x => x.id !== b.dataset.removeLine);
-      renderExecutionLines(outletName);
-    };
-  });
+  return `
+    <span
+      class="pill ${
+        st === 'DELIVERED'
+          ? 'green'
+          : st === 'CANCELLED'
+            ? 'red'
+            : 'orange'
+      }"
+    >
+      ${esc(st)}
+    </span>
+  `;
 }
 
 function renderExecution() {
-  const orders = current?.executionOrders || [];
+  const orders =
+    current?.orders || [];
 
   $('#mainContent').innerHTML = `
     ${monthBar()}
 
     <section class="hero">
-      <p class="eyebrow">ORDER → DELIVERY</p>
-      <h3>Actual Sales Execution</h3>
-      <p class="muted">Order is not counted as achievement until delivery is confirmed.</p>
-      ${syncStatus()}
+      <p class="eyebrow">
+        ACTUAL SALES CONTROL
+      </p>
+
+      <h3>
+        Order → Delivery → Actual Sale
+      </h3>
+
+      <p class="muted">
+        Booked order does not count as sales.
+        Only delivered value counts in achievement,
+        incentive and income.
+      </p>
     </section>
 
-    <form id="executionForm" class="card">
-      <label>Order Date
-        <input type="date" name="date" value="${esc(selectedDate)}" required>
-      </label>
+    ${
+      !isManagerMode()
+        ? `
+          <div
+            class="card"
+            style="margin-top:12px"
+          >
+            <h2>New Order</h2>
 
-      <label>Outlet
-        <select id="executionOutlet" name="outletName" required>
-          ${outletOptions()}
-        </select>
-      </label>
+            <form
+              id="execOrderForm"
+              class="stack"
+            >
 
-      <div id="executionLines"></div>
+              <label>
+                Date
+                <input
+                  name="date"
+                  type="date"
+                  value="${selectedDate}"
+                  required
+                >
+              </label>
 
-      <button type="button" id="addExecutionLine" class="btn secondary" style="width:100%;margin-top:10px">+ ADD SKU</button>
+              <label>
+                Outlet
+                <select
+                  name="outlet"
+                  required
+                >
+                  ${outletOptions()}
+                </select>
+              </label>
 
-      <label style="margin-top:10px">Remarks
-        <textarea name="note" rows="2" placeholder="Order / buyer / delivery note"></textarea>
-      </label>
+              <label>
+                Ordered Amount (RM)
+                <input
+                  name="amount"
+                  type="number"
+                  min="0"
+                  step=".01"
+                  required
+                >
+              </label>
 
-      <button class="btn primary" type="submit">SAVE ORDER</button>
-    </form>
+              <label>
+                SKU (optional)
+                <input
+                  name="sku"
+                  placeholder="Product name"
+                >
+              </label>
+
+              <div class="form-grid">
+
+                <label>
+                  Ordered Cartons
+                  <input
+                    name="cartons"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="0"
+                  >
+                </label>
+
+                <label>
+                  SKU Value (RM)
+                  <input
+                    name="skuValue"
+                    type="number"
+                    min="0"
+                    step=".01"
+                    value="0"
+                  >
+                </label>
+
+              </div>
+
+              <label>
+                Note
+                <textarea name="note"></textarea>
+              </label>
+
+              <button class="btn primary">
+                SAVE AS PENDING ORDER
+              </button>
+
+            </form>
+          </div>
+        `
+        : ''
+    }
 
     <div class="section-title">
-      <div>
-        <p class="eyebrow">ORDER HISTORY</p>
-        <h3>${orders.length} order(s)</h3>
-      </div>
+      <h3>Order & Delivery Register</h3>
     </div>
 
     <div class="list">
       ${
         orders.length
-          ? orders.map(o => `
-            <div class="card">
-              <div class="row">
-                <div>
-                  <span class="pill ${
-                    o.status === 'DELIVERED' ? 'green' :
-                    o.status === 'PARTIAL' ? 'orange' :
-                    o.status === 'CANCELLED' ? 'red' : ''
-                  }">${esc(o.status || 'PENDING')}</span>
-                  <h3 style="margin:8px 0 3px">${esc(o.outletName || 'Outlet')}</h3>
-                  <p class="muted">${dateLabel(o.date)} • ${esc(o.orderId || '')}</p>
+          ? orders.map((o, i) => `
+              <div class="list-item">
+
+                <div class="row">
+
+                  <div>
+                    <h4>
+                      ${i + 1}. ${esc(o.outletName)}
+                    </h4>
+
+                    <p>
+                      ${dateLabel(o.date)}
+                      • Order ${money(o.orderedAmount)}
+                      • Delivered ${money(o.deliveredAmount)}
+                      • Pending ${money(o.pendingAmount)}
+                    </p>
+                  </div>
+
+                  ${deliveryPill(o.status)}
+
                 </div>
-                <div style="text-align:right">
-                  <strong>${money(o.deliveredAmount || 0)}</strong>
-                  <p class="muted">of ${money(o.orderedAmount || 0)}</p>
+
+                <div
+                  class="form-grid"
+                  style="margin-top:10px"
+                >
+
+                  <input
+                    data-delamt="${esc(o.orderId)}"
+                    type="number"
+                    min="0"
+                    max="${n(o.orderedAmount)}"
+                    step=".01"
+                    value="${n(o.deliveredAmount)}"
+                  >
+
+                  <select
+                    data-delstatus="${esc(o.orderId)}"
+                  >
+                    <option
+                      ${o.status === 'PENDING' ? 'selected' : ''}
+                    >
+                      PENDING
+                    </option>
+
+                    <option
+                      ${o.status === 'PARTIAL' ? 'selected' : ''}
+                    >
+                      PARTIAL
+                    </option>
+
+                    <option
+                      ${o.status === 'DELIVERED' ? 'selected' : ''}
+                    >
+                      DELIVERED
+                    </option>
+
+                    <option
+                      ${o.status === 'CANCELLED' ? 'selected' : ''}
+                    >
+                      CANCELLED
+                    </option>
+                  </select>
+
                 </div>
+
+                <div class="form-actions">
+
+                  <button
+                    class="btn secondary"
+                    data-deliver="${esc(o.orderId)}"
+                  >
+                    UPDATE DELIVERY
+                  </button>
+
+                </div>
+
               </div>
-
-              ${
-                Array.isArray(o.items) && o.items.length
-                  ? `<div class="list" style="margin-top:10px">
-                      ${o.items.map(i => `
-                        <div class="list-item">
-                          <div class="row">
-                            <div>
-                              <h4>${esc(i.skuName)}</h4>
-                              <p>${n(i.deliveredCartons)} / ${n(i.orderedCartons)} CTN delivered</p>
-                            </div>
-                            <strong>${money(i.deliveredValue || 0)}</strong>
-                          </div>
-                        </div>`).join('')}
-                    </div>`
-                  : ''
-              }
-
-              ${
-                isManager()
-                  ? `<div class="button-row" style="margin-top:10px">
-                      <button class="btn secondary" data-deliver-order="${esc(o.orderId)}">UPDATE DELIVERY</button>
-                      <button class="btn danger" data-reset-order="${esc(o.orderId)}">RESET / CANCEL</button>
-                    </div>`
-                  : `<button class="btn secondary" data-deliver-order="${esc(o.orderId)}" style="width:100%;margin-top:10px">UPDATE DELIVERY</button>`
-              }
-            </div>`).join('')
+            `).join('')
           : empty('No order found.')
       }
     </div>
@@ -940,536 +2681,924 @@ function renderExecution() {
 
   bindCommon();
 
-  executionLines = [newExecutionLine()];
-  renderExecutionLines('');
+  if ($('#execOrderForm')) {
+    $('#execOrderForm').onsubmit =
+      async e => {
+        e.preventDefault();
 
-  $('#executionOutlet').onchange = e => {
-    executionLines.forEach(x => x.skuName = '');
-    renderExecutionLines(e.target.value);
-  };
+        const fd =
+          new FormData(e.target);
 
-  $('#addExecutionLine').onclick = () => {
-    executionLines.push(newExecutionLine());
-    renderExecutionLines($('#executionOutlet').value);
-  };
+        const outletName =
+          String(
+            fd.get('outlet') ||
+            ''
+          );
 
-  $('#executionForm').onsubmit = async e => {
-    e.preventDefault();
+        const outlet =
+          routeOutlets().find(
+            x =>
+              String(
+                x['Outlet Name']
+              ) === outletName
+          );
 
-    const fd = new FormData(e.currentTarget);
-    const outletName = String(fd.get('outletName') || '');
-    const outlet = routeOutlets().find(x => String(x['Outlet Name']) === outletName);
+        if (!outlet) {
+          return toast(
+            'Select outlet'
+          );
+        }
 
-    const items = executionLines.map(x => {
-      const skuName = $(`[data-line-sku="${x.id}"]`)?.value || '';
-      const cartons = n($(`[data-line-carton="${x.id}"]`)?.value);
-      const price = n($(`[data-line-price="${x.id}"]`)?.value);
+        setBusy(
+          true,
+          'Saving pending order…'
+        );
 
-      return {
-        skuName,
-        cartons,
-        price,
-        salesValue: price
+        try {
+          const r =
+            await apiPost(
+              'saveOrder',
+              {
+                requestId:
+                  idGen(),
+
+                date:
+                  String(
+                    fd.get('date')
+                  ),
+
+                outletCode:
+                  outlet[
+                    'Outlet Code'
+                  ] || '',
+
+                outletName,
+
+                orderedAmount:
+                  n(
+                    fd.get(
+                      'amount'
+                    )
+                  ),
+
+                skuName:
+                  String(
+                    fd.get('sku') ||
+                    ''
+                  ),
+
+                orderedCartons:
+                  n(
+                    fd.get(
+                      'cartons'
+                    )
+                  ),
+
+                skuValue:
+                  n(
+                    fd.get(
+                      'skuValue'
+                    )
+                  ),
+
+                note:
+                  String(
+                    fd.get('note') ||
+                    ''
+                  )
+              }
+            );
+
+          if (!r?.ok) {
+            throw new Error(
+              r?.error ||
+              'Order save failed'
+            );
+          }
+
+          await loadCurrent({
+            quiet: true
+          });
+
+          toast(
+            'Pending order saved'
+          );
+
+          render();
+
+        } catch (err) {
+          toast(
+            err.message,
+            3500
+          );
+
+        } finally {
+          setBusy(false);
+        }
       };
-    }).filter(x => x.skuName && (x.cartons > 0 || x.salesValue > 0));
+  }
 
-    if (!outletName) return toast('Select outlet');
-    if (!items.length) return toast('Add at least one SKU');
+  $$('[data-deliver]')
+    .forEach(b => {
+      b.onclick = async () => {
+        const id =
+          b.dataset.deliver;
 
-    setBusy(true, 'Saving order…');
+        const amount =
+          n(
+            $(
+              `[data-delamt="${CSS.escape(id)}"]`
+            )?.value
+          );
 
-    try {
-      const r = await apiPost('saveOrder', {
-        date: fd.get('date'),
-        outletCode: outlet?.['Outlet Code'] || '',
-        outletName,
-        note: fd.get('note'),
-        items,
-        requestId: idGen()
-      });
+        const status =
+          String(
+            $(
+              `[data-delstatus="${CSS.escape(id)}"]`
+            )?.value ||
+            'PENDING'
+          );
 
-      if (!r?.ok) throw new Error(r?.error || 'Order save failed');
+        setBusy(
+          true,
+          'Updating delivery…'
+        );
 
-      await loadCurrent({ quiet: true });
-      toast('Order saved');
-      executionLines = [newExecutionLine()];
-      render();
+        try {
+          const r =
+            await apiPost(
+              'updateDelivery',
+              {
+                orderId: id,
+                deliveredAmount:
+                  amount,
+                status
+              }
+            );
 
-    } catch (err) {
-      toast(err.message, 4000);
-    } finally {
-      setBusy(false);
-    }
-  };
+          if (!r?.ok) {
+            throw new Error(
+              r?.error ||
+              'Delivery update failed'
+            );
+          }
 
-  $$('[data-deliver-order]').forEach(b => {
-    b.onclick = async () => {
-      const order = orders.find(x => String(x.orderId) === String(b.dataset.deliverOrder));
-      if (!order) return;
+          await loadCurrent({
+            quiet: true
+          });
 
-      const amount = prompt(
-        `Delivered amount for ${order.outletName}\nOrdered: ${money(order.orderedAmount)}\nEnter actual delivered RM:`,
-        String(order.deliveredAmount || order.orderedAmount || 0)
-      );
+          toast(
+            'Delivery updated'
+          );
 
-      if (amount === null) return;
+          render();
 
-      const deliveryDate = prompt('Delivery date (YYYY-MM-DD):', localDate());
-      if (deliveryDate === null) return;
+        } catch (err) {
+          toast(
+            err.message,
+            3500
+          );
 
-      setBusy(true, 'Updating delivery…');
-
-      try {
-        const r = await apiPost('updateDelivery', {
-          orderId: order.orderId,
-          deliveredAmount: n(amount),
-          deliveryDate,
-          status: n(amount) >= n(order.orderedAmount) ? 'DELIVERED' : n(amount) > 0 ? 'PARTIAL' : 'PENDING'
-        });
-
-        if (!r?.ok) throw new Error(r?.error || 'Delivery update failed');
-
-        await loadCurrent({ quiet: true });
-        toast('Delivery updated');
-        render();
-
-      } catch (err) {
-        toast(err.message, 4000);
-      } finally {
-        setBusy(false);
-      }
-    };
-  });
-
-  $$('[data-reset-order]').forEach(b => {
-    b.onclick = async () => {
-      if (!isManager()) return;
-      if (!confirm('Reset this order/delivery to zero?')) return;
-
-      const reason = prompt('Manager correction / reset reason:');
-      if (!reason) return toast('Reason is required');
-
-      setBusy(true, 'Applying manager correction…');
-
-      try {
-        const r = await apiPost('managerResetExecution', {
-          orderId: b.dataset.resetOrder,
-          note: reason,
-          deliveryDate: localDate()
-        });
-
-        if (!r?.ok) throw new Error(r?.error || 'Reset failed');
-
-        await loadCurrent({ quiet: true });
-        toast('Manager correction saved');
-        render();
-
-      } catch (err) {
-        toast(err.message, 4000);
-      } finally {
-        setBusy(false);
-      }
-    };
-  });
+        } finally {
+          setBusy(false);
+        }
+      };
+    });
 }
 
 /* =========================================================
-   CPO
+   OUTLET REPORT / ZERO SALES
 ========================================================= */
 
-function fileToDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result || ''));
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+function renderZero() {
+  const rows =
+    routeOutlets().map(o => {
+      const name =
+        String(
+          o['Outlet Name'] || ''
+        );
 
-function getCurrentPosition() {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) return reject(new Error('GPS is not supported'));
+      const d =
+        dayOutletSales(name);
 
-    navigator.geolocation.getCurrentPosition(
-      resolve,
-      reject,
-      {
-        enableHighAccuracy: true,
-        timeout: 20000,
-        maximumAge: 0
-      }
-    );
-  });
-}
+      const mtd =
+        monthOutletSales(name);
 
-function renderCpo() {
-  const list = current?.cpo || current?.cpoProofs || [];
+      const plan =
+        planByOutlet(name);
+
+      const autoTarget =
+        routeOutlets().length
+          ? n(
+              current?.performance
+                ?.target
+            ) /
+            routeOutlets().length
+          : 0;
+
+      const target =
+        n(
+          plan?.[
+            'Outlet Target'
+          ]
+        ) ||
+        autoTarget;
+
+      return {
+        name,
+        code:
+          o['Outlet Code'] ||
+          '',
+        category:
+          o.Category || '',
+        day: d,
+        mtd,
+        target,
+        gap:
+          target
+            ? Math.max(
+                0,
+                target - mtd
+              )
+            : 0
+      };
+    });
+
+  const q =
+    getPref().zeroSearch || '';
 
   $('#mainContent').innerHTML = `
     ${monthBar()}
 
-    <section class="hero">
-      <p class="eyebrow">CPO EXECUTION</p>
-      <h3>Outlet Proof</h3>
-      <p class="muted">Upload CPO photo with outlet and GPS proof.</p>
-      ${syncStatus()}
-    </section>
+    <div
+      class="card"
+      style="margin-bottom:12px"
+    >
+      <div class="form-grid">
 
-    <form id="cpoForm" class="card">
-      <label>Date
-        <input type="date" name="date" value="${esc(selectedDate)}" required>
-      </label>
+        ${dateFilter(
+          'Daily Sale Date'
+        )}
 
-      <label>Outlet
-        <select name="outletName" id="cpoOutlet" required>
-          ${outletOptions()}
-        </select>
-      </label>
+        <label>
+          Search Outlet
+          <input
+            id="zeroSearch"
+            value="${esc(q)}"
+            placeholder="Outlet name / code"
+          >
+        </label>
 
-      <label>Title
-        <input name="title" value="CPO Proof" placeholder="CPO Proof">
-      </label>
-
-      <label>Photo
-        <input type="file" name="photo" accept="image/*" capture="environment" required>
-      </label>
-
-      <label>Note
-        <textarea name="note" rows="2" placeholder="Optional note"></textarea>
-      </label>
-
-      <button class="btn primary" type="submit">CAPTURE GPS & SUBMIT CPO</button>
-    </form>
-
-    <div class="section-title">
-      <div>
-        <p class="eyebrow">CPO HISTORY</p>
-        <h3>${list.length} record(s)</h3>
       </div>
     </div>
 
-    <div class="list">
-      ${
-        list.length
-          ? list.map(x => `
-            <div class="card">
-              <div class="row">
-                <div>
-                  <span class="pill ${String(x.Status || x.status).toUpperCase() === 'ACTIVE' ? 'green' : 'orange'}">
-                    ${esc(x.Status || x.status || 'ACTIVE')}
-                  </span>
-                  <h3 style="margin:8px 0 3px">${esc(x['Outlet Name'] || x.outletName || 'Outlet')}</h3>
-                  <p class="muted">${dateLabel(x.Date || x.date)} • ${esc(x.Title || x.title || 'CPO Proof')}</p>
-                </div>
-                <button class="mini-btn" data-cpo-download="${esc(x['CPO ID'] || x.cpoId || '')}">PHOTO</button>
-              </div>
-            </div>`).join('')
-          : empty('No CPO proof found.')
-      }
-    </div>
+    <section class="hero">
+
+      <p class="eyebrow">
+        OUTLET SALES / ZERO SALES
+      </p>
+
+      <h3>
+        ${dateLabel(selectedDate)}
+      </h3>
+
+      <p class="muted">
+        Daily sale + MTD sale + monthly
+        outlet target stay visible together.
+      </p>
+
+      ${syncStatus()}
+
+      <button
+        id="zeroRefresh"
+        class="btn secondary"
+        style="margin-top:10px"
+      >
+        ↻ REFRESH LIVE
+      </button>
+
+    </section>
+
+    <div
+      id="zeroList"
+      class="list"
+      style="margin-top:12px"
+    ></div>
   `;
 
   bindCommon();
 
-  $('#cpoForm').onsubmit = async e => {
-    e.preventDefault();
+  const paint = () => {
+    const query =
+      String(
+        $('#zeroSearch')?.value ||
+        ''
+      ).toLowerCase();
 
-    const fd = new FormData(e.currentTarget);
-    const file = fd.get('photo');
-    const outletName = String(fd.get('outletName') || '');
-    const outlet = routeOutlets().find(x => String(x['Outlet Name']) === outletName);
+    const list =
+      rows.filter(
+        x =>
+          !query ||
+          x.name
+            .toLowerCase()
+            .includes(query) ||
+          String(x.code)
+            .toLowerCase()
+            .includes(query)
+      );
 
-    if (!(file instanceof File) || !file.size) return toast('Select CPO photo');
+    $('#zeroList').innerHTML =
+      list.length
+        ? list.map(x => `
+            <div class="list-item">
 
-    setBusy(true, 'Getting GPS & uploading CPO…');
+              <div class="row">
 
-    try {
-      const pos = await getCurrentPosition();
-      const dataUrl = await fileToDataUrl(file);
-      const base64 = dataUrl.split(',').pop();
+                <div>
+                  <h4>
+                    ${esc(x.name)}
+                  </h4>
 
-      const r = await apiPost('saveCpo', {
-        date: fd.get('date'),
-        outletCode: outlet?.['Outlet Code'] || '',
-        outletName,
-        title: fd.get('title'),
-        note: fd.get('note'),
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude,
-        accuracy: pos.coords.accuracy,
-        base64,
-        mimeType: file.type || 'image/jpeg',
-        fileName: file.name || `CPO-${Date.now()}.jpg`
-      });
+                  <p>
+                    ${esc(x.category)}
+                    •
+                    ${esc(
+                      x.code ||
+                      'No code'
+                    )}
+                  </p>
 
-      if (!r?.ok) throw new Error(r?.error || 'CPO save failed');
+                  <p style="margin-top:7px">
+                    <strong style="color:#fff">
+                      Today ${money(x.day)}
+                    </strong>
 
-      await loadCurrent({ quiet: true });
-      toast('CPO proof submitted');
-      render();
+                    • MTD ${money(x.mtd)}
+                    • Target ${
+                      x.target
+                        ? money(x.target)
+                        : 'Not set'
+                    }
 
-    } catch (err) {
-      toast(err.message || 'CPO upload failed', 4500);
-    } finally {
-      setBusy(false);
-    }
+                    ${
+                      x.target
+                        ? ' • Gap ' +
+                          money(x.gap)
+                        : ''
+                    }
+                  </p>
+                </div>
+
+                <span
+                  class="pill ${
+                    x.day > 0
+                      ? 'green'
+                      : 'red'
+                  }"
+                >
+                  ${
+                    x.day > 0
+                      ? 'SALE'
+                      : 'ZERO'
+                  }
+                </span>
+
+              </div>
+            </div>
+          `).join('')
+        : empty(
+            'No outlet found'
+          );
   };
 
-  $$('[data-cpo-download]').forEach(b => {
-    b.onclick = async () => {
-      setBusy(true, 'Loading CPO photo…');
+  paint();
 
-      try {
-        const r = await apiPost('downloadCpoPhoto', { cpoId: b.dataset.cpoDownload });
-        if (!r?.ok) throw new Error(r?.error || 'Photo unavailable');
+  $('#zeroSearch').oninput =
+    () => {
+      setPref({
+        zeroSearch:
+          $('#zeroSearch').value
+      });
 
-        const a = document.createElement('a');
-        a.href = `data:${r.mimeType || 'image/jpeg'};base64,${r.base64}`;
-        a.download = r.fileName || 'CPO-photo.jpg';
-        a.click();
-
-      } catch (err) {
-        toast(err.message, 4000);
-      } finally {
-        setBusy(false);
-      }
+      paint();
     };
-  });
+
+  $('#zeroRefresh').onclick =
+    () => refreshCloud(true);
 }
 
 /* =========================================================
    MONTHLY PLANNING
 ========================================================= */
 
-function renderPlanning() {
-  const plans = current?.plans || [];
+function parsePlanSkus(p) {
+  const raw =
+    typeof p?.[
+      'Targeted SKU List'
+    ] === 'string'
+      ? (() => {
+          try {
+            return JSON.parse(
+              p[
+                'Targeted SKU List'
+              ]
+            );
+          } catch {
+            return [];
+          }
+        })()
+      : (
+          p?.[
+            'Targeted SKU List'
+          ] || []
+        );
 
-  $('#mainContent').innerHTML = `
-    ${monthBar()}
+  return Array.isArray(raw)
+    ? raw
+    : [];
+}
 
-    <section class="hero">
-      <p class="eyebrow">MONTHLY PLANNING</p>
-      <h3>Outlet & SKU Target</h3>
-      <p class="muted">Set outlet target and target SKU count for ${esc(monthName(selectedMonth))}.</p>
-      ${syncStatus()}
-    </section>
+function planningList() {
+  const plans =
+    current?.plans || [];
 
-    <form id="planningForm" class="card">
-      <label>Outlet
-        <select id="planningOutlet" name="outletName" required>
-          ${outletOptions()}
-        </select>
-      </label>
+  if (!plans.length) {
+    return empty(
+      'No monthly plan yet.'
+    );
+  }
 
-      <label>Outlet Target RM
-        <input type="number" name="outletTarget" min="0" step="0.01" placeholder="0.00">
-      </label>
-
-      <label>Target SKU Count
-        <input type="number" name="targetSkuCount" min="0" step="1" placeholder="25">
-      </label>
-
-      <label>Search SKU
-        <input id="planningSkuSearch" placeholder="Type product name">
-      </label>
-
-      <div id="planningSkuResults" class="search-results"></div>
-      <div id="planningSkuChips" class="chip-wrap"></div>
-
-      <button class="btn primary" type="submit">SAVE MONTHLY PLAN</button>
-    </form>
-
-    <div class="section-title">
-      <div>
-        <p class="eyebrow">OUTLET PLANS</p>
-        <h3>${plans.length} planned outlet(s)</h3>
-      </div>
-    </div>
-
+  return `
     <div class="list">
-      ${
-        plans.length
-          ? plans.map(x => {
-              let skuList = [];
-              try { skuList = JSON.parse(x['Targeted SKU List'] || '[]'); } catch {}
-              return `
-                <div class="card">
-                  <div class="row">
-                    <div>
-                      <h3>${esc(x['Outlet Name'] || '')}</h3>
-                      <p class="muted">${esc(x['Outlet Code'] || '')}</p>
-                    </div>
-                    <strong>${money(x['Outlet Target'] || 0)}</strong>
+
+      ${plans.map(p => {
+        const mtd =
+          monthOutletSales(
+            p['Outlet Name']
+          );
+
+        const target =
+          n(
+            p[
+              'Outlet Target'
+            ]
+          );
+
+        const list =
+          parsePlanSkus(p);
+
+        return `
+          <div class="card">
+
+            <div class="row">
+
+              <div>
+                <h3>
+                  ${esc(
+                    p['Outlet Name']
+                  )}
+                </h3>
+
+                <p class="muted">
+                  ${money(mtd)}
+                  /
+                  ${money(target)}
+                  •
+                  ${
+                    target
+                      ? pct(
+                          mtd /
+                          target *
+                          100
+                        )
+                      : 'No target'
+                  }
+                </p>
+              </div>
+
+              <span
+                class="pill ${
+                  mtd >= target &&
+                  target
+                    ? 'green'
+                    : 'orange'
+                }"
+              >
+                ${
+                  target
+                    ? money(
+                        Math.max(
+                          0,
+                          target - mtd
+                        )
+                      ) +
+                      ' left'
+                    : 'PLAN'
+                }
+              </span>
+
+            </div>
+
+            ${
+              list.length
+                ? `
+                  <div class="status-strip">
+
+                    ${list.map(x => `
+                      <span class="status-chip">
+                        ${esc(
+                          typeof x === 'string'
+                            ? x
+                            : x.name ||
+                              ''
+                        )}
+                      </span>
+                    `).join('')}
+
                   </div>
-                  <div class="status-strip" style="margin-top:8px">
-                    <span class="status-chip">Target SKU ${n(x['Targeted SKU Count'])}</span>
-                    <span class="status-chip">${skuList.length} selected</span>
-                  </div>
-                </div>`;
-            }).join('')
-          : empty('No monthly outlet plan yet.')
-      }
+                `
+                : ''
+            }
+
+          </div>
+        `;
+      }).join('')}
+
     </div>
   `;
+}
 
-  bindCommon();
+function renderPlanning() {
+  if (isManagerMode()) {
+    $('#mainContent').innerHTML = `
+      ${monthBar()}
+
+      <div class="card">
+        <h2>
+          ${esc(viewedName())}
+          • Monthly Plan
+        </h2>
+      </div>
+
+      <div style="margin-top:12px">
+        ${planningList()}
+      </div>
+    `;
+
+    bindCommon();
+    return;
+  }
 
   selectedPlanningSkus = [];
 
-  const refreshSku = () => {
-    const q = String($('#planningSkuSearch')?.value || '').trim().toLowerCase();
-    const all = allSkuNames()
-      .filter(x => !selectedPlanningSkus.includes(x))
-      .filter(x => !q || x.toLowerCase().includes(q))
-      .slice(0, 80);
-
-    $('#planningSkuResults').innerHTML = all.length
-      ? all.map(x => `<button type="button" class="search-result" data-plan-add="${esc(x)}">＋ ${esc(x)}</button>`).join('')
-      : empty('No matching SKU');
-
-    $('#planningSkuChips').innerHTML = selectedPlanningSkus
-      .map(x => `<span class="chip">${esc(x)}<button type="button" data-plan-remove="${esc(x)}">×</button></span>`)
-      .join('');
-
-    $$('[data-plan-add]').forEach(b => {
-      b.onclick = () => {
-        selectedPlanningSkus.push(b.dataset.planAdd);
-        refreshSku();
-      };
-    });
-
-    $$('[data-plan-remove]').forEach(b => {
-      b.onclick = () => {
-        selectedPlanningSkus = selectedPlanningSkus.filter(x => x !== b.dataset.planRemove);
-        refreshSku();
-      };
-    });
-  };
-
-  $('#planningSkuSearch').oninput = refreshSku;
-  refreshSku();
-
-  $('#planningForm').onsubmit = async e => {
-    e.preventDefault();
-
-    const fd = new FormData(e.currentTarget);
-    const outletName = String(fd.get('outletName') || '');
-    const outlet = routeOutlets().find(x => String(x['Outlet Name']) === outletName);
-
-    if (!outlet) return toast('Select outlet');
-
-    setBusy(true, 'Saving monthly plan…');
-
-    try {
-      const r = await apiPost('savePlan', {
-        month: selectedMonth,
-        routeTarget: current?.performance?.target || 0,
-        outletCode: outlet['Outlet Code'] || '',
-        outletName,
-        outletTarget: n(fd.get('outletTarget')),
-        targetedSkuCount: n(fd.get('targetSkuCount')) || selectedPlanningSkus.length,
-        targetSkus: selectedPlanningSkus,
-        skuSalesPlan: 0
-      });
-
-      if (!r?.ok) throw new Error(r?.error || 'Plan save failed');
-
-      await loadCurrent({ quiet: true });
-      toast('Monthly plan saved');
-      render();
-
-    } catch (err) {
-      toast(err.message, 3500);
-    } finally {
-      setBusy(false);
-    }
-  };
-}
-
-/* =========================================================
-   ZERO SALES / OUTLET STATUS
-========================================================= */
-
-function renderZero() {
-  const all = routeOutlets();
-  const zero = current?.zeroOutlets || [];
-
   $('#mainContent').innerHTML = `
-    ${monthBar()}
+    ${monthBar({
+      showManager: false
+    })}
 
-    <section class="hero">
-      <p class="eyebrow">OUTLET COVERAGE</p>
-      <h3>Zero Sales Tracker</h3>
-      <p class="muted">Find outlets with no sales in ${esc(monthName(selectedMonth))}.</p>
-      ${syncStatus()}
-    </section>
+    <div class="card">
 
-    <div class="metric-grid">
-      ${metricCard('Total Outlet', String(all.length))}
-      ${metricCard('Zero Sales', String(zero.length))}
-      ${metricCard('Active Outlet', String(Math.max(0, all.length - zero.length)))}
-      ${metricCard('Coverage', pct(all.length ? ((all.length - zero.length) / all.length * 100) : 0))}
+      <h2>
+        Monthly Outlet & SKU Plan
+      </h2>
+
+      <form
+        id="planForm"
+        class="stack"
+      >
+
+        <label>
+          Search Outlet
+          <input
+            id="planOutletSearch"
+            placeholder="Outlet name"
+          >
+        </label>
+
+        <label>
+          Select Outlet
+          <select
+            id="planOutlet"
+            name="outlet"
+            required
+          >
+            ${outletOptions()}
+          </select>
+        </label>
+
+        <label>
+          Outlet Monthly Target (RM)
+          <input
+            name="outletTarget"
+            type="number"
+            min="0"
+            step="0.01"
+            required
+          >
+        </label>
+
+        <label>
+          Target SKU Count
+          <input
+            name="targetSkuCount"
+            type="number"
+            min="0"
+            step="1"
+            value="0"
+          >
+        </label>
+
+        <label>
+          Search SKU
+          <input
+            id="planSkuSearch"
+            placeholder="SKU name"
+          >
+        </label>
+
+        <label>
+          Select SKU
+          <select id="planSku">
+            <option value="">
+              Select outlet first
+            </option>
+          </select>
+        </label>
+
+        <button
+          type="button"
+          id="addPlanSku"
+          class="btn secondary"
+        >
+          + ADD SKU
+        </button>
+
+        <div
+          id="planSkuChips"
+          class="chipbox"
+        ></div>
+
+        <button class="btn primary">
+          SAVE MONTHLY PLAN
+        </button>
+
+      </form>
     </div>
 
-    <div class="card" style="margin-top:12px">
-      <input id="zeroSearch" placeholder="Search outlet / code / route">
+    <div class="section-title">
+      <h3>Plan vs Achievement</h3>
     </div>
 
-    <div id="zeroList" class="list" style="margin-top:12px"></div>
+    ${planningList()}
   `;
 
   bindCommon();
 
-  const paint = () => {
-    const q = String($('#zeroSearch')?.value || '').trim().toLowerCase();
+  const os =
+    $('#planOutletSearch');
 
-    const rows = zero.filter(x => {
-      const text = [
-        x['Outlet Name'],
-        x['Outlet Code'],
-        x.Route,
-        x.route,
-        x.Category
-      ].join(' ').toLowerCase();
+  const o =
+    $('#planOutlet');
 
-      return !q || text.includes(q);
-    });
+  const ss =
+    $('#planSkuSearch');
 
-    $('#zeroList').innerHTML = rows.length
-      ? rows.map(x => `
-        <div class="card">
-          <div class="row">
-            <div>
-              <span class="pill red">ZERO SALES</span>
-              <h3 style="margin:8px 0 3px">${esc(x['Outlet Name'] || x.outletName || '')}</h3>
-              <p class="muted">${esc(x['Outlet Code'] || x.outletCode || '')} • ${esc(x.Route || x.route || '')}</p>
-            </div>
-            <strong>${money(0)}</strong>
-          </div>
-        </div>`).join('')
-      : empty('No zero-sales outlet found.');
+  const s =
+    $('#planSku');
+
+  const chips =
+    $('#planSkuChips');
+
+  const paintSkus = () => {
+    chips.innerHTML =
+      selectedPlanningSkus
+        .map(x => `
+          <span class="chip">
+            ${esc(x)}
+            <button
+              type="button"
+              data-rmsku="${esc(x)}"
+            >
+              ×
+            </button>
+          </span>
+        `)
+        .join('');
+
+    $$('[data-rmsku]')
+      .forEach(b => {
+        b.onclick = () => {
+          selectedPlanningSkus =
+            selectedPlanningSkus
+              .filter(
+                x =>
+                  x !==
+                  b.dataset.rmsku
+              );
+
+          paintSkus();
+          refreshSku();
+        };
+      });
   };
 
-  $('#zeroSearch').oninput = paint;
-  paint();
+  const refreshSku = () => {
+    s.innerHTML =
+      o.value
+        ? skuOptions(
+            o.value,
+            s.value,
+            ss.value
+          )
+        : `
+          <option value="">
+            Select outlet first
+          </option>
+        `;
+
+    [...s.options]
+      .forEach(opt => {
+        if (
+          selectedPlanningSkus
+            .includes(opt.value)
+        ) {
+          opt.disabled = true;
+        }
+      });
+  };
+
+  os.oninput = () => {
+    const old = o.value;
+
+    o.innerHTML =
+      outletOptions(
+        old,
+        os.value
+      );
+
+    refreshSku();
+  };
+
+  o.onchange = () => {
+    selectedPlanningSkus = [];
+
+    paintSkus();
+    refreshSku();
+  };
+
+  ss.oninput =
+    refreshSku;
+
+  $('#addPlanSku').onclick =
+    () => {
+      if (!s.value) {
+        return toast(
+          'Select SKU'
+        );
+      }
+
+      if (
+        !selectedPlanningSkus
+          .includes(s.value)
+      ) {
+        selectedPlanningSkus
+          .push(s.value);
+      }
+
+      paintSkus();
+      refreshSku();
+    };
+
+  $('#planForm').onsubmit =
+    async e => {
+      e.preventDefault();
+
+      const fd =
+        new FormData(e.target);
+
+      const outletName =
+        String(
+          fd.get('outlet') ||
+          ''
+        );
+
+      const outlet =
+        routeOutlets().find(
+          x =>
+            String(
+              x['Outlet Name']
+            ) === outletName
+        );
+
+      if (!outlet) {
+        return toast(
+          'Select outlet'
+        );
+      }
+
+      setBusy(
+        true,
+        'Saving monthly plan…'
+      );
+
+      try {
+        const r =
+          await apiPost(
+            'savePlan',
+            {
+              month:
+                selectedMonth,
+
+              routeTarget:
+                current
+                  ?.performance
+                  ?.target ||
+                0,
+
+              outletCode:
+                outlet[
+                  'Outlet Code'
+                ] || '',
+
+              outletName,
+
+              outletTarget:
+                n(
+                  fd.get(
+                    'outletTarget'
+                  )
+                ),
+
+              targetedSkuCount:
+                n(
+                  fd.get(
+                    'targetSkuCount'
+                  )
+                ) ||
+                selectedPlanningSkus
+                  .length,
+
+              targetSkus:
+                selectedPlanningSkus,
+
+              skuSalesPlan: 0
+            }
+          );
+
+        if (!r?.ok) {
+          throw new Error(
+            r?.error ||
+            'Plan save failed'
+          );
+        }
+
+        await loadCurrent({
+          quiet: true
+        });
+
+        toast(
+          'Monthly plan saved'
+        );
+
+        render();
+
+      } catch (err) {
+        toast(
+          err.message,
+          3500
+        );
+
+      } finally {
+        setBusy(false);
+      }
+    };
+
+  refreshSku();
 }
+
 /* =========================================================
-   INCENTIVES
+   INCENTIVES — START
 ========================================================= */
 
 let incentiveSelectedSkus = [];
 let editingIncentiveId = null;
 
 function incentiveCard(x) {
-  const v = n(x.percent);
+  const v =
+    n(x.percent);
 
   const skuText =
-    Array.isArray(x.selectedSkus) && x.selectedSkus.length
+    Array.isArray(
+      x.selectedSkus
+    ) &&
+    x.selectedSkus.length
+
       ? (
           x.selectedSkus.length === 1
             ? x.selectedSkus[0]
             : `${x.selectedSkus.length} SKUs • ${x.groupName || 'Combo / Series'}`
         )
+
       : (
           x.metric === 'SALES_RM'
             ? 'Total Sales'
@@ -1479,1271 +3608,1525 @@ function incentiveCard(x) {
         );
 
   const perSku =
-    x.perSku && typeof x.perSku === 'object'
-      ? Object.entries(x.perSku).sort((a,b) => b[1] - a[1])
+    x.perSku &&
+    typeof x.perSku === 'object'
+      ? Object
+          .entries(x.perSku)
+          .sort(
+            (a, b) =>
+              b[1] - a[1]
+          )
       : [];
 
   return `
     <div class="card">
+
       <div class="row">
+
         <div>
-          <span class="pill ${x.fulfilled ? 'green' : 'orange'}">
-            ${esc(String(x.category || 'INCENTIVE').toUpperCase())}
+
+          <span
+            class="pill ${
+              x.fulfilled
+                ? 'green'
+                : 'orange'
+            }"
+          >
+            ${esc(
+              String(
+                x.category ||
+                'INCENTIVE'
+              ).toUpperCase()
+            )}
           </span>
 
           <h3 style="margin:9px 0 5px">
-            ${esc(x.name || 'Incentive')}
+            ${esc(
+              x.name ||
+              'Incentive'
+            )}
           </h3>
 
-          <p class="muted">${esc(x.description || '')}</p>
+          <p class="muted">
+            ${esc(
+              x.description ||
+              ''
+            )}
+          </p>
+
         </div>
 
         <div style="text-align:right">
-          <strong>${money(x.rewardRM)}</strong>
-          <p class="muted">reward</p>
+          <strong>
+            ${money(x.rewardRM)}
+          </strong>
+
+          <p class="muted">
+            reward
+          </p>
         </div>
+
       </div>
 
       <div class="status-strip">
-        <span class="status-chip">${esc(skuText)}</span>
-        <span class="status-chip">${esc(String(x.metric || ''))}</span>
+
+        <span class="status-chip">
+          ${esc(skuText)}
+        </span>
+
+        <span class="status-chip">
+          ${esc(
+            String(
+              x.metric ||
+              ''
+            )
+          )}
+        </span>
 
         ${
-          x.calculationRule === 'EACH_MIN'
-            ? `<span class="status-chip">Each SKU ≥ ${n(x.eachSkuMinimum)}</span>`
+          x.calculationRule ===
+          'EACH_MIN'
+            ? `
+              <span class="status-chip">
+                Each SKU ≥
+                ${n(
+                  x.eachSkuMinimum
+                )}
+              </span>
+            `
             : ''
         }
+
       </div>
 
       <div style="margin-top:12px">
         ${progressBar(v)}
       </div>
 
-      <div class="row" style="margin-top:8px">
-        <small class="muted">Progress</small>
-        <strong>${n(x.actual)} / ${n(x.target)}</strong>
+      <div
+        class="row"
+        style="margin-top:8px"
+      >
+        <small class="muted">
+          Progress
+        </small>
+
+        <strong>
+          ${n(x.actual)}
+          /
+          ${n(x.target)}
+        </strong>
       </div>
 
-      <p class="muted" style="margin:8px 0 0">
+      <p
+        class="muted"
+        style="margin:8px 0 0"
+      >
         ${
           x.fulfilled
-            ? '✓ Fulfilled • Earned ' + money(x.earnedRM)
-            : n(x.remaining) + ' remaining'
+            ? '✓ Fulfilled • Earned ' +
+              money(x.earnedRM)
+            : n(x.remaining) +
+              ' remaining'
         }
-        • ${dateLabel(x.startDate)}
-        → ${x.endDate ? dateLabel(x.endDate) : 'Open end'}
+
+        •
+        ${dateLabel(x.startDate)}
+        →
+
+        ${
+          x.endDate
+            ? dateLabel(x.endDate)
+            : 'Open end'
+        }
       </p>
 
       ${
         perSku.length > 1
           ? `
-            <div class="list" style="margin-top:10px">
-              ${perSku.map(([sku, val]) => `
-                <div class="list-item">
-                  <div class="row">
-                    <span>${esc(sku)}</span>
-                    <strong>${n(val)}</strong>
-                  </div>
-                </div>
-              `).join('')}
-            </div>`
+            <details style="margin-top:10px">
+
+              <summary class="muted">
+                SKU breakdown
+              </summary>
+
+              <div
+                class="list"
+                style="margin-top:8px"
+              >
+                ${perSku.map(
+                  ([sku, val]) => `
+                    <div class="list-item">
+                      <div class="row">
+                        <span>
+                          ${esc(sku)}
+                        </span>
+
+                        <strong>
+                          ${n(val)}
+                        </strong>
+                      </div>
+                    </div>
+                  `
+                ).join('')}
+              </div>
+
+            </details>
+          `
           : ''
       }
 
-      ${
-        x.bannerFileId
-          ? `<button class="btn secondary" data-banner="${esc(x.bannerFileId)}" style="margin-top:10px;width:100%">VIEW BANNER</button>`
-          : ''
-      }
+      <div class="form-actions">
 
-      ${
-        isManagerMode()
-          ? `
-            <div class="button-row" style="margin-top:10px">
-              <button class="btn secondary" data-editinc="${esc(x.id || x.incentiveId || '')}">
-                EDIT
+        ${
+          x.bannerFileId
+            ? `
+              <button
+                class="btn secondary"
+                data-banner="${esc(
+                  x.bannerFileId
+                )}"
+              >
+                VIEW BANNER
               </button>
-              <button class="btn danger" data-stopinc="${esc(x.id || x.incentiveId || '')}">
-                DEACTIVATE
+            `
+            : ''
+        }
+
+        ${
+          isManagerMode()
+            ? `
+              <button
+                class="btn secondary"
+                data-editinc="${esc(
+                  x.id
+                )}"
+              >
+                EDIT INCENTIVE
               </button>
-            </div>`
-          : ''
-      }
-    </div>`;
+            `
+            : ''
+        }
+
+      </div>
+
+    </div>
+  `;
 }
 
-function personalTargetProgress(t) {
-  const metric = String(t.Metric || t.metric || 'SALES_RM').toUpperCase();
-  const target = n(t['Target Value'] || t.targetValue);
+function incentiveSkuPicker() {
+  const all =
+    allSkuNames();
 
-  let actual = 0;
+  return `
+    <div id="incSkuArea">
 
-  if (metric === 'SALES_RM') {
-    actual = n(current?.performance?.achievement || current?.performance?.sales);
-  } else if (metric === 'CARTONS') {
-    actual = (current?.skuSales || []).reduce((a,x) => a + n(x.Cartons), 0);
-  } else if (metric === 'SKU_SALES_RM') {
-    const sku = String(t['SKU Name'] || t.skuName || '');
-    actual = (current?.skuSales || [])
-      .filter(x => !sku || String(x['SKU Name']) === sku)
-      .reduce((a,x) => a + n(x['Sales Value']), 0);
-  }
+      <label>
+        Search SKU
+        <input
+          id="incSkuSearch"
+          placeholder="Type product name"
+        >
+      </label>
 
-  return {
-    target,
-    actual,
-    remaining: Math.max(0, target - actual),
-    percent: target ? Math.min(100, actual / target * 100) : 0
-  };
+      <div
+        id="incSkuResults"
+        class="search-results"
+        style="
+          margin-top:8px;
+          max-height:260px
+        "
+      ></div>
+
+      <div
+        id="incSkuChips"
+        class="chipbox"
+        style="margin-top:10px"
+      ></div>
+
+      <p
+        class="muted"
+        style="
+          font-size:11px;
+          margin:8px 0 0
+        "
+      >
+        Selected:
+        <b id="incSkuCount">0</b>
+        SKU(s) from
+        ${all.length}
+        master products
+      </p>
+
+    </div>
+  `;
 }
-
-function teamUsers() {
-  const fromSnapshot = (teamSnapshot || [])
-    .map(x => ({
-      id: String(x.staffId || x.id || x['Staff ID'] || ''),
-      name: String(x.name || x.fullName || x['Full Name'] || x.staffId || '')
-    }))
-    .filter(x => x.id);
-
-  if (fromSnapshot.length) {
-    return [...new Map(fromSnapshot.map(x => [x.id, x])).values()];
-  }
-
-  return (D.users || [])
-    .filter(x => String(x.role || '').toUpperCase() === 'SR')
-    .map(x => ({
-      id: String(x.id || ''),
-      name: String(x.name || x.id || '')
-    }))
-    .filter(x => x.id);
-}
-
 function renderIncentives() {
   const list = current?.incentives || [];
 
+  const edit = editingIncentiveId
+    ? list.find(x => x.id === editingIncentiveId)
+    : null;
+
+  incentiveSelectedSkus =
+    edit?.selectedSkus
+      ? [...edit.selectedSkus]
+      : [];
+
   const managerForm = isManagerMode()
     ? `
-      <div class="card">
-        <p class="eyebrow">MANAGER INCENTIVE CONTROL</p>
-        <h2>${editingIncentiveId ? 'Edit Incentive' : 'Create Incentive'}</h2>
+      <div class="card" style="margin-bottom:12px">
+        <p class="eyebrow">MANAGER MASTER INCENTIVE</p>
+        <h2>${edit ? 'Update Incentive' : 'Create Incentive'}</h2>
 
         <form id="incForm" class="stack">
-
-          <label>Incentive Name
-            <input name="name" required placeholder="e.g. Basil Seed Push">
+          <label>
+            Incentive Name
+            <input
+              name="name"
+              required
+              placeholder="e.g. Value Pack Combo Incentive"
+              value="${esc(edit?.name || '')}"
+            >
           </label>
 
-          <label>Description
-            <textarea name="description" rows="2"></textarea>
+          <label>
+            Description
+            <textarea
+              name="description"
+              placeholder="Simple instruction for SR"
+            >${esc(edit?.description || '')}</textarea>
           </label>
 
           <div class="form-grid">
-            <label>Category
+            <label>
+              Category
               <select name="category">
-                <option value="PRODUCT">Product</option>
-                <option value="GROWTH">Growth</option>
-                <option value="COVERAGE">Coverage</option>
-                <option value="OTHER">Other</option>
+                <option value="PRODUCT" ${edit?.category === 'PRODUCT' ? 'selected' : ''}>
+                  Product
+                </option>
+                <option value="INDIVIDUAL" ${edit?.category === 'INDIVIDUAL' ? 'selected' : ''}>
+                  Individual
+                </option>
+                <option value="GROWTH" ${edit?.category === 'GROWTH' ? 'selected' : ''}>
+                  Growth
+                </option>
+                <option value="OTHER" ${edit?.category === 'OTHER' ? 'selected' : ''}>
+                  Other
+                </option>
               </select>
             </label>
 
-            <label>Basis
-              <select id="incBasis" name="basis">
-                <option value="SINGLE_SKU">Single SKU</option>
-                <option value="MULTI_SKU">Multi SKU / Combo</option>
-                <option value="TOTAL_SALES">Total Sales</option>
-                <option value="OUTLET_COVERAGE">Outlet Coverage</option>
+            <label>
+              Incentive Basis
+              <select name="basis" id="incBasis">
+                <option value="SINGLE_SKU" ${(edit?.basis || 'SINGLE_SKU') === 'SINGLE_SKU' ? 'selected' : ''}>
+                  Single SKU
+                </option>
+                <option value="MULTI_SKU" ${edit?.basis === 'MULTI_SKU' ? 'selected' : ''}>
+                  Multiple SKU / Combo / Series
+                </option>
+                <option value="TOTAL_SALES" ${edit?.basis === 'TOTAL_SALES' ? 'selected' : ''}>
+                  Total Sales RM
+                </option>
+                <option value="OUTLET_COVERAGE" ${edit?.basis === 'OUTLET_COVERAGE' ? 'selected' : ''}>
+                  Outlet Coverage
+                </option>
               </select>
             </label>
           </div>
 
           <div id="incProductControls">
-            <label>Search SKU
-              <input id="incSkuSearch" placeholder="Search product">
-            </label>
+            <div class="form-grid">
+              <label>
+                Metric
+                <select name="metric" id="incMetric">
+                  <option value="CARTONS" ${(edit?.metric || 'CARTONS') === 'CARTONS' ? 'selected' : ''}>
+                    Cartons
+                  </option>
+                  <option value="SKU_SALES_RM" ${edit?.metric === 'SKU_SALES_RM' ? 'selected' : ''}>
+                    SKU Sales RM
+                  </option>
+                </select>
+              </label>
 
-            <div id="incSkuResults" class="search-results"></div>
-
-            <div class="row" style="margin-top:8px">
-              <small class="muted">Selected SKU</small>
-              <strong id="incSkuCount">0</strong>
+              <label id="incGroupWrap" style="display:none">
+                Group / Series Name
+                <input
+                  name="groupName"
+                  placeholder="e.g. Mr. Noodles Series"
+                  value="${esc(edit?.groupName || '')}"
+                >
+              </label>
             </div>
 
-            <div id="incSkuChips" class="chip-wrap"></div>
-          </div>
+            ${incentiveSkuPicker()}
 
-          <div id="incGroupWrap">
-            <label>Combo / Group Name
-              <input name="groupName" placeholder="e.g. Juice Series">
-            </label>
-          </div>
-
-          <div class="form-grid">
-            <label>Metric
-              <select id="incMetric" name="metric">
-                <option value="CARTONS">Cartons</option>
-                <option value="SKU_SALES_RM">SKU Sales RM</option>
-                <option value="SALES_RM">Total Sales RM</option>
-                <option value="OUTLETS">Outlet Count</option>
-              </select>
-            </label>
-
-            <label>Target
-              <input name="target" type="number" min="0" step="0.01" required>
-            </label>
-          </div>
-
-          <div id="incRuleWrap">
-            <label>Calculation Rule
-              <select id="incRule" name="calculationRule">
-                <option value="COMBINED">Combined Total</option>
-                <option value="EACH_MIN">Each SKU Minimum</option>
-              </select>
-            </label>
-          </div>
-
-          <div id="incEachMinWrap">
-            <label>Minimum for Each SKU
-              <input name="eachSkuMinimum" type="number" min="0" step="0.01">
-            </label>
-          </div>
-
-          <div class="form-grid">
-            <label>Reward RM
-              <input name="reward" type="number" min="0" step="0.01" required>
-            </label>
-
-            <label>Scope
-              <select id="incScope" name="scope">
-                <option value="SPECIFIC">Specific SR</option>
-                <option value="ALL">ALL SR</option>
-              </select>
-            </label>
-          </div>
-
-          <div id="incStaffWrap">
-            <label>Assigned SR
-              <select name="staffId">
-                ${teamUsers().map(u => `
-                  <option value="${esc(u.id)}" ${u.id === managerView ? 'selected' : ''}>
-                    ${esc(u.name)} • ${esc(u.id)}
+            <div
+              id="incRuleWrap"
+              style="display:none;margin-top:12px"
+              class="form-grid"
+            >
+              <label>
+                Calculation Rule
+                <select name="calculationRule" id="incRule">
+                  <option value="COMBINED" ${(edit?.calculationRule || 'COMBINED') === 'COMBINED' ? 'selected' : ''}>
+                    Combined Total
                   </option>
-                `).join('')}
-              </select>
+                  <option value="EACH_MIN" ${edit?.calculationRule === 'EACH_MIN' ? 'selected' : ''}>
+                    Combined Total + Each SKU Minimum
+                  </option>
+                </select>
+              </label>
+
+              <label id="incEachMinWrap" style="display:none">
+                Each SKU Minimum
+                <input
+                  name="eachSkuMinimum"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value="${n(edit?.eachSkuMinimum)}"
+                >
+              </label>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              Target
+              <input
+                name="target"
+                type="number"
+                min="0.01"
+                step="0.01"
+                value="${edit ? n(edit.target) : ''}"
+                required
+              >
+            </label>
+
+            <label>
+              Reward RM
+              <input
+                name="reward"
+                type="number"
+                min="0"
+                step="0.01"
+                value="${edit ? n(edit.rewardRM) : ''}"
+                required
+              >
             </label>
           </div>
 
           <div class="form-grid">
-            <label>Start Date
-              <input name="startDate" type="date" value="${selectedMonth + '-01'}">
+            <label>
+              Start Date
+              <input
+                name="startDate"
+                type="date"
+                value="${edit?.startDate || selectedMonth + '-01'}"
+                required
+              >
             </label>
 
-            <label>End Date
-              <input name="endDate" type="date">
+            <label>
+              End Date
+              <input
+                name="endDate"
+                type="date"
+                value="${edit?.endDate || ''}"
+              >
             </label>
           </div>
 
-          <label>Banner
-            <input name="banner" type="file" accept="image/*">
-          </label>
-
-          <button class="btn primary">
-            ${editingIncentiveId ? 'UPDATE INCENTIVE' : 'CREATE INCENTIVE'}
-          </button>
-        </form>
-      </div>`
-    : '';
-
-  $('#mainContent').innerHTML = `
-    ${monthBar()}
-
-    <section class="hero">
-      <p class="eyebrow">INCENTIVE CENTER</p>
-      <h3>${esc(viewedName())}</h3>
-      <p class="muted">Live incentive progress based on actual database.</p>
-      ${syncStatus()}
-    </section>
-
-    ${managerForm}
-
-    <div class="section-title">
-      <div>
-        <p class="eyebrow">ACTIVE INCENTIVES</p>
-        <h3>${list.length} incentive(s)</h3>
-      </div>
-    </div>
-
-    <div class="list">
-      ${list.length ? list.map(incentiveCard).join('') : empty('No active incentive.')}
-    </div>
-
-    ${personalTargetsSection()}
-  `;
-
-  bindCommon();
-
-  $$('[data-banner]').forEach(b => {
-    b.onclick = async () => {
-      setBusy(true, 'Loading banner…');
-
-      try {
-        const r = await apiPost('downloadBanner', {
-          fileId: b.dataset.banner
-        });
-
-        if (!r?.ok) throw new Error(r?.error || 'Banner unavailable');
-
-        const a = document.createElement('a');
-        a.href = `data:${r.mimeType || 'image/jpeg'};base64,${r.base64}`;
-        a.download = r.fileName || 'incentive-banner.jpg';
-        a.click();
-
-      } catch (e) {
-        toast(e.message, 3500);
-      } finally {
-        setBusy(false);
-      }
-    };
-  });
-
-  $$('[data-editinc]').forEach(b => {
-    b.onclick = () => {
-      editingIncentiveId = b.dataset.editinc;
-
-      const x = list.find(z =>
-        String(z.id || z.incentiveId || '') === editingIncentiveId
-      );
-
-      incentiveSelectedSkus = Array.isArray(x?.selectedSkus)
-        ? [...x.selectedSkus]
-        : [];
-
-      render();
-    };
-  });
-
-  $$('[data-stopinc]').forEach(b => {
-    b.onclick = async () => {
-      if (!confirm('Deactivate this incentive?')) return;
-
-      setBusy(true, 'Updating incentive…');
-
-      try {
-        const r = await apiPost('setIncentiveStatus', {
-          incentiveId: b.dataset.stopinc,
-          status: 'INACTIVE'
-        });
-
-        if (!r?.ok) throw new Error(r?.error || 'Update failed');
-
-        await loadCurrent({ quiet: true });
-        toast('Incentive deactivated');
-        render();
-
-      } catch (e) {
-        toast(e.message, 3500);
-      } finally {
-        setBusy(false);
-      }
-    };
-  });
-
-  if (isManagerMode()) {
-    const scope = $('#incScope');
-
-    if (scope) {
-      scope.onchange = () => {
-        $('#incStaffWrap').style.display =
-          scope.value === 'ALL' ? 'none' : '';
-      };
-
-      scope.onchange();
-    }
-
-    const basis = $('#incBasis');
-    const metric = $('#incMetric');
-    const search = $('#incSkuSearch');
-    const results = $('#incSkuResults');
-    const chips = $('#incSkuChips');
-
-    const paintPicker = () => {
-      if (!results || !chips) return;
-
-      const q = String(search?.value || '')
-        .trim()
-        .toLowerCase();
-
-      const all = allSkuNames()
-        .filter(x => !incentiveSelectedSkus.includes(x))
-        .filter(x => !q || x.toLowerCase().includes(q))
-        .slice(0,80);
-
-      results.innerHTML = all.length
-        ? all.map(x =>
-            `<button type="button" class="search-result" data-addincsku="${esc(x)}" style="display:block;width:100%;text-align:left;background:transparent;color:inherit;border:0">＋ ${esc(x)}</button>`
-          ).join('')
-        : empty('No matching SKU');
-
-      chips.innerHTML = incentiveSelectedSkus
-        .map(x =>
-          `<span class="chip">${esc(x)}<button type="button" data-rmincsku="${esc(x)}">×</button></span>`
-        ).join('');
-
-      if ($('#incSkuCount')) {
-        $('#incSkuCount').textContent =
-          String(incentiveSelectedSkus.length);
-      }
-
-      $$('[data-addincsku]').forEach(b => {
-        b.onclick = () => {
-          const max =
-            basis?.value === 'SINGLE_SKU'
-              ? 1
-              : 100;
-
-          if (incentiveSelectedSkus.length >= max) {
-            if (max === 1) incentiveSelectedSkus = [];
-            else return;
-          }
-
-          incentiveSelectedSkus.push(b.dataset.addincsku);
-          paintPicker();
-        };
-      });
-
-      $$('[data-rmincsku]').forEach(b => {
-        b.onclick = () => {
-          incentiveSelectedSkus =
-            incentiveSelectedSkus.filter(
-              x => x !== b.dataset.rmincsku
-            );
-
-          paintPicker();
-        };
-      });
-    };
-
-    const syncBasis = () => {
-      if (!basis) return;
-
-      const product =
-        ['SINGLE_SKU','MULTI_SKU'].includes(basis.value);
-
-      if ($('#incProductControls')) {
-        $('#incProductControls').style.display =
-          product ? '' : 'none';
-      }
-
-      if ($('#incGroupWrap')) {
-        $('#incGroupWrap').style.display =
-          basis.value === 'MULTI_SKU' ? '' : 'none';
-      }
-
-      if ($('#incRuleWrap')) {
-        $('#incRuleWrap').style.display =
-          basis.value === 'MULTI_SKU' ? '' : 'none';
-      }
-
-      if (basis.value === 'TOTAL_SALES') {
-        if (metric) metric.value = 'SALES_RM';
-      }
-
-      if (basis.value === 'OUTLET_COVERAGE') {
-        if (metric) metric.value = 'OUTLETS';
-      }
-
-      if (
-        basis.value === 'SINGLE_SKU' &&
-        incentiveSelectedSkus.length > 1
-      ) {
-        incentiveSelectedSkus =
-          incentiveSelectedSkus.slice(0,1);
-      }
-
-      paintPicker();
-    };
-
-    if (basis) basis.onchange = syncBasis;
-    if (search) search.oninput = paintPicker;
-
-    if ($('#incRule')) {
-      $('#incRule').onchange = e => {
-        $('#incEachMinWrap').style.display =
-          e.target.value === 'EACH_MIN' ? '' : 'none';
-      };
-
-      $('#incRule').onchange({
-        target: $('#incRule')
-      });
-    }
-
-    syncBasis();
-
-    if ($('#incForm')) {
-      $('#incForm').onsubmit = async e => {
-        e.preventDefault();
-
-        const fd = new FormData(e.target);
-        const b = String(fd.get('basis') || 'SINGLE_SKU');
-
-        let metricValue =
-          String(fd.get('metric') || 'CARTONS');
-
-        if (b === 'TOTAL_SALES') metricValue = 'SALES_RM';
-        if (b === 'OUTLET_COVERAGE') metricValue = 'OUTLETS';
-
-        if (
-          b === 'SINGLE_SKU' &&
-          incentiveSelectedSkus.length !== 1
-        ) {
-          return toast('Please select exactly 1 SKU');
-        }
-
-        if (
-          b === 'MULTI_SKU' &&
-          incentiveSelectedSkus.length < 2
-        ) {
-          return toast(
-            'Please select at least 2 SKUs for combo / series'
-          );
-        }
-
-        const file = fd.get('banner');
-
-        setBusy(true, 'Creating incentive…');
-
-        try {
-          let bannerBase64 = '';
-          let bannerFileName = '';
-          let bannerMimeType = '';
-
-          if (file instanceof File && file.size) {
-            if (file.size > 3 * 1024 * 1024) {
-              throw new Error('Banner must be under 3 MB');
-            }
-
-            bannerBase64 = await fileToBase64(file);
-            bannerFileName = file.name;
-            bannerMimeType = file.type;
-          }
-
-          const scopeValue =
-            String(fd.get('scope'));
-
-          const r = await apiPost('createIncentive', {
-            incentiveId: editingIncentiveId || '',
-            name: String(fd.get('name') || ''),
-            description: String(fd.get('description') || ''),
-            category: String(fd.get('category') || 'PRODUCT'),
-            basis: b,
-            metric: metricValue,
-            selectedSkus: [...incentiveSelectedSkus],
-            groupName: String(fd.get('groupName') || ''),
-            calculationRule:
-              String(fd.get('calculationRule') || 'COMBINED'),
-            eachSkuMinimum:
-              n(fd.get('eachSkuMinimum')),
-            targetValue:
-              n(fd.get('target')),
-            rewardRM:
-              n(fd.get('reward')),
-            startDate:
-              String(fd.get('startDate') || ''),
-            endDate:
-              String(fd.get('endDate') || ''),
-            scope: scopeValue,
-            assignedStaff:
-              scopeValue === 'ALL'
-                ? []
-                : [String(fd.get('staffId') || managerView)],
-            bannerBase64,
-            bannerFileName,
-            bannerMimeType
-          });
-
-          if (!r?.ok) {
-            throw new Error(
-              r?.error || 'Incentive save failed'
-            );
-          }
-
-          const selectedStaff =
-            scopeValue === 'ALL'
-              ? managerView
-              : String(fd.get('staffId') || managerView);
-
-          if (scopeValue !== 'ALL') {
-            managerView = selectedStaff;
-            session.managerView = managerView;
-            saveSession();
-          }
-
-          editingIncentiveId = null;
-
-          await loadCurrent({
-            quiet: true
-          });
-
-          toast(
-            editingIncentiveId
-              ? 'Incentive updated'
-              : 'Incentive created'
-          );
-
-          render();
-
-        } catch (err) {
-          toast(err.message, 4000);
-        } finally {
-          setBusy(false);
-        }
-      };
-    }
-
-    bindPersonalTargetForm();
-  }
-}
-
-/* =========================================================
-   PERSONAL / ADDITIONAL TARGET
-========================================================= */
-
-function personalTargetsSection() {
-  const list = current?.personalTargets || [];
-
-  return `
-    <div class="section-title">
-      <h3>My Additional / Personal Target</h3>
-    </div>
-
-    <div class="card">
-      <form id="personalTargetForm" class="stack">
-
-        <label>Target Name
-          <input name="name" required placeholder="e.g. My Extra Mango Target">
-        </label>
-
-        <label>Description
-          <textarea name="description"></textarea>
-        </label>
-
-        <label>SKU (optional)
-          <select name="skuName">
-            <option value="">No specific SKU</option>
-            ${allSkuNames().map(x =>
-              `<option value="${esc(x)}">${esc(x)}</option>`
-            ).join('')}
-          </select>
-        </label>
-
-        <div class="form-grid">
-          <label>Metric
-            <select name="metric">
-              <option value="SALES_RM">Total Sales RM</option>
-              <option value="CARTONS">Cartons</option>
-              <option value="SKU_SALES_RM">SKU Sales RM</option>
+          <label>
+            Assign To
+            <select name="scope" id="incScope">
+              <option value="SPECIFIC" ${(edit?.scope || 'SPECIFIC') === 'SPECIFIC' ? 'selected' : ''}>
+                Selected SR
+              </option>
+              <option value="ALL" ${edit?.scope === 'ALL' ? 'selected' : ''}>
+                All SR
+              </option>
             </select>
           </label>
 
-          <label>Target
-            <input name="targetValue" type="number" min="0" step="0.01" required>
-          </label>
-        </div>
-
-        <div class="form-grid">
-          <label>Start Date
-            <input name="startDate" type="date" value="${selectedMonth + '-01'}">
-          </label>
-
-          <label>End Date
-            <input name="endDate" type="date">
-          </label>
-        </div>
-
-        <button class="btn secondary">
-          SAVE PERSONAL TARGET
-        </button>
-      </form>
-    </div>
-
-    <div class="list" style="margin-top:12px">
-      ${
-        list.length
-          ? list.map(t => {
-              const p = personalTargetProgress(t);
-
-              return `
-                <div class="list-item">
-                  <div class="row">
-                    <div>
-                      <h4>${esc(t.Name)}</h4>
-                      <p>${esc(t.Description || '')}</p>
-                    </div>
-
-                    <span class="pill ${
-                      p.actual >= p.target && p.target
-                        ? 'green'
-                        : 'orange'
-                    }">
-                      ${p.actual.toFixed(1)} / ${p.target.toFixed(1)}
-                    </span>
-                  </div>
-
-                  ${progressBar(p.percent)}
-
-                  <p style="margin-top:7px">
-                    ${p.remaining.toFixed(1)} remaining
-                  </p>
-                </div>`;
-            }).join('')
-          : empty('No personal target yet.')
-      }
-    </div>`;
-}
-
-function bindPersonalTargetForm() {
-  const form = $('#personalTargetForm');
-
-  if (!form) return;
-
-  form.onsubmit = async e => {
-    e.preventDefault();
-
-    const fd = new FormData(e.target);
-
-    setBusy(true, 'Saving personal target…');
-
-    try {
-      const r = await apiPost('savePersonalTarget', {
-        month: selectedMonth,
-        name: String(fd.get('name') || ''),
-        description: String(fd.get('description') || ''),
-        category: 'PERSONAL',
-        skuName: String(fd.get('skuName') || ''),
-        metric: String(fd.get('metric') || 'SALES_RM'),
-        targetValue: n(fd.get('targetValue')),
-        startDate: String(fd.get('startDate') || ''),
-        endDate: String(fd.get('endDate') || '')
-      });
-
-      if (!r?.ok) {
-        throw new Error(
-          r?.error || 'Save failed'
-        );
-      }
-
-      await loadCurrent({
-        quiet: true
-      });
-
-      toast('Personal target saved');
-      render();
-
-    } catch (err) {
-      toast(err.message, 3500);
-    } finally {
-      setBusy(false);
-    }
-  };
-}
-
-/* =========================================================
-   PENALTIES
-========================================================= */
-
-function activePenalty(x) {
-  return String(x.Status || 'ACTIVE').toUpperCase() === 'ACTIVE';
-}
-
-function renderPenalties() {
-  const list = current?.penalties || [];
-
-  const form = isManagerMode()
-    ? `
-      <div class="card">
-        <p class="eyebrow">MANAGER / HR</p>
-        <h2>Add Penalty</h2>
-
-        <form id="penaltyForm" class="stack">
-
-          <label>Assigned SR
+          <label id="incStaffWrap">
+            Selected SR
             <select name="staffId">
               ${teamUsers().map(u => `
-                <option value="${u.id}" ${u.id === managerView ? 'selected' : ''}>
+                <option
+                  value="${u.id}"
+                  ${u.id === (edit?.assignedStaff?.[0] || managerView) ? 'selected' : ''}
+                >
                   ${esc(u.name)} • ${u.id}
                 </option>
               `).join('')}
             </select>
           </label>
 
-          <div class="form-grid">
-            <label>Date
-              <input name="date" type="date" value="${selectedDate}" required>
-            </label>
-
-            <label>Type
-              <select name="type">
-                <option>Late attendance</option>
-                <option>Poor display</option>
-                <option>Product unavailable</option>
-                <option>Other company penalty</option>
-              </select>
-            </label>
-          </div>
-
-          <label>Reason
-            <input name="reason" required>
+          <label>
+            Banner / Image (optional, max 3 MB)
+            <input
+              name="banner"
+              type="file"
+              accept="image/*"
+            >
           </label>
 
-          <label>Description
-            <textarea name="description"></textarea>
-          </label>
-
-          <label>Amount RM
-            <input name="amount" type="number" min="0" step="0.01" required>
-          </label>
-
-          <button class="btn danger">
-            ADD PENALTY
+          <button class="btn primary big-action">
+            ${edit ? 'UPDATE INCENTIVE' : 'CREATE INCENTIVE'}
           </button>
+
+          ${
+            edit
+              ? `
+                <button
+                  type="button"
+                  id="cancelIncEdit"
+                  class="btn secondary"
+                >
+                  CANCEL EDIT
+                </button>
+              `
+              : ''
+          }
         </form>
-      </div>`
+      </div>
+    `
     : '';
 
   $('#mainContent').innerHTML = `
     ${monthBar()}
+    ${managerForm}
 
-    ${form}
+    <section class="hero">
+      <p class="eyebrow">INCENTIVE CENTER</p>
+      <h3>${esc(viewedName())}</h3>
+      <p class="muted">
+        Single SKU, combo/series, total sales and outlet coverage
+        incentives are calculated from live Google Sheet sales.
+      </p>
+    </section>
 
-    <div class="section-title">
-      <h3>Penalty History</h3>
-    </div>
-
-    <div class="list">
+    <div class="list" style="margin-top:12px">
       ${
         list.length
-          ? list.map(x => `
-            <div class="list-item">
-              <div class="row">
-                <div>
-                  <h4>${esc(x.Reason || x.Type || 'Penalty')}</h4>
-
-                  <p>
-                    ${dateLabel(x.Date)}
-                    • ${esc(x.Type || '')}
-                    ${
-                      x.Description
-                        ? '<br>' + esc(x.Description)
-                        : ''
-                    }
-                  </p>
-                </div>
-
-                <div style="text-align:right">
-                  <strong class="bad">
-                    -${money(x.Amount)}
-                  </strong>
-
-                  <br>
-
-                  <span class="pill ${activePenalty(x) ? 'red' : ''}">
-                    ${esc(x.Status || 'ACTIVE')}
-                  </span>
-                </div>
-              </div>
-
-              ${
-                isManagerMode() && activePenalty(x)
-                  ? `<button class="btn secondary" data-voidpen="${esc(x['Penalty ID'])}" style="margin-top:8px">VOID PENALTY</button>`
-                  : ''
-              }
-            </div>`).join('')
-          : empty('No penalty record for this month.')
+          ? list.map(incentiveCard).join('')
+          : empty('No active incentive for this month.')
       }
-    </div>`;
+    </div>
+
+    ${!isManagerMode() ? personalTargetsSection() : ''}
+  `;
 
   bindCommon();
 
-  if ($('#penaltyForm')) {
-    $('#penaltyForm').onsubmit = async e => {
+  $$('[data-banner]').forEach(b => {
+    b.onclick = () =>
+      downloadCloudFile(
+        'downloadBanner',
+        b.dataset.banner,
+        true
+      );
+  });
+
+  $$('[data-editinc]').forEach(b => {
+    b.onclick = () => {
+      editingIncentiveId = b.dataset.editinc;
+      renderIncentives();
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    };
+  });
+
+  if ($('#cancelIncEdit')) {
+    $('#cancelIncEdit').onclick = () => {
+      editingIncentiveId = null;
+      renderIncentives();
+    };
+  }
+
+  const scope = $('#incScope');
+
+  if (scope) {
+    scope.onchange = () => {
+      $('#incStaffWrap').style.display =
+        scope.value === 'ALL'
+          ? 'none'
+          : '';
+    };
+
+    scope.onchange();
+  }
+
+  const basis = $('#incBasis');
+  const metric = $('#incMetric');
+  const search = $('#incSkuSearch');
+  const results = $('#incSkuResults');
+  const chips = $('#incSkuChips');
+
+  const paintPicker = () => {
+    if (!results || !chips) return;
+
+    const q = String(
+      search?.value || ''
+    )
+      .trim()
+      .toLowerCase();
+
+    const all = allSkuNames()
+      .filter(x =>
+        !incentiveSelectedSkus.includes(x) &&
+        (!q || x.toLowerCase().includes(q))
+      )
+      .slice(0, 80);
+
+    results.innerHTML = all.length
+      ? all.map(x => `
+          <button
+            type="button"
+            class="search-result"
+            data-addincsku="${esc(x)}"
+            style="
+              display:block;
+              width:100%;
+              text-align:left;
+              background:transparent;
+              color:inherit;
+              border:0
+            "
+          >
+            ＋ ${esc(x)}
+          </button>
+        `).join('')
+      : empty('No matching SKU');
+
+    chips.innerHTML =
+      incentiveSelectedSkus
+        .map(x => `
+          <span class="chip">
+            ${esc(x)}
+            <button
+              type="button"
+              data-rmincsku="${esc(x)}"
+            >
+              ×
+            </button>
+          </span>
+        `)
+        .join('');
+
+    if ($('#incSkuCount')) {
+      $('#incSkuCount').textContent =
+        String(incentiveSelectedSkus.length);
+    }
+
+    $$('[data-addincsku]').forEach(b => {
+      b.onclick = () => {
+        const max =
+          basis?.value === 'SINGLE_SKU'
+            ? 1
+            : 100;
+
+        if (incentiveSelectedSkus.length >= max) {
+          if (max === 1) {
+            incentiveSelectedSkus = [];
+          } else {
+            return;
+          }
+        }
+
+        incentiveSelectedSkus.push(
+          b.dataset.addincsku
+        );
+
+        paintPicker();
+      };
+    });
+
+    $$('[data-rmincsku]').forEach(b => {
+      b.onclick = () => {
+        incentiveSelectedSkus =
+          incentiveSelectedSkus.filter(
+            x => x !== b.dataset.rmincsku
+          );
+
+        paintPicker();
+      };
+    });
+  };
+
+  const syncBasis = () => {
+    if (!basis) return;
+
+    const product =
+      ['SINGLE_SKU', 'MULTI_SKU']
+        .includes(basis.value);
+
+    if ($('#incProductControls')) {
+      $('#incProductControls').style.display =
+        product ? '' : 'none';
+    }
+
+    if ($('#incGroupWrap')) {
+      $('#incGroupWrap').style.display =
+        basis.value === 'MULTI_SKU'
+          ? ''
+          : 'none';
+    }
+
+    if ($('#incRuleWrap')) {
+      $('#incRuleWrap').style.display =
+        basis.value === 'MULTI_SKU'
+          ? ''
+          : 'none';
+    }
+
+    if (
+      basis.value === 'TOTAL_SALES' &&
+      metric
+    ) {
+      metric.value = 'SALES_RM';
+    }
+
+    if (
+      basis.value === 'OUTLET_COVERAGE' &&
+      metric
+    ) {
+      metric.value = 'OUTLETS';
+    }
+
+    if (
+      basis.value === 'SINGLE_SKU' &&
+      incentiveSelectedSkus.length > 1
+    ) {
+      incentiveSelectedSkus =
+        incentiveSelectedSkus.slice(0, 1);
+    }
+
+    paintPicker();
+  };
+
+  if (basis) {
+    basis.onchange = syncBasis;
+  }
+
+  if (search) {
+    search.oninput = paintPicker;
+  }
+
+  if ($('#incRule')) {
+    $('#incRule').onchange = e => {
+      $('#incEachMinWrap').style.display =
+        e.target.value === 'EACH_MIN'
+          ? ''
+          : 'none';
+    };
+
+    $('#incRule').onchange({
+      target: $('#incRule')
+    });
+  }
+
+  syncBasis();
+
+  if ($('#incForm')) {
+    $('#incForm').onsubmit = async e => {
       e.preventDefault();
 
       const fd = new FormData(e.target);
 
-      setBusy(true, 'Saving penalty…');
+      const b = String(
+        fd.get('basis') || 'SINGLE_SKU'
+      );
+
+      let metricValue = String(
+        fd.get('metric') || 'CARTONS'
+      );
+
+      if (b === 'TOTAL_SALES') {
+        metricValue = 'SALES_RM';
+      }
+
+      if (b === 'OUTLET_COVERAGE') {
+        metricValue = 'OUTLETS';
+      }
+
+      if (
+        ['SINGLE_SKU', 'MULTI_SKU'].includes(b) &&
+        !incentiveSelectedSkus.length
+      ) {
+        return toast('Select at least one SKU');
+      }
+
+      const file = fd.get('banner');
+
+      let bannerBase64 = '';
+      let bannerFileName = '';
+      let bannerMimeType = '';
+
+      if (file && file.size) {
+        if (file.size > 3 * 1024 * 1024) {
+          return toast('Banner maximum 3 MB');
+        }
+
+        bannerBase64 = await fileToBase64(file);
+        bannerFileName = file.name;
+        bannerMimeType =
+          file.type || 'image/jpeg';
+      }
+
+      const payload = {
+        incentiveId:
+          editingIncentiveId || '',
+
+        name:
+          String(fd.get('name') || ''),
+
+        description:
+          String(fd.get('description') || ''),
+
+        category:
+          String(fd.get('category') || 'PRODUCT'),
+
+        basis: b,
+
+        metric: metricValue,
+
+        groupName:
+          String(fd.get('groupName') || ''),
+
+        selectedSkus:
+          incentiveSelectedSkus,
+
+        calculationRule:
+          String(
+            fd.get('calculationRule') ||
+            'COMBINED'
+          ),
+
+        eachSkuMinimum:
+          n(fd.get('eachSkuMinimum')),
+
+        target:
+          n(fd.get('target')),
+
+        rewardRM:
+          n(fd.get('reward')),
+
+        startDate:
+          String(fd.get('startDate') || ''),
+
+        endDate:
+          String(fd.get('endDate') || ''),
+
+        scope:
+          String(fd.get('scope') || 'SPECIFIC'),
+
+        staffId:
+          String(fd.get('staffId') || ''),
+
+        bannerBase64,
+        bannerFileName,
+        bannerMimeType
+      };
+
+      setBusy(
+        true,
+        editingIncentiveId
+          ? 'Updating incentive…'
+          : 'Creating incentive…'
+      );
 
       try {
-        const r = await apiPost('savePenalty', {
-          staffId: String(fd.get('staffId')),
-          date: String(fd.get('date')),
-          type: String(fd.get('type')),
-          reason: String(fd.get('reason')),
-          description: String(fd.get('description') || ''),
-          amount: n(fd.get('amount'))
-        });
+        const r = await apiPost(
+          editingIncentiveId
+            ? 'saveIncentive'
+            : 'createIncentive',
+          payload
+        );
 
         if (!r?.ok) {
           throw new Error(
-            r?.error || 'Penalty failed'
+            r?.error || 'Incentive save failed'
           );
         }
 
-        managerView =
-          String(fd.get('staffId'));
+        editingIncentiveId = null;
+        incentiveSelectedSkus = [];
 
         await loadCurrent({
           quiet: true
         });
 
-        toast('Penalty added');
+        toast('Incentive saved');
+
         render();
 
       } catch (err) {
-        toast(err.message, 3500);
+        toast(err.message, 4000);
+
+      } finally {
+        setBusy(false);
+      }
+    };
+  }
+}
+
+function personalTargetsSection() {
+  const targets =
+    current?.personalTargets || [];
+
+  if (!targets.length) {
+    return '';
+  }
+
+  return `
+    <div class="section-title">
+      <h3>Personal Targets</h3>
+    </div>
+
+    <div class="list">
+      ${targets.map(t => {
+        const p = personalTargetProgress(t);
+
+        return `
+          <div class="card">
+
+            <div class="row">
+              <div>
+                <h3>
+                  ${esc(
+                    t['Target Name'] ||
+                    'Personal Target'
+                  )}
+                </h3>
+
+                <p class="muted">
+                  ${esc(
+                    t.Metric ||
+                    'SALES_RM'
+                  )}
+                </p>
+              </div>
+
+              <span class="pill ${p.percent >= 100 ? 'green' : 'orange'}">
+                ${pct(p.percent)}
+              </span>
+            </div>
+
+            ${progressBar(p.percent)}
+
+            <p class="muted" style="margin-top:8px">
+              ${p.actual} / ${p.target}
+              • ${p.remaining} remaining
+            </p>
+
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+/* =========================================================
+   TASKS / IMPORTANT WORK
+========================================================= */
+
+function renderTasks() {
+  const tasks = current?.tasks || [];
+
+  const pending =
+    tasks.filter(x => !taskDone(x));
+
+  const done =
+    tasks.filter(taskDone);
+
+  const managerAssign =
+    isManagerMode()
+      ? `
+        <div class="card" style="margin-bottom:12px">
+          <p class="eyebrow">MANAGER ASSIGNMENT</p>
+          <h2>Assign Important Work</h2>
+
+          <form id="managerTaskForm" class="stack">
+
+            <label>
+              Assign To
+              <select
+                id="taskAssignScope"
+                name="scope"
+              >
+                <option value="SPECIFIC">
+                  Selected SR
+                </option>
+
+                <option value="ALL">
+                  ALL SR
+                </option>
+
+                <option value="SELF">
+                  My Reminder
+                </option>
+              </select>
+            </label>
+
+            <label id="taskStaffWrap">
+              SR
+              <select name="staffId">
+                ${teamUsers().map(u => `
+                  <option value="${esc(u.id)}">
+                    ${esc(u.name)} • ${esc(u.id)}
+                  </option>
+                `).join('')}
+              </select>
+            </label>
+
+            <label>
+              Work / Task
+              <input
+                name="title"
+                required
+                placeholder="What needs to be done?"
+              >
+            </label>
+
+            <label>
+              Details / Instruction
+              <textarea
+                name="details"
+                placeholder="Instruction, buyer follow-up, execution details..."
+              ></textarea>
+            </label>
+
+            <div class="form-grid">
+              <label>
+                Due Date
+                <input
+                  name="due"
+                  type="date"
+                  value="${selectedDate}"
+                >
+              </label>
+
+              <label>
+                Due Time
+                <input
+                  name="dueTime"
+                  type="time"
+                >
+              </label>
+            </div>
+
+            <div class="form-grid">
+              <label>
+                Priority
+                <select name="priority">
+                  <option value="NORMAL">Normal</option>
+                  <option value="HIGH">High</option>
+                  <option value="URGENT">Urgent</option>
+                </select>
+              </label>
+
+              <label>
+                Outlet
+                <select name="outlet">
+                  ${outletOptions()}
+                </select>
+              </label>
+            </div>
+
+            <label class="row" style="justify-content:flex-start;gap:8px">
+              <input
+                name="reminderEnabled"
+                type="checkbox"
+                checked
+                style="width:auto"
+              >
+              Reminder enabled
+            </label>
+
+            <button class="btn primary">
+              ASSIGN / SAVE WORK
+            </button>
+
+          </form>
+        </div>
+      `
+      : '';
+
+  const selfReminder =
+    !isManagerMode()
+      ? `
+        <div class="card" style="margin-bottom:12px">
+          <p class="eyebrow">MY REMINDER</p>
+          <h2>Add Personal Work</h2>
+
+          <form id="selfTaskForm" class="stack">
+
+            <label>
+              Reminder / Work
+              <input
+                name="title"
+                required
+                placeholder="e.g. Buyer meeting at Giant Setapak"
+              >
+            </label>
+
+            <label>
+              Note
+              <textarea
+                name="details"
+                placeholder="Follow-up details..."
+              ></textarea>
+            </label>
+
+            <div class="form-grid">
+              <label>
+                Date
+                <input
+                  name="due"
+                  type="date"
+                  value="${selectedDate}"
+                >
+              </label>
+
+              <label>
+                Time
+                <input
+                  name="dueTime"
+                  type="time"
+                >
+              </label>
+            </div>
+
+            <div class="form-grid">
+              <label>
+                Priority
+                <select name="priority">
+                  <option value="NORMAL">Normal</option>
+                  <option value="HIGH">High</option>
+                  <option value="URGENT">Urgent</option>
+                </select>
+              </label>
+
+              <label>
+                Outlet
+                <select name="outlet">
+                  ${outletOptions()}
+                </select>
+              </label>
+            </div>
+
+            <label class="row" style="justify-content:flex-start;gap:8px">
+              <input
+                name="shareManager"
+                type="checkbox"
+                style="width:auto"
+              >
+              Share / Notify Manager
+            </label>
+
+            <button class="btn primary">
+              SAVE MY REMINDER
+            </button>
+
+          </form>
+        </div>
+      `
+      : '';
+
+  const taskCard = t => {
+    const own =
+      String(t.Source || '').toUpperCase() === 'OWN';
+
+    return `
+      <div class="list-item">
+
+        <div class="row">
+          <div>
+            <span class="pill ${taskDone(t) ? 'green' : 'orange'}">
+              ${taskDone(t) ? 'DONE' : 'PENDING'}
+            </span>
+
+            <h4 style="margin-top:8px">
+              ${esc(
+                t.Title ||
+                t['Task Title'] ||
+                'Important Work'
+              )}
+            </h4>
+
+            <p>
+              ${esc(
+                t.Details ||
+                t.Note ||
+                ''
+              )}
+            </p>
+          </div>
+
+          <span class="pill">
+            ${own ? 'MY REMINDER' : 'ASSIGNED'}
+          </span>
+        </div>
+
+        <div class="status-strip">
+          ${
+            t['Staff ID']
+              ? `
+                <span class="status-chip">
+                  ${esc(
+                    t['Staff Name'] ||
+                    ''
+                  )}
+                  •
+                  ${esc(t['Staff ID'])}
+                </span>
+              `
+              : ''
+          }
+
+          ${
+            t['Due Date'] || t.Due
+              ? `
+                <span class="status-chip">
+                  📅
+                  ${dateLabel(
+                    t['Due Date'] ||
+                    t.Due
+                  )}
+                </span>
+              `
+              : ''
+          }
+
+          ${
+            t['Due Time']
+              ? `
+                <span class="status-chip">
+                  ⏰ ${esc(t['Due Time'])}
+                </span>
+              `
+              : ''
+          }
+
+          ${
+            t.Priority
+              ? `
+                <span class="status-chip">
+                  ${esc(t.Priority)}
+                </span>
+              `
+              : ''
+          }
+        </div>
+
+        ${
+          !taskDone(t)
+            ? `
+              <div class="form-actions">
+                <button
+                  class="btn secondary"
+                  data-taskdone="${esc(
+                    t['Task ID'] ||
+                    t.ID ||
+                    t.id ||
+                    ''
+                  )}"
+                >
+                  ✓ MARK DONE
+                </button>
+              </div>
+            `
+            : ''
+        }
+
+      </div>
+    `;
+  };
+
+  $('#mainContent').innerHTML = `
+    ${monthBar()}
+
+    ${managerAssign}
+    ${selfReminder}
+
+    <section class="hero">
+      <p class="eyebrow">IMPORTANT WORK</p>
+      <h3>${esc(viewedName())}</h3>
+      <p class="muted">
+        Manager assigned work and personal reminders stay together,
+        with independent status and reminders.
+      </p>
+    </section>
+
+    <div class="section-title">
+      <h3>Pending (${pending.length})</h3>
+    </div>
+
+    <div class="list">
+      ${
+        pending.length
+          ? pending.map(taskCard).join('')
+          : empty('No pending work.')
+      }
+    </div>
+
+    <div class="section-title">
+      <h3>Completed (${done.length})</h3>
+    </div>
+
+    <div class="list">
+      ${
+        done.length
+          ? done.map(taskCard).join('')
+          : empty('No completed work.')
+      }
+    </div>
+  `;
+
+  bindCommon();
+
+  const scope = $('#taskAssignScope');
+
+  if (scope) {
+    scope.onchange = () => {
+      const wrap = $('#taskStaffWrap');
+
+      if (wrap) {
+        wrap.style.display =
+          ['ALL', 'SELF'].includes(scope.value)
+            ? 'none'
+            : '';
+      }
+    };
+
+    scope.onchange();
+  }
+
+  if ($('#managerTaskForm')) {
+    $('#managerTaskForm').onsubmit = async e => {
+      e.preventDefault();
+
+      const fd = new FormData(e.target);
+
+      const assignment =
+        String(fd.get('scope') || 'SPECIFIC');
+
+      const outletName =
+        String(fd.get('outlet') || '');
+
+      const outlet =
+        routeOutlets().find(
+          x =>
+            String(x['Outlet Name']) === outletName
+        );
+
+      const basePayload = {
+        title:
+          String(fd.get('title') || ''),
+
+        details:
+          String(fd.get('details') || ''),
+
+        due:
+          String(fd.get('due') || ''),
+
+        dueTime:
+          String(fd.get('dueTime') || ''),
+
+        priority:
+          String(fd.get('priority') || 'NORMAL'),
+
+        outletCode:
+          outlet?.['Outlet Code'] || '',
+
+        outletName,
+
+        reminderEnabled:
+          fd.get('reminderEnabled') === 'on'
+      };
+
+      setBusy(true, 'Saving important work…');
+
+      try {
+        if (assignment === 'ALL') {
+          const users = teamUsers();
+
+          for (const u of users) {
+            const r = await apiPost(
+              'saveTask',
+              {
+                ...basePayload,
+                staffId: u.id,
+                source: 'MANAGER'
+              }
+            );
+
+            if (!r?.ok) {
+              throw new Error(
+                r?.error ||
+                `Task failed for ${u.id}`
+              );
+            }
+          }
+
+          toast(
+            `Work assigned to ${users.length} SR(s)`
+          );
+
+        } else {
+          const staffId =
+            assignment === 'SELF'
+              ? session.id
+              : String(fd.get('staffId') || '');
+
+          const r = await apiPost(
+            'saveTask',
+            {
+              ...basePayload,
+              staffId,
+              source:
+                assignment === 'SELF'
+                  ? 'OWN'
+                  : 'MANAGER'
+            }
+          );
+
+          if (!r?.ok) {
+            throw new Error(
+              r?.error || 'Task save failed'
+            );
+          }
+
+          toast(
+            assignment === 'SELF'
+              ? 'My reminder saved'
+              : 'Important work assigned'
+          );
+        }
+
+        if (isManagerMode()) {
+          await loadTeam({
+            quiet: true
+          });
+        }
+
+        await loadCurrent({
+          quiet: true
+        });
+
+        render();
+
+      } catch (err) {
+        toast(err.message, 4000);
+
       } finally {
         setBusy(false);
       }
     };
   }
 
-  $$('[data-voidpen]').forEach(b => {
-    b.onclick = async () => {
-      if (!confirm('Void this penalty?')) return;
+  if ($('#selfTaskForm')) {
+    $('#selfTaskForm').onsubmit = async e => {
+      e.preventDefault();
 
-      const r = await apiPost('voidPenalty', {
-        penaltyId: b.dataset.voidpen
-      });
+      const fd = new FormData(e.target);
 
-      if (r?.ok) {
+      const outletName =
+        String(fd.get('outlet') || '');
+
+      const outlet =
+        routeOutlets().find(
+          x =>
+            String(x['Outlet Name']) === outletName
+        );
+
+      setBusy(true, 'Saving my reminder…');
+
+      try {
+        const r = await apiPost(
+          'saveTask',
+          {
+            staffId: session.id,
+
+            title:
+              String(fd.get('title') || ''),
+
+            details:
+              String(fd.get('details') || ''),
+
+            due:
+              String(fd.get('due') || ''),
+
+            dueTime:
+              String(fd.get('dueTime') || ''),
+
+            priority:
+              String(fd.get('priority') || 'NORMAL'),
+
+            outletCode:
+              outlet?.['Outlet Code'] || '',
+
+            outletName,
+
+            source: 'OWN',
+
+            reminderEnabled: true,
+
+            shareManager:
+              fd.get('shareManager') === 'on'
+          }
+        );
+
+        if (!r?.ok) {
+          throw new Error(
+            r?.error || 'Reminder save failed'
+          );
+        }
+
         await loadCurrent({
           quiet: true
         });
 
-        toast('Penalty voided');
+        toast('My reminder saved');
         render();
-      } else {
-        toast(r?.error || 'Failed');
+
+      } catch (err) {
+        toast(err.message, 4000);
+
+      } finally {
+        setBusy(false);
       }
     };
-  });
-}
-
-/* =========================================================
-   INCOME
-========================================================= */
-
-function incomeRow(label, value, cls = '') {
-  return `
-    <div class="row" style="padding:9px 0">
-      <span class="muted">${esc(label)}</span>
-      <strong class="${cls}">${money(value)}</strong>
-    </div>`;
-}
-
-function renderIncome() {
-  const x = current?.incomeSummary || {};
-
-  $('#mainContent').innerHTML = `
-    ${monthBar()}
-
-    <section class="hero">
-      <p class="eyebrow">FINAL MONTHLY INCOME</p>
-
-      <div class="salary-total">
-        ${money(x.finalIncome)}
-      </div>
-
-      <p class="muted">
-        Automatically calculated from sales, incentive and penalty.
-      </p>
-    </section>
-
-    <div class="card" style="margin-top:12px">
-      ${incomeRow('Basic Salary', x.baseSalary)}
-      ${incomeRow('Fuel / Oil', x.fuel)}
-      ${incomeRow('House Rent', x.houseRent)}
-      ${incomeRow('Food Allowance', x.food)}
-      ${incomeRow('Sales Commission', x.salesCommission)}
-      ${incomeRow('Zero Sales Incentive', x.zeroSalesIncentive, 'good')}
-      ${incomeRow('Product Incentive', x.productIncentive, 'good')}
-      ${incomeRow('Other Incentive', x.otherIncentive, 'good')}
-      ${incomeRow('Individual Incentive', x.individualIncentive, 'good')}
-
-      <hr style="border:0;border-top:1px solid var(--line)">
-
-      ${incomeRow('TOTAL INCENTIVE', x.totalIncentive, 'good')}
-      ${incomeRow('PENALTY', -n(x.penalty), 'bad')}
-
-      <hr style="border:0;border-top:1px solid var(--line)">
-
-      ${incomeRow('FINAL SALARY / INCOME', x.finalIncome)}
-    </div>
-
-    <div class="mini-grid" style="margin-top:12px">
-      <button class="btn secondary" data-page-go="incentives">
-        🏆 INCENTIVE DETAILS
-      </button>
-
-      <button class="btn secondary" data-page-go="penalties">
-        − PENALTY HISTORY
-      </button>
-    </div>`;
-
-  bindCommon();
-}
-
-/* =========================================================
-   IMPORTANT WORK / PERSONAL REMINDER
-========================================================= */
-
-function renderTasks() {
-  const tasks = current?.tasks || [];
-
-  const canAssignTeam = isManagerMode();
-
-  $('#mainContent').innerHTML = `
-    ${monthBar()}
-
-    <section class="hero">
-      <p class="eyebrow">IMPORTANT WORK</p>
-      <h3>Task & Personal Reminder</h3>
-      <p class="muted">
-        Keep meetings, buyer follow-up and important work in one place.
-      </p>
-      ${syncStatus()}
-    </section>
-
-    <div class="card">
-      <form id="taskForm" class="stack">
-
-        ${
-          canAssignTeam
-            ? `
-              <label>Assign To
-                <select name="staffId" id="taskStaff">
-                  <option value="${esc(session.id)}">MYSELF • ${esc(sessionName())}</option>
-                  <option value="ALL">ALL SR</option>
-                  ${teamUsers().map(u => `
-                    <option value="${esc(u.id)}">
-                      ${esc(u.name)} • ${esc(u.id)}
-                    </option>
-                  `).join('')}
-                </select>
-              </label>`
-            : `
-              <input type="hidden" name="staffId" value="${esc(session.id)}">
-            `
-        }
-
-        <label>Title
-          <input name="title" required placeholder="e.g. Buyer Meeting / Follow-up">
-        </label>
-
-        <label>Instruction / Note
-          <textarea name="instruction" rows="3" placeholder="Important details"></textarea>
-        </label>
-
-        <div class="form-grid">
-          <label>Due Date
-            <input name="due" type="date" value="${localDate()}">
-          </label>
-
-          <label>Due Time
-            <input name="dueTime" type="time">
-          </label>
-        </div>
-
-        <div class="form-grid">
-          <label>Priority
-            <select name="priority">
-              <option value="NORMAL">Normal</option>
-              <option value="HIGH">High</option>
-              <option value="URGENT">Urgent</option>
-            </select>
-          </label>
-
-          <label>Type
-            <select name="source">
-              <option value="OWN">My Reminder</option>
-              <option value="MEETING">Meeting</option>
-              <option value="BUYER">Buyer Follow-up</option>
-              <option value="OUTLET">Outlet Work</option>
-              <option value="MANAGER">Manager Assigned</option>
-            </select>
-          </label>
-        </div>
-
-        <label>Outlet (optional)
-          <select name="outletName">
-            ${outletOptions()}
-          </select>
-        </label>
-
-        <label style="display:flex;align-items:center;gap:8px">
-          <input name="reminderEnabled" type="checkbox" checked style="width:auto">
-          Push reminder enabled
-        </label>
-
-        <button class="btn primary">
-          SAVE IMPORTANT WORK
-        </button>
-      </form>
-    </div>
-
-    <div class="section-title">
-      <div>
-        <p class="eyebrow">WORK LIST</p>
-        <h3>${tasks.length} item(s)</h3>
-      </div>
-    </div>
-
-    <div class="list">
-      ${
-        tasks.length
-          ? tasks.map(t => {
-              const done =
-                String(t.Status || '').toUpperCase() === 'DONE';
-
-              const source =
-                String(t.Source || 'OWN').toUpperCase();
-
-              return `
-                <div class="card">
-                  <div class="row">
-                    <div>
-                      <span class="pill ${done ? 'green' : source === 'OWN' ? '' : 'orange'}">
-                        ${done ? 'DONE' : esc(source)}
-                      </span>
-
-                      <h3 style="margin:8px 0 3px">
-                        ${esc(t.Title || 'Important Work')}
-                      </h3>
-
-                      <p class="muted">
-                        ${dateLabel(t['Due Date'])}
-                        ${t['Due Time'] ? ' • ' + esc(t['Due Time']) : ''}
-                        • ${esc(t.Priority || 'NORMAL')}
-                      </p>
-                    </div>
-
-                    ${
-                      !done
-                        ? `<button class="btn secondary" data-taskdone="${esc(t['Task ID'])}">DONE</button>`
-                        : '✓'
-                    }
-                  </div>
-
-                  ${
-                    t.Instruction
-                      ? `<p style="margin-top:8px">${esc(t.Instruction)}</p>`
-                      : ''
-                  }
-
-                  ${
-                    t['Outlet Name']
-                      ? `<p class="muted" style="margin-top:5px">🏪 ${esc(t['Outlet Name'])}</p>`
-                      : ''
-                  }
-                </div>`;
-            }).join('')
-          : empty('No important work yet.')
-      }
-    </div>`;
-
-  bindCommon();
-
-  $('#taskForm').onsubmit = async e => {
-    e.preventDefault();
-
-    const fd = new FormData(e.target);
-
-    const target =
-      String(fd.get('staffId') || session.id);
-
-    setBusy(true, 'Saving important work…');
-
-    try {
-      if (target === 'ALL' && isManagerMode()) {
-        const users = teamUsers();
-
-        for (const u of users) {
-          const r = await apiPost('saveTask', {
-            staffId: u.id,
-            title: String(fd.get('title') || ''),
-            instruction: String(fd.get('instruction') || ''),
-            due: String(fd.get('due') || ''),
-            dueTime: String(fd.get('dueTime') || ''),
-            priority: String(fd.get('priority') || 'NORMAL'),
-            source: 'MANAGER',
-            outletName: String(fd.get('outletName') || ''),
-            reminderEnabled: fd.get('reminderEnabled') === 'on'
-          });
-
-          if (!r?.ok) {
-            throw new Error(
-              r?.error || `Task failed for ${u.id}`
-            );
-          }
-        }
-
-        toast(`Important Work assigned to ${users.length} SR`);
-
-      } else {
-        const own =
-          normalizeId(target) === normalizeId(session.id);
-
-        const r = await apiPost('saveTask', {
-          staffId: target,
-          title: String(fd.get('title') || ''),
-          instruction: String(fd.get('instruction') || ''),
-          due: String(fd.get('due') || ''),
-          dueTime: String(fd.get('dueTime') || ''),
-          priority: String(fd.get('priority') || 'NORMAL'),
-          source: own
-            ? String(fd.get('source') || 'OWN')
-            : 'MANAGER',
-          outletName: String(fd.get('outletName') || ''),
-          reminderEnabled: fd.get('reminderEnabled') === 'on'
-        });
-
-        if (!r?.ok) {
-          throw new Error(
-            r?.error || 'Task save failed'
-          );
-        }
-
-        toast(
-          own
-            ? 'Personal reminder saved'
-            : 'Important Work assigned'
-        );
-      }
-
-      await loadCurrent({
-        quiet: true
-      });
-
-      render();
-
-    } catch (err) {
-      toast(err.message, 4000);
-    } finally {
-      setBusy(false);
-    }
-  };
+  }
 
   $$('[data-taskdone]').forEach(b => {
     b.onclick = async () => {
+      const taskId =
+        b.dataset.taskdone;
+
+      if (!taskId) {
+        return toast('Task ID missing');
+      }
+
       setBusy(true, 'Completing task…');
 
       try {
-        const r = await apiPost('completeTask', {
-          taskId: b.dataset.taskdone
-        });
+        const r = await apiPost(
+          'completeTask',
+          { taskId }
+        );
 
         if (!r?.ok) {
           throw new Error(
-            r?.error || 'Task completion failed'
+            r?.error ||
+            'Task completion failed'
           );
         }
 
@@ -2754,8 +5137,507 @@ function renderTasks() {
         toast('Task completed');
         render();
 
-      } catch (e) {
-        toast(e.message, 3500);
+      } catch (err) {
+        toast(err.message, 4000);
+
+      } finally {
+        setBusy(false);
+      }
+    };
+  });
+}
+
+/* =========================================================
+   CPO EXECUTION
+========================================================= */
+
+function getCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(
+        new Error('GPS is not supported')
+      );
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      p => resolve({
+        latitude: p.coords.latitude,
+        longitude: p.coords.longitude,
+        accuracy: p.coords.accuracy
+      }),
+      () => reject(
+        new Error('Location permission required')
+      ),
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      }
+    );
+  });
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const value =
+        String(reader.result || '');
+
+      resolve(
+        value.includes(',')
+          ? value.split(',')[1]
+          : value
+      );
+    };
+
+    reader.onerror = () =>
+      reject(
+        new Error('File read failed')
+      );
+
+    reader.readAsDataURL(file);
+  });
+}
+
+function base64ToBlob(base64, mimeType) {
+  const bin = atob(base64);
+  const bytes = new Uint8Array(bin.length);
+
+  for (let i = 0; i < bin.length; i++) {
+    bytes[i] = bin.charCodeAt(i);
+  }
+
+  return new Blob(
+    [bytes],
+    {
+      type:
+        mimeType ||
+        'application/octet-stream'
+    }
+  );
+}
+
+async function downloadCloudFile(
+  action,
+  id,
+  open = false
+) {
+  if (!id) return;
+
+  setBusy(true, 'Opening file…');
+
+  try {
+    const r = await apiPost(
+      action,
+      {
+        fileId: id,
+        id
+      }
+    );
+
+    if (!r?.ok) {
+      throw new Error(
+        r?.error || 'File failed'
+      );
+    }
+
+    const blob =
+      base64ToBlob(
+        r.base64,
+        r.mimeType
+      );
+
+    const url =
+      URL.createObjectURL(blob);
+
+    if (open) {
+      window.open(
+        url,
+        '_blank',
+        'noopener'
+      );
+    } else {
+      const a =
+        document.createElement('a');
+
+      a.href = url;
+
+      a.download =
+        r.fileName ||
+        'download';
+
+      a.click();
+    }
+
+    setTimeout(
+      () =>
+        URL.revokeObjectURL(url),
+      30000
+    );
+
+  } catch (e) {
+    toast(e.message, 4000);
+
+  } finally {
+    setBusy(false);
+  }
+}
+
+function renderCpo() {
+  const list =
+    current?.cpo || [];
+
+  const pending =
+    list.filter(x =>
+      String(
+        x.Status || ''
+      ).toUpperCase() !== 'COMPLETED'
+    );
+
+  $('#mainContent').innerHTML = `
+    ${monthBar()}
+
+    ${
+      !isManagerMode()
+        ? `
+          <div
+            class="card"
+            style="margin-bottom:12px"
+          >
+            <p class="eyebrow">
+              CPO EXECUTION
+            </p>
+
+            <h2>
+              Upload Outlet Proof
+            </h2>
+
+            <form
+              id="cpoForm"
+              class="stack"
+            >
+
+              <label>
+                Date
+                <input
+                  name="date"
+                  type="date"
+                  value="${selectedDate}"
+                  required
+                >
+              </label>
+
+              <label>
+                Outlet
+                <select
+                  name="outlet"
+                  required
+                >
+                  ${outletOptions()}
+                </select>
+              </label>
+
+              <label>
+                CPO Photo / Proof
+                <input
+                  name="photo"
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  required
+                >
+              </label>
+
+              <label>
+                Note
+                <textarea name="note"></textarea>
+              </label>
+
+              <button class="btn primary">
+                📍 SAVE CPO WITH GPS
+              </button>
+
+            </form>
+          </div>
+        `
+        : ''
+    }
+
+    <section class="hero">
+      <p class="eyebrow">
+        CPO CONTROL
+      </p>
+
+      <h3>${esc(viewedName())}</h3>
+
+      <p class="muted">
+        Photo proof, outlet and execution status.
+      </p>
+
+      <div class="status-strip">
+        <span class="status-chip">
+          Total ${list.length}
+        </span>
+
+        <span class="status-chip">
+          Pending ${pending.length}
+        </span>
+      </div>
+    </section>
+
+    <div
+      class="list"
+      style="margin-top:12px"
+    >
+      ${
+        list.length
+          ? list.map(x => `
+              <div class="list-item">
+
+                <div class="row">
+                  <div>
+                    <h4>
+                      ${esc(
+                        x['Outlet Name'] ||
+                        x.outletName ||
+                        'Outlet'
+                      )}
+                    </h4>
+
+                    <p>
+                      ${dateLabel(
+                        x.Date ||
+                        x.date
+                      )}
+                      •
+                      ${esc(
+                        x.Note ||
+                        x.note ||
+                        ''
+                      )}
+                    </p>
+                  </div>
+
+                  <span
+                    class="pill ${
+                      String(
+                        x.Status ||
+                        ''
+                      ).toUpperCase() === 'COMPLETED'
+                        ? 'green'
+                        : 'orange'
+                    }"
+                  >
+                    ${esc(
+                      x.Status ||
+                      'PENDING'
+                    )}
+                  </span>
+                </div>
+
+                ${
+                  x['Photo File ID'] ||
+                  x.photoFileId
+                    ? `
+                      <div class="form-actions">
+                        <button
+                          class="btn secondary"
+                          data-cpophoto="${esc(
+                            x['CPO ID'] ||
+                            x.cpoId ||
+                            x.ID ||
+                            ''
+                          )}"
+                        >
+                          VIEW PROOF
+                        </button>
+                      </div>
+                    `
+                    : `
+                      <p class="bad" style="margin-top:8px">
+                        Proof Missing / Vacant
+                      </p>
+                    `
+                }
+
+              </div>
+            `).join('')
+          : empty(
+              'No CPO record found.'
+            )
+      }
+    </div>
+  `;
+
+  bindCommon();
+
+  if ($('#cpoForm')) {
+    $('#cpoForm').onsubmit = async e => {
+      e.preventDefault();
+
+      const fd =
+        new FormData(e.target);
+
+      const name =
+        String(
+          fd.get('outlet') || ''
+        );
+
+      const out =
+        routeOutlets().find(
+          x =>
+            String(
+              x['Outlet Name']
+            ) === name
+        );
+
+      const file =
+        fd.get('photo');
+
+      if (!file || !file.size) {
+        return toast(
+          'CPO photo required'
+        );
+      }
+
+      setBusy(
+        true,
+        'Getting GPS and uploading CPO…'
+      );
+
+      try {
+        const c =
+          await getCurrentPosition();
+
+        const base64 =
+          await fileToBase64(file);
+
+        const r =
+          await apiPost(
+            'saveCpo',
+            {
+              date:
+                String(
+                  fd.get('date')
+                ),
+
+              outletCode:
+                out?.[
+                  'Outlet Code'
+                ] || '',
+
+              outletName:
+                name,
+
+              note:
+                String(
+                  fd.get('note') ||
+                  ''
+                ),
+
+              fileName:
+                file.name,
+
+              mimeType:
+                file.type ||
+                'image/jpeg',
+
+              base64,
+
+              latitude:
+                c.latitude,
+
+              longitude:
+                c.longitude,
+
+              accuracy:
+                c.accuracy
+            }
+          );
+
+        if (!r?.ok) {
+          throw new Error(
+            r?.error ||
+            'CPO failed'
+          );
+        }
+
+        await loadCurrent({
+          quiet: true
+        });
+
+        toast(
+          'CPO photo + GPS saved'
+        );
+
+        render();
+
+      } catch (x) {
+        toast(
+          x.message ||
+          'GPS/photo failed',
+          4500
+        );
+
+      } finally {
+        setBusy(false);
+      }
+    };
+  }
+
+  $$('[data-cpophoto]').forEach(b => {
+    b.onclick = async () => {
+      setBusy(
+        true,
+        'Opening CPO proof…'
+      );
+
+      try {
+        const r =
+          await apiPost(
+            'downloadCpoPhoto',
+            {
+              cpoId:
+                b.dataset.cpophoto
+            }
+          );
+
+        if (!r?.ok) {
+          throw new Error(
+            r?.error ||
+            'Photo failed'
+          );
+        }
+
+        const url =
+          URL.createObjectURL(
+            base64ToBlob(
+              r.base64,
+              r.mimeType
+            )
+          );
+
+        window.open(
+          url,
+          '_blank',
+          'noopener'
+        );
+
+        setTimeout(
+          () =>
+            URL.revokeObjectURL(url),
+          30000
+        );
+
+      } catch (x) {
+        toast(
+          x.message,
+          4000
+        );
+
       } finally {
         setBusy(false);
       }
@@ -2768,321 +5650,636 @@ function renderTasks() {
 ========================================================= */
 
 function renderSummary() {
-  const p = current?.performance || {};
-  const orders = current?.executionOrders || [];
-  const tasks = current?.tasks || [];
-  const zero = current?.zeroOutlets || [];
-  const inc = current?.incentives || [];
+  const p =
+    current?.performance || {};
+
+  const cmp =
+    current?.comparisons || {};
+
+  const inc =
+    current?.incomeSummary || {};
 
   $('#mainContent').innerHTML = `
     ${monthBar()}
 
     <section class="hero">
-      <p class="eyebrow">PERFORMANCE SUMMARY</p>
-      <h3>${esc(viewedName())}</h3>
-      <p class="muted">${esc(viewedId())} • ${esc(monthName(selectedMonth))}</p>
+      <p class="eyebrow">
+        PERFORMANCE SUMMARY
+      </p>
+
+      <h3>
+        ${esc(viewedName())}
+      </h3>
+
+      <p class="muted">
+        ${monthName(selectedMonth)}
+      </p>
+
+      ${progressBar(p.percent)}
       ${syncStatus()}
     </section>
 
-    <div class="metric-grid">
-      ${metricCard('Target', money(p.target || 0))}
-      ${metricCard('Delivered', money(p.achievement || p.sales || 0))}
-      ${metricCard('Achievement', pct(p.percent || p.achievementPercent || 0))}
-      ${metricCard('Shortfall', money(p.shortfall || 0))}
-      ${metricCard('Orders', String(orders.length))}
-      ${metricCard('Zero Outlet', String(zero.length))}
-      ${metricCard('Tasks', String(tasks.length))}
-      ${metricCard('Incentives', String(inc.length))}
+    <div class="grid kpi-grid">
+
+      ${kpi(
+        'TARGET',
+        money(p.target)
+      )}
+
+      ${kpi(
+        'DELIVERED SALES',
+        money(p.achievement),
+        pct(p.percent),
+        p.percent >= 100
+          ? 'good'
+          : ''
+      )}
+
+      ${kpi(
+        'SHORTFALL',
+        money(p.shortfall),
+        '',
+        p.shortfall
+          ? 'bad'
+          : 'good'
+      )}
+
+      ${kpi(
+        'TODAY',
+        money(p.todaySales)
+      )}
+
+      ${kpi(
+        'COVERAGE',
+        pct(p.coverage)
+      )}
+
+      ${kpi(
+        'ZERO OUTLET',
+        String(
+          n(p.zeroOutlets)
+        )
+      )}
+
+      ${kpi(
+        'LAST MONTH SAME DAY',
+        money(
+          cmp.lastMonthSameDay
+        )
+      )}
+
+      ${kpi(
+        'LAST YEAR SAME DAY',
+        money(
+          cmp.lastYearSameDay
+        )
+      )}
+
+      ${kpi(
+        'INCENTIVE',
+        money(
+          inc.incentive ||
+          inc.incentiveEarned
+        )
+      )}
+
+      ${kpi(
+        'FINAL INCOME',
+        money(
+          inc.finalIncome
+        )
+      )}
+
     </div>
 
-    <div class="card" style="margin-top:12px">
-      <h3>Database Snapshot</h3>
+    <div class="form-actions">
+      <button
+        class="btn secondary"
+        data-go="zero"
+      >
+        OUTLET REPORT
+      </button>
 
-      <div class="list" style="margin-top:10px">
-        <div class="list-item">
-          <div class="row">
-            <span>Outlet Master</span>
-            <strong>${routeOutlets().length}</strong>
-          </div>
-        </div>
+      <button
+        class="btn secondary"
+        data-go="incentives"
+      >
+        INCENTIVES
+      </button>
 
-        <div class="list-item">
-          <div class="row">
-            <span>SKU Master</span>
-            <strong>${skuMaster().length}</strong>
-          </div>
-        </div>
+      <button
+        class="btn secondary"
+        data-go="tasks"
+      >
+        IMPORTANT WORK
+      </button>
+    </div>
+  `;
 
-        <div class="list-item">
-          <div class="row">
-            <span>Outlet Sales Records</span>
-            <strong>${(current?.outletSales || []).length}</strong>
-          </div>
-        </div>
-
-        <div class="list-item">
-          <div class="row">
-            <span>SKU Sales Records</span>
-            <strong>${(current?.skuSales || []).length}</strong>
-          </div>
-        </div>
-      </div>
-    </div>`;
-    
   bindCommon();
 }
 
 /* =========================================================
-   OPPORTUNITY ENGINE
+   OPPORTUNITY
 ========================================================= */
 
 function renderOpportunity() {
-  const list =
-    current?.opportunities ||
-    current?.opportunity ||
-    [];
+  const p =
+    current?.performance || {};
+
+  const outlets =
+    routeOutlets()
+      .map(o => {
+        const name =
+          String(
+            o['Outlet Name'] ||
+            ''
+          );
+
+        return {
+          name,
+          sales:
+            monthOutletSales(name)
+        };
+      })
+      .sort(
+        (a, b) =>
+          a.sales - b.sales
+      );
+
+  const zero =
+    outlets.filter(
+      x => x.sales <= 0
+    );
+
+  const low =
+    outlets.filter(
+      x => x.sales > 0
+    ).slice(0, 10);
 
   $('#mainContent').innerHTML = `
     ${monthBar()}
 
     <section class="hero">
-      <p class="eyebrow">OPPORTUNITY ENGINE</p>
-      <h3>Where Should I Focus?</h3>
-      <p class="muted">
-        Uses current incentive, SKU movement and outlet performance.
+      <p class="eyebrow">
+        SALES OPPORTUNITY
       </p>
-      ${syncStatus()}
+
+      <h3>
+        ${money(p.shortfall)}
+        shortfall
+      </h3>
+
+      <p class="muted">
+        Focus first on zero-sales and
+        lowest-performing outlets.
+      </p>
     </section>
+
+    <div class="section-title">
+      <h3>
+        Zero Sales Priority
+      </h3>
+    </div>
 
     <div class="list">
       ${
-        list.length
-          ? list.map(i => `
-            <div class="card">
-              <div class="row">
-                <div>
-                  <h3>${esc(i.name || i.incentiveName || 'Opportunity')}</h3>
-                  <p class="muted">
-                    ${esc(i.description || '')}
-                  </p>
-                </div>
+        zero.length
+          ? zero.slice(0, 20)
+              .map((x, i) => `
+                <div class="list-item">
+                  <div class="row">
+                    <strong>
+                      ${i + 1}.
+                      ${esc(x.name)}
+                    </strong>
 
-                <strong>
-                  ${n(i.actual)} / ${n(i.target)}
-                </strong>
-              </div>
-
-              ${progressBar(i.percent || (i.target ? i.actual / i.target * 100 : 0))}
-
-              <div class="status-strip">
-                <span class="status-chip">
-                  ${(i.selectedSkus || []).length} SKU(s)
-                </span>
-
-                <span class="status-chip">
-                  ${esc(i.metric || '')}
-                </span>
-              </div>
-
-              <div class="list" style="margin-top:12px">
-                ${(i.outlets || []).slice(0,80).map(o => `
-                  <div class="list-item">
-                    <div class="row">
-                      <div>
-                        <h4>${esc(o.outletName)}</h4>
-                        <p>
-                          ${n(o.value ?? o.cartons)}
-                          ${i.metric === 'CARTONS' ? 'CTN' : ''}
-                          • ${esc(o.category || '')}
-                        </p>
-                      </div>
-
-                      <span class="pill ${
-                        o.status === 'HIGH_OPPORTUNITY'
-                          ? 'red'
-                          : o.status === 'OPPORTUNITY'
-                            ? 'orange'
-                            : 'green'
-                      }">
-                        ${
-                          o.status === 'HIGH_OPPORTUNITY'
-                            ? '🔴 HIGH'
-                            : o.status === 'OPPORTUNITY'
-                              ? '🟠 OPPORTUNITY'
-                              : '🟢 PERFORMING'
-                        }
-                      </span>
-                    </div>
+                    <span class="pill red">
+                      ZERO
+                    </span>
                   </div>
-                `).join('')}
-              </div>
-            </div>
-          `).join('')
+                </div>
+              `)
+              .join('')
           : empty(
-              'Opportunity Engine becomes active when a product/combination incentive is running.'
+              'No zero-sales outlet.'
             )
       }
-    </div>`;
+    </div>
 
-  bindCommon();
-}
+    <div class="section-title">
+      <h3>
+        Low Sales Priority
+      </h3>
+    </div>
 
-/* =========================================================
-   ACTIVITY TIMELINE
-========================================================= */
-
-function renderActivity() {
-  const list = current?.activity || [];
-
-  $('#mainContent').innerHTML = `
-    ${monthBar()}
-
-    <section class="hero">
-      <p class="eyebrow">PROOF / HISTORY</p>
-      <h3>Activity Timeline</h3>
-      <p class="muted">
-        Sales, tasks, incentive, penalty and important records with date/time.
-      </p>
-    </section>
-
-    <div class="notification-list">
+    <div class="list">
       ${
-        list.length
-          ? list.map(x => `
-            <div class="notification-item">
-              <div class="notification-icon">
-                ${activityIcon(x.Type)}
-              </div>
-
-              <div style="flex:1">
+        low.length
+          ? low.map((x, i) => `
+              <div class="list-item">
                 <div class="row">
-                  <h4>${esc(x.Title || x.Type || 'Activity')}</h4>
+                  <strong>
+                    ${i + 1}.
+                    ${esc(x.name)}
+                  </strong>
 
-                  ${
-                    n(x.Amount)
-                      ? `<strong class="${n(x.Amount) < 0 ? 'bad' : 'good'}">
-                          ${n(x.Amount) < 0 ? '-' : ''}
-                          ${money(Math.abs(n(x.Amount)))}
-                        </strong>`
-                      : ''
-                  }
+                  <span class="pill orange">
+                    ${money(x.sales)}
+                  </span>
                 </div>
-
-                <p>
-                  ${esc(x.Description || '')}
-                  <br>
-                  ${esc(String(x.Timestamp || x.Date || ''))}
-                </p>
               </div>
-            </div>
-          `).join('')
-          : empty('No activity record for this month.')
+            `).join('')
+          : empty(
+              'No low-sales outlet data.'
+            )
       }
-    </div>`;
+    </div>
+  `;
 
   bindCommon();
 }
-
-function activityIcon(type) {
-  const t = String(type || '').toUpperCase();
-
-  if (t.includes('TASK')) return '✅';
-  if (t.includes('PENALTY')) return '−';
-  if (t.includes('INCENTIVE')) return '🏆';
-  if (t.includes('SKU')) return '📦';
-  if (t.includes('OUTLET')) return '🏪';
-  if (t.includes('SALE')) return 'RM';
-  if (t.includes('PROPOSAL')) return '▤';
-
-  return '•';
-}
-
 /* =========================================================
-   PROPOSAL ORDER FORM
+   INCOME / PENALTIES / ACTIVITY
 ========================================================= */
 
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-
-    r.onload = () =>
-      resolve(
-        String(r.result || '')
-          .split(',')
-          .pop() || ''
-      );
-
-    r.onerror = reject;
-    r.readAsDataURL(file);
-  });
-}
-
-function renderProposal() {
-  const list = current?.proposals || current?.proposalForms || [];
+function renderIncome() {
+  const x = current?.incomeSummary || {};
 
   $('#mainContent').innerHTML = `
     ${monthBar()}
 
     <section class="hero">
-      <p class="eyebrow">PROPOSAL ORDER FORM</p>
-      <h3>PO / Proposal Files</h3>
+      <p class="eyebrow">INCOME SUMMARY</p>
+      <h3>${esc(viewedName())}</h3>
       <p class="muted">
-        Manager can upload proposal/order documents for field use.
+        Commission + incentive − penalty
       </p>
-      ${syncStatus()}
     </section>
 
-    ${
-      isManagerMode()
-        ? `
-          <form id="proposalForm" class="card">
-            <label>Title
-              <input name="title" required placeholder="Proposal / Order Form">
-            </label>
+    <div class="grid kpi-grid">
+      ${kpi('BASE / COMMISSION', money(x.baseIncome || x.commission))}
+      ${kpi('INCENTIVE', money(x.incentive || x.incentiveEarned), '', 'good')}
+      ${kpi('PENALTY', money(x.penalty), '', x.penalty ? 'bad' : '')}
+      ${kpi('FINAL INCOME', money(x.finalIncome), '', 'good')}
+    </div>
+  `;
 
-            <label>Note
-              <textarea name="note" rows="2"></textarea>
-            </label>
+  bindCommon();
+}
 
-            <label>File
-              <input name="file" type="file" required>
-            </label>
+function renderPenalties() {
+  const list = current?.penalties || [];
 
-            <button class="btn primary">
-              UPLOAD FILE
-            </button>
-          </form>`
-        : ''
-    }
+  $('#mainContent').innerHTML = `
+    ${monthBar()}
+
+    <section class="hero">
+      <p class="eyebrow">PENALTY CONTROL</p>
+      <h3>${esc(viewedName())}</h3>
+    </section>
 
     <div class="list" style="margin-top:12px">
       ${
         list.length
           ? list.map(x => `
-            <div class="card">
-              <div class="row">
-                <div>
-                  <h3>${esc(x.Title || x.title || x['File Name'] || 'Proposal')}</h3>
-
-                  <p class="muted">
-                    ${esc(x.Note || x.note || '')}
-                    ${
-                      x['Uploaded At']
-                        ? '<br>' + esc(String(x['Uploaded At']))
-                        : ''
-                    }
-                  </p>
+              <div class="list-item">
+                <div class="row">
+                  <div>
+                    <h4>${esc(x.Reason || x.reason || 'Penalty')}</h4>
+                    <p>${dateLabel(x.Date || x.date)}</p>
+                  </div>
+                  <strong class="bad">
+                    ${money(x.Amount || x.amount)}
+                  </strong>
                 </div>
-
-                <button class="btn secondary" data-proposal-download="${esc(x['Form ID'] || x.id || '')}">
-                  DOWNLOAD
-                </button>
               </div>
-            </div>
-          `).join('')
-          : empty('No proposal file.')
+            `).join('')
+          : empty('No penalty found.')
       }
-    </div>`;
+    </div>
+  `;
+
+  bindCommon();
+}
+
+function renderActivity() {
+  const rows = current?.activity || current?.timeline || [];
+
+  $('#mainContent').innerHTML = `
+    ${monthBar()}
+
+    <section class="hero">
+      <p class="eyebrow">ACTIVITY TIMELINE</p>
+      <h3>${esc(viewedName())}</h3>
+    </section>
+
+    <div class="list" style="margin-top:12px">
+      ${
+        rows.length
+          ? rows.map(x => `
+              <div class="list-item">
+                <h4>
+                  ${esc(
+                    x.Title ||
+                    x.Action ||
+                    x.Type ||
+                    'Activity'
+                  )}
+                </h4>
+
+                <p>
+                  ${esc(
+                    x.Note ||
+                    x.Details ||
+                    x.Description ||
+                    ''
+                  )}
+                </p>
+
+                <small class="muted">
+                  ${esc(
+                    String(
+                      x['Created At'] ||
+                      x.Timestamp ||
+                      x.Date ||
+                      ''
+                    )
+                  )}
+                </small>
+              </div>
+            `).join('')
+          : empty('No activity found.')
+      }
+    </div>
+  `;
+
+  bindCommon();
+}
+
+/* =========================================================
+   TEAM
+========================================================= */
+
+function renderTeam() {
+  if (!isManager()) {
+    setPage('dashboard');
+    return;
+  }
+
+  if (!v8Team) {
+    $('#mainContent').innerHTML = `
+      ${monthBar({ showManager: false })}
+
+      <section class="hero">
+        <p class="eyebrow">MANAGER • ALL SR</p>
+        <h3>Loading Team Dashboard…</h3>
+        ${syncStatus()}
+      </section>
+    `;
+
+    v8LoadManagerData().then(render);
+    return;
+  }
+
+  const x = v8Team.performance || {};
+  const members = v8Team.members || [];
+
+  $('#mainContent').innerHTML = `
+    ${monthBar({ showManager: false })}
+
+    <section class="hero">
+      <p class="eyebrow">
+        MANAGER • ALL SR — MY TEAM
+      </p>
+
+      <h3>Full Zone Dashboard</h3>
+
+      <p class="muted">
+        ${members.length} active SR
+        • delivered sales source of truth
+      </p>
+
+      ${syncStatus()}
+
+      <button
+        id="v8Refresh"
+        class="btn primary"
+      >
+        ↻ SYNC TEAM NOW
+      </button>
+    </section>
+
+    <div
+      class="mini-grid"
+      style="margin-top:12px"
+    >
+      ${v8Kpi('Team Target', money(x.target))}
+      ${v8Kpi('Delivered', money(x.achievement), 'good')}
+      ${v8Kpi('Achievement', pct(x.percent), x.percent >= 100 ? 'good' : '')}
+      ${v8Kpi('Shortfall', money(x.shortfall), 'bad')}
+      ${v8Kpi('Today Sales', money(x.todaySales))}
+      ${v8Kpi('Pending Delivery', n(v8Team.pendingOrders), 'bad')}
+      ${v8Kpi('Coverage', pct(x.coverage))}
+      ${v8Kpi('Zero Sales', n(x.zeroOutlets), 'bad')}
+      ${v8Kpi('Pending CPO', n(v8Team.pendingCpo), 'bad')}
+      ${v8Kpi('Pending Tasks', n(v8Team.pendingTasks), 'bad')}
+    </div>
+
+    <div class="section-title">
+      <h3>Individual SR Drill-down</h3>
+    </div>
+
+    <div class="list">
+      ${
+        members.length
+          ? members.map(m => {
+              const p = m.performance || {};
+
+              return `
+                <div class="list-item">
+                  <div class="row">
+                    <div>
+                      <h4>${esc(m.name)}</h4>
+                      <p>
+                        ${esc(m.staffId)}
+                        • ${esc(m.route || '')}
+                        • ${money(p.achievement)}
+                        / ${money(p.target)}
+                      </p>
+                    </div>
+
+                    <span
+                      class="pill ${
+                        p.percent >= 100
+                          ? 'green'
+                          : p.percent >= 80
+                            ? 'orange'
+                            : 'red'
+                      }"
+                    >
+                      ${pct(p.percent)}
+                    </span>
+                  </div>
+
+                  <div class="form-actions">
+                    <button
+                      class="btn action-sales"
+                      data-v8open="${esc(m.staffId)}"
+                      data-page="dashboard"
+                    >
+                      DASHBOARD
+                    </button>
+
+                    <button
+                      class="btn secondary"
+                      data-v8open="${esc(m.staffId)}"
+                      data-page="summary"
+                    >
+                      FULL DATA
+                    </button>
+
+                    <button
+                      class="btn action-plan"
+                      data-v8open="${esc(m.staffId)}"
+                      data-page="planning"
+                    >
+                      PLAN
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')
+          : empty('No active SR found.')
+      }
+    </div>
+  `;
+
+  bindCommon();
+
+  $('#v8Refresh').onclick = async () => {
+    setBusy(true, 'Syncing full team…');
+
+    await v8LoadManagerData();
+
+    setBusy(false);
+    render();
+  };
+
+  $$('[data-v8open]').forEach(b => {
+    b.onclick = async () => {
+      managerView = b.dataset.v8open;
+
+      session.managerView = managerView;
+      saveSession();
+
+      await loadCurrent();
+
+      setPage(
+        b.dataset.page || 'summary'
+      );
+    };
+  });
+}
+
+/* =========================================================
+   PROPOSAL
+========================================================= */
+
+function renderProposal() {
+  const list = current?.proposals || [];
+
+  $('#mainContent').innerHTML = `
+    ${monthBar()}
+
+    <section class="hero">
+      <p class="eyebrow">PROPOSAL / PO FORM</p>
+      <h3>Proposal Documents</h3>
+      <p class="muted">
+        Upload and access approved working files.
+      </p>
+    </section>
+
+    ${
+      !isManagerMode()
+        ? `
+          <div class="card" style="margin-top:12px">
+            <form id="proposalForm" class="stack">
+              <label>
+                Title
+                <input name="title" required>
+              </label>
+
+              <label>
+                File
+                <input
+                  name="file"
+                  type="file"
+                  required
+                >
+              </label>
+
+              <label>
+                Note
+                <textarea name="note"></textarea>
+              </label>
+
+              <button class="btn primary">
+                UPLOAD PROPOSAL
+              </button>
+            </form>
+          </div>
+        `
+        : ''
+    }
+
+    <div class="section-title">
+      <h3>Proposal History</h3>
+    </div>
+
+    <div class="list">
+      ${
+        list.length
+          ? list.map(x => `
+              <div class="list-item">
+                <div class="row">
+                  <div>
+                    <h4>
+                      ${esc(
+                        x.Title ||
+                        x.title ||
+                        x['File Name'] ||
+                        'Proposal'
+                      )}
+                    </h4>
+
+                    <p>
+                      ${esc(
+                        x.Note ||
+                        x.note ||
+                        ''
+                      )}
+                    </p>
+                  </div>
+
+                  <button
+                    class="btn secondary"
+                    data-proposal="${esc(
+                      x['File ID'] ||
+                      x.fileId ||
+                      x.id ||
+                      ''
+                    )}"
+                  >
+                    OPEN
+                  </button>
+                </div>
+              </div>
+            `).join('')
+          : empty('No proposal uploaded.')
+      }
+    </div>
+  `;
 
   bindCommon();
 
@@ -3093,12 +6290,12 @@ function renderProposal() {
       const fd = new FormData(e.target);
       const file = fd.get('file');
 
-      if (!(file instanceof File) || !file.size) {
-        return toast('Select a file');
+      if (!file || !file.size) {
+        return toast('Select file');
       }
 
       if (file.size > 6 * 1024 * 1024) {
-        return toast('File must be under 6 MB');
+        return toast('Maximum file size 6 MB');
       }
 
       setBusy(true, 'Uploading proposal…');
@@ -3107,19 +6304,29 @@ function renderProposal() {
         const base64 =
           await fileToBase64(file);
 
-        const r = await apiPost('uploadProposal', {
-          title: String(fd.get('title') || ''),
-          note: String(fd.get('note') || ''),
-          fileName: file.name,
-          mimeType:
-            file.type ||
-            'application/octet-stream',
-          base64
-        });
+        const r = await apiPost(
+          'uploadProposal',
+          {
+            title:
+              String(fd.get('title') || ''),
+
+            note:
+              String(fd.get('note') || ''),
+
+            fileName: file.name,
+
+            mimeType:
+              file.type ||
+              'application/octet-stream',
+
+            base64
+          }
+        );
 
         if (!r?.ok) {
           throw new Error(
-            r?.error || 'Upload failed'
+            r?.error ||
+            'Proposal upload failed'
           );
         }
 
@@ -3130,774 +6337,193 @@ function renderProposal() {
         toast('Proposal uploaded');
         render();
 
-      } catch (e) {
-        toast(e.message, 4000);
+      } catch (x) {
+        toast(x.message, 4000);
+
       } finally {
         setBusy(false);
       }
     };
   }
 
-  $$('[data-proposal-download]').forEach(b => {
-    b.onclick = async () => {
-      setBusy(true, 'Downloading file…');
-
-      try {
-        const r = await apiPost('downloadProposal', {
-          formId: b.dataset.proposalDownload
-        });
-
-        if (!r?.ok) {
-          throw new Error(
-            r?.error || 'Download failed'
-          );
-        }
-
-        const a =
-          document.createElement('a');
-
-        a.href =
-          `data:${r.mimeType || 'application/octet-stream'};base64,${r.base64}`;
-
-        a.download =
-          r.fileName || 'proposal-file';
-
-        a.click();
-
-      } catch (e) {
-        toast(e.message, 4000);
-      } finally {
-        setBusy(false);
-      }
-    };
+  $$('[data-proposal]').forEach(b => {
+    b.onclick = () =>
+      downloadCloudFile(
+        'downloadProposal',
+        b.dataset.proposal,
+        true
+      );
   });
 }
 
 /* =========================================================
-   TEAM MANAGER
+   NOTIFICATIONS / PUSH
 ========================================================= */
 
-function renderTeam() {
-  if (!isManagerMode()) {
-    return renderDashboard();
-  }
+function updateNotificationBadge() {
+  const badge =
+    $('#notificationBadge');
 
-  const list =
-    Array.isArray(teamSnapshot)
-      ? teamSnapshot
-      : [];
+  if (!badge) return;
 
-  const teamTarget =
-    list.reduce(
-      (a,x) =>
-        a + n(
-          x.target ||
-          x.performance?.target
-        ),
-      0
-    );
+  const count =
+    (current?.notifications || [])
+      .filter(x =>
+        String(
+          x.Read ||
+          x.read ||
+          ''
+        ).toUpperCase() !== 'TRUE'
+      )
+      .length;
 
-  const teamSales =
-    list.reduce(
-      (a,x) =>
-        a + n(
-          x.sales ||
-          x.achievement ||
-          x.performance?.achievement ||
-          x.performance?.sales
-        ),
-      0
-    );
+  badge.textContent =
+    count ? String(count) : '';
 
-  const teamShortfall =
-    Math.max(
-      0,
-      teamTarget - teamSales
-    );
-
-  const teamPercent =
-    teamTarget
-      ? teamSales / teamTarget * 100
-      : 0;
-
-  $('#mainContent').innerHTML = `
-    ${monthBar()}
-
-    <section class="hero">
-      <p class="eyebrow">ALL SR — MY TEAM</p>
-      <h2>Manager Dashboard</h2>
-      <p class="muted">
-        Live team performance • ${esc(monthName(selectedMonth))}
-      </p>
-      ${syncStatus()}
-    </section>
-
-    <div class="metric-grid">
-      ${metricCard('Team Target', money(teamTarget))}
-      ${metricCard('Delivered Sales', money(teamSales))}
-      ${metricCard('Achievement', pct(teamPercent))}
-      ${metricCard('Shortfall', money(teamShortfall))}
-      ${metricCard('Active SR', String(list.length))}
-    </div>
-
-    <div class="card" style="margin-top:12px">
-      <div class="row">
-        <div>
-          <p class="eyebrow">TEAM PROGRESS</p>
-          <h3>${pct(teamPercent)}</h3>
-        </div>
-
-        <button id="teamRefresh" class="mini-btn">
-          ↻ REFRESH
-        </button>
-      </div>
-
-      ${progressBar(teamPercent)}
-    </div>
-
-    <div class="section-title">
-      <div>
-        <p class="eyebrow">SR PERFORMANCE</p>
-        <h3>${list.length} active SR</h3>
-      </div>
-    </div>
-
-    <div class="list">
-      ${
-        list.length
-          ? list.map(x => {
-              const p =
-                x.performance || x;
-
-              const id =
-                x.staffId ||
-                x.id ||
-                x['Staff ID'] ||
-                '';
-
-              const name =
-                x.name ||
-                x.fullName ||
-                x['Full Name'] ||
-                id;
-
-              const target =
-                n(p.target);
-
-              const sales =
-                n(
-                  p.achievement ||
-                  p.sales
-                );
-
-              const percent =
-                n(
-                  p.percent ||
-                  p.achievementPercent ||
-                  (
-                    target
-                      ? sales / target * 100
-                      : 0
-                  )
-                );
-
-              const shortfall =
-                Math.max(
-                  0,
-                  target - sales
-                );
-
-              return `
-                <div class="card">
-                  <div class="row">
-                    <div>
-                      <span class="pill ${percent >= 100 ? 'green' : percent >= 70 ? 'orange' : 'red'}">
-                        ${pct(percent)}
-                      </span>
-
-                      <h3 style="margin:8px 0 3px">
-                        ${esc(name)}
-                      </h3>
-
-                      <p class="muted">
-                        ${esc(id)}
-                      </p>
-                    </div>
-
-                    <div style="text-align:right">
-                      <strong>${money(sales)}</strong>
-                      <p class="muted">
-                        of ${money(target)}
-                      </p>
-                    </div>
-                  </div>
-
-                  ${progressBar(percent)}
-
-                  <div class="status-strip" style="margin-top:8px">
-                    <span class="status-chip">
-                      Shortfall ${money(shortfall)}
-                    </span>
-
-                    <span class="status-chip">
-                      Zero ${n(p.zeroOutlets || p.zeroOutletCount || 0)}
-                    </span>
-
-                    <span class="status-chip">
-                      Tasks ${n(p.pendingTasks || 0)}
-                    </span>
-                  </div>
-
-                  <div class="button-row" style="margin-top:10px">
-                    <button class="btn secondary" data-openstaff="${esc(id)}" data-openpage="dashboard">
-                      OPEN DASHBOARD
-                    </button>
-
-                    <button class="btn secondary" data-openstaff="${esc(id)}" data-openpage="summary">
-                      SEE DATABASE
-                    </button>
-                  </div>
-                </div>`;
-            }).join('')
-          : empty('No team data loaded.')
-      }
-    </div>`;
-
-  bindCommon();
-
-  $('#teamRefresh').onclick = async () => {
-    await loadTeam();
-    render();
-  };
-
-  $$('[data-openstaff]').forEach(b => {
-    b.onclick = async () => {
-      managerView =
-        b.dataset.openstaff;
-
-      session.managerView =
-        managerView;
-
-      saveSession();
-
-      await loadCurrent();
-
-      page =
-        b.dataset.openpage ||
-        'summary';
-
-      render();
-    };
-  });
+  badge.style.display =
+    count ? '' : 'none';
 }
-/* =========================================================
-   NOTIFICATIONS
-========================================================= */
 
 function renderNotifications() {
-  const alerts = alertsForCurrent();
-  const historyList =
-    current?.notifications ||
-    current?.notificationHistory ||
-    [];
+  const list =
+    current?.notifications || [];
 
   $('#mainContent').innerHTML = `
     ${monthBar()}
 
     <section class="hero">
-      <p class="eyebrow">NOTIFICATION CENTER</p>
-      <h3>Alerts & Reminders</h3>
+      <p class="eyebrow">NOTIFICATIONS</p>
+      <h3>Sales Performance Alerts</h3>
       <p class="muted">
-        Target, task, CPO, delivery and incentive alerts.
+        Tasks, CPO, incentive, shortfall and
+        execution alerts.
       </p>
-      ${syncStatus()}
     </section>
 
-    <div class="card">
-      <div class="row">
-        <div>
-          <h3>Mobile Push</h3>
-          <p class="muted">
-            ${pushConfig.ready ? 'Push system ready' : 'Push permission/setup required'}
-          </p>
-        </div>
-
-        <button id="enablePushBtn" class="btn secondary">
-          ENABLE
-        </button>
-      </div>
-    </div>
-
-    <div class="section-title">
-      <h3>Action Required</h3>
-    </div>
-
-    <div class="notification-list">
+    <div class="list" style="margin-top:12px">
       ${
-        alerts.length
-          ? alerts.map(x => `
-            <button class="notification-item" data-page-go="${esc(x.page)}" style="width:100%;text-align:left">
-              <div class="notification-icon">
-                ${activityIcon(x.type)}
-              </div>
-
-              <div style="flex:1">
-                <h4>${esc(x.title)}</h4>
-                <p>${esc(x.text)}</p>
-              </div>
-
-              <span>›</span>
-            </button>
-          `).join('')
-          : empty('No urgent notification.')
-      }
-    </div>
-
-    <div class="section-title">
-      <h3>Notification History</h3>
-    </div>
-
-    <div class="notification-list">
-      ${
-        historyList.length
-          ? historyList.map(x => `
-            <div class="notification-item">
-              <div class="notification-icon">🔔</div>
-
-              <div style="flex:1">
-                <h4>${esc(x.Title || x.title || 'Notification')}</h4>
+        list.length
+          ? list.map(x => `
+              <div class="list-item">
+                <h4>
+                  ${esc(
+                    x.Title ||
+                    x.title ||
+                    'Notification'
+                  )}
+                </h4>
 
                 <p>
-                  ${esc(x.Message || x.message || '')}
-                  <br>
-                  ${esc(String(x.Timestamp || x.timestamp || x.Date || ''))}
+                  ${esc(
+                    x.Message ||
+                    x.message ||
+                    ''
+                  )}
                 </p>
+
+                <small class="muted">
+                  ${esc(
+                    String(
+                      x['Created At'] ||
+                      x.createdAt ||
+                      ''
+                    )
+                  )}
+                </small>
               </div>
-            </div>
-          `).join('')
-          : empty('No notification history.')
+            `).join('')
+          : empty('No notification.')
       }
-    </div>`;
+    </div>
+  `;
 
   bindCommon();
-
-  if ($('#enablePushBtn')) {
-    $('#enablePushBtn').onclick = enablePushPermission;
-  }
 }
 
-/* =========================================================
-   ONESIGNAL PUSH
-========================================================= */
-
 async function initPushSystem() {
-  if (!backendUrl() || !window.OneSignalDeferred) return;
+  if (!session) return;
 
   try {
-    const r =
-      await fetchJson(
-        backendUrl() + '?action=publicConfig'
-      );
+    if (
+      window.OneSignalDeferred &&
+      Array.isArray(
+        window.OneSignalDeferred
+      )
+    ) {
+      window.OneSignalDeferred.push(
+        async OneSignal => {
+          oneSignalSdk = OneSignal;
 
-    const cfg =
-      r?.data || {};
-
-    pushConfig = {
-      configured: !!cfg.pushConfigured,
-      appId: String(cfg.oneSignalAppId || ''),
-      ready: false
-    };
-
-    if (!pushConfig.appId) return;
-
-    const path =
-      location.pathname.endsWith('/')
-        ? location.pathname
-        : location.pathname.replace(/[^/]+$/, '');
-
-    const workerPath =
-      path.replace(/^\//, '') +
-      'push/onesignal/OneSignalSDKWorker.js';
-
-    window.OneSignalDeferred.push(
-      async OneSignal => {
-        try {
-          await OneSignal.init({
-            appId: pushConfig.appId,
-            serviceWorkerPath: workerPath,
-            serviceWorkerParam: {
-              scope: path + 'push/onesignal/'
-            }
-          });
-
-          oneSignalSdk =
-            OneSignal;
-
-          pushConfig.ready =
-            true;
-
-          if (session) {
+          try {
             await OneSignal.login(
               session.id
             );
+          } catch (e) {
+            console.warn(
+              'OneSignal login',
+              e
+            );
           }
 
-        } catch (e) {
-          console.warn(
-            'OneSignal',
-            e
-          );
+          pushConfig.ready = true;
         }
-      }
-    );
-
+      );
+    }
   } catch (e) {
     console.warn(
-      'Push config',
+      'Push init failed',
       e
     );
   }
-}
-
-async function enablePushPermission() {
-  try {
-    if (!oneSignalSdk) {
-      await initPushSystem();
-      await sleep(1000);
-    }
-
-    if (!oneSignalSdk) {
-      return toast(
-        'Push service is not configured yet.',
-        3500
-      );
-    }
-
-    if (
-      oneSignalSdk.Notifications?.requestPermission
-    ) {
-      await oneSignalSdk.Notifications.requestPermission();
-    }
-
-    if (session) {
-      await oneSignalSdk.login(
-        session.id
-      );
-    }
-
-    pushConfig.ready = true;
-
-    toast(
-      'Mobile notification enabled'
-    );
-
-    render();
-
-  } catch (e) {
-    toast(
-      'Notification permission was not enabled.',
-      3500
-    );
-  }
-}
-
-/* =========================================================
-   TEAM MANAGEMENT
-========================================================= */
-
-function renderTeamManagement() {
-  if (!isManagerMode()) {
-    return renderDashboard();
-  }
-
-  const users =
-    current?.users ||
-    current?.teamUsers ||
-    teamUsers();
-
-  $('#mainContent').innerHTML = `
-    <section class="hero">
-      <p class="eyebrow">TEAM MANAGEMENT</p>
-      <h3>SR Management</h3>
-      <p class="muted">
-        Add, edit or deactivate team members without changing app code.
-      </p>
-      ${syncStatus()}
-    </section>
-
-    <form id="teamUserForm" class="card">
-      <input type="hidden" name="originalStaffId">
-
-      <label>Staff ID
-        <input name="staffId" required placeholder="Staff ID">
-      </label>
-
-      <label>Full Name
-        <input name="fullName" required placeholder="Full Name">
-      </label>
-
-      <label>Route / Area
-        <input name="route" placeholder="Route / Area">
-      </label>
-
-      <div class="form-grid">
-        <label>Role
-          <select name="role">
-            <option value="SR">SR</option>
-            <option value="MANAGER">Manager</option>
-            <option value="HR">HR</option>
-          </select>
-        </label>
-
-        <label>Status
-          <select name="active">
-            <option value="TRUE">Active</option>
-            <option value="FALSE">Inactive</option>
-          </select>
-        </label>
-      </div>
-
-      <label>Password / Initial PIN
-        <input name="password" type="text" placeholder="Initial PIN">
-      </label>
-
-      <button class="btn primary">
-        SAVE TEAM MEMBER
-      </button>
-    </form>
-
-    <div class="section-title">
-      <h3>Team Members</h3>
-    </div>
-
-    <div class="list">
-      ${
-        users.length
-          ? users.map(u => {
-              const id =
-                u['Staff ID'] ||
-                u.staffId ||
-                u.id ||
-                '';
-
-              const name =
-                u['Full Name'] ||
-                u.fullName ||
-                u.name ||
-                id;
-
-              const active =
-                String(
-                  u.Active ??
-                  u.active ??
-                  'TRUE'
-                ).toUpperCase() !== 'FALSE';
-
-              return `
-                <div class="card">
-                  <div class="row">
-                    <div>
-                      <span class="pill ${active ? 'green' : 'red'}">
-                        ${active ? 'ACTIVE' : 'INACTIVE'}
-                      </span>
-
-                      <h3 style="margin:8px 0 3px">
-                        ${esc(name)}
-                      </h3>
-
-                      <p class="muted">
-                        ${esc(id)}
-                        • ${esc(u.Role || u.role || 'SR')}
-                        • ${esc(u.Route || u.route || '')}
-                      </p>
-                    </div>
-
-                    <button
-                      class="btn secondary"
-                      data-edit-user="${esc(id)}">
-                      EDIT
-                    </button>
-                  </div>
-                </div>`;
-            }).join('')
-          : empty('No team member found.')
-      }
-    </div>`;
-
-  bindCommon();
-
-  $('#teamUserForm').onsubmit =
-    async e => {
-      e.preventDefault();
-
-      const fd =
-        new FormData(e.target);
-
-      setBusy(
-        true,
-        'Saving team member…'
-      );
-
-      try {
-        const r =
-          await apiPost(
-            'saveUser',
-            {
-              originalStaffId:
-                String(
-                  fd.get(
-                    'originalStaffId'
-                  ) || ''
-                ),
-
-              staffId:
-                normalizeId(
-                  fd.get('staffId')
-                ),
-
-              fullName:
-                String(
-                  fd.get('fullName') ||
-                  ''
-                ),
-
-              route:
-                String(
-                  fd.get('route') ||
-                  ''
-                ),
-
-              role:
-                String(
-                  fd.get('role') ||
-                  'SR'
-                ),
-
-              password:
-                String(
-                  fd.get('password') ||
-                  ''
-                ),
-
-              active:
-                String(
-                  fd.get('active') ||
-                  'TRUE'
-                )
-            }
-          );
-
-        if (!r?.ok) {
-          throw new Error(
-            r?.error ||
-            'Team member save failed'
-          );
-        }
-
-        await Promise.all([
-          loadCurrent({
-            quiet: true
-          }),
-
-          loadTeam({
-            quiet: true
-          })
-        ]);
-
-        toast(
-          'Team member saved'
-        );
-
-        render();
-
-      } catch (err) {
-        toast(
-          err.message,
-          4000
-        );
-      } finally {
-        setBusy(false);
-      }
-    };
-
-  $$('[data-edit-user]').forEach(
-    b => {
-      b.onclick = () => {
-        const id =
-          b.dataset.editUser;
-
-        const u =
-          users.find(x =>
-            String(
-              x['Staff ID'] ||
-              x.staffId ||
-              x.id ||
-              ''
-            ) === id
-          );
-
-        if (!u) return;
-
-        const f =
-          $('#teamUserForm');
-
-        f.elements.originalStaffId.value =
-          id;
-
-        f.elements.staffId.value =
-          id;
-
-        f.elements.fullName.value =
-          u['Full Name'] ||
-          u.fullName ||
-          u.name ||
-          '';
-
-        f.elements.route.value =
-          u.Route ||
-          u.route ||
-          '';
-
-        f.elements.role.value =
-          String(
-            u.Role ||
-            u.role ||
-            'SR'
-          ).toUpperCase();
-
-        f.elements.active.value =
-          String(
-            u.Active ??
-            u.active ??
-            'TRUE'
-          ).toUpperCase() === 'FALSE'
-            ? 'FALSE'
-            : 'TRUE';
-
-        f.elements.password.value =
-          '';
-
-        f.scrollIntoView({
-          behavior: 'smooth'
-        });
-      };
-    }
-  );
 }
 
 /* =========================================================
    AYON AI KNOWLEDGE MANAGER
 ========================================================= */
 
-let ayonKnowledgeCache = [];
+let ayonKnowledge = [];
+let editingAyonKnowledgeId = null;
 
-async function loadAyonKnowledge() {
-  if (!session || !isManager()) return [];
+function ayonToneLabel(tone) {
+  const x =
+    String(
+      tone || 'Normal'
+    ).toUpperCase();
+
+  if (x === 'FUNNY') {
+    return 'Funny';
+  }
+
+  if (x === 'MOTIVATIONAL') {
+    return 'Motivational';
+  }
+
+  if (
+    x === 'STRICT-FUNNY' ||
+    x === 'STRICT_FUNNY'
+  ) {
+    return 'Strict-Funny';
+  }
+
+  return 'Normal';
+}
+
+async function loadAyonKnowledge(
+  { quiet = false } = {}
+) {
+  if (!isManager()) return [];
+
+  if (!quiet) {
+    setBusy(
+      true,
+      'Loading AYON knowledge…'
+    );
+  }
 
   try {
     const r =
       await apiPost(
-        'aiKnowledgeList',
+        'aiKnowledge',
         {}
       );
 
@@ -3908,291 +6534,264 @@ async function loadAyonKnowledge() {
       );
     }
 
-    ayonKnowledgeCache =
+    ayonKnowledge =
       Array.isArray(r.data)
         ? r.data
         : [];
 
-    return ayonKnowledgeCache;
+    window.AYON_AI_KNOWLEDGE =
+      ayonKnowledge;
 
-  } catch (e) {
-    console.warn(
-      'AYON Knowledge',
-      e
-    );
+    return ayonKnowledge;
 
-    ayonKnowledgeCache = [];
-    return [];
+  } catch (x) {
+    console.warn(x);
+
+    if (!quiet) {
+      toast(
+        x.message ||
+        'Knowledge load failed',
+        4000
+      );
+    }
+
+    return ayonKnowledge;
+
+  } finally {
+    if (!quiet) {
+      setBusy(false);
+    }
   }
 }
 
-function renderAyonKnowledgeManager() {
-  if (!isManagerMode()) return '';
+function renderAyonKnowledge() {
+  if (!isManager()) {
+    setPage('dashboard');
+    return;
+  }
 
-  return `
-    <div class="card" style="margin-top:12px">
-      <div class="row">
-        <div>
-          <p class="eyebrow">AYON AI CONTROL</p>
-          <h3>Knowledge Manager</h3>
-          <p class="muted">
-            Teach AYON AI your own questions, instructions and answers.
-          </p>
-        </div>
+  const edit =
+    editingAyonKnowledgeId
+      ? ayonKnowledge.find(
+          x =>
+            String(x.id) ===
+            String(
+              editingAyonKnowledgeId
+            )
+        )
+      : null;
 
-        <span class="pill orange">
-          MANAGER
-        </span>
+  $('#mainContent').innerHTML = `
+    ${monthBar()}
+
+    <section class="hero">
+      <p class="eyebrow">
+        MANAGER AI CONTROL
+      </p>
+
+      <h3>
+        AYON AI Knowledge Manager
+      </h3>
+
+      <p class="muted">
+        Manager Knowledge is checked before
+        ordinary AYON AI responses.
+      </p>
+
+      <div class="form-actions">
+        <button
+          id="ayonKbRefresh"
+          class="btn secondary"
+        >
+          ↻ REFRESH
+        </button>
+
+        <button
+          id="ayonKbNew"
+          class="btn primary"
+        >
+          + NEW KNOWLEDGE
+        </button>
       </div>
+    </section>
 
-      <form id="aiKnowledgeForm" class="stack" style="margin-top:12px">
-        <input type="hidden" name="id">
-
-        <label>Question / Keywords
+    <div class="card" style="margin-top:12px">
+      <form
+        id="ayonKbForm"
+        class="stack"
+      >
+        <label>
+          Question / Keywords
           <input
             name="question"
             required
-            placeholder="e.g. buyer order না দিলে কী করব">
+            value="${esc(edit?.question || '')}"
+            placeholder="e.g. creator, কে বানিয়েছে"
+          >
         </label>
 
-        <label>Answer / Instruction
+        <label>
+          Answer / Instruction
           <textarea
             name="answer"
-            rows="4"
             required
-            placeholder="AYON AI কী উত্তর দেবে লিখুন"></textarea>
+            placeholder="Exact answer AYON should use"
+          >${esc(edit?.answer || '')}</textarea>
         </label>
 
         <div class="form-grid">
-          <label>Tone
+          <label>
+            Tone
             <select name="tone">
-              <option value="NORMAL">Normal</option>
-              <option value="FUNNY">Funny</option>
-              <option value="MOTIVATIONAL">Motivational</option>
-              <option value="STRICT-FUNNY">Strict-Funny</option>
+              <option ${ayonToneLabel(edit?.tone) === 'Normal' ? 'selected' : ''}>
+                Normal
+              </option>
+              <option ${ayonToneLabel(edit?.tone) === 'Funny' ? 'selected' : ''}>
+                Funny
+              </option>
+              <option ${ayonToneLabel(edit?.tone) === 'Motivational' ? 'selected' : ''}>
+                Motivational
+              </option>
+              <option ${ayonToneLabel(edit?.tone) === 'Strict-Funny' ? 'selected' : ''}>
+                Strict-Funny
+              </option>
             </select>
           </label>
 
-          <label>Status
+          <label>
+            Status
             <select name="active">
-              <option value="TRUE">Active</option>
-              <option value="FALSE">Inactive</option>
+              <option
+                value="true"
+                ${edit?.active !== false ? 'selected' : ''}
+              >
+                Active
+              </option>
+
+              <option
+                value="false"
+                ${edit?.active === false ? 'selected' : ''}
+              >
+                Inactive
+              </option>
             </select>
           </label>
         </div>
 
-        <div class="button-row">
+        <div class="form-actions">
           <button class="btn primary">
-            SAVE KNOWLEDGE
+            ${edit ? 'UPDATE KNOWLEDGE' : 'SAVE KNOWLEDGE'}
           </button>
 
-          <button
-            id="clearAiKnowledgeForm"
-            type="button"
-            class="btn secondary">
-            CLEAR
-          </button>
+          ${
+            edit
+              ? `
+                <button
+                  type="button"
+                  id="ayonKbCancel"
+                  class="btn secondary"
+                >
+                  CANCEL EDIT
+                </button>
+              `
+              : ''
+          }
         </div>
       </form>
+    </div>
 
-      <div id="aiKnowledgeList" class="list" style="margin-top:12px">
-        ${empty('Loading AYON AI knowledge…')}
-      </div>
-    </div>`;
-}
+    <div class="section-title">
+      <h3>Saved Knowledge</h3>
+    </div>
 
-function paintAyonKnowledge() {
-  const box =
-    $('#aiKnowledgeList');
+    <div class="list">
+      ${
+        ayonKnowledge.length
+          ? ayonKnowledge.map((x, i) => `
+              <div
+                class="list-item"
+                style="${x.active === false ? 'opacity:.62' : ''}"
+              >
+                <div class="row">
+                  <div style="min-width:0">
+                    <span class="pill ${x.active === false ? 'red' : 'green'}">
+                      ${x.active === false ? 'INACTIVE' : 'ACTIVE'}
+                    </span>
 
-  if (!box) return;
+                    <span class="pill orange">
+                      ${esc(ayonToneLabel(x.tone))}
+                    </span>
 
-  box.innerHTML =
-    ayonKnowledgeCache.length
-      ? ayonKnowledgeCache.map(x => {
-          const id =
-            x.ID ||
-            x.id ||
-            '';
+                    <h4 style="margin-top:8px">
+                      ${i + 1}. ${esc(x.question || '')}
+                    </h4>
 
-          const q =
-            x['Question / Keywords'] ||
-            x.question ||
-            '';
+                    <p style="white-space:pre-wrap">
+                      ${esc(x.answer || '')}
+                    </p>
+                  </div>
+                </div>
 
-          const a =
-            x.Answer ||
-            x.answer ||
-            '';
+                <div class="form-actions">
+                  <button
+                    class="btn secondary"
+                    data-ayonkbedit="${esc(x.id)}"
+                  >
+                    EDIT
+                  </button>
 
-          const tone =
-            x.Tone ||
-            x.tone ||
-            'NORMAL';
-
-          const active =
-            String(
-              x.Active ??
-              x.active ??
-              'TRUE'
-            ).toUpperCase() !== 'FALSE';
-
-          return `
-            <div class="list-item">
-              <div class="row">
-                <div style="flex:1">
-                  <span class="pill ${active ? 'green' : 'red'}">
-                    ${active ? 'ACTIVE' : 'INACTIVE'}
-                  </span>
-
-                  <h4 style="margin-top:7px">
-                    ${esc(q)}
-                  </h4>
-
-                  <p>
-                    ${esc(a)}
-                  </p>
-
-                  <small class="muted">
-                    Tone: ${esc(tone)}
-                  </small>
+                  ${
+                    x.active === false
+                      ? `
+                        <button
+                          class="btn primary"
+                          data-ayonkbrestore="${esc(x.id)}"
+                        >
+                          RESTORE
+                        </button>
+                      `
+                      : `
+                        <button
+                          class="btn danger"
+                          data-ayonkbdelete="${esc(x.id)}"
+                        >
+                          DEACTIVATE
+                        </button>
+                      `
+                  }
                 </div>
               </div>
+            `).join('')
+          : empty(
+              'No Manager Knowledge has been added yet.'
+            )
+      }
+    </div>
+  `;
 
-              <div class="button-row" style="margin-top:8px">
-                <button
-                  class="btn secondary"
-                  data-ai-edit="${esc(id)}">
-                  EDIT
-                </button>
+  bindCommon();
 
-                <button
-                  class="btn danger"
-                  data-ai-delete="${esc(id)}">
-                  DELETE
-                </button>
-              </div>
-            </div>`;
-        }).join('')
-      : empty(
-          'No AYON AI knowledge added yet.'
-        );
+  $('#ayonKbRefresh').onclick =
+    async () => {
+      await loadAyonKnowledge();
+      renderAyonKnowledge();
+    };
 
-  $$('[data-ai-edit]').forEach(
-    b => {
-      b.onclick = () => {
-        const x =
-          ayonKnowledgeCache.find(
-            z =>
-              String(
-                z.ID ||
-                z.id ||
-                ''
-              ) ===
-              String(
-                b.dataset.aiEdit
-              )
-          );
+  $('#ayonKbNew').onclick =
+    () => {
+      editingAyonKnowledgeId = null;
+      renderAyonKnowledge();
+    };
 
-        if (!x) return;
-
-        const f =
-          $('#aiKnowledgeForm');
-
-        f.elements.id.value =
-          x.ID ||
-          x.id ||
-          '';
-
-        f.elements.question.value =
-          x['Question / Keywords'] ||
-          x.question ||
-          '';
-
-        f.elements.answer.value =
-          x.Answer ||
-          x.answer ||
-          '';
-
-        f.elements.tone.value =
-          x.Tone ||
-          x.tone ||
-          'NORMAL';
-
-        f.elements.active.value =
-          String(
-            x.Active ??
-            x.active ??
-            'TRUE'
-          ).toUpperCase() === 'FALSE'
-            ? 'FALSE'
-            : 'TRUE';
-
-        f.scrollIntoView({
-          behavior: 'smooth'
-        });
+  if ($('#ayonKbCancel')) {
+    $('#ayonKbCancel').onclick =
+      () => {
+        editingAyonKnowledgeId = null;
+        renderAyonKnowledge();
       };
-    }
-  );
+  }
 
-  $$('[data-ai-delete]').forEach(
-    b => {
-      b.onclick = async () => {
-        if (
-          !confirm(
-            'Delete this AYON AI knowledge?'
-          )
-        ) return;
-
-        setBusy(
-          true,
-          'Deleting AI knowledge…'
-        );
-
-        try {
-          const r =
-            await apiPost(
-              'deleteAiKnowledge',
-              {
-                id:
-                  b.dataset.aiDelete
-              }
-            );
-
-          if (!r?.ok) {
-            throw new Error(
-              r?.error ||
-              'Delete failed'
-            );
-          }
-
-          await loadAyonKnowledge();
-          paintAyonKnowledge();
-
-          toast(
-            'AYON AI knowledge deleted'
-          );
-
-        } catch (e) {
-          toast(
-            e.message,
-            3500
-          );
-        } finally {
-          setBusy(false);
-        }
-      };
-    }
-  );
-}
-
-function bindAyonKnowledgeManager() {
-  const f =
-    $('#aiKnowledgeForm');
-
-  if (!f) return;
-
-  f.onsubmit =
+  $('#ayonKbForm').onsubmit =
     async e => {
       e.preventDefault();
 
@@ -4201,7 +6800,9 @@ function bindAyonKnowledgeManager() {
 
       setBusy(
         true,
-        'Saving AYON AI knowledge…'
+        edit
+          ? 'Updating AYON knowledge…'
+          : 'Saving AYON knowledge…'
       );
 
       try {
@@ -4209,35 +6810,30 @@ function bindAyonKnowledgeManager() {
           await apiPost(
             'saveAiKnowledge',
             {
-              id:
-                String(
-                  fd.get('id') ||
-                  ''
-                ),
+              id: edit?.id || '',
 
               question:
                 String(
                   fd.get('question') ||
                   ''
-                ),
+                ).trim(),
 
               answer:
                 String(
                   fd.get('answer') ||
                   ''
-                ),
+                ).trim(),
 
               tone:
                 String(
                   fd.get('tone') ||
-                  'NORMAL'
+                  'Normal'
                 ),
 
               active:
                 String(
-                  fd.get('active') ||
-                  'TRUE'
-                )
+                  fd.get('active')
+                ) === 'true'
             }
           );
 
@@ -4248,37 +6844,142 @@ function bindAyonKnowledgeManager() {
           );
         }
 
-        e.target.reset();
-        e.target.elements.id.value = '';
+        editingAyonKnowledgeId = null;
 
-        await loadAyonKnowledge();
-        paintAyonKnowledge();
+        await loadAyonKnowledge({
+          quiet: true
+        });
 
         toast(
-          'AYON AI knowledge saved'
+          edit
+            ? 'AYON knowledge updated'
+            : 'AYON learned the new answer'
         );
 
-      } catch (err) {
+        renderAyonKnowledge();
+
+      } catch (x) {
         toast(
-          err.message,
-          3500
+          x.message ||
+          'Knowledge save failed',
+          4000
         );
+
       } finally {
         setBusy(false);
       }
     };
 
-  if ($('#clearAiKnowledgeForm')) {
-    $('#clearAiKnowledgeForm').onclick =
-      () => {
-        f.reset();
-        f.elements.id.value = '';
-      };
-  }
+  $$('[data-ayonkbedit]')
+    .forEach(b => {
+      b.onclick = () => {
+        editingAyonKnowledgeId =
+          b.dataset.ayonkbedit;
 
-  loadAyonKnowledge().then(
-    paintAyonKnowledge
-  );
+        renderAyonKnowledge();
+
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      };
+    });
+
+  $$('[data-ayonkbdelete]')
+    .forEach(b => {
+      b.onclick = async () => {
+        if (
+          !confirm(
+            'Deactivate this AYON knowledge answer?'
+          )
+        ) {
+          return;
+        }
+
+        setBusy(
+          true,
+          'Deactivating knowledge…'
+        );
+
+        try {
+          const r =
+            await apiPost(
+              'deleteAiKnowledge',
+              {
+                id:
+                  b.dataset.ayonkbdelete
+              }
+            );
+
+          if (!r?.ok) {
+            throw new Error(
+              r?.error ||
+              'Deactivate failed'
+            );
+          }
+
+          await loadAyonKnowledge({
+            quiet: true
+          });
+
+          toast(
+            'Knowledge deactivated'
+          );
+
+          renderAyonKnowledge();
+
+        } catch (x) {
+          toast(x.message, 4000);
+
+        } finally {
+          setBusy(false);
+        }
+      };
+    });
+
+  $$('[data-ayonkbrestore]')
+    .forEach(b => {
+      b.onclick = async () => {
+        setBusy(
+          true,
+          'Restoring knowledge…'
+        );
+
+        try {
+          const r =
+            await apiPost(
+              'restoreAiKnowledge',
+              {
+                id:
+                  b.dataset.ayonkbrestore
+              }
+            );
+
+          if (!r?.ok) {
+            throw new Error(
+              r?.error ||
+              'Restore failed'
+            );
+          }
+
+          await loadAyonKnowledge({
+            quiet: true
+          });
+
+          toast(
+            'Knowledge restored'
+          );
+
+          renderAyonKnowledge();
+
+        } catch (x) {
+          toast(x.message, 4000);
+
+        } finally {
+          setBusy(false);
+        }
+      };
+    });
 }
 
 /* =========================================================
@@ -4286,156 +6987,565 @@ function bindAyonKnowledgeManager() {
 ========================================================= */
 
 function renderSettings() {
+  const ayonManager =
+    isManager()
+      ? `
+        <div
+          class="card"
+          style="margin-top:12px"
+        >
+          <p class="eyebrow">
+            MANAGER AI CONTROL
+          </p>
+
+          <h3>
+            AYON AI Knowledge Manager
+          </h3>
+
+          <p class="muted">
+            Add, edit, deactivate or restore
+            AYON answers without changing code.
+          </p>
+
+          <button
+            id="openAyonKnowledge"
+            class="btn primary"
+            style="width:100%"
+          >
+            OPEN KNOWLEDGE MANAGER
+          </button>
+        </div>
+      `
+      : '';
+
   $('#mainContent').innerHTML = `
+    ${monthBar()}
+
     <section class="hero">
-      <p class="eyebrow">SETTINGS</p>
-      <h3>Sales Performance Hub</h3>
-      <p class="muted">
-        ${esc(APP_BUILD)}
+      <p class="eyebrow">
+        SETTINGS
       </p>
+
+      <h3>
+        Account & App
+      </h3>
+
+      <p class="muted">
+        This phone stays logged in until
+        you press Logout.
+      </p>
+
+      ${syncStatus()}
     </section>
 
-    <div class="card">
-      <div class="row">
-        <div>
-          <h3>${esc(sessionName())}</h3>
-          <p class="muted">
-            ${esc(session.id)}
-            • ${esc(session.role)}
-          </p>
-        </div>
+    ${ayonManager}
 
-        <span class="pill green">
-          SIGNED IN
-        </span>
+    <div
+      class="card"
+      style="margin-top:12px"
+    >
+      <div class="list-item">
+        <h4>Signed in</h4>
+
+        <p>
+          ${esc(sessionName())}
+          • ${esc(session.id)}
+          • ${esc(
+            String(
+              session.mode
+            ).toUpperCase()
+          )}
+        </p>
       </div>
-    </div>
 
-    ${
-      isManagerMode()
-        ? `
-          <div class="card" style="margin-top:12px">
-            <p class="eyebrow">MANAGER CONTROL</p>
-            <h3>Team & Database</h3>
+      <div
+        class="list-item"
+        style="margin-top:8px"
+      >
+        <h4>Backend</h4>
 
-            <div class="quick-grid" style="margin-top:10px">
-              <button class="quick-card" data-page-go="team">
-                <strong>👥 Team Dashboard</strong>
-                <small>ALL SR performance</small>
-              </button>
-
-              <button class="quick-card" data-page-go="teamManagement">
-                <strong>⚙ Team Management</strong>
-                <small>Add / edit / deactivate SR</small>
-              </button>
-
-              <button class="quick-card" data-page-go="tasks">
-                <strong>✓ Important Work</strong>
-                <small>Assign individual or ALL SR</small>
-              </button>
-
-              <button class="quick-card" data-page-go="incentives">
-                <strong>🏆 Incentive Control</strong>
-                <small>Create & track plans</small>
-              </button>
-            </div>
-          </div>
-        `
-        : ''
-    }
-
-    ${renderAyonKnowledgeManager()}
-
-    <div class="card" style="margin-top:12px">
-      <h3>Mobile Notification</h3>
-
-      <p class="muted">
-        Allow notification permission for task, CPO, incentive and target reminders.
-      </p>
+        <p>
+          ${backendUrl() ? 'Connected' : 'Missing'}
+          • Server
+          ${esc(current?.version || '—')}
+        </p>
+      </div>
 
       <button
-        id="settingsPushBtn"
+        id="settingsSync"
         class="btn secondary"
-        style="width:100%">
-        ENABLE PUSH NOTIFICATION
+        style="margin-top:12px;width:100%"
+      >
+        ↻ SYNC LIVE DATA NOW
+      </button>
+
+      <button
+        id="realLogout"
+        class="btn danger"
+        style="margin-top:10px;width:100%"
+      >
+        LOG OUT
       </button>
     </div>
 
-    <div class="card" style="margin-top:12px">
-      <h3>Cloud Connection</h3>
-
-      <p class="muted">
-        Backend is configured through config.js.
+    <div
+      class="card"
+      style="
+        margin-top:12px;
+        text-align:center
+      "
+    >
+      <p
+        class="muted"
+        style="margin:0"
+      >
+        Developed by
+        <strong style="color:#ff7414">
+          KAM AYON
+        </strong>
       </p>
-
-      <code style="word-break:break-all">
-        ${esc(backendUrl() || 'Not configured')}
-      </code>
     </div>
-
-    <button
-      id="settingsLogoutBtn"
-      class="btn danger"
-      style="width:100%;margin-top:12px">
-      LOG OUT
-    </button>`;
+  `;
 
   bindCommon();
 
-  bindAyonKnowledgeManager();
+  if ($('#openAyonKnowledge')) {
+    $('#openAyonKnowledge').onclick =
+      async () => {
+        page = 'aiKnowledge';
 
-  if ($('#settingsPushBtn')) {
-    $('#settingsPushBtn').onclick =
-      enablePushPermission;
+        render();
+
+        await loadAyonKnowledge({
+          quiet: true
+        });
+
+        render();
+      };
   }
 
-  if ($('#settingsLogoutBtn')) {
-    $('#settingsLogoutBtn').onclick =
-      logout;
+  $('#settingsSync').onclick =
+    () => refreshCloud(true);
+
+  $('#realLogout').onclick =
+    () => {
+      if (
+        confirm(
+          'Log out from Sales Performance Hub?'
+        )
+      ) {
+        logout();
+      }
+    };
+
+  if (isManager()) {
+    installTeamManagement();
   }
 }
 
 /* =========================================================
-   MAIN RENDER ROUTER
+   FINAL V8 — DYNAMIC SR MANAGEMENT
+========================================================= */
+
+let v8SRs = [];
+let v8Team = null;
+let v8Outlets = [];
+
+async function v8LoadManagerData() {
+  if (!isManager()) return;
+
+  try {
+    const [s, t] =
+      await Promise.all([
+        apiPost(
+          'activeSRs',
+          {}
+        ),
+
+        apiPost(
+          'teamDashboard',
+          {
+            month:
+              selectedMonth,
+
+            date:
+              selectedDate
+          }
+        )
+      ]);
+
+    if (s?.ok) {
+      v8SRs =
+        s.data || [];
+    }
+
+    if (t?.ok) {
+      v8Team =
+        t.data || null;
+    }
+
+  } catch (e) {
+    console.warn(
+      'V8 manager data',
+      e
+    );
+  }
+}
+
+function v8SrOptions(
+  includeAll = true,
+  includeManager = true
+) {
+  let h =
+    includeAll
+      ? `
+        <option value="ALL">
+          ALL SR — MY TEAM
+        </option>
+      `
+      : '';
+
+  if (includeManager) {
+    h += `
+      <option value="${esc(session.id)}">
+        MYSELF — ${esc(sessionName())}
+      </option>
+    `;
+  }
+
+  h += v8SRs
+    .map(x => `
+      <option value="${esc(x.staffId)}">
+        ${esc(x.name)}
+        • ${esc(x.staffId)}
+        ${x.route ? ' • ' + esc(x.route) : ''}
+      </option>
+    `)
+    .join('');
+
+  return h;
+}
+
+function v8Kpi(
+  label,
+  value,
+  cls = ''
+) {
+  return `
+    <div class="metric-box">
+      <small>${esc(label)}</small>
+      <br>
+      <b class="${cls}">
+        ${value}
+      </b>
+    </div>
+  `;
+}
+
+function installTeamManagement() {
+  const root =
+    $('#mainContent');
+
+  if (
+    !root ||
+    $('#v8UserForm')
+  ) {
+    return;
+  }
+
+  root.insertAdjacentHTML(
+    'beforeend',
+    `
+      <div
+        class="card"
+        style="margin-top:12px"
+      >
+        <p class="eyebrow">
+          TEAM MANAGEMENT
+        </p>
+
+        <h3>
+          Add / Edit / Activate SR
+        </h3>
+
+        <p class="muted">
+          USERS sheet is the source of truth.
+          New active SR automatically appears
+          in ALL SR selectors.
+        </p>
+
+        <form
+          id="v8UserForm"
+          class="stack"
+        >
+          <div class="form-grid">
+            <label>
+              Staff ID
+              <input
+                name="staffId"
+                required
+              >
+            </label>
+
+            <label>
+              Full Name
+              <input
+                name="name"
+                required
+              >
+            </label>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              Route / Area
+              <input name="route">
+            </label>
+
+            <label>
+              Role
+              <select name="role">
+                <option value="SR">
+                  SR
+                </option>
+
+                <option value="MANAGER">
+                  MANAGER
+                </option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Initial PIN / New PIN
+            <input
+              name="password"
+              type="password"
+              placeholder="Leave blank when not changing"
+            >
+          </label>
+
+          <button class="btn primary">
+            SAVE USER
+          </button>
+        </form>
+
+        <div class="section-title">
+          <h3>Active SR</h3>
+        </div>
+
+        <div id="v8Users">
+          ${
+            v8SRs.length
+              ? v8SRs.map(u => `
+                  <div class="list-item">
+                    <div class="row">
+                      <div>
+                        <h4>
+                          ${esc(u.name)}
+                        </h4>
+
+                        <p>
+                          ${esc(u.staffId)}
+                          •
+                          ${esc(u.route || '')}
+                        </p>
+                      </div>
+
+                      <button
+                        class="btn danger"
+                        data-v8deactivate="${esc(u.staffId)}"
+                      >
+                        DEACTIVATE
+                      </button>
+                    </div>
+                  </div>
+                `).join('')
+              : empty(
+                  'Loading active SR…'
+                )
+          }
+        </div>
+      </div>
+    `
+  );
+
+  if (!v8SRs.length) {
+    v8LoadManagerData()
+      .then(() => {
+        if (page === 'settings') {
+          renderSettings();
+        }
+      });
+  }
+
+  $('#v8UserForm').onsubmit =
+    async e => {
+      e.preventDefault();
+
+      const fd =
+        new FormData(e.target);
+
+      setBusy(
+        true,
+        'Saving user…'
+      );
+
+      try {
+        const r =
+          await apiPost(
+            'saveUser',
+            {
+              staffId:
+                String(
+                  fd.get('staffId')
+                ),
+
+              name:
+                String(
+                  fd.get('name')
+                ),
+
+              route:
+                String(
+                  fd.get('route')
+                ),
+
+              area:
+                String(
+                  fd.get('route')
+                ),
+
+              role:
+                String(
+                  fd.get('role')
+                ),
+
+              password:
+                String(
+                  fd.get('password')
+                ),
+
+              active: true
+            }
+          );
+
+        if (!r?.ok) {
+          throw new Error(
+            r?.error ||
+            'Save failed'
+          );
+        }
+
+        await v8LoadManagerData();
+
+        toast('User saved');
+
+        renderSettings();
+
+      } catch (x) {
+        toast(
+          x.message,
+          4000
+        );
+
+      } finally {
+        setBusy(false);
+      }
+    };
+
+  $$('[data-v8deactivate]')
+    .forEach(b => {
+      b.onclick = async () => {
+        if (
+          !confirm(
+            'Deactivate this SR?'
+          )
+        ) {
+          return;
+        }
+
+        setBusy(
+          true,
+          'Deactivating SR…'
+        );
+
+        try {
+          const r =
+            await apiPost(
+              'setUserActive',
+              {
+                staffId:
+                  b.dataset.v8deactivate,
+
+                active: false
+              }
+            );
+
+          if (!r?.ok) {
+            throw new Error(
+              r?.error ||
+              'Failed'
+            );
+          }
+
+          await v8LoadManagerData();
+
+          toast(
+            'SR deactivated'
+          );
+
+          renderSettings();
+
+        } catch (x) {
+          toast(
+            x.message,
+            4000
+          );
+
+        } finally {
+          setBusy(false);
+        }
+      };
+    });
+}
+
+/* =========================================================
+   FINAL RENDER ROUTER
 ========================================================= */
 
 function render() {
   if (!session) return;
 
+  installShell();
   refreshTop();
   bindNav();
 
-  const routes = {
+  const map = {
     dashboard: renderDashboard,
-    daily: renderDaily,
     execution: renderExecution,
     cpo: renderCpo,
+    daily: renderDaily,
     planning: renderPlanning,
+    income: renderIncome,
+    summary: renderSummary,
+    tasks: renderTasks,
     zero: renderZero,
     incentives: renderIncentives,
     penalties: renderPenalties,
-    income: renderIncome,
-    tasks: renderTasks,
-    summary: renderSummary,
     opportunity: renderOpportunity,
     activity: renderActivity,
-    proposal: renderProposal,
     team: renderTeam,
+    proposal: renderProposal,
     notifications: renderNotifications,
     settings: renderSettings,
-    teamManagement: renderTeamManagement
+    aiKnowledge: renderAyonKnowledge
   };
 
-  const fn =
-    routes[page] ||
-    renderDashboard;
+  (map[page] || renderDashboard)();
 
-  fn();
-
+  refreshTop();
   bindNav();
-  bindCommon();
-  installVisibleBackButton();
-  updateNotificationBadge();
 }
 
 /* =========================================================
@@ -4447,61 +7557,206 @@ function startLiveSync() {
     clearInterval(liveTimer);
   }
 
-  liveTimer =
-    setInterval(
-      async () => {
+  liveTimer = setInterval(
+    async () => {
+      if (
+        !session ||
+        document.hidden ||
+        syncing ||
+        !navigator.onLine
+      ) {
+        return;
+      }
+
+      try {
         if (
-          !session ||
-          syncing ||
-          document.hidden ||
-          !navigator.onLine
-        ) return;
-
-        try {
-          if (
-            isManagerMode() &&
+          isManager() &&
+          (
+            page === 'dashboard' ||
             page === 'team'
-          ) {
-            await loadTeam({
-              quiet: true
-            });
-          } else {
-            await loadCurrent({
-              quiet: true
-            });
-          }
-
-          render();
-
-        } catch (e) {
-          console.warn(
-            'Live sync',
-            e
-          );
+          )
+        ) {
+          await v8LoadManagerData();
+        } else {
+          await loadCurrent({
+            quiet: true
+          });
         }
-      },
-      60000
-    );
+
+        render();
+
+      } catch (e) {
+        console.warn(
+          'Live sync',
+          e
+        );
+      }
+    },
+    120000
+  );
 }
 
-document.addEventListener(
-  'visibilitychange',
-  () => {
-    if (
-      !document.hidden &&
-      session &&
-      navigator.onLine
-    ) {
-      refreshCloud(false);
-    }
+/* =========================================================
+   PREMIUM LOGIN PANEL BEHAVIOR
+========================================================= */
+
+function installPremiumLogin() {
+  const form =
+    $('#loginForm');
+
+  const idInput =
+    $('#staffId') ||
+    $('#loginStaffId') ||
+    $('input[name="staffId"]');
+
+  const pinInput =
+    $('#password') ||
+    $('#loginPin') ||
+    $('input[name="password"]');
+
+  if (!form) return;
+
+  form.onsubmit = async e => {
+    e.preventDefault();
+
+    const id =
+      idInput?.value ||
+      '';
+
+    const pin =
+      pinInput?.value ||
+      '';
+
+    await login(id, pin);
+  };
+
+  if (idInput) {
+    idInput.setAttribute(
+      'autocomplete',
+      'username'
+    );
   }
+
+  if (pinInput) {
+    pinInput.setAttribute(
+      'autocomplete',
+      'current-password'
+    );
+
+    pinInput.addEventListener(
+      'keydown',
+      e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+
+          form.requestSubmit();
+        }
+      }
+    );
+  }
+}
+
+/* =========================================================
+   BOOT
+========================================================= */
+
+async function boot() {
+  const pref =
+    getPref();
+
+  selectedMonth =
+    pref.month ||
+    localDate().slice(0, 7);
+
+  selectedDate =
+    pref.date ||
+    localDate();
+
+  pushHistoryState();
+  installPremiumLogin();
+
+  if (!restoreSession()) {
+    $('#appView')?.classList.add(
+      'hidden'
+    );
+
+    $('#loginView')?.classList.remove(
+      'hidden'
+    );
+
+    return;
+  }
+
+  $('#loginView')?.classList.add(
+    'hidden'
+  );
+
+  $('#appView')?.classList.remove(
+    'hidden'
+  );
+
+  installShell();
+
+  if (isManager()) {
+    page = 'dashboard';
+
+    await Promise.all([
+      loadCurrent({
+        quiet: true
+      }),
+      v8LoadManagerData()
+    ]);
+
+  } else {
+    page = 'dashboard';
+
+    await loadCurrent({
+      quiet: true
+    });
+  }
+
+  initPushSystem();
+  startLiveSync();
+  render();
+}
+
+/* Manager always lands on ALL SR dashboard after login. */
+const finalPremiumLogin =
+  login;
+
+login = async function(
+  id,
+  pin
+) {
+  await finalPremiumLogin(
+    id,
+    pin
+  );
+
+  if (
+    session &&
+    isManager()
+  ) {
+    managerView =
+      session.id;
+
+    page =
+      'dashboard';
+
+    await v8LoadManagerData();
+
+    render();
+  }
+};
+
+document.addEventListener(
+  'DOMContentLoaded',
+  boot
 );
 
 window.addEventListener(
   'online',
   () => {
-    toast('Internet connected');
-
     if (session) {
       refreshCloud(false);
     }
@@ -4512,176 +7767,8 @@ window.addEventListener(
   'offline',
   () => {
     toast(
-      'Offline — live database paused'
+      'Offline — waiting for internet',
+      3000
     );
   }
 );
-
-/* =========================================================
-   LOGIN BINDINGS
-========================================================= */
-
-function bindLogin() {
-  const form =
-    $('#loginForm');
-
-  if (!form) return;
-
-  form.onsubmit =
-    async e => {
-      e.preventDefault();
-
-      const id =
-        $('#loginId')?.value ||
-        form.elements.staffId?.value ||
-        form.elements.id?.value ||
-        '';
-
-      const pin =
-        $('#loginPin')?.value ||
-        form.elements.password?.value ||
-        form.elements.pin?.value ||
-        '';
-
-      if (!String(id).trim()) {
-        return toast(
-          'Enter Staff ID'
-        );
-      }
-
-      if (!String(pin)) {
-        return toast(
-          'Enter password'
-        );
-      }
-
-      await login(
-        id,
-        pin
-      );
-    };
-}
-
-/* =========================================================
-   STARTUP
-========================================================= */
-
-async function startup() {
-  bindLogin();
-  pushHistoryState();
-
-  if (!restoreSession()) {
-    $('#loginView')?.classList.remove('hidden');
-    $('#appView')?.classList.add('hidden');
-    return;
-  }
-
-  openApp();
-
-  /* Render shell immediately. */
-  render();
-
-  try {
-    if (isManagerMode()) {
-      await Promise.all([
-        loadTeam({
-          quiet: true
-        }),
-
-        loadCurrent({
-          quiet: true
-        })
-      ]);
-    } else {
-      await loadCurrent({
-        quiet: true
-      });
-    }
-
-    initPushSystem();
-    render();
-
-  } catch (e) {
-    console.warn(
-      'Startup sync',
-      e
-    );
-
-    render();
-  }
-}
-
-if (
-  document.readyState ===
-  'loading'
-) {
-  document.addEventListener(
-    'DOMContentLoaded',
-    startup
-  );
-} else {
-  startup();
-}
-
-/* =========================================================
-   GLOBAL ACCESS FOR AYON AI
-========================================================= */
-
-window.SPH = {
-  getSession: () => session,
-
-  getCurrent: () => current,
-
-  getTeamSnapshot: () =>
-    teamSnapshot,
-
-  getManagerView: () =>
-    managerView,
-
-  isManager: () =>
-    isManager(),
-
-  getSelectedMonth: () =>
-    selectedMonth,
-
-  getSelectedDate: () =>
-    selectedDate,
-
-  getBackendUrl: () =>
-    backendUrl(),
-
-  apiPost: (
-    action,
-    payload = {}
-  ) =>
-    apiPost(
-      action,
-      payload
-    ),
-
-  refresh: async () => {
-    if (
-      isManagerMode() &&
-      page === 'team'
-    ) {
-      await loadTeam({
-        quiet: true
-      });
-    } else {
-      await loadCurrent({
-        quiet: true
-      });
-    }
-
-    render();
-
-    return current;
-  },
-
-  openPage: p =>
-    setPage(p)
-};
-
-/* =========================================================
-   END OF app.js
-========================================================= */
