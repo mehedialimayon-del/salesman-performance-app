@@ -6,7 +6,7 @@
    Backend: Google Apps Script / Google Sheets source of truth
 ========================================================= */
 
-const APP_BUILD = 'FINAL-2026.09.15-5';
+const APP_BUILD = 'OPERATIONAL-2026.09.18-1';
 const TZ = 'Asia/Kuala_Lumpur';
 const D = window.APP_DATA || { users: [], salaryRules: {}, categoryProducts: {}, products: [], outlets: {} };
 const $ = s => document.querySelector(s);
@@ -126,7 +126,7 @@ async function apiGet(action, extra = {}) {
 async function apiPost(action, payload = {}) {
   if (!backendUrl()) throw new Error('Backend URL is missing');
   if (!session) throw new Error('Please login');
-  const longAction = ['uploadProposal','downloadProposal','downloadBanner','createIncentive','saveIncentive'].includes(action);
+  const longAction = ['uploadProposal','downloadProposal','downloadBanner','createIncentive','saveIncentive','saveCpo','downloadCpoPhoto'].includes(action);
   return fetchJson(backendUrl(), {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -552,7 +552,7 @@ function renderDashboard() {
   const alerts = alertsForCurrent();
   $('#mainContent').innerHTML = `${monthBar()}<section class="hero"><p class="eyebrow">LIVE SALES DATABASE</p><h3>${esc(viewedName())}</h3><p class="muted">${monthName(selectedMonth)} • Source of truth: Google Sheets</p>${progressBar(p.percent)}${syncStatus()}<div class="form-actions"><button id="syncNow" class="btn secondary">↻ REFRESH LIVE</button>${isManagerMode() ? '<button class="btn secondary" data-go="team">👥 TEAM</button>' : ''}</div></section>
   <div class="grid kpi-grid">${kpi('MONTH TARGET', money(p.target), monthName(selectedMonth))}${kpi('ACHIEVEMENT', money(p.achievement), pct(p.percent), p.percent >= 100 ? 'good' : '')}${kpi('SHORTFALL', money(p.shortfall), 'Remaining', p.shortfall ? 'bad' : 'good')}${kpi('TODAY SALES', money(p.todaySales), dateLabel(selectedDate))}${kpi('OUTLET COVERAGE', pct(p.coverage), `${n(p.coveredOutlets)}/${n(p.routeOutlets)} outlets`, p.zeroOutlets ? 'warn' : 'good')}${kpi('ZERO OUTLETS', String(n(p.zeroOutlets)), 'Month-to-date', p.zeroOutlets ? 'bad' : 'good')}${kpi('PROJECTED MONTH', money(f.projectedSales), f.onTrack ? 'On track' : 'Needs acceleration', f.onTrack ? 'good' : 'warn')}${kpi('FINAL INCOME', money(inc.finalIncome), 'After incentive & penalty')}${kpi('LAST MONTH SAME DAY', money(cmp.lastMonthSameDay), cmp.lastMonthDate ? dateLabel(cmp.lastMonthDate) : '—')}${kpi('LAST YEAR SAME DAY', money(cmp.lastYearSameDay), cmp.lastYearDate ? dateLabel(cmp.lastYearDate) : '—')}</div>
-  <div class="section-title"><h3>Smart Actions</h3></div><div class="mini-grid"><button class="btn secondary" data-go="daily">＋ Add Sales</button><button class="btn secondary" data-go="zero">🏪 Outlet Report</button><button class="btn secondary" data-go="incentives">🏆 Incentives</button><button class="btn secondary" data-go="opportunity">⚡ Opportunity</button><button class="btn secondary" data-go="tasks">✅ Tasks</button><button class="btn secondary" data-go="activity">🕘 Timeline</button><button class="btn secondary" data-go="planning">◎ Monthly Plan</button><button class="btn secondary" data-go="summary">▦ Full Summary</button></div>
+  <div class="section-title"><h3>Smart Actions</h3></div><div class="mini-grid"><button class="btn secondary" data-go="execution">📦 Order & Delivery</button><button class="btn secondary" data-go="daily">＋ Legacy Sales</button><button class="btn secondary" data-go="zero">🏪 Outlet Report</button><button class="btn secondary" data-go="incentives">🏆 Incentives</button><button class="btn secondary" data-go="opportunity">⚡ Opportunity</button><button class="btn secondary" data-go="tasks">⚠️ Important Work</button><button class="btn secondary" data-go="cpo">📍 CPO Execution</button><button class="btn secondary" data-go="activity">🕘 Timeline</button><button class="btn secondary" data-go="planning">◎ Monthly Plan</button><button class="btn secondary" data-go="summary">▦ Full Summary</button></div>
   <div class="section-title"><h3>Attention</h3></div>${alerts.length ? `<div class="notification-list">${alerts.map(x => `<button class="notification-item" data-go="${x.page}" style="text-align:left;width:100%;color:inherit"><div class="notification-icon">${x.icon}</div><div><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p></div></button>`).join('')}</div>` : `<div class="card"><span class="pill green">ALL CLEAR</span><p class="muted" style="margin:10px 0 0">No urgent item found for the selected period.</p></div>`}`;
   bindCommon();
   $('#syncNow').onclick = () => refreshCloud(true);
@@ -613,6 +613,53 @@ function renderDaily() {
       render();
     } catch (err) { toast(err.message, 3500); } finally { setBusy(false); }
   };
+}
+
+
+/* =========================================================
+   OPERATIONAL EXECUTION — ORDER -> ACTUAL DELIVERY
+========================================================= */
+function deliveryPill(st){
+  st=String(st||'PENDING').toUpperCase();
+  return `<span class="pill ${st==='DELIVERED'?'green':st==='CANCELLED'?'red':'orange'}">${esc(st)}</span>`;
+}
+function renderExecution(){
+  const orders=current?.orders||[], outlets=routeOutlets();
+  const canEdit=isManagerMode();
+  $('#mainContent').innerHTML=`${monthBar()}<section class="hero"><p class="eyebrow">ACTUAL SALES CONTROL</p><h3>Order → Delivery → Actual Sale</h3><p class="muted">Booked order does not count as sales. Only delivered value counts in achievement, incentive and income.</p></section>
+  ${!isManagerMode()?`<div class="card" style="margin-top:12px"><h2>New Order</h2><form id="execOrderForm" class="stack"><label>Date<input name="date" type="date" value="${selectedDate}" required></label><label>Outlet<select name="outlet" required>${outletOptions()}</select></label><label>Ordered Amount (RM)<input name="amount" type="number" min="0" step=".01" required></label><label>SKU (optional)<input name="sku" placeholder="Product name"></label><div class="form-grid"><label>Ordered Cartons<input name="cartons" type="number" min="0" step="1" value="0"></label><label>SKU Value (RM)<input name="skuValue" type="number" min="0" step=".01" value="0"></label></div><label>Note<textarea name="note"></textarea></label><button class="btn primary">SAVE AS PENDING ORDER</button></form></div>`:''}
+  <div class="section-title"><h3>Order & Delivery Register</h3></div><div class="list">${orders.length?orders.map((o,i)=>`<div class="list-item"><div class="row"><div><h4>${i+1}. ${esc(o.outletName)}</h4><p>${dateLabel(o.date)} • Order ${money(o.orderedAmount)} • Delivered ${money(o.deliveredAmount)} • Pending ${money(o.pendingAmount)}</p></div>${deliveryPill(o.status)}</div>
+  <div class="form-grid" style="margin-top:10px"><input data-delamt="${esc(o.orderId)}" type="number" min="0" max="${n(o.orderedAmount)}" step=".01" value="${n(o.deliveredAmount)}"><select data-delstatus="${esc(o.orderId)}"><option>PENDING</option><option ${o.status==='PARTIAL'?'selected':''}>PARTIAL</option><option ${o.status==='DELIVERED'?'selected':''}>DELIVERED</option><option ${o.status==='CANCELLED'?'selected':''}>CANCELLED</option></select></div><div class="form-actions"><button class="btn secondary" data-deliver="${esc(o.orderId)}">UPDATE DELIVERY</button>${canEdit?`<button class="btn danger" data-reset="${esc(o.orderId)}">RESET TO ZERO</button>`:''}</div></div>`).join(''):empty('No execution orders yet.')}</div>`;
+  bindCommon();
+  if($('#execOrderForm')) $('#execOrderForm').onsubmit=async e=>{
+    e.preventDefault(); const fd=new FormData(e.target), name=String(fd.get('outlet')||''), out=outlets.find(x=>String(x['Outlet Name'])===name);
+    setBusy(true,'Saving pending order…');
+    try{
+      const sku=String(fd.get('sku')||'').trim(), items=sku?[{skuName:sku,orderedCartons:n(fd.get('cartons')),orderedValue:n(fd.get('skuValue'))}]:[];
+      const r=await apiPost('saveExecutionOrder',{requestId:idGen(),date:String(fd.get('date')),outletCode:out?.['Outlet Code']||'',outletName:name,orderedAmount:n(fd.get('amount')),note:String(fd.get('note')||''),items});
+      if(!r?.ok) throw new Error(r?.error||'Order failed'); await loadCurrent({quiet:true}); toast('Order saved as PENDING — not counted as actual sale'); render();
+    }catch(x){toast(x.message,4000)}finally{setBusy(false)}
+  };
+  $$('[data-deliver]').forEach(b=>b.onclick=async()=>{
+    const id=b.dataset.deliver, amount=$(`[data-delamt="${CSS.escape(id)}"]`)?.value||0, status=$(`[data-delstatus="${CSS.escape(id)}"]`)?.value||'PENDING';
+    setBusy(true,'Updating actual delivery…'); try{const r=await apiPost('updateExecutionDelivery',{orderId:id,status,deliveredAmount:n(amount),deliveryDate:localDate()});if(!r?.ok)throw new Error(r?.error||'Update failed');await loadCurrent({quiet:true});toast('Actual delivery updated');render()}catch(x){toast(x.message,4000)}finally{setBusy(false)}
+  });
+  $$('[data-reset]').forEach(b=>b.onclick=async()=>{if(!confirm('Reset this order actual sale to RM0?'))return;setBusy(true,'Resetting…');try{const r=await apiPost('managerResetExecution',{orderId:b.dataset.reset,note:'Manager reset to zero'});if(!r?.ok)throw new Error(r?.error||'Reset failed');await loadCurrent({quiet:true});toast('Actual sale reset to RM0');render()}catch(x){toast(x.message,4000)}finally{setBusy(false)}});
+}
+
+/* =========================================================
+   CPO EXECUTION — PHOTO + GPS
+========================================================= */
+function gpsNow(){return new Promise((resolve,reject)=>navigator.geolocation?navigator.geolocation.getCurrentPosition(x=>resolve(x.coords),reject,{enableHighAccuracy:true,timeout:20000,maximumAge:0}):reject(new Error('GPS not supported')))}
+function renderCpo(){
+ const proofs=current?.cpo||[], route=current?.outletSummary||[], proofKeys=new Set(proofs.map(x=>String(x.outletCode||x.outletName).toUpperCase()));
+ $('#mainContent').innerHTML=`${monthBar()}<section class="hero"><p class="eyebrow">CPO EXECUTION TRACKER</p><h3>Photo + GPS Proof</h3><p class="muted">Outlet without CPO proof remains RED.</p></section>
+ ${!isManagerMode()?`<div class="card" style="margin-top:12px"><form id="cpoForm" class="stack"><label>Date<input name="date" type="date" value="${selectedDate}" required></label><label>Outlet<select name="outlet" required>${outletOptions()}</select></label><label>Current CPO Photo<input name="photo" type="file" accept="image/*" capture="environment" required></label><label>Note<textarea name="note"></textarea></label><button class="btn primary">CAPTURE GPS & SAVE CPO</button></form></div>`:''}
+ <div class="section-title"><h3>Route CPO Status</h3></div><div class="list">${route.map(x=>{const key=String(x.outletCode||x.outletName).toUpperCase(),ok=proofKeys.has(key)||x.cpo;return `<div class="list-item"><div class="row"><div><h4>${x.serial||''}. ${esc(x.outletName)}</h4><p>${esc(x.outletCode||'')}</p></div><span class="pill ${ok?'green':'red'}">${ok?'CPO ✓':'NO CPO'}</span></div></div>`}).join('')}</div>
+ <div class="section-title"><h3>Proof History</h3></div><div class="list">${proofs.length?proofs.map(x=>`<div class="list-item"><h4>${esc(x.outletName)}</h4><p>${dateLabel(x.date)} • GPS ${n(x.latitude).toFixed(5)}, ${n(x.longitude).toFixed(5)} • Accuracy ${n(x.accuracy).toFixed(0)}m</p><div class="form-actions"><button class="btn secondary" data-cpophoto="${esc(x.id)}">VIEW PHOTO</button>${x.locationUrl?`<a class="btn secondary" href="${esc(x.locationUrl)}" target="_blank" rel="noopener">MAP</a>`:''}</div></div>`).join(''):empty('No CPO proof uploaded yet.')}</div>`;
+ bindCommon();
+ if($('#cpoForm')) $('#cpoForm').onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.target),file=fd.get('photo'),name=String(fd.get('outlet')||''),out=routeOutlets().find(x=>String(x['Outlet Name'])===name);if(!(file instanceof File)||!file.size)return toast('Take/select CPO photo');setBusy(true,'Getting GPS and uploading CPO…');try{const c=await gpsNow(),base64=await fileToBase64(file),r=await apiPost('saveCpo',{date:String(fd.get('date')),outletCode:out?.['Outlet Code']||'',outletName:name,note:String(fd.get('note')||''),fileName:file.name,mimeType:file.type||'image/jpeg',base64,latitude:c.latitude,longitude:c.longitude,accuracy:c.accuracy});if(!r?.ok)throw new Error(r?.error||'CPO failed');await loadCurrent({quiet:true});toast('CPO photo + GPS saved');render()}catch(x){toast(x.message||'GPS/photo failed',4500)}finally{setBusy(false)}};
+ $$('[data-cpophoto]').forEach(b=>b.onclick=async()=>{setBusy(true,'Opening CPO proof…');try{const r=await apiPost('downloadCpoPhoto',{cpoId:b.dataset.cpophoto});if(!r?.ok)throw new Error(r?.error||'Photo failed');const url=URL.createObjectURL(base64ToBlob(r.base64,r.mimeType));window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),30000)}catch(x){toast(x.message,4000)}finally{setBusy(false)}});
 }
 
 /* =========================================================
@@ -893,13 +940,13 @@ function renderIncome() {
 
 function renderTasks() {
   const tasks = (current?.tasks || []).slice().sort((a, b) => String(b['Created At'] || '').localeCompare(String(a['Created At'] || '')));
-  const form = isManagerMode() ? `<div class="card"><p class="eyebrow">MANAGER TASK</p><form id="taskForm" class="stack"><label>Assign To<select name="staffId">${teamUsers().map(u => `<option value="${u.id}" ${u.id === managerView ? 'selected' : ''}>${esc(u.name)} • ${u.id}</option>`).join('')}</select></label><label>Task Title<input name="title" required></label><label>Instruction<textarea name="instruction" required></textarea></label><label>Due Date<input name="due" type="date"></label><button class="btn primary">SEND TASK</button></form></div>` : '';
+  const form = isManagerMode() ? `<div class="card"><p class="eyebrow">MANAGER TASK</p><form id="taskForm" class="stack"><label>Assign To<select name="staffId">${teamUsers().map(u => `<option value="${u.id}" ${u.id === managerView ? 'selected' : ''}>${esc(u.name)} • ${u.id}</option>`).join('')}</select></label><div class="form-grid"><label>Source<select name="source"><option>MD</option><option>HOS</option><option selected>OWN</option><option>BUYER</option><option>DIC</option><option>OTHERS</option></select></label><label>Priority<select name="priority"><option>CRITICAL</option><option>HIGH</option><option selected>NORMAL</option></select></label></div><label>Task Title<input name="title" required></label><label>Instruction<textarea name="instruction" required></textarea></label><div class="form-grid"><label>Due Date<input name="due" type="date"></label><label>Due Time<input name="dueTime" type="time"></label></div><button class="btn primary">SAVE IMPORTANT WORK</button></form></div>` : '';
   $('#mainContent').innerHTML = `${monthBar()}${form}<div class="section-title"><h3>Complete Task History</h3></div><div class="list">${tasks.length ? tasks.map(t => `<div class="list-item"><div class="row"><div><h4>${esc(t.Title || '')}</h4><p>${esc(t.Instruction || '')}<br>Created: ${esc(String(t['Created At'] || ''))}${t['Due Date'] ? ' • Due: ' + dateLabel(t['Due Date']) : ''}${t['Completed At'] ? '<br>Completed: ' + esc(String(t['Completed At'])) : ''}</p></div><span class="pill ${taskDone(t) ? 'green' : 'red'}">${taskDone(t) ? 'DONE' : 'PENDING'}</span></div>${!isManagerMode() && !taskDone(t) ? `<button class="btn secondary" data-taskdone="${esc(t['Task ID'])}" data-tasktitle="${esc(t.Title || '')}" style="margin-top:8px">MARK COMPLETE</button>` : ''}</div>`).join('') : empty('No task history yet.')}</div>`;
   bindCommon();
   if ($('#taskForm')) $('#taskForm').onsubmit = async e => {
     e.preventDefault(); const fd = new FormData(e.target);
     setBusy(true, 'Sending task…');
-    try { const r = await apiPost('saveTask', { staffId: String(fd.get('staffId')), title: String(fd.get('title')), instruction: String(fd.get('instruction')), due: String(fd.get('due') || '') }); if (!r?.ok) throw new Error(r?.error || 'Task failed'); managerView = String(fd.get('staffId')); await loadCurrent({ quiet: true }); toast('Task sent'); render(); } catch (err) { toast(err.message, 3500); } finally { setBusy(false); }
+    try { const r = await apiPost('saveTask', { staffId: String(fd.get('staffId')), title: String(fd.get('title')), instruction: String(fd.get('instruction')), due: String(fd.get('due') || ''), dueTime:String(fd.get('dueTime')||''), source:String(fd.get('source')||'OWN'), priority:String(fd.get('priority')||'NORMAL') }); if (!r?.ok) throw new Error(r?.error || 'Task failed'); managerView = String(fd.get('staffId')); await loadCurrent({ quiet: true }); toast('Task sent'); render(); } catch (err) { toast(err.message, 3500); } finally { setBusy(false); }
   };
   $$('[data-taskdone]').forEach(b => b.onclick = async () => {
     setBusy(true, 'Completing task…');
@@ -974,26 +1021,17 @@ async function downloadCloudFile(action, fileId, preview = false) {
   } catch (e) { toast(e.message, 3500); } finally { setBusy(false); }
 }
 
+function proposalChains(){
+ const fromOutlets=[...new Set((current?.outlets||[]).map(x=>String(x.Category||x.Chain||x['Outlet Category']||'').trim()).filter(Boolean))];
+ const fallback=['KK Supermart','The Store','TF Value Mart','Aneka','NSK Grocer','Giant Hypermarket','Econsave','Jaya Grocer','Mydin','MR DIY','Other'];
+ return [...new Set([...fromOutlets,...fallback])];
+}
 function renderProposal() {
-  const list = current?.proposalForms || [];
-  const form = isManagerMode() ? `<div class="card"><p class="eyebrow">MANAGER UPLOAD</p><h2>Upload Proposal Order Form</h2><form id="poForm" class="stack"><label>Title<input name="title" required></label><label>File (PDF / Excel / Word / Image, max 6 MB)<input name="file" type="file" accept=".pdf,.xlsx,.xls,.doc,.docx,.jpg,.jpeg,.png" required></label><label>Note<textarea name="note"></textarea></label><button class="btn primary">UPLOAD FORM</button></form></div>` : '';
-  $('#mainContent').innerHTML = `${monthBar()}${form}<section class="hero" style="margin-top:${form ? '12px' : '0'}"><p class="eyebrow">PROPOSAL ORDER FORM</p><h3>Shared PO Form Library</h3><p class="muted">Manager uploads. Authorized app users can download.</p></section><div class="list" style="margin-top:12px">${list.length ? list.map(f => `<div class="list-item"><div class="row"><div><h4>${esc(f.title || f.fileName || 'Proposal Form')}</h4><p>${esc(f.note || '')}${f.uploadedAt ? '<br>' + esc(String(f.uploadedAt)) : ''}</p></div><button class="btn secondary" data-podownload="${esc(f.fileId)}">DOWNLOAD</button></div></div>`).join('') : empty('No Proposal Order Form uploaded yet.')}</div>`;
-  bindCommon();
-  $$('[data-podownload]').forEach(b => b.onclick = () => downloadCloudFile('downloadProposal', b.dataset.podownload));
-  if ($('#poForm')) $('#poForm').onsubmit = async e => {
-    e.preventDefault(); const fd = new FormData(e.target), file = fd.get('file');
-    if (!(file instanceof File) || !file.size) return toast('Choose a file');
-    if (file.size > 6 * 1024 * 1024) return toast('File must be under 6 MB');
-    setBusy(true, 'Uploading Proposal Order Form…');
-    try {
-      const base64 = await fileToBase64(file);
-      const r = await apiPost('uploadProposal', { title: String(fd.get('title') || file.name), note: String(fd.get('note') || ''), fileName: file.name, mimeType: file.type || 'application/octet-stream', base64 });
-      if (!r?.ok) throw new Error(r?.error || 'Upload failed');
-      await loadCurrent({ quiet: true });
-      toast('Proposal Order Form uploaded');
-      render();
-    } catch (err) { toast(err.message, 4000); } finally { setBusy(false); }
-  };
+  const list=current?.proposalForms||[], chains=proposalChains();
+  const form=isManagerMode()?`<div class="card"><p class="eyebrow">MANAGER MASTER PDF</p><h2>Upload / Replace Proposal Form</h2><form id="poForm" class="stack"><label>Chain<select name="chain" required>${chains.map(x=>`<option>${esc(x)}</option>`).join('')}</select></label><label>PDF (max 6 MB)<input name="file" type="file" accept="application/pdf,.pdf" required></label><label>Note<textarea name="note"></textarea></label><button class="btn primary">UPLOAD / REPLACE CURRENT PDF</button></form><p class="muted">Replacing keeps the previous version in backend history.</p></div>`:'';
+  $('#mainContent').innerHTML=`${monthBar()}${form}<section class="hero" style="margin-top:${form?'12px':'0'}"><p class="eyebrow">CHAIN-WISE PROPOSAL MASTER</p><h3>Current Proposal Forms</h3><p class="muted">One current PDF per chain. Manager controls replacement.</p></section><div class="list" style="margin-top:12px">${chains.map((c,i)=>{const f=list.find(x=>String(x.chain||x.title).toLowerCase()===c.toLowerCase());return `<div class="list-item" style="border-left:4px solid hsl(${(i*47)%360} 70% 50%)"><div class="row"><div><h4>${esc(c)}</h4><p>${f?`PDF Available • Version ${n(f.version)||1}`:'Not Uploaded'}${f?.uploadedAt?'<br>'+esc(String(f.uploadedAt)):''}</p></div>${f?`<button class="btn secondary" data-podownload="${esc(f.fileId)}">DOWNLOAD PDF</button>`:'<span class="pill red">NO PDF</span>'}</div></div>`}).join('')}</div>`;
+  bindCommon(); $$('[data-podownload]').forEach(b=>b.onclick=()=>downloadCloudFile('downloadProposal',b.dataset.podownload));
+  if($('#poForm')) $('#poForm').onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.target),file=fd.get('file');if(!(file instanceof File)||!file.size)return toast('Choose PDF');if(file.size>6*1024*1024)return toast('PDF must be under 6 MB');setBusy(true,'Uploading / replacing proposal PDF…');try{const base64=await fileToBase64(file),chain=String(fd.get('chain')),r=await apiPost('uploadProposal',{chain,title:chain,note:String(fd.get('note')||''),fileName:file.name,mimeType:file.type||'application/pdf',base64});if(!r?.ok)throw new Error(r?.error||'Upload failed');await loadCurrent({quiet:true});toast(r.replaced?'Proposal replaced — history preserved':'Proposal uploaded');render()}catch(x){toast(x.message,4500)}finally{setBusy(false)}};
 }
 
 /* =========================================================
@@ -1094,6 +1132,8 @@ function render() {
   installShell(); refreshTop(); bindNav();
   const map = {
     dashboard: renderDashboard,
+    execution: renderExecution,
+    cpo: renderCpo,
     daily: renderDaily,
     planning: renderPlanning,
     income: renderIncome,
@@ -1195,7 +1235,7 @@ async function forceServiceWorkerUpdate() {
   } catch {}
   initPushSystem();
   const deep = new URLSearchParams(location.search).get('open');
-  const allowed = ['dashboard','daily','planning','income','summary','tasks','zero','incentives','penalties','opportunity','activity','team','proposal','notifications','settings'];
+  const allowed = ['dashboard','execution','cpo','daily','planning','income','summary','tasks','zero','incentives','penalties','opportunity','activity','team','proposal','notifications','settings'];
   if (allowed.includes(deep)) page = deep;
   render();
 })();
