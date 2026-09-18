@@ -6,7 +6,7 @@
    Backend: Google Apps Script / Google Sheets source of truth
 ========================================================= */
 
-const APP_BUILD = 'OPERATIONAL-2026.09.18-1';
+const APP_BUILD = 'LAUNCH-FINAL-2026.09.18-1';
 const TZ = 'Asia/Kuala_Lumpur';
 const D = window.APP_DATA || { users: [], salaryRules: {}, categoryProducts: {}, products: [], outlets: {} };
 const $ = s => document.querySelector(s);
@@ -270,7 +270,7 @@ async function login(rawId, password) {
     render();
 
     if (session.mode === 'manager') {
-      await loadTeam({ quiet: true });
+      await Promise.all([loadTeam({ quiet: true }), loadCurrent({ quiet: true })]);
     } else {
       await loadCurrent({ quiet: true });
     }
@@ -303,7 +303,7 @@ function installShell() {
   if (settingsBtn) {
     settingsBtn.textContent = '⚙';
     settingsBtn.title = 'Settings';
-    settingsBtn.onclick = () => { page = 'settings'; render(); };
+    settingsBtn.onclick = () => setPage('settings');
   }
 
   const nav = $('#bottomNav');
@@ -336,9 +336,15 @@ function refreshTop() {
   updateNotificationBadge();
 }
 
-function setPage(next) {
+function setPage(next, opts = {}) {
+  if (!next) return;
+  const prev = page;
   page = next;
+  if (session && !opts.fromHistory && prev !== next) {
+    history.pushState({ sph: true, page: next }, '', location.href);
+  }
   render();
+  window.scrollTo({top:0, behavior:'auto'});
 }
 
 function bindNav() {
@@ -349,14 +355,13 @@ function bindNav() {
 }
 
 function pushHistoryState() {
-  if (!history.state?.sph) history.replaceState({ sph: true }, '', location.href);
+  if (!history.state?.sph) history.replaceState({ sph: true, page: page || 'dashboard' }, '', location.href);
 }
 
-window.addEventListener('popstate', () => {
+window.addEventListener('popstate', e => {
   if (!session) return;
-  page = 'dashboard';
+  page = e.state?.page || 'dashboard';
   render();
-  history.pushState({ sph: true }, '', location.href);
 });
 
 /* =========================================================
@@ -1161,11 +1166,18 @@ function startLiveSync() {
   if (liveTimer) clearInterval(liveTimer);
   liveTimer = setInterval(async () => {
     if (!session || document.hidden || !navigator.onLine || syncing) return;
-    if (page === 'daily' || page === 'planning') return;
-    if (isManagerMode() && page === 'team') await loadTeam({ quiet: true });
-    else await loadCurrent({ quiet: true });
-    if (['dashboard', 'summary', 'zero', 'team', 'tasks', 'incentives', 'penalties', 'opportunity', 'notifications'].includes(page)) render();
-  }, 60000);
+    try {
+      if (isManagerMode() && page === 'team') {
+        await loadTeam({ quiet: true });
+        render();
+        return;
+      }
+      if (['dashboard','summary','zero','tasks','incentives','income','cpo','execution','notifications','opportunity'].includes(page)) {
+        await loadCurrent({ quiet: true });
+        render();
+      }
+    } catch (_) {}
+  }, 45000);
 }
 
 document.addEventListener('visibilitychange', async () => {
@@ -1239,3 +1251,128 @@ async function forceServiceWorkerUpdate() {
   if (allowed.includes(deep)) page = deep;
   render();
 })();
+
+
+/* =========================================================
+   LAUNCH FINAL UI OVERRIDES — 2026-09-18
+========================================================= */
+(function installLaunchFinalVisuals(){
+  if (document.getElementById('launchFinalVisuals')) return;
+  const st=document.createElement('style'); st.id='launchFinalVisuals';
+  st.textContent=`
+    .action-sales{background:#173f75!important;color:#fff!important;border-color:#173f75!important}
+    .action-zero,.alert-red{background:#8f1d24!important;color:#fff!important;border-color:#8f1d24!important}
+    .action-task{background:#7a1d63!important;color:#fff!important;border-color:#7a1d63!important}
+    .action-inc{background:#8a5a00!important;color:#fff!important;border-color:#8a5a00!important}
+    .action-cpo{background:#00695c!important;color:#fff!important;border-color:#00695c!important}
+    .action-plan{background:#4a3f8f!important;color:#fff!important;border-color:#4a3f8f!important}
+    .action-summary{background:#37474f!important;color:#fff!important;border-color:#37474f!important}
+    .important-critical{border-left:6px solid #b71c1c!important;background:rgba(183,28,28,.08)!important}
+    .important-high{border-left:6px solid #ef6c00!important;background:rgba(239,108,0,.08)!important}
+    .important-normal{border-left:6px solid #1565c0!important;background:rgba(21,101,192,.07)!important}
+    .launch-back{margin:0 0 10px;padding:8px 12px;border-radius:10px}
+    .cpo-program{border-left:5px solid #00695c}
+  `;
+  document.head.appendChild(st);
+})();
+
+function alertsForCurrent() {
+  if (!current) return [];
+  const a=[], perf=current.performance||{}, pending=(current.tasks||[]).filter(x=>!taskDone(x));
+  if (pending.length) a.push({icon:'⚠️',title:`IMPORTANT WORK • ${pending.length} PENDING`,text:'Senior/manager assigned work requires attention.',page:'tasks',danger:true});
+  else a.push({icon:'✓',title:'IMPORTANT WORK • NO TASK AVAILABLE',text:'No pending important work.',page:'tasks'});
+  if (n(perf.zeroOutlets)>0) a.push({icon:'🔴',title:`ZERO SALES • ${n(perf.zeroOutlets)} OUTLET(S)`,text:'Coverage gap requires follow-up.',page:'zero',danger:true});
+  if (n(perf.shortfall)>0) a.push({icon:'🎯',title:`SHORTFALL • ${money(perf.shortfall)}`,text:`Achievement ${pct(perf.percent)}.`,page:'summary',danger:true});
+  const inc=current.incentives||[], earned=inc.reduce((z,x)=>z+n(x.earnedRM),0);
+  a.push({icon:'RM',title:`INCENTIVE EARNED • ${money(earned)}`,text:'Delivered-sales based earned incentive.',page:'incentives'});
+  inc.filter(x=>!x.fulfilled&&n(x.remaining)>0).slice(0,3).forEach(x=>a.push({icon:'🏆',title:`${x.name||'INCENTIVE'} • ${n(x.remaining)} LEFT`,text:`${n(x.actual)} / ${n(x.target)} • Reward ${money(x.rewardRM)}`,page:'incentives'}));
+  return a;
+}
+
+function renderDashboard() {
+  if (!current) {
+    $('#mainContent').innerHTML=monthBar()+`<div class="card">${empty('Live database is not loaded yet.')}<button id="loadNow" class="btn primary">LOAD DATABASE</button></div>`;
+    bindCommon(); $('#loadNow').onclick=()=>refreshCloud(true); return;
+  }
+  const p=current.performance||{}, f=current.forecast||{}, inc=current.incomeSummary||{}, cmp=current.comparisons||{}, alerts=alertsForCurrent();
+  $('#mainContent').innerHTML=`${monthBar()}<section class="hero"><p class="eyebrow">LIVE SALES DATABASE</p><h3>${esc(viewedName())}</h3><p class="muted">${monthName(selectedMonth)} • Actual delivered value is the sales source of truth</p>${progressBar(p.percent)}${syncStatus()}<div class="form-actions"><button id="syncNow" class="btn secondary">↻ REFRESH LIVE</button>${isManagerMode()?'<button class="btn secondary" data-go="team">👥 TEAM CONTROL</button>':''}</div></section>
+  <div class="grid kpi-grid">${kpi('MONTH TARGET',money(p.target),monthName(selectedMonth))}${kpi('ACHIEVEMENT',money(p.achievement),pct(p.percent),p.percent>=100?'good':'')}${kpi('SHORTFALL',money(p.shortfall),'Remaining',p.shortfall?'bad':'good')}${kpi('TODAY DELIVERED',money(p.todaySales),dateLabel(selectedDate))}${kpi('OUTLET COVERAGE',pct(p.coverage),`${n(p.coveredOutlets)}/${n(p.routeOutlets)} outlets`,p.zeroOutlets?'warn':'good')}${kpi('ZERO OUTLETS',String(n(p.zeroOutlets)),'Month-to-date',p.zeroOutlets?'bad':'good')}${kpi('PROJECTED MONTH',money(f.projectedSales),f.onTrack?'On track':'Needs acceleration',f.onTrack?'good':'warn')}${kpi('FINAL INCOME',money(inc.finalIncome),'Commission + incentive − penalty')}${kpi('LAST MONTH SAME DAY',money(cmp.lastMonthSameDay),cmp.lastMonthDate?dateLabel(cmp.lastMonthDate):'—')}${kpi('LAST YEAR SAME DAY',money(cmp.lastYearSameDay),cmp.lastYearDate?dateLabel(cmp.lastYearDate):'—')}</div>
+  <div class="section-title"><h3>Smart Actions</h3></div><div class="mini-grid">
+  <button class="btn action-sales" data-go="execution">📦 Order & Delivery</button>
+  <button class="btn action-zero" data-go="zero">🏪 Zero / Outlet Report</button>
+  <button class="btn action-inc" data-go="incentives">🏆 Incentives</button>
+  <button class="btn action-task" data-go="tasks">⚠️ Important Work</button>
+  <button class="btn action-cpo" data-go="cpo">📍 CPO Execution</button>
+  <button class="btn action-plan" data-go="planning">◎ Monthly Plan</button>
+  <button class="btn action-summary" data-go="summary">▦ Full Summary</button>
+  <button class="btn secondary" data-go="opportunity">⚡ SKU Opportunity</button>
+  <button class="btn secondary" data-go="income">RM Income</button>
+  <button class="btn secondary" data-go="activity">🕘 Timeline</button></div>
+  <div class="section-title"><h3>Notification & Attention</h3></div><div class="notification-list">${alerts.map(x=>`<button class="notification-item ${x.danger?'alert-red':''}" data-go="${x.page}" style="text-align:left;width:100%"><div class="notification-icon">${x.icon}</div><div><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p></div></button>`).join('')}</div>`;
+  bindCommon(); $('#syncNow').onclick=()=>refreshCloud(true);
+}
+
+function renderDaily(){
+  $('#mainContent').innerHTML=`${monthBar()}<section class="hero"><p class="eyebrow">SALES ENTRY</p><h3>Use Order & Delivery</h3><p class="muted">Manual/legacy sales entry is disabled for launch. Book an order first; only actual delivered amount/cartons count as sales, incentive and income.</p></section><button class="btn action-sales big-action" data-go="execution">OPEN ORDER & DELIVERY</button>`;
+  bindCommon();
+}
+
+function renderPlanning(){
+  const plans=current?.plans||[];
+  if(!isManagerMode()){
+    $('#mainContent').innerHTML=`${monthBar()}<section class="hero"><p class="eyebrow">MONTHLY PLAN • LOCKED</p><h3>${esc(viewedName())}</h3><p class="muted">Monthly target and plan are fixed by Manager. SR access is view-only.</p></section><div style="margin-top:12px">${planningList()}</div>`;
+    bindCommon(); return;
+  }
+  selectedPlanningSkus=[];
+  const users=teamUsers(), target=current?.performance?.target||0, teamTarget=current?.teamTarget||0;
+  $('#mainContent').innerHTML=`${monthBar()}<section class="hero"><p class="eyebrow">MANAGER MONTHLY CONTROL</p><h3>Target & Plan Lock</h3><p class="muted">Manager is the only editor. Saved monthly values become the working target for calculations.</p></section>
+  <div class="card" style="margin-top:12px"><h3>Monthly Target</h3><form id="monthlyTargetForm" class="stack"><label>Target Type<select id="targetScope" name="scope"><option value="STAFF">Selected SR / My Route</option><option value="TEAM">Manager Team Total</option></select></label><label id="targetStaffWrap">Staff<select name="staffId">${users.map(u=>`<option value="${esc(u.id)}" ${u.id===managerView?'selected':''}>${esc(u.name)} • ${esc(u.id)}</option>`).join('')}</select></label><label>Target RM<input name="targetRM" type="number" min="0" step=".01" value="${n(target)}" required></label><button class="btn primary">SAVE & LOCK MONTHLY TARGET</button><p class="muted">Current Team Target: ${money(teamTarget)}</p></form></div>
+  <div class="card" style="margin-top:12px"><h3>Outlet & SKU Monthly Plan</h3><form id="planForm" class="stack"><label>Search Outlet<input id="planOutletSearch" placeholder="Outlet name or code"></label><label>Outlet<select id="planOutlet" name="outlet" required>${outletOptions()}</select></label><label>Outlet Monthly Target RM<input name="outletTarget" type="number" min="0" step=".01" required></label><label>Target SKU Count<input name="targetSkuCount" type="number" min="0" step="1" value="0"></label><label>Search SKU<input id="planSkuSearch" placeholder="SKU name"></label><label>SKU<select id="planSku"><option value="">Select outlet first</option></select></label><button type="button" id="addPlanSku" class="btn secondary">+ ADD SKU</button><div id="planSkuChips" class="chipbox"></div><button class="btn action-plan">SAVE / UPDATE MONTHLY PLAN</button></form></div>
+  <div class="section-title"><h3>Plan vs Actual Delivered</h3></div>${planningList()}`;
+  bindCommon();
+  const scope=$('#targetScope'), sw=$('#targetStaffWrap'); scope.onchange=()=>sw.style.display=scope.value==='TEAM'?'none':''; scope.onchange();
+  $('#monthlyTargetForm').onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.target);setBusy(true,'Saving target…');try{const r=await apiPost('saveMonthlyTarget',{scope:String(fd.get('scope')),staffId:String(fd.get('staffId')||managerView),month:selectedMonth,targetRM:n(fd.get('targetRM'))});if(!r?.ok)throw new Error(r?.error||'Target save failed');await Promise.all([loadCurrent({quiet:true}),loadTeam({quiet:true})]);toast('Monthly target saved & locked');render()}catch(x){toast(x.message,4000)}finally{setBusy(false)}};
+  const os=$('#planOutletSearch'),o=$('#planOutlet'),ss=$('#planSkuSearch'),sk=$('#planSku'),chips=$('#planSkuChips');
+  const paint=()=>{chips.innerHTML=selectedPlanningSkus.map(x=>`<span class="chip">${esc(x)} <button type="button" data-rmsku="${esc(x)}">×</button></span>`).join('');$$('[data-rmsku]').forEach(b=>b.onclick=()=>{selectedPlanningSkus=selectedPlanningSkus.filter(x=>x!==b.dataset.rmsku);paint();refresh()})};
+  const refresh=()=>{sk.innerHTML=o.value?skuOptions(o.value,sk.value,ss.value):'<option value="">Select outlet first</option>';[...sk.options].forEach(z=>{if(selectedPlanningSkus.includes(z.value))z.disabled=true})};
+  os.oninput=()=>{const old=o.value;o.innerHTML=outletOptions(old,os.value);refresh()};o.onchange=()=>{selectedPlanningSkus=[];paint();refresh()};ss.oninput=refresh;
+  $('#addPlanSku').onclick=()=>{if(!sk.value)return toast('Select SKU');if(!selectedPlanningSkus.includes(sk.value))selectedPlanningSkus.push(sk.value);paint();refresh()};
+  $('#planForm').onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.target),name=String(fd.get('outlet')||''),out=routeOutlets().find(x=>String(x['Outlet Name'])===name);if(!out)return toast('Select outlet');setBusy(true,'Saving plan…');try{const r=await apiPost('savePlan',{staffId:managerView,month:selectedMonth,outletCode:out['Outlet Code']||'',outletName:name,outletTarget:n(fd.get('outletTarget')),targetedSkuCount:n(fd.get('targetSkuCount'))||selectedPlanningSkus.length,targetSkus:selectedPlanningSkus,skuSalesPlan:0});if(!r?.ok)throw new Error(r?.error||'Plan failed');await loadCurrent({quiet:true});toast('Monthly plan saved');render()}catch(x){toast(x.message,4000)}finally{setBusy(false)}};refresh();
+}
+
+function renderTasks(){
+  const tasks=(current?.tasks||[]).slice().sort((a,b)=>String(b['Created At']||'').localeCompare(String(a['Created At']||'')));
+  const form=isManagerMode()?`<div class="card"><p class="eyebrow">MANAGER • IMPORTANT WORK</p><form id="taskForm" class="stack"><label>Assign To<select name="staffId">${teamUsers().map(u=>`<option value="${u.id}" ${u.id===managerView?'selected':''}>${esc(u.name)} • ${u.id}</option>`).join('')}</select></label><div class="form-grid"><label>Source<select name="source"><option>MD</option><option>HOS</option><option selected>OWN</option><option>BUYER</option><option>DIC</option><option>OTHERS</option></select></label><label>Priority<select name="priority"><option>CRITICAL</option><option>HIGH</option><option selected>NORMAL</option></select></label></div><label>Important Work Title<input name="title" required></label><label>Instruction<textarea name="instruction" required></textarea></label><div class="form-grid"><label>Due Date<input name="due" type="date"></label><label>Due Time<input name="dueTime" type="time"></label></div><button class="btn action-task">ASSIGN IMPORTANT WORK</button></form></div>`:'';
+  $('#mainContent').innerHTML=`${monthBar()}${form}<div class="section-title"><h3>Important Work</h3></div><div class="list">${tasks.length?tasks.map(t=>{const done=taskDone(t),pr=String(t.Priority||'NORMAL').toUpperCase(),cls=done?'':pr==='CRITICAL'?'important-critical':pr==='HIGH'?'important-high':'important-normal';return `<div class="list-item ${cls}"><div class="row"><div><span class="pill ${done?'green':'red'}">${done?'DONE':pr+' • PENDING'}</span><h4>${esc(t.Title||'Important Work')}</h4><p>${esc(t.Instruction||'')}<br>${esc(t.Source||'OWN')}${t['Due Date']?' • Due '+dateLabel(t['Due Date']):''}${t['Due Time']?' '+esc(t['Due Time']):''}${t['Completed At']?'<br>Completed: '+esc(String(t['Completed At'])):''}</p></div></div>${!isManagerMode()&&!done?`<button class="btn action-task" data-taskdone="${esc(t['Task ID'])}" data-tasktitle="${esc(t.Title||'')}">MARK COMPLETE</button>`:''}</div>`}).join(''):empty('NO TASK AVAILABLE')}</div>`;
+  bindCommon();
+  if($('#taskForm'))$('#taskForm').onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.target);setBusy(true,'Assigning…');try{const r=await apiPost('saveTask',{staffId:String(fd.get('staffId')),title:String(fd.get('title')),instruction:String(fd.get('instruction')),due:String(fd.get('due')||''),dueTime:String(fd.get('dueTime')||''),source:String(fd.get('source')||'OWN'),priority:String(fd.get('priority')||'NORMAL')});if(!r?.ok)throw new Error(r?.error||'Task failed');managerView=String(fd.get('staffId'));await loadCurrent({quiet:true});toast('Important Work assigned');render()}catch(x){toast(x.message,4000)}finally{setBusy(false)}};
+  $$('[data-taskdone]').forEach(b=>b.onclick=async()=>{setBusy(true,'Completing…');try{const r=await apiPost('completeTask',{taskId:b.dataset.taskdone,title:b.dataset.tasktitle});if(!r?.ok)throw new Error(r?.error||'Failed');await loadCurrent({quiet:true});toast('Work completed');render()}catch(x){toast(x.message,4000)}finally{setBusy(false)}});
+}
+
+function renderCpo(){
+  const proofs=current?.cpo||[], route=current?.outletSummary||[], programs=current?.cpoPrograms||[];
+  const proofKeys=new Set(proofs.map(x=>String(x.outletCode||x.outletName).toUpperCase()));
+  const routeList=route.map(x=>`<option value="${esc(x.outletName)}" data-code="${esc(x.outletCode||'')}"></option>`).join('');
+  const managerProgram=isManagerMode()?`<div class="card" style="margin-top:12px"><p class="eyebrow">MANAGER CPO PROGRAM</p><form id="cpoProgramForm" class="stack"><label>Program Title<input name="title" required></label><label>Chain / Outlet Group<input name="chain" placeholder="e.g. Giant / KK Supermart"></label><label>Description<textarea name="description"></textarea></label><div class="form-grid"><label>Start Date<input name="startDate" type="date"></label><label>End Date<input name="endDate" type="date"></label></div><label>Program File / Image<input name="file" type="file" accept="image/*,.pdf"></label><button class="btn action-cpo">UPLOAD CPO PROGRAM</button></form></div>`:'';
+  const proofForm=!isManagerMode()?`<div class="card" style="margin-top:12px"><form id="cpoForm" class="stack"><label>CPO Program<select name="programId"><option value="">General / No program</option>${programs.map(p=>`<option value="${esc(p.id)}">${esc(p.title)}${p.chain?' • '+esc(p.chain):''}</option>`).join('')}</select></label><label>Date<input name="date" type="date" value="${selectedDate}" required></label><label>Outlet Name<input id="cpoOutletName" name="outletName" list="cpoOutletList" placeholder="Select from route OR type manually" required><datalist id="cpoOutletList">${routeList}</datalist></label><label>Outlet Code<input id="cpoOutletCode" name="outletCode" placeholder="Type code if outside route"></label><label>Current CPO Photo<input name="photo" type="file" accept="image/*" capture="environment" required></label><label>Note<textarea name="note"></textarea></label><button class="btn action-cpo">CAPTURE GPS & SAVE FOR VERIFICATION</button></form></div>`:'';
+  $('#mainContent').innerHTML=`${monthBar()}<section class="hero"><p class="eyebrow">CPO EXECUTION TRACKER</p><h3>Program → Outlet → Photo + GPS → Manager Verification</h3><p class="muted">Route outlet can be selected by typing; outside-route outlet can be entered manually with its code.</p></section>${managerProgram}${proofForm}
+  <div class="section-title"><h3>Active CPO Programs</h3></div><div class="list">${programs.length?programs.map(p=>`<div class="list-item cpo-program"><h4>${esc(p.title)}</h4><p>${esc(p.chain||'All / General')}${p.description?'<br>'+esc(p.description):''}${p.startDate?'<br>'+dateLabel(p.startDate)+(p.endDate?' → '+dateLabel(p.endDate):''):''}</p></div>`).join(''):empty('No CPO program uploaded.')}</div>
+  <div class="section-title"><h3>Route CPO Status</h3></div><div class="list">${route.map(x=>{const key=String(x.outletCode||x.outletName).toUpperCase(),ok=proofKeys.has(key)||x.cpo;return `<div class="list-item"><div class="row"><div><h4>${x.serial||''}. ${esc(x.outletName)}</h4><p>${esc(x.outletCode||'')}</p></div><span class="pill ${ok?'green':'red'}">${ok?'CPO ✓':'NO CPO'}</span></div></div>`}).join('')}</div>
+  <div class="section-title"><h3>Proof & Verification</h3></div><div class="list">${proofs.length?proofs.map(x=>`<div class="list-item"><div class="row"><div><h4>${esc(x.outletName)}</h4><p>${esc(x.outletCode||'')} • ${dateLabel(x.date)}<br>GPS ${n(x.latitude).toFixed(5)}, ${n(x.longitude).toFixed(5)}</p></div><span class="pill ${x.verificationStatus==='VERIFIED'?'green':x.verificationStatus==='REJECTED'?'red':'orange'}">${esc(x.verificationStatus||'PENDING')}</span></div><div class="form-actions"><button class="btn secondary" data-cpophoto="${esc(x.id)}">VIEW PHOTO</button>${x.locationUrl?`<a class="btn secondary" href="${esc(x.locationUrl)}" target="_blank" rel="noopener">MAP</a>`:''}${isManagerMode()?`<button class="btn action-cpo" data-cpoverify="${esc(x.id)}">VERIFY</button><button class="btn danger" data-cporeject="${esc(x.id)}">REJECT</button>`:''}</div>${x.verificationNote?`<p class="muted">Manager note: ${esc(x.verificationNote)}</p>`:''}</div>`).join(''):empty('No CPO proof uploaded yet.')}</div>`;
+  bindCommon();
+  const name=$('#cpoOutletName'), code=$('#cpoOutletCode');
+  if(name)name.onchange=name.oninput=()=>{const r=route.find(x=>String(x.outletName).toLowerCase()===String(name.value).trim().toLowerCase());if(r&&code)code.value=r.outletCode||''};
+  if($('#cpoProgramForm'))$('#cpoProgramForm').onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.target),f=fd.get('file');setBusy(true,'Uploading CPO program…');try{let base64='',fileName='',mimeType='';if(f instanceof File&&f.size){if(f.size>8*1024*1024)throw new Error('File must be under 8 MB');base64=await fileToBase64(f);fileName=f.name;mimeType=f.type}const r=await apiPost('saveCpoProgram',{title:String(fd.get('title')),chain:String(fd.get('chain')||''),description:String(fd.get('description')||''),startDate:String(fd.get('startDate')||''),endDate:String(fd.get('endDate')||''),base64,fileName,mimeType});if(!r?.ok)throw new Error(r?.error||'Upload failed');await loadCurrent({quiet:true});toast('CPO program uploaded');render()}catch(x){toast(x.message,4000)}finally{setBusy(false)}};
+  if($('#cpoForm'))$('#cpoForm').onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.target),f=fd.get('photo');if(!(f instanceof File)||!f.size)return toast('Take/upload CPO photo');setBusy(true,'Getting GPS & saving proof…');try{const c=await gpsNow(),base64=await fileToBase64(f),r=await apiPost('saveCpo',{programId:String(fd.get('programId')||''),date:String(fd.get('date')),outletCode:String(fd.get('outletCode')||''),outletName:String(fd.get('outletName')||''),note:String(fd.get('note')||''),base64,fileName:f.name,mimeType:f.type,latitude:c.latitude,longitude:c.longitude,accuracy:c.accuracy});if(!r?.ok)throw new Error(r?.error||'CPO failed');await loadCurrent({quiet:true});toast('CPO saved • waiting for Manager verification');render()}catch(x){toast(x.message||'GPS/CPO failed',4500)}finally{setBusy(false)}};
+  $$('[data-cpophoto]').forEach(b=>b.onclick=()=>{const x=proofs.find(z=>z.id===b.dataset.cpophoto);if(x?.proofUrl)window.open(x.proofUrl,'_blank');else toast('Proof link unavailable')});
+  const verify=async(id,status)=>{const note=prompt(status==='VERIFIED'?'Verification note (optional)':'Reason for rejection')||'';setBusy(true,'Updating verification…');try{const r=await apiPost('verifyCpo',{cpoId:id,status,note});if(!r?.ok)throw new Error(r?.error||'Verification failed');await loadCurrent({quiet:true});toast('CPO '+status);render()}catch(x){toast(x.message,4000)}finally{setBusy(false)}};
+  $$('[data-cpoverify]').forEach(b=>b.onclick=()=>verify(b.dataset.cpoverify,'VERIFIED'));$$('[data-cporeject]').forEach(b=>b.onclick=()=>verify(b.dataset.cporeject,'REJECTED'));
+}
+
+function renderTeam(){
+  if(!isManager()){page='dashboard';return render()}
+  const sorted=teamSnapshot.slice().sort((a,b)=>attentionScore(b)-attentionScore(a)),tt=n(current?.teamTarget);
+  $('#mainContent').innerHTML=`${monthBar({showManager:false})}<section class="hero"><p class="eyebrow">MANAGER LIVE DATABASE</p><h3>Team Control Center</h3><p class="muted">Team Target: ${money(tt)} • Actual delivered sales only</p>${syncStatus()}<button id="teamRefresh" class="btn primary">↻ SYNC TEAM NOW</button></section><div class="list" style="margin-top:12px">${sorted.length?sorted.map(x=>{const p=x.performance||{},ii=x.incomeSummary||{};return `<div class="card"><div class="row"><div><h3>${esc(x.name)}</h3><p class="muted">${esc(x.staffId)} • ${money(p.achievement)} / ${money(p.target)}</p></div><span class="pill ${p.percent>=100?'green':p.percent>=80?'orange':'red'}">${pct(p.percent)}</span></div><div class="mini-grid"><div class="metric-box"><small>Shortfall</small><br><b class="bad">${money(p.shortfall)}</b></div><div class="metric-box"><small>Zero Sale</small><br><b class="bad">${n(p.zeroOutlets)}</b></div><div class="metric-box"><small>Pending Work</small><br><b class="bad">${n(x.pendingTasks)}</b></div><div class="metric-box"><small>Income</small><br><b>${money(ii.finalIncome)}</b></div></div><div class="form-actions"><button class="btn action-sales" data-openstaff="${esc(x.staffId)}" data-openpage="dashboard">DASHBOARD</button><button class="btn action-summary" data-openstaff="${esc(x.staffId)}" data-openpage="summary">FULL DATABASE</button><button class="btn action-plan" data-openstaff="${esc(x.staffId)}" data-openpage="planning">TARGET / PLAN</button></div></div>`}).join(''):empty('No team data loaded.')}</div>`;
+  bindCommon();$('#teamRefresh').onclick=async()=>{await Promise.all([loadTeam(),loadCurrent({quiet:true})]);render()};$$('[data-openstaff]').forEach(b=>b.onclick=async()=>{managerView=b.dataset.openstaff;session.managerView=managerView;saveSession();await loadCurrent();setPage(b.dataset.openpage||'summary')});
+}
+
