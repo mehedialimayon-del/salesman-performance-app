@@ -4,7 +4,7 @@
    AYON AI LITE — ZERO-COST SALES ASSISTANT
    Premium Floating Assistant + Voice
    Developed by KAM AYON
-   Build: AYON-AI-LITE-2026.09.18-3
+   Build: AYON-AI-LITE-2026.09.18-4
 
    IMPORTANT:
    - No paid AI/API required.
@@ -14,7 +14,7 @@
 ========================================================= */
 
 (() => {
-  const BUILD = 'AYON-AI-LITE-2026.09.18-3';
+  const BUILD = 'AYON-AI-LITE-2026.09.18-4';
   const AVATAR_SRC = 'icons/ayon-avatar.jpg';
   const CHAT_KEY = 'ayon.ai.chat.v2';
   const MAX_HISTORY = 40;
@@ -356,13 +356,37 @@
     return 'আমি live sales data + sales playbook দিয়ে সাহায্য করতে পারি। জিজ্ঞেস করুন:\n• আজ কোথায় focus করব?\n• Target achieve করতে daily কত লাগবে?\n• Zero-sales outlet কোনগুলো?\n• কোন SKU push করব?\n• Buyer order দিচ্ছে না—কি বলব?\n• Meeting-এর 5টা point দাও।';
   }
 
+
+  /* ===== AYON HUMAN SALES COACH — VERIFIED SYNC BUILD ===== */
+  function motivationCoach(q) {
+    if (has(q,['হতাশ','মন খারাপ','ভালো লাগছে না','ভাল লাগছে না','আর পারছি না','পারতেছি না',
+      'sale হচ্ছে না','sales হচ্ছে না','সেল হচ্ছে না','sale নাই','sales নাই','সেল নাই',
+      'order পাচ্ছি না','অর্ডার পাচ্ছি না','buyer না করে','reject','rejection',
+      'tired','demotivated','frustrated','no sale','cannot sell',"can't sell"])) {
+      return 'আরে ভাই 😄 দুইটা buyer “না” বললেই retirement application লিখে ফেলবেন নাকি? Target কিন্তু resign করে নাই! চলেন next outlet-এ বড় order না—২টা fast-moving SKU দিয়ে একটা ছোট YES বের করি। Stock, display, price tag দেখেন; supervisor-এর objection আগে শুনেন। একটা order নিয়ে এসে আমাকে বলেন—তারপর Mission 2। 💪';
+    }
+    if (has(q,['বৃষ্টি','rain','raining','ভিজে'])) return 'বৃষ্টি দেখে নাকে তেল দিয়ে ঘুমানোর planning নাকি ভাই? 😄 নিরাপদে market-এ যান—ভিজে hero হওয়ার দরকার নাই। Buyer-এর সাথে সময় নিয়ে কথা বলেন, stock/display check করেন, একটা smart order নিয়ে ফেরেন। ☔💪';
+    if (has(q,['গরম','hot weather','too hot','heat'])) return 'ভাই গরমে battery 20% হয়ে গেছে নাকি? 😄 পানি খান, একটু cool হন—তারপর 100% power নিয়ে outlet-এ যান। PRAN Power দেখলে energy-ও মনে পড়ে যাবে 😄। Mission: next 2 outlets → 1টা order + 2টা extra SKU try।';
+    if (has(q,['mission','মিশন','challenge','চ্যালেঞ্জ'])) return 'AYON Mission 😄: Next 2 outlets → অন্তত 1টা order + 2টা extra SKU চেষ্টা। আগে stock/display/price tag check, তারপর easy mover দিয়ে YES বের করেন। Complete হলে বলবেন “হয়ে গেছে”—তারপর next mission! 💪';
+    if (has(q,['হয়ে গেছে','হয়ে গেছে','mission complete','order পেয়েছি','order পেয়েছি'])) return 'এই তো! 😄 একটু আগে tension, এখন salesman mode ON! Momentum নষ্ট করবেন না—next outlet-এ একই winning approach repeat করেন, আর app-এ update করতে ভুলবেন না। 💪';
+    return '';
+  }
+
+  function humanSalesDiagnosis(q) {
+    if (has(q,['stock আছে','স্টক আছে','enough stock'])) return 'Buyer বলছে stock আছে? 😄 নতুন stock ঠেলে লাভ নাই। Existing movement, display, price tag আর slow SKU দেখেন। Fast mover/zero SKU gap থাকলে ওইটার ছোট order চান।';
+    if (has(q,['space নাই','space নেই','no space','shelf space'])) return 'Space নাই মানেই দরজা বন্ধ না ভাই 😄। Full shelf না—ছোট facing/available gap চান। Strong fast mover দিয়ে শুরু করেন; movement দেখিয়ে পরে space বাড়ান।';
+    if (has(q,['slow sale','slow moving','সেল স্লো','movement নাই'])) return 'Movement slow? সব SKU-কে একসাথে দোষ দিয়েন না 😄। Slow SKU ধরেন, display/price/expiry check করেন, fast mover দিয়ে small replenishment চান।';
+    if (has(q,['next week','পরের সপ্তাহ','পরে আসেন','later'])) return '“Next week আসেন” শুনে চলে গেলে next week-ও একই dialogue হতে পারে 😄। Specific দিন + SKU + approximate carton commitment নিন, তারপর reminder রাখেন।';
+    return '';
+  }
+
   function answerQuestion(text) {
     const q = normalizeText(text);
 
     if (!q) return 'বলুন, sales-related কী সহযোগিতা লাগবে?';
 
     // Fixed identity / company-safe knowledge. These answers work even before live app data loads.
-    if (has(q, ['who created you', 'who made you', 'কে তৈরি করেছে', 'কে বানিয়েছে', 'কে বানিয়েছে', 'creator', 'developer'])) {
+    if (has(q, ['who created you', 'who made you', 'তোমাকে কে তৈরি করেছে', 'তোমাকে কে তৈরি করছে', 'কে তৈরি করেছে', 'কে বানিয়েছে', 'কে বানিয়েছে', 'creator', 'developer'])) {
       return 'আমার নাম AYON — Key Account Manager Ayon-এর Sales Assistant। আমাকে তৈরি ও কনফিগার করেছেন PRAN Group Malaysia-এর Key Account Manager Mehedi Alim Ayon। Sales performance, outlet execution, SKU growth, incentive, CPO, target recovery এবং Modern Trade–সংক্রান্ত কাজে সহযোগিতা করাই আমার কাজ। Mehedi Alim Ayon-এর professional portfolio এই app-এ দেওয়া আছে।';
     }
     if (has(q, ['head of sales', 'hos কে', 'hos sir', 'হেড অব সেলস', 'পারভেজ হিরা', 'parves hira'])) {
@@ -382,6 +406,7 @@
     if (humanCoach) return humanCoach;
     const diagnosis = humanSalesDiagnosis(q);
     if (diagnosis) return diagnosis;
+
     if (!appReady()) {
       return 'Live data এখনো load হয়নি, তবে sales problem নিয়ে কথা বলতে পারেন ভাই 😄। Buyer objection, motivation, negotiation, display, SKU push বা order closing—যেটায় আটকে আছেন বলুন।';
     }
