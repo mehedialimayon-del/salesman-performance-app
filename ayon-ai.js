@@ -306,84 +306,6 @@
       '\n\nPriority shortfall + zero-sales + pending task ধরে সাজানো।';
   }
 
-
-  function findTeamMemberFromQuestion(q) {
-    if (!isManagerContext()) return null;
-    const nq = normalizeText(q);
-    const aliases = {
-      'emon':['emon','ইমন','বদরুদ্দোজা','badruddoza','bodruddaza','m22075'],
-      'limon':['limon','লিমন','majumder','মজুমদার','m22268'],
-      'munnaf':['munnaf','মুন্নাফ','munnaf ali','মুন্নাফ আলী','m22328'],
-      'ayon':['ayon','অয়ন','অয়ন','mehedi','মেহেদি','m21954']
-    };
-    const team = getTeam();
-    for (const x of team) {
-      const hay = normalizeText(`${x.name||''} ${x.staffId||''}`);
-      if (hay && (nq.includes(hay) || hay.split(' ').some(w => w.length > 3 && nq.includes(w)))) return x;
-    }
-    for (const [key, arr] of Object.entries(aliases)) {
-      if (arr.some(a => nq.includes(normalizeText(a)))) {
-        const ids = {emon:'M22075',limon:'M22268',munnaf:'M22328',ayon:'M21954'};
-        return team.find(x => String(x.staffId).toUpperCase() === ids[key]) || {staffId:ids[key],name:key.toUpperCase()};
-      }
-    }
-    return null;
-  }
-
-  async function fetchManagerStaffData(member) {
-    if (!member || !isManagerContext() || typeof apiPost !== 'function') return null;
-    try {
-      const r = await apiPost('bootstrap', {
-        viewStaffId: member.staffId,
-        month: (typeof selectedMonth !== 'undefined' ? selectedMonth : ''),
-        date: (typeof selectedDate !== 'undefined' ? selectedDate : '')
-      });
-      return r?.ok ? (r.data || null) : null;
-    } catch (_) { return null; }
-  }
-
-  function zeroRowsFromData(d) {
-    const rows = Array.isArray(d?.outletSummary) ? d.outletSummary : [];
-    return rows.filter(x => num(x.mtdSales ?? x.actualDelivered ?? x.deliveredValue ?? x.sales) <= 0);
-  }
-
-  function managerStaffAnswer(q, member, d) {
-    const name = d?.user?.['Full Name'] || d?.user?.name || member?.name || member?.staffId || 'SR';
-    const p = d?.performance || member?.performance || {};
-    const inc = d?.incomeSummary || member?.incomeSummary || {};
-    const ins = Array.isArray(d?.incentives) ? d.incentives : [];
-    const zeros = zeroRowsFromData(d);
-
-    if (has(q,['zero sale','zero-sales','zero outlet','জিরো','শূন্য সেল'])) {
-      const count = zeros.length || num(p.zeroOutlets);
-      if (!count) return `${name}-এর loaded data অনুযায়ী zero-sales outlet নেই।`;
-      const list = zeros.slice(0,25).map((x,i)=>`${i+1}) ${x.outletName || x['Outlet Name'] || x.outletCode || 'Outlet'}`).join('\n');
-      return `${name}-এর zero-sales outlet: ${count}টি।${list ? '\n\n'+list : ''}`;
-    }
-    if (has(q,['income','salary','commission','বেতন','ইনকাম','কমিশন'])) {
-      return `${name}-এর income picture:\n• Achievement: ${rm(p.achievement)}\n• Commission: ${rm(inc.salesCommission)}\n• Product incentive: ${rm(inc.productIncentive)}\n• Other incentive: ${rm(inc.otherIncentive)}\n• Penalty: ${rm(inc.penalty)}\n• Final income: ${rm(inc.finalIncome)}`;
-    }
-    if (has(q,['incentive','ইনসেনটিভ','reward','আর কত','কত বাকি','remaining'])) {
-      if (!ins.length) return `${name}-এর active incentive data পাওয়া যাচ্ছে না।`;
-      return `${name}-এর incentive progress:\n` + ins.map((x,i)=>`${i+1}) ${x.name||'Incentive'} — ${num(x.actual)}/${num(x.target)}, বাকি ${num(x.remaining)}, reward ${rm(x.rewardRM)}, earned ${rm(x.earnedRM)}`).join('\n');
-    }
-    if (has(q,['pending delivery','pending','ডেলিভারি','delivery'])) {
-      const ex = Array.isArray(d?.execution) ? d.execution : [];
-      const pend = ex.filter(x => !['DELIVERED','CANCELLED'].includes(String(x.deliveryStatus||x.status||'').toUpperCase()));
-      return `${name}-এর pending delivery ${pend.length}টি।` + (pend.length ? '\n' + pend.slice(0,20).map((x,i)=>`${i+1}) ${x.outletName||'Outlet'} — ${rm(x.orderValue||x.bookedValue)} booked, ${rm(x.deliveredValue)} delivered`).join('\n') : '');
-    }
-    if (has(q,['task','important work','কাজ','pending work'])) {
-      const ts = Array.isArray(d?.tasks) ? d.tasks : [];
-      const pend = ts.filter(x => !taskDone(x));
-      return `${name}-এর pending Important Work ${pend.length}টি।` + (pend.length ? '\n' + pend.slice(0,15).map((x,i)=>`${i+1}) ${x.Title||'Important Work'} • ${x.Priority||'NORMAL'}`).join('\n') : '');
-    }
-    return `${name}: Achievement ${rm(p.achievement)} / Target ${rm(p.target)} (${pct(p.percent)}), Shortfall ${rm(p.shortfall)}, Zero outlet ${num(p.zeroOutlets)}, Final income ${rm(inc.finalIncome)}।`;
-  }
-
-  function strongSalesCoach() {
-    return 'আরে ভাই 😄 আপনি sales করতে পারবেন না—এটা আমি মানি না। আপনি অবশ্যই পারবেন। Technique একটু change করি:\\n\\n1) Outlet-এ ঢুকেই order চাইবেন না—supervisor/buyer-এর সাথে relationship warm করুন।\\n2) আগে জিজ্ঞেস করুন: “Boss, কোন item slow, কোনটা stock-out?”\\n3) Zero/low SKU থেকে 2–3টা fast-moving item দিয়ে small order close করুন।\\n4) Price tag, display, stock availability নিজের চোখে check করুন।\\n5) Full range চাপাবেন না—easy yes দিয়ে শুরু করে SKU বাড়ান।\\n6) Objection থাকলে কারণটা লিখে রাখুন; next visit-এর clear follow-up নিন।\\n7) Outlet থেকে বের হওয়ার আগে আজকের order/delivery app-এ update করবেন 😄\\n\\nProblemটা আমাকে বলেন—buyer order দিচ্ছে না, stock নাই, price issue, listing issue নাকি display? আমি সেই অনুযায়ী next move বলব।';
-  }
-
   function buyerAdvice(q) {
     if (has(q, ['order dibe na', 'order dibena', 'অর্ডার দিবে না', 'অর্ডার দিচ্ছে না', 'no order'])) {
       return 'Buyer/supervisor order দিচ্ছে না হলে:\n' +
@@ -434,7 +356,7 @@
     return 'আমি live sales data + sales playbook দিয়ে সাহায্য করতে পারি। জিজ্ঞেস করুন:\n• আজ কোথায় focus করব?\n• Target achieve করতে daily কত লাগবে?\n• Zero-sales outlet কোনগুলো?\n• কোন SKU push করব?\n• Buyer order দিচ্ছে না—কি বলব?\n• Meeting-এর 5টা point দাও।';
   }
 
-  async function answerQuestion(text) {
+  function answerQuestion(text) {
     const q = normalizeText(text);
 
     if (!q) return 'বলুন, sales-related কী সহযোগিতা লাগবে?';
@@ -444,7 +366,7 @@
       return 'আমার নাম AYON — Key Account Manager Ayon-এর Sales Assistant। আমাকে তৈরি ও কনফিগার করেছেন PRAN Group Malaysia-এর Key Account Manager Mehedi Alim Ayon। Sales performance, outlet execution, SKU growth, incentive, CPO, target recovery এবং Modern Trade–সংক্রান্ত কাজে সহযোগিতা করাই আমার কাজ। Mehedi Alim Ayon-এর professional portfolio এই app-এ দেওয়া আছে।';
     }
     if (has(q, ['head of sales', 'hos কে', 'hos sir', 'হেড অব সেলস', 'পারভেজ হিরা', 'parves hira'])) {
-      return 'Pinnacle Foods (M) Sdn Bhd-এর Modern Trade Head of Sales হলেন Parves Hira। Internal team context অনুযায়ী Modern Trade-এর SKU-wise, outlet-wise এবং sales planning/instruction-এ তাঁর গুরুত্বপূর্ণ ভূমিকা আছে; তাঁর planning ও direction অনুসরণ করে team execution পরিচালিত হয়।';
+      return 'Pinnacle Foods (M) Sdn Bhd-এর Modern Trade Head of Sales হলেন Parves Hira।';
     }
     if (has(q, ['your name', 'তোমার নাম', 'আপনার নাম', 'who are you'])) {
       return 'আমি AYON — Key Account Manager Ayon-এর Sales Assistant। Sales-related কী সহযোগিতা লাগবে বলুন।';
@@ -456,27 +378,20 @@
       return 'দুঃখিত, আমি কারও ব্যক্তিগত তথ্য বা ব্যক্তিগত মূল্যায়ন প্রদান করি না। Sales-related কোনো প্রশ্ন থাকলে করুন।';
     }
 
+    const humanCoach = motivationCoach(q);
+    if (humanCoach) return humanCoach;
+    const diagnosis = humanSalesDiagnosis(q);
+    if (diagnosis) return diagnosis;
     if (!appReady()) {
-      return 'App-এর live sales data এখনো load হয়নি। Dashboard → Refresh Live করুন। তারপর আমি target, outlet, SKU, incentive ও task ধরে suggestion দেব।';
+      return 'Live data এখনো load হয়নি, তবে sales problem নিয়ে কথা বলতে পারেন ভাই 😄। Buyer objection, motivation, negotiation, display, SKU push বা order closing—যেটায় আটকে আছেন বলুন।';
     }
 
     if (isGreeting(q)) {
       return `হ্যালো ${getViewedName()}। আমি AYON AI — আপনার Sales Assistant। Target, outlet, SKU, incentive, buyer handling বা meeting নিয়ে জিজ্ঞেস করুন।`;
     }
 
-    if (isManagerContext()) {
-      const member = findTeamMemberFromQuestion(q);
-      if (member) {
-        const d = await fetchManagerStaffData(member);
-        return managerStaffAnswer(q, member, d || member);
-      }
-      if (has(q, ['team', 'কে পিছিয়ে', 'manager attention', 'ম্যানেজার', 'compare sr', 'sr compare'])) {
-        return managerAdvice();
-      }
-    }
-
-    if (has(q, ['sale নাই','sale nai','sales নাই','sales nai','সেল নাই','সেল হচ্ছে না','সেল করতে পারছি না','sale korte parchi na','কোথা থেকে সেল করব','কিভাবে সেল করব','কীভাবে সেল করব'])) {
-      return strongSalesCoach();
+    if (isManagerContext() && has(q, ['team', 'কে পিছিয়ে', 'manager attention', 'ম্যানেজার', 'compare sr', 'sr compare'])) {
+      return managerAdvice();
     }
 
     if (has(q, ['today focus', 'আজ কোথায়', 'আজ কি করব', 'আজ কী করব', 'আজকের focus', 'আজকে focus'])) {
@@ -915,9 +830,9 @@
     addMessage('user', text);
     const typing = showTyping();
 
-    setTimeout(async () => {
-      const reply = await answerQuestion(text);
+    setTimeout(() => {
       typing?.remove();
+      const reply = answerQuestion(text);
       addMessage('ai', reply);
       if (autoVoice && (fromVoice || opened)) speak(reply, text);
     }, 180);
