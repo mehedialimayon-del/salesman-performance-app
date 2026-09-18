@@ -359,7 +359,24 @@
   function answerQuestion(text) {
     const q = normalizeText(text);
 
-    if (!q) return 'বলুন ভাই, sales নিয়ে কী জানতে চান?';
+    if (!q) return 'বলুন, sales-related কী সহযোগিতা লাগবে?';
+
+    // Fixed identity / company-safe knowledge. These answers work even before live app data loads.
+    if (has(q, ['who created you', 'who made you', 'কে তৈরি করেছে', 'কে বানিয়েছে', 'কে বানিয়েছে', 'creator', 'developer'])) {
+      return 'আমার নাম AYON — Key Account Manager Ayon-এর Sales Assistant। আমাকে তৈরি ও কনফিগার করেছেন PRAN Group Malaysia-এর Key Account Manager Mehedi Alim Ayon। Sales performance, outlet execution, SKU growth, incentive, CPO, target recovery এবং Modern Trade–সংক্রান্ত কাজে সহযোগিতা করাই আমার কাজ। Mehedi Alim Ayon-এর professional portfolio এই app-এ দেওয়া আছে।';
+    }
+    if (has(q, ['head of sales', 'hos কে', 'hos sir', 'হেড অব সেলস', 'পারভেজ হিরা', 'parves hira'])) {
+      return 'Pinnacle Foods (M) Sdn Bhd-এর Modern Trade Head of Sales হলেন Parves Hira।';
+    }
+    if (has(q, ['your name', 'তোমার নাম', 'আপনার নাম', 'who are you'])) {
+      return 'আমি AYON — Key Account Manager Ayon-এর Sales Assistant। Sales-related কী সহযোগিতা লাগবে বলুন।';
+    }
+    if (has(q, ['তুমি ছেলে', 'তুমি মেয়ে', 'তুমি মেয়ে', 'are you male', 'are you female', 'boy or girl', 'তোমার বয়স', 'তোমার বয়স'])) {
+      return 'দুঃখিত, এ ধরনের ব্যক্তিগত প্রশ্নের উত্তর দিই না। Sales-related কোনো প্রশ্ন থাকলে করুন।';
+    }
+    if (has(q, ['কেমন মানুষ', 'ব্যক্তিগত তথ্য', 'personal information', 'private information', 'পারভেজ স্যার কেমন', 'ayon কেমন', 'অয়ন কেমন', 'অয়ন কেমন'])) {
+      return 'দুঃখিত, আমি কারও ব্যক্তিগত তথ্য বা ব্যক্তিগত মূল্যায়ন প্রদান করি না। Sales-related কোনো প্রশ্ন থাকলে করুন।';
+    }
 
     if (!appReady()) {
       return 'App-এর live sales data এখনো load হয়নি। Dashboard → Refresh Live করুন। তারপর আমি target, outlet, SKU, incentive ও task ধরে suggestion দেব।';
@@ -409,7 +426,12 @@
       return meetingAdvice();
     }
 
-    return generalAdvice(q);
+    const salesScope = ['sales','sale','সেল','target','টার্গেট','outlet','আউটলেট','sku','product','প্রোডাক্ট','buyer','বায়ার','order','অর্ডার','delivery','ডেলিভারি','growth','গ্রোথ','incentive','ইনসেনটিভ','commission','কমিশন','cpo','display','listing','লিস্টিং','modern trade','route','market','মার্কেট','po','proposal','task','কাজ'];
+    if (!has(q, salesScope)) return 'দুঃখিত, আমি Sales Performance Hub-এর sales-related assistant। Sales, target, outlet, SKU, buyer, delivery, incentive, CPO বা Modern Trade–সংক্রান্ত প্রশ্ন করুন।';
+
+    const ans = generalAdvice(q);
+    if (!ans) return 'এই sales প্রশ্নে আমার available data থেকে নির্ভরযোগ্য guidance তৈরি করা যাচ্ছে না। আরও নির্ভুল guidance-এর জন্য Key Account Manager Mehedi Alim Ayon-এর সঙ্গে যোগাযোগ করুন।';
+    return ans;
   }
 
   function injectStyle() {
