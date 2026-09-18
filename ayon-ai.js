@@ -4,7 +4,7 @@
    AYON AI LITE — ZERO-COST SALES ASSISTANT
    Premium Floating Assistant + Voice
    Developed by KAM AYON
-   Build: AYON-AI-LITE-2026.09.18-4
+   Build: AYON-AI-LITE-2026.09.18-5
 
    IMPORTANT:
    - No paid AI/API required.
@@ -14,7 +14,7 @@
 ========================================================= */
 
 (() => {
-  const BUILD = 'AYON-AI-LITE-2026.09.18-4';
+  const BUILD = 'AYON-AI-LITE-2026.09.18-5';
   const AVATAR_SRC = 'icons/ayon-avatar.jpg';
   const CHAT_KEY = 'ayon.ai.chat.v2';
   const MAX_HISTORY = 40;
@@ -380,6 +380,24 @@
     return '';
   }
 
+
+  function fieldSalesHumanHelp(q) {
+    if (has(q,['আউটলেটে','outlet এ','outlet-e','outlet e','outlet visit','মার্কেটে','market এ','market e']) &&
+        has(q,['কি করব','কী করব','কেমনে','কিভাবে','কীভাবে','what do i do','what should i do','কাছে'])) {
+      return 'আউটলেটে গিয়ে robot-এর মতো “order দেন” দিয়ে শুরু করবেন না ভাই 😄। আগে supervisor/buyer-কে সালাম দিয়ে ১–২ মিনিট normal কথা বলেন। তারপর shelf ঘুরে stock, display, price tag, zero/low SKU দেখেন। এরপর বলেন: “Boss, এই ২টা item একটু support করেন, movement আমি follow-up করব।” বড় order না পেলেও একটা ছোট YES নিয়ে বের হওয়ার চেষ্টা করেন। Buyer busy থাকলে timing নেন—relationship আগে। 💪';
+    }
+    if (has(q,['buyer এর কাছে','buyer কাছে','বায়ারের কাছে','বায়ারের কাছে','supervisor এর কাছে','সুপারভাইজারের কাছে'])) {
+      return 'Buyer/supervisor-এর কাছে গেলে প্রথম mission order না—trust 😄। Greeting → stock/display observation → genuine gap → ছোট specific request। “Boss order দেন” না বলে “এই SKUটা low/zero, 2 CTN support করেন?” বললে decision সহজ হয়। না বললে কারণটা শুনে next move ঠিক করেন।';
+    }
+    if (has(q,['কথা বলব','কথা বলবো','কি বলব','কী বলব','how to talk','conversation'])) {
+      return 'Sales conversation simple রাখেন ভাই 😄: “Boss, কেমন আছেন? Stock/displayটা একটু দেখে নিই?” → gap পেলে “এই itemটা low/zero, 2 CTN support করেন; movement আমি follow-up করব।” Buyer objection দিলে আগে শুনবেন, তারপর answer। বেশি lecture দিলে buyer order দেওয়ার আগেই lunch break-এ চলে যাবে 😄।';
+    }
+    if (has(q,['order দেয় না','order দেয় না','অর্ডার দেয় না','অর্ডার দেয় না','buyer না','buyer no'])) {
+      return 'Buyer order দিচ্ছে না? 😄 আগে কারণ ধরেন—stock বেশি, movement slow, space নাই, price issue, নাকি timing? কারণ না জেনে product list পড়লে buyer ঘুমিয়ে যাবে! কারণটা বলেন, আমি সেই objection-এর next move বলব।';
+    }
+    return '';
+  }
+
   function answerQuestion(text) {
     const q = normalizeText(text);
 
@@ -389,7 +407,7 @@
     if (has(q, ['who created you', 'who made you', 'তোমাকে কে তৈরি করেছে', 'তোমাকে কে তৈরি করছে', 'কে তৈরি করেছে', 'কে বানিয়েছে', 'কে বানিয়েছে', 'creator', 'developer'])) {
       return 'আমার নাম AYON — Key Account Manager Ayon-এর Sales Assistant। আমাকে তৈরি ও কনফিগার করেছেন PRAN Group Malaysia-এর Key Account Manager Mehedi Alim Ayon। Sales performance, outlet execution, SKU growth, incentive, CPO, target recovery এবং Modern Trade–সংক্রান্ত কাজে সহযোগিতা করাই আমার কাজ। Mehedi Alim Ayon-এর professional portfolio এই app-এ দেওয়া আছে।';
     }
-    if (has(q, ['head of sales', 'hos কে', 'hos sir', 'হেড অব সেলস', 'পারভেজ হিরা', 'parves hira'])) {
+    if (has(q, ['head of sales','head sales','who is head of sales','hos কে','hos sir','হেড অব সেলস','হেড অফ সেলস','হেড ওফ সেলস','হেড অফ সেলস কে','হেড ওএফ সেলস','পারভেজ হিরা','parves hira'])) {
       return 'Pinnacle Foods (M) Sdn Bhd-এর Modern Trade Head of Sales হলেন Parves Hira।';
     }
     if (has(q, ['your name', 'তোমার নাম', 'আপনার নাম', 'who are you'])) {
@@ -407,8 +425,10 @@
     const diagnosis = humanSalesDiagnosis(q);
     if (diagnosis) return diagnosis;
 
+    const fieldHelp = fieldSalesHumanHelp(q);
+    if (fieldHelp) return fieldHelp;
     if (!appReady()) {
-      return 'Live data এখনো load হয়নি, তবে sales problem নিয়ে কথা বলতে পারেন ভাই 😄। Buyer objection, motivation, negotiation, display, SKU push বা order closing—যেটায় আটকে আছেন বলুন।';
+      return 'Live হিসাব load না থাকলেও sales নিয়ে কথা বলতে পারবেন ভাই 😄। Buyer/supervisor handling, outlet visit, objection, negotiation, confidence, relationship, order closing, display, SKU push—যেখানে আটকে আছেন সরাসরি বলেন। Live target/income/zero-sales জানতে শুধু data load লাগবে।';
     }
 
     if (isGreeting(q)) {
