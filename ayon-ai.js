@@ -4,7 +4,7 @@
    AYON AI LITE — ZERO-COST SALES ASSISTANT
    Premium Floating Assistant + Voice
    Developed by KAM AYON
-   Build: AYON-AI-LITE-2026.09.18-5
+   Build: AYON-AI-LITE-2026.09.18-6 FINAL-AI
 
    IMPORTANT:
    - No paid AI/API required.
@@ -14,7 +14,7 @@
 ========================================================= */
 
 (() => {
-  const BUILD = 'AYON-AI-LITE-2026.09.18-5';
+  const BUILD = 'AYON-AI-LITE-2026.09.18-6-FINAL-AI';
   const AVATAR_SRC = 'icons/ayon-avatar.jpg';
   const CHAT_KEY = 'ayon.ai.chat.v2';
   const MAX_HISTORY = 40;
@@ -357,129 +357,139 @@
   }
 
 
-  /* ===== AYON HUMAN SALES COACH — VERIFIED SYNC BUILD ===== */
-  function motivationCoach(q) {
-    if (has(q,['হতাশ','মন খারাপ','ভালো লাগছে না','ভাল লাগছে না','আর পারছি না','পারতেছি না',
-      'sale হচ্ছে না','sales হচ্ছে না','সেল হচ্ছে না','sale নাই','sales নাই','সেল নাই',
-      'order পাচ্ছি না','অর্ডার পাচ্ছি না','buyer না করে','reject','rejection',
-      'tired','demotivated','frustrated','no sale','cannot sell',"can't sell"])) {
-      return 'আরে ভাই 😄 দুইটা buyer “না” বললেই retirement application লিখে ফেলবেন নাকি? Target কিন্তু resign করে নাই! চলেন next outlet-এ বড় order না—২টা fast-moving SKU দিয়ে একটা ছোট YES বের করি। Stock, display, price tag দেখেন; supervisor-এর objection আগে শুনেন। একটা order নিয়ে এসে আমাকে বলেন—তারপর Mission 2। 💪';
+  function humanSalesCoach(q) {
+    if (has(q,['হতাশ','মন খারাপ','ভালো লাগছে না','ভাল লাগছে না','পারছি না','পারতেছি না','demotivated','frustrated','no sale','sale নাই','সেল নাই','সেল হচ্ছে না','sales হচ্ছে না'])) {
+      return 'আরে ভাই 😄 দুইটা buyer “না” বলছে আর retirement নিয়ে ফেলবেন নাকি? Target কিন্তু resign করে নাই! Next 2 outlet-এ mission: অন্তত 1টা order + 2টা extra SKU try। আগে stock, display, price tag আর zero/low SKU দেখেন। বড় order না—একটা ছোট YES বের করেন। হয়ে গেলে আমাকে বলেন “হয়ে গেছে”। 💪';
     }
-    if (has(q,['বৃষ্টি','rain','raining','ভিজে'])) return 'বৃষ্টি দেখে নাকে তেল দিয়ে ঘুমানোর planning নাকি ভাই? 😄 নিরাপদে market-এ যান—ভিজে hero হওয়ার দরকার নাই। Buyer-এর সাথে সময় নিয়ে কথা বলেন, stock/display check করেন, একটা smart order নিয়ে ফেরেন। ☔💪';
-    if (has(q,['গরম','hot weather','too hot','heat'])) return 'ভাই গরমে battery 20% হয়ে গেছে নাকি? 😄 পানি খান, একটু cool হন—তারপর 100% power নিয়ে outlet-এ যান। PRAN Power দেখলে energy-ও মনে পড়ে যাবে 😄। Mission: next 2 outlets → 1টা order + 2টা extra SKU try।';
-    if (has(q,['mission','মিশন','challenge','চ্যালেঞ্জ'])) return 'AYON Mission 😄: Next 2 outlets → অন্তত 1টা order + 2টা extra SKU চেষ্টা। আগে stock/display/price tag check, তারপর easy mover দিয়ে YES বের করেন। Complete হলে বলবেন “হয়ে গেছে”—তারপর next mission! 💪';
-    if (has(q,['হয়ে গেছে','হয়ে গেছে','mission complete','order পেয়েছি','order পেয়েছি'])) return 'এই তো! 😄 একটু আগে tension, এখন salesman mode ON! Momentum নষ্ট করবেন না—next outlet-এ একই winning approach repeat করেন, আর app-এ update করতে ভুলবেন না। 💪';
-    return '';
-  }
-
-  function humanSalesDiagnosis(q) {
-    if (has(q,['stock আছে','স্টক আছে','enough stock'])) return 'Buyer বলছে stock আছে? 😄 নতুন stock ঠেলে লাভ নাই। Existing movement, display, price tag আর slow SKU দেখেন। Fast mover/zero SKU gap থাকলে ওইটার ছোট order চান।';
-    if (has(q,['space নাই','space নেই','no space','shelf space'])) return 'Space নাই মানেই দরজা বন্ধ না ভাই 😄। Full shelf না—ছোট facing/available gap চান। Strong fast mover দিয়ে শুরু করেন; movement দেখিয়ে পরে space বাড়ান।';
-    if (has(q,['slow sale','slow moving','সেল স্লো','movement নাই'])) return 'Movement slow? সব SKU-কে একসাথে দোষ দিয়েন না 😄। Slow SKU ধরেন, display/price/expiry check করেন, fast mover দিয়ে small replenishment চান।';
-    if (has(q,['next week','পরের সপ্তাহ','পরে আসেন','later'])) return '“Next week আসেন” শুনে চলে গেলে next week-ও একই dialogue হতে পারে 😄। Specific দিন + SKU + approximate carton commitment নিন, তারপর reminder রাখেন।';
-    return '';
-  }
-
-
-  function fieldSalesHumanHelp(q) {
-    if (has(q,['আউটলেটে','outlet এ','outlet-e','outlet e','outlet visit','মার্কেটে','market এ','market e']) &&
-        has(q,['কি করব','কী করব','কেমনে','কিভাবে','কীভাবে','what do i do','what should i do','কাছে'])) {
-      return 'আউটলেটে গিয়ে robot-এর মতো “order দেন” দিয়ে শুরু করবেন না ভাই 😄। আগে supervisor/buyer-কে সালাম দিয়ে ১–২ মিনিট normal কথা বলেন। তারপর shelf ঘুরে stock, display, price tag, zero/low SKU দেখেন। এরপর বলেন: “Boss, এই ২টা item একটু support করেন, movement আমি follow-up করব।” বড় order না পেলেও একটা ছোট YES নিয়ে বের হওয়ার চেষ্টা করেন। Buyer busy থাকলে timing নেন—relationship আগে। 💪';
+    if (has(q,['হয়ে গেছে','হয়ে গেছে','mission complete','order পেয়েছি','order পেয়েছি'])) {
+      return 'এই তো দায়িত্ববান মানুষ! 😄 একটু আগে tension, এখন salesman mode ON। Momentum নষ্ট করবেন না—next outlet-এ একই winning approach repeat করেন আর sale update করে দেন। 💪';
     }
-    if (has(q,['buyer এর কাছে','buyer কাছে','বায়ারের কাছে','বায়ারের কাছে','supervisor এর কাছে','সুপারভাইজারের কাছে'])) {
-      return 'Buyer/supervisor-এর কাছে গেলে প্রথম mission order না—trust 😄। Greeting → stock/display observation → genuine gap → ছোট specific request। “Boss order দেন” না বলে “এই SKUটা low/zero, 2 CTN support করেন?” বললে decision সহজ হয়। না বললে কারণটা শুনে next move ঠিক করেন।';
+    if ((has(q,['আউটলেট','outlet','মার্কেট','market']) && has(q,['কি করব','কী করব','কিভাবে','কীভাবে','কেমনে','what should','what do'])) ||
+        has(q,['buyer এর কাছে','buyer কাছে','বায়ারের কাছে','বায়ারের কাছে','supervisor এর কাছে','সুপারভাইজারের কাছে'])) {
+      return 'আউটলেটে গিয়ে robot-এর মতো “Boss order দেন” দিয়ে শুরু করবেন না ভাই 😄। আগে সালাম/normal কথা, তারপর shelf দেখে stock, display, price tag, zero/low SKU ধরেন। Gap পেলে বলেন: “Boss, এই 2টা item একটু support করেন, movement আমি follow-up করব।” বড় order না পেলেও একটা ছোট YES নিয়ে বের হন। Buyer busy হলে timing নেন—relationship আগে। 💪';
+    }
+    if (has(q,['stock আছে','স্টক আছে','enough stock'])) {
+      return 'Buyer বলছে stock আছে? 😄 তাহলে নতুন stock ঠেলে লাভ নাই। Existing movement, display, price tag আর slow SKU দেখেন। Zero/low fast mover থাকলে ওইটার small replenishment চান।';
+    }
+    if (has(q,['space নাই','space নেই','no space','shelf space'])) {
+      return 'Space নাই মানেই game over না ভাই 😄। Full shelf না—ছোট facing/available gap চান। Fast mover দিয়ে movement দেখান, পরে space বাড়ানোর কথা বলেন।';
+    }
+    if (has(q,['next week','পরের সপ্তাহ','পরে আসেন','later'])) {
+      return '“Next week আসেন” শুনে শুধু চলে গেলে next week-ও একই dialogue হতে পারে 😄। Specific দিন + SKU + approximate carton commitment নেন, তারপর follow-up রাখেন।';
+    }
+    if (has(q,['order দেয় না','order দেয় না','অর্ডার দেয় না','অর্ডার দেয় না','order দিচ্ছে না','no order'])) {
+      return 'Buyer order দিচ্ছে না? আগে কারণ ধরেন ভাই 😄—stock বেশি, movement slow, space নাই, price issue, নাকি timing? তারপর 2–3 fast SKU দিয়ে small order চান। কারণটা আমাকে বললে objection অনুযায়ী next line দেব।';
     }
     if (has(q,['কথা বলব','কথা বলবো','কি বলব','কী বলব','how to talk','conversation'])) {
-      return 'Sales conversation simple রাখেন ভাই 😄: “Boss, কেমন আছেন? Stock/displayটা একটু দেখে নিই?” → gap পেলে “এই itemটা low/zero, 2 CTN support করেন; movement আমি follow-up করব।” Buyer objection দিলে আগে শুনবেন, তারপর answer। বেশি lecture দিলে buyer order দেওয়ার আগেই lunch break-এ চলে যাবে 😄।';
-    }
-    if (has(q,['order দেয় না','order দেয় না','অর্ডার দেয় না','অর্ডার দেয় না','buyer না','buyer no'])) {
-      return 'Buyer order দিচ্ছে না? 😄 আগে কারণ ধরেন—stock বেশি, movement slow, space নাই, price issue, নাকি timing? কারণ না জেনে product list পড়লে buyer ঘুমিয়ে যাবে! কারণটা বলেন, আমি সেই objection-এর next move বলব।';
+      return 'Simple রাখেন ভাই 😄: “Boss, কেমন আছেন? Stock/displayটা একটু দেখি?” Gap পেলে: “এই itemটা low/zero, 2 CTN support করেন; movement আমি follow-up করব।” আগে শুনবেন, তারপর বলবেন—বেশি lecture দিলে buyer order দেওয়ার আগেই lunch break-এ চলে যাবে 😄।';
     }
     return '';
+  }
+
+  function teamMemberFromQuestion(q) {
+    const team=getTeam();
+    if (!isManagerContext() || !team.length) return null;
+    const nq=normalizeText(q);
+    const aliases = [
+      ['emon','ইমন','বদরুদ্দোজা','বদরুদ্দজা','bodrud','badrud'],
+      ['limon','লিমন','majumder','মজুমদার'],
+      ['munnaf','মুন্নাফ','মুন্নফ','munnaf ali'],
+      ['adib','আদিব','rubayat','রুবায়াত','রুবায়াত']
+    ];
+    for (const x of team) {
+      const name=normalizeText(x.name || x.staffName || x.staffId || '');
+      if (name && nq.includes(name)) return x;
+      for (const group of aliases) {
+        if (group.some(a=>nq.includes(normalizeText(a))) && group.some(a=>name.includes(normalizeText(a)))) return x;
+      }
+      const id=normalizeText(x.staffId||'');
+      if (id && nq.includes(id)) return x;
+    }
+    return null;
+  }
+
+  function managerMemberAnswer(q) {
+    const x=teamMemberFromQuestion(q);
+    if (!x) return '';
+    const name=x.name || x.staffName || x.staffId || 'SR';
+    const p=x.performance || {};
+    const target=num(p.target ?? x.target);
+    const delivered=num(p.delivered ?? p.sales ?? p.achievement ?? x.deliveredSales ?? x.sales);
+    const percent=num(p.percent ?? (target ? delivered/target*100 : 0));
+    const shortfall=num(p.shortfall ?? Math.max(0,target-delivered));
+    const zero=num(p.zeroOutlets ?? x.zeroOutlets);
+    const pending=num(x.pendingTasks ?? p.pendingTasks);
+    const pendingDelivery=num(p.pendingDelivery ?? x.pendingDelivery);
+    const inc=num(x.incentive ?? x.incentiveEarned ?? p.incentive);
+    if (has(q,['zero','জিরো','শূন্য'])) return `${name}: zero-sales outlet ${zero}টি। Team snapshot-এ outlet-name list না থাকলে আমি সংখ্যা বানিয়ে বলব না—Manager screen-এর loaded detail অনুযায়ী list দেখাতে হবে।`;
+    if (has(q,['incentive','ইনসেনটিভ'])) return `${name}: incentive ${rm(inc)}। Achievement ${pct(percent)}, shortfall ${rm(shortfall)}।`;
+    if (has(q,['pending delivery','ডেলিভারি','delivery'])) return `${name}: pending delivery ${rm(pendingDelivery)}। Delivered/achievement ${rm(delivered)}।`;
+    if (has(q,['task','কাজ'])) return `${name}: pending Important Work ${pending}টি।`;
+    if (has(q,['target','টার্গেট','shortfall','শর্টফল','sale','sales','সেল','achievement','অ্যাচিভ'])) return `${name}: target ${rm(target)}, delivered/achievement ${rm(delivered)}, achievement ${pct(percent)}, shortfall ${rm(shortfall)}, zero outlet ${zero}, pending task ${pending}।`;
+    return `${name}: achievement ${pct(percent)}, delivered ${rm(delivered)}, shortfall ${rm(shortfall)}, zero outlet ${zero}, pending task ${pending}।`;
   }
 
   function answerQuestion(text) {
     const q = normalizeText(text);
+    if (!q) return 'বলুন ভাই, sales নিয়ে কী জানতে চান?';
 
-    if (!q) return 'বলুন, sales-related কী সহযোগিতা লাগবে?';
-
-    // Fixed identity / company-safe knowledge. These answers work even before live app data loads.
-    if (has(q, ['who created you', 'who made you', 'তোমাকে কে তৈরি করেছে', 'তোমাকে কে তৈরি করছে', 'কে তৈরি করেছে', 'কে বানিয়েছে', 'কে বানিয়েছে', 'creator', 'developer'])) {
-      return 'আমার নাম AYON — Key Account Manager Ayon-এর Sales Assistant। আমাকে তৈরি ও কনফিগার করেছেন PRAN Group Malaysia-এর Key Account Manager Mehedi Alim Ayon। Sales performance, outlet execution, SKU growth, incentive, CPO, target recovery এবং Modern Trade–সংক্রান্ত কাজে সহযোগিতা করাই আমার কাজ। Mehedi Alim Ayon-এর professional portfolio এই app-এ দেওয়া আছে।';
+    // 1) Fixed knowledge: NEVER requires live data.
+    if (has(q,[
+      'who created you','who made you','who built you','creator','developer',
+      'কে তৈরি করেছে','কে তৈরি করছে','কে বানিয়েছে','কে বানিয়েছে','কে বানাইছে',
+      'তোমাকে কে তৈরি','আপনাকে কে তৈরি','তোমাকে কে বান','আপনাকে কে বান',
+      'কার তৈরি','কার বানানো','কে ডেভেলপ'
+    ])) {
+      return 'আমার নাম AYON — Key Account Manager Ayon-এর Sales Assistant। আমাকে তৈরি ও কনফিগার করেছেন PRAN Group Malaysia-এর Key Account Manager Mehedi Alim Ayon। Sales performance, outlet execution, SKU growth, incentive, CPO, target recovery এবং Modern Trade–সংক্রান্ত কাজে সহযোগিতা করাই আমার কাজ।';
     }
-    if (has(q, ['head of sales','head sales','who is head of sales','hos কে','hos sir','হেড অব সেলস','হেড অফ সেলস','হেড ওফ সেলস','হেড অফ সেলস কে','হেড ওএফ সেলস','পারভেজ হিরা','parves hira'])) {
-      return 'Pinnacle Foods (M) Sdn Bhd-এর Modern Trade Head of Sales হলেন Parves Hira।';
+    if (has(q,[
+      'head of sales','head sales','hos কে','hos sir','হেড অব সেলস','হেড অফ সেলস','হেড ওফ সেলস','হেড ওএফ সেলস',
+      'হেড অফ সেলস কে','হেড ওফ সেলস কে','পারভেজ হিরা','parves hira'
+    ])) {
+      return 'Pinnacle Foods (M) Sdn Bhd-এর Modern Trade Head of Sales হলেন Parves Hira। তিনি team-কে planning, SKU-wise, outlet-wise এবং sales execution নিয়ে guide করেন।';
     }
-    if (has(q, ['your name', 'তোমার নাম', 'আপনার নাম', 'who are you'])) {
-      return 'আমি AYON — Key Account Manager Ayon-এর Sales Assistant। Sales-related কী সহযোগিতা লাগবে বলুন।';
+    if (has(q,['your name','তোমার নাম','আপনার নাম','who are you','তুমি কে','আপনি কে'])) {
+      return 'আমি AYON — Key Account Manager Ayon-এর Sales Assistant। Field sales থেকে live performance—দুইটাই নিয়ে কথা বলতে পারেন ভাই 😄।';
     }
-    if (has(q, ['তুমি ছেলে', 'তুমি মেয়ে', 'তুমি মেয়ে', 'are you male', 'are you female', 'boy or girl', 'তোমার বয়স', 'তোমার বয়স'])) {
-      return 'দুঃখিত, এ ধরনের ব্যক্তিগত প্রশ্নের উত্তর দিই না। Sales-related কোনো প্রশ্ন থাকলে করুন।';
+    if (has(q,['তুমি ছেলে','তুমি মেয়ে','তুমি মেয়ে','are you male','are you female','boy or girl','তোমার বয়স','তোমার বয়স'])) {
+      return 'আমি software sales assistant ভাই 😄—ছেলে-মেয়ে না। Sales নিয়ে বলেন, মাঠে নামি!';
     }
-    if (has(q, ['কেমন মানুষ', 'ব্যক্তিগত তথ্য', 'personal information', 'private information', 'পারভেজ স্যার কেমন', 'ayon কেমন', 'অয়ন কেমন', 'অয়ন কেমন'])) {
-      return 'দুঃখিত, আমি কারও ব্যক্তিগত তথ্য বা ব্যক্তিগত মূল্যায়ন প্রদান করি না। Sales-related কোনো প্রশ্ন থাকলে করুন।';
-    }
-
-    const humanCoach = motivationCoach(q);
-    if (humanCoach) return humanCoach;
-    const diagnosis = humanSalesDiagnosis(q);
-    if (diagnosis) return diagnosis;
-
-    const fieldHelp = fieldSalesHumanHelp(q);
-    if (fieldHelp) return fieldHelp;
-    if (!appReady()) {
-      return 'Live হিসাব load না থাকলেও sales নিয়ে কথা বলতে পারবেন ভাই 😄। Buyer/supervisor handling, outlet visit, objection, negotiation, confidence, relationship, order closing, display, SKU push—যেখানে আটকে আছেন সরাসরি বলেন। Live target/income/zero-sales জানতে শুধু data load লাগবে।';
+    if (has(q,['কেমন মানুষ','ব্যক্তিগত তথ্য','personal information','private information','পারভেজ স্যার কেমন','ayon কেমন','অয়ন কেমন','অয়ন কেমন'])) {
+      return 'কারও private information বা ব্যক্তিগত মূল্যায়ন আমি দিই না ভাই। কাজ/সেলস/টিম performance নিয়ে যা দরকার বলেন।';
     }
 
-    if (isGreeting(q)) {
-      return `হ্যালো ${getViewedName()}। আমি AYON AI — আপনার Sales Assistant। Target, outlet, SKU, incentive, buyer handling বা meeting নিয়ে জিজ্ঞেস করুন।`;
-    }
+    // 2) Human field-sales conversation: NEVER blocked by live-data state.
+    if (isGreeting(q)) return `হ্যালো ${getViewedName()} 😄 আমি AYON। আজ sale, buyer, outlet, motivation—কোথায় আটকে আছেন বলেন।`;
+    const human=humanSalesCoach(q);
+    if (human) return human;
 
-    if (isManagerContext() && has(q, ['team', 'কে পিছিয়ে', 'manager attention', 'ম্যানেজার', 'compare sr', 'sr compare'])) {
+    // 3) Live manager access: manager can ask a named SR from loaded team snapshot.
+    const memberAns=managerMemberAnswer(q);
+    if (memberAns) return memberAns;
+    if (isManagerContext() && has(q,['team','কে পিছিয়ে','manager attention','ম্যানেজার','compare sr','sr compare','সব salesman','সব সেলসম্যান','সব sr'])) {
       return managerAdvice();
     }
 
-    if (has(q, ['today focus', 'আজ কোথায়', 'আজ কি করব', 'আজ কী করব', 'আজকের focus', 'আজকে focus'])) {
-      return todayFocus();
+    // 4) Only actual numeric/live questions need app data.
+    if (!appReady()) {
+      return 'Live হিসাব এখনো load হয়নি, কিন্তু field sales নিয়ে কথা বলতে পারবেন ভাই 😄। Target/zero-sales/income/incentive-এর live সংখ্যা জানতে Dashboard data load করুন।';
     }
 
-    if (has(q, ['target', 'shortfall', 'কত sale', 'কত সেল', 'daily কত', 'টার্গেট', 'শর্টফল'])) {
-      return targetPlan();
-    }
+    if (has(q,['today focus','আজ কোথায়','আজ কি করব','আজ কী করব','আজকের focus','আজকে focus'])) return todayFocus();
+    if (has(q,['target','shortfall','কত sale','কত সেল','daily কত','টার্গেট','শর্টফল'])) return targetPlan();
+    if (has(q,['zero sale','zero-sales','zero outlet','জিরো','শূন্য সেল'])) return zeroSalesAdvice();
+    if (has(q,['incentive','ইনসেনটিভ','reward','combo'])) return `Active incentive status:\n${activeIncentiveText()}\n\nTactic: remaining target-কে daily route target-এ ভাগ করুন এবং zero/low outlet-এ selected SKU push করুন।`;
+    if (has(q,['sku','product','প্রোডাক্ট','item','আইটেম'])) return skuAdvice();
+    if (has(q,['task','টাস্ক','কাজ বাকি','important work'])) return taskAdvice();
+    if (has(q,['income','salary','commission','বেতন','ইনকাম','কমিশন'])) return incomeAdvice();
+    if (has(q,['buyer','বায়ার','বায়ার','supervisor','সুপারভাইজার','listing','লিস্টিং','price','দাম','অর্ডার','order'])) return buyerAdvice(q);
+    if (has(q,['meeting','মিটিং','speech','পয়েন্ট','point'])) return meetingAdvice();
 
-    if (has(q, ['zero sale', 'zero-sales', 'zero outlet', 'জিরো', 'শূন্য সেল'])) {
-      return zeroSalesAdvice();
-    }
+    const salesScope=['sales','sale','সেল','target','টার্গেট','outlet','আউটলেট','sku','product','প্রোডাক্ট','buyer','বায়ার','বায়ার','order','অর্ডার','delivery','ডেলিভারি','growth','গ্রোথ','incentive','ইনসেনটিভ','commission','কমিশন','cpo','display','listing','লিস্টিং','modern trade','route','market','মার্কেট','po','proposal','task','কাজ','motivate','মোটিভেট'];
+    if (!has(q,salesScope)) return 'আমি মূলত আপনার sales team-এর assistant ভাই 😄। Field sales, buyer handling, outlet, target, SKU, delivery, incentive, CPO, Important Work বা team motivation নিয়ে বলেন।';
 
-    if (has(q, ['incentive', 'ইনসেনটিভ', 'reward', 'combo'])) {
-      return `Active incentive status:\n${activeIncentiveText()}\n\nTactic: remaining target-কে daily route target-এ ভাগ করুন এবং zero/low outlet-এ selected SKU push করুন।`;
-    }
-
-    if (has(q, ['sku', 'product', 'প্রোডাক্ট', 'item', 'আইটেম'])) {
-      return skuAdvice();
-    }
-
-    if (has(q, ['task', 'টাস্ক', 'কাজ বাকি'])) {
-      return taskAdvice();
-    }
-
-    if (has(q, ['income', 'salary', 'commission', 'বেতন', 'ইনকাম', 'কমিশন'])) {
-      return incomeAdvice();
-    }
-
-    if (has(q, ['buyer', 'বায়ার', 'supervisor', 'সুপারভাইজার', 'listing', 'লিস্টিং', 'price', 'দাম', 'অর্ডার', 'order'])) {
-      return buyerAdvice(q);
-    }
-
-    if (has(q, ['meeting', 'মিটিং', 'speech', 'পয়েন্ট', 'point'])) {
-      return meetingAdvice();
-    }
-
-    const salesScope = ['sales','sale','সেল','target','টার্গেট','outlet','আউটলেট','sku','product','প্রোডাক্ট','buyer','বায়ার','order','অর্ডার','delivery','ডেলিভারি','growth','গ্রোথ','incentive','ইনসেনটিভ','commission','কমিশন','cpo','display','listing','লিস্টিং','modern trade','route','market','মার্কেট','po','proposal','task','কাজ'];
-    if (!has(q, salesScope)) return 'দুঃখিত, আমি Sales Performance Hub-এর sales-related assistant। Sales, target, outlet, SKU, buyer, delivery, incentive, CPO বা Modern Trade–সংক্রান্ত প্রশ্ন করুন।';
-
-    const ans = generalAdvice(q);
-    if (!ans) return 'এই sales প্রশ্নে আমার available data থেকে নির্ভরযোগ্য guidance তৈরি করা যাচ্ছে না। আরও নির্ভুল guidance-এর জন্য Key Account Manager Mehedi Alim Ayon-এর সঙ্গে যোগাযোগ করুন।';
+    const ans=generalAdvice(q);
+    if (!ans) return 'এই case-টা একটু tricky ভাই 😄। ভুল কথা বানিয়ে বলব না—Key Account Manager Mehedi Alim Ayon-এর guidance নিন।';
     return ans;
   }
 
@@ -902,33 +912,32 @@
 
   function speak(text, question = '') {
     if (!autoVoice || !('speechSynthesis' in window)) return;
-
     try {
       speechSynthesis.cancel();
-
-      const clean = String(text)
-        .replace(/[•→✓🔴🟠🟢🏆🎯✅🏪]/g, ' ')
-        .replace(/\n+/g, '. ')
-        .replace(/\s+/g, ' ')
+      const clean=String(text||'')
+        .replace(/[•→✓🔴🟠🟢🏆🎯✅🏪💪😄]/g,' ')
+        .replace(/\n+/g,'. ')
+        .replace(/\s+/g,' ')
         .trim();
-
       if (!clean) return;
-
-      const lang = /[\u0980-\u09FF]/.test(`${question} ${text}`) ? 'bn-BD' : 'en-MY';
-      const u = new SpeechSynthesisUtterance(clean);
-      u.lang = lang;
-      u.rate = lang.startsWith('bn') ? 0.95 : 1;
-      u.pitch = 1;
-
-      const voice = preferredVoice(lang);
-      if (voice) u.voice = voice;
-
-      u.onstart = () => $('#ayonAiPanel')?.classList.add('speaking');
-      u.onend = () => $('#ayonAiPanel')?.classList.remove('speaking');
-      u.onerror = () => $('#ayonAiPanel')?.classList.remove('speaking');
-
-      speechSynthesis.speak(u);
-    } catch {
+      const lang=/[\u0980-\u09FF]/.test(`${question} ${text}`)?'bn-BD':'en-MY';
+      const chunks=(clean.match(/[^.!?।]+[.!?।]?/g)||[clean]).map(x=>x.trim()).filter(Boolean);
+      let i=0;
+      const sayNext=()=>{
+        if(i>=chunks.length){ $('#ayonAiPanel')?.classList.remove('speaking'); return; }
+        const u=new SpeechSynthesisUtterance(chunks[i++]);
+        u.lang=lang;
+        u.rate=lang.startsWith('bn')?0.82:0.92;
+        u.pitch=1;
+        u.volume=1;
+        const v=preferredVoice(lang); if(v) u.voice=v;
+        u.onstart=()=>$('#ayonAiPanel')?.classList.add('speaking');
+        u.onend=sayNext;
+        u.onerror=()=>$('#ayonAiPanel')?.classList.remove('speaking');
+        speechSynthesis.speak(u);
+      };
+      sayNext();
+    } catch(e) {
       $('#ayonAiPanel')?.classList.remove('speaking');
     }
   }
