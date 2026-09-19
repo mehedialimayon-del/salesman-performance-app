@@ -32,3 +32,11 @@
 .listBtn.ctl{background:linear-gradient(135deg,#2a210f,#15120c 55%,#33230d)!important;color:#f5e2ae!important;border:1px solid #7f622d!important}
 .listBtn.ctl .ico{background:linear-gradient(145deg,#4c3915,#21180b)!important;color:#f0cd70!important;border:1px solid #8e6b2e}
 .zeroBadge{display:inline-block;padding:5px 9px;border-radius:20px;background:#ff4b4b18;color:#ff6e6e;border:1px solid #8c3030;font-size:10px;font-weight:900;letter-spacing:.5px}
+
+.brandLogo{width:35px;height:35px;border-radius:10px;object-fit:cover;border:1px solid #d8a846;box-shadow:0 0 18px #d9a84735}
+.bellBtn{font-size:16px}
+.module,.listBtn.ctl{background:linear-gradient(135deg,#ffb347 0%,#e78924 48%,#b95f0a 100%)!important;color:#100b05!important;border:1px solid #ffd48a!important;box-shadow:inset 0 1px #fff0c488,0 8px 22px #a951162c!important}
+.module small,.listBtn.ctl .miniStat{color:#39210f!important}.module .mi,.listBtn.ctl .ico{background:linear-gradient(145deg,#17120b,#3b260d)!important;color:#ffd67f!important;border:1px solid #6c491d!important}
+.module:hover,.listBtn.ctl:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.top{position:sticky;top:0;z-index:30}.bottom{position:fixed}.wrap{min-height:calc(100vh - 150px)}
+.compactRow{padding:8px 0!important}.outletGroup{padding:7px 0;border-bottom:1px solid #2b2f31}.cpoCampaign{border-color:#6d4b1c!important}
