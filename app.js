@@ -1693,5 +1693,137 @@ function renderSettings(){
 
 // Manager landing page is always ALL SR team dashboard; individual drill-down remains available.
 const v8OldLogin=login;
-login=async function(id,pin){await v8OldLogin(id,pin);if(session&&isManager()){managerView=session.id;page='dashboard';await v8LoadManagerData();render()}};
 
+login=async function(id,pin){await v8OldLogin(id,pin);if(session&&isManager()){managerView=session.id;page='dashboard';await v8LoadManagerData();render()}};
+/* =========================================================
+   FINAL SETTINGS + LOGOUT FIX
+   Existing system unchanged
+========================================================= */
+
+function sphBindSettingsLogout() {
+
+  /* TOP SETTINGS BUTTON */
+  const settingsBtn = document.getElementById('logoutBtn');
+
+  if (settingsBtn) {
+    settingsBtn.type = 'button';
+    settingsBtn.textContent = '⚙';
+    settingsBtn.title = 'Settings';
+
+    settingsBtn.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      page = 'settings';
+      render();
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'auto'
+      });
+    };
+  }
+
+
+  /* REAL LOGOUT BUTTON INSIDE SETTINGS */
+  const realLogoutBtn = document.getElementById('realLogout');
+
+  if (realLogoutBtn) {
+    realLogoutBtn.type = 'button';
+
+    realLogoutBtn.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (!confirm('Log out from Sales Performance Hub?')) return;
+
+      /* Stop live sync first */
+      if (liveTimer) {
+        clearInterval(liveTimer);
+        liveTimer = null;
+      }
+
+      /* Clear login session only */
+      localStorage.removeItem(SESSION_KEY);
+
+      session = null;
+      current = null;
+      teamSnapshot = [];
+      v8Team = null;
+      v8SRs = [];
+      managerView = 'M21954';
+      page = 'dashboard';
+
+      try {
+        oneSignalSdk?.logout?.();
+      } catch (_) {}
+
+
+      /* Hide app */
+      const appView = document.getElementById('appView');
+      if (appView) {
+        appView.classList.add('hidden');
+      }
+
+
+      /* Show login */
+      const loginView = document.getElementById('loginView');
+      if (loginView) {
+        loginView.classList.remove('hidden');
+      }
+
+
+      /* Clear old account details */
+      const loginUser = document.getElementById('loginUser');
+      const loginPin = document.getElementById('loginPin');
+
+      if (loginUser) loginUser.value = '';
+      if (loginPin) loginPin.value = '';
+
+
+      /* Return page to login position */
+      window.scrollTo({
+        top: 0,
+        behavior: 'auto'
+      });
+
+      setTimeout(function() {
+        if (loginUser) loginUser.focus();
+      }, 100);
+    };
+  }
+}
+
+
+/* =========================================================
+   KEEP SETTINGS BUTTON ALIVE AFTER EVERY RENDER
+========================================================= */
+
+const sphOriginalRenderFinal = render;
+
+render = function() {
+
+  sphOriginalRenderFinal();
+
+  sphBindSettingsLogout();
+
+};
+
+
+/* =========================================================
+   ALSO BIND AFTER APP OPENS
+========================================================= */
+
+const sphOriginalOpenAppFinal = openApp;
+
+openApp = function() {
+
+  sphOriginalOpenAppFinal();
+
+  sphBindSettingsLogout();
+
+};
+
+
+/* Initial binding */
+sphBindSettingsLogout();
