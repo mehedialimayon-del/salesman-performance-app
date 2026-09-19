@@ -6,7 +6,37 @@ let U=db.users||baseUsers;db.users=U;const products=D.categoryProducts||{}, allP
 const rules=D.salaryRules||{basic:1700,fuel:300,houseRent:250,foodThreshold:50000,foodHigh:250,foodLow:100,zeroSalesHigh:200,zeroSalesLow:100};
 const isMgr=()=>user?.mode==='MANAGER', srIds=()=>U.filter(x=>x.active!==false&&(x.role==='SR'||x.role==='MANAGER+SR')).map(x=>x.id), sr=id=>U.find(x=>x.id===id), currentSr=()=>isMgr()?(view==='ALL'?null:view):user.id;
 function target(id,m=month()){return +(db.targets?.[m]?.[id]??sr(id)?.target??0)}function delivered(id,m=month()){return db.sales.filter(x=>x.status==='Delivered'&&x.sr===id&&x.date?.startsWith(m)).reduce((a,x)=>a+(+x.deliveredAmount||0),0)}function teamDelivered(){return srIds().reduce((a,id)=>a+delivered(id),0)}function teamTarget(){return srIds().reduce((a,id)=>a+target(id),0)}function scopeDelivered(){return currentSr()?delivered(currentSr()):teamDelivered()}function scopeTarget(){return currentSr()?target(currentSr()):teamTarget()}
-function login(){A.innerHTML=`<div class="login"><div class="loginBox"><div class="logo"><img class="brandLogo" src="an-logo.png" alt="AN"><div>FieldForce <span class="orange">Hub</span><small>SALES PERFORMANCE COMMAND CENTER</small></div></div><div class="welcome"><h1>Welcome <span>Back.</span></h1><p>Secure access to sales execution, performance and field intelligence.</p></div><form id="loginForm"><label>USER ID<input name="id" autocomplete="username" required></label><label>PASSWORD<input name="pw" type="password" autocomplete="current-password" required></label><button class="primary">SECURE LOGIN</button></form><div class="devFooter">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank" rel="noopener noreferrer">KAM AYON</a></div></div></div>`;document.querySelector('#loginForm').onsubmit=e=>{e.preventDefault();let f=new FormData(e.target),id=String(f.get('id')).trim(),pw=String(f.get('pw')).trim();if(id.toLowerCase()==='manager'&&pw==='M21954'){user={...sr('M21954'),mode:'MANAGER'};view='ALL';localStorage.setItem('ffh_session',JSON.stringify(user));navStack=[];return home(true)}let x=U.find(z=>z.id===id&&z.active!==false);if(x&&pw===(x.password||id)){user={...x,mode:'SR'};view=id;localStorage.setItem('ffh_session',JSON.stringify(user));navStack=[];return home(true)}alert('Invalid User ID or Password')}}
+function login(){
+  currentPage='login'; navStack=[];
+  A.innerHTML=`<div class="login"><div class="loginBox">
+    <div class="logo"><img class="brandLogo" src="an-logo.png" alt="AN"><div>FieldForce <span class="orange">Hub</span><small>SALES PERFORMANCE COMMAND CENTER</small></div></div>
+    <div class="welcome"><h1>Welcome <span>Back.</span></h1><p>Secure access to sales execution, performance and field intelligence.</p></div>
+    <form id="loginForm">
+      <label>USER ID<input id="loginId" autocomplete="username" required></label>
+      <label>PASSWORD<input id="loginPw" type="password" autocomplete="current-password" required></label>
+      <button class="primary" type="submit">SECURE LOGIN</button>
+    </form>
+    <div class="devFooter">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank" rel="noopener noreferrer">KAM AYON</a></div>
+  </div></div>`;
+  document.getElementById('loginForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    const id=document.getElementById('loginId').value.trim();
+    const pw=document.getElementById('loginPw').value.trim();
+    if(id.toLowerCase()==='manager' && pw==='M21954'){
+      user={id:'M21954',name:'MEHEDI ALIM AYON',mode:'MANAGER',role:'MANAGER'};
+      view='ALL';
+      try{localStorage.setItem('ffh_session',JSON.stringify(user))}catch(_){}
+      home(true); return;
+    }
+    const x=(U||[]).find(z=>String(z.id).trim().toLowerCase()===id.toLowerCase() && z.active!==false);
+    if(x && (pw===String(x.password||x.id) || pw===String(x.id))){
+      user={...x,mode:'SR'}; view=x.id;
+      try{localStorage.setItem('ffh_session',JSON.stringify(user))}catch(_){}
+      home(true); return;
+    }
+    alert('Invalid User ID or Password');
+  });
+}
 const mods=[['▦','dashboard','Dashboard'],['0','zero','Zero Sales'],['＋','sales','Daily Sales'],['৳','income','Income'],['★','incentive','Incentive'],['◎','cpo','CPO / DPO'],['⌖','route','Route Plan'],['✓','tasks','Tasks'],['▥','reports','Reports'],['PDF','proposals','Proposal Library'],['▤','catalogue','Catalogue'],['⚙','control','Manager Control'],['AI','ai','AYON AI']];
 function shell(body){A.innerHTML=`<div class="app"><header class="top"><div class="logo"><img class="brandLogo" src="an-logo.png" alt="AN"><div>FieldForce <span class="orange">Hub</span></div></div><div class="topBtns"><button class="iconBtn bellBtn" id="bell" aria-label="Notifications">🔔</button><button class="iconBtn" id="refresh" aria-label="Refresh">↻</button><div class="dropWrap"><button class="iconBtn" id="dots">⋮</button><div class="drop" id="drop"><button id="lang">🌐 বাংলা / English</button><button id="profile">◉ Profile</button><button id="logout">↪ Logout</button></div></div></div></header><main class="wrap">${body}</main><footer class="devFooter">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank" rel="noopener noreferrer">KAM AYON</a></footer><nav class="bottom"><button id="bh"><i>⌂</i>Home</button><button id="bn"><i>♢</i>Notifications</button><button id="bp"><i>◉</i>Profile</button></nav><div class="aiNudge" id="nudge">স্যার, আমি AYON AI। দরকার হলে ট্যাপ করুন।</div><button class="aiOrb" id="orb" aria-label="AYON AI"><img src="ayon-ai.png"></button></div>`;q('#dots').onclick=()=>q('#drop').classList.toggle('show');q('#logout').onclick=()=>{localStorage.removeItem('ffh_session');user=null;navStack=[];login()};q('#lang').onclick=()=>{lang=lang==='bn'?'en':'bn';home()};q('#profile').onclick=()=>navigate('profile',profile);q('#bh').onclick=()=>{navStack=[];home(true)};q('#bn').onclick=()=>navigate('notifications',notifications);q('#bp').onclick=()=>navigate('profile',profile);q('#bell').onclick=()=>navigate('notifications',notifications);q('#refresh').onclick=()=>location.reload();q('#orb').onclick=()=>navigate('ai',ai);dragOrb();setTimeout(()=>q('#nudge')?.classList.add('hide'),3800)}
 function q(s,r=document){return r.querySelector(s)}function qa(s,r=document){return [...r.querySelectorAll(s)]}
@@ -70,4 +100,11 @@ function askAI(){let inp=q('#ask'),s=inp.value.trim();if(!s)return;let c=q('#cha
 function setupMic(){let B=q('#mic');let SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){B.onclick=()=>alert('Voice input is not supported by this browser.');return}let r=new SR();r.lang=lang==='bn'?'bn-BD':'en-US';r.onstart=()=>B.classList.add('listening');r.onend=()=>B.classList.remove('listening');r.onresult=e=>{q('#ask').value=e.results[0][0].transcript;askAI()};B.onclick=()=>r.start()}
 function globalSearch(s){s=s.trim().toLowerCase();if(!s)return;let m=mods.find(x=>x[2].toLowerCase().includes(s)||x[1].includes(s));if(m)return go(m[1]);let id=currentSr()||user.id,o=outlets(id).find(x=>x.name.toLowerCase().includes(s)||x.code.includes(s));if(o){alert(`${o.name}\n${o.code}\n${o.category}`);return}let p=allProducts.find(x=>x.toLowerCase().includes(s));if(p)alert(p);else alert('No matching module, outlet or SKU found.')}
 function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});initNotifications();try{let sess=JSON.parse(localStorage.getItem('ffh_session')||'null');if(sess&&sess.id){user=sess;view=sess.mode==='MANAGER'?'ALL':sess.id;home(true)}else{localStorage.removeItem('ffh_session');login()}}catch(e){localStorage.removeItem('ffh_session');login()}})();
+try{if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}}catch(_){}
+try{initNotifications()}catch(_){}
+try{
+  const sess=JSON.parse(localStorage.getItem('ffh_session')||'null');
+  if(sess && sess.id){user=sess;view=sess.mode==='MANAGER'?'ALL':sess.id;home(true)}
+  else login();
+}catch(e){try{localStorage.removeItem('ffh_session')}catch(_){} login()}
+})();
