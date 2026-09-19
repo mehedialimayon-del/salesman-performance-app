@@ -23,3 +23,12 @@
 .devFooter{max-width:620px;margin:18px auto 76px;padding:12px 16px;text-align:center;color:#66747d;font-size:10px;letter-spacing:.45px}
 .devFooter a{color:#ff8a3d;text-decoration:none;font-weight:900}.devFooter a:hover{color:#ffb278;text-decoration:underline}
 .login .devFooter{margin:28px auto 0;padding:0;color:#56636c}.login .devFooter a{color:#ff8a3d}
+
+:root{--gold:#d6a84b;--gold2:#f3d17a;--gold3:#8b6728}
+.module{border-color:#6b5428!important;background:linear-gradient(145deg,#221b0f 0%,#0b0d0f 62%,#171109 100%)!important;box-shadow:inset 0 1px 0 #f4d47b22,0 7px 20px #0005!important}
+.module:hover{border-color:#e1b75c!important;box-shadow:inset 0 1px 0 #ffe4a355,0 0 20px #d6a84b22!important}
+.module .mi{background:linear-gradient(145deg,#493817,#1b160c)!important;color:#f2cf78!important;border:1px solid #8c6c2f!important;box-shadow:inset 0 1px #ffe9a52b}
+.primary,.premiumBtn{background:linear-gradient(135deg,#f0d17a 0%,#b88732 45%,#76531e 100%)!important;color:#0a0906!important;border:1px solid #f2d583!important;box-shadow:0 8px 22px #a77a2d25,inset 0 1px #fff4c277!important}
+.listBtn.ctl{background:linear-gradient(135deg,#2a210f,#15120c 55%,#33230d)!important;color:#f5e2ae!important;border:1px solid #7f622d!important}
+.listBtn.ctl .ico{background:linear-gradient(145deg,#4c3915,#21180b)!important;color:#f0cd70!important;border:1px solid #8e6b2e}
+.zeroBadge{display:inline-block;padding:5px 9px;border-radius:20px;background:#ff4b4b18;color:#ff6e6e;border:1px solid #8c3030;font-size:10px;font-weight:900;letter-spacing:.5px}
