@@ -1,8 +1,1 @@
-{
-  "name":"FieldForce Hub",
-  "short_name":"FieldForce",
-  "start_url":"./",
-  "display":"standalone",
-  "background_color":"#101315",
-  "theme_color":"#ff6b18"
-}
+{"name": "FieldForce Hub", "short_name": "FieldForce", "start_url": "./", "display": "standalone", "background_color": "#edf0f3", "theme_color": "#101820"}

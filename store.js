@@ -1,18 +1,3 @@
 'use strict';
-window.FFHStore=(()=>{
- const KEY='ffh-v2-store-step2';
- const base={orders:[],targets:{},incomeSetup:{},productIncentives:[],cpo:[],dpo:[],routes:[],zeroSales:[],month:new Date().toISOString().slice(0,7)};
- let d; try{d={...base,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){d={...base}}
- const save=()=>localStorage.setItem(KEY,JSON.stringify(d));
- const id=p=>p+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
- return{
-  data:()=>d,
-  set:(k,v)=>(d[k]=v,save(),v),
-  addOrder:o=>{const x={id:id('ORD'),createdAt:new Date().toISOString(),status:'Pending Delivery',deliveredAmount:0,...o};d.orders.push(x);save();return x},
-  deliver:(orderId,amount)=>{const o=d.orders.find(x=>x.id===orderId);if(!o)return null;o.deliveredAmount=Number(amount)||0;o.status='Delivered';o.deliveredAt=new Date().toISOString();save();return o},
-  deliveredTotal:(month,sr)=>d.orders.filter(o=>o.status==='Delivered'&&(!month||String(o.date||'').startsWith(month))&&(!sr||o.sr===sr)).reduce((a,o)=>a+Number(o.deliveredAmount||0),0),
-  setTarget:(month,sr,value)=>{d.targets[month]??={};d.targets[month][sr]=Number(value)||0;save()},
-  getTarget:(month,sr)=>Number(d.targets?.[month]?.[sr]||0),
-  reset:()=>{d={...base};save()}
- };
-})();
+window.FFHStore=(()=>{const K='ffh-final-v1';const seed={orders:[],targets:{},tasks:[],otherIncentives:[],cpo:[],dpo:[],routes:[],alerts:[],incentives:[],proposals:[]};let d;try{d={...seed,...JSON.parse(localStorage.getItem(K)||'{}')}}catch(e){d={...seed}}const save=()=>localStorage.setItem(K,JSON.stringify(d)),id=p=>p+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+return{data:()=>d,addOrder:o=>{let x={id:id('ORD'),createdAt:new Date().toISOString(),status:'Pending Delivery',deliveredAmount:0,...o};d.orders.push(x);save();return x},deliver:(i,a)=>{let o=d.orders.find(x=>x.id===i);if(o){o.deliveredAmount=+a||0;o.status='Delivered';o.deliveredAt=new Date().toISOString();save()}return o},setTarget:(m,s,v)=>{d.targets[m]??={};d.targets[m][s]=+v||0;save()},getTarget:(m,s)=>+(d.targets?.[m]?.[s]||0),delivered:(m,s)=>d.orders.filter(o=>o.status==='Delivered'&&(!m||String(o.date).startsWith(m))&&(!s||o.sr===s)).reduce((a,o)=>a+(+o.deliveredAmount||0),0),add:(k,x)=>{d[k]??=[];d[k].push({id:id(k),createdAt:new Date().toISOString(),...x});save()},save};})();
