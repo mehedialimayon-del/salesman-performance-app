@@ -1,1 +1,1 @@
-{"name": "FieldForce Hub", "short_name": "FieldForce", "start_url": "./", "display": "standalone", "background_color": "#070a0d", "theme_color": "#070a0d"}
+{"name": "FieldForce Hub", "short_name": "FieldForce", "start_url": "./", "display": "standalone", "background_color": "#070a0d", "theme_color": "#070a0d", "icons": [{"src": "ayon-ai.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]}
