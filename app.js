@@ -18,12 +18,14 @@ function login(){currentPage='login';navStack=[];A.innerHTML=`<div class="login 
 <rect class="animBar b3" x="61" y="34" width="15" height="49" rx="2" fill="url(#lg22)"/>
 <rect class="animBar b4" x="83" y="19" width="15" height="64" rx="2" fill="url(#lg22)"/>
 <path class="animCurve" d="M14 58 C35 54, 50 42, 65 31 S89 14,102 10" fill="none" stroke="url(#lg22)" stroke-width="7" stroke-linecap="round"/>
-<path class="animArrow" d="M91 7 L108 7 L104 23 Z" fill="#ff7114"/><circle class="arrowSpark" cx="105" cy="8" r="4.2" fill="#fff3b0"/>
+<path class="animArrow" d="M94 2 L114 5 L104 23 Z" fill="url(#lg22)"/>
+<g class="runner" aria-hidden="true"><circle cx="72" cy="19" r="3.1" fill="#fff3c4"/><path d="M70 23l-5 8m5-8 7 5m-7-5 3 9m-8-1-7 5m15-4 6 5" fill="none" stroke="#fff3c4" stroke-width="2.6" stroke-linecap="round"/></g>
+<circle class="arrowSpark" cx="110" cy="5" r="3.2" fill="#ffd76a"/>
 </svg></div>
-    <div class="loginBrandWords"><strong>Field<span>Force</span> Hub</strong><small>Sales | Team Management</small></div>
+    <div class="loginBrandWords"><strong>Field<span>Force</span> Hub</strong><small class="typeSales">Sales | Delivery | Performance | Growth</small></div>
   </div>
 </div>
-<div class="loginMotto"><b>Smart People. Stronger Team. Bigger Tomorrow.</b><span>DISCIPLINE DRIVES RESULTS</span></div>
+<div class="loginMotto"><b class="typeMotto">Smart People. Stronger Team. Bigger Tomorrow.</b><span>DISCIPLINE DRIVES RESULTS</span></div>
 <div class="loginBox premiumLoginBox"><h1>Welcome Back</h1><p>Login to your account</p>
 <form id="loginForm">
 <label class="loginField"><span class="fieldIcon">●</span><input id="loginId" placeholder="User ID" autocomplete="username" required></label>

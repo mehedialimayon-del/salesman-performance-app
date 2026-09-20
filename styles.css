@@ -556,3 +556,15 @@ html,body,#app{background:#05090d!important}
 @keyframes ffTypeLine{to{width:100%}}
 @keyframes ffTypeMotto{to{max-width:520px}}
 @media(prefers-reduced-motion:reduce){.loginChartLogo .animBar,.loginChartLogo .animCurve,.loginChartLogo .animArrow,.loginChartLogo .arrowSpark,.loginBrandWords strong,.loginBrandWords small,.loginMotto b{animation:none!important;opacity:1!important;transform:none!important;stroke-dashoffset:0!important;width:auto!important;max-width:none!important;border-right:0!important}}
+
+/* V26 — fixed brand + looping type lines + runner/sun spark */
+.loginBrandWords strong{animation:none!important;opacity:1!important;transform:none!important;white-space:nowrap!important}
+.loginBrandWords .typeSales{width:0!important;max-width:100%!important;animation:ffTypeSalesLoop 7.2s steps(39,end) 1.9s infinite!important;border-right:1.5px solid #ff8120!important}
+.loginMotto .typeMotto{max-width:0!important;width:auto!important;animation:ffTypeMottoLoop 8.4s steps(45,end) 2.7s infinite!important;border-right:1.5px solid rgba(255,129,32,.8)}
+.loginChartLogo .runner{opacity:0;transform-box:view-box;transform-origin:center;animation:ffRunner 2.1s cubic-bezier(.22,.7,.2,1) 1.35s both;filter:drop-shadow(0 0 5px #ff9a28)}
+.loginChartLogo .arrowSpark{fill:#ffd76a!important;animation:ffSunSpark 1.25s ease-in-out 1.72s infinite!important;filter:drop-shadow(0 0 4px #fff0a0) drop-shadow(0 0 10px #ff9b19) drop-shadow(0 0 18px #ff7114)!important}
+@keyframes ffRunner{0%{opacity:0;transform:translate(-38px,27px) scale(.72)}15%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translate(30px,-15px) scale(.82)}}
+@keyframes ffSunSpark{0%,100%{opacity:.82;transform:scale(.8)}50%{opacity:1;transform:scale(1.7)}}
+@keyframes ffTypeSalesLoop{0%,10%{width:0}42%,72%{width:100%}90%,100%{width:0}}
+@keyframes ffTypeMottoLoop{0%,10%{max-width:0}45%,72%{max-width:520px}90%,100%{max-width:0}}
+@media(prefers-reduced-motion:reduce){.loginBrandWords .typeSales,.loginMotto .typeMotto{animation:none!important;width:auto!important;max-width:none!important;border-right:0!important}.loginChartLogo .runner{animation:none!important;opacity:1!important;transform:none!important}}
