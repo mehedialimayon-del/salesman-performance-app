@@ -707,3 +707,10 @@ html,body,#app{background:#05090d!important}
   .aiMotto{font-size:9px!important;padding:0 2px!important}
   .aiPopupMain{padding-left:9px!important;padding-right:9px!important}
 }
+
+/* V36 — portrait identity above head */
+.aiIdentityTop{position:absolute;z-index:9;left:10px;right:8px;top:445px;text-align:center;pointer-events:none;text-shadow:0 2px 8px #000,0 0 12px #000}
+.aiIdentityTop strong{display:block;color:#ff7b18;font:italic 15px/1.05 cursive;white-space:nowrap}
+.aiIdentityTop small{display:block;color:#fff;font:700 9px/1.2 sans-serif;margin-top:4px;white-space:nowrap}
+.aiSignature{display:none!important}
+@media(max-width:650px){.aiIdentityTop{top:610px;left:2px;right:2px}.aiIdentityTop strong{font-size:12px}.aiIdentityTop small{font-size:7.5px}.aiPortraitFade{bottom:82px!important;height:405px!important}.aiPortraitFade .aiFullPortrait{width:108px!important;max-width:108px!important;left:auto!important;bottom:-2px!important}}
