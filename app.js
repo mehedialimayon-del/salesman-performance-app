@@ -28,7 +28,7 @@ q('#showPw').onclick=()=>{let x=q('#loginPw');x.type=x.type==='password'?'text':
 const lb=q('#loginLangBtn'),lm=q('#loginLangMenu');lb.onclick=()=>lm.classList.toggle('show');qa('#loginLangMenu button').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;lb.textContent=lang==='bn'?'🌐 বাংলা⌄':'🌐 English⌄';lm.classList.remove('show');applyLoginLang()});
 function applyLoginLang(){let bn=lang==='bn';q('.premiumLoginBox h1').textContent=bn?'স্বাগতম':'Welcome Back';q('.premiumLoginBox>p').textContent=bn?'আপনার অ্যাকাউন্টে লগইন করুন':'Login to your account';q('#loginId').placeholder=bn?'ইউজার আইডি':'User ID';q('#loginPw').placeholder=bn?'পাসওয়ার্ড':'Password';q('#forgotPw').textContent=bn?'পাসওয়ার্ড ভুলে গেছেন?':'Forgot Password?';q('.loginSubmit').innerHTML=(bn?'লগইন':'Login')+' <span>→</span>';q('.loginOptions label').lastChild.textContent=bn?' মনে রাখুন':' Remember Me'}
 q('#forgotPw').onclick=()=>alert('Please contact your Manager to reset your password.');
-q('#loginForm').onsubmit=e=>{e.preventDefault();let id=q('#loginId').value.trim(),pw=q('#loginPw').value.trim();if(id.toLowerCase()==='manager'&&pw.toUpperCase()==='M21954'){user={id:'M21954',name:'MEHEDI ALIM AYON',mode:'MANAGER',role:'MANAGER'};view='ALL';localStorage.setItem('ffh_session',JSON.stringify(user));return home(true)}let x=(U||[]).find(z=>String(z.id).trim().toLowerCase()===id.toLowerCase()&&z.active!==false);if(x&&(pw===String(x.password||x.id)||pw===String(x.id))){user={...x,mode:'SR'};view=x.id;localStorage.setItem('ffh_session',JSON.stringify(user));return home(true)}alert('Invalid User ID or Password')}}
+const doLogin=()=>{let id=q('#loginId').value.trim(),pw=q('#loginPw').value.trim();if(id.toLowerCase()==='manager'&&pw.toUpperCase()==='M21954'){user={id:'M21954',name:'MEHEDI ALIM AYON',mode:'MANAGER',role:'MANAGER'};view='ALL';localStorage.setItem('ffh_session',JSON.stringify(user));home(true);return true}let x=(U||[]).find(z=>String(z.id).trim().toLowerCase()===id.toLowerCase()&&z.active!==false);if(x&&(pw===String(x.password||x.id)||pw===String(x.id))){user={...x,mode:'SR'};view=x.id;localStorage.setItem('ffh_session',JSON.stringify(user));home(true);return true}alert('Invalid User ID or Password');return false};q('#loginForm').onsubmit=e=>{e.preventDefault();doLogin()}}
 function pendingTaskCount(){
   let arr=(db.tasks||[]).filter(x=>String(x.status||'').toLowerCase()!=='done'&&String(x.status||'').toLowerCase()!=='completed');
   if(isMgr()) return arr.length;
@@ -68,6 +68,20 @@ function dragOrb(){let el=q('#orb'),n=q('#nudge'),p=JSON.parse(localStorage.getI
 function back(title){return `<div class="head"><button class="back" id="back">←</button><h1>${title}</h1></div>`}
 function navigate(name,fn){if(currentPage!==name)navStack.push({name:currentPage,view});currentPage=name;fn()}
 function bindBack(){q('#back')&&(q('#back').onclick=()=>{let prev=navStack.pop();if(!prev){currentPage='home';return home(true)}view=prev.view;currentPage=prev.name;let fn=({home,dashboard,zero,sales,income,incentive,cpo,route,tasks,reports,proposals,catalogue,control,ai,notifications,profile})[prev.name];if(prev.name?.startsWith('control:'))return controlPage(prev.name.split(':')[1]);if(prev.name?.startsWith('report:'))return reports();fn?fn(true):home(true)})}
+const mods=[
+['▦','dashboard','Dashboard'],
+['◌','zero','Zero Sales'],
+['▥','sales','Daily Sales'],
+['RM','income','Income'],
+['★','incentive','Incentive'],
+['▣','cpo','CPO / DPO'],
+['⌖','route','Route Plan'],
+['✓','tasks','Tasks'],
+['▤','reports','Reports'],
+['▧','proposals','Proposal Library'],
+['◫','catalogue','Catalogue'],
+['⚙','control','Manager Control']
+];
 function home(noPush=false){currentPage='home';let role=isMgr()?'Manager · Team Command':'Sales Representative',nm=(user?.name||'Team').split(' ').slice(-1)[0];shell(`<div class="homeHero"><div><h2>Good Morning, <span>${esc(nm)}!</span></h2><p>Same People. Bigger Targets. Brighter Tomorrow.</p></div><div class="homeMoral">“ Discipline<br>Drives<br>Results ”</div><div class="heroDate">▣ ${new Date().toLocaleDateString('en-MY',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div></div><div class="profile compactProfile"><img class="avatar" src="${user.photo||'ayon-ai.png'}"><div><strong>${user.name}</strong><span class="muted">${role}</span></div></div><div class="grid homeGrid">${mods.filter(x=>isMgr()||x[1]!=='control').map(x=>`<button class="module" data-page="${x[1]}"><span class="mi">${x[0]}</span><span class="moduleTitle">${x[2]}</span>${moduleBadge(x[1])}<small>${sub(x[1])}</small><b class="moduleArrow">›</b></button>`).join('')}</div><div class="motivationPanel"><div><em>Smart People</em><br><em>Stronger Team</em><br><strong>Bigger Tomorrow</strong></div><span>ONE TEAM<br>ONE PLATFORM<br>GREATER<br>TOMORROW</span></div>`);
 qa('.module').forEach(b=>b.onclick=()=>go(b.dataset.page));updateTaskBadges()}
 function moduleBadge(p){let id=currentSr(),n=0;if(p==='zero')n=zeroCount(id);if(p==='tasks')n=db.tasks.filter(x=>(!id||x.to===id||x.to==='ALL')&&x.status!=='Done').length;if(p==='sales')n=db.sales.filter(x=>(!id||x.sr===id)&&x.status!=='Delivered').length;if(p==='notifications')n=(db.notifications||[]).filter(x=>!x.read).length;return n?`<span class="moduleBadge">${n>999?'999+':n}</span>`:''}
