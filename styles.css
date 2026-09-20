@@ -616,3 +616,30 @@ html,body,#app{background:#05090d!important}
  .loginMotto{height:35px!important;min-height:35px!important;margin-bottom:7px!important}
  .loginMotto span{margin-top:6px!important;line-height:11px!important;height:11px!important}
 }
+
+/* ===== V32 AI POPUP MOBILE FIT ===== */
+/* Keep the same floating AYON AI orb above the popup so tapping it closes/reopens the popup. */
+.aiOrb{z-index:10080!important}
+.aiFloatingOverlay{z-index:10050!important}
+.aiPopupPanel,.aiPopupMain,.aiPopupLeft{min-width:0!important}
+.aiPopupMain{overflow-x:hidden!important}
+.aiPopupComposer{width:100%!important;max-width:100%!important;grid-template-columns:44px minmax(0,1fr) 48px!important;box-sizing:border-box!important}
+.aiPopupComposer input{min-width:0!important;width:100%!important;box-sizing:border-box!important}
+.aiPopupComposer button{min-width:0!important;box-sizing:border-box!important}
+/* Portrait sits lower; bottom edge dissolves into the dark panel instead of looking cut. */
+.aiPortraitFade{bottom:22px!important;height:505px!important;overflow:hidden!important;background:linear-gradient(180deg,transparent 0%,transparent 72%,#071015 100%)!important}
+.aiPortraitFade .aiFullPortrait{bottom:-54px!important}
+.aiPortraitFade:after{height:170px!important;background:linear-gradient(180deg,transparent 0%,rgba(7,16,21,.30) 32%,#071015 86%,#071015 100%)!important}
+.aiSignature{margin-bottom:118px!important}
+.aiMotto{margin-bottom:4px!important}
+@media(max-width:650px){
+  .aiFloatingOverlay .aiPopupPanel{grid-template-columns:105px minmax(0,1fr)!important;width:calc(100vw - 12px)!important;max-width:calc(100vw - 12px)!important}
+  .aiPopupMain{padding-left:10px!important;padding-right:10px!important;width:auto!important;min-width:0!important}
+  .aiPortraitFade{bottom:18px!important;height:405px!important}
+  .aiPortraitFade .aiFullPortrait{width:155px!important;left:-32px!important;bottom:-48px!important}
+  .aiPortraitFade:after{height:135px!important}
+  .aiSignature{margin-bottom:116px!important}
+  .aiPopupComposer{grid-template-columns:42px minmax(0,1fr) 46px!important;gap:6px!important}
+  .aiPopupComposer input{font-size:12px!important;padding:0 9px!important}
+  .aiOrb{right:12px!important;bottom:86px!important}
+}
