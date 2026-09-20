@@ -401,3 +401,21 @@ html,body,#app{background:#05090d!important}
   .donut{width:88px!important;height:88px!important}.donut>div{width:54px!important;height:54px!important}
   .legend{font-size:7px!important}
 }
+
+/* V21 — final visual corrections requested */
+.loginHeroLogo .bars{position:relative;overflow:visible!important}
+.loginHeroLogo .bars:after{content:"";position:absolute;width:58px;height:4px;left:0;top:3px;background:linear-gradient(90deg,#ff7412,#ff9d2e);transform:rotate(-32deg);transform-origin:right center;border-radius:4px;box-shadow:0 0 7px rgba(255,124,24,.5)}
+.loginHeroLogo .bars:before{content:"";position:absolute;right:-2px;top:-4px;width:0;height:0;border-left:9px solid #ff861b;border-top:6px solid transparent;border-bottom:6px solid transparent;transform:rotate(-32deg);z-index:4}
+.loginTop{height:164px!important;min-height:164px!important;padding-top:9px!important}
+.loginMotto{margin:0 auto 9px!important}
+.premiumLoginBox{background:linear-gradient(160deg,rgba(6,16,21,.52),rgba(1,8,12,.46))!important;backdrop-filter:blur(2.5px)!important;-webkit-backdrop-filter:blur(2.5px)!important;border-color:rgba(183,198,207,.58)!important}
+.login label.loginField{background:rgba(4,14,19,.35)!important}
+.loginMiniCards div{background:rgba(4,14,19,.42)!important}
+
+.home .motivationPanel,.motivationPanel{height:128px!important;min-height:128px!important;background:linear-gradient(90deg,rgba(2,7,10,.45),rgba(2,7,10,.02) 48%,rgba(2,7,10,.18)),url('home-motivation.png') center center/cover no-repeat!important;display:flex!important;overflow:hidden!important}
+.homeContent,.wrap{padding-bottom:100px!important}
+
+.homeGrid .module .mi{width:42px!important;height:42px!important;display:flex!important;align-items:center!important}
+.homeGrid .module .mi svg{width:38px!important;height:38px!important;fill:currentColor;color:#ff8520!important;filter:drop-shadow(0 0 7px rgba(255,126,26,.42))}
+.homeGrid .module{background:radial-gradient(circle at 20% 5%,rgba(255,170,69,.34),transparent 32%),linear-gradient(145deg,#1b2529 0%,#0a1115 57%,#04080b 100%)!important;box-shadow:inset 0 1px rgba(255,230,190,.18),inset 18px 0 28px rgba(255,135,33,.05),0 7px 20px rgba(0,0,0,.58)!important}
+.homeGrid .module:first-child{box-shadow:0 0 10px #ff8420,0 0 30px rgba(255,119,15,.66),inset 0 0 34px rgba(255,137,38,.24)!important}
