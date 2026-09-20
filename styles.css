@@ -568,3 +568,12 @@ html,body,#app{background:#05090d!important}
 @keyframes ffTypeSalesLoop{0%,10%{width:0}42%,72%{width:100%}90%,100%{width:0}}
 @keyframes ffTypeMottoLoop{0%,10%{max-width:0}45%,72%{max-width:520px}90%,100%{max-width:0}}
 @media(prefers-reduced-motion:reduce){.loginBrandWords .typeSales,.loginMotto .typeMotto{animation:none!important;width:auto!important;max-width:none!important;border-right:0!important}.loginChartLogo .runner{animation:none!important;opacity:1!important;transform:none!important}}
+
+/* V27 — visible orange flare + human runner + JS typewriter lock */
+.loginBrandWords .typeSales.jsTyping,.loginMotto .typeMotto.jsTyping{animation:none!important;width:auto!important;max-width:none!important;min-height:1em!important;display:inline-block!important;overflow:visible!important;border-right:2px solid #ff8a1f!important;white-space:nowrap!important}
+.loginBrandWords .typeSales.jsTyping{min-width:1px!important}
+.loginMotto .typeMotto.jsTyping{min-width:1px!important}
+.loginChartLogo .arrowSpark{transform-box:view-box;transform-origin:110px 5px;animation:ffOrangeFlare 1.05s ease-in-out 1.72s infinite!important;filter:drop-shadow(0 0 3px #fff0a0) drop-shadow(0 0 9px #ffb21e) drop-shadow(0 0 20px #ff6b00)!important}
+.loginChartLogo .runner{animation:ffHumanRun 2.15s cubic-bezier(.2,.72,.25,1) 1.22s both!important;filter:drop-shadow(0 0 3px #ff7b13) drop-shadow(0 0 7px #ff9b22)!important}
+@keyframes ffOrangeFlare{0%,100%{opacity:.72;transform:scale(.72) rotate(0)}50%{opacity:1;transform:scale(1.5) rotate(12deg)}}
+@keyframes ffHumanRun{0%{opacity:0;transform:translate(-39px,28px) scale(.7) rotate(-7deg)}12%{opacity:1}45%{transform:translate(-10px,8px) scale(.82) rotate(2deg)}82%{opacity:1}100%{opacity:0;transform:translate(29px,-14px) scale(.9) rotate(-4deg)}}

@@ -19,8 +19,8 @@ function login(){currentPage='login';navStack=[];A.innerHTML=`<div class="login 
 <rect class="animBar b4" x="83" y="19" width="15" height="64" rx="2" fill="url(#lg22)"/>
 <path class="animCurve" d="M14 58 C35 54, 50 42, 65 31 S89 14,102 10" fill="none" stroke="url(#lg22)" stroke-width="7" stroke-linecap="round"/>
 <path class="animArrow" d="M94 2 L114 5 L104 23 Z" fill="url(#lg22)"/>
-<g class="runner" aria-hidden="true"><circle cx="72" cy="19" r="3.1" fill="#fff3c4"/><path d="M70 23l-5 8m5-8 7 5m-7-5 3 9m-8-1-7 5m15-4 6 5" fill="none" stroke="#fff3c4" stroke-width="2.6" stroke-linecap="round"/></g>
-<circle class="arrowSpark" cx="110" cy="5" r="3.2" fill="#ffd76a"/>
+<g class="runner" aria-hidden="true" fill="#120b05" stroke="#ffb13b" stroke-width="1.15" stroke-linejoin="round"><circle cx="71" cy="18" r="4.2"/><path d="M68 23c3-3 7-2 9 1l4 6 7-3 2 3-10 6-5-6-3 9 7 7-3 3-10-8-4 8-4-2 6-15-8 6-3-3z"/></g>
+<g class="arrowSpark" aria-hidden="true"><circle cx="110" cy="5" r="4.3" fill="#ffb11f"/><circle cx="110" cy="5" r="2" fill="#fff3a0"/><path d="M110-6v6M110 10v6M99 5h6M115 5h6M102-3l4 4M114 9l4 4M118-3l-4 4M106 9l-4 4" stroke="#ff9a16" stroke-width="2.2" stroke-linecap="round"/></g>
 </svg></div>
     <div class="loginBrandWords"><strong>Field<span>Force</span> Hub</strong><small class="typeSales">Sales | Delivery | Performance | Growth</small></div>
   </div>
@@ -38,6 +38,14 @@ function login(){currentPage='login';navStack=[];A.innerHTML=`<div class="login 
 q('#showPw').onclick=()=>{let x=q('#loginPw');x.type=x.type==='password'?'text':'password';q('#showPw').textContent=x.type==='password'?'◉':'◎'};
 const lb=q('#loginLangBtn'),lm=q('#loginLangMenu');lb.onclick=()=>lm.classList.toggle('show');qa('#loginLangMenu button').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;localStorage.setItem('ffh_lang',lang);lb.textContent=lang==='bn'?'🌐 বাংলা⌄':'🌐 English⌄';lm.classList.remove('show');applyLoginLang()});
 setTimeout(()=>applyLoginLang(),0);
+startLoginTyping();
+function startLoginTyping(){
+ const sales=q('.typeSales'), motto=q('.typeMotto'); if(!sales||!motto)return;
+ const salesText='Sales | Delivery | Performance | Growth', mottoText='Smart People. Stronger Team. Bigger Tomorrow.';
+ sales.classList.add('jsTyping'); motto.classList.add('jsTyping');
+ const typeLoop=(el,text,startDelay,hold)=>{let i=0,del=false; setTimeout(function tick(){ if(!document.body.contains(el))return; if(!del){i++;el.textContent=text.slice(0,i);if(i>=text.length){del=true;return setTimeout(tick,hold)}}else{i--;el.textContent=text.slice(0,Math.max(0,i));if(i<=0){del=false;return setTimeout(tick,500)}} setTimeout(tick,del?28:62)},startDelay)};
+ typeLoop(sales,salesText,1650,1800); typeLoop(motto,mottoText,2450,2100);
+}
 function applyLoginLang(){let bn=lang==='bn';q('.premiumLoginBox h1').textContent=bn?'স্বাগতম':'Welcome Back';q('.premiumLoginBox>p').textContent=bn?'আপনার অ্যাকাউন্টে লগইন করুন':'Login to your account';q('#loginId').placeholder=bn?'ইউজার আইডি':'User ID';q('#loginPw').placeholder=bn?'পাসওয়ার্ড':'Password';q('#forgotPw').textContent=bn?'পাসওয়ার্ড ভুলে গেছেন?':'Forgot Password?';q('.loginSubmit').innerHTML=(bn?'লগইন':'Login')+' <span>→</span>';q('.loginOptions label').lastChild.textContent=bn?' মনে রাখুন':' Remember Me'}
 q('#forgotPw').onclick=()=>alert('Please contact your Manager to reset your password.');
 const doLogin=()=>{let id=q('#loginId').value.trim(),pw=q('#loginPw').value.trim();if(id.toLowerCase()==='manager'&&pw.toUpperCase()==='M21954'){user={id:'M21954',name:'MEHEDI ALIM AYON',mode:'MANAGER',role:'MANAGER'};view='ALL';localStorage.setItem('ffh_session',JSON.stringify(user));home(true);return true}let x=(U||[]).find(z=>String(z.id).trim().toLowerCase()===id.toLowerCase()&&z.active!==false);if(x&&(pw===String(x.password||x.id)||pw===String(x.id))){user={...x,mode:'SR'};view=x.id;localStorage.setItem('ffh_session',JSON.stringify(user));home(true);return true}alert('Invalid User ID or Password');return false};q('#loginForm').onsubmit=e=>{e.preventDefault();doLogin()}}
