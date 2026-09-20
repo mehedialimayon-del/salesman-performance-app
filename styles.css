@@ -116,40 +116,193 @@ body{background:#05090c;color:#fff}.premiumLogin{min-height:100dvh;background:ur
 .loginDev{font-size:8px!important;letter-spacing:.3px!important}
 .loginDev a{font-weight:800!important}
 
-/* FINAL REFERENCE V13 */
-:root{--refOrange:#ff7415;--refGold:#ff9b31;--refPanel:#0b1217;--refLine:#6c3b20}
-body{background:#05090c}
-.app{background:radial-gradient(circle at 18% 8%,rgba(255,112,15,.08),transparent 22%),linear-gradient(180deg,#060b0f,#05090c)}
-.top{height:68px!important;padding:0 12px!important;background:#061017f7!important}
-.top .logo{font-size:19px!important}.brandTag{font-size:7px!important;letter-spacing:1.2px!important}.topBtns{gap:5px!important}.iconBtn{width:43px!important;height:43px!important;border-radius:13px!important}
-.wrap{padding:10px 12px 86px!important}
-.refHero{position:relative;display:grid;grid-template-columns:1fr auto;align-items:center;min-height:82px;padding:12px 15px;margin:0 0 10px;border:1px solid #34434d;border-radius:16px;background:linear-gradient(115deg,rgba(14,24,31,.98),rgba(7,12,16,.96));overflow:hidden}
-.refHero:after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 65%,rgba(255,113,16,.08));pointer-events:none}
-.refHero h2{margin:0;font-size:21px;line-height:1.1}.refHero h2 span{color:var(--refOrange)}.refHero p{font-size:10px;color:#c0c7cc;margin:6px 0 0}.refQuote{position:absolute;right:112px;top:10px;color:#f4f4f4;font:italic 13px Georgia;line-height:1.05;transform:rotate(-4deg)}.refDate{display:flex;flex-direction:column;gap:2px;border:1px solid #394952;background:#101920;border-radius:12px;padding:9px 11px;font-size:9px}.refDate span{color:#c2c9cd}
-.homeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.refModule{position:relative;min-height:128px!important;padding:15px 10px 13px!important;text-align:left!important;border-radius:16px!important;background:linear-gradient(145deg,#11191e,#070b0e)!important;border:1px solid #7a4325!important;box-shadow:inset 0 1px rgba(255,255,255,.035),0 9px 24px rgba(0,0,0,.34)!important;overflow:hidden}
-.refModule:after{content:"";position:absolute;right:-16px;top:-18px;width:88px;height:88px;background:linear-gradient(135deg,transparent,rgba(255,128,25,.045));transform:rotate(22deg)}
-.refModule:hover,.refModule:first-child{border-color:#ff7716!important;box-shadow:0 0 20px rgba(255,111,13,.38),inset 0 0 20px rgba(255,118,18,.06)!important}
-.refModule .mi{display:block!important;width:auto!important;height:auto!important;margin:0 0 12px!important;color:#ff8120!important;font-size:31px!important;line-height:1!important}.refModule strong{display:block;font-size:14px;line-height:1.08}.refModule small{display:block!important;font-size:9px!important;color:#c5ccd0!important;margin-top:4px!important}.goArrow{position:absolute;right:10px;bottom:12px;width:25px;height:25px;border:1px solid #4d5960;border-radius:50%;display:grid;place-items:center;color:#fff;font-style:normal;font-size:20px}
-.motivationBanner{height:112px;margin:12px 0 0;border:1px solid #40505a;border-radius:16px;background:linear-gradient(90deg,rgba(5,11,15,.25),rgba(5,11,15,.12)),url('login-background.png') center 58%/cover no-repeat;display:flex;justify-content:space-between;align-items:center;padding:16px 20px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.35)}
-.motivationBanner div{display:flex;flex-direction:column;font:italic 17px Georgia;text-shadow:0 2px 10px #000}.motivationBanner b{color:#ff7b18;font-size:18px}.motivationBanner>span{font-size:8px;line-height:1.65;letter-spacing:2px;color:#e2e6e8;text-align:left}
-.bottom{height:72px!important;grid-template-columns:repeat(3,1fr)!important;background:#050b0ff7!important}.bottom button{font-size:11px!important}.bottom i{font-size:23px!important}
-.premiumLogin{height:100dvh!important;min-height:100dvh!important;overflow:hidden!important;padding:12px 18px 8px!important;background-position:center 54%!important}
-.loginTop{margin-bottom:7px!important}.ffGrowthLogo .bars{width:66px!important;height:49px!important}.ffGrowthLogo .bars i{width:10px!important}.ffGrowthLogo strong{font-size:21px!important}.langPill{padding:9px 11px!important}
-.loginMotto{margin:0 auto 8px!important}.loginMotto b{font-size:11px!important}.loginMotto span{margin-top:10px!important;font-size:7px!important}
-.premiumLoginBox{padding:16px 18px!important;border-radius:22px!important;margin:0 auto!important}.premiumLoginBox h1{font-size:25px!important}.premiumLoginBox>p{font-size:13px;margin:3px 0 10px!important}
-.loginField{height:52px!important;margin:8px 0!important;border-radius:14px!important}.loginField input{font-size:14px!important}.loginOptions{margin:9px 0 12px!important}.loginSubmit{height:53px!important;font-size:20px!important}
-.loginMiniCards{margin:10px auto 5px!important;gap:7px!important}.loginMiniCards div{height:59px!important;border-radius:12px!important;font-size:18px!important}.loginMiniCards span{font-size:8px!important}.loginQuote{font-size:12px!important;margin:5px auto 1px!important;line-height:1.1}.loginDev{font-size:7px!important;margin:1px auto!important}
-.dashKpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}.dashKpi{min-height:118px;border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;border:1px solid #31404a;background:#0d151a;box-shadow:inset 0 0 25px rgba(255,255,255,.015)}.dashKpi>span{font-size:30px}.dashKpi small{display:block;color:#d3d8db;font-size:10px}.dashKpi b{display:block;font-size:21px;margin:5px 0}.dashKpi em{font-style:normal;font-size:9px;color:#aeb8be}.salesK{border-color:#168657;background:linear-gradient(145deg,#073e2b,#08231b)}.salesK>span,.salesK em{color:#1de38d}.targetK{border-color:#b05c16;background:linear-gradient(145deg,#3a1d08,#211208)}.targetK>span{color:#ff8b22}.outletK{border-color:#155ea4;background:linear-gradient(145deg,#08294c,#091827)}.outletK>span{color:#3b96ff}.skuK{border-color:#9b2631;background:linear-gradient(145deg,#401018,#210a0e)}.skuK>span{color:#ff5968}
-.refProgress{height:8px;background:#49372d;border-radius:10px;overflow:hidden;margin:7px 0}.refProgress i{display:block;height:100%;background:linear-gradient(90deg,#ff8b1f,#ffb14e)}
-.dashCharts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.dashPanel{min-height:205px;background:linear-gradient(145deg,#0d171d,#081015);border:1px solid #33424c;border-radius:14px;padding:12px;overflow:hidden}.panelHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.panelHead b{font-size:13px}.panelHead small{font-size:8px;color:#a8b2b8}.refBars{height:145px;display:flex;align-items:flex-end;gap:5px;border-bottom:1px solid #2d3941;padding:5px 2px 17px}.refBars i{flex:1;min-height:4px;background:linear-gradient(#ff8b20,#ff6410);border-radius:3px 3px 0 0;position:relative;box-shadow:0 0 8px rgba(255,111,15,.15)}.refBars i span{position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);font-style:normal;font-size:6px;color:#7f8d95}
-.channelWrap{display:flex;align-items:center;gap:12px;height:155px}.donut{width:105px;height:105px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}.donut>div{width:62px;height:62px;border-radius:50%;background:#0b1318;display:grid;place-items:center;text-align:center}.donut b{font-size:9px}.donut small{font-size:7px;color:#aab5bb}.legend{display:grid;gap:7px;flex:1}.legend span{display:grid;grid-template-columns:8px 1fr auto;gap:5px;align-items:center;font-size:7px}.legend span>i{width:7px;height:7px;border-radius:50%}.legend b{font-size:7px}
-.activityList>div{display:grid;grid-template-columns:42px 10px 1fr;gap:7px;align-items:start;padding:8px 0;border-bottom:1px solid #202c33}.activityList time{font-size:7px;color:#9ca8ae}.activityList>div>i{width:7px;height:7px;border-radius:50%;margin-top:3px}.doneDot{background:#1dd78b}.pendingDot{background:#ff7a17}.activityList b{display:block;font-size:8px}.activityList small{display:block;font-size:7px;color:#9ba7ad;margin-top:2px}
-.topOutlets>div{display:grid;grid-template-columns:22px 1fr auto;gap:7px;align-items:center;padding:7px 0}.topOutlets>div>i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#2b86f6;font-style:normal;font-size:8px}.topOutlets b{display:block;font-size:8px}.topOutlets small{font-size:7px;color:#9eabb1}.topOutlets em{font-size:8px;color:#20db8d;font-style:normal}.dashEmpty{color:#77858e;font-size:9px;padding:30px 4px;text-align:center}
+
+/* ==========================================================
+   V14 FINAL — THEME ONLY
+   Functional JS / login / data / modules are untouched.
+   Visual target: supplied FieldForce Hub reference screens.
+   ========================================================== */
+
+:root{
+  --v14-orange:#ff7415;
+  --v14-orange2:#ff9d28;
+  --v14-bg:#05090c;
+  --v14-panel:#091117;
+  --v14-line:#7a4526;
+}
+
+/* ---------- LOGIN: compact reference proportions ---------- */
+.premiumLogin{
+  height:100dvh!important;
+  min-height:100dvh!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+  padding:13px 18px 8px!important;
+  background:
+    linear-gradient(180deg,rgba(2,8,13,.12) 0%,rgba(2,8,13,.16) 32%,rgba(2,7,11,.76) 73%,#03070a 100%),
+    url('login-background.png') center 52%/cover no-repeat!important;
+}
+.loginShade{background:linear-gradient(180deg,rgba(2,8,13,.08),rgba(2,8,13,.14) 36%,rgba(2,7,10,.62) 72%,rgba(2,6,9,.96))!important}
+
+.loginTop{
+  min-height:111px!important;
+  max-width:520px!important;
+  margin:0 auto 0!important;
+  position:relative!important;
+  justify-content:center!important;
+  align-items:flex-start!important;
+  padding-top:12px!important;
+}
+.loginBrand{justify-content:center!important;text-align:left!important}
+.ffGrowthLogo{gap:8px!important}
+.ffGrowthLogo .bars{width:62px!important;height:50px!important;transform:scale(.92)}
+.ffGrowthLogo .bars i{width:10px!important}
+.ffGrowthLogo strong{font-size:22px!important;white-space:nowrap}
+.ffGrowthLogo small{font-size:8px!important}
+.langPill{
+  position:absolute!important;right:0!important;top:10px!important;
+  padding:8px 10px!important;border-radius:12px!important;font-size:11px!important;
+  background:rgba(7,17,24,.80)!important;backdrop-filter:blur(10px)
+}
+
+.loginMotto{margin:-18px auto 8px!important;text-shadow:0 2px 12px #000!important}
+.loginMotto b{font-size:11px!important}
+.loginMotto span{font-size:7px!important;letter-spacing:3.4px!important;margin-top:9px!important}
+
+.premiumLoginBox{
+  width:min(88vw,410px)!important;
+  margin:0 auto!important;
+  padding:14px 17px 15px!important;
+  border-radius:21px!important;
+  background:linear-gradient(160deg,rgba(9,19,25,.92),rgba(4,11,15,.92))!important;
+  border:1px solid rgba(135,151,160,.58)!important;
+  box-shadow:0 18px 45px rgba(0,0,0,.55),inset 0 1px rgba(255,255,255,.035)!important;
+  backdrop-filter:blur(9px)!important;
+}
+.premiumLoginBox h1{font-size:24px!important;line-height:1.05!important;margin:0 0 3px!important}
+.premiumLoginBox>p{font-size:11px!important;margin:0 0 8px!important;color:#aeb8be!important}
+
+.loginField{
+  height:47px!important;margin:7px 0!important;padding:0 12px!important;
+  border-radius:13px!important;background:rgba(6,15,20,.92)!important;
+  border:1px solid #596a74!important;box-shadow:inset 0 1px 5px rgba(0,0,0,.35)!important;
+}
+.loginField input{
+  height:100%!important;padding:0!important;background:transparent!important;
+  color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:13px!important;
+}
+.loginField input::placeholder{color:#8e9aa2!important;-webkit-text-fill-color:#8e9aa2!important}
+.loginField input:-webkit-autofill,
+.loginField input:-webkit-autofill:hover,
+.loginField input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#fff!important;
+  -webkit-box-shadow:0 0 0 1000px #071117 inset!important;
+  box-shadow:0 0 0 1000px #071117 inset!important;
+  caret-color:#fff!important;
+  transition:background-color 99999s ease-out 0s!important;
+}
+.loginOptions{font-size:9px!important;margin:8px 0 10px!important;align-items:center!important}
+.loginOptions input{width:15px!important;height:15px!important;accent-color:var(--v14-orange)!important}
+.loginOptions button{font-size:9px!important}
+.loginSubmit{
+  width:82%!important;height:48px!important;margin:0 auto!important;display:block!important;
+  border-radius:13px!important;font-size:18px!important;
+  background:linear-gradient(115deg,#ff9d26 0%,#ff7415 52%,#ff5d0a 100%)!important;
+  box-shadow:0 9px 24px rgba(255,103,12,.22),inset 0 1px rgba(255,255,255,.25)!important;
+}
+.loginSubmit span{font-size:23px!important}
+
+.loginMiniCards{
+  width:min(86vw,400px)!important;margin:9px auto 4px!important;gap:7px!important;
+}
+.loginMiniCards div{
+  height:54px!important;border-radius:11px!important;
+  background:linear-gradient(160deg,rgba(11,20,26,.95),rgba(5,11,15,.95))!important;
+  border:1px solid #3d4c55!important;font-size:17px!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.025)!important;
+}
+.loginMiniCards span{font-size:7px!important;margin-top:2px!important}
+.loginQuote{font-size:11px!important;line-height:1.05!important;margin:4px auto 1px!important}
+.loginDev{font-size:6.5px!important;margin:1px auto 0!important;opacity:.72!important}
+
+/* ---------- HOME: reference black glass + orange/gold edge ---------- */
+.grid{gap:8px!important}
+.module{
+  min-height:100px!important;
+  border-radius:15px!important;
+  color:#fff!important;
+  background:
+    radial-gradient(circle at 24% 0%,rgba(255,137,33,.11),transparent 38%),
+    linear-gradient(155deg,#131b20 0%,#0a1014 52%,#060a0d 100%)!important;
+  border:1px solid #7c4527!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.045),
+    inset 0 -16px 28px rgba(0,0,0,.24),
+    0 8px 20px rgba(0,0,0,.34)!important;
+  text-shadow:0 1px 2px #000!important;
+  transition:.18s ease!important;
+}
+.module:first-child{
+  border-color:#ff7b18!important;
+  box-shadow:0 0 18px rgba(255,113,16,.38),inset 0 0 24px rgba(255,119,17,.08),0 8px 20px rgba(0,0,0,.4)!important;
+}
+.module:active,.module:hover{
+  transform:translateY(-2px)!important;
+  border-color:#ff8a22!important;
+  box-shadow:0 0 20px rgba(255,113,16,.42),inset 0 0 26px rgba(255,119,17,.09)!important;
+}
+.module .mi{
+  width:38px!important;height:38px!important;margin:0 auto 7px!important;
+  background:transparent!important;border:0!important;color:#ff8120!important;
+  font-size:25px!important;text-shadow:0 0 13px rgba(255,119,17,.25)!important;
+}
+.module small{color:#c5ccd0!important;font-size:8.5px!important}
+.moduleBadge{background:#0b0d0f!important;border-color:#ffcf84!important;color:#fff!important}
+
+/* ---------- DASHBOARD: same existing data/functions, reference colors ---------- */
+.highlightStrip,.kpis{gap:9px!important}
+.alertBox,.kpi,.card{
+  background:linear-gradient(150deg,#10191e,#071015)!important;
+  border:1px solid #354650!important;border-radius:15px!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.025),0 8px 20px rgba(0,0,0,.28)!important;
+}
+.highlightStrip .alertBox:first-child{
+  background:linear-gradient(145deg,#351216,#160b0d)!important;border-color:#7b3035!important;
+}
+.highlightStrip .alertBox:nth-child(2){
+  background:linear-gradient(145deg,#30240a,#171207)!important;border-color:#705925!important;
+}
+.kpis .kpi:nth-child(1){
+  background:linear-gradient(145deg,#073b29,#071b14)!important;border-color:#16865b!important;
+}
+.kpis .kpi:nth-child(2){
+  background:linear-gradient(145deg,#3a1d08,#171007)!important;border-color:#b05d16!important;
+}
+.kpis .kpi:nth-child(3){
+  background:linear-gradient(145deg,#082a4e,#081824)!important;border-color:#1764a9!important;
+}
+.kpis .kpi:nth-child(4){
+  background:linear-gradient(145deg,#421018,#1b090d)!important;border-color:#9d2934!important;
+}
+.kpi strong{font-size:20px!important}
+.chart{background:linear-gradient(180deg,rgba(255,255,255,.01),rgba(0,0,0,.08))!important}
+.bar{background:linear-gradient(180deg,#ff9d28,#ff6610)!important;box-shadow:0 0 9px rgba(255,108,13,.16)!important}
+
+/* ---------- HEADER / BOTTOM ---------- */
+.top{background:linear-gradient(180deg,#071118,#050c11)!important;border-bottom:1px solid #293a44!important}
+.iconBtn{background:linear-gradient(145deg,#111b21,#081016)!important;border-color:#30414c!important}
+.bottom{
+  background:rgba(4,10,14,.97)!important;
+  border-top:1px solid #2c3a43!important;
+  box-shadow:0 -10px 28px rgba(0,0,0,.32)!important;
+}
+.bottom button.active{color:#ff7a18!important;text-shadow:0 0 10px rgba(255,116,21,.28)!important}
+
+/* compact mobile fit */
 @media(max-width:700px){
- .app:has(.homeGrid) .wrap{height:calc(100dvh - 140px)!important;overflow:hidden!important;padding-bottom:0!important}
- .app:has(.homeGrid) .refHero{min-height:69px!important;margin-bottom:7px!important;padding:9px 11px!important}.app:has(.homeGrid) .refHero h2{font-size:17px!important}.app:has(.homeGrid) .refQuote{display:none}
- .app:has(.homeGrid) .homeGrid{height:calc(100dvh - 322px)!important;grid-template-rows:repeat(4,1fr)!important;gap:7px!important}
- .app:has(.homeGrid) .refModule{min-height:0!important;padding:8px 7px!important;border-radius:14px!important}.app:has(.homeGrid) .refModule .mi{font-size:23px!important;margin-bottom:5px!important}.app:has(.homeGrid) .refModule strong{font-size:11px!important}.app:has(.homeGrid) .refModule small{font-size:7px!important}.app:has(.homeGrid) .goArrow{width:19px;height:19px;font-size:15px;right:6px;bottom:6px}
- .app:has(.homeGrid) .motivationBanner{height:72px!important;margin-top:7px!important;padding:8px 12px!important}.app:has(.homeGrid) .motivationBanner div{font-size:11px!important}.app:has(.homeGrid) .motivationBanner b{font-size:12px!important}.app:has(.homeGrid) .motivationBanner>span{font-size:5px!important}
- .dashCharts{grid-template-columns:1fr 1fr!important}.dashPanel{min-height:190px;padding:10px}.donut{width:82px;height:82px}.donut>div{width:48px;height:48px}.channelWrap{gap:7px}
+  .premiumLogin{padding-left:16px!important;padding-right:16px!important}
+  .loginTop{min-height:105px!important}
+  .premiumLoginBox{width:min(90vw,405px)!important}
+  .app:has(.grid) .grid{gap:7px!important}
+  .app:has(.grid) .module{min-height:96px!important}
 }
