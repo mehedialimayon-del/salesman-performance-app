@@ -1,6 +1,6 @@
 'use strict';
 (()=>{const D=window.APP_DATA||{},A=document.getElementById('app'),K='ffh_ultimate_final_v1',today=()=>new Date().toISOString().slice(0,10),month=()=>today().slice(0,7),rm=n=>'RM '+Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
-let db;try{db=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){db={}};db={sales:[],targets:{},tasks:[],adjustments:[],cpo:[],routes:{},proposals:[],incentives:[],notifications:[],customOutlets:{},incomeSetup:{},settings:{notifyMorning:'08:30',notifyNoon:'14:00'},cpoCampaigns:[],notes:[],navStack:[],catalogue:[],cataloguePdfs:[],scheduledNotices:[],...db};const save=()=>localStorage.setItem(K,JSON.stringify(db));let user=null,view='ALL',lang='bn',navStack=[],currentPage='login';
+let db;try{db=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){db={}};db={sales:[],targets:{},tasks:[],adjustments:[],cpo:[],routes:{},proposals:[],incentives:[],notifications:[],customOutlets:{},incomeSetup:{},settings:{notifyMorning:'08:30',notifyNoon:'14:00'},cpoCampaigns:[],notes:[],navStack:[],catalogue:[],cataloguePdfs:[],scheduledNotices:[],...db};const save=()=>localStorage.setItem(K,JSON.stringify(db));let user=null,view='ALL',lang=localStorage.getItem('ffh_lang')||'en',navStack=[],currentPage='login';
 const baseUsers=(D.users||[]).map(x=>({...x,display:x.name}));if(!baseUsers.some(x=>x.id==='SR-ADIB'))baseUsers.push({id:'SR-ADIB',name:'RUBAYAT SAMS ADIB',display:'RUBAYAT SAMS ADIB',role:'SR',target:50000});
 let U=db.users||baseUsers;db.users=U;const products=D.categoryProducts||{}, allProducts=[...new Set(Object.values(products).flat())];const outlets=id=>(db.customOutlets?.[id]?.length?db.customOutlets[id]:(D.outlets?.[id]||[])).map(o=>({...o,totalSku:+o.totalSku||allProducts.length}));
 const rules=D.salaryRules||{basic:1700,fuel:300,houseRent:250,foodThreshold:50000,foodHigh:250,foodLow:100,zeroSalesHigh:200,zeroSalesLow:100};
@@ -34,7 +34,8 @@ function login(){currentPage='login';navStack=[];A.innerHTML=`<div class="login 
 <div class="loginQuote">“ A Good Plan Today,<br>A Greater Tomorrow ”</div>
 <div class="devFooter loginDev">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank">KAM AYON</a></div></div>`;
 q('#showPw').onclick=()=>{let x=q('#loginPw');x.type=x.type==='password'?'text':'password';q('#showPw').textContent=x.type==='password'?'◉':'◎'};
-const lb=q('#loginLangBtn'),lm=q('#loginLangMenu');lb.onclick=()=>lm.classList.toggle('show');qa('#loginLangMenu button').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;lb.textContent=lang==='bn'?'🌐 বাংলা⌄':'🌐 English⌄';lm.classList.remove('show');applyLoginLang()});
+const lb=q('#loginLangBtn'),lm=q('#loginLangMenu');lb.onclick=()=>lm.classList.toggle('show');qa('#loginLangMenu button').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;localStorage.setItem('ffh_lang',lang);lb.textContent=lang==='bn'?'🌐 বাংলা⌄':'🌐 English⌄';lm.classList.remove('show');applyLoginLang()});
+setTimeout(()=>applyLoginLang(),0);
 function applyLoginLang(){let bn=lang==='bn';q('.premiumLoginBox h1').textContent=bn?'স্বাগতম':'Welcome Back';q('.premiumLoginBox>p').textContent=bn?'আপনার অ্যাকাউন্টে লগইন করুন':'Login to your account';q('#loginId').placeholder=bn?'ইউজার আইডি':'User ID';q('#loginPw').placeholder=bn?'পাসওয়ার্ড':'Password';q('#forgotPw').textContent=bn?'পাসওয়ার্ড ভুলে গেছেন?':'Forgot Password?';q('.loginSubmit').innerHTML=(bn?'লগইন':'Login')+' <span>→</span>';q('.loginOptions label').lastChild.textContent=bn?' মনে রাখুন':' Remember Me'}
 q('#forgotPw').onclick=()=>alert('Please contact your Manager to reset your password.');
 const doLogin=()=>{let id=q('#loginId').value.trim(),pw=q('#loginPw').value.trim();if(id.toLowerCase()==='manager'&&pw.toUpperCase()==='M21954'){user={id:'M21954',name:'MEHEDI ALIM AYON',mode:'MANAGER',role:'MANAGER'};view='ALL';localStorage.setItem('ffh_session',JSON.stringify(user));home(true);return true}let x=(U||[]).find(z=>String(z.id).trim().toLowerCase()===id.toLowerCase()&&z.active!==false);if(x&&(pw===String(x.password||x.id)||pw===String(x.id))){user={...x,mode:'SR'};view=x.id;localStorage.setItem('ffh_session',JSON.stringify(user));home(true);return true}alert('Invalid User ID or Password');return false};q('#loginForm').onsubmit=e=>{e.preventDefault();doLogin()}}
@@ -43,6 +44,15 @@ function pendingTaskCount(){
   if(isMgr()) return arr.length;
   let uid=String(user?.id||'');
   return arr.filter(x=>String(x.to||'')===uid||String(x.to||'').toUpperCase()==='ALL').length;
+}
+function priorityNotifyCount(){
+  let id=currentSr(), n=(db.notifications||[]).filter(x=>!x.read).length;
+  n+=db.tasks.filter(x=>(!id||x.to===id||x.to==='ALL')&&String(x.status||'').toLowerCase()!=='done'&&String(x.status||'').toLowerCase()!=='completed').length;
+  return n;
+}
+function updateNotifyBadges(){
+  let n=priorityNotifyCount();
+  ['#topNotifyBadge','#notifyNavBadge'].forEach(s=>{let el=q(s);if(el){el.textContent=n>99?'99+':String(n);el.style.display=n?'grid':'none'}});
 }
 function updateTaskBadges(){
   let n=pendingTaskCount();
@@ -55,10 +65,10 @@ function updateTaskBadges(){
     old.textContent=n>99?'99+':String(n);
   });
 }
-function shell(body){A.innerHTML=`<div class="app"><header class="top"><div class="logo"><div class="ffMiniLogo"><span><i></i><i></i><i></i><b>↗</b></span></div><div>FieldForce <span class="orange">Hub</span><small class="brandTag">Sales | Delivery | Performance | Growth</small></div></div><div class="topBtns"><button class="iconBtn bellBtn" id="bell" aria-label="Notifications">♧</button><button class="iconBtn" id="globalSearchBtn" aria-label="Search">⌕</button><button class="iconBtn" id="refresh" aria-label="Refresh">↻</button><div class="dropWrap"><button class="iconBtn" id="dots">⋮</button><div class="drop" id="drop"><button id="lang">🌐 বাংলা / English</button><button id="profile">◉ Profile</button><button id="logout">↪ Logout</button></div></div></div></header><main class="wrap">${body}</main><footer class="devFooter">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank" rel="noopener noreferrer">KAM AYON</a></footer><nav class="bottom bottomSix"><button id="bh"><i>⌂</i>Home</button><button id="bs"><i>▥</i>Sales</button><button id="bo"><i>▣</i>Outlets</button><button id="bt"><i>▤</i>CPO/DPO</button><button id="bn"><i class="bellGlyph">♢</i>Notification<span class="navBadge" id="notifyNavBadge"></span></button><button id="br"><i>⌖</i>Route</button></nav><div class="aiNudge" id="nudge">স্যার, আমি AYON AI। দরকার হলে ট্যাপ করুন।</div><button class="aiOrb" id="orb" aria-label="AYON AI"><img src="ayon-ai.png"></button></div>`;
+function shell(body){A.innerHTML=`<div class="app"><header class="top"><div class="logo"><div class="ffMiniLogo"><span><i></i><i></i><i></i><b>↗</b></span></div><div>FieldForce <span class="orange">Hub</span><small class="brandTag">Sales | Delivery | Performance | Growth</small></div></div><div class="topBtns"><button class="iconBtn bellBtn" id="bell" aria-label="Notifications"><svg class="topBellSvg" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 33h24l-3-5V19c0-6-4-11-9-11s-9 5-9 11v9z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 38c1 3 7 3 8 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg><span class="topNotifyBadge" id="topNotifyBadge"></span></button><button class="iconBtn" id="globalSearchBtn" aria-label="Search">⌕</button><button class="iconBtn" id="refresh" aria-label="Refresh">↻</button><div class="dropWrap"><button class="iconBtn" id="dots">⋮</button><div class="drop" id="drop"><button id="lang">🌐 বাংলা / English</button><button id="profile">◉ Profile</button><button id="logout">↪ Logout</button></div></div></div></header><main class="wrap">${body}</main><footer class="devFooter">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank" rel="noopener noreferrer">KAM AYON</a></footer><nav class="bottom bottomSix"><button id="bh"><i>⌂</i>Home</button><button id="bs"><i>▥</i>Sales</button><button id="bo"><i>▣</i>Outlets</button><button id="bt"><i>▤</i>CPO/DPO</button><button id="bn"><i class="bellGlyph">♢</i>Notification<span class="navBadge" id="notifyNavBadge"></span></button><button id="br"><i>⌖</i>Route</button></nav><div class="aiNudge" id="nudge">স্যার, আমি AYON AI। দরকার হলে ট্যাপ করুন।</div><button class="aiOrb" id="orb" aria-label="AYON AI"><img src="ayon-ai.png"></button></div>`;
 q('#dots').onclick=()=>q('#drop').classList.toggle('show');
 q('#logout').onclick=()=>{localStorage.removeItem('ffh_session');user=null;navStack=[];login()};
-q('#lang').onclick=()=>{lang=lang==='bn'?'en':'bn';home()};
+q('#lang').onclick=()=>{lang=lang==='bn'?'en':'bn';localStorage.setItem('ffh_lang',lang);home(true)};
 q('#profile').onclick=()=>navigate('profile',profile);
 q('#bh').onclick=()=>{navStack=[];home(true)};
 q('#bs').onclick=()=>navigate('sales',sales);
@@ -70,7 +80,7 @@ q('#bell').onclick=()=>navigate('notifications',notifications);
 q('#globalSearchBtn').onclick=globalSearch;
 q('#refresh').onclick=()=>location.reload();
 q('#orb').onclick=()=>navigate('ai',ai);
-updateTaskBadges();
+updateTaskBadges();updateNotifyBadges();
 dragOrb();setTimeout(()=>q('#nudge')?.classList.add('hide'),3800)}
 function q(s,r=document){return r.querySelector(s)}function qa(s,r=document){return [...r.querySelectorAll(s)]}
 function dragOrb(){let el=q('#orb'),n=q('#nudge'),p=JSON.parse(localStorage.getItem('ffh_ai_pos')||'null'),down=false,moved=false,dx=0,dy=0;if(p){Object.assign(el.style,{left:p.x+'px',top:p.y+'px',right:'auto',bottom:'auto'});n?.classList.add('hide')}el.onpointerdown=e=>{down=true;moved=false;dx=e.clientX-el.offsetLeft;dy=e.clientY-el.offsetTop;el.setPointerCapture(e.pointerId)};el.onpointermove=e=>{if(!down)return;moved=true;let x=Math.max(4,Math.min(innerWidth-el.offsetWidth-4,e.clientX-dx)),y=Math.max(68,Math.min(innerHeight-el.offsetHeight-72,e.clientY-dy));Object.assign(el.style,{left:x+'px',top:y+'px',right:'auto',bottom:'auto'});n?.classList.add('hide')};el.onpointerup=e=>{down=false;if(moved){localStorage.setItem('ffh_ai_pos',JSON.stringify({x:el.offsetLeft,y:el.offsetTop}));el.onclick=ev=>{ev.preventDefault();el.onclick=ai};setTimeout(()=>el.onclick=ai,100)}}}
@@ -92,8 +102,32 @@ const mods=[
 ['◆','catalogue','Catalogue'],
 ['⚙','control','Manager Control']
 ];
-function home(noPush=false){currentPage='home';let role=isMgr()?'Manager · Team Command':'Sales Representative',nm=(user?.name||'Team').split(' ').slice(-1)[0];shell(`<div class="homeHero"><div><h2>Good Morning, <span>${esc(nm)}!</span></h2><p>Same People. Bigger Targets. Brighter Tomorrow.</p></div><div class="homeMoral">“ Discipline<br>Drives<br>Results ”</div><div class="heroDate">▣ ${new Date().toLocaleDateString('en-MY',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div></div><div class="profile compactProfile"><img class="avatar" src="${user.photo||'ayon-ai.png'}"><div><strong>${user.name}</strong><span class="muted">${role}</span></div></div><div class="grid homeGrid">${mods.filter(x=>isMgr()||x[1]!=='control').map(x=>`<button class="module" data-page="${x[1]}"><span class="mi">${moduleIcon(x[1],x[0])}</span><span class="moduleTitle">${x[2]}</span>${moduleBadge(x[1])}<small>${sub(x[1])}</small><b class="moduleArrow">›</b></button>`).join('')}</div><div class="motivationPanel"><div><em>Smart People</em><br><em>Stronger Team</em><br><strong>Bigger Tomorrow</strong></div><span>ONE TEAM<br>ONE PLATFORM<br>GREATER<br>TOMORROW</span></div>`);
-qa('.module').forEach(b=>b.onclick=()=>go(b.dataset.page));updateTaskBadges()}
+function displayFirstName(){
+ let n=String(user?.name||'Team').trim().replace(/\s+/g,' ');
+ if(!n)return 'Team';
+ let a=n.split(' ');
+ // Existing staff names are commonly written with titles/given names first; use the familiar final name.
+ return a[a.length-1];
+}
+function greetingNow(){
+ let h=new Date().getHours();
+ if(lang==='bn') return h<12?'সুপ্রভাত':h<17?'শুভ অপরাহ্ণ':h<21?'শুভ সন্ধ্যা':'শুভ রাত্রি';
+ return h<12?'Good Morning':h<17?'Good Afternoon':h<21?'Good Evening':'Good Night';
+}
+function home(noPush=false){
+ currentPage='home';
+ let bn=lang==='bn', role=isMgr()?(bn?'ম্যানেজার · টিম কমান্ড':'Manager · Team Command'):(bn?'সেলস রিপ্রেজেন্টেটিভ':'Sales Representative');
+ let nm=displayFirstName();
+ let labels=bn?{
+ dashboard:['ড্যাশবোর্ড','পারফরম্যান্স ও গ্রাফ'],zero:['জিরো সেলস','আউটলেট কভারেজ'],sales:['ডেইলি সেলস','অর্ডার → ডেলিভারি'],
+ income:['ইনকাম','বেতন ও আয়'],incentive:['ইনসেনটিভ','টার্গেট ও অগ্রগতি'],cpo:['CPO / DPO','এক্সিকিউশন প্রুফ'],
+ route:['রুট প্ল্যান','দৈনিক ফোকাস প্ল্যান'],tasks:['টাস্কস','অ্যাসাইনমেন্ট'],reports:['রিপোর্টস','অ্যানালিটিক্স ও এক্সপোর্ট'],
+ proposals:['প্রপোজাল লাইব্রেরি','ফর্ম ও ডাউনলোড'],catalogue:['ক্যাটালগ','SKU মাস্টার'],control:['ম্যানেজার কন্ট্রোল','অ্যাডমিন ও পাবলিশিং']
+ }:{};
+ let dateLocale=bn?'bn-BD':'en-MY';
+ shell(`<div class="homeHero"><div><h2>${greetingNow()}, <span>${esc(nm)}!</span></h2><p>${bn?'একই মানুষ। বড় টার্গেট। আরও উজ্জ্বল আগামী।':'Same People. Bigger Targets. Brighter Tomorrow.'}</p></div><div class="homeMoral">“ ${bn?'শৃঙ্খলাই<br>ফলাফল<br>আনে':'Discipline<br>Drives<br>Results'} ”</div><div class="heroDate">▣ ${new Date().toLocaleDateString(dateLocale,{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div></div><div class="profile compactProfile"><img class="avatar" src="${user.photo||'ayon-ai.png'}"><div><strong>${user.name}</strong><span class="muted">${role}</span></div></div><div class="grid homeGrid">${mods.filter(x=>isMgr()||x[1]!=='control').map(x=>{let tx=labels[x[1]]||[x[2],sub(x[1])];return `<button class="module" data-page="${x[1]}"><span class="mi">${moduleIcon(x[1],x[0])}</span><span class="moduleTitle">${tx[0]}</span>${moduleBadge(x[1])}<small>${tx[1]}</small><b class="moduleArrow">›</b></button>`}).join('')}</div><div class="motivationPanel"><div><em>${bn?'স্মার্ট মানুষ':'Smart People'}</em><br><em>${bn?'শক্তিশালী টিম':'Stronger Team'}</em><br><strong>${bn?'আরও বড় আগামী':'Bigger Tomorrow'}</strong></div><span>${bn?'এক টিম<br>এক প্ল্যাটফর্ম<br>আরও বড়<br>আগামী':'ONE TEAM<br>ONE PLATFORM<br>GREATER<br>TOMORROW'}</span></div>`);
+ qa('.module').forEach(b=>b.onclick=()=>go(b.dataset.page));updateTaskBadges();updateNotifyBadges()
+}
 function moduleBadge(p){let id=currentSr(),n=0;if(p==='zero')n=zeroCount(id);if(p==='tasks')n=db.tasks.filter(x=>(!id||x.to===id||x.to==='ALL')&&x.status!=='Done').length;if(p==='sales')n=db.sales.filter(x=>(!id||x.sr===id)&&x.status!=='Delivered').length;if(p==='notifications')n=(db.notifications||[]).filter(x=>!x.read).length;return n?`<span class="moduleBadge">${n>999?'999+':n}</span>`:''}
 function globalSearch(){let o=document.createElement('div');o.className='globalSearchOverlay';o.innerHTML=`<div class="globalSearchBox"><div class="searchTop"><input id="globalSearchInput" autofocus placeholder="Search module, outlet, SKU, task..."><button id="closeGlobalSearch">×</button></div><div id="globalSearchResults"></div></div>`;document.body.appendChild(o);let inp=o.querySelector('#globalSearchInput'),res=o.querySelector('#globalSearchResults');o.querySelector('#closeGlobalSearch').onclick=()=>o.remove();function run(){let v=inp.value.trim().toLowerCase();if(!v){res.innerHTML='<div class="empty">Type to search.</div>';return}let out=[];mods.forEach(m=>{if((m[2]+' '+sub(m[1])).toLowerCase().includes(v))out.push(`<button class="searchResult" data-page="${m[1]}"><b>${m[2]}</b><span>${sub(m[1])}</span></button>`)});srIds().forEach(id=>outlets(id).forEach(x=>{if((x.name+' '+x.code+' '+x.category).toLowerCase().includes(v))out.push(`<div class="searchResult"><b>${esc(x.name)}</b><span>${esc(x.code)} · ${esc(x.category)} · ${short(sr(id).name)}</span></div>`)}));allProducts.filter(x=>x.toLowerCase().includes(v)).slice(0,15).forEach(x=>out.push(`<div class="searchResult"><b>${esc(x)}</b><span>SKU / Product</span></div>`));db.tasks.filter(x=>(x.title+' '+(x.by||'')).toLowerCase().includes(v)).slice(0,10).forEach(x=>out.push(`<div class="searchResult"><b>${esc(x.title)}</b><span>Task · ${esc(x.by||'')}</span></div>`));res.innerHTML=out.slice(0,30).join('')||'<div class="empty">No result found.</div>';qa('.searchResult[data-page]',res).forEach(b=>b.onclick=()=>{o.remove();go(b.dataset.page)})}inp.oninput=run;setTimeout(()=>inp.focus(),50);run()}
 function sub(p){return({dashboard:'Performance & graph',sales:'Order → Delivery',income:'Salary & earnings',incentive:'Target & progress',cpo:'Execution proof',route:'Daily focus plan',zero:'Outlet coverage',tasks:'Assignments',reports:'Analytics & export',proposals:'Forms & downloads',catalogue:'SKU master',control:'Admin & publishing',ai:'Ask your sales data'})[p]||''}
