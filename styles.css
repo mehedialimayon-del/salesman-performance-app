@@ -826,3 +826,34 @@ html,body,#app{background:#05090d!important}
  .aiIdentityTop{top:auto!important;bottom:350px!important;left:3px!important;right:3px!important;position:absolute!important;text-align:center!important;z-index:20!important}
  .aiIdentityTop strong{font-size:12px!important;white-space:nowrap!important}.aiIdentityTop small{font-size:8px!important;white-space:nowrap!important}
 }
+
+/* V44 — AI left rail identity placement: exactly between brand logo and portrait */
+@media (max-width:650px){
+  .aiPopupLeft{position:relative!important;overflow:hidden!important;}
+  .aiSideBrand{top:250px!important;}
+  .aiIdentityTop{
+    position:absolute!important;
+    top:auto!important;
+    bottom:430px!important;
+    left:2px!important;
+    right:2px!important;
+    transform:none!important;
+    text-align:center!important;
+    z-index:22!important;
+    pointer-events:none!important;
+    text-shadow:0 2px 8px #000,0 0 12px #000!important;
+  }
+  .aiIdentityTop strong{
+    display:block!important;
+    color:#ff7b18!important;
+    font:italic 12px/1.08 cursive!important;
+    white-space:nowrap!important;
+  }
+  .aiIdentityTop small{
+    display:block!important;
+    margin-top:5px!important;
+    color:#fff!important;
+    font:700 8px/1.15 sans-serif!important;
+    white-space:nowrap!important;
+  }
+}
