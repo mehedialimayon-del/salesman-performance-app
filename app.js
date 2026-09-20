@@ -8,7 +8,7 @@ const isMgr=()=>user?.mode==='MANAGER', srIds=()=>U.filter(x=>x.active!==false&&
 function target(id,m=month()){return +(db.targets?.[m]?.[id]??sr(id)?.target??0)}function delivered(id,m=month()){return db.sales.filter(x=>x.status==='Delivered'&&x.sr===id&&x.date?.startsWith(m)).reduce((a,x)=>a+(+x.deliveredAmount||0),0)}function teamDelivered(){return srIds().reduce((a,id)=>a+delivered(id),0)}function teamTarget(){return srIds().reduce((a,id)=>a+target(id),0)}function scopeDelivered(){return currentSr()?delivered(currentSr()):teamDelivered()}function scopeTarget(){return currentSr()?target(currentSr()):teamTarget()}
 function login(){currentPage='login';navStack=[];A.innerHTML=`<div class="login premiumLogin"><div class="loginShade"></div>
 <div class="loginTop">
-  <button class="langPill">🌐 English⌄</button>
+  <div class="langWrap"><button class="langPill" id="loginLangBtn">🌐 English⌄</button><div class="langMenu" id="loginLangMenu"><button type="button" data-lang="en">English</button><button type="button" data-lang="bn">বাংলা</button></div></div>
   <div class="loginBrand loginBrandStack">
     <div class="ffGrowthLogo loginHeroLogo" aria-label="FieldForce Hub"><span class="bars"><i></i><i></i><i></i><i></i><b>↗</b></span></div>
     <div class="loginBrandWords"><strong>Field<span>Force</span> Hub</strong><small>Sales | Team Management</small></div>
@@ -24,9 +24,11 @@ function login(){currentPage='login';navStack=[];A.innerHTML=`<div class="login 
 <div class="loginMiniCards"><div>▥<span>Sales</span></div><div>▣<span>Delivery</span></div><div>◎<span>Performance</span></div><div>♟<span>Growth</span></div></div>
 <div class="loginQuote">“ A Good Plan Today,<br>A Greater Tomorrow ”</div>
 <div class="devFooter loginDev">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank">AYON</a></div></div>`;
-q('#showPw').onclick=()=>{let x=q('#loginPw');x.type=x.type==='password'?'text':'password'};
+q('#showPw').onclick=()=>{let x=q('#loginPw');x.type=x.type==='password'?'text':'password';q('#showPw').textContent=x.type==='password'?'◉':'◎'};
+const lb=q('#loginLangBtn'),lm=q('#loginLangMenu');lb.onclick=()=>lm.classList.toggle('show');qa('#loginLangMenu button').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;lb.textContent=lang==='bn'?'🌐 বাংলা⌄':'🌐 English⌄';lm.classList.remove('show');applyLoginLang()});
+function applyLoginLang(){let bn=lang==='bn';q('.premiumLoginBox h1').textContent=bn?'স্বাগতম':'Welcome Back';q('.premiumLoginBox>p').textContent=bn?'আপনার অ্যাকাউন্টে লগইন করুন':'Login to your account';q('#loginId').placeholder=bn?'ইউজার আইডি':'User ID';q('#loginPw').placeholder=bn?'পাসওয়ার্ড':'Password';q('#forgotPw').textContent=bn?'পাসওয়ার্ড ভুলে গেছেন?':'Forgot Password?';q('.loginSubmit').innerHTML=(bn?'লগইন':'Login')+' <span>→</span>';q('.loginOptions label').lastChild.textContent=bn?' মনে রাখুন':' Remember Me'}
 q('#forgotPw').onclick=()=>alert('Please contact your Manager to reset your password.');
-q('#loginForm').onsubmit=e=>{e.preventDefault();let id=q('#loginId').value.trim(),pw=q('#loginPw').value.trim();if(id.toLowerCase()==='manager'&&pw==='M21954'){user={id:'M21954',name:'MEHEDI ALIM AYON',mode:'MANAGER',role:'MANAGER'};view='ALL';localStorage.setItem('ffh_session',JSON.stringify(user));return home(true)}let x=(U||[]).find(z=>String(z.id).trim().toLowerCase()===id.toLowerCase()&&z.active!==false);if(x&&(pw===String(x.password||x.id)||pw===String(x.id))){user={...x,mode:'SR'};view=x.id;localStorage.setItem('ffh_session',JSON.stringify(user));return home(true)}alert('Invalid User ID or Password')}}
+q('#loginForm').onsubmit=e=>{e.preventDefault();let id=q('#loginId').value.trim(),pw=q('#loginPw').value.trim();if(id.toLowerCase()==='manager'&&pw.toUpperCase()==='M21954'){user={id:'M21954',name:'MEHEDI ALIM AYON',mode:'MANAGER',role:'MANAGER'};view='ALL';localStorage.setItem('ffh_session',JSON.stringify(user));return home(true)}let x=(U||[]).find(z=>String(z.id).trim().toLowerCase()===id.toLowerCase()&&z.active!==false);if(x&&(pw===String(x.password||x.id)||pw===String(x.id))){user={...x,mode:'SR'};view=x.id;localStorage.setItem('ffh_session',JSON.stringify(user));return home(true)}alert('Invalid User ID or Password')}}
 function pendingTaskCount(){
   let arr=(db.tasks||[]).filter(x=>String(x.status||'').toLowerCase()!=='done'&&String(x.status||'').toLowerCase()!=='completed');
   if(isMgr()) return arr.length;

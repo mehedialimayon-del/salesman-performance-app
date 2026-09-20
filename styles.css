@@ -196,3 +196,23 @@ html,body,#app{background:#05090d!important}
 }
 .navBadge{top:4px;right:16%}
 .taskCornerBadge{display:grid;top:8px;right:9px;min-width:20px;height:20px;font-size:9px}
+
+/* V17 LOGIN POLISH — visual/layout only, reference matched */
+.langWrap{position:absolute;right:0;top:24px;z-index:9}.langWrap .langPill{position:static!important;min-width:94px}.langMenu{display:none;position:absolute;right:0;top:43px;width:112px;padding:5px;background:rgba(5,13,18,.97);border:1px solid #52616a;border-radius:12px;box-shadow:0 14px 35px #000b;backdrop-filter:blur(12px)}.langMenu.show{display:grid}.langMenu button{border:0;background:transparent;color:#fff;text-align:left;padding:9px 10px;border-radius:8px;font-weight:700}.langMenu button:active{background:#ff7417;color:#080b0d}
+@media (max-width:600px){
+ .premiumLogin{padding:7px 15px 6px!important;background-position:center top!important;background-size:100% auto!important;background-color:#03070a!important}
+ .loginShade{background:linear-gradient(180deg,rgba(1,5,8,.03) 0%,rgba(1,5,8,.04) 31%,rgba(2,7,10,.34) 55%,rgba(2,7,10,.88) 84%,#03070a 100%)!important}
+ .loginTop{height:210px!important;min-height:210px!important;padding-top:38px!important;align-items:flex-start!important}
+ .loginHeroLogo .bars{width:68px!important;height:58px!important}
+ .loginBrandWords strong{font-size:22px!important}.loginBrandWords small{font-size:8.5px!important}
+ .langWrap{top:28px!important;right:0!important}
+ .loginMotto{margin:-7px auto 8px!important}.loginMotto b{font-size:9.5px!important}.loginMotto span{margin-top:8px!important}
+ .premiumLoginBox{width:min(76vw,330px)!important;padding:12px 16px 13px!important;border-radius:21px!important}
+ .premiumLoginBox h1{font-size:22px!important}.premiumLoginBox>p{font-size:9.5px!important;margin-bottom:7px!important}
+ .loginField{height:42px!important;margin:6px 0!important}.loginField input{height:40px!important;line-height:40px!important;font-size:12px!important}.loginField button{font-size:15px!important;padding:4px 2px!important}
+ .loginOptions{margin:7px 0 9px!important}.loginSubmit{width:76%!important;height:43px!important;font-size:16px!important}
+ .loginMiniCards{width:min(74vw,330px)!important;margin:9px auto 5px!important}.loginMiniCards div{height:49px!important}
+ .loginQuote{font-size:10px!important;line-height:1.08!important;margin:5px auto 1px!important;position:relative!important;z-index:4!important}
+ .loginDev{font-size:6px!important;margin:2px auto 0!important;position:relative!important;z-index:4!important}
+}
+@media (max-height:760px){.loginTop{height:184px!important;min-height:184px!important;padding-top:29px!important}.premiumLoginBox{padding-top:10px!important;padding-bottom:10px!important}.loginMiniCards{margin-top:6px!important}.loginQuote{margin-top:2px!important}}
