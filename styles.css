@@ -40,3 +40,34 @@
 .module:hover,.listBtn.ctl:hover{filter:brightness(1.08);transform:translateY(-1px)}
 .top{position:sticky;top:0;z-index:30}.bottom{position:fixed}.wrap{min-height:calc(100vh - 150px)}
 .compactRow{padding:8px 0!important}.outletGroup{padding:7px 0;border-bottom:1px solid #2b2f31}.cpoCampaign{border-color:#6d4b1c!important}
+
+/* FINAL 9 — ULTRA PREMIUM ORANGE/WHITE CONTROL SYSTEM */
+:root{--premiumOrange:#f28a1a;--premiumOrange2:#ffad42;--premiumDark:#0b0d0f;--premiumWhite:#fff}
+button,.primary,.secondary,.success,.danger,.download,.tabs button,.scope button,.listBtn,.module{
+  font-size:13px!important;font-weight:800!important;letter-spacing:.25px;
+}
+.primary,.secondary,.success,.download,.tabs button.on,.scope button.active,.listBtn.ctl,.module{
+  background:linear-gradient(180deg,#ffb34d 0%,#f28a1a 52%,#d96f08 100%)!important;
+  color:#fff!important;border:1px solid #ffc979!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 7px 18px rgba(242,138,26,.20)!important;
+  text-shadow:0 1px 1px rgba(0,0,0,.28);
+}
+.primary:hover,.secondary:hover,.success:hover,.download:hover,.tabs button:hover,.scope button:hover,.listBtn:hover,.module:hover{
+  filter:brightness(1.12);box-shadow:0 0 0 2px rgba(255,171,61,.18),0 10px 25px rgba(242,138,26,.30)!important;transform:translateY(-1px)
+}
+.module{position:relative;min-height:104px}
+.module small{color:rgba(255,255,255,.82)!important;font-weight:600!important}
+.module .mi,.listBtn.ctl .ico{background:rgba(12,12,12,.82)!important;color:#fff!important;border-color:rgba(255,255,255,.22)!important}
+.moduleBadge{position:absolute;right:7px;top:7px;min-width:23px;height:23px;padding:0 6px;border-radius:999px;background:#111;color:#fff;border:2px solid #ffd08c;display:flex;align-items:center;justify-content:center;font-size:10px;box-shadow:0 4px 12px rgba(0,0,0,.35)}
+.danger{background:linear-gradient(180deg,#3a2222,#241414)!important;color:#ffb0a9!important;border:1px solid #74352f!important}
+.proposalCard{text-align:center}.proposalLogo{width:72px;height:72px;object-fit:contain;border-radius:16px;background:#fff;padding:8px;margin:4px auto 10px;display:block}.placeholderLogo{display:flex;align-items:center;justify-content:center;color:#111;font-weight:900}
+.proposalName{font-size:17px;font-weight:900;margin-bottom:4px}.miniDownload{padding:7px 10px!important}
+.catalogueGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.productCard{background:linear-gradient(155deg,#17191c,#0d0f11);border:1px solid #34383d;border-radius:16px;padding:10px;box-shadow:0 10px 25px rgba(0,0,0,.25)}
+.productImg{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:12px;background:#fff;margin-bottom:8px}.productPlaceholder{display:flex;align-items:center;justify-content:center;color:#222;font-weight:900}
+.productMeta{display:grid;gap:5px;margin-top:8px;font-size:11px}.productMeta span{display:flex;justify-content:space-between;color:#aeb4ba}.productMeta strong{color:#fff}
+.imageLightbox{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;padding:18px}.imageLightbox img{max-width:96vw;max-height:86vh;object-fit:contain;border-radius:14px}.imageLightbox button{position:absolute;top:18px;right:18px;width:42px;height:42px;border-radius:50%;background:#f28a1a!important;color:#fff!important}
+.taskRow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #292d31}.doneTask{opacity:.58}
+.aiOrb{animation:aiFloat 2.3s ease-in-out infinite,aiGlow 1.8s ease-in-out infinite alternate}
+@keyframes aiFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}@keyframes aiGlow{from{box-shadow:0 0 10px rgba(242,138,26,.35)}to{box-shadow:0 0 28px rgba(255,169,55,.85)}}
+.highlightStrip{position:sticky;top:61px;z-index:18;background:rgba(10,12,14,.94);backdrop-filter:blur(12px);padding:7px 0}
