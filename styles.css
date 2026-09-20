@@ -71,3 +71,22 @@ button,.primary,.secondary,.success,.danger,.download,.tabs button,.scope button
 .aiOrb{animation:aiFloat 2.3s ease-in-out infinite,aiGlow 1.8s ease-in-out infinite alternate}
 @keyframes aiFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}@keyframes aiGlow{from{box-shadow:0 0 10px rgba(242,138,26,.35)}to{box-shadow:0 0 28px rgba(255,169,55,.85)}}
 .highlightStrip{position:sticky;top:61px;z-index:18;background:rgba(10,12,14,.94);backdrop-filter:blur(12px);padding:7px 0}
+
+/* FINAL 10 — fixed one-screen Home */
+.globalSearchOverlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);padding:72px 14px 20px}
+.globalSearchBox{max-width:680px;margin:auto;background:#0d1114;border:1px solid #34404a;border-radius:20px;padding:12px;max-height:78vh;overflow:auto;box-shadow:0 25px 70px rgba(0,0,0,.55)}
+.searchTop{display:flex;gap:8px;position:sticky;top:0;background:#0d1114;padding-bottom:10px;z-index:2}
+.searchTop input{flex:1;background:#12181d;border:1px solid #34404a;color:#fff;border-radius:13px;padding:13px;font-size:15px}
+.searchTop button{width:44px;border-radius:12px;background:#f28a1a!important;color:#fff!important;border:0;font-size:24px}
+.searchResult{width:100%;display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:11px 8px;border:0;border-bottom:1px solid #252c31;background:transparent!important;color:#fff!important}
+.searchResult span{font-size:11px;color:#9da6ae;margin-top:3px}
+@media(max-width:700px){
+  .app:has(.homeGrid) .wrap{height:calc(100dvh - 126px);min-height:0;overflow:hidden;padding-top:0;padding-bottom:0}
+  .app:has(.homeGrid) .profile{margin:0 0 5px!important;padding-top:0!important;padding-bottom:4px!important}
+  .app:has(.homeGrid) .homeGrid{height:calc(100dvh - 254px);display:grid!important;grid-template-columns:repeat(3,1fr)!important;grid-template-rows:repeat(4,1fr)!important;gap:7px!important;margin:4px 0!important}
+  .app:has(.homeGrid) .module{min-height:0!important;height:auto!important;padding:7px 4px!important;border-radius:15px!important;font-size:12px!important;line-height:1.05!important}
+  .app:has(.homeGrid) .module .mi{width:39px!important;height:39px!important;margin-bottom:4px!important;font-size:19px!important}
+  .app:has(.homeGrid) .module small{font-size:9px!important;line-height:1.05!important;margin-top:4px!important}
+  .app:has(.homeGrid) .moduleBadge{right:3px!important;top:3px!important}
+  .app:has(.homeGrid) .devFooter{display:none}
+}
