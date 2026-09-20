@@ -761,3 +761,51 @@ html,body,#app{background:#05090d!important}
     white-space:normal!important;
   }
 }
+
+/* ===== V41 AI ONLY — identity locked in empty space above portrait ===== */
+@media(max-width:650px){
+  .aiIdentityTop{
+    top:auto!important;
+    bottom:535px!important;
+    left:7px!important;
+    right:7px!important;
+    text-align:center!important;
+    z-index:20!important;
+    pointer-events:none!important;
+    text-shadow:0 2px 8px #000,0 0 12px #000!important;
+  }
+  .aiIdentityTop strong{
+    display:block!important;
+    color:#ff7b18!important;
+    font:italic 13px/1.08 cursive!important;
+    white-space:nowrap!important;
+  }
+  .aiIdentityTop small{
+    display:block!important;
+    color:#fff!important;
+    font:700 7.5px/1.2 sans-serif!important;
+    margin-top:4px!important;
+    white-space:nowrap!important;
+  }
+  /* portrait itself stays exactly where V40 placed it */
+  .aiPortraitFade,
+  .aiPortraitFade .aiFullPortrait{ }
+}
+
+/* ===== V42 — AI voice + fixed identity + side brand ===== */
+.aiSideBrand{position:absolute;z-index:18;left:6px;right:6px;top:205px;display:flex;flex-direction:column;align-items:center;text-align:center;pointer-events:none}
+.aiSideBrand img{width:76px;height:76px;object-fit:contain;border-radius:50%;filter:drop-shadow(0 0 10px rgba(255,132,35,.35))}
+.aiSideBrand b{margin-top:5px;font-size:12px;line-height:1;color:#f4f6f7;white-space:nowrap}.aiSideBrand b::first-letter{color:#ff7b18}
+.aiSideBrand small{margin-top:5px;color:#ff8a2a;font-size:6.7px;line-height:1.15;white-space:nowrap}
+@media(max-width:650px){
+  html:has(#aiPopup),body:has(#aiPopup){overflow:hidden!important;overscroll-behavior:none!important}
+  .aiPopupOverlay{overflow:hidden!important;overscroll-behavior:none!important}
+  .aiPopupPanel{position:relative!important;height:calc(100dvh - 14px)!important;overflow:hidden!important}
+  .aiPopupLeft{position:relative!important;height:100%!important;overflow:hidden!important;transform:none!important}
+  .aiSideBrand{top:250px!important;left:2px!important;right:2px!important}
+  .aiSideBrand img{width:58px!important;height:58px!important}
+  .aiSideBrand b{font-size:9px!important}.aiSideBrand small{font-size:5.1px!important;white-space:normal!important;max-width:98px!important}
+  .aiIdentityTop{top:auto!important;bottom:535px!important;left:3px!important;right:3px!important;transform:none!important;position:absolute!important}
+  .aiIdentityTop strong{font-size:12px!important;white-space:nowrap!important}
+  .aiIdentityTop small{font-size:8px!important;white-space:nowrap!important}
+}
