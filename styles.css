@@ -693,3 +693,17 @@ html,body,#app{background:#05090d!important}
  .aiPopupMain{z-index:7!important}
  .aiPopupComposer{padding-right:0!important}
 }
+
+/* ===== V35 portrait fit + resilient voice UI ===== */
+.voiceNote{font-size:11px!important;color:#cbd5db!important;border-color:#34444e!important}
+@media(max-width:650px){
+  /* slightly wider portrait lane, but keep the conversation comfortably wide */
+  .aiFloatingOverlay .aiPopupPanel{grid-template-columns:118px minmax(0,1fr)!important;width:calc(100vw - 8px)!important;max-width:calc(100vw - 8px)!important}
+  .aiPopupLeft{overflow:hidden!important;padding-left:4px!important;padding-right:4px!important}
+  .aiPortraitFade{left:0!important;right:0!important;bottom:0!important;width:118px!important;height:455px!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;overflow:visible!important}
+  .aiPortraitFade .aiFullPortrait{position:relative!important;left:auto!important;bottom:-4px!important;width:108px!important;max-width:108px!important;height:auto!important;max-height:440px!important;object-fit:contain!important;object-position:center bottom!important}
+  .aiSignature{font-size:10px!important;margin-left:2px!important;margin-right:2px!important;white-space:nowrap!important}
+  .aiSignature small{font-size:7.5px!important}
+  .aiMotto{font-size:9px!important;padding:0 2px!important}
+  .aiPopupMain{padding-left:9px!important;padding-right:9px!important}
+}
