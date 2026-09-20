@@ -419,3 +419,96 @@ html,body,#app{background:#05090d!important}
 .homeGrid .module .mi svg{width:38px!important;height:38px!important;fill:currentColor;color:#ff8520!important;filter:drop-shadow(0 0 7px rgba(255,126,26,.42))}
 .homeGrid .module{background:radial-gradient(circle at 20% 5%,rgba(255,170,69,.34),transparent 32%),linear-gradient(145deg,#1b2529 0%,#0a1115 57%,#04080b 100%)!important;box-shadow:inset 0 1px rgba(255,230,190,.18),inset 18px 0 28px rgba(255,135,33,.05),0 7px 20px rgba(0,0,0,.58)!important}
 .homeGrid .module:first-child{box-shadow:0 0 10px #ff8420,0 0 30px rgba(255,119,15,.66),inset 0 0 34px rgba(255,137,38,.24)!important}
+
+/* =========================================================
+   V22 — REFERENCE MATCH: icons / glow / login geometry / banner
+   ========================================================= */
+
+/* LOGIN: larger reference logo + spacing + road kept visible */
+.loginHeroLogo .bars{display:none!important}
+.loginChartLogo{display:block!important;width:94px!important;height:74px!important;filter:drop-shadow(0 0 7px rgba(255,119,20,.34))}
+.loginTop{height:190px!important;min-height:190px!important;padding-top:14px!important}
+.loginBrandStack{gap:0!important}
+.loginBrandWords strong{font-size:24px!important;line-height:1!important}
+.loginBrandWords small{font-size:9px!important;margin-top:3px!important}
+.loginMotto{margin:0 auto 11px!important}
+.loginMotto b{font-size:10px!important}
+.loginMotto span{font-size:6.5px!important;letter-spacing:3.4px!important;margin-top:8px!important}
+.premiumLoginBox{
+ width:min(76vw,330px)!important;
+ background:linear-gradient(155deg,rgba(8,18,24,.50),rgba(2,9,13,.43))!important;
+ backdrop-filter:blur(2px)!important;-webkit-backdrop-filter:blur(2px)!important;
+ padding:13px 17px 14px!important;border-radius:22px!important
+}
+.premiumLoginBox h1{font-size:23px!important}
+.premiumLoginBox>p{font-size:10px!important;margin:2px 0 8px!important}
+.login label.loginField{height:44px!important;margin:7px 0!important;background:rgba(5,15,20,.35)!important}
+.login label.loginField input{height:42px!important;line-height:42px!important;font-size:13px!important}
+.loginSubmit{height:45px!important;font-size:17px!important}
+.loginMiniCards{width:min(76vw,330px)!important;margin:9px auto 4px!important}
+.loginMiniCards div{height:50px!important;background:rgba(4,13,18,.39)!important}
+.loginQuote{font-size:10.5px!important;margin:6px auto 2px!important}
+
+/* HOME: reference-card surface — dark black, warm orange-gold illumination, no pale/white wash */
+.app:has(.homeGrid) .wrap{height:auto!important;min-height:calc(100dvh - 126px)!important;overflow-y:auto!important;padding-bottom:92px!important}
+.app:has(.homeGrid) .homeGrid{
+ height:auto!important;
+ grid-template-rows:none!important;
+ gap:10px!important;
+ margin:7px 0 11px!important
+}
+.app:has(.homeGrid) .module{
+ min-height:118px!important;height:118px!important;padding:11px 8px!important;
+ background:
+   radial-gradient(circle at 13% 7%,rgba(255,132,27,.24),transparent 34%),
+   linear-gradient(145deg,#12191d 0%,#080d10 57%,#030608 100%)!important;
+ border:1px solid rgba(217,106,34,.72)!important;
+ box-shadow:inset 0 1px rgba(255,165,74,.10),inset 14px 10px 28px rgba(255,115,20,.045),0 8px 20px rgba(0,0,0,.58)!important
+}
+.app:has(.homeGrid) .module:first-child{
+ border-color:#ff8a20!important;
+ box-shadow:0 0 9px #ff7d1c,0 0 26px rgba(255,113,15,.72),inset 0 0 31px rgba(255,133,25,.20)!important
+}
+.homeGrid .module .mi{
+ width:54px!important;height:54px!important;margin:0 0 5px 3px!important;
+ display:flex!important;align-items:center!important;justify-content:flex-start!important
+}
+.homeGrid .module .mi svg{
+ width:48px!important;height:48px!important;color:#ff8724!important;
+ fill:currentColor;filter:drop-shadow(0 0 5px rgba(255,123,20,.38))!important
+}
+.homeGrid .moduleTitle{font-size:15px!important}
+.homeGrid .module small{font-size:9.5px!important;color:#c8ced2!important}
+
+/* Full horizontal motivational artwork, with the two text blocks like reference */
+.motivationPanel{
+ height:145px!important;min-height:145px!important;margin:12px 0 5px!important;
+ background:
+  linear-gradient(90deg,rgba(2,7,10,.44),rgba(2,7,10,.02) 45%,rgba(2,7,10,.25)),
+  url('home-motivation.png') center center/cover no-repeat!important;
+ padding:18px 22px!important;align-items:center!important
+}
+.motivationPanel div{font:italic 19px Georgia,serif!important;line-height:1.18!important}
+.motivationPanel>span{font-size:8px!important;letter-spacing:2.5px!important;line-height:1.65!important}
+
+/* Bottom nav: recognizable bell */
+.bottomSix #bn .bellGlyph{font-size:0!important;position:relative;width:22px;height:20px;margin:0 auto 4px!important}
+.bottomSix #bn .bellGlyph:before{
+ content:"";display:block;width:14px;height:14px;margin:1px auto 0;
+ border:2px solid #ff8120;border-radius:8px 8px 5px 5px;border-top-width:2px;
+ clip-path:polygon(0 0,100% 0,100% 82%,0 82%)
+}
+.bottomSix #bn .bellGlyph:after{
+ content:"";position:absolute;left:9px;bottom:0;width:5px;height:3px;border-radius:50%;background:#ff8120
+}
+.bottomSix i{font-size:22px!important}
+.bottomSix button{font-size:9.5px!important}
+
+/* keep mobile login fitting while preserving reference spacing */
+@media(max-height:780px){
+ .loginTop{height:166px!important;min-height:166px!important;padding-top:8px!important}
+ .loginChartLogo{width:82px!important;height:64px!important}
+ .loginMotto{margin:-1px auto 7px!important}
+ .premiumLoginBox{padding:10px 15px 11px!important}
+ .loginMiniCards div{height:44px!important}
+}
