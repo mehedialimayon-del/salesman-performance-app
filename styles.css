@@ -672,3 +672,24 @@ html,body,#app{background:#05090d!important}
 .aiPopupComposer{padding-right:66px!important}
 #aiPopupMic.listening{background:#ff7417!important;color:#111!important;box-shadow:0 0 18px rgba(255,116,23,.8)!important}
 @media(max-width:650px){.aiPopupOrbClose{width:54px;height:54px;right:9px;bottom:9px}.aiPortraitFade .aiFullPortrait{width:175px!important;left:-29px!important;bottom:-45px!important}.aiPortraitFade:after{left:-5px!important;right:-42px!important;background:linear-gradient(180deg,transparent 0%,rgba(7,16,21,.12) 30%,#071015 92%)!important}.aiPopupComposer{padding-right:60px!important}}
+
+/* ===== V34 single-orb + transparent foreground portrait ===== */
+/* There is only ONE AI orb: the shell orb. It toggles popup open/closed. */
+.aiPopupOrbClose{display:none!important}
+#orb.aiOrb{z-index:10120!important}
+/* Keep portrait as transparent human only; allow arm/shoulder to float over divider. */
+.aiPopupLeft{overflow:visible!important}
+.aiPortraitFade{overflow:visible!important;background:none!important;pointer-events:none!important;z-index:5!important}
+.aiPortraitFade:after{display:none!important}
+.aiPortraitFade .aiFullPortrait{mix-blend-mode:normal!important;object-fit:contain!important;z-index:6!important;filter:drop-shadow(8px 10px 16px rgba(0,0,0,.72))!important}
+.aiPopupMain{position:relative;z-index:7!important;background:linear-gradient(90deg,rgba(5,10,14,.90),rgba(5,10,14,.97) 14%,rgba(5,10,14,.98))}
+/* composer uses full available width; no space reserved for a second orb */
+.aiPopupComposer{padding-right:0!important}
+@media(max-width:650px){
+ .aiPortraitFade{left:0!important;right:auto!important;bottom:0!important;width:150px!important;height:540px!important}
+ .aiPortraitFade .aiFullPortrait{width:168px!important;max-height:520px!important;left:-27px!important;bottom:-12px!important}
+ .aiSignature{z-index:8!important}
+ .aiMotto{z-index:8!important}
+ .aiPopupMain{z-index:7!important}
+ .aiPopupComposer{padding-right:0!important}
+}
