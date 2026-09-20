@@ -714,3 +714,13 @@ html,body,#app{background:#05090d!important}
 .aiIdentityTop small{display:block;color:#fff;font:700 9px/1.2 sans-serif;margin-top:4px;white-space:nowrap}
 .aiSignature{display:none!important}
 @media(max-width:650px){.aiIdentityTop{top:610px;left:2px;right:2px}.aiIdentityTop strong{font-size:12px}.aiIdentityTop small{font-size:7.5px}.aiPortraitFade{bottom:82px!important;height:405px!important}.aiPortraitFade .aiFullPortrait{width:108px!important;max-width:108px!important;left:auto!important;bottom:-2px!important}}
+\n/* ===== V37 verified layout: identity ABOVE portrait, portrait position unchanged ===== */
+@media(max-width:650px){
+  .aiIdentityTop{top:auto!important;bottom:505px!important;left:4px!important;right:4px!important;text-align:center!important;z-index:10!important}
+  .aiIdentityTop strong{font-size:13px!important;line-height:1.08!important;color:#ff7b18!important;white-space:normal!important}
+  .aiIdentityTop small{font-size:7.4px!important;line-height:1.18!important;margin-top:4px!important;white-space:normal!important}
+  /* undo V36 portrait lift: keep V35 center-bottom placement */
+  .aiPortraitFade{bottom:0!important;height:455px!important}
+  .aiPortraitFade .aiFullPortrait{width:108px!important;max-width:108px!important;bottom:-4px!important}
+  .aiMotto{bottom:0!important}
+}
