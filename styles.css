@@ -605,3 +605,14 @@ html,body,#app{background:#05090d!important}
 .aiPortraitFade{position:absolute;left:0;right:0;bottom:105px;height:535px;overflow:hidden}.aiPortraitFade:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:125px;background:linear-gradient(180deg,transparent,#071015 82%);pointer-events:none}.aiPortraitFade .aiFullPortrait{bottom:-3px!important}.aiSignature{z-index:4!important}.aiPdfDownload{display:block;margin-top:10px;padding:10px 12px;border:1px solid #ff7a18;border-radius:10px;color:#fff!important;background:linear-gradient(90deg,#8d3d0c,#ff7217);font-weight:900;text-align:center;text-decoration:none}
 .aiHelloBubble{position:fixed;right:76px;bottom:112px;z-index:12000;width:min(285px,70vw);padding:12px 15px;background:linear-gradient(145deg,#111c22,#071015);border:1px solid #ff7a18;border-radius:18px 18px 5px 18px;box-shadow:0 12px 35px #000b,0 0 20px #ff741733;opacity:0;transform:translate(18px,16px) scale(.75);transform-origin:right bottom;transition:.25s cubic-bezier(.2,.9,.3,1.25);pointer-events:none}.aiHelloBubble:after{content:"";position:absolute;right:-8px;bottom:7px;border-width:8px 0 0 10px;border-style:solid;border-color:transparent transparent transparent #ff7a18}.aiHelloBubble.show{opacity:1;transform:none}.aiHelloBubble strong,.aiHelloBubble small{display:block}.aiHelloBubble strong{font-size:14px;color:#fff}.aiHelloBubble small{margin-top:4px;color:#ff9234;font-size:11px;font-weight:800}
 @media(max-width:650px){.aiFloatingOverlay{padding:8px!important}.aiFloatingOverlay .aiPopupPanel{height:calc(100dvh - 82px)!important;margin-bottom:68px!important}.aiPortraitFade{bottom:120px;height:430px}.aiPortraitFade .aiFullPortrait{width:155px!important;left:-32px!important}.aiPortraitFade:after{height:105px}.aiHelloBubble{right:69px;bottom:105px}.loginMotto .typeMotto{font-size:9px!important}}
+
+/* V31 — login framing only: keep discipline fully visible + reveal more road */
+.premiumLogin{background-position:center 22%!important;background-size:cover!important}
+.loginMotto{height:34px!important;min-height:34px!important;margin-bottom:8px!important;overflow:visible!important}
+.loginMotto .typeMotto{height:auto!important;min-height:13px!important;margin:0!important;padding:0 0 1px!important}
+.loginMotto span{display:block!important;position:relative!important;margin-top:6px!important;line-height:11px!important;height:11px!important;overflow:visible!important;transform:none!important;z-index:3!important}
+@media(max-width:650px){
+ .premiumLogin{background-position:center 25%!important}
+ .loginMotto{height:35px!important;min-height:35px!important;margin-bottom:7px!important}
+ .loginMotto span{margin-top:6px!important;line-height:11px!important;height:11px!important}
+}
