@@ -293,3 +293,111 @@ html,body,#app{background:#05090d!important}
   .premiumLoginBox{padding:8px 13px 9px!important}
   .loginMiniCards{margin-top:5px!important}
 }
+
+/* ==========================================================
+   V20 — USER-REFERENCE VISUAL REBUILD
+   Visual layer only. Existing page functions/data logic stay intact.
+   ========================================================== */
+
+/* LOGIN — user supplied truck/road background, lighter glass so scene remains visible */
+.premiumLogin{
+  min-height:100dvh!important;height:100dvh!important;overflow:hidden!important;
+  background-image:url('login-background.png')!important;
+  background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;
+  padding:7px 13px 7px!important;
+}
+.loginShade{
+  background:linear-gradient(180deg,rgba(1,6,9,.08) 0%,rgba(1,6,9,.12) 28%,rgba(1,6,9,.24) 62%,rgba(1,6,9,.42) 100%)!important;
+}
+.loginTop{height:142px!important;min-height:142px!important;padding-top:12px!important}
+.loginHeroLogo .bars{width:58px!important;height:48px!important}
+.loginBrandWords strong{font-size:20px!important}.loginBrandWords small{font-size:7.5px!important}
+.loginMotto{margin:-1px auto 5px!important;text-shadow:0 2px 7px #000}
+.loginMotto b{font-size:9px!important}.loginMotto span{font-size:6px!important;letter-spacing:3px!important;margin-top:5px!important}
+.premiumLoginBox{
+  width:min(70vw,305px)!important;margin:0 auto!important;padding:10px 14px 11px!important;border-radius:20px!important;
+  background:linear-gradient(160deg,rgba(7,17,23,.72),rgba(2,9,13,.68))!important;
+  border:1px solid rgba(168,187,198,.64)!important;
+  backdrop-filter:blur(5px)!important;-webkit-backdrop-filter:blur(5px)!important;
+  box-shadow:0 15px 35px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.06)!important;
+}
+.premiumLoginBox h1{font-size:20px!important;margin:0!important}.premiumLoginBox>p{font-size:9px!important;margin:1px 0 6px!important}
+.login label.loginField{height:39px!important;margin:5px 0!important;background:rgba(7,18,24,.54)!important;border-color:rgba(151,170,181,.55)!important}
+.login label.loginField input{height:37px!important;line-height:37px!important}
+.login .loginOptions{margin:6px 0 8px!important}
+.loginSubmit{width:78%!important;height:40px!important;margin:0 auto!important;display:block!important;font-size:15px!important}
+.loginMiniCards{width:min(70vw,305px)!important;margin:7px auto 2px!important;gap:6px!important}
+.loginMiniCards div{height:43px!important;background:rgba(5,15,20,.62)!important;backdrop-filter:blur(3px)!important}
+.loginQuote{font-size:9px!important;margin:4px auto 1px!important;text-shadow:0 2px 6px #000}
+.login .devFooter.loginDev,.loginDev{margin:2px auto 0!important;font-size:6px!important}
+
+/* HOME — brighter reference cards */
+.homeGrid{gap:9px!important}
+.homeGrid .module{
+  min-height:113px!important;padding:12px 9px!important;border-radius:16px!important;
+  background:
+    radial-gradient(circle at 22% 4%,rgba(255,156,58,.27),transparent 30%),
+    linear-gradient(145deg,#172126 0%,#0b1115 58%,#05090c 100%)!important;
+  border:1px solid rgba(255,130,38,.72)!important;
+  box-shadow:inset 0 1px rgba(255,222,170,.16),inset 0 -25px 35px rgba(0,0,0,.42),0 7px 20px rgba(0,0,0,.55)!important;
+}
+.homeGrid .module:first-child{
+  border-color:#ff8a24!important;
+  box-shadow:0 0 9px #ff8a24,0 0 26px rgba(255,117,20,.58),inset 0 0 30px rgba(255,126,26,.19)!important;
+}
+.homeGrid .module .mi{
+  color:#ff8a25!important;font-size:31px!important;font-weight:900!important;
+  text-shadow:0 0 13px rgba(255,126,26,.42)!important;
+}
+.homeGrid .moduleTitle{font-size:14px!important}.homeGrid .module small{font-size:8.5px!important}
+.moduleArrow{border-color:#65727a!important;background:rgba(5,11,15,.48)!important}
+.motivationPanel{
+  height:118px!important;margin:12px 0 6px!important;border-radius:15px!important;
+  background:
+    linear-gradient(90deg,rgba(2,7,10,.68),rgba(2,7,10,.05) 48%,rgba(2,7,10,.32)),
+    url('home-motivation.png') center/cover no-repeat!important;
+  border:1px solid #59656b!important;overflow:hidden!important;
+}
+.motivationPanel div{font-size:17px!important;text-shadow:0 2px 7px #000!important}
+.motivationPanel strong{color:#ff7d1a!important}.motivationPanel span{text-shadow:0 2px 7px #000!important}
+
+/* DASHBOARD — reference spacing; cards must not collide/overlap */
+.app:has(.dashHero) .wrap{overflow:auto!important;padding-bottom:88px!important}
+.dashHero{
+  background:linear-gradient(135deg,#121d23,#071015)!important;border:1px solid #394a54!important;
+  border-radius:15px!important;box-shadow:inset 0 1px rgba(255,255,255,.06)!important;
+}
+.kpiGrid{gap:10px!important}
+.kpi{
+  min-height:126px!important;border-radius:15px!important;overflow:hidden!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.08),0 7px 18px rgba(0,0,0,.38)!important;
+}
+.kpi:nth-child(1){background:linear-gradient(145deg,#064c32,#06271d)!important;border-color:#0cbf72!important}
+.kpi:nth-child(2){background:linear-gradient(145deg,#5a3009,#251505)!important;border-color:#e67816!important}
+.kpi:nth-child(3){background:linear-gradient(145deg,#083d69,#071f35)!important;border-color:#1685dc!important}
+.kpi:nth-child(4){background:linear-gradient(145deg,#57151e,#2b0c12)!important;border-color:#d43a4b!important}
+.dashTwo{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;margin-top:10px!important;align-items:stretch!important}
+.dashTwo>.card{width:auto!important;min-width:0!important;margin:0!important;overflow:hidden!important}
+.graphCard,.donutCard{min-height:235px!important}.activityCard,.topOutletCard{min-height:220px!important}
+.refChart{height:155px!important;overflow:hidden!important}
+.donutWrap{min-height:165px!important;overflow:hidden!important}
+.cardTitle{font-size:15px!important;line-height:1.15!important}
+.lowerDash{margin-bottom:12px!important}
+
+/* fixed six-button nav */
+.bottomSix{height:76px!important;background:#03090df5!important;border-top:1px solid #26343c!important}
+.bottomSix button{font-size:9px!important}
+.bottomSix button i{font-size:21px!important;color:#ff7b18!important}
+
+/* keep portrait orb from covering dashboard content */
+.app:has(.dashHero) .aiOrb{bottom:88px!important;right:12px!important;width:55px!important;height:55px!important}
+
+@media(max-width:600px){
+  .homeGrid .module{min-height:108px!important}
+  .motivationPanel{height:108px!important}
+  .dashTwo{grid-template-columns:1fr 1fr!important;gap:8px!important}
+  .graphCard,.donutCard{min-height:220px!important}
+  .activityCard,.topOutletCard{min-height:210px!important}
+  .donut{width:88px!important;height:88px!important}.donut>div{width:54px!important;height:54px!important}
+  .legend{font-size:7px!important}
+}

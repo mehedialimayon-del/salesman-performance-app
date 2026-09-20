@@ -23,7 +23,7 @@ function login(){currentPage='login';navStack=[];A.innerHTML=`<div class="login 
 <button class="loginSubmit" type="submit">Login <span>→</span></button></form></div>
 <div class="loginMiniCards"><div>▥<span>Sales</span></div><div>▣<span>Delivery</span></div><div>◎<span>Performance</span></div><div>♟<span>Growth</span></div></div>
 <div class="loginQuote">“ A Good Plan Today,<br>A Greater Tomorrow ”</div>
-<div class="devFooter loginDev">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank">AYON</a></div></div>`;
+<div class="devFooter loginDev">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank">KAM AYON</a></div></div>`;
 q('#showPw').onclick=()=>{let x=q('#loginPw');x.type=x.type==='password'?'text':'password';q('#showPw').textContent=x.type==='password'?'◉':'◎'};
 const lb=q('#loginLangBtn'),lm=q('#loginLangMenu');lb.onclick=()=>lm.classList.toggle('show');qa('#loginLangMenu button').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;lb.textContent=lang==='bn'?'🌐 বাংলা⌄':'🌐 English⌄';lm.classList.remove('show');applyLoginLang()});
 function applyLoginLang(){let bn=lang==='bn';q('.premiumLoginBox h1').textContent=bn?'স্বাগতম':'Welcome Back';q('.premiumLoginBox>p').textContent=bn?'আপনার অ্যাকাউন্টে লগইন করুন':'Login to your account';q('#loginId').placeholder=bn?'ইউজার আইডি':'User ID';q('#loginPw').placeholder=bn?'পাসওয়ার্ড':'Password';q('#forgotPw').textContent=bn?'পাসওয়ার্ড ভুলে গেছেন?':'Forgot Password?';q('.loginSubmit').innerHTML=(bn?'লগইন':'Login')+' <span>→</span>';q('.loginOptions label').lastChild.textContent=bn?' মনে রাখুন':' Remember Me'}
@@ -69,17 +69,17 @@ function back(title){return `<div class="head"><button class="back" id="back">�
 function navigate(name,fn){if(currentPage!==name)navStack.push({name:currentPage,view});currentPage=name;fn()}
 function bindBack(){q('#back')&&(q('#back').onclick=()=>{let prev=navStack.pop();if(!prev){currentPage='home';return home(true)}view=prev.view;currentPage=prev.name;let fn=({home,dashboard,zero,sales,income,incentive,cpo,route,tasks,reports,proposals,catalogue,control,ai,notifications,profile})[prev.name];if(prev.name?.startsWith('control:'))return controlPage(prev.name.split(':')[1]);if(prev.name?.startsWith('report:'))return reports();fn?fn(true):home(true)})}
 const mods=[
-['▦','dashboard','Dashboard'],
-['◌','zero','Zero Sales'],
-['▥','sales','Daily Sales'],
-['RM','income','Income'],
+['▥','dashboard','Dashboard'],
+['◎','zero','Zero Sales'],
+['▤','sales','Daily Sales'],
+['●','income','Income'],
 ['★','incentive','Incentive'],
-['▣','cpo','CPO / DPO'],
+['◉','cpo','CPO / DPO'],
 ['⌖','route','Route Plan'],
 ['✓','tasks','Tasks'],
-['▤','reports','Reports'],
-['▧','proposals','Proposal Library'],
-['◫','catalogue','Catalogue'],
+['▦','reports','Reports'],
+['PDF','proposals','Proposal Library'],
+['◆','catalogue','Catalogue'],
 ['⚙','control','Manager Control']
 ];
 function home(noPush=false){currentPage='home';let role=isMgr()?'Manager · Team Command':'Sales Representative',nm=(user?.name||'Team').split(' ').slice(-1)[0];shell(`<div class="homeHero"><div><h2>Good Morning, <span>${esc(nm)}!</span></h2><p>Same People. Bigger Targets. Brighter Tomorrow.</p></div><div class="homeMoral">“ Discipline<br>Drives<br>Results ”</div><div class="heroDate">▣ ${new Date().toLocaleDateString('en-MY',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div></div><div class="profile compactProfile"><img class="avatar" src="${user.photo||'ayon-ai.png'}"><div><strong>${user.name}</strong><span class="muted">${role}</span></div></div><div class="grid homeGrid">${mods.filter(x=>isMgr()||x[1]!=='control').map(x=>`<button class="module" data-page="${x[1]}"><span class="mi">${x[0]}</span><span class="moduleTitle">${x[2]}</span>${moduleBadge(x[1])}<small>${sub(x[1])}</small><b class="moduleArrow">›</b></button>`).join('')}</div><div class="motivationPanel"><div><em>Smart People</em><br><em>Stronger Team</em><br><strong>Bigger Tomorrow</strong></div><span>ONE TEAM<br>ONE PLATFORM<br>GREATER<br>TOMORROW</span></div>`);
