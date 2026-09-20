@@ -528,3 +528,31 @@ html,body,#app{background:#05090d!important}
  .loginChartLogo{width:94px!important;height:70px!important}
  .loginTop{height:174px!important;min-height:174px!important}
 }
+
+/* V24 profile/content controls */
+.editableAvatar{cursor:pointer;box-shadow:0 0 0 2px rgba(255,129,32,.7),0 0 13px rgba(255,119,20,.28)}
+.editOverlay{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.8);display:grid;place-items:center;padding:18px}
+.editForm{width:min(92vw,420px);background:#071116;border:1px solid #a65320;border-radius:22px;padding:20px;box-shadow:0 0 32px rgba(255,111,12,.24)}
+.editForm h3{margin:0 0 15px;color:#fff}.editForm label{display:block;color:#bdc6ca;font-size:12px;margin:10px 0}
+.editForm input,.photoChoose{width:100%;box-sizing:border-box;margin-top:5px;padding:12px;border-radius:11px;border:1px solid #42515a;background:#0c171c;color:#fff}
+.photoChoose{color:#ff8b27}.editPreview{display:block;width:68px;height:68px;object-fit:cover;border-radius:50%;margin:10px auto;border:2px solid #ff8120}
+.editActions{display:flex;gap:10px;margin-top:15px}.editActions button{flex:1;padding:12px;border:0;border-radius:11px;background:linear-gradient(90deg,#ff9a28,#ff5e0c);font-weight:800}
+.editActions .secondary{background:#182329;color:#fff}.mgrCrud{display:inline-flex;gap:5px}.mgrCrud button{border:1px solid #75411e;background:#11191d;color:#ff8a24;border-radius:7px;padding:5px 7px}
+
+/* V25 — animated login identity only */
+.loginChartLogo .animBar{transform-box:fill-box;transform-origin:center bottom;animation:ffBarRise .48s cubic-bezier(.2,.85,.3,1) both}
+.loginChartLogo .b1{animation-delay:.10s}.loginChartLogo .b2{animation-delay:.34s}.loginChartLogo .b3{animation-delay:.58s}.loginChartLogo .b4{animation-delay:.82s}
+.loginChartLogo .animCurve{stroke-dasharray:150;stroke-dashoffset:150;animation:ffCurveDraw .72s ease-out 1.06s forwards;filter:drop-shadow(0 0 5px rgba(255,133,24,.75))}
+.loginChartLogo .animArrow{opacity:0;transform-box:fill-box;transform-origin:center;animation:ffArrowIn .28s ease-out 1.68s forwards}
+.loginChartLogo .arrowSpark{opacity:0;transform-box:fill-box;transform-origin:center;animation:ffSpark 1.35s ease-in-out 1.82s infinite;filter:drop-shadow(0 0 8px #ffd56a)}
+.loginBrandWords strong{animation:ffNameIn .45s ease-out .18s both}
+.loginBrandWords small{display:inline-block;white-space:nowrap;overflow:hidden;width:0;animation:ffTypeLine 1.5s steps(37,end) 1.95s forwards;border-right:1px solid rgba(255,129,32,.8)}
+.loginMotto b{display:inline-block;white-space:nowrap;overflow:hidden;max-width:0;animation:ffTypeMotto 1.9s steps(44,end) 3.25s forwards}
+@keyframes ffBarRise{from{transform:scaleY(.06);opacity:.2}to{transform:scaleY(1);opacity:1}}
+@keyframes ffCurveDraw{to{stroke-dashoffset:0}}
+@keyframes ffArrowIn{from{opacity:0;transform:translate(-8px,8px) scale(.7)}to{opacity:1;transform:none}}
+@keyframes ffSpark{0%,100%{opacity:.55;transform:scale(.65)}50%{opacity:1;transform:scale(1.45)}}
+@keyframes ffNameIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes ffTypeLine{to{width:100%}}
+@keyframes ffTypeMotto{to{max-width:520px}}
+@media(prefers-reduced-motion:reduce){.loginChartLogo .animBar,.loginChartLogo .animCurve,.loginChartLogo .animArrow,.loginChartLogo .arrowSpark,.loginBrandWords strong,.loginBrandWords small,.loginMotto b{animation:none!important;opacity:1!important;transform:none!important;stroke-dashoffset:0!important;width:auto!important;max-width:none!important;border-right:0!important}}

@@ -13,12 +13,12 @@ function login(){currentPage='login';navStack=[];A.innerHTML=`<div class="login 
     <div class="ffGrowthLogo loginHeroLogo" aria-label="FieldForce Hub">
 <svg class="loginChartLogo" viewBox="0 0 120 92" aria-hidden="true">
 <defs><linearGradient id="lg22" x1="0" x2="1"><stop stop-color="#ff9c28"/><stop offset="1" stop-color="#ff6510"/></linearGradient></defs>
-<rect x="17" y="60" width="15" height="23" rx="2" fill="url(#lg22)"/>
-<rect x="39" y="48" width="15" height="35" rx="2" fill="url(#lg22)"/>
-<rect x="61" y="34" width="15" height="49" rx="2" fill="url(#lg22)"/>
-<rect x="83" y="19" width="15" height="64" rx="2" fill="url(#lg22)"/>
-<path d="M14 58 C35 54, 50 42, 65 31 S89 14,102 10" fill="none" stroke="url(#lg22)" stroke-width="7" stroke-linecap="round"/>
-<path d="M91 7 L108 7 L104 23 Z" fill="#ff7114"/>
+<rect class="animBar b1" x="17" y="60" width="15" height="23" rx="2" fill="url(#lg22)"/>
+<rect class="animBar b2" x="39" y="48" width="15" height="35" rx="2" fill="url(#lg22)"/>
+<rect class="animBar b3" x="61" y="34" width="15" height="49" rx="2" fill="url(#lg22)"/>
+<rect class="animBar b4" x="83" y="19" width="15" height="64" rx="2" fill="url(#lg22)"/>
+<path class="animCurve" d="M14 58 C35 54, 50 42, 65 31 S89 14,102 10" fill="none" stroke="url(#lg22)" stroke-width="7" stroke-linecap="round"/>
+<path class="animArrow" d="M91 7 L108 7 L104 23 Z" fill="#ff7114"/><circle class="arrowSpark" cx="105" cy="8" r="4.2" fill="#fff3b0"/>
 </svg></div>
     <div class="loginBrandWords"><strong>Field<span>Force</span> Hub</strong><small>Sales | Team Management</small></div>
   </div>
@@ -125,7 +125,7 @@ function home(noPush=false){
  proposals:['প্রপোজাল লাইব্রেরি','ফর্ম ও ডাউনলোড'],catalogue:['ক্যাটালগ','SKU মাস্টার'],control:['ম্যানেজার কন্ট্রোল','অ্যাডমিন ও পাবলিশিং']
  }:{};
  let dateLocale=bn?'bn-BD':'en-MY';
- shell(`<div class="homeHero"><div><h2>${greetingNow()}, <span>${esc(nm)}!</span></h2><p>${bn?'একই মানুষ। বড় টার্গেট। আরও উজ্জ্বল আগামী।':'Same People. Bigger Targets. Brighter Tomorrow.'}</p></div><div class="homeMoral">“ ${bn?'শৃঙ্খলাই<br>ফলাফল<br>আনে':'Discipline<br>Drives<br>Results'} ”</div><div class="heroDate">▣ ${new Date().toLocaleDateString(dateLocale,{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div></div><div class="profile compactProfile"><img class="avatar" src="${user.photo||'ayon-ai.png'}"><div><strong>${user.name}</strong><span class="muted">${role}</span></div></div><div class="grid homeGrid">${mods.filter(x=>isMgr()||x[1]!=='control').map(x=>{let tx=labels[x[1]]||[x[2],sub(x[1])];return `<button class="module" data-page="${x[1]}"><span class="mi">${moduleIcon(x[1],x[0])}</span><span class="moduleTitle">${tx[0]}</span>${moduleBadge(x[1])}<small>${tx[1]}</small><b class="moduleArrow">›</b></button>`}).join('')}</div><div class="motivationPanel"><div><em>${bn?'স্মার্ট মানুষ':'Smart People'}</em><br><em>${bn?'শক্তিশালী টিম':'Stronger Team'}</em><br><strong>${bn?'আরও বড় আগামী':'Bigger Tomorrow'}</strong></div><span>${bn?'এক টিম<br>এক প্ল্যাটফর্ম<br>আরও বড়<br>আগামী':'ONE TEAM<br>ONE PLATFORM<br>GREATER<br>TOMORROW'}</span></div>`);
+ shell(`<div class="homeHero"><div><h2>${greetingNow()}, <span>${esc(nm)}!</span></h2><p>${bn?'একই মানুষ। বড় টার্গেট। আরও উজ্জ্বল আগামী।':'Same People. Bigger Targets. Brighter Tomorrow.'}</p></div><div class="homeMoral">“ ${bn?'শৃঙ্খলাই<br>ফলাফল<br>আনে':'Discipline<br>Drives<br>Results'} ”</div><div class="heroDate">▣ ${new Date().toLocaleDateString(dateLocale,{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div></div><div class="profile compactProfile"><img class="avatar editableAvatar" title="Change profile picture" onclick="changeOwnPhoto()" src="${user.photo||'ayon-ai.png'}"><div><strong>${user.name}</strong><span class="muted">${role}</span></div></div><div class="grid homeGrid">${mods.filter(x=>isMgr()||x[1]!=='control').map(x=>{let tx=labels[x[1]]||[x[2],sub(x[1])];return `<button class="module" data-page="${x[1]}"><span class="mi">${moduleIcon(x[1],x[0])}</span><span class="moduleTitle">${tx[0]}</span>${moduleBadge(x[1])}<small>${tx[1]}</small><b class="moduleArrow">›</b></button>`}).join('')}</div><div class="motivationPanel"><div><em>${bn?'স্মার্ট মানুষ':'Smart People'}</em><br><em>${bn?'শক্তিশালী টিম':'Stronger Team'}</em><br><strong>${bn?'আরও বড় আগামী':'Bigger Tomorrow'}</strong></div><span>${bn?'এক টিম<br>এক প্ল্যাটফর্ম<br>আরও বড়<br>আগামী':'ONE TEAM<br>ONE PLATFORM<br>GREATER<br>TOMORROW'}</span></div>`);
  qa('.module').forEach(b=>b.onclick=()=>go(b.dataset.page));updateTaskBadges();updateNotifyBadges()
 }
 function moduleBadge(p){let id=currentSr(),n=0;if(p==='zero')n=zeroCount(id);if(p==='tasks')n=db.tasks.filter(x=>(!id||x.to===id||x.to==='ALL')&&x.status!=='Done').length;if(p==='sales')n=db.sales.filter(x=>(!id||x.sr===id)&&x.status!=='Delivered').length;if(p==='notifications')n=(db.notifications||[]).filter(x=>!x.read).length;return n?`<span class="moduleBadge">${n>999?'999+':n}</span>`:''}
@@ -192,7 +192,7 @@ if(x==='kb'){shell(back('AI Knowledge Base')+`<div class="card"><form class="for
 function editSrAccount(id){let u=sr(id);if(!u)return;let name=prompt('SR Name',u.name);if(name===null)return;let pw=prompt('Login Password',u.password||u.id);if(pw===null)return;let mobile=prompt('Mobile Number',u.mobile||'');if(mobile===null)return;let address=prompt('Home Address',u.address||'');if(address===null)return;u.name=name.trim()||u.name;u.password=pw;u.mobile=mobile;u.address=address;let act=confirm('OK = keep ACTIVE. Cancel = deactivate this SR.');u.active=act;let del=!act&&confirm('Deactivate selected. Press OK again to permanently remove this SR account. Outlet/sales history will remain for audit.');if(del){db.users=U=U.filter(x=>x.id!==id)}save();controlPage('users')}
 function outletManager(){controlPage('outlets')}
 function notifications(){let id=currentSr(),pending=db.sales.filter(x=>x.status!=='Delivered'&&(!id||x.sr===id)).length,task=db.tasks.filter(x=>(!id||x.to===id||x.to==='ALL')&&x.status!=='Done').length,z=zeroCount(id),sh=Math.max(0,scopeTarget()-scopeDelivered());shell(back('Notifications & Priority Panel')+`<div class="highlightStrip"><div class="alertBox"><span>SHORTFALL</span><b class="red">${rm(sh)}</b></div><div class="alertBox yellow"><span>ZERO SALES</span><b>${z}</b></div></div><div class="card"><div class="row"><div><b>Pending Delivery</b><div class="miniStat">Orders waiting for confirmation</div></div><span class="${pending?'orange':'green'}">${pending}</span></div><div class="row"><div><b>Important / Open Tasks</b><div class="miniStat">Pending tasks stay on top</div></div><span class="${task?'yellow':'green'}">${task}</span></div><div class="row"><div><b>Outlet Coverage Gap</b><div class="miniStat">Assigned outlets without delivered sales</div></div><span class="${z?'red':'green'}">${z}</span></div></div>${isMgr()?`<button class="primary" id="notifySetup">OPEN NOTIFICATION SETTINGS</button>`:''}`);bindBack();if(q('#notifySetup'))q('#notifySetup').onclick=()=>{navStack.push({name:'notifications',view});controlPage('notify')}}
-function profile(){shell(back('Profile')+`<div class="card"><div class="profile"><img class="avatar" src="${user.photo||'ayon-ai.png'}"><div><strong>${user.name}</strong><span class="muted">${user.id} · ${user.mode}</span></div></div><div class="row"><span>Assigned Outlets</span><b>${outlets(user.id).length}</b></div><div class="row"><span>Current Month Delivered</span><b class="green">${rm(delivered(user.id))}</b></div></div>`);bindBack()}
+function profile(){shell(back('Profile')+`<div class="card"><div class="profile"><img class="avatar editableAvatar" title="Change profile picture" onclick="changeOwnPhoto()" src="${user.photo||'ayon-ai.png'}"><div><strong>${user.name}</strong><span class="muted">${user.id} · ${user.mode}</span></div></div><div class="row"><span>Assigned Outlets</span><b>${outlets(user.id).length}</b></div><div class="row"><span>Current Month Delivered</span><b class="green">${rm(delivered(user.id))}</b></div></div>`);bindBack()}
 function ai(){shell(back('AYON AI')+`<div class="card"><div class="aiHero"><img src="ayon-ai.png"><div><h2>AYON AI</h2><div class="online">● ONLINE · SALES INTELLIGENCE ASSISTANT</div><div class="muted">Data-aware · Permission-aware · Voice enabled</div></div></div><div class="chips"><button>আমার সেলস কত?</button><button>শর্টফল কত?</button><button>কোন outlet focus করব?</button><button>তোমাকে তৈরি করেছে কে?</button></div><div class="chat" id="chat"><div class="bubble bot">স্যার, AYON AI প্রস্তুত। Sales, target, outlet, route, income বা execution নিয়ে জিজ্ঞেস করুন।</div></div><div class="composer"><button class="mic" id="mic">🎙</button><input id="ask" placeholder="Ask AYON AI..."><button class="primary" id="send">➤</button></div></div>`);bindBack();qa('.chips button').forEach(b=>b.onclick=()=>{q('#ask').value=b.textContent;askAI()});q('#send').onclick=askAI;q('#ask').onkeydown=e=>e.key==='Enter'&&askAI();setupMic()}
 function aiAnswer(s){let z=s.toLowerCase(),id=currentSr()||'M21954',d=delivered(id),t=target(id),sh=Math.max(0,t-d);if(/তৈরি|creator|created|বানাই/.test(z)){let k=db.kb||{};return `স্যার, আমাকে তৈরি ও পরিকল্পনা করেছেন ${k.creator||'Mehedi Alim Ayon'}, ${k.designation||'Key Account Manager'}, ${k.company||'Pinnacle Foods (M) Sdn. Bhd.'}। FieldForce Hub-এ sales performance আর field execution সহজ করাই আমার কাজ।`}if(isMgr()){let hit=U.find(u=>z.includes((u.name||'').toLowerCase().split(' ').slice(-1)[0])||z.includes(u.id.toLowerCase()));if(hit){id=hit.id;d=delivered(id);t=target(id);sh=Math.max(0,t-d)}}if(/short|শর্ট|বাকি/.test(z))return `স্যার, target ${rm(t)}, delivered ${rm(d)}—বর্তমান shortfall ${rm(sh)}। ${sh?'Gap আছে, কিন্তু panic না—delivery confirmation ঠিক রাখলে picture পরিষ্কার থাকবে 😄':'Target complete, এখন over-achievement-এর পালা 😄'}`;if(/sale|সেল/.test(z))return `স্যার, confirmed delivered sales ${rm(d)}। Pending order আমি achievement-এ ধরিনি।`;if(/income|ইনকাম|আয়/.test(z))return `স্যার, Income screen-এ fixed income, commission, incentives এবং penalty মিলিয়ে net amount দেখানো আছে।`;if(/outlet|focus|ফোকাস|route|রুট/.test(z)){let os=outlets(id),done=new Set(db.sales.filter(x=>x.sr===id&&x.status==='Delivered').map(x=>x.outletCode)),zero=os.filter(o=>!done.has(o.code));if(!os.length)return 'স্যার, এই SR-এর outlet route এখনো assign করা নেই—আমি বানিয়ে outlet বলব না।';return `স্যার, ${os.length} assigned outlet-এর মধ্যে ${zero.length}টিতে confirmed delivery নেই। আগে ${zero.slice(0,3).map(x=>x.name).join(', ')} ফোকাস করতে পারেন।`}if(/pending|ডেলিভারি/.test(z)){let p=db.sales.filter(x=>x.sr===id&&x.status!=='Delivered').length;return `স্যার, ${p}টি order Pending Delivery আছে। Confirm না হওয়া পর্যন্ত dashboard sales-এ যাবে না।`}return 'স্যার, প্রশ্নটা sales/target/outlet/income/CPO/task data অনুযায়ী একটু নির্দিষ্ট করে বলুন। Data না থাকলে আমি গল্প বানাব না 😄।'}
 function askAI(){let inp=q('#ask'),s=inp.value.trim();if(!s)return;let c=q('#chat');c.innerHTML+=`<div class="bubble me">${esc(s)}</div>`;let a=aiAnswer(s);c.innerHTML+=`<div class="bubble bot">${a}</div>`;inp.value='';c.scrollTop=c.scrollHeight}
@@ -207,3 +207,34 @@ try{
   else login();
 }catch(e){try{localStorage.removeItem('ffh_session')}catch(_){} login()}
 })();
+/* ===== V24 PROFILE / CPO / MANAGER CONTENT CONTROL ===== */
+function ffPhotoPick(cb){
+ let i=document.createElement('input'); i.type='file'; i.accept='image/*';
+ i.onchange=()=>{let f=i.files&&i.files[0];if(!f)return;if(f.size>3*1024*1024){alert('Image must be under 3MB');return}
+ let r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(f)};i.click()
+}
+function changeOwnPhoto(){
+ ffPhotoPick(data=>{user.photo=data;let u=db.users.find(x=>x.id===user.id);if(u)u.photo=data;save();home(true)})
+}
+function editSrForm(id){
+ if(!isMgr())return;let u=db.users.find(x=>x.id===id);if(!u)return;
+ let o=document.createElement('div');o.className='editOverlay';
+ o.innerHTML='<form class="editForm"><h3>Edit SR</h3><label>Name<input name="name"></label><label>Staff / Login ID<input name="id" disabled></label><label>Monthly Target<input name="target" type="number" min="50000"></label><label>Profile Picture<button type="button" class="photoChoose">Choose / Replace Photo</button></label><img class="editPreview"><div class="editActions"><button type="button" class="secondary">Cancel</button><button type="submit">Save Update</button></div></form>';
+ document.body.appendChild(o);let f=o.querySelector('form'),pic=u.photo||'ayon-ai.png',preview=o.querySelector('.editPreview');
+ f.name.value=u.name||'';f.id.value=u.id||'';f.target.value=Number(u.target||50000);preview.src=pic;
+ o.querySelector('.photoChoose').onclick=()=>ffPhotoPick(d=>{pic=d;preview.src=d});
+ o.querySelector('.secondary').onclick=()=>o.remove();
+ f.onsubmit=e=>{e.preventDefault();u.name=f.name.value.trim()||u.name;u.target=Math.max(50000,Number(f.target.value||u.target||50000));u.photo=pic;save();o.remove();home(true)}
+}
+function cpoCanUpload(c){
+ let id=currentSr();return !!c&&(isMgr()||!c.to||c.to==='ALL'||c.to===id||c.sr===id)
+}
+function upsertByName(arr,item){
+ let key=String(item.name||item.title||'').trim().toLowerCase();
+ let old=arr.find(x=>String(x.name||x.title||'').trim().toLowerCase()===key);
+ if(old){Object.assign(old,item);return old} arr.push(item);return item
+}
+function managerEditDeleteBar(type,id){
+ if(!isMgr())return '';
+ return '<span class="mgrCrud" data-type="'+type+'" data-id="'+encodeURIComponent(id)+'"><button class="mgrEdit" title="Edit">✎</button><button class="mgrDelete" title="Delete">🗑</button></span>'
+}
