@@ -857,3 +857,5 @@ html,body,#app{background:#05090d!important}
     white-space:nowrap!important;
   }
 }
+/* V49 catalogue-driven incentive groups */
+.incGroup{margin:12px 0;padding:14px;border:1px solid rgba(255,123,25,.42);border-radius:16px;background:linear-gradient(145deg,rgba(255,125,28,.08),rgba(4,12,17,.68))}.incGroup>b{color:#ff8a28;font-size:16px}.incBuilder{margin:12px 0!important;background:rgba(7,15,20,.72)!important}.incBuilder .row{margin-bottom:10px}.incBuilder .danger{width:auto;padding:7px 10px}
