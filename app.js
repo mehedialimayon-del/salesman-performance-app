@@ -1,45 +1,25 @@
 'use strict';
+
 /* =========================================================
    FIELDFORCE HUB — SUPABASE CONNECTION
 ========================================================= */
+const FFH_SUPABASE_URL='https://svpgjrxeqnluipsgjywk.supabase.co';
+const FFH_SUPABASE_PUBLISHABLE_KEY='sb_publishable_eR5TZxv2aWndxdwzU0RIUA_mXWcBcO3';
+const FFH_SUPABASE=window.supabase.createClient(FFH_SUPABASE_URL,FFH_SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+window.FFH_SUPABASE=FFH_SUPABASE;
 
-const FFH_SUPABASE_URL = 'https://svpgjrxeqnluipsgjywk.supabase.co';
-const FFH_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_eR5TZxv2aWndxdwzU0RIUA_mXWcBcO3';
-
-const FFH_SUPABASE = window.supabase.createClient(
-  FFH_SUPABASE_URL,
-  FFH_SUPABASE_PUBLISHABLE_KEY,
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
-    }
-  }
-);
-
-window.FFH_SUPABASE = FFH_SUPABASE;
-FFH_SUPABASE
-  .from('ffh_profiles')
-  .select('staff_id,full_name,role,can_manage,can_sell')
-  .limit(1)
-  .then(({ data, error }) => {
-    if (error) {
-      alert('SUPABASE TEST FAILED\n\n' + error.message);
-    } else {
-      alert(
-        'SUPABASE CONNECTION PASS ✅\n\n' +
-        'Database connected successfully.\n' +
-        'Rows received: ' + data.length
-      );
-    }
-  });
 (()=>{const D=window.APP_DATA||{},A=document.getElementById('app'),K='ffh_ultimate_final_v1',today=()=>new Date().toISOString().slice(0,10),month=()=>today().slice(0,7),rm=n=>'RM '+Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
 let db;try{db=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){db={}};db={sales:[],targets:{},tasks:[],adjustments:[],cpo:[],routes:{},proposals:[],incentives:[],notifications:[],customOutlets:{},incomeSetup:{},settings:{notifyMorning:'08:30',notifyNoon:'14:00'},cpoCampaigns:[],notes:[],navStack:[],catalogue:[],cataloguePdfs:[],scheduledNotices:[],...db};const save=()=>localStorage.setItem(K,JSON.stringify(db));let user=null,view='ALL',lang=localStorage.getItem('ffh_lang')||'en',navStack=[],currentPage='login';
 const baseUsers=(D.users||[]).map(x=>({...x,display:x.name}));
 let U=db.users||baseUsers;db.users=U;const products=D.categoryProducts||{}, allProducts=[...new Set(Object.values(products).flat())];const catalogueProducts=()=>{const names=(db.catalogue||[]).map(x=>String(x.name||'').trim()).filter(Boolean);return [...new Set(names.length?names:allProducts)]};const outlets=id=>(db.customOutlets?.[id]?.length?db.customOutlets[id]:(D.outlets?.[id]||[])).map(o=>({...o,totalSku:+o.totalSku||allProducts.length}));
 const rules=D.salaryRules||{basic:1700,fuel:300,houseRent:250,foodThreshold:50000,foodHigh:250,foodLow:100,zeroSalesHigh:200,zeroSalesLow:100};
 const isMgr=()=>user?.mode==='MANAGER', srIds=()=>U.filter(x=>x.active!==false&&(x.role==='SR'||x.role==='MANAGER+SR')).map(x=>x.id), sr=id=>U.find(x=>x.id===id), currentSr=()=>isMgr()?(view==='ALL'?null:view):user.id;
+const ffhStaffId=v=>String(v||'').trim().toUpperCase();
+const ffhEmail=id=>ffhStaffId(id).toLowerCase()+'@fieldforce.app';
+async function ffhProfile(authUserId){const {data,error}=await FFH_SUPABASE.from('ffh_profiles').select('staff_id,full_name,role,active,monthly_target,photo_url,can_manage,can_sell,auth_user_id').eq('auth_user_id',authUserId).single();if(error)throw error;return data}
+function ffhUser(profile,mode){let local=(U||[]).find(x=>String(x.id).toUpperCase()===String(profile.staff_id).toUpperCase())||{};return{...local,id:profile.staff_id,name:profile.full_name||local.name||profile.staff_id,role:local.role||profile.role,target:+profile.monthly_target||+local.target||0,photo:profile.photo_url||local.photo||'',can_manage:!!profile.can_manage,can_sell:!!profile.can_sell,mode}}
+async function ffhSignIn(rawId,pw){let entered=String(rawId||'').trim(),wantsManager=entered.toLowerCase()==='manager',sid=wantsManager?'M21954':ffhStaffId(entered);if(!sid||!pw)throw new Error('User ID and Password are required.');const {data,error}=await FFH_SUPABASE.auth.signInWithPassword({email:ffhEmail(sid),password:String(pw)});if(error||!data?.user)throw new Error('Invalid User ID or Password');let profile;try{profile=await ffhProfile(data.user.id)}catch(e){await FFH_SUPABASE.auth.signOut();throw new Error('Profile access failed. Please contact your Manager.')}if(profile.active===false){await FFH_SUPABASE.auth.signOut();throw new Error('This account is inactive.')}if(wantsManager&&!profile.can_manage){await FFH_SUPABASE.auth.signOut();throw new Error('Manager access is not enabled for this account.')}if(!wantsManager&&!profile.can_sell){await FFH_SUPABASE.auth.signOut();throw new Error('Sales access is not enabled for this account.')}return ffhUser(profile,wantsManager?'MANAGER':'SR')}
+
 function target(id,m=month()){return +(db.targets?.[m]?.[id]??sr(id)?.target??0)}function delivered(id,m=month()){return db.sales.filter(x=>x.status==='Delivered'&&x.sr===id&&x.date?.startsWith(m)).reduce((a,x)=>a+(+x.deliveredAmount||0),0)}function teamDelivered(){return srIds().reduce((a,id)=>a+delivered(id),0)}function teamTarget(){return srIds().reduce((a,id)=>a+target(id),0)}function scopeDelivered(){return currentSr()?delivered(currentSr()):teamDelivered()}function scopeTarget(){return currentSr()?target(currentSr()):teamTarget()}
 function login(){currentPage='login';navStack=[];A.innerHTML=`<div class="login premiumLogin"><div class="loginShade"></div>
 <div class="loginTop">
@@ -83,7 +63,7 @@ function startLoginTyping(){
 }
 function applyLoginLang(){let bn=lang==='bn';q('.premiumLoginBox h1').textContent=bn?'স্বাগতম':'Welcome Back';q('.premiumLoginBox>p').textContent=bn?'আপনার অ্যাকাউন্টে লগইন করুন':'Login to your account';q('#loginId').placeholder=bn?'ইউজার আইডি':'User ID';q('#loginPw').placeholder=bn?'পাসওয়ার্ড':'Password';q('#forgotPw').textContent=bn?'পাসওয়ার্ড ভুলে গেছেন?':'Forgot Password?';q('.loginSubmit').innerHTML=(bn?'লগইন':'Login')+' <span>→</span>';q('.loginOptions label').lastChild.textContent=bn?' মনে রাখুন':' Remember Me'}
 q('#forgotPw').onclick=()=>alert('Please contact your Manager to reset your password.');
-const doLogin=()=>{let id=q('#loginId').value.trim(),pw=q('#loginPw').value.trim();if(id.toLowerCase()==='manager'&&pw.toUpperCase()==='M21954'){user={id:'M21954',name:'MEHEDI ALIM AYON',mode:'MANAGER',role:'MANAGER'};view='ALL';localStorage.setItem('ffh_session',JSON.stringify(user));home(true);return true}let x=(U||[]).find(z=>String(z.id).trim().toLowerCase()===id.toLowerCase()&&z.active!==false);if(x&&(pw===String(x.password||x.id)||pw===String(x.id))){user={...x,mode:'SR'};view=x.id;localStorage.setItem('ffh_session',JSON.stringify(user));home(true);return true}alert('Invalid User ID or Password');return false};q('#loginForm').onsubmit=e=>{e.preventDefault();doLogin()}}
+const doLogin=async()=>{let id=q('#loginId').value.trim(),pw=q('#loginPw').value.trim(),btn=q('#loginForm button[type="submit"]');if(btn){btn.disabled=true;btn.dataset.oldText=btn.textContent;btn.textContent='Signing in...'}try{user=await ffhSignIn(id,pw);view=user.mode==='MANAGER'?'ALL':user.id;localStorage.setItem('ffh_session',JSON.stringify(user));home(true);return true}catch(err){alert(err?.message||'Invalid User ID or Password');return false}finally{if(btn&&document.body.contains(btn)){btn.disabled=false;btn.textContent=btn.dataset.oldText||'Login'}}};q('#loginForm').onsubmit=e=>{e.preventDefault();doLogin()}}
 function pendingTaskCount(){
   let arr=(db.tasks||[]).filter(x=>String(x.status||'').toLowerCase()!=='done'&&String(x.status||'').toLowerCase()!=='completed');
   if(isMgr()) return arr.length;
@@ -112,7 +92,7 @@ function updateTaskBadges(){
 }
 function shell(body){A.innerHTML=`<div class="app"><header class="top"><div class="logo"><div class="ffMiniLogo"><span><i></i><i></i><i></i><b>↗</b></span></div><div>FieldForce <span class="orange">Hub</span><small class="brandTag">Sales | Delivery | Performance | Growth</small></div></div><div class="topBtns"><button class="iconBtn bellBtn" id="bell" aria-label="Notifications"><svg class="topBellSvg" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 33h24l-3-5V19c0-6-4-11-9-11s-9 5-9 11v9z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 38c1 3 7 3 8 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg><span class="topNotifyBadge" id="topNotifyBadge"></span></button><button class="iconBtn" id="globalSearchBtn" aria-label="Search">⌕</button><button class="iconBtn" id="refresh" aria-label="Refresh">↻</button><div class="dropWrap"><button class="iconBtn" id="dots">⋮</button><div class="drop" id="drop"><button id="lang">🌐 বাংলা / English</button><button id="profile">◉ Profile</button><button id="logout">↪ Logout</button></div></div></div></header><main class="wrap">${body}</main><footer class="devFooter">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank" rel="noopener noreferrer">KAM AYON</a></footer><nav class="bottom bottomSix"><button id="bh"><i>⌂</i>Home</button><button id="bs"><i>▥</i>Sales</button><button id="bo"><i>▣</i>Outlets</button><button id="bt"><i>▤</i>CPO/Promotion</button><button id="bn"><i class="bellGlyph">♢</i>Notification<span class="navBadge" id="notifyNavBadge"></span></button><button id="br"><i>⌖</i>Route</button></nav><div class="aiNudge" id="nudge">স্যার, আমি AYON AI। দরকার হলে ট্যাপ করুন।</div><button class="aiOrb" id="orb" aria-label="AYON AI"><img src="ayon-ai.png"></button></div>`;
 q('#dots').onclick=()=>q('#drop').classList.toggle('show');
-q('#logout').onclick=()=>{localStorage.removeItem('ffh_session');user=null;navStack=[];login()};
+q('#logout').onclick=async()=>{try{await FFH_SUPABASE.auth.signOut()}catch(e){}localStorage.removeItem('ffh_session');user=null;navStack=[];login()};
 q('#lang').onclick=()=>{lang=lang==='bn'?'en':'bn';localStorage.setItem('ffh_lang',lang);home(true)};
 q('#profile').onclick=()=>navigate('profile',profile);
 q('#bh').onclick=()=>{navStack=[];home(true)};
@@ -363,11 +343,7 @@ function globalSearch(s){s=s.trim().toLowerCase();if(!s)return;let m=mods.find(x
 function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 try{if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}}catch(_){}
 try{initNotifications()}catch(_){}
-try{
-  const sess=JSON.parse(localStorage.getItem('ffh_session')||'null');
-  if(sess && sess.id){user=sess;view=sess.mode==='MANAGER'?'ALL':sess.id;home(true)}
-  else login();
-}catch(e){try{localStorage.removeItem('ffh_session')}catch(_){} login()}
+(async()=>{try{const {data,error}=await FFH_SUPABASE.auth.getSession();if(error||!data?.session?.user){login();return}const profile=await ffhProfile(data.session.user.id);if(!profile||profile.active===false){await FFH_SUPABASE.auth.signOut();localStorage.removeItem('ffh_session');login();return}let old=null;try{old=JSON.parse(localStorage.getItem('ffh_session')||'null')}catch(_){}let mode=old?.mode==='MANAGER'&&profile.can_manage?'MANAGER':'SR';if(mode==='SR'&&!profile.can_sell){await FFH_SUPABASE.auth.signOut();localStorage.removeItem('ffh_session');login();return}user=ffhUser(profile,mode);view=mode==='MANAGER'?'ALL':user.id;localStorage.setItem('ffh_session',JSON.stringify(user));home(true)}catch(e){console.error('Supabase session restore failed:',e);login()}})();
 })();
 /* ===== V24 PROFILE / CPO / MANAGER CONTENT CONTROL ===== */
 function ffPhotoPick(cb){
