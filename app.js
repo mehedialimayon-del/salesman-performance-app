@@ -25,9 +25,13 @@ FFH_SUPABASE
   .limit(1)
   .then(({ data, error }) => {
     if (error) {
-      console.error('FFH Supabase Test FAILED:', error);
+      alert('SUPABASE TEST FAILED\n\n' + error.message);
     } else {
-      console.log('FFH Supabase Test PASS:', data);
+      alert(
+        'SUPABASE CONNECTION PASS ✅\n\n' +
+        'Database connected successfully.\n' +
+        'Rows received: ' + data.length
+      );
     }
   });
 (()=>{const D=window.APP_DATA||{},A=document.getElementById('app'),K='ffh_ultimate_final_v1',today=()=>new Date().toISOString().slice(0,10),month=()=>today().slice(0,7),rm=n=>'RM '+Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
