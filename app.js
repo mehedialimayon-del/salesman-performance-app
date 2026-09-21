@@ -1,4 +1,24 @@
 'use strict';
+/* =========================================================
+   FIELDFORCE HUB — SUPABASE CONNECTION
+========================================================= */
+
+const FFH_SUPABASE_URL = 'https://svpgjrxeqnluipsgjywk.supabase.co';
+const FFH_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_eR5TZxv2aWndxdwzU0RIUA_mXWcBcO3';
+
+const FFH_SUPABASE = window.supabase.createClient(
+  FFH_SUPABASE_URL,
+  FFH_SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  }
+);
+
+window.FFH_SUPABASE = FFH_SUPABASE;
 (()=>{const D=window.APP_DATA||{},A=document.getElementById('app'),K='ffh_ultimate_final_v1',today=()=>new Date().toISOString().slice(0,10),month=()=>today().slice(0,7),rm=n=>'RM '+Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
 let db;try{db=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){db={}};db={sales:[],targets:{},tasks:[],adjustments:[],cpo:[],routes:{},proposals:[],incentives:[],notifications:[],customOutlets:{},incomeSetup:{},settings:{notifyMorning:'08:30',notifyNoon:'14:00'},cpoCampaigns:[],notes:[],navStack:[],catalogue:[],cataloguePdfs:[],scheduledNotices:[],...db};const save=()=>localStorage.setItem(K,JSON.stringify(db));let user=null,view='ALL',lang=localStorage.getItem('ffh_lang')||'en',navStack=[],currentPage='login';
 const baseUsers=(D.users||[]).map(x=>({...x,display:x.name}));
