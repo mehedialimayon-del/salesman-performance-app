@@ -103,6 +103,7 @@ function updateTaskBadges(){
   });
 }
 function shell(body){if(user&&currentPage&&currentPage!=='login')localStorage.setItem('ffh_last_page',currentPage);A.innerHTML=`<div class="app"><header class="top"><div class="logo"><div class="ffMiniLogo"><span><i></i><i></i><i></i><b>↗</b></span></div><div>FieldForce <span class="orange">Hub</span><small class="brandTag">Sales | Delivery | Performance | Growth</small></div></div><div class="topBtns"><button class="iconBtn bellBtn" id="bell" aria-label="Notifications"><svg class="topBellSvg" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 33h24l-3-5V19c0-6-4-11-9-11s-9 5-9 11v9z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 38c1 3 7 3 8 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg><span class="topNotifyBadge" id="topNotifyBadge"></span></button><button class="iconBtn" id="globalSearchBtn" aria-label="Search">⌕</button><button class="iconBtn" id="refresh" aria-label="Refresh">↻</button><div class="dropWrap"><button class="iconBtn" id="dots">⋮</button><div class="drop" id="drop"><button id="lang">🌐 বাংলা / English</button><button id="profile">◉ Profile</button><button id="logout">↪ Logout</button></div></div></div></header><main class="wrap">${body}</main><footer class="devFooter">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank" rel="noopener noreferrer">KAM AYON</a></footer><nav class="bottom bottomSix"><button id="bh"><i>⌂</i>Home</button><button id="bs"><i>▥</i>Sales</button><button id="bo"><i>▣</i>Outlets</button><button id="bt"><i>▤</i>CPO/Promotion</button><button id="bn"><i class="bellGlyph">♢</i>Notification<span class="navBadge" id="notifyNavBadge"></span></button><button id="br"><i>⌖</i>Route</button></nav><div class="aiNudge" id="nudge">স্যার, আমি AYON AI। দরকার হলে ট্যাপ করুন।</div><button class="aiOrb" id="orb" aria-label="AYON AI"><img src="ayon-ai.png"></button></div>`;
+ffhSyncBrowserHistory();
 q('#dots').onclick=()=>q('#drop').classList.toggle('show');
 q('#logout').onclick=async()=>{try{await FFH_SUPABASE.auth.signOut()}catch(e){}localStorage.removeItem('ffh_session');user=null;navStack=[];login()};
 q('#lang').onclick=()=>{lang=lang==='bn'?'en':'bn';localStorage.setItem('ffh_lang',lang);home(true)};
@@ -121,7 +122,7 @@ updateTaskBadges();updateNotifyBadges();
 dragOrb();setTimeout(()=>q('#nudge')?.classList.add('hide'),3800)}
 function q(s,r=document){return r.querySelector(s)}function qa(s,r=document){return [...r.querySelectorAll(s)]}
 function dragOrb(){let el=q('#orb'),n=q('#nudge'),p=JSON.parse(localStorage.getItem('ffh_ai_pos')||'null'),down=false,moved=false,dx=0,dy=0;if(p){Object.assign(el.style,{left:p.x+'px',top:p.y+'px',right:'auto',bottom:'auto'});n?.classList.add('hide')}el.onpointerdown=e=>{down=true;moved=false;dx=e.clientX-el.offsetLeft;dy=e.clientY-el.offsetTop;el.setPointerCapture(e.pointerId)};el.onpointermove=e=>{if(!down)return;moved=true;let x=Math.max(4,Math.min(innerWidth-el.offsetWidth-4,e.clientX-dx)),y=Math.max(68,Math.min(innerHeight-el.offsetHeight-72,e.clientY-dy));Object.assign(el.style,{left:x+'px',top:y+'px',right:'auto',bottom:'auto'});n?.classList.add('hide')};el.onpointerup=e=>{down=false;if(moved){localStorage.setItem('ffh_ai_pos',JSON.stringify({x:el.offsetLeft,y:el.offsetTop}));el.onclick=ev=>{ev.preventDefault();el.onclick=toggleAIPopup};setTimeout(()=>el.onclick=toggleAIPopup,100)}}}
-function back(title){return `<div class="head"><button class="back" id="back">←</button><h1>${title}</h1></div>`}
+function back(title){return `<div class="head ffNoScreenBack"><h1>${title}</h1></div>`}
 function navigate(name,fn){if(currentPage!==name)navStack.push({name:currentPage,view});currentPage=name;fn()}
 function bindBack(){q('#back')&&(q('#back').onclick=()=>{let prev=navStack.pop();if(!prev){currentPage='home';return home(true)}view=prev.view;currentPage=prev.name;let fn=({home,dashboard,zero,sales,income,incentive,cpo,route,tasks,reports,proposals,catalogue,control,ai,notifications,profile})[prev.name];if(prev.name?.startsWith('control:'))return controlPage(prev.name.split(':')[1]);if(prev.name?.startsWith('report:'))return reports();fn?fn(true):home(true)})}
 const moduleIcon=(p,f)=>({'dashboard':`<svg viewBox="0 0 48 48"><rect x="5" y="28" width="8" height="14" rx="2"/><rect x="19" y="20" width="8" height="22" rx="2"/><rect x="33" y="10" width="8" height="32" rx="2"/></svg>`,'zero':`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="15" fill="none" stroke="currentColor" stroke-width="5"/><circle cx="24" cy="24" r="7" fill="none" stroke="currentColor" stroke-width="4"/><path d="M24 3v8M45 24h-8M24 45v-8M3 24h8" stroke="currentColor" stroke-width="4"/></svg>`,'sales':`<svg viewBox="0 0 48 48"><rect x="9" y="5" width="27" height="38" rx="4" fill="none" stroke="currentColor" stroke-width="4"/><path d="M16 15h13M16 23h10M16 31h8" stroke="currentColor" stroke-width="4"/><circle cx="37" cy="34" r="8"/><path d="M37 29v10M32 34h10" stroke="#081015" stroke-width="3"/></svg>`,'income':`<svg viewBox="0 0 48 48"><circle cx="29" cy="16" r="10"/><path d="M5 32c8-7 15-6 21-2l9-4c5-2 8 4 4 7L25 43H9z"/></svg>`,'incentive':`<svg viewBox="0 0 48 48"><path d="M24 4l6 13 14 2-10 10 3 14-13-7-13 7 3-14L4 19l14-2z"/></svg>`,'cpo':`<svg viewBox="0 0 48 48"><path d="M24 4c10 0 18 8 18 18 0 13-18 23-18 23S6 35 6 22C6 12 14 4 24 4z"/><circle cx="24" cy="22" r="7" fill="#081015"/></svg>`,'route':`<svg viewBox="0 0 48 48"><path d="M13 4c7 0 11 5 11 11 0 8-11 16-11 16S2 23 2 15C2 9 6 4 13 4z"/><circle cx="13" cy="15" r="4" fill="#081015"/><path d="M19 36c7-8 13-2 19-9" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="4 4"/><circle cx="40" cy="25" r="5"/></svg>`,'tasks':`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="19"/><path d="M14 24l7 7 14-17" fill="none" stroke="#081015" stroke-width="5"/></svg>`,'reports':`<svg viewBox="0 0 48 48"><rect x="8" y="5" width="32" height="38" rx="4"/><rect x="14" y="28" width="5" height="9" fill="#081015"/><rect x="22" y="20" width="5" height="17" fill="#081015"/><rect x="30" y="13" width="5" height="24" fill="#081015"/></svg>`,'proposals':`<svg viewBox="0 0 48 48"><path d="M8 4h23l9 9v31H8z"/><path d="M30 4v11h10" fill="#081015"/><text x="11" y="34" font-size="11" font-weight="900" fill="#081015">PDF</text></svg>`,'catalogue':`<svg viewBox="0 0 48 48"><path d="M24 3l18 10v22L24 45 6 35V13z"/><path d="M6 13l18 10 18-10M24 23v22" fill="none" stroke="#081015" stroke-width="3"/></svg>`,'control':`<svg viewBox="0 0 48 48"><path d="M20 3h8l2 6 6 2 6-3 5 7-5 5 1 7 5 4-4 8-7-2-5 4-1 7h-9l-1-7-6-3-7 2-4-8 5-5-1-7-5-4 4-8 7 2 5-3z"/><circle cx="24" cy="24" r="7" fill="#081015"/></svg>`}[p]||f);
@@ -518,6 +519,54 @@ function ffhRestoreLastPage(){
  if(fn){currentPage=p;return fn(true)}
  return home(true)
 }
+
+/* ===== V66 NATIVE MOBILE BACK / PAGE HISTORY ===== */
+let ffhHistoryRendering=false, ffhExitPromptOpen=false;
+function ffhHistoryPage(){return currentPage||'home'}
+function ffhSyncBrowserHistory(){
+ if(!user||currentPage==='login'||ffhHistoryRendering)return;
+ let p=ffhHistoryPage(),cur=history.state?.ffhPage;
+ if(!cur){history.replaceState({ffhPage:p},'',location.href);return}
+ if(cur!==p)history.pushState({ffhPage:p},'',location.href);
+}
+function ffhExitPrompt(){
+ if(ffhExitPromptOpen)return;ffhExitPromptOpen=true;
+ let o=document.createElement('div');o.className='globalSearchOverlay ffExitOverlay';
+ o.innerHTML=`<div class="globalSearchBox ffPremiumModal ffExitModal"><div class="cardTitle">Exit FieldForce Hub?</div><div class="notice">Are you confirm to exit?</div><div class="ffExitActions"><button type="button" class="secondary" id="ffExitCancel">NO</button><button type="button" class="primary" id="ffExitYes">EXIT</button></div></div>`;
+ document.body.appendChild(o);
+ const close=()=>{ffhExitPromptOpen=false;o.remove()};
+ o.querySelector('#ffExitCancel').onclick=close;
+ o.querySelector('#ffExitYes').onclick=()=>{close();window.__FFH_ALLOW_EXIT__=true;history.go(-2)};
+ o.onclick=e=>{if(e.target===o)close()};
+}
+function ffhRenderHistoryPage(p){
+ ffhHistoryRendering=true;
+ try{
+  if(p==='home')return home(true);
+  if(p==='catalogue')return catalogue();
+  if(p.startsWith('catalogueCategory:'))return catalogueCategory(p.slice('catalogueCategory:'.length));
+  if(p==='proposals')return proposals();
+  if(p.startsWith('control:')){currentPage=p;return controlPage(p.split(':')[1])}
+  if(p.startsWith('report:')){currentPage=p;return reports()}
+  let fn=({dashboard,zero,sales,income,incentive,cpo,route,tasks,reports,control,ai,notifications,profile})[p];
+  if(fn){currentPage=p;return fn(true)}
+  return home(true);
+ }finally{setTimeout(()=>{ffhHistoryRendering=false},0)}
+}
+window.addEventListener('popstate',e=>{
+ if(window.__FFH_ALLOW_EXIT__)return;
+ if(!user)return;
+ if(currentPage==='home'){
+  history.pushState({ffhPage:'home'},'',location.href);
+  ffhExitPrompt();return;
+ }
+ let p=e.state?.ffhPage||'home';
+ let idx=navStack.length?navStack.length-1:-1;if(idx>=0)navStack.pop();
+ ffhRenderHistoryPage(p);
+});
+
+(function(){let st=document.createElement('style');st.id='ffh-v66-nav-style';st.textContent=`.ffNoScreenBack{padding-left:0!important}.ffNoScreenBack h1{margin-left:0!important}.ffExitModal{max-width:360px!important}.ffExitActions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;margin-top:16px!important}.ffExitActions button{min-height:48px!important;border-radius:14px!important;font-weight:900!important}`;document.head.appendChild(st)})();
+
 window.addEventListener('beforeunload',()=>{if(user&&currentPage&&currentPage!=='login')localStorage.setItem('ffh_last_page',currentPage)});
 (async()=>{try{const {data,error}=await FFH_SUPABASE.auth.getSession();if(error||!data?.session?.user){login();return}const profile=await ffhProfile(data.session.user.id);if(!profile||profile.active===false){await FFH_SUPABASE.auth.signOut();localStorage.removeItem('ffh_session');login();return}let old=null;try{old=JSON.parse(localStorage.getItem('ffh_session')||'null')}catch(_){}let mode=old?.mode==='MANAGER'&&profile.can_manage?'MANAGER':'SR';if(mode==='SR'&&!profile.can_sell){await FFH_SUPABASE.auth.signOut();localStorage.removeItem('ffh_session');login();return}user=ffhUser(profile,mode);view=mode==='MANAGER'?'ALL':user.id;localStorage.setItem('ffh_session',JSON.stringify(user));ffhRestoreLastPage()}catch(e){console.error('Supabase session restore failed:',e);login()}})();
 })();
@@ -695,25 +744,3 @@ const FFH_PROPOSAL_FINAL_CSS=`
 
 /* ===== V64 CATALOGUE PREMIUM EDIT / PRICE / SORT FIX ===== */
 (function(){const st=document.createElement('style');st.id='ffh-v64-catalogue-style';st.textContent=`.ffReferenceProducts .ffProductName{color:#fff!important;font-size:13px!important;font-weight:950!important;text-shadow:0 0 14px rgba(255,116,23,.18)!important}.ffReferenceProducts .productCategoryTag{color:#ff8a2a!important;border-color:rgba(255,122,24,.45)!important;background:rgba(255,116,23,.055)!important}.ffCatalogueMeta span label{color:#ff8a2a!important;font-weight:850!important;letter-spacing:.3px!important}.ffCatalogueMeta span strong{color:#fff!important;font-weight:950!important;text-shadow:0 0 10px rgba(255,255,255,.08)!important}.ffCatalogueMeta .ffBarcodeRow strong{color:#fff!important;font-weight:950!important;letter-spacing:0!important;font-size:9.2px!important}.ffPriceStrip{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;margin:9px 12px 2px!important}.ffPriceChip{display:flex!important;flex-direction:column!important;gap:2px!important;padding:8px 7px!important;border:1px solid rgba(255,154,61,.72)!important;border-radius:11px!important;background:linear-gradient(145deg,rgba(255,116,23,.17),rgba(255,183,77,.055))!important}.ffPriceChip label{color:#ff9a3d!important;font-size:7.5px!important;font-weight:900!important}.ffPriceChip strong{color:#fff!important;font-size:11px!important;font-weight:950!important}.ffProductSerial{position:absolute!important;left:9px!important;top:9px!important;z-index:5!important;color:#fff!important;background:rgba(5,10,13,.82)!important;border:1px solid rgba(255,116,23,.75)!important;border-radius:9px!important;padding:4px 7px!important;font-size:8px!important;font-weight:900!important}.skuMenuBtn{z-index:8!important;background:linear-gradient(145deg,#16232b,#091015)!important;color:#ff8a2a!important;border:1px solid #ff7417!important;box-shadow:0 0 15px rgba(255,116,23,.28)!important;font-size:18px!important}.ffProductVisual{background:#fff!important}.ffProductVisual img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}.ffProductEditor label{color:#ff9a3d!important;font-weight:850!important}.ffProductEditor input,.ffProductEditor select{color:#fff!important;border-color:rgba(255,116,23,.45)!important;background:#091217!important}`;document.head.appendChild(st)})();
-
-
-/* ===== V65 CATALOGUE EDIT/UPLOAD RELIABILITY FIX ===== */
-(function(){
-  if(window.__FFH_V65_CATALOGUE_BOUND__) return;
-  window.__FFH_V65_CATALOGUE_BOUND__=true;
-  document.addEventListener('click',function(e){
-    const edit=e.target.closest && e.target.closest('.skuMenuBtn');
-    if(edit){ e.preventDefault(); e.stopPropagation(); try{ openSkuMenu(edit.dataset.id); }catch(err){ console.error(err); alert('Edit could not open: '+(err?.message||err)); } return; }
-    const up=e.target.closest && e.target.closest('.ffUploadProductImage');
-    if(up){ e.preventDefault(); e.stopPropagation(); try{ openSkuMenu(up.dataset.id); }catch(err){ console.error(err); alert('Photo editor could not open: '+(err?.message||err)); } }
-  },true);
-  const st=document.createElement('style'); st.id='ffh-v65-catalogue-style'; st.textContent=`
-    .ffReferenceProducts .skuMenuBtn{width:44px!important;height:44px!important;border-radius:14px!important;display:grid!important;place-items:center!important;cursor:pointer!important;pointer-events:auto!important;touch-action:manipulation!important;background:linear-gradient(145deg,#17252e,#071015)!important;border:1px solid #ff8128!important;box-shadow:0 0 0 1px #ff812822 inset,0 7px 20px #0008,0 0 18px #ff741744!important}
-    .ffReferenceProducts .skuMenuBtn:active{transform:scale(.92)!important;box-shadow:0 0 24px #ff741799!important}
-    .ffUploadProductImage{cursor:pointer!important;pointer-events:auto!important;touch-action:manipulation!important;background:radial-gradient(circle at 50% 30%,#fff 0,#fff9f2 48%,#fff 100%)!important;color:#ff7a18!important;font-weight:950!important;letter-spacing:.2px!important}
-    .ffProductEditor .cardTitle{color:#fff!important;font-weight:950!important}.ffProductEditor .notice{border:1px solid #ff741744!important;background:#ff74170c!important;color:#d7dde1!important}
-    .ffProductEditor select{appearance:auto!important}.ffProductEditor .ffPhotoEditBtn{background:linear-gradient(135deg,#ff9b3d,#ff6b00)!important;color:#fff!important;border:0!important;box-shadow:0 8px 24px #ff741744!important;border-radius:14px!important;padding:13px!important}
-    .ffProductEditor button.primary[type=submit]{background:linear-gradient(135deg,#ffad4b,#ff6500)!important;box-shadow:0 8px 24px #ff741744!important;border-radius:14px!important}
-    .ffPriceChip{box-shadow:0 0 15px #ff74171f inset,0 5px 15px #0005!important}
-  `; document.head.appendChild(st);
-})();
