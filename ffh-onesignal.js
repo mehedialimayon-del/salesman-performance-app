@@ -7,7 +7,9 @@ let started=false,lastStaff='';
 function init(){if(started)return;started=true;
  deferred.push(async function(OneSignal){
    try{
-     await OneSignal.init({appId:APP_ID,serviceWorkerPath:'push/OneSignalSDKWorker.js',serviceWorkerParam:{scope:'/push/'},notifyButton:{enable:false}});
+     // GitHub Pages serves the application from this project path. The worker
+     // stays at the app root so its scope covers every FieldForce Hub screen.
+     await OneSignal.init({appId:APP_ID,serviceWorkerPath:'OneSignalSDKWorker.js',serviceWorkerParam:{scope:'/salesman-performance-app/'},notifyButton:{enable:false}});
      window.FFH_ONESIGNAL_READY=true;
      // Never bind a push subscription to a locally stored or unverified ID.
      const sync=async()=>{
