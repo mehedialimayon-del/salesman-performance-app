@@ -1,0 +1,10 @@
+{
+  "source_profiles": 740,
+  "complete_english_profiles": 740,
+  "source_bengali_profiles": 0,
+  "duplicate_item_code": "102386",
+  "js_syntax": "PASS",
+  "manager_auth_browser_test": "NOT RUN",
+  "full_photo_matching": "NOT AVAILABLE FROM SOURCE",
+  "cloud_atomic_reorder_migration": "APPLIED"
+}
