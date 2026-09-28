@@ -514,9 +514,9 @@ function control(){currentPage='control';if(!isMgr())return home();shell(back('M
 async function ffhFindCatalogueCloud(x){
  if(!window.FFH_SUPABASE)return null;
  let q=FFH_SUPABASE.from('ffh_catalogue_products').select('id,item_code,name,category,image_url,serial_no,active');
- if(x?.cloudId){let r=await q.eq('id',x.cloudId).maybeSingle();if(!r.error&&r.data)return r.data}
- if(x?.itemCode){let r=await FFH_SUPABASE.from('ffh_catalogue_products').select('id,item_code,name,category,image_url,serial_no,active').eq('item_code',String(x.itemCode)).eq('name',x.name).maybeSingle();if(!r.error&&r.data)return r.data}
- if(x?.name){let r=await FFH_SUPABASE.from('ffh_catalogue_products').select('id,item_code,name,category,image_url,serial_no,active').eq('name',x.name).maybeSingle();if(!r.error&&r.data)return r.data}
+ if(x?.cloudId){let r=await q.eq('id',x.cloudId).maybeSingle();if(r.error)throw r.error;if(r.data)return r.data}
+ if(x?.itemCode){let r=await FFH_SUPABASE.from('ffh_catalogue_products').select('id,item_code,name,category,image_url,serial_no,active').eq('item_code',String(x.itemCode)).eq('name',x.name).maybeSingle();if(r.error)throw r.error;if(r.data)return r.data}
+ if(x?.name){let r=await FFH_SUPABASE.from('ffh_catalogue_products').select('id,item_code,name,category,image_url,serial_no,active').eq('name',x.name).maybeSingle();if(r.error)throw r.error;if(r.data)return r.data}
  return null;
 }
 async function ffhSaveCatalogueCloud(x){
@@ -525,7 +525,7 @@ async function ffhSaveCatalogueCloud(x){
  let payload={item_code:String(x.itemCode||''),name:x.name||'',category:x.category||'Other Products',carton_qty:Number(x.ctnFactors||x.cartonQty)||0,piece_price:+x.piecePrice||0,carton_price:+x.cartonPrice||0,image_url:x.image||x.image_url||'',serial_no:+x.serialNo||0,description:x.description||'',origin:x.origin||'',process:x.process||'',talking_points:x.talkingPoints||'',pitch:x.pitch||'',description_bn:x.descriptionBn||'',origin_bn:x.originBn||'',process_bn:x.processBn||'',talking_points_bn:x.talkingPointsBn||'',pitch_bn:x.pitchBn||'',buyer_sections:x.buyerSections||{},active:x.active!==false};
  let r=existing?.id
    ? await FFH_SUPABASE.from('ffh_catalogue_products').update(payload).eq('id',existing.id).select('id').single()
-   : await FFH_SUPABASE.from('ffh_catalogue_products').insert(payload).select('id').single();
+   : await FFH_SUPABASE.from('ffh_catalogue_products').insert({...payload,id:(x.cloudId||('ffh-'+(typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2))))}).select('id').single();
  if(r.error)throw r.error;
  x.cloudId=r.data?.id||existing?.id||x.cloudId||'';
  return r.data;
@@ -534,7 +534,7 @@ async function ffhDeleteCatalogueCloud(x){
  if(!window.FFH_SUPABASE||!x)return;
  let existing=await ffhFindCatalogueCloud(x);
  if(existing?.id){let {error}=await FFH_SUPABASE.from('ffh_catalogue_products').update({active:false}).eq('id',existing.id);if(error)throw error}
- else {let payload={item_code:String(x.itemCode||''),name:x.name||'',category:x.category||'Other Products',image_url:x.image||'',serial_no:+x.serialNo||0,active:false};let {error}=await FFH_SUPABASE.from('ffh_catalogue_products').insert(payload);if(error)throw error}
+ else {let payload={item_code:String(x.itemCode||''),name:x.name||'',category:x.category||'Other Products',image_url:x.image||'',serial_no:+x.serialNo||0,active:false};let {error}=await FFH_SUPABASE.from('ffh_catalogue_products').insert({...payload,id:(x.cloudId||('ffh-'+(typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2))))});if(error)throw error}
 }
 async function ffhSyncCategorySerialCloud(category){
  if(!window.FFH_SUPABASE)return;
