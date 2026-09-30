@@ -34,9 +34,10 @@ function init(){if(started)return;started=true;
        const page=e?.notification?.additionalData?.ffh_page;
        if(!allowed.includes(page))return;
        sessionStorage.setItem('ffh_push_target',page);
-       // Existing FieldForce app has a safe hash router on many builds; dispatch a hash change.
-       location.hash='#'+page;
-       window.dispatchEvent(new HashChangeEvent('hashchange'));
+       // The app uses its own page state, so enter through its verified landing route.
+       const landing=new URL(location.href);
+       landing.searchParams.set('ffh_page',page);
+       location.assign(landing.href);
      });
    }catch(e){started=false;console.error('FFH OneSignal init:',e)}
  });
