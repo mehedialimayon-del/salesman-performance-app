@@ -23,7 +23,8 @@ function init(){if(started)return;started=true;
      };
      window.FFH_ONESIGNAL_SYNC=sync;
      await sync();
-     window.FFH_ONESIGNAL_ASK_PERMISSION=()=>OneSignal.Notifications.requestPermission();
+     window.FFH_ONESIGNAL_ASK_PERMISSION=async()=>{await OneSignal.Notifications.requestPermission();if(Notification.permission==='granted'&&OneSignal.User.PushSubscription?.optIn)await OneSignal.User.PushSubscription.optIn()};
+     window.FFH_ONESIGNAL_STATUS=()=>({permission:Notification.permission,subscriptionId:OneSignal.User.PushSubscription?.id||null,optedIn:!!OneSignal.User.PushSubscription?.optedIn,externalId:OneSignal.User.externalId||null});
      if(window.FFH_SUPABASE?.auth?.onAuthStateChange){window.FFH_SUPABASE.auth.onAuthStateChange((event)=>{
        if(event==='SIGNED_OUT'){lastStaff='';OneSignal.logout().catch(console.warn)}
        else if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED')setTimeout(sync,0);
