@@ -31,7 +31,7 @@ function init(){if(started)return;started=true;
      });}
      OneSignal.Notifications.addEventListener('click',function(e){
        // Backend may set data.ffh_page. Never use arbitrary URLs from notification data.
-       const allowed=['notifications','tasks','zero','cpo','sales','route','home'];
+       const allowed=['notifications','tasks','zero','cpo','sales','route','home','briefings'];
        const page=e?.notification?.additionalData?.ffh_page;
        if(!allowed.includes(page))return;
        sessionStorage.setItem('ffh_push_target',page);
