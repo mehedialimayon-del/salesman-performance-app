@@ -40,10 +40,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v3
-      - name: Get Android platform 35
-        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Check preinstalled Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$ANDROID_HOME/platforms"
+          ls "$ANDROID_HOME/build-tools"
       - name: Generate launcher icons from existing app logo
         run: |
           python -m pip install --quiet Pillow
