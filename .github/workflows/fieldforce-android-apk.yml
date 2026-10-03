@@ -1,0 +1,103 @@
+name: FieldForce Hub - Android APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: "Create an internal test APK, or a signed production APK"
+        required: true
+        default: test
+        type: choice
+        options:
+          - test
+          - production
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - '.github/workflows/fieldforce-android-apk.yml'
+      - 'an-logo.png'
+
+permissions:
+  contents: read
+
+jobs:
+  android-apk:
+    name: Build installable Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract Android source kit
+        run: |
+          unzip -q FieldForce_Hub_Android_Release_Kit_v2.zip 'FieldForce_Hub_Android_Release_Kit/android/*' -d "$RUNNER_TEMP"
+          cp -R "$RUNNER_TEMP/FieldForce_Hub_Android_Release_Kit/android" ./android
+      - name: Install Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Get Android platform 35
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Generate launcher icons from existing app logo
+        run: |
+          python -m pip install --quiet Pillow
+          python android/make_icons.py
+      - name: Import persistent production signing key
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'production' }}
+        shell: bash
+        env:
+          FFH_KEYSTORE_B64: ${{ secrets.FFH_KEYSTORE_B64 }}
+          FFH_KEYSTORE_PASS: ${{ secrets.FFH_KEYSTORE_PASS }}
+          FFH_KEY_ALIAS: ${{ secrets.FFH_KEY_ALIAS }}
+          FFH_KEY_PASS: ${{ secrets.FFH_KEY_PASS }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$FFH_KEYSTORE_B64" || -z "$FFH_KEYSTORE_PASS" || -z "$FFH_KEY_ALIAS" || -z "$FFH_KEY_PASS" ]]; then
+            echo 'Production signing secrets are missing. See android/README.md.' >&2
+            exit 1
+          fi
+          printf '%s' "$FFH_KEYSTORE_B64" | base64 --decode > android/app/signing.jks
+          keytool -list -keystore android/app/signing.jks -storepass "$FFH_KEYSTORE_PASS" -alias "$FFH_KEY_ALIAS" > /dev/null
+      - name: Build APK and verification files
+        shell: bash
+        env:
+          FFH_KEYSTORE_PASS: ${{ secrets.FFH_KEYSTORE_PASS }}
+          FFH_KEY_ALIAS: ${{ secrets.FFH_KEY_ALIAS }}
+          FFH_KEY_PASS: ${{ secrets.FFH_KEY_PASS }}
+          IS_PRODUCTION: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'production' }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          if [[ "$IS_PRODUCTION" == 'true' ]]; then
+            gradle -p android :app:assembleRelease --no-daemon
+            cp android/app/build/outputs/apk/release/app-release.apk dist/FieldForce-Hub.apk
+            "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose dist/FieldForce-Hub.apk
+            python android/scripts/make_assetlinks.py \
+              --keystore android/app/signing.jks \
+              --storepass "$FFH_KEYSTORE_PASS" \
+              --alias "$FFH_KEY_ALIAS" \
+              --out dist/assetlinks.json
+            echo 'Type: signed production APK' > dist/BUILD-INFO.txt
+            echo 'Next: publish assetlinks.json at the ROOT of the website host before distribution.' >> dist/BUILD-INFO.txt
+          else
+            gradle -p android :app:assembleDebug --no-daemon
+            cp android/app/build/outputs/apk/debug/app-debug.apk dist/FieldForce-Hub-TEST.apk
+            "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose dist/FieldForce-Hub-TEST.apk
+            echo 'Type: INTERNAL TEST ONLY. Do not distribute as production.' > dist/BUILD-INFO.txt
+            echo 'Without assetlinks.json on website host, the app will show a browser address bar.' >> dist/BUILD-INFO.txt
+          fi
+          sha256sum dist/*.apk >> dist/BUILD-INFO.txt
+          ls -lh dist/
+      - name: Upload APK for direct file distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: FieldForce-Hub-Android-${{ github.run_number }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
