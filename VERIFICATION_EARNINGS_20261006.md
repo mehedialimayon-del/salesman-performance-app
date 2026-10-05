@@ -1,0 +1,9 @@
+# Earnings, briefings and daily duty verification
+
+Implemented without changing the base theme: independent actual/planning targets and SKU targets; cloud dated SKU/sales rewards; RM or carton CPO/promotion rewards; owner/delegate approval; issuer-only reversals; permanent reasons and audit events; public assigned notices; meeting covers and join links; private minutes and scheduled follow-up tasks; remembered device setup; visible consent-based attendance tracking with checkout and Malaysia midnight cutoff; daily attendance reference areas and manager-only residence marking.
+
+Passed automated checks: commission boundaries; expired/backdated reward exclusion using actual delivery time; 100 synthetic income examples; pending/approved/reversed totals; manager own plus team incentive calculation; DOM attendance/navigation/chat and permission-return checks; target/SKU save and approval/refund UI; meeting cover save/join, private minutes and follow-up task UI; transactional cloud RLS/approval/issuer-only refund/delegation, multi-recipient meeting persistence and timed queue tests; expired CPO submission and checkout location rejection. Cloud tests roll back their data.
+
+Public earnings API is SECURITY INVOKER; privileged mutations are in the private schema with authenticated staff identity checks. New exposed tables have RLS; direct financial mutation is revoked. Security advisor found only pre-existing unrelated warnings.
+
+Android build is an internal TEST APK, not a production release. Physical-phone screen-off GPS, native closed-app FCM push, channel sound and OEM battery behavior remain unverified. No claim of testing on 100 real phones is made. Android FCM/provider subscription setup and phone notification permissions must be operational to display push. A newly generated debug-signature test APK may not update over a differently signed existing installation; stable production signing is a separate requirement.

@@ -1021,8 +1021,7 @@ async function ffhLoadInbox(){
 async function ffhReadCloudNotice(n){if(!n?.cloudId)return;let {error}=await FFH_SUPABASE.from('ffh_notification_inbox').update({read_at:new Date().toISOString()}).eq('id',n.cloudId).eq('staff_id',user.id);if(error)throw error}
 async function ffhLoadSalesCloud(){
  if(!window.FFH_SUPABASE||!user?.id)return;
- let {data,error}=await FFH_SUPABASE.from('ffh_sales').select('*').order('created_at',{ascending:false}).limit(1000);
- if(error){console.warn('Cloud sales:',error.message);return}
+ let data=[];for(let offset=0;;offset+=1000){const {data:rows,error}=await FFH_SUPABASE.from('ffh_sales').select('*').order('created_at',{ascending:false}).range(offset,offset+999);if(error){console.warn('Cloud sales:',error.message);return}data.push(...(rows||[]));if(!rows||rows.length<1000)break;}
  let before=JSON.stringify(db.sales||[]);let byId=new Map((db.sales||[]).map(x=>[String(x.id),x]));
  (data||[]).forEach(r=>byId.set(String(r.id),{id:r.id,sr:r.sr_id,date:r.sale_date,outletCode:r.outlet_code,outletName:r.outlet_name,category:r.category,sku:r.sku,qty:r.qty,price:r.price,orderAmount:r.order_amount,deliveredAmount:r.delivered_amount,status:r.status,remarks:r.remarks,deliveredAt:r.delivered_at}));
  db.sales=[...byId.values()];let changed=JSON.stringify(db.sales)!==before;if(changed)try{save()}catch(e){console.warn('Cloud sales cache full',e)}
