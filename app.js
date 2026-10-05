@@ -808,14 +808,20 @@ function aiSpeechClean(t){
  if(bn)x=x.replace(/Mehedi\s+Alim\s+Ayon/gi,'মেহেদী আলিম অয়ন').replace(/AYON/gi,'অয়ন').replace(/\bRM\s*/g,'রিঙ্গিত ').replace(/CPO\s*\/\s*(?:DPO|Promotion)/gi,'সি পি ও, প্রোমোশন').replace(/\bPO\b/gi,'পি ও');
  return x.trim();
 }
+let ffhSpeechRequest=0;
 function aiSpeak(t){try{
  if(!('speechSynthesis' in window))return;
+ const request=++ffhSpeechRequest,clean=aiSpeechClean(t),bn=/[\u0980-\u09FF]/.test(clean);
  speechSynthesis.cancel();
- const clean=aiSpeechClean(t),bn=/[\u0980-\u09FF]/.test(clean),u=new SpeechSynthesisUtterance(clean),v=chooseAIVoice(clean);
- u.lang=v?.lang||(bn?'bn-BD':'en-GB');u.rate=.9;u.pitch=1;u.volume=1;
- if(v)u.voice=v;window._ffhVoice=u;speechSynthesis.speak(u);
+ const speak=()=>{if(request!==ffhSpeechRequest)return;const v=chooseAIVoice(clean);
+ if(!v){const chat=q('#aiPopupChat')||q('#chat');if(chat){const old=chat.querySelector('.ffhVoiceNotice');if(old)old.remove();const note=document.createElement('div');note.className='bubble bot ffhVoiceNotice';note.textContent=bn?'এই ফোনে বাংলা কণ্ঠ পাওয়া যায়নি। বাংলা উত্তর লেখায় দেখুন; ফোনের Text-to-speech সেটিংসে বাংলা voice যোগ করলে শুনতে পারবেন।':'An English voice is unavailable on this device. Your answer is shown in text.';chat.appendChild(note)}return;}
+ const u=new SpeechSynthesisUtterance(clean);u.lang=v.lang;u.voice=v;u.rate=.9;u.pitch=1;u.volume=1;window._ffhVoice=u;speechSynthesis.speak(u);
+ };
+ if(speechSynthesis.getVoices().length)speak();else{
+ const ready=()=>{speechSynthesis.removeEventListener('voiceschanged',ready);speak()};speechSynthesis.addEventListener('voiceschanged',ready,{once:true});setTimeout(()=>{speechSynthesis.removeEventListener('voiceschanged',ready);if(request===ffhSpeechRequest&&!window._ffhVoice)speak()},1500);
+ }
 }catch(_){}}
-function stopAIVoice(){try{speechSynthesis.cancel()}catch(_){}}
+function stopAIVoice(){++ffhSpeechRequest;try{speechSynthesis.cancel()}catch(_){}}
 function closeAIPopup(){stopAIVoice();q('#aiPopup')?.remove()}
 function aiQuickQuestions(){return lang==='bn'?[['▥','আমার সেলস কেমন?','আজ, এই সপ্তাহ বা এই মাস'],['◎','আমার টার্গেট প্রোগ্রেস?','টার্গেট বনাম অ্যাচিভমেন্ট'],['▣','কোন আউটলেটে ফোকাস দেব?','পারফরম্যান্স অনুযায়ী সাজেশন'],['▤','CPO / Promotion স্ট্যাটাস','অর্ডার, ডেলিভারি ও এক্সিকিউশন'],['⌖','আজকের রুট প্ল্যান দেখাও','ভিজিট এবং কভারেজ'],['$','আমার ইনকাম আপডেট','বেতন, ইনসেনটিভ ও বোনাস']]:[['▥','How are my sales?','Today, this week or this month'],['◎','My target progress?','Target versus achievement'],['▣','Which outlets need focus?','Suggestions from performance'],['▤','CPO / Promotion status','Order, delivery and execution'],['⌖','Show today’s route plan','Visits and coverage'],['$','My income update','Salary, incentive and bonus']]}
 function toggleAIPopup(){if(q('#aiPopup'))closeAIPopup();else openAIPopup()}
