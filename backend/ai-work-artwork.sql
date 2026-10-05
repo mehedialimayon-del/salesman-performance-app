@@ -1,0 +1,1 @@
+create policy ffh_ai_work_artwork_upload on storage.objects for insert to authenticated with check(bucket_id='ffh-public' and split_part(name,'/',1)='ai-work' and split_part(name,'/',2)=public.ffh_my_staff_id() and (ffh_private.work_allowed('notice') or ffh_private.work_allowed('cpo')));

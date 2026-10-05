@@ -21,7 +21,7 @@ Deno.serve(async (req: Request) => {
   const {data:expiredPhotos}=await sb.from('ffh_attendance').select('id,photo_path').lt('check_in',new Date(Date.now()-30*86400000).toISOString()).not('photo_path','is',null).limit(10);
   for(const photo of expiredPhotos||[]){const {error}=await sb.storage.from('ffh-attendance').remove([photo.photo_path]);if(!error)await sb.from('ffh_attendance').update({photo_path:null}).eq('id',photo.id);}
   const notificationKey=async (jobId:string,staffId:string)=>{ const bytes=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(jobId+'|'+staffId))); bytes[6]=(bytes[6]&15)|80; bytes[8]=(bytes[8]&63)|128; const hex=Array.from(bytes.slice(0,16),b=>b.toString(16).padStart(2,'0')).join(''); return [hex.slice(0,8),hex.slice(8,12),hex.slice(12,16),hex.slice(16,20),hex.slice(20,32)].join('-'); };
-  const targetPage=(type:string)=>(({task:'tasks',tasks:'tasks',zero:'zero',cpo:'cpo',promotion:'cpo',sales:'sales',route:'route',message:'communication',tracking:'tracking',meeting:'briefings',notice:'briefings'} as Record<string,string>)[type]||'notifications');
+  const targetPage=(type:string)=>(({task:'tasks',tasks:'tasks',zero:'zero',cpo:'cpo',promotion:'cpo',sales:'sales',route:'route',message:'communication',tracking:'tracking',meeting:'briefings',notice:'briefings',claim:'claims',ai_question:'aiQuestions',ai_answer:'aiQuestions'} as Record<string,string>)[type]||'notifications');
   const now=new Date().toISOString();
   await sb.from('ffh_notification_heartbeat').upsert({id:1,last_run_at:now,last_error:null});
   const {data:due,error}=await sb.from('ffh_notification_jobs').select('*').eq('status','scheduled').lte('scheduled_at',now).order('scheduled_at').limit(40);

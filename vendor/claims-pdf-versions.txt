@@ -1,0 +1,4 @@
+jspdf 3.0.4 — npm jspdf — jspdf.umd.min.js
+html2canvas 1.4.1 — npm html2canvas — html2canvas.min.js
+pdf-lib 1.17.1 — npm pdf-lib — pdf-lib.min.js
+Licenses provided alongside these locally served distributions.
