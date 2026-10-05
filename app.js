@@ -653,7 +653,7 @@ async function ffhInsertIfEmpty(table,rows,onProgress){
  return{table,status:after===rows.length?'PASS':'CHECK',local:rows.length,cloud:after||0};
 }
 function ffhMigrationRows(d){
- let users=d.users||[],out=[];users.forEach(u=>(d.customOutlets?.[u.id]||[]).forEach(o=>out.push({sr_id:u.id,outlet_code:o.code||'',outlet_name:o.name||'',category:o.category||'Other',total_sku:+o.totalSku||0,active:true,source:'local-migration'})));
+ let users=d.users||[],out=[];users.forEach(u=>{const rows=Object.prototype.hasOwnProperty.call(d.customOutlets||{},u.id)?d.customOutlets[u.id]:(D.outlets?.[u.id]||[]);(rows||[]).forEach(o=>out.push({sr_id:u.id,outlet_code:o.code||'',outlet_name:o.name||'',category:o.category||'Other',total_sku:+o.totalSku||0,active:true,source:'local-migration'}));});
  let cats=Object.entries(d.catalogueCategories||{}).map(([name,v],i)=>({name,cover_url:typeof v==='object'?(v.cover||v.image||''):'',sort_order:i,active:true}));
  let prods=(d.catalogue||[]).map(x=>({name:x.name,category:x.category||'Uncategorized',carton_qty:+x.cartonQty||0,piece_price:+x.piecePrice||0,carton_price:+x.cartonPrice||0,image_url:x.image||'',active:true}));
  let sales=(d.sales||[]).map((x,i)=>({id:String(x.id||'migration-sale-'+i),sr_id:x.sr,sale_date:x.date||today(),outlet_code:x.outletCode||'',outlet_name:x.outletName||'',category:x.category||'Other',sku:x.sku||'',qty:+x.qty||0,price:+x.price||0,order_amount:+x.orderAmount||0,delivered_amount:+x.deliveredAmount||0,status:x.status||'Pending Delivery',remarks:x.remarks||'',delivered_at:x.deliveredAt||null}));
