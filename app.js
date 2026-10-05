@@ -108,7 +108,7 @@ function updateTaskBadges(){
     old.textContent=n>99?'99+':String(n);
   });
 }
-function shell(body){document.querySelectorAll("[data-ff-briefing-editor]").forEach(el=>el.remove());if(user&&currentPage&&currentPage!=='login')try{localStorage.setItem('ffh_last_page',currentPage)}catch(e){console.warn('Page cache full:',e)}A.innerHTML=`<div class="app"><header class="top"><div class="logo"><div class="ffMiniLogo"><span><i></i><i></i><i></i><b>↗</b></span></div><div>FieldForce <span class="orange">Hub</span><small class="brandTag">Sales | Delivery | Performance | Growth</small></div></div><div class="topBtns"><button class="iconBtn bellBtn" id="bell" aria-label="Notifications"><svg class="topBellSvg" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 33h24l-3-5V19c0-6-4-11-9-11s-9 5-9 11v9z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 38c1 3 7 3 8 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg><span class="topNotifyBadge" id="topNotifyBadge"></span></button><button class="iconBtn" id="globalSearchBtn" aria-label="Search">⌕</button><button class="iconBtn" id="refresh" aria-label="Refresh">↻</button><div class="dropWrap"><button class="iconBtn" id="dots">⋮</button><div class="drop" id="drop"><button id="lang">🌐 বাংলা / English</button><button id="profile">◉ Profile</button><button id="logout">↪ Logout</button></div></div></div></header><main class="wrap">${body}</main><footer class="devFooter">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank" rel="noopener noreferrer">KAM AYON</a></footer><nav class="bottom bottomSix"><button id="bh"><i>⌂</i>Home</button><button id="bs"><i>▥</i>Sales</button><button id="bo"><i>▣</i>Outlets</button><button id="bt"><i>▤</i>CPO/Promotion</button><button id="bn"><i class="bellGlyph">♢</i>Notification<span class="navBadge" id="notifyNavBadge"></span></button><button id="br"><i>⌖</i>Route</button></nav><div class="aiNudge" id="nudge">স্যার, আমি AYON AI। দরকার হলে ট্যাপ করুন।</div><button class="aiOrb" id="orb" aria-label="AYON AI"><img src="ayon-ai.png?v=20260927" alt="AYON AI" onerror="this.style.display='none';this.parentElement.textContent='AI'"></button></div>`;
+function shell(body){setTimeout(ffhEntryPermissionGate,0);document.querySelectorAll("[data-ff-briefing-editor]").forEach(el=>el.remove());if(user&&currentPage&&currentPage!=='login')try{localStorage.setItem('ffh_last_page',currentPage)}catch(e){console.warn('Page cache full:',e)}A.innerHTML=`<div class="app"><header class="top"><div class="logo"><div class="ffMiniLogo"><span><i></i><i></i><i></i><b>↗</b></span></div><div>FieldForce <span class="orange">Hub</span><small class="brandTag">Sales | Delivery | Performance | Growth</small></div></div><div class="topBtns"><button class="iconBtn bellBtn" id="bell" aria-label="Notifications"><svg class="topBellSvg" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 33h24l-3-5V19c0-6-4-11-9-11s-9 5-9 11v9z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 38c1 3 7 3 8 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg><span class="topNotifyBadge" id="topNotifyBadge"></span></button><button class="iconBtn" id="globalSearchBtn" aria-label="Search">⌕</button><button class="iconBtn" id="refresh" aria-label="Refresh">↻</button><div class="dropWrap"><button class="iconBtn" id="dots">⋮</button><div class="drop" id="drop"><button id="lang">🌐 বাংলা / English</button><button id="profile">◉ Profile</button><button id="logout">↪ Logout</button></div></div></div></header><main class="wrap">${body}</main><footer class="devFooter">Developed by <a href="https://mehedialimayon-del.github.io/MEHEDI-ALIM-AYON-PORTFOLIO/" target="_blank" rel="noopener noreferrer">KAM AYON</a></footer><nav class="bottom bottomSix"><button id="bh"><i>⌂</i>Home</button><button id="bs"><i>▥</i>Sales</button><button id="bo"><i>▣</i>Outlets</button><button id="bt"><i>▤</i>CPO/Promotion</button><button id="bn"><i class="bellGlyph">♢</i>Notification<span class="navBadge" id="notifyNavBadge"></span></button><button id="br"><i>⌖</i>Route</button></nav><div class="aiNudge" id="nudge">স্যার, আমি AYON AI। দরকার হলে ট্যাপ করুন।</div><button class="aiOrb" id="orb" aria-label="AYON AI"><img src="ayon-ai.png?v=20260927" alt="AYON AI" onerror="this.style.display='none';this.parentElement.textContent='AI'"></button></div>`;
 ffhSyncBrowserHistory();
 q('#dots').onclick=()=>q('#drop').classList.toggle('show');
 q('#logout').onclick=async()=>{try{await FFH_SUPABASE.auth.signOut()}catch(e){}localStorage.removeItem('ffh_session');user=null;navStack=[];login()};
@@ -1485,3 +1485,40 @@ const ffhCleanDetailStyle=document.createElement('style');ffhCleanDetailStyle.te
 (()=>{const style=document.createElement('style');style.textContent='.ffTaskList{max-height:55vh;overflow:auto;overscroll-behavior:contain}.ffTaskList>.cardTitle{position:sticky;top:0;background:#101920;z-index:2;padding:12px 0}.ffFavoriteAdd{position:absolute;top:12px;left:85px;width:36px;min-height:36px;padding:4px}';document.head.appendChild(style)})();
 
 (()=>{const style=document.createElement("style");style.textContent=".ffInboxScroller{max-height:60vh;overflow:auto;overscroll-behavior:contain}.ffInboxScroller>.row:first-child{position:sticky;top:0;z-index:2;background:#101920;padding:10px 0}.globalSearchBox select[multiple]{max-width:100%;min-height:110px}";document.head.appendChild(style)})();
+
+
+/* Entry permissions: explicit user action, no background location collection. */
+let ffhEntryLocationReady=false,ffhEntryChecking=false;
+function ffhEntryReady(notifications,location,push){return notifications==='granted'&&location===true&&push===true}
+function ffhEntryPermissionGate(){
+ if(!user||currentPage==='login')return;
+ const push=window.FFH_ONESIGNAL_STATUS?.(),ready=ffhEntryReady(window.Notification?.permission,ffhEntryLocationReady,!!(push?.optedIn&&push?.subscriptionId));
+ const existing=document.getElementById('ffhEntryPermissions');
+ if(ready){existing?.remove();document.querySelector('#app>.app')?.removeAttribute('inert');return;}
+ document.querySelector('#app>.app')?.setAttribute('inert','');
+ if(existing)return;
+ const bn=lang==='bn',overlay=document.createElement('div');overlay.id='ffhEntryPermissions';
+ overlay.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#070a0df5;display:grid;place-items:center;padding:20px;box-sizing:border-box;overflow:auto';
+ overlay.innerHTML=`<section class="card" style="width:min(100%,460px);box-sizing:border-box"><div class="cardTitle">FieldForce Hub</div><p>${bn?'অ্যাপ ব্যবহার করতে নোটিফিকেশন ও লোকেশন চালু করুন। টাস্ক, মিটিং ও কাজের আপডেট পেতে নোটিফিকেশন দরকার। লোকেশন কাজের অবস্থান যাচাই করতে ব্যবহার হবে।':'Enable notifications and location to use the app. Notifications deliver tasks, meetings and work updates. Location verifies work locations.'}</p><p id="ffhEntryStatus" role="status"></p><button type="button" class="primary" id="ffhEntryAllow">${bn?'অনুমতি দিন ও চালু করুন':'ALLOW & CONTINUE'}</button><button type="button" class="secondary" id="ffhEntryExit">${bn?'লগআউট':'LOG OUT'}</button></section>`;
+ document.body.appendChild(overlay);
+ overlay.querySelector('#ffhEntryExit').onclick=async()=>{await window.FFH_SUPABASE?.auth.signOut();user=null;ffhEntryLocationReady=false;overlay.remove();login()};
+ overlay.querySelector('#ffhEntryAllow').onclick=async()=>{
+ if(ffhEntryChecking)return;ffhEntryChecking=true;
+ const button=overlay.querySelector('#ffhEntryAllow'),status=overlay.querySelector('#ffhEntryStatus');button.disabled=true;
+ try{
+ if(!window.Notification||!navigator.geolocation)throw Error(bn?'এই ব্রাউজারে প্রয়োজনীয় অনুমতি সমর্থিত নয়। সমর্থিত ব্রাউজার বা ইনস্টল করা অ্যাপ ব্যবহার করুন।':'Required permissions are unsupported. Use a supported browser or the installed app.');
+ if(Notification.permission==='denied')throw Error(bn?'ফোন বা ব্রাউজারের এই অ্যাপের সেটিংসে Notifications Allow করুন, তারপর আবার চেষ্টা করুন।':'Allow notifications in this app’s phone/browser settings, then retry.');
+ if(Notification.permission!=='granted')await Notification.requestPermission();
+ if(Notification.permission!=='granted')throw Error(bn?'নোটিফিকেশন অনুমতি ছাড়া অ্যাপ চালু হবে না।':'Notification permission is required to continue.');
+ await new Promise((resolve,reject)=>navigator.geolocation.getCurrentPosition(()=>resolve(),e=>reject(Error(bn?'লোকেশন চালু করে এই অ্যাপকে অনুমতি দিন, তারপর আবার চেষ্টা করুন।':'Turn on location and allow this app to access it, then retry.')),{enableHighAccuracy:true,timeout:15000,maximumAge:0}));
+ ffhEntryLocationReady=true;
+ if(!window.FFH_ONESIGNAL_ASK_PERMISSION)throw Error(bn?'নোটিফিকেশন সংযোগ প্রস্তুত হচ্ছে। কয়েক সেকেন্ড পরে আবার চেষ্টা করুন।':'Notification connection is starting. Retry in a few seconds.');
+ await window.FFH_ONESIGNAL_SYNC?.();await window.FFH_ONESIGNAL_ASK_PERMISSION();
+ for(let i=0;i<10;i++){const p=window.FFH_ONESIGNAL_STATUS?.();if(p?.optedIn&&p?.subscriptionId)break;await new Promise(r=>setTimeout(r,500))}
+ if(!window.FFH_ONESIGNAL_STATUS?.()?.subscriptionId)throw Error(bn?'Push সংযোগ তৈরি হয়নি। ইন্টারনেট ও নোটিফিকেশন সেটিংস দেখে আবার চেষ্টা করুন।':'Push registration is incomplete. Check your connection and notification settings, then retry.');
+ ffhEntryPermissionGate();
+ }catch(e){status.textContent=e.message}finally{ffhEntryChecking=false;button.disabled=false}
+ };
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&user){ffhEntryLocationReady=false;ffhEntryPermissionGate()}});
+setTimeout(ffhEntryPermissionGate,0);
