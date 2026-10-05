@@ -19,6 +19,7 @@ function init(){if(started)return;started=true;
          const {data:profile,error:pe}=await sb.from('ffh_profiles').select('staff_id,active').eq('auth_user_id',data.user.id).single();
          if(pe||!profile?.staff_id||profile.active===false)return;
          const staff=String(profile.staff_id).trim();if(staff&&staff!==lastStaff){await OneSignal.login(staff);lastStaff=staff;}
+         if(window.Notification?.permission==='granted'&&OneSignal.User.PushSubscription?.optedIn===false)await OneSignal.User.PushSubscription.optIn();
        }catch(e){console.warn('FFH OneSignal identity sync:',e)}
      };
      window.FFH_ONESIGNAL_SYNC=sync;
