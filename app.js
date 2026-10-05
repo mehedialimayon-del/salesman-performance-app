@@ -813,12 +813,13 @@ function aiSpeak(t){try{
  if(!('speechSynthesis' in window))return;
  const request=++ffhSpeechRequest,clean=aiSpeechClean(t),bn=/[\u0980-\u09FF]/.test(clean);
  speechSynthesis.cancel();
- const speak=()=>{if(request!==ffhSpeechRequest)return;const v=chooseAIVoice(clean);
+ let attempted=false;
+ const speak=()=>{if(request!==ffhSpeechRequest||attempted)return;attempted=true;const v=chooseAIVoice(clean);
  if(!v){const chat=q('#aiPopupChat')||q('#chat');if(chat){const old=chat.querySelector('.ffhVoiceNotice');if(old)old.remove();const note=document.createElement('div');note.className='bubble bot ffhVoiceNotice';note.textContent=bn?'এই ফোনে বাংলা কণ্ঠ পাওয়া যায়নি। বাংলা উত্তর লেখায় দেখুন; ফোনের Text-to-speech সেটিংসে বাংলা voice যোগ করলে শুনতে পারবেন।':'An English voice is unavailable on this device. Your answer is shown in text.';chat.appendChild(note)}return;}
  const u=new SpeechSynthesisUtterance(clean);u.lang=v.lang;u.voice=v;u.rate=.9;u.pitch=1;u.volume=1;window._ffhVoice=u;speechSynthesis.speak(u);
  };
  if(speechSynthesis.getVoices().length)speak();else{
- const ready=()=>{speechSynthesis.removeEventListener('voiceschanged',ready);speak()};speechSynthesis.addEventListener('voiceschanged',ready,{once:true});setTimeout(()=>{speechSynthesis.removeEventListener('voiceschanged',ready);if(request===ffhSpeechRequest&&!window._ffhVoice)speak()},1500);
+ const ready=()=>{speechSynthesis.removeEventListener('voiceschanged',ready);speak()};speechSynthesis.addEventListener('voiceschanged',ready,{once:true});setTimeout(()=>{speechSynthesis.removeEventListener('voiceschanged',ready);if(request===ffhSpeechRequest&&!attempted)speak()},1500);
  }
 }catch(_){}}
 function stopAIVoice(){++ffhSpeechRequest;try{speechSynthesis.cancel()}catch(_){}}
