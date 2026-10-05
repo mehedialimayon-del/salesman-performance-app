@@ -4,7 +4,7 @@
 const APP_ID='b867a503-3728-411a-977d-cad4bd9b2440';
 const deferred=window.OneSignalDeferred=window.OneSignalDeferred||[];
 let started=false,lastStaff='';
-function init(){if(started)return;started=true;
+function init(){if(window.FieldForceNative||/FFHNative\/1/.test(navigator.userAgent))return;if(started)return;started=true;
  deferred.push(async function(OneSignal){
    try{
      // GitHub Pages serves the application from this project path. The worker
@@ -32,7 +32,7 @@ function init(){if(started)return;started=true;
      });}
      OneSignal.Notifications.addEventListener('click',function(e){
        // Backend may set data.ffh_page. Never use arbitrary URLs from notification data.
-       const allowed=['notifications','tasks','zero','cpo','sales','route','home','briefings'];
+       const allowed=['notifications','tasks','zero','cpo','sales','route','home','briefings','attendance','tracking','communication'];
        const page=e?.notification?.additionalData?.ffh_page;
        if(!allowed.includes(page))return;
        sessionStorage.setItem('ffh_push_target',page);
