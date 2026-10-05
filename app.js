@@ -843,12 +843,15 @@ function ffhAiProposalAnswer(s){
  if(hit?.file)return{text:`স্যার, ${hit.name} Proposal Form পেয়েছি। এখান থেকেই PDF দেখতে বা ডাউনলোড করতে পারবেন।`,html:`<a class="aiPdfDownload" href="${hit.file}" target="_blank" rel="noopener">👁 VIEW PDF</a> <a class="aiPdfDownload" href="${hit.file}" download="${esc(hit.filename||hit.name+'.pdf')}">⬇ DOWNLOAD PDF</a>`};
  return{text:'স্যার, Proposal Form module খুলে দিচ্ছি। Chain-এর নাম বললে uploaded PDF থাকলে আমি সরাসরি form-টা দেব।',html:ffhAiGoButton('proposals','OPEN PROPOSAL FORM')};
 }
-function ffhAiIncentiveAnswer(){
- let id=currentSr()||user.id,list=(db.incentives||[]).filter(x=>x.sr===id||x.sr==='ALL'),parts=[];
+function ffhAiIncentiveAnswer(question=''){
+ const bn=/[\u0980-\u09FF]/.test(question)||(!question&&lang==='bn'),id=currentSr()||user.id,m=month(),parts=[];
+ const list=(db.incentives||[]).filter(x=>x.active!==false&&(x.sr===id||x.sr==='ALL')&&(!x.month||x.month===m));
  const groups=x=>Array.isArray(x.groups)&&x.groups.length?x.groups:[{name:x.mode==='combo'?'Combo':'SKU',skus:Array.isArray(x.skus)?x.skus:(x.sku?[x.sku]:[]),target:+x.target||0,reward:+x.reward||0}];
- const got=g=>(db.sales||[]).filter(z=>z.sr===id&&z.status==='Delivered'&&(g.skus||[]).includes(z.sku)).reduce((a,z)=>a+(+z.qty||0),0);
- list.forEach(x=>groups(x).forEach(g=>{let v=got(g),tar=+g.target||0;parts.push(`${g.name||x.name}: ${v}/${tar}, বাকি ${Math.max(0,tar-v)} carton, reward ${rm(g.reward||0)}`)}));
- return parts.length?{text:'স্যার, আপনার current incentive progress: '+parts.slice(0,6).join(' | ')+'.',html:ffhAiGoButton('incentive','OPEN INCENTIVE')}:{text:'স্যার, আপনার জন্য এখন কোনো active product incentive published নেই।',html:ffhAiGoButton('incentive','OPEN INCENTIVE')};
+ list.forEach(x=>groups(x).forEach(g=>{
+ const qty=(db.sales||[]).filter(z=>z.sr===id&&z.status==='Delivered'&&String(z.date||'').slice(0,7)===m&&(!x.startDate||z.date>=x.startDate)&&(!x.endDate||z.date<=x.endDate)&&(g.skus||[]).includes(z.sku)).reduce((n,z)=>n+(+z.qty||0),0);
+ parts.push(`${g.name||x.name}: ${qty}/${+g.target||0}, ${bn?'বাকি':'remaining'} ${Math.max(0,(+g.target||0)-qty)} ${bn?'কার্টুন':'cartons'}, ${bn?'পুরস্কার':'reward'} ${rm(g.reward||0)}`);
+ }));
+ return{text:parts.length?(bn?'স্যার, এই মাসের ইনসেনটিভ অগ্রগতি: ':'Sir, your incentive progress this month: ')+parts.slice(0,6).join(' | '):(bn?'স্যার, এই মাসে আপনার জন্য কোনো সক্রিয় প্রোডাক্ট ইনসেনটিভ প্রকাশিত নেই।':'Sir, no active product incentive is published for you this month.'),html:ffhAiGoButton('incentive',bn?'ইনসেনটিভ দেখুন':'OPEN INCENTIVE')};
 }
 function ffhAiShortfallAnswer(){
  let id=currentSr()||user.id,d=delivered(id),t=target(id),sh=Math.max(0,t-d),zs=zeroOutlets(id)||[],names=zs.slice(0,5).map(x=>x.name).filter(Boolean);
@@ -889,7 +892,7 @@ function aiAnswerRich(s){
  if(restricted)return{text:restricted,html:''};
  let approved=aiKbAnswer(s);if(approved)return{text:approved,html:''};
  if(/proposal|প্রপোজাল|pdf|ফর্ম/.test(z))return ffhAiProposalAnswer(s);
- if(/incentive|ইনসেনটিভ|reward|আর কত.*লাগ/.test(z))return ffhAiIncentiveAnswer();
+ if(/incentive|ইনসেনটিভ|reward|আর কত.*লাগ/.test(z))return ffhAiIncentiveAnswer(s);
  if(/shortfall|short|শর্ট|target.*বাকি|টার্গেট.*বাকি|আর কত.*target/.test(z))return ffhAiShortfallAnswer();
  if(/cpo|promotion|প্রমোশন|campaign|ক্যাম্পেইন/.test(z))return ffhAiCpoAnswer();
  if(/zero\s*sales?|জিরো\s*সেলস?|শূন্য\s*সেল/.test(z)||nz.includes('zerosales'))return{text:aiZeroSalesAnswer(),html:ffhAiGoButton('zero','OPEN ZERO SALES')};
