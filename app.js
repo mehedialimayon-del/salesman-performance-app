@@ -1023,7 +1023,7 @@ async function ffhLoadInbox(){
  db.notifications=[...existing.values()];let changed=JSON.stringify(db.notifications)!==before;if(changed)try{save()}catch(e){console.warn('Cloud inbox cache full',e)}updateNotifyBadges();
  if(changed&&currentPage==='notifications')notifications();
 }
-async function ffhReadCloudNotice(n){if(!n?.cloudId)return;let {error}=await FFH_SUPABASE.from('ffh_notification_inbox').update({read_at:new Date().toISOString()}).eq('id',n.cloudId).eq('staff_id',user.id);if(error)throw error}
+async function ffhReadCloudNotice(n){if(!n?.cloudId||n.read)return;let {error}=await FFH_SUPABASE.from('ffh_notification_inbox').update({read_at:new Date().toISOString()}).eq('id',n.cloudId).eq('staff_id',user.id).is('read_at',null);if(error)throw error}
 async function ffhLoadSalesCloud(){
  if(!window.FFH_SUPABASE||!user?.id)return;
  let data=[];for(let offset=0;;offset+=1000){const {data:rows,error}=await FFH_SUPABASE.from('ffh_sales').select('*').order('created_at',{ascending:false}).range(offset,offset+999);if(error){console.warn('Cloud sales:',error.message);return}data.push(...(rows||[]));if(!rows||rows.length<1000)break;}
