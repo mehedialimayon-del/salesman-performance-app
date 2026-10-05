@@ -796,9 +796,25 @@ function ffhAiFallback(s){
 
 function aiWelcomeText(){let n=displayFirstName(),g=greetingNow();if(lang==='bn'){let bg=g==='Good Morning'?'শুভ সকাল':g==='Good Afternoon'?'শুভ অপরাহ্ন':g==='Good Evening'?'শুভ সন্ধ্যা':'শুভ রাত্রি';return `${bg}, ${n} স্যার!`; }return `${g}, ${n} Sir!`}
 function aiShortIntro(){return lang==='bn'?'আমি আপনার Sales Assistant — AYON AI':'I am your Sales Assistant — AYON AI'}
-function chooseAIVoice(text=''){let vs=window.speechSynthesis?.getVoices?.()||[],isBn=/[\u0980-\u09FF]/.test(text);if(!vs.length)return null;let langList=isBn?vs.filter(v=>/^bn(?:-|$)/i.test(v.lang||'')):vs.filter(v=>/^en-(?:GB|US|IN|AU)/i.test(v.lang||''));let male=/male|guy|david|mark|daniel|ryan|george|ravi|prabhat|hemant|madhur/i,natural=/google|microsoft|natural|online|neural|bangla|bengali/i;return langList.find(v=>male.test((v.name||'')+' '+(v.voiceURI||'')))||langList.find(v=>natural.test((v.name||'')+' '+(v.voiceURI||'')))||langList[0]||vs.find(v=>male.test(v.name||''))||vs[0]}
-function aiSpeechClean(t){let x=String(t||'').replace(/[👋😄🎯⚡✦♢💪]/g,'').replace(/AYON/gi,'অয়ন').replace(/Mehedi\s+Alim\s+Ayon/gi,'মেহেদী আলিম অয়ন').replace(/RM\s*/g,/[\u0980-\u09FF]/.test(t)?'রিঙ্গিত ':'RM ');return x.replace(/CPO\s*\/\s*(?:DPO|Promotion)/gi,'সি পি ও, প্রোমোশন').replace(/\bPO\b/gi,'পি ও')}
-function aiSpeak(t){try{if(!('speechSynthesis' in window))return;speechSynthesis.cancel();let clean=aiSpeechClean(t),isBn=/[\u0980-\u09FF]/.test(clean),u=new SpeechSynthesisUtterance(clean);u.lang=isBn?'bn-BD':'en-GB';u.rate=isBn?.70:.90;u.pitch=isBn?.88:.92;u.volume=1;let v=chooseAIVoice(clean);if(v){u.voice=v;if(!isBn)u.lang=v.lang||u.lang}window._ffhVoice=u;speechSynthesis.speak(u)}catch(_){}}
+function chooseAIVoice(text=''){
+ const voices=window.speechSynthesis?.getVoices?.()||[],bn=/[\u0980-\u09FF]/.test(text);
+ const candidates=voices.filter(v=>(bn?/^bn(?:-|$)/i:/^en(?:-|$)/i).test(v.lang||''));
+ const male=/(?:\bmale\b|\bguy\b|\bdavid\b|\bmark\b|\bdaniel\b|\bryan\b|\bgeorge\b|\bravi\b|\bprabhat\b|\bhemant\b|\bmadhur\b)/i;
+ return candidates.find(v=>! /female/i.test(v.name||'')&&male.test((v.name||'')+' '+(v.voiceURI||'')))||candidates.find(v=>/natural|neural|google|microsoft/i.test(v.name||''))||candidates[0]||null;
+}
+function aiSpeechClean(t){
+ const bn=/[\u0980-\u09FF]/.test(String(t||''));
+ let x=String(t||'').replace(/[👋😄🎯⚡✦♢💪]/g,'');
+ if(bn)x=x.replace(/Mehedi\s+Alim\s+Ayon/gi,'মেহেদী আলিম অয়ন').replace(/AYON/gi,'অয়ন').replace(/\bRM\s*/g,'রিঙ্গিত ').replace(/CPO\s*\/\s*(?:DPO|Promotion)/gi,'সি পি ও, প্রোমোশন').replace(/\bPO\b/gi,'পি ও');
+ return x.trim();
+}
+function aiSpeak(t){try{
+ if(!('speechSynthesis' in window))return;
+ speechSynthesis.cancel();
+ const clean=aiSpeechClean(t),bn=/[\u0980-\u09FF]/.test(clean),u=new SpeechSynthesisUtterance(clean),v=chooseAIVoice(clean);
+ u.lang=v?.lang||(bn?'bn-BD':'en-GB');u.rate=.9;u.pitch=1;u.volume=1;
+ if(v)u.voice=v;window._ffhVoice=u;speechSynthesis.speak(u);
+}catch(_){}}
 function stopAIVoice(){try{speechSynthesis.cancel()}catch(_){}}
 function closeAIPopup(){stopAIVoice();q('#aiPopup')?.remove()}
 function aiQuickQuestions(){return lang==='bn'?[['▥','আমার সেলস কেমন?','আজ, এই সপ্তাহ বা এই মাস'],['◎','আমার টার্গেট প্রোগ্রেস?','টার্গেট বনাম অ্যাচিভমেন্ট'],['▣','কোন আউটলেটে ফোকাস দেব?','পারফরম্যান্স অনুযায়ী সাজেশন'],['▤','CPO / Promotion স্ট্যাটাস','অর্ডার, ডেলিভারি ও এক্সিকিউশন'],['⌖','আজকের রুট প্ল্যান দেখাও','ভিজিট এবং কভারেজ'],['$','আমার ইনকাম আপডেট','বেতন, ইনসেনটিভ ও বোনাস']]:[['▥','How are my sales?','Today, this week or this month'],['◎','My target progress?','Target versus achievement'],['▣','Which outlets need focus?','Suggestions from performance'],['▤','CPO / Promotion status','Order, delivery and execution'],['⌖','Show today’s route plan','Visits and coverage'],['$','My income update','Salary, incentive and bonus']]}
