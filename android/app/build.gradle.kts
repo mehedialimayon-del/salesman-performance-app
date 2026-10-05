@@ -7,8 +7,8 @@ android {
         applicationId = "com.fieldforcehub.mobile"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1-duty"
+        versionCode = 3
+        versionName = "1.2-earnings"
     }
     signingConfigs {
         create("production") {
