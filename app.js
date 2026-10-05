@@ -421,7 +421,7 @@ async function ffhSafeDownload(blob,filename){if(window.FieldForceNative?.saveFi
 async function exportWorkbook(){
  const names=['Executive Summary','SR Performance','Daily Sales','Delivered Sales','Outlet Wise','SKU Wise','Targets & Shortfall','Income Breakdown','Sales Commission','Product Incentives','Other Incentives','Zero Sales','CPO Execution','Promotion Execution','Route & Visits'];
  const btn=q('#xls');if(btn){btn.disabled=true;btn.textContent='GENERATING EXCEL...'}
- try{const XLSX=await ffhEnsureXlsx(),wb=XLSX.utils.book_new();for(const name of names){const rows=reportRows(name),ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=(rows[0]||[]).map((_,i)=>({wch:Math.min(46,Math.max(14,...rows.slice(0,150).map(r=>String(r[i]??'').length+2)))}));XLSX.utils.book_append_sheet(wb,ws,name.slice(0,31))}const bytes=XLSX.write(wb,{bookType:'xlsx',type:'array'});ffhSafeDownload(new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'FieldForce-Full-'+today()+'.xlsx')}
+ try{const XLSX=await ffhEnsureXlsx(),wb=XLSX.utils.book_new();for(const name of names){const rows=reportRows(name),ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=(rows[0]||[]).map((_,i)=>({wch:Math.min(46,Math.max(14,...rows.slice(0,150).map(r=>String(r[i]??'').length+2)))}));XLSX.utils.book_append_sheet(wb,ws,name.slice(0,31))}const bytes=XLSX.write(wb,{bookType:'xlsx',type:'array'});await ffhSafeDownload(new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'FieldForce-Full-'+today()+'.xlsx')}
  catch(e){console.error('Excel export failed',e);alert('Excel download failed: '+(e.message||e))}
  finally{if(btn&&document.body.contains(btn)){btn.disabled=false;btn.textContent='DOWNLOAD FULL EXCEL WORKBOOK'}}
 }
