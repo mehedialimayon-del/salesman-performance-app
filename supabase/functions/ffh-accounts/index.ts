@@ -11,6 +11,7 @@ Deno.serve(async(req:Request)=>{
  if(actor?.staff_id!=='M21954'||!actor.active||!actor.login_approved)return out({error:'Only Ayon can provision or delegate accounts'},403);
  try{
  const p=await req.json();const action=p.action;
+ if(action==='zone'){const id=String(p.zone_id||'').trim().toUpperCase(),name=String(p.name||'').trim();if(!/^[A-Z0-9_-]{1,40}$/.test(id)||!name||name.length>150)throw Error('Zone ID and name required');const {error}=await sb.from('ffh_zones').upsert({id,name,active:true});if(error)throw error;return out({saved:true});}
  if(action==='list'){const {data:profiles,error}=await sb.from('ffh_profiles').select('staff_id,full_name,role,active,login_approved,monthly_target,can_manage,can_sell,zone_id,owner_access').order('full_name');if(error)throw error;const {data:zones}=await sb.from('ffh_zones').select('*');return out({profiles,zones});}
  const id=String(p.staff_id||'').trim().toUpperCase();if(!/^[A-Z][A-Z0-9_-]{2,29}$/.test(id))throw Error('Use a valid staff ID');
  const {data:existing,error:ee}=await sb.from('ffh_profiles').select('auth_user_id,staff_id').eq('staff_id',id).maybeSingle();if(ee)throw ee;
