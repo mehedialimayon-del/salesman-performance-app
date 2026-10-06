@@ -7,8 +7,8 @@ android {
         applicationId = "com.fieldforcehub.mobile"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.4-alarms-accounts"
+        versionCode = 6
+        versionName = "1.5"
     }
     signingConfigs {
         create("production") {

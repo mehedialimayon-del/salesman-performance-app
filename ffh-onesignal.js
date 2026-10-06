@@ -32,7 +32,7 @@ function init(){if(window.FieldForceNative||/FFHNative\/1/.test(navigator.userAg
      });}
      OneSignal.Notifications.addEventListener('click',function(e){
        // Backend may set data.ffh_page. Never use arbitrary URLs from notification data.
-       const allowed=['notifications','tasks','zero','cpo','sales','route','home','briefings','attendance','tracking','communication','claims','aiQuestions','aiWork'];
+       const allowed=['notifications','tasks','zero','cpo','sales','route','home','briefings','meetings','notices','attendance','tracking','communication','claims','aiQuestions','aiWork'];
        const page=e?.notification?.additionalData?.ffh_page;
        if(!allowed.includes(page))return;
        sessionStorage.setItem('ffh_push_target',page);

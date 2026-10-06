@@ -12,7 +12,7 @@ on:
           - test
           - production
   push:
-    branches: [main, ffh-duty-communication]
+    branches: [main, ffh-duty-communication, ffh-notice-meetings-1-5]
     paths:
       - 'android/**'
       - '.github/workflows/fieldforce-android-apk.yml'

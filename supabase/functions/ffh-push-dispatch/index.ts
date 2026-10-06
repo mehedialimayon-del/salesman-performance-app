@@ -21,7 +21,7 @@ Deno.serve(async (req: Request) => {
   const {data:expiredPhotos}=await sb.from('ffh_attendance').select('id,photo_path').lt('check_in',new Date(Date.now()-30*86400000).toISOString()).not('photo_path','is',null).limit(10);
   for(const photo of expiredPhotos||[]){const {error}=await sb.storage.from('ffh-attendance').remove([photo.photo_path]);if(!error)await sb.from('ffh_attendance').update({photo_path:null}).eq('id',photo.id);}
   const notificationKey=async (jobId:string,staffId:string)=>{ const bytes=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(jobId+'|'+staffId))); bytes[6]=(bytes[6]&15)|80; bytes[8]=(bytes[8]&63)|128; const hex=Array.from(bytes.slice(0,16),b=>b.toString(16).padStart(2,'0')).join(''); return [hex.slice(0,8),hex.slice(8,12),hex.slice(12,16),hex.slice(16,20),hex.slice(20,32)].join('-'); };
-  const targetPage=(type:string)=>(({task:'tasks',tasks:'tasks',zero:'zero',cpo:'cpo',promotion:'cpo',sales:'sales',route:'route',message:'communication',tracking:'tracking',meeting:'briefings',notice:'briefings',claim:'claims',ai_question:'aiQuestions',ai_answer:'aiQuestions',alarm_setup:'alarms'} as Record<string,string>)[type]||'notifications');
+  const targetPage=(type:string)=>(({task:'tasks',tasks:'tasks',zero:'zero',cpo:'cpo',promotion:'cpo',sales:'sales',route:'route',message:'communication',tracking:'tracking',meeting:'meetings',notice:'notices',claim:'claims',ai_question:'aiQuestions',ai_answer:'aiQuestions',alarm_setup:'alarms'} as Record<string,string>)[type]||'notifications');
   const now=new Date().toISOString();
   await sb.from('ffh_notification_heartbeat').upsert({id:1,last_run_at:now,last_error:null});
   const {data:due,error}=await sb.from('ffh_notification_jobs').select('*').eq('status','scheduled').lte('scheduled_at',now).order('scheduled_at').limit(40);
@@ -63,8 +63,8 @@ Deno.serve(async (req: Request) => {
               priority:10,
               ttl:job.type==='alarm_setup'?86400:259200,
               web_url:'https://mehedialimayon-del.github.io/salesman-performance-app/?ffh_page='+encodeURIComponent(page),
-              existing_android_channel_id:'ffh_messages_v1',
-              android_sound:'ffh_chime',
+              existing_android_channel_id:'ffh_messages_v2',
+              android_sound:'ffh_brand',
               small_icon:'ic_stat_ffh',
               android_accent_color:'FFFF9F43',
               chrome_web_icon:'https://mehedialimayon-del.github.io/salesman-performance-app/an-logo.png',
