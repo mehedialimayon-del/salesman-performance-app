@@ -7,8 +7,8 @@ android {
         applicationId = "com.fieldforcehub.mobile"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.3-ai-claims"
+        versionCode = 5
+        versionName = "1.4-alarms-accounts"
     }
     signingConfigs {
         create("production") {
@@ -26,6 +26,7 @@ android {
             }
         }
     }
+    testOptions { unitTests.isIncludeAndroidResources = true }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -33,6 +34,8 @@ android {
 }
 
 dependencies {
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.15.1")
     implementation("androidx.webkit:webkit:1.12.1")
     implementation("com.onesignal:OneSignal:5.10.2")
 }

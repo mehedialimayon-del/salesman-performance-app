@@ -21,7 +21,7 @@ Deno.serve(async (req: Request) => {
   const {data:expiredPhotos}=await sb.from('ffh_attendance').select('id,photo_path').lt('check_in',new Date(Date.now()-30*86400000).toISOString()).not('photo_path','is',null).limit(10);
   for(const photo of expiredPhotos||[]){const {error}=await sb.storage.from('ffh-attendance').remove([photo.photo_path]);if(!error)await sb.from('ffh_attendance').update({photo_path:null}).eq('id',photo.id);}
   const notificationKey=async (jobId:string,staffId:string)=>{ const bytes=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(jobId+'|'+staffId))); bytes[6]=(bytes[6]&15)|80; bytes[8]=(bytes[8]&63)|128; const hex=Array.from(bytes.slice(0,16),b=>b.toString(16).padStart(2,'0')).join(''); return [hex.slice(0,8),hex.slice(8,12),hex.slice(12,16),hex.slice(16,20),hex.slice(20,32)].join('-'); };
-  const targetPage=(type:string)=>(({task:'tasks',tasks:'tasks',zero:'zero',cpo:'cpo',promotion:'cpo',sales:'sales',route:'route',message:'communication',tracking:'tracking',meeting:'briefings',notice:'briefings',claim:'claims',ai_question:'aiQuestions',ai_answer:'aiQuestions'} as Record<string,string>)[type]||'notifications');
+  const targetPage=(type:string)=>(({task:'tasks',tasks:'tasks',zero:'zero',cpo:'cpo',promotion:'cpo',sales:'sales',route:'route',message:'communication',tracking:'tracking',meeting:'briefings',notice:'briefings',claim:'claims',ai_question:'aiQuestions',ai_answer:'aiQuestions',alarm_setup:'alarms'} as Record<string,string>)[type]||'notifications');
   const now=new Date().toISOString();
   await sb.from('ffh_notification_heartbeat').upsert({id:1,last_run_at:now,last_error:null});
   const {data:due,error}=await sb.from('ffh_notification_jobs').select('*').eq('status','scheduled').lte('scheduled_at',now).order('scheduled_at').limit(40);
@@ -49,6 +49,7 @@ Deno.serve(async (req: Request) => {
 
         try{
           const page=targetPage(job.type);
+          let alarmData=null;if(job.type==='alarm_setup'){const {data:a}=await sb.from('ffh_alarm_schedules').select('*').eq('id',job.provider_response?.ffh_alarm?.id).eq('staff_id',staff).eq('created_by',job.created_by).maybeSingle();if(!a)throw Error('Invalid alarm assignment');alarmData={id:a.id,staff_id:a.staff_id,title:a.title,daily:a.daily,enabled:a.enabled,time:(a.time_of_day||'').slice(0,5),at:a.alarm_at?Date.parse(a.alarm_at):0};}
           const response=await fetch('https://api.onesignal.com/notifications',{
             method:'POST',
             headers:{'Content-Type':'application/json',Authorization:'Key '+one},
@@ -58,11 +59,14 @@ Deno.serve(async (req: Request) => {
               target_channel:'push',
               headings:{en:job.title},
               contents:{en:job.body},
-              data:{ffh_page:page,ffh_job_id:job.id},
+              data:{ffh_page:page,ffh_job_id:job.id,...(alarmData?{ffh_alarm:alarmData}:{})},
+              priority:10,
+              ttl:job.type==='alarm_setup'?86400:259200,
               web_url:'https://mehedialimayon-del.github.io/salesman-performance-app/?ffh_page='+encodeURIComponent(page),
               existing_android_channel_id:'ffh_messages_v1',
               android_sound:'ffh_chime',
               small_icon:'ic_stat_ffh',
+              android_accent_color:'FFFF9F43',
               chrome_web_icon:'https://mehedialimayon-del.github.io/salesman-performance-app/an-logo.png',
               idempotency_key:await notificationKey(String(job.id),staff)
             })
@@ -76,7 +80,7 @@ Deno.serve(async (req: Request) => {
           await sb.from('ffh_notification_delivery').update({status:'failed',last_error:String(e)}).eq('job_id',job.id).eq('staff_id',staff);
         }
       }
-      await sb.from('ffh_notification_jobs').update({status:failures?'failed':'push_accepted',last_error:failures?failures+' recipients failed':null,provider_response:{accepted:ids.length-failures,failed:failures}}).eq('id',job.id);
+      await sb.from('ffh_notification_jobs').update({status:failures?'failed':'push_accepted',last_error:failures?failures+' recipients failed':null,provider_response:{...job.provider_response,accepted:ids.length-failures,failed:failures}}).eq('id',job.id);
       failed+=failures;
     }catch(e){
       failed++;

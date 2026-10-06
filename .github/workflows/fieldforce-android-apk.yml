@@ -45,8 +45,12 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python android/make_icons.py
+      - name: Run native alarm regression tests
+        run: gradle -p android :app:testDebugUnitTest --no-daemon
+      - name: Compile debug verification APK
+        run: gradle -p android :app:assembleDebug --no-daemon
       - name: Import persistent production signing key
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'production' }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.build_type == 'production') || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
         shell: bash
         env:
           FFH_KEYSTORE_B64: ${{ secrets.FFH_KEYSTORE_B64 }}
@@ -67,7 +71,7 @@ jobs:
           FFH_KEYSTORE_PASS: ${{ secrets.FFH_KEYSTORE_PASS }}
           FFH_KEY_ALIAS: ${{ secrets.FFH_KEY_ALIAS }}
           FFH_KEY_PASS: ${{ secrets.FFH_KEY_PASS }}
-          IS_PRODUCTION: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'production' }}
+          IS_PRODUCTION: ${{ (github.event_name == 'workflow_dispatch' && inputs.build_type == 'production') || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
         run: |
           set -euo pipefail
           mkdir -p dist
