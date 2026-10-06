@@ -1,6 +1,7 @@
-async function ffhBulkCatalogue(){
+window.FFH_CREATE_BULK_CATALOGUE=ctx=>async function ffhBulkCatalogue(){
+ const {isMgr,ffhRefreshCatalogueCloud,ffhCatalogueRows,shell,back,esc,bindBack,q,qa,ffhAssertManagerCloudWrite,ffhUploadPublicFile,ffhSafeName,FFH_SUPABASE,ffhCatalogueLocalRow,ffhSaveCatalogueLocal}=ctx;
  if(!isMgr())return;
- await ffhRefreshCatalogueCloud();currentPage='catalogueBulk';
+ await ffhRefreshCatalogueCloud();ctx.setPage('catalogueBulk');
  const rows=ffhCatalogueRows().map(x=>({...x})),categories=[...new Set(rows.map(x=>x.category))];
  const fields=[['name','Product name'],['itemCode','Item code'],['serialNo','Category serial','number'],['cartonPrice','Carton price RM','number'],['piecePrice','Unit price RM','number'],['pack','Pack'],['ctnFactors','Carton factors'],['ctnBarcode','Carton barcode'],['singlePcsBarcode','Unit barcode'],['comboBarcode','Combo barcode']];
  shell(back('Full Catalogue Edit')+`<form id="ffBulkCatalogueForm"><div class="card" style="position:sticky;top:0;z-index:3"><input id="ffBulkSearch" class="search" placeholder="Find product, code or category"><p id="ffBulkStatus" role="status">${rows.length} products · Edit any rows, then save once.</p><button class="primary" type="submit">SAVE ALL CHANGES</button></div><div id="ffBulkRows">${rows.map((x,i)=>`<section class="card form ffBulkRow" data-index="${i}"><h3>${i+1}. ${esc(x.name)}</h3><div class="ffEditTwo">${fields.map(([k,label,type])=>`<label>${label}<input data-field="${k}" type="${type||'text'}" ${type?'min="0" step="'+(k==='serialNo'?'1':'0.01')+'"':''} value="${esc(x[k]??'')}" ${k==='name'?'required':''}></label>`).join('')}<label>Category<select data-field="category">${categories.map(c=>`<option ${c===x.category?'selected':''}>${esc(c)}</option>`).join('')}</select></label></div>${x.image?`<img src="${esc(x.image)}" loading="lazy" alt="" style="width:70px;height:70px;object-fit:contain">`:''}<label>Product photo · maximum 1.2 MB<input data-field="photo" type="file" accept="image/jpeg,image/png,image/webp"></label><label>Description<textarea data-field="description">${esc(x.description||'')}</textarea></label></section>`).join('')}</div></form>`);bindBack();
@@ -16,4 +17,4 @@ async function ffhBulkCatalogue(){
  const {data,error}=await FFH_SUPABASE.rpc('ffh_catalogue_bulk_save',{products:payload});if(error)throw Error(error.message);if(data?.saved!==changed.length)throw Error('Cloud save verification failed');for(const [i,x] of dirty){delete x.photoFile;Object.assign(ffhCatalogueLocalRow(rows[i]),x,{cloudId:String(x.cloudId||x.id)});rows[i]={...x};}ffhSaveCatalogueLocal();dirty.clear();form.querySelectorAll('[data-field=photo]').forEach(input=>input.value='');status(`${data.saved} products saved · visible to all SRs.`);
  }catch(err){status('Save failed: '+err.message+' · Your edits are still here.');}finally{saving=false;button.disabled=false;form.querySelectorAll('.ffBulkRow input,.ffBulkRow select,.ffBulkRow textarea').forEach(el=>el.disabled=false);}
  };
-}
+};

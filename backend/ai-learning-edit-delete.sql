@@ -46,26 +46,3 @@ begin
  else raise exception 'Unknown learning action';end if;
 end$$;
 
-create or replace function public.ffh_catalogue_bulk_save(products jsonb) returns jsonb language plpgsql security invoker set search_path='' as $$
-declare p jsonb;r public.ffh_catalogue_products%rowtype;n integer:=0;
-begin
- if auth.uid() is null or not public.ffh_can_manage() then raise exception 'Manager access required' using errcode='42501';end if;
- if jsonb_typeof(products)<>'array' or jsonb_array_length(products) not between 1 and 1000 then raise exception 'Choose 1 to 1000 products';end if;
- if (select count(distinct x->>'id') from jsonb_array_elements(products) x)<>jsonb_array_length(products) then raise exception 'Duplicate product IDs';end if;
- for p in select value from jsonb_array_elements(products) loop
- if coalesce(trim(p->>'id'),'')='' or coalesce(trim(p->>'name'),'')='' or coalesce(trim(p->>'category'),'')='' then raise exception 'Product ID, name and category required';end if;
- if (p->>'piece_price')::numeric<0 or (p->>'carton_price')::numeric<0 or (p->>'serial_no')::integer<0 then raise exception 'Invalid price or serial';end if;
- select * into r from public.ffh_catalogue_products where id=p->>'id' for update;
- if found then
- r:=jsonb_populate_record(r,p);
- update public.ffh_catalogue_products set name=r.name,item_code=r.item_code,category=r.category,serial_no=r.serial_no,piece_price=r.piece_price,carton_price=r.carton_price,pack=r.pack,ctn_factors=r.ctn_factors,carton_qty=r.carton_qty,ctn_barcode=r.ctn_barcode,single_pcs_barcode=r.single_pcs_barcode,combo_barcode=r.combo_barcode,description=r.description,image_url=r.image_url,updated_at=now() where id=r.id;
- else
- insert into public.ffh_catalogue_products(id,name,item_code,category,serial_no,piece_price,carton_price,pack,ctn_factors,carton_qty,ctn_barcode,single_pcs_barcode,combo_barcode,description,image_url,active) values(p->>'id',p->>'name',p->>'item_code',p->>'category',(p->>'serial_no')::integer,(p->>'piece_price')::numeric,(p->>'carton_price')::numeric,p->>'pack',p->>'ctn_factors',(p->>'carton_qty')::numeric,p->>'ctn_barcode',p->>'single_pcs_barcode',p->>'combo_barcode',p->>'description',p->>'image_url',true);
- end if;n:=n+1;
- end loop;return jsonb_build_object('saved',n);
-end$$;
-revoke all on function public.ffh_catalogue_bulk_save(jsonb) from public,anon;
-grant execute on function public.ffh_catalogue_bulk_save(jsonb) to authenticated;
-do $$begin
- if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='ffh_catalogue_products') then alter publication supabase_realtime add table public.ffh_catalogue_products;end if;
-end$$;
