@@ -1,4 +1,5 @@
 import {createClient} from 'npm:@supabase/supabase-js@2.57.4';
+import {setAccountPassword} from './password.ts';
 const cors={'Access-Control-Allow-Origin':'https://mehedialimayon-del.github.io','Access-Control-Allow-Headers':'authorization,apikey,content-type,x-client-info','Content-Type':'application/json'};
 Deno.serve(async(req:Request)=>{
  const out=(value:unknown,status=200)=>new Response(JSON.stringify(value),{status,headers:cors});
@@ -15,7 +16,7 @@ Deno.serve(async(req:Request)=>{
  if(action==='list'){const {data:profiles,error}=await sb.from('ffh_profiles').select('staff_id,full_name,role,active,login_approved,monthly_target,can_manage,can_sell,zone_id,owner_access').order('full_name');if(error)throw error;const {data:zones}=await sb.from('ffh_zones').select('*');return out({profiles,zones});}
  const id=String(p.staff_id||'').trim().toUpperCase();if(!/^[A-Z][A-Z0-9_-]{2,29}$/.test(id))throw Error('Use a valid staff ID');
  const {data:existing,error:ee}=await sb.from('ffh_profiles').select('auth_user_id,staff_id').eq('staff_id',id).maybeSingle();if(ee)throw ee;
- if(action==='password'){if(!existing?.auth_user_id)throw Error('Account not found');if(String(p.password||'').length<12)throw Error('Password needs at least 12 characters');const {error}=await sb.auth.admin.updateUserById(existing.auth_user_id,{password:p.password});if(error)throw error;await sb.from('ffh_profiles').update({must_change_password:true}).eq('staff_id',id);return out({saved:true});}
+ if(action==='password'){if(!existing?.auth_user_id)throw Error('Account not found');await setAccountPassword(sb,existing.auth_user_id,p.password);const {error}=await sb.from('ffh_profiles').update({must_change_password:false}).eq('staff_id',id);if(error)throw error;return out({saved:true,password_changed:true});}
  if(!['create','update'].includes(action))throw Error('Unknown account action');
  if(id==='M21954')throw Error('Owner permissions cannot be changed here');
  if(action==='create'&&existing)throw Error('Staff ID already exists');if(action==='update'&&!existing)throw Error('Account not found');
@@ -23,10 +24,10 @@ Deno.serve(async(req:Request)=>{
  const {data:z}=await sb.from('ffh_zones').select('id').eq('id',zone).maybeSingle();if(!z)throw Error('Choose an existing zone');
  const target=Number(p.monthly_target||50000);if(!Number.isFinite(target)||target<50000)throw Error('Actual target minimum RM 50,000');
  const row={staff_id:id,full_name:name,role:manager?'MANAGER':'SR',can_manage:manager,can_sell:manager?p.can_sell!==false:true,zone_id:zone,owner_access:manager&&p.owner_access===true,active:p.active!==false,login_approved:true,monthly_target:target,updated_at:new Date().toISOString()};
- if(action==='update'){const {error}=await sb.from('ffh_profiles').update(row).eq('staff_id',id);if(error)throw error;return out({saved:true,staff_id:id});}
+ if(action==='update'){if(p.password!==undefined&&String(p.password).length<12)throw Error('Password needs at least 12 characters');if(p.password!==undefined)await setAccountPassword(sb,existing.auth_user_id,p.password);const {error}=await sb.from('ffh_profiles').update({...row,...(p.password!==undefined?{must_change_password:false}:{})}).eq('staff_id',id);if(error)throw Error(p.password!==undefined?'Password changed, but profile update failed; retry profile save.':'Profile update failed');return out({saved:true,staff_id:id,password_changed:p.password!==undefined});}
  if(String(p.password||'').length<12)throw Error('Password needs at least 12 characters');
  const {data:newAuth,error:ce}=await sb.auth.admin.createUser({email:id.toLowerCase()+'@fieldforce.app',password:p.password,email_confirm:true});if(ce||!newAuth.user)throw ce||Error('Login creation failed');
- const {error:pe}=await sb.from('ffh_profiles').insert({...row,auth_user_id:newAuth.user.id,must_change_password:true});
+ const {error:pe}=await sb.from('ffh_profiles').insert({...row,auth_user_id:newAuth.user.id,must_change_password:false});
  if(pe){await sb.auth.admin.deleteUser(newAuth.user.id);throw Error('Profile creation failed; new login rolled back');}
  return out({saved:true,staff_id:id});
  }catch(e){return out({error:e instanceof Error?e.message:'Account operation failed'},400);}
