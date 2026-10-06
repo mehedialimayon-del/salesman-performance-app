@@ -1,0 +1,7 @@
+package com.fieldforcehub.mobile;
+import android.app.Application;import android.os.Bundle;import android.speech.SpeechRecognizer;import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.Config;import java.util.*;import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(sdk=28,application=Application.class)
+public class VoiceSessionTest {
+ @Test public void retainsSegmentsAndStopsOnce(){String[] output=new String[2];int[] calls={0};VoiceSession v=new VoiceSession(RuntimeEnvironment.getApplication(),"bn-BD",(text,error)->{output[0]=text;output[1]=error;calls[0]++;});Bundle a=new Bundle();a.putStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION,new ArrayList<>(Arrays.asList("মুন্নাফকে ২০ RM পেনাল্টি")));v.onResults(a);Bundle b=new Bundle();b.putStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION,new ArrayList<>(Arrays.asList("কাজ না করার জন্য")));v.onResults(b);v.stop(null);v.stop(null);assertEquals(1,calls[0]);assertEquals("মুন্নাফকে ২০ RM পেনাল্টি\nকাজ না করার জন্য",output[0]);assertNull(output[1]);}
+ @Test public void providerFailurePreservesCapturedText(){String[] output=new String[2];VoiceSession v=new VoiceSession(RuntimeEnvironment.getApplication(),"bn-BD",(text,error)->{output[0]=text;output[1]=error;});Bundle b=new Bundle();b.putStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION,new ArrayList<>(Arrays.asList("Notice for everyone")));v.onResults(b);v.onError(SpeechRecognizer.ERROR_NETWORK);assertEquals("Notice for everyone",output[0]);assertNotNull(output[1]);}
+}
