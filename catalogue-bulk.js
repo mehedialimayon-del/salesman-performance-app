@@ -1,6 +1,6 @@
 window.FFH_CREATE_BULK_CATALOGUE=ctx=>async function ffhBulkCatalogue(){
  const {isMgr,ffhRefreshCatalogueCloud,ffhCatalogueRows,shell,back,esc,bindBack,q,qa,ffhAssertManagerCloudWrite,ffhUploadPublicFile,ffhSafeName,FFH_SUPABASE,ffhCatalogueLocalRow,ffhSaveCatalogueLocal}=ctx;
- if(!isMgr())return;
+ if(!window.ffhCanEdit?.('catalogue'))return;
  await ffhRefreshCatalogueCloud();ctx.setPage('catalogueBulk');
  const rows=ffhCatalogueRows().map(x=>({...x})),categories=[...new Set(rows.map(x=>x.category))];
  const fields=[['name','Product name'],['itemCode','Item code'],['serialNo','Category serial','number'],['cartonPrice','Carton price RM','number'],['piecePrice','Unit price RM','number'],['pack','Pack'],['ctnFactors','Carton factors'],['ctnBarcode','Carton barcode'],['singlePcsBarcode','Unit barcode'],['comboBarcode','Combo barcode']];
