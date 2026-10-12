@@ -1,4 +1,4 @@
-name: FieldForce Hub 1.10 PDF auto-open release
+name: FieldForce Hub 1.10 PDF auto-open verification build
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  signed-release:
+  verify-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,41 +27,24 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python android/make_icons.py
-      - name: Restore production signing key
-        shell: bash
-        env:
-          FFH_KEYSTORE_B64: ${{ secrets.FFH_KEYSTORE_B64 }}
-          FFH_KEYSTORE_PASS: ${{ secrets.FFH_KEYSTORE_PASS }}
-          FFH_KEY_ALIAS: ${{ secrets.FFH_KEY_ALIAS }}
-          FFH_KEY_PASS: ${{ secrets.FFH_KEY_PASS }}
-        run: |
-          set -euo pipefail
-          test -n "$FFH_KEYSTORE_B64"
-          test -n "$FFH_KEYSTORE_PASS"
-          test -n "$FFH_KEY_ALIAS"
-          test -n "$FFH_KEY_PASS"
-          printf '%s' "$FFH_KEYSTORE_B64" | base64 --decode > android/app/signing.jks
-          keytool -list -keystore android/app/signing.jks -storepass "$FFH_KEYSTORE_PASS" -alias "$FFH_KEY_ALIAS" >/dev/null
       - name: Run native regression tests
         run: gradle -p android :app:testDebugUnitTest --no-daemon
-      - name: Build and verify signed release APK
+      - name: Build and align release APK
         shell: bash
-        env:
-          FFH_KEYSTORE_PASS: ${{ secrets.FFH_KEYSTORE_PASS }}
-          FFH_KEY_ALIAS: ${{ secrets.FFH_KEY_ALIAS }}
-          FFH_KEY_PASS: ${{ secrets.FFH_KEY_PASS }}
         run: |
           set -euo pipefail
           gradle -p android :app:assembleRelease --no-daemon
-          mkdir -p dist
-          cp android/app/build/outputs/apk/release/app-release.apk dist/FieldForce-Hub-1.10.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs dist/FieldForce-Hub-1.10.apk | tee dist/SIGNATURE-INFO.txt
-          grep -F 'b8bf91d5cfb1a5cddaa4d9e887a5c67f3976515df63c4abff3dd092488c5dbb5' dist/SIGNATURE-INFO.txt
-          sha256sum dist/FieldForce-Hub-1.10.apk > dist/SHA256.txt
-          printf 'Release: 1.10\nPDF exports: saved PDFs open in the installed PDF viewer.\nAutomated Android unit tests: passed before APK build.\nPhysical handset acceptance: not run in CI.\n' > dist/BUILD-INFO.txt
+          mkdir -p dist/signing-tools
+          input=android/app/build/outputs/apk/release/app-release-unsigned.apk
+          test -f "$input"
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -f 4 "$input" dist/FieldForce-Hub-1.10-unsigned.apk
+          cp -R "$ANDROID_HOME/build-tools/35.0.0/." dist/signing-tools/
+          printf 'Release: 1.10\nBuild: aligned unsigned APK; production signing is performed locally with the existing certificate.\nNative regression tests: passed before build.\nPhysical handset acceptance: not run in CI.\n' > dist/BUILD-INFO.txt
+          sha256sum dist/FieldForce-Hub-1.10-unsigned.apk > dist/SHA256.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging dist/FieldForce-Hub-1.10-unsigned.apk | head -1
       - uses: actions/upload-artifact@v4
         with:
-          name: FieldForce-Hub-1.10-Signed-Release
+          name: FieldForce-Hub-1.10-Unsigned-Verification
           path: dist/*
           if-no-files-found: error
           retention-days: 30
