@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import android.content.Intent;
 import android.net.Uri;
 
-import androidx.test.core.app.ApplicationProvider;
+import org.robolectric.RuntimeEnvironment;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +19,7 @@ public class PdfAutoOpenIntentTest {
     public void savedPdfOpensWithReadPermission() {
         Uri uri = Uri.parse("content://downloads/my_downloads/42");
         Intent intent = MainActivity.pdfOpenIntent(
-            ApplicationProvider.getApplicationContext(), uri, "Buyer-Catalogue.pdf");
+            RuntimeEnvironment.getApplication(), uri, "Buyer-Catalogue.pdf");
 
         assertEquals(Intent.ACTION_VIEW, intent.getAction());
         assertEquals(uri, intent.getData());
