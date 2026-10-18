@@ -15,6 +15,12 @@ on:
     branches: [main, ffh-duty-communication, ffh-notice-meetings-1-5, ffh-contacts-zone-20261018]
     paths:
       - 'android/**'
+      - 'tests/**'
+      - 'contacts.js'
+      - 'contacts.css'
+      - 'accounts.js'
+      - 'app.js'
+      - 'earnings-core.js'
       - '.github/workflows/fieldforce-android-apk.yml'
       - 'an-logo.png'
 
