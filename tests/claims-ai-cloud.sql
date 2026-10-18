@@ -43,6 +43,7 @@ do $$declare r jsonb;req jsonb;pid text;line uuid;before_count int;begin
  select id into pid from public.ffh_catalogue_products where active limit 1;
  perform public.ffh_ai_work('execute',jsonb_build_object('request_id',gen_random_uuid(),'actions',jsonb_build_array(jsonb_build_object('kind','catalogue','data',jsonb_build_object('product_id',pid,'changes','{"piece_price":3.45}'::jsonb)),jsonb_build_object('kind','cpo','data',jsonb_build_object('title','ROLLBACK QA CPO','start_date',(now() at time zone 'Asia/Kuala_Lumpur')::date,'end_date',(now() at time zone 'Asia/Kuala_Lumpur')::date+7,'execution_mode','view')),jsonb_build_object('kind','task','data','{"title":"ROLLBACK QA task","staff_id":"M22075","due_date":"2026-10-06"}'::jsonb),jsonb_build_object('kind','target','data','{"staff_id":"M22075","month":"2026-10","planning_target":30000}'::jsonb))));
  perform public.ffh_ai_work('grant','{"staff_id":"M22075","actions":["notice"]}');
+ insert into public.ffh_access_grants(staff_id,module,can_edit) values('M22075','briefings',true) on conflict(staff_id,module) do update set can_edit=true;
 end$$;
 reset role;
 select set_config('request.jwt.claims',jsonb_build_object('sub',(select auth_user_id from public.ffh_profiles where staff_id='M22075'),'role','authenticated')::text,true);

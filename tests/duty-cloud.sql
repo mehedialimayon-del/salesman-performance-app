@@ -1,4 +1,6 @@
 begin;
+-- Isolate the default-OFF scenario from current owner-granted tracking settings.
+update public.ffh_duty_settings set tracking_shared=false where id=1;
 -- No real messages, attendance or notifications remain after this test.
 select set_config('request.jwt.claims',jsonb_build_object('sub',(select auth_user_id from public.ffh_profiles where staff_id='M22075'),'role','authenticated')::text,true);
 set local role authenticated;

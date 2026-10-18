@@ -1,8 +1,9 @@
 begin;
+insert into public.ffh_profiles(staff_id,full_name,role,zone_id,auth_user_id,active,login_approved,can_manage,can_sell) values('QA_INCOME_MANAGER','QA Income Approver','MANAGER','PRIMARY','00000000-0000-0000-0000-000000009201',true,true,true,false);
 select set_config('request.jwt.claims',jsonb_build_object('sub',(select auth_user_id from public.ffh_profiles where staff_id='M22075'),'role','authenticated')::text,true);
 set local role authenticated;
 do $$declare r jsonb;begin
- r:=public.ffh_earnings('propose',jsonb_build_object('staff_id','M22268','kind','Penalty','amount',20,'reason','ROLLBACK QA penalty'));
+ r:=public.ffh_earnings('propose',jsonb_build_object('staff_id','M22075','kind','Penalty','amount',20,'reason','ROLLBACK QA penalty'));
  perform set_config('qa.penalty',r->>'id',true);
  if r->>'created_by'<>'M22075' or r->>'status'<>'Pending' then raise exception 'Proposal identity/status wrong';end if;
  begin perform public.ffh_earnings('approve',jsonb_build_object('id',r->>'id','reason','Unauthorized'));raise exception 'SR approved';exception when insufficient_privilege then null;end;
@@ -18,7 +19,7 @@ do $$declare r jsonb;b uuid;begin
  begin perform public.ffh_earnings('reverse',jsonb_build_object('id',current_setting('qa.penalty'),'reason','Wrong issuer'));raise exception 'Owner refunded another issuer';exception when insufficient_privilege then null;end;
  perform public.ffh_earnings('settings','{"staff_id":"M22075","month":"2026-10","actual_target":50000,"planning_target":30000,"basic":1000,"fuel":100,"house_rent":50,"sku_targets":[{"sku":"Juice","target":10}]}');
  if not exists(select 1 from public.ffh_income_settings where staff_id='M22075' and month='2026-10' and actual_target=50000 and planning_target=30000) then raise exception 'Targets not independent';end if;
- perform public.ffh_earnings('grant','{"staff_id":"M22268","enabled":true}');
+ perform public.ffh_earnings('grant','{"staff_id":"QA_INCOME_MANAGER","enabled":true}');
  insert into public.ffh_briefings(kind,title,description,meeting_url,cover_url,recipients,starts_at,created_by) values('meeting','ROLLBACK QA meeting','Meeting persistence test','https://meet.google.com/qa-test','https://example.com/cover.jpg',array['ALL'],now()+interval '2 hours','M21954') returning id into b;
  if (select count(*) from public.ffh_notification_jobs where source_key like 'briefing:'||b||':%')<>(select count(*) from public.ffh_profiles where active and login_approved) then raise exception 'Multi-recipient meeting not queued';end if;
  if (select count(*) from public.ffh_notification_jobs where source_key like 'briefing-time:'||b||':%')=0 then raise exception 'Timed meeting reminder missing';end if;
@@ -39,9 +40,10 @@ reset role;
 select set_config('request.jwt.claims',jsonb_build_object('sub',(select auth_user_id from public.ffh_profiles where staff_id='M22268'),'role','authenticated')::text,true);
 set local role authenticated;
 do $$begin
- if not exists(select 1 from public.ffh_briefings where id=current_setting('qa.notice')::uuid) then raise exception 'Assigned notice hidden from unrelated staff';end if;
+ if exists(select 1 from public.ffh_briefings where id=current_setting('qa.notice')::uuid) then raise exception 'Assigned notice leaked to unrelated staff';end if;
+ perform set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000009201","role":"authenticated"}',true);
  perform public.ffh_earnings('approve',jsonb_build_object('id',current_setting('qa.bonus'),'reason','Delegated approval'));
- if not exists(select 1 from public.ffh_income_entries where id=current_setting('qa.bonus')::uuid and approved_by='M22268' and status='Approved') then raise exception 'Delegated approval failed';end if;
+ if not exists(select 1 from public.ffh_income_entries where id=current_setting('qa.bonus')::uuid and approved_by='QA_INCOME_MANAGER' and status='Approved') then raise exception 'Delegated approval failed';end if;
 end$$;
 reset role;
 do $$begin
@@ -49,4 +51,4 @@ do $$begin
  if not exists(select 1 from public.ffh_notification_jobs where source_key like 'income:'||current_setting('qa.penalty')||':Reversed:%') then raise exception 'Refund notification missing';end if;
 end$$;
 rollback;
-select 'PASS: separate targets/SKU; SR approval denial; issuer-only refund and retained history; delegated approval; multi-recipient meeting persistence; public assigned notice; timed task reminders' as result;
+select 'PASS: separate targets/SKU; SR approval denial; issuer-only refund and retained history; delegated approval; multi-recipient meeting persistence; scoped assigned notice; timed task reminders' as result;
