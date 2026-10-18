@@ -1,0 +1,48 @@
+-- Real database RLS checks; every test write is rolled back.
+begin;
+select set_config('request.jwt.claims',jsonb_build_object('sub',(select auth_user_id from ffh_profiles where staff_id='M21954'),'role','authenticated')::text,true);
+set local role authenticated;
+do $$declare n integer;begin
+ update ffh_contacts set contacts='[{"id":"qa-contact","name":"QA rollback only","serial":1}]',version=version+1 where id=1;
+ get diagnostics n=row_count;if n<>1 then raise exception 'Owner contact save failed';end if;
+end$$;
+reset role;
+select set_config('request.jwt.claims','{}',true);
+select set_config('request.jwt.claims',jsonb_build_object('sub',(select auth_user_id from ffh_profiles where staff_id='M22075'),'role','authenticated')::text,true);
+select set_config('request.jwt.claims',jsonb_build_object('sub',(select auth_user_id from ffh_profiles where staff_id='M22075'),'role','authenticated')::text,true);
+set local role authenticated;
+do $$declare n integer;begin
+ if (select contacts->0->>'name' from ffh_contacts where id=1)<>'QA rollback only' then raise exception 'SR cannot read company contacts';end if;
+ update ffh_contacts set contacts='[]' where id=1;get diagnostics n=row_count;
+ if n<>0 then raise exception 'SR unexpectedly modified contacts';end if;
+end$$;
+reset role;
+select set_config('request.jwt.claims','{}',true);
+insert into ffh_zones(id,name) values('QA_SCOPE_A','QA scope A'),('QA_SCOPE_B','QA scope B');
+update ffh_profiles set zone_id='QA_SCOPE_A',can_manage=true,owner_access=false,access_all_zones=false,accessible_zones='{}' where staff_id='M22075';
+update ffh_profiles set zone_id='QA_SCOPE_B' where staff_id='M22268';
+select set_config('request.jwt.claims',jsonb_build_object('sub',(select auth_user_id from ffh_profiles where staff_id='M22075'),'role','authenticated')::text,true);
+set local role authenticated;
+do $$begin if ffh_staff_view('M22268') then raise exception 'Cross-zone access leaked';end if;end$$;
+reset role;
+select set_config('request.jwt.claims','{}',true);
+update ffh_profiles set accessible_zones=array['QA_SCOPE_B'] where staff_id='M22075';
+select set_config('request.jwt.claims',jsonb_build_object('sub',(select auth_user_id from ffh_profiles where staff_id='M22075'),'role','authenticated')::text,true);
+set local role authenticated;
+do $$begin if not ffh_staff_view('M22268') then raise exception 'Assigned extra zone is not visible';end if;end$$;
+reset role;
+select set_config('request.jwt.claims','{}',true);
+update ffh_profiles set accessible_zones='{}',access_all_zones=true where staff_id='M22075';
+select set_config('request.jwt.claims',jsonb_build_object('sub',(select auth_user_id from ffh_profiles where staff_id='M22075'),'role','authenticated')::text,true);
+set local role authenticated;
+do $$begin if not ffh_staff_view('M22268') then raise exception 'All Zones is not visible';end if;end$$;
+reset role;
+select set_config('request.jwt.claims','{}',true);
+update ffh_profiles set access_all_zones=false where staff_id='M22075';
+select set_config('request.jwt.claims',jsonb_build_object('sub',(select auth_user_id from ffh_profiles where staff_id='M22075'),'role','authenticated')::text,true);
+set local role authenticated;
+do $$begin if ffh_staff_view('M22268') then raise exception 'Revoked zone remains accessible';end if;end$$;
+reset role;
+select set_config('request.jwt.claims','{}',true);
+select 'PASS owner contact write, SR global read and write denial, isolated zones, extra zone grant, All Zones, immediate revocation; transaction rolled back' as result;
+rollback;
