@@ -1,0 +1,23 @@
+const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require('/tmp/ffh-qa/node_modules/jsdom');
+(async()=>{
+ const dom=new JSDOM('<main></main>',{url:'https://example.test/',runScripts:'outside-only'}),w=dom.window;
+ let staff='M21954',page='home',record={contacts:[],version:0},fail=false,writes=0;
+ const clone=v=>JSON.parse(JSON.stringify(v));
+ const sb={from:()=>{let change=null,filters=[];const q={select:()=>q,eq:(k,v)=>(filters.push([k,v]),q),update:v=>(change=v,q),single:async()=>({data:clone(record)}),maybeSingle:async()=>{if(fail)return {error:{message:'offline'}};if(!filters.every(([k,v])=>k==='id'||record[k]===v))return {data:null};record={...record,...clone(change)};writes++;return {data:{version:record.version}};}};return q;}};
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ w.eval(fs.readFileSync('contacts.js','utf8'));w.confirm=()=>true;
+ const ctx={FFH_SUPABASE:sb,esc,shell:s=>w.document.querySelector('main').innerHTML=s,back:t=>`<h1>${t}</h1>`,bindBack(){},q:s=>w.document.querySelector(s),qa:s=>[...w.document.querySelectorAll(s)],user:()=>({id:staff}),page:()=>page,setPage:p=>page=p,navigate:(p,f)=>{page=p;w.history.pushState({},'');f();},uploadPublic:async()=>''};
+ const ui=w.FFH_CREATE_CONTACTS(ctx),q=ctx.q;
+ const edit=()=>q('#ffContactAdd').click();
+ const save=async data=>{const form=q('form');for(const [k,v]of Object.entries(data))form.elements[k].value=v;await form.onsubmit({preventDefault(){}});};
+ await ui.home();assert(q('#ffContactAdd'));edit();await save({name:'MD Test',designation:'Managing Director',whatsapp:'+60 123456789',email:'md@example.test',serial:1});assert.equal(record.contacts.length,1);assert.equal(record.contacts[0].whatsapp,'60123456789');
+ await ui.home();assert.equal(q('.ffContactWA').getAttribute('href'),'https://wa.me/60123456789');assert.equal(q('.ffContactMail').getAttribute('href'),'mailto:md%40example.test');assert.equal(q('.ffContactTop h2').textContent,'Managing Director');assert.equal(q('.ffContactAbout'),null);assert(!q('.ffContactTags').textContent.includes('salesmen'));
+ edit();await save({name:'Accounts',serial:1,department:'',designation:''});await ui.home();assert.deepEqual(record.contacts.filter(x=>!x.deleted_at).map(x=>x.name),['Accounts','MD Test']);assert.equal(q('.ffContactCard').querySelector('h2'),null);assert.equal(q('.ffContactCard').querySelector('.ffContactTags'),null);
+ q('[data-edit]').click();await save({name:'Accounts Updated',serial:2,salesmen_count:0,routes_count:3,about:'<script>bad()</script>'});await ui.home();assert.deepEqual(record.contacts.map(x=>x.serial),[1,2]);assert.equal(record.contacts[1].name,'Accounts Updated');assert.equal(q('script'),null);assert(q('.ffContactList').textContent.includes('0 salesmen'));
+ q('[data-delete]').click();await new Promise(r=>setTimeout(r,5));assert(record.contacts.some(x=>x.deleted_at));assert(q('[data-restore]'));q('#ffContactUndo').click();await new Promise(r=>setTimeout(r,5));assert.equal(record.contacts.filter(x=>!x.deleted_at).length,2);
+ q('[data-delete]').click();await new Promise(r=>setTimeout(r,5));q('[data-restore]').click();await new Promise(r=>setTimeout(r,5));assert.equal(record.contacts.filter(x=>!x.deleted_at).length,2);assert.equal(record.contacts[0].name,'MD Test');
+ edit();record.version++;await save({name:'Conflict',serial:1});assert(q('#ffContactStatus').textContent.includes('another device'));assert(!record.contacts.some(x=>x.name==='Conflict'));
+ await ui.home();edit();fail=true;await save({name:'Offline',serial:1});assert(q('#ffContactStatus').textContent.includes('offline'));assert(!record.contacts.some(x=>x.name==='Offline'));fail=false;
+ await ui.home();staff='M22075';await ui.home();assert.equal(q('#ffContactAdd'),null);assert.equal(q('[data-edit]'),null);assert.equal(q('[data-delete]'),null);assert.equal(q('[data-restore]'),null);const count=writes;ui.edit();assert.equal(writes,count);assert.equal(page,'contacts');
+ dom.window.close();console.log('PASS Contacts create/edit/reorder, conditional fields, safe links/escaping, delete/undo/restore, concurrent save conflict, offline error, SR read-only controls');
+})().catch(e=>{console.error(e);process.exit(1)});
