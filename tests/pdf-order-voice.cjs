@@ -1,4 +1,4 @@
-const fs=require('fs'),assert=require('node:assert/strict'),{JSDOM}=require('/tmp/ffh-qa/node_modules/jsdom');
+const fs=require('fs'),assert=require('node:assert/strict'),{JSDOM}=require('jsdom');
 (async()=>{const dom=new JSDOM('<main></main>',{url:'https://app.example',runScripts:'outside-only'}),w=dom.window,$=s=>w.document.querySelector(s);let saved=[],calls=0;
 const source=Array.from({length:70},(_,i)=>({id:'p'+(i+1),name:'Product '+(i+1),category:'Test',serialNo:i+1,itemCode:String(i+1),piecePrice:1,cartonPrice:10}));w.eval(fs.readFileSync('catalogue-bulk.js','utf8'));
 const ui=w.FFH_CREATE_BULK_CATALOGUE({isMgr:()=>true,ffhRefreshCatalogueCloud:async()=>{},ffhCatalogueRows:()=>source,shell:s=>$('main').innerHTML=s,back:s=>s,esc:s=>String(s??''),bindBack(){},q:$,qa:s=>[...w.document.querySelectorAll(s)],ffhAssertManagerCloudWrite:async()=>{},ffhUploadPublicFile:async()=>{},ffhSafeName:s=>s,FFH_SUPABASE:{rpc:async(n,a)=>{calls++;saved=a.products;return{data:{saved:saved.length}}}},ffhCatalogueLocalRow:x=>x,ffhSaveCatalogueLocal(){},setPage(){}});

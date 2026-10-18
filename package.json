@@ -1,0 +1,1 @@
+{"name":"fieldforce-hub","private":true,"version":"1.11.0","scripts":{"test":"node tests/run-company.cjs"},"devDependencies":{"jsdom":"26.1.0","typescript":"5.9.3"}}
