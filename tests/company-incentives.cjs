@@ -6,4 +6,27 @@ assert.equal(C.progress(sales,offer,offer.groups[0],'S1'),5000);
 const delivered={...offer,groups:[{...offer.groups[0],basis:'delivered'}]};assert.equal(C.rewards(sales,[delivered],'S1','2026-10').length,0);
 const across={...offer,endDate:'2026-11-03',groups:[{name:'10k',mode:'sales',basis:'order',target:10000,reward:100}]};assert.equal(C.rewards(sales.slice(0,2),[across],'S1','2026-10')[0].amount,100);assert.equal(C.rewards(sales.slice(0,2),[across],'S1','2026-11').length,0);
 const out={...offer,groups:[{name:'coverage',mode:'outlets',basis:'order',target:2,reward:20}]};const os=sales.slice(0,2).map((x,i)=>({...x,outletCode:'O'+i}));assert.equal(C.rewards(os,[out],'S1','2026-10')[0].amount,20);os[1].outletCode='O0';assert.equal(C.rewards(os,[out],'S1','2026-10').length,0);
-console.log('PASS order/delivery basis, each-day reward, late key-in exclusion, cross-month earning date, unique outlet coverage');
+// Five-day target: Malaysia's final second qualifies; the next midnight does not.
+const five={sr:'S1',name:'Five-day RM2000',startDate:'2026-10-01',endDate:'2026-10-05',groups:[{mode:'sales',basis:'order',period:'window',target:2000,reward:75}]};
+const rows=[{id:'a',sr:'S1',date:'2026-10-01',createdAt:'2026-09-30T16:00:00Z',status:'Pending',orderAmount:1200},{id:'b',sr:'S1',date:'2026-10-05',createdAt:'2026-10-05T15:59:59Z',status:'Pending',orderAmount:800}];
+assert.equal(C.progress(rows,five,five.groups[0],'S1'),2000);
+assert.equal(C.rewards(rows,[five],'S1','2026-10')[0].amount,75);
+const late=[rows[0],{...rows[1],createdAt:'2026-10-05T16:00:00Z'}];
+assert.equal(C.progress(late,five,five.groups[0],'S1'),1200);
+assert.equal(C.rewards(late,[five],'S1','2026-10').length,0,'backdating cannot complete an expired target');
+const deliveryOffer={...five,groups:[{...five.groups[0],basis:'delivered'}]};
+const deliveryRows=rows.map(s=>({...s,status:'Delivered',deliveredAmount:s.orderAmount,deliveredAt:s.createdAt}));
+assert.equal(C.rewards(deliveryRows,[deliveryOffer],'S1','2026-10')[0].amount,75);
+deliveryRows[1].deliveredAt='2026-10-05T16:00:00Z';
+assert.equal(C.rewards(deliveryRows,[deliveryOffer],'S1','2026-10').length,0);
+assert.equal(C.offerStatus(five,'2026-10-05'),'Active');
+assert.equal(C.offerStatus(five,'2026-10-06'),'Expired');
+assert.equal(C.rewards(rows,[five],'S1','2026-10')[0].amount,75,'expiry retains rewards already earned on time');
+// Render the app's real incentive screen: expired/upcoming offers remain visible to SRs.
+const fs=require('node:fs'),vm=require('node:vm'),app=fs.readFileSync('app.js','utf8');let html='';
+const ui={currentSr:()=> 'S1',user:{id:'S1'},db:{incentives:[five,{...five,name:'Upcoming offer',startDate:'2026-11-01',endDate:'2026-11-05'},{...five,name:'Other staff only',sr:'S2'}]},catalogueProducts:()=>[],ffhIncentiveProgress:(x,g)=>C.progress(rows,x,g,'S1'),ffhOfferStatus:x=>C.offerStatus(x,'2026-10-06'),esc:String,rm:n=>'RM '+n,shell:s=>{html=s},back:()=>'',isMgr:()=>false,ffhMay:()=>false,bindBack(){},bindScope(){},q:()=>null};
+vm.createContext(ui);vm.runInContext(app.slice(app.indexOf('function incentive(){'),app.indexOf('function cpo(){')),ui);ui.incentive();
+assert.ok(html.includes('Five-day RM2000')&&html.includes('Expired'));
+assert.ok(html.includes('Upcoming offer')&&html.includes('Upcoming'));
+assert.ok(!html.includes('Other staff only'),'staff assignment remains private');
+console.log('PASS order/delivery basis, daily and five-day targets, Malaysia midnight deadline, late key-in exclusion, retained earned rewards, cross-month earning date, unique outlet coverage');
