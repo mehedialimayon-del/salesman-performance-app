@@ -1,3 +1,7 @@
+-- Exercise the real state function before mocked forms can hide SQL alias errors.
+select set_config('request.jwt.claims',jsonb_build_object('sub',(select auth_user_id from public.ffh_profiles where staff_id='M21954'),'role','authenticated')::text,true);
+select public.ffh_governance('state')->>'owner' as owner_state;
+select set_config('request.jwt.claims','{}',true);
 -- Attendance is tested separately; disable only this guard inside this rollback transaction.
 alter table public.ffh_sales disable trigger ffh_sales_attendance;
 -- Run after the migration, in the same rollback-only verification transaction.

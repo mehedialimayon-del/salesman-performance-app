@@ -105,9 +105,9 @@ declare sid text:=public.ffh_my_staff_id();own boolean:=ffh_private.is_owner();t
  if auth.uid() is null or sid is null then raise exception 'Active login required' using errcode='42501';end if;
  if action='state' then return jsonb_build_object('owner',own,
  'profiles',coalesce((select jsonb_agg(to_jsonb(p)-'auth_user_id') from public.ffh_profiles p where public.ffh_staff_view(p.staff_id)),'[]'),
- 'zones',coalesce((select jsonb_agg(to_jsonb(z)) from public.ffh_zones z where ffh_private.zone_visible(z.id)),'[]'),
+ 'zones',coalesce((select jsonb_agg(to_jsonb(zone_row)) from public.ffh_zones zone_row where ffh_private.zone_visible(zone_row.id)),'[]'),
  'zone_access',coalesce((select jsonb_agg(to_jsonb(a)) from public.ffh_zone_access a where own or a.staff_id=sid),'[]'),
- 'grants',coalesce((select jsonb_agg(to_jsonb(g)) from public.ffh_access_grants g where own or g.staff_id=sid),'[]'),
+ 'grants',coalesce((select jsonb_agg(to_jsonb(grant_row)) from public.ffh_access_grants grant_row where own or grant_row.staff_id=sid),'[]'),
  'requests',coalesce((select jsonb_agg(to_jsonb(q) order by q.created_at desc) from public.ffh_change_requests q where own or q.staff_id=sid),'[]'),
  'outlets',coalesce((select jsonb_agg(jsonb_build_object('id',o.id,'sr_id',o.sr_id,'outlet_name',o.outlet_name,'outlet_code',o.outlet_code,'active',o.active)) from public.ffh_outlets o where own or public.ffh_staff_view(o.sr_id)),'[]'));
  elsif action='save_access' then
