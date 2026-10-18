@@ -1,0 +1,8 @@
+const assert=require('node:assert/strict');require('../ai-sales.js');const C=globalThis.FFH_SALES_INSIGHT;
+const outlets=['Zero','Low','High'].map((n,i)=>({sr_id:'SR1',outlet_code:''+i,outlet_name:n,active:true,total_sku:10}));outlets.push({sr_id:'SR2',outlet_code:'0',outlet_name:'PRIVATE',active:true});
+const sale=(code,amount,sku='SKU1',extra={})=>({sr_id:'SR1',outlet_code:code,sale_date:'2026-10-18',status:'Delivered',delivered_amount:amount,qty:1,sku,...extra});
+const sales=[sale('1',10),sale('1',5,'SKU1'),sale('2',100,'SKU1'),sale('2',100,'SKU2'),sale('0',500,'OLD',{sale_date:'2026-09-18'}),sale('0',0,'PENDING',{status:'Pending Delivery',order_amount:75}),sale('0',999,'FUTURE',{sale_date:'2026-10-19'}),sale('0',999,'CANCEL',{status:'Cancelled'}),sale('0',999,'OTHER',{sr_id:'SR2'})];
+const ctx={ids:['SR1'],outlets,sales,month:'2026-10',today:'2026-10-18',staff:[]};
+for(const question of ['Which outlets need focus?','আজকে কোন মার্কেটে ফোকাস করবো','কম SKU সেল কোন আউটলেটে']){const a=C.answer({...ctx,question});assert.ok(a.includes('Zero (0)'));assert.ok(a.indexOf('Zero (0)')<a.indexOf('Low (1)'));assert.ok(a.indexOf('Low (1)')<a.indexOf('High (2)'));assert.ok(a.includes('RM 15.00'));assert.ok(a.includes('RM 75.00'));assert.ok(!a.includes('PRIVATE'));assert.ok(!a.includes('999'));assert.match(a,/SKU[s]? 1 \/ 10/);}
+assert.equal(C.answer({...ctx,question:'Who is head of sales?'}),null);assert.ok(C.answer({...ctx,outlets:[],question:'Which market needs focus?'}).includes('No active'));assert.ok(C.answer({...ctx,ids:[],question:'Which outlets need focus?'}).includes('No active'));
+console.log('PASS live focus ranking: month/to-date, zero/low sales/SKU, distinct SKU, pending separated, SR scope, future/cancelled exclusions, no invented outlet');

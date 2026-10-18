@@ -6,8 +6,11 @@ const mailIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" wi
 root.FFH_CONTACT_ICON=bookIcon;
 root.FFH_CREATE_CONTACTS=ctx=>{
  const {FFH_SUPABASE:sb,esc,shell,back,bindBack,q,qa}=ctx;
- let rows=[],version=null,undo=null,loading=0,saving=false;
- const owner=()=>ctx.user()?.id==='M21954';
+ let rows=[],version=null,undo=null,loading=0,saving=false,category=null,searchTerm='';
+ const categories=[['management','Management'],['manager','Manager'],['dic','DIC'],['accounts','Accounts'],['delivery','DM / Deliveryman']];
+ const categoryOf=p=>categories.some(([id])=>id===p.category)?p.category:/account/i.test(p.designation+' '+p.department)?'accounts':/delivery|deliveryman|\bdm\b/i.test(p.designation+' '+p.department)?'delivery':/\bdic\b|distribution.*charge/i.test(p.designation+' '+p.department)?'dic':/manager/i.test(p.designation)&&!/general manager/i.test(p.designation)?'manager':'management';
+ const matches=(p,term)=>[p.name,p.designation,p.department,p.zone,categories.find(([id])=>id===categoryOf(p))?.[1]].some(v=>String(v||'').normalize('NFKC').toLowerCase().includes(term.normalize('NFKC').toLowerCase()));
+ const owner=()=>ctx.user()?.id==='M21954'||ctx.user()?.ownerAccess===true;
  const active=()=>ctx.page()==='contacts';
  const copy=x=>JSON.parse(JSON.stringify(x));
  const visible=()=>rows.filter(x=>!x.deleted_at).sort((a,b)=>a.serial-b.serial||a.id.localeCompare(b.id));
@@ -24,18 +27,26 @@ root.FFH_CREATE_CONTACTS=ctx=>{
  function contactCard(p){
   const photo=safePhoto(p.photo_url),digits=String(p.whatsapp||'').replace(/\D/g,'');
   const tags=[p.department,p.zone,p.salesmen_count!=null?`${p.salesmen_count} salesmen`:'',p.routes_count!=null?`${p.routes_count} routes`:''].filter(Boolean);
-  return `<article class="ffContactCard" data-contact-id="${esc(p.id)}"><div class="ffContactTop"><span class="ffContactSerial">${p.serial}</span>${p.designation?`<h2>${esc(p.designation)}</h2>`:''}</div><div class="ffContactIdentity">${photo?`<img class="ffContactPhoto" src="${esc(photo)}" alt="${esc(p.name)}" loading="lazy">`:`<div class="ffContactInitial" aria-hidden="true">${esc(Array.from(p.name)[0]||'?')}</div>`}<h3>${esc(p.name)}</h3>${tags.length?`<div class="ffContactTags">${tags.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}</div>${p.about?`<p class="ffContactAbout">${esc(p.about)}</p>`:''}<div class="ffContactLinks">${digits?`<a class="ffContactWA" href="https://wa.me/${digits}" aria-label="WhatsApp ${esc(p.name)}">${waIcon}<span>WhatsApp<small>+${digits}</small></span></a>`:''}${p.email?`<a class="ffContactMail" href="mailto:${esc(encodeURIComponent(p.email))}" aria-label="Email ${esc(p.name)}">${mailIcon}<span>Email<small>${esc(p.email)}</small></span></a>`:''}</div>${owner()?`<div class="ffContactTools"><button class="secondary" data-edit="${esc(p.id)}">EDIT</button><button class="secondary" data-delete="${esc(p.id)}">DELETE</button></div>`:''}</article>`;
+  return `<article class="ffContactCard" data-contact-id="${esc(p.id)}"><div class="ffContactTop"><span class="ffContactSerial">${p.serial}</span>${p.designation?`<h2>${esc(p.designation)}</h2>`:''}</div><div class="ffContactIdentity">${photo?`<button class="ffContactPhotoButton" data-photo="${esc(p.id)}" aria-label="Zoom photo of ${esc(p.name)}"><img class="ffContactPhoto" src="${esc(photo)}" alt="${esc(p.name)}" loading="lazy"></button>`:`<div class="ffContactInitial" aria-hidden="true">${esc(Array.from(p.name)[0]||'?')}</div>`}<h3>${esc(p.name)}</h3>${tags.length?`<div class="ffContactTags">${tags.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}</div>${p.about?`<p class="ffContactAbout">${esc(p.about)}</p>`:''}<div class="ffContactLinks">${digits?`<a class="ffContactWA" href="https://wa.me/${digits}" aria-label="WhatsApp ${esc(p.name)}">${waIcon}<span>WhatsApp<small>+${digits}</small></span></a>`:''}${p.email?`<a class="ffContactMail" href="mailto:${esc(p.email.replace(/[?#\r\n]/g,''))}" aria-label="Email ${esc(p.name)}">${mailIcon}<span>Email<small>${esc(p.email)}</small></span></a>`:''}</div>${owner()?`<div class="ffContactTools"><button class="secondary" data-edit="${esc(p.id)}">EDIT</button><button class="secondary" data-delete="${esc(p.id)}">DELETE</button></div>`:''}</article>`;
  }
  function render(message=''){
   if(!active())return;
-  const list=visible(),trash=rows.filter(x=>x.deleted_at).sort((a,b)=>b.deleted_at.localeCompare(a.deleted_at));
-  shell(back('Company Contacts')+`<section class="ffContactHero"><span class="ffContactHeroIcon">${bookIcon}</span><div><small>ONE COMPANY · EVERY ZONE</small><h2>People you can reach</h2><p>Emergency &amp; company contacts</p></div></section><div class="ffContactToolbar">${owner()?'<button class="primary" id="ffContactAdd">＋ ADD CONTACT</button>':''}<button class="secondary" id="ffContactRefresh">REFRESH</button>${owner()&&undo?'<button class="secondary" id="ffContactUndo">UNDO LAST CHANGE</button>':''}</div><p id="ffContactStatus" role="status">${esc(message)}</p><div class="ffContactList">${list.map(contactCard).join('')||'<div class="card empty">No contacts added yet.</div>'}</div>${owner()&&trash.length?`<details class="card ffContactTrash"><summary>Deleted contacts (${trash.length})</summary>${trash.map(p=>`<div class="row"><span>${esc(p.name)}</span><button class="secondary" data-restore="${esc(p.id)}">RESTORE</button></div>`).join('')}</details>`:''}`);
-  bindBack();q('#ffContactAdd')?.addEventListener('click',()=>ctx.navigate('contactEdit',()=>edit()));
+  const all=visible(),list=all.filter(p=>searchTerm?matches(p,searchTerm):category==='all'||categoryOf(p)===category),trash=rows.filter(x=>x.deleted_at).sort((a,b)=>b.deleted_at.localeCompare(a.deleted_at));
+  shell(back('Company Contacts')+`<section class="ffContactHero"><span class="ffContactHeroIcon">${bookIcon}</span><div><small>ONE COMPANY · EVERY ZONE</small><h2>People you can reach</h2><p>Emergency &amp; company contacts</p></div></section><div class="ffContactToolbar">${owner()?'<button class="primary" id="ffContactAdd">＋ ADD CONTACT</button>':''}<button class="secondary" id="ffContactRefresh">REFRESH</button>${owner()&&undo?'<button class="secondary" id="ffContactUndo">UNDO LAST CHANGE</button>':''}</div><label class="ffContactSearchLabel">Search company contacts<input id="ffContactSearch" type="search" placeholder="Search by name, designation or zone" value="${esc(searchTerm)}"></label><div class="ffContactCategories">${categories.map(([id,label])=>`<button class="secondary ffContactCategory ${category===id&&!searchTerm?'selected':''}" data-category="${id}">${label}<small>${all.filter(p=>categoryOf(p)===id).length} contacts</small></button>`).join('')}</div><div id="ffContactResultsLabel">${searchTerm?`Search results (${list.length})`:category?esc(categories.find(([id])=>id===category)?.[1]||'All contacts'):'Choose a category to see contacts'}</div><p id="ffContactStatus" role="status">${esc(message)}</p><div class="ffContactList">${list.map(contactCard).join('')||(category||searchTerm?'<div class="card empty">No matching contacts.</div>':'')}</div>${owner()&&trash.length?`<details class="card ffContactTrash"><summary>Deleted contacts (${trash.length})</summary>${trash.map(p=>`<div class="row"><span>${esc(p.name)}</span><button class="secondary" data-restore="${esc(p.id)}">RESTORE</button></div>`).join('')}</details>`:''}`);
+  bindBack();
+  const drawResults=()=>{const results=visible().filter(p=>searchTerm?matches(p,searchTerm):category==='all'||categoryOf(p)===category);q('.ffContactList').innerHTML=results.map(contactCard).join('')||((category||searchTerm)?'<p>No matching contacts.</p>':'');q('#ffContactResultsLabel').textContent=searchTerm?'Search results ('+results.length+')':(categories.find(([id])=>id===category)?.[1]||'Choose a category to see contacts');bindCards();};
+  q('#ffContactSearch').oninput=e=>{searchTerm=e.target.value.trim();drawResults();};
+  qa('[data-category]').forEach(b=>b.onclick=()=>{category=b.dataset.category;searchTerm='';render();});
+  q('#ffContactAdd')?.addEventListener('click',()=>ctx.navigate('contactEdit',()=>edit()));
   q('#ffContactRefresh').onclick=()=>home();
   q('#ffContactUndo')?.addEventListener('click',()=>action(async()=>{
    if(version!==undo.version)throw Error('Another change was saved. Refresh before editing; restore deleted contacts below.');
    const before=undo.before;await persist(before,false);undo=null;render('Last change undone.');
   }));
+  bindCards();
+ }
+ function bindCards(){
+  qa('[data-photo]').forEach(b=>b.onclick=()=>{const p=rows.find(p=>p.id===b.dataset.photo);if(p&&root.FFH_OPEN_IMAGE)root.FFH_OPEN_IMAGE(safePhoto(p.photo_url));});
   qa('[data-edit]').forEach(b=>b.onclick=()=>ctx.navigate('contactEdit',()=>edit(b.dataset.edit)));
   qa('[data-delete]').forEach(b=>b.onclick=()=>{
    const p=rows.find(x=>x.id===b.dataset.delete);if(!root.confirm(`Delete ${p.name}? You can undo or restore it.`))return;
@@ -47,7 +58,7 @@ root.FFH_CREATE_CONTACTS=ctx=>{
  }
  function renumber(list){list.filter(x=>!x.deleted_at).sort((a,b)=>a.serial-b.serial||a.id.localeCompare(b.id)).forEach((p,i)=>p.serial=i+1);return list;}
  async function persist(next,remember=true){
-  if(!owner())throw Error('Only Ayon can change contacts.');
+  if(!owner())throw Error('Administrator access is required to change contacts.');
   if(version===null)throw Error('Load contacts before saving.');
   const before=copy(rows),oldVersion=version;
   const {data,error}=await sb.from('ffh_contacts').update({contacts:next,version:oldVersion+1,updated_at:new Date().toISOString()}).eq('id',1).eq('version',oldVersion).select('version').maybeSingle();
@@ -56,7 +67,8 @@ root.FFH_CREATE_CONTACTS=ctx=>{
   rows=next;version=data.version;if(remember)undo={before,version};
  }
  async function action(fn){if(saving)return;saving=true;try{await fn();}catch(e){setStatus(e.message,true);}finally{saving=false;}}
- async function home(){
+ async function home(selected=null){
+  if(typeof selected==='string')category=selected;
   ctx.setPage('contacts');
   shell(back('Company Contacts')+'<div class="card"><p>Loading company contacts…</p><p id="ffContactStatus" role="status"></p><button id="ffContactRetry" class="secondary">RETRY</button></div>');bindBack();q('#ffContactRetry').onclick=home;
   try{await load();render();}catch(e){if(active())setStatus(e.message,true);}
@@ -65,7 +77,7 @@ root.FFH_CREATE_CONTACTS=ctx=>{
   if(!owner()){ctx.setPage('contacts');render();return;}
   const p=rows.find(x=>x.id===id)||{},baseVersion=version;
   ctx.setPage('contactEdit');
-  shell(back(id?'Edit Contact':'Add Contact')+`<div class="card"><p>Only filled details appear on the contact card. Visible to all zones.</p><form class="form" id="ffContactForm">${input('serial','Serial / position',p.serial||visible().length+1,'type="number" min="1" step="1" required')}${input('designation','Company designation',p.designation,'maxlength="150" placeholder="Managing Director"')}${input('name','Full name',p.name,'required maxlength="150"')}${input('department','Department',p.department??'Modern Trade','maxlength="100"')}${input('zone','Zone (optional)',p.zone,'maxlength="100"')}${input('salesmen_count','Number of salesmen (optional)',p.salesmen_count,'type="number" min="0" max="100000" step="1"')}${input('routes_count','Number of routes (optional)',p.routes_count,'type="number" min="0" max="100000" step="1"')}${input('whatsapp','WhatsApp with country code',p.whatsapp,'type="tel" maxlength="25" placeholder="+60…"')}${input('email','Email',p.email,'type="email" maxlength="254"')}<label>Photo (optional)<input name="photo" type="file" accept="image/jpeg,image/png,image/webp"></label>${safePhoto(p.photo_url)?`<img class="ffContactPhoto" id="ffContactPreview" src="${esc(p.photo_url)}" alt="Current photo"><label><input type="checkbox" name="remove_photo"> Remove photo</label>`:'<img class="ffContactPhoto" id="ffContactPreview" alt="New photo preview" hidden>'}<label>About (optional)<textarea name="about" maxlength="3000" rows="4">${esc(p.about||'')}</textarea></label><div class="ffContactTools"><button class="primary" type="submit">SAVE CONTACT</button><button class="secondary" type="button" id="ffContactCancel">CANCEL</button></div><p id="ffContactStatus" role="status"></p></form></div>`);
+  shell(back(id?'Edit Contact':'Add Contact')+`<div class="card"><p>Only filled details appear on the contact card. Visible to all zones.</p><form class="form" id="ffContactForm"><label>Contact category<select name="category">${categories.map(([id,label])=>`<option value="${id}" ${id===(p.id?categoryOf(p):category||'management')?'selected':''}>${label}</option>`).join('')}</select></label>${input('serial','Serial / position',p.serial||visible().length+1,'type="number" min="1" step="1" required')}${input('designation','Company designation',p.designation,'maxlength="150" placeholder="Managing Director"')}${input('name','Full name',p.name,'required maxlength="150"')}${input('department','Department',p.department??'Modern Trade','maxlength="100"')}${input('zone','Zone (optional)',p.zone,'maxlength="100"')}${input('salesmen_count','Number of salesmen (optional)',p.salesmen_count,'type="number" min="0" max="100000" step="1"')}${input('routes_count','Number of routes (optional)',p.routes_count,'type="number" min="0" max="100000" step="1"')}${input('whatsapp','WhatsApp with country code',p.whatsapp,'type="tel" maxlength="25" placeholder="+60…"')}${input('email','Email',p.email,'type="email" maxlength="254"')}<label>Photo (optional)<input name="photo" type="file" accept="image/jpeg,image/png,image/webp"></label>${safePhoto(p.photo_url)?`<img class="ffContactPhoto" id="ffContactPreview" src="${esc(p.photo_url)}" alt="Current photo"><label><input type="checkbox" name="remove_photo"> Remove photo</label>`:'<img class="ffContactPhoto" id="ffContactPreview" alt="New photo preview" hidden>'}<label>About (optional)<textarea name="about" maxlength="3000" rows="4">${esc(p.about||'')}</textarea></label><div class="ffContactTools"><button class="primary" type="submit">SAVE CONTACT</button><button class="secondary" type="button" id="ffContactCancel">CANCEL</button></div><p id="ffContactStatus" role="status"></p></form></div>`);
   bindBack();const f=q('#ffContactForm');let preview;
   f.elements.photo.onchange=()=>{if(preview)URL.revokeObjectURL(preview);const file=f.elements.photo.files[0],el=q('#ffContactPreview');if(file){preview=URL.createObjectURL(file);el.src=preview;el.hidden=false;}else{el.hidden=!p.photo_url;if(p.photo_url)el.src=p.photo_url;}};
   q('#ffContactCancel').onclick=()=>root.history.back();
@@ -75,7 +87,7 @@ root.FFH_CREATE_CONTACTS=ctx=>{
    try{
     if(version!==baseVersion)throw Error('Contacts changed. Return to Contacts and reopen this editor.');
     const values=Object.fromEntries(new FormData(f));
-    const contact={id:p.id||root.crypto.randomUUID(),serial:1,deleted_at:null};
+    const contact={id:p.id||root.crypto.randomUUID(),serial:1,deleted_at:null,category:values.category};if(!categories.some(([id])=>id===contact.category))throw Error('Choose a contact category.');
     for(const key of ['name','designation','department','zone','whatsapp','email','about'])contact[key]=String(values[key]||'').trim();
     if(!contact.name)throw Error('Full name is required.');
     if(contact.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email))throw Error('Enter a valid email.');
@@ -105,7 +117,8 @@ root.FFH_CREATE_CONTACTS=ctx=>{
    return await ctx.uploadPublic(new File([blob],'contact-'+root.crypto.randomUUID()+'.jpg',{type:'image/jpeg'}),'contacts');
   }finally{URL.revokeObjectURL(url);}
  }
- async function refresh(){if(!active()||saving)return;try{await load();render();}catch(e){if(active())setStatus(e.message,true);}}
- return {home,edit,refresh};
+ async function refresh(){if(!active()||saving||document.activeElement?.id==='ffContactSearch')return;try{await load();render();}catch(e){if(active())setStatus(e.message,true);}}
+ async function search(term){await load();const found=visible().filter(p=>matches(p,String(term).trim()));if(!found.length)return false;searchTerm=String(term).trim();category=null;ctx.setPage('contacts');ctx.navigate('contacts',()=>render());return true;}
+ return {home,edit,refresh,search};
 };
 })(window);
