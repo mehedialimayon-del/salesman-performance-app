@@ -12,6 +12,23 @@ do $$declare n int;begin
 end$$;
 reset role;
 select set_config('request.jwt.claims','{}',true);
+update public.ffh_access_grants set can_edit=true,can_delete=false where staff_id='QA_CONTACT_EDITOR';
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000007001","role":"authenticated"}',true);
+do $$begin
+ begin update public.ffh_contacts c set contacts=(select jsonb_agg(case when x->>'id'='qa-contact-permission' then x||jsonb_build_object('deleted_at',now()) else x end) from jsonb_array_elements(c.contacts) x);raise exception 'Edit-only user deleted';exception when insufficient_privilege then null;end;
+end$$;
+reset role;
+select set_config('request.jwt.claims','{}',true);
+update public.ffh_access_grants set can_edit=false,can_delete=true where staff_id='QA_CONTACT_EDITOR';
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000007001","role":"authenticated"}',true);
+do $$begin
+ begin update public.ffh_contacts c set contacts=(select jsonb_agg(case when x->>'id'='qa-contact-permission' then x||'{"name":"Not allowed"}'::jsonb else x end) from jsonb_array_elements(c.contacts) x);raise exception 'Delete-only user edited';exception when insufficient_privilege then null;end;
+ update public.ffh_contacts c set contacts=(select jsonb_agg(case when x->>'id'='qa-contact-permission' then x||jsonb_build_object('deleted_at',now()) else x end) from jsonb_array_elements(c.contacts) x);
+end$$;
+reset role;
+select set_config('request.jwt.claims','{}',true);
 update public.ffh_access_grants set can_edit=false,can_upload=false,can_delete=false where staff_id='QA_CONTACT_EDITOR';
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000007001","role":"authenticated"}',true);
