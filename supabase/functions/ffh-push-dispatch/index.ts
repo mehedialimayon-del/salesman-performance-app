@@ -32,8 +32,7 @@ Deno.serve(async (req: Request) => {
     const {data:claim}=await sb.from('ffh_notification_jobs').update({status:'dispatching'}).eq('id',job.id).eq('status','scheduled').select('id');
     if(!claim?.length) continue;
     try{
-      let peopleQuery=sb.from('ffh_profiles').select('staff_id').eq('active',true);
-      if(job.recipient==='ALL') peopleQuery=peopleQuery.eq('can_sell',true);
+      const peopleQuery=sb.from('ffh_profiles').select('staff_id').eq('active',true).eq('login_approved',true);
       const {data:people,error:pe}=await peopleQuery;
       if(pe) throw pe;
       const ids=(people||[]).map(p=>String(p.staff_id)).filter(id=>job.recipient==='ALL'||id.toUpperCase()===String(job.recipient).toUpperCase());
@@ -41,7 +40,13 @@ Deno.serve(async (req: Request) => {
 
       let failures=0;
       for(const staff of ids){
-        const {error:ie}=await sb.from('ffh_notification_inbox').upsert({job_id:job.id,staff_id:staff,title:job.title,body:job.body,type:job.type,target_page:targetPage(job.type)},{onConflict:'job_id,staff_id',ignoreDuplicates:true});
+        let body=String(job.body||'');
+        // Shared report requests are recomputed for this recipient; fixed notices keep their assigned text.
+        if(!job.source_key&&['zero','dashboard','sales','route','tasks'].includes(job.type)){
+          const {data:report,error:re}=await sb.rpc('ffh_notification_focus_report',{viewer:staff});
+          if(re||!report?.body)throw re||Error('Recipient report unavailable');body=String(report.body);
+        }
+        const {error:ie}=await sb.from('ffh_notification_inbox').upsert({job_id:job.id,staff_id:staff,title:job.title,body,type:job.type,target_page:targetPage(job.type)},{onConflict:'job_id,staff_id',ignoreDuplicates:true});
         if(ie){failures++;continue}
         const {data:old}=await sb.from('ffh_notification_delivery').select('status').eq('job_id',job.id).eq('staff_id',staff).maybeSingle();
         if(old?.status==='push_accepted') continue;
@@ -58,7 +63,7 @@ Deno.serve(async (req: Request) => {
               include_aliases:{external_id:[staff]},
               target_channel:'push',
               headings:{en:String(job.title||'').trim()||'FieldForce Hub'},
-              contents:{en:String(job.body||'').trim()||String(job.title||'').trim()||'FieldForce Hub update'},
+              contents:{en:body.trim()||String(job.title||'').trim()||'FieldForce Hub update'},
               data:{ffh_page:page,ffh_job_id:job.id,...(alarmData?{ffh_alarm:alarmData}:{})},
               priority:10,
               ttl:job.type==='alarm_setup'?86400:259200,

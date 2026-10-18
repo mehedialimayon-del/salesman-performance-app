@@ -9,8 +9,8 @@ root.FFH_CREATE_CONTACTS=ctx=>{
  let rows=[],version=null,undo=null,loading=0,saving=false,category=null,searchTerm='';
  const categories=[['management','Management'],['manager','Manager'],['dic','DIC'],['accounts','Accounts'],['delivery','DM / Deliveryman']];
  const categoryOf=p=>categories.some(([id])=>id===p.category)?p.category:/account/i.test(p.designation+' '+p.department)?'accounts':/delivery|deliveryman|\bdm\b/i.test(p.designation+' '+p.department)?'delivery':/\bdic\b|distribution.*charge/i.test(p.designation+' '+p.department)?'dic':/manager/i.test(p.designation)&&!/general manager/i.test(p.designation)?'manager':'management';
- const matches=(p,term)=>[p.name,p.designation,p.department,p.zone,categories.find(([id])=>id===categoryOf(p))?.[1]].some(v=>String(v||'').normalize('NFKC').toLowerCase().includes(term.normalize('NFKC').toLowerCase()));
- const owner=()=>ctx.user()?.id==='M21954'||ctx.user()?.ownerAccess===true;
+ const matches=(p,term)=>[p.name,p.designation,p.designation2,p.department,p.zone,p.salesmen_names,p.route_names,categories.find(([id])=>id===categoryOf(p))?.[1]].some(v=>String(v||'').normalize('NFKC').toLowerCase().includes(term.normalize('NFKC').toLowerCase()));
+ const owner=()=>ctx.user()?.id==='M21954'||ctx.user()?.ownerAccess===true||ctx.may?.('contacts')===true;
  const active=()=>ctx.page()==='contacts';
  const copy=x=>JSON.parse(JSON.stringify(x));
  const visible=()=>rows.filter(x=>!x.deleted_at).sort((a,b)=>a.serial-b.serial||a.id.localeCompare(b.id));
@@ -26,8 +26,8 @@ root.FFH_CREATE_CONTACTS=ctx=>{
  }
  function contactCard(p){
   const photo=safePhoto(p.photo_url),digits=String(p.whatsapp||'').replace(/\D/g,'');
-  const tags=[p.department,p.zone,p.salesmen_count!=null?`${p.salesmen_count} salesmen`:'',p.routes_count!=null?`${p.routes_count} routes`:''].filter(Boolean);
-  return `<article class="ffContactCard" data-contact-id="${esc(p.id)}"><div class="ffContactTop"><span class="ffContactSerial">${p.serial}</span>${p.designation?`<h2>${esc(p.designation)}</h2>`:''}</div><div class="ffContactIdentity">${photo?`<button class="ffContactPhotoButton" data-photo="${esc(p.id)}" aria-label="Zoom photo of ${esc(p.name)}"><img class="ffContactPhoto" src="${esc(photo)}" alt="${esc(p.name)}" loading="lazy"></button>`:`<div class="ffContactInitial" aria-hidden="true">${esc(Array.from(p.name)[0]||'?')}</div>`}<h3>${esc(p.name)}</h3>${tags.length?`<div class="ffContactTags">${tags.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}</div>${p.about?`<p class="ffContactAbout">${esc(p.about)}</p>`:''}<div class="ffContactLinks">${digits?`<a class="ffContactWA" href="https://wa.me/${digits}" aria-label="WhatsApp ${esc(p.name)}">${waIcon}<span>WhatsApp<small>+${digits}</small></span></a>`:''}${p.email?`<a class="ffContactMail" href="mailto:${esc(p.email.replace(/[?#\r\n]/g,''))}" aria-label="Email ${esc(p.name)}">${mailIcon}<span>Email<small>${esc(p.email)}</small></span></a>`:''}</div>${owner()?`<div class="ffContactTools"><button class="secondary" data-edit="${esc(p.id)}">EDIT</button><button class="secondary" data-delete="${esc(p.id)}">DELETE</button></div>`:''}</article>`;
+  const tags=[['Department',p.department],['Zone',p.zone],['Salesmen',p.salesmen_count],['Routes',p.routes_count],['Sales team',p.salesmen_names],['Route names',p.route_names]].filter(([,v])=>v!==null&&v!==undefined&&v!=='');
+  return `<article class="ffContactCard" data-contact-id="${esc(p.id)}"><div class="ffContactTop"><span class="ffContactSerial">${p.serial}</span>${p.designation?`<h2>${esc(p.designation)}${p.designation2?` <span class="ffContactPostTwo">${esc(p.designation2)}</span>`:''}</h2>`:''}</div><div class="ffContactIdentity">${photo?`<button class="ffContactPhotoButton" data-photo="${esc(p.id)}" aria-label="Zoom photo of ${esc(p.name)}"><img class="ffContactPhoto" src="${esc(photo)}" alt="${esc(p.name)}" loading="lazy"></button>`:`<div class="ffContactInitial" aria-hidden="true">${esc(Array.from(p.name)[0]||'?')}</div>`}<h3>${esc(p.name)}</h3>${tags.length?`<div class="ffContactTags">${tags.map(([label,value])=>`<span><small>${esc(label)}</small><b>${esc(value)}</b></span>`).join('')}</div>`:''}</div>${p.about?`<p class="ffContactAbout">${esc(p.about)}</p>`:''}<div class="ffContactLinks">${digits?`<a class="ffContactWA" href="https://wa.me/${digits}" aria-label="WhatsApp ${esc(p.name)}">${waIcon}<span>WhatsApp<small>+${digits}</small></span></a>`:''}${p.email?`<a class="ffContactMail" href="mailto:${esc(p.email.replace(/[?#\r\n]/g,''))}" aria-label="Email ${esc(p.name)}">${mailIcon}<span>Email<small>${esc(p.email)}</small></span></a>`:''}</div>${owner()?`<div class="ffContactTools"><button class="secondary" data-edit="${esc(p.id)}">EDIT</button><button class="secondary" data-delete="${esc(p.id)}">DELETE</button></div>`:''}</article>`;
  }
  function render(message=''){
   if(!active())return;
@@ -46,6 +46,7 @@ root.FFH_CREATE_CONTACTS=ctx=>{
   bindCards();
  }
  function bindCards(){
+  qa('.ffContactMail').forEach(a=>a.onclick=e=>{if(root.FieldForceNative?.openContact){e.preventDefault();root.FieldForceNative.openContact({url:a.href}).catch(err=>setStatus(err.message,true));}});
   qa('[data-photo]').forEach(b=>b.onclick=()=>{const p=rows.find(p=>p.id===b.dataset.photo);if(p&&root.FFH_OPEN_IMAGE)root.FFH_OPEN_IMAGE(safePhoto(p.photo_url));});
   qa('[data-edit]').forEach(b=>b.onclick=()=>ctx.navigate('contactEdit',()=>edit(b.dataset.edit)));
   qa('[data-delete]').forEach(b=>b.onclick=()=>{
@@ -77,8 +78,8 @@ root.FFH_CREATE_CONTACTS=ctx=>{
   if(!owner()){ctx.setPage('contacts');render();return;}
   const p=rows.find(x=>x.id===id)||{},baseVersion=version;
   ctx.setPage('contactEdit');
-  shell(back(id?'Edit Contact':'Add Contact')+`<div class="card"><p>Only filled details appear on the contact card. Visible to all zones.</p><form class="form" id="ffContactForm"><label>Contact category<select name="category">${categories.map(([id,label])=>`<option value="${id}" ${id===(p.id?categoryOf(p):category||'management')?'selected':''}>${label}</option>`).join('')}</select></label>${input('serial','Serial / position',p.serial||visible().length+1,'type="number" min="1" step="1" required')}${input('designation','Company designation',p.designation,'maxlength="150" placeholder="Managing Director"')}${input('name','Full name',p.name,'required maxlength="150"')}${input('department','Department',p.department??'Modern Trade','maxlength="100"')}${input('zone','Zone (optional)',p.zone,'maxlength="100"')}${input('salesmen_count','Number of salesmen (optional)',p.salesmen_count,'type="number" min="0" max="100000" step="1"')}${input('routes_count','Number of routes (optional)',p.routes_count,'type="number" min="0" max="100000" step="1"')}${input('whatsapp','WhatsApp with country code',p.whatsapp,'type="tel" maxlength="25" placeholder="+60…"')}${input('email','Email',p.email,'type="email" maxlength="254"')}<label>Photo (optional)<input name="photo" type="file" accept="image/jpeg,image/png,image/webp"></label>${safePhoto(p.photo_url)?`<img class="ffContactPhoto" id="ffContactPreview" src="${esc(p.photo_url)}" alt="Current photo"><label><input type="checkbox" name="remove_photo"> Remove photo</label>`:'<img class="ffContactPhoto" id="ffContactPreview" alt="New photo preview" hidden>'}<label>About (optional)<textarea name="about" maxlength="3000" rows="4">${esc(p.about||'')}</textarea></label><div class="ffContactTools"><button class="primary" type="submit">SAVE CONTACT</button><button class="secondary" type="button" id="ffContactCancel">CANCEL</button></div><p id="ffContactStatus" role="status"></p></form></div>`);
-  bindBack();const f=q('#ffContactForm');let preview;
+  shell(back(id?'Edit Contact':'Add Contact')+`<div class="card"><p>Only filled details appear on the contact card. Visible to all zones.</p><form class="form" id="ffContactForm"><label>Contact category<select name="category">${categories.map(([id,label])=>`<option value="${id}" ${id===(p.id?categoryOf(p):category||'management')?'selected':''}>${label}</option>`).join('')}</select></label>${input('serial','Serial / position',p.serial||visible().length+1,'type="number" min="1" step="1" required')}<div class="two">${input('designation','Post 1 / Company designation',p.designation,'maxlength="150" placeholder="Managing Director"')}${input('designation2','Post 2 (optional)',p.designation2,'maxlength="150"')}</div>${input('name','Full name',p.name,'required maxlength="150"')}${input('department','Department',p.department??'Modern Trade','maxlength="100"')}${input('zone','Zone (optional)',p.zone,'maxlength="100"')}${input('salesmen_count','Number of salesmen (optional)',p.salesmen_count,'type="number" min="0" max="100000" step="1"')}${input('routes_count','Number of routes (optional)',p.routes_count,'type="number" min="0" max="100000" step="1"')}${input('salesmen_names','Sales team names (optional)',p.salesmen_names,'maxlength="500"')}${input('route_names','Route names (optional)',p.route_names,'maxlength="500"')}${input('whatsapp','WhatsApp with country code',p.whatsapp,'type="tel" maxlength="25" placeholder="+60…"')}${input('email','Email',p.email,'type="email" maxlength="254"')}<label>Photo (optional)<input name="photo" type="file" accept="image/jpeg,image/png,image/webp"></label>${safePhoto(p.photo_url)?`<img class="ffContactPhoto" id="ffContactPreview" src="${esc(p.photo_url)}" alt="Current photo"><label><input type="checkbox" name="remove_photo"> Remove photo</label>`:'<img class="ffContactPhoto" id="ffContactPreview" alt="New photo preview" hidden>'}<label>About (optional)<textarea name="about" maxlength="3000" rows="4">${esc(p.about||'')}</textarea></label><div class="ffContactTools"><button class="primary" type="submit">SAVE CONTACT</button><button class="secondary" type="button" id="ffContactCancel">CANCEL</button></div><p id="ffContactStatus" role="status"></p></form></div>`);
+  bindBack();const f=q('#ffContactForm');let preview;f.elements.photo.oninput=()=>{const data=ctx.editedPhoto?.(f.elements.photo.files[0]);if(data){q('#ffContactPreview').src=data;q('#ffContactPreview').hidden=false;}};
   f.elements.photo.onchange=()=>{if(preview)URL.revokeObjectURL(preview);const file=f.elements.photo.files[0],el=q('#ffContactPreview');if(file){preview=URL.createObjectURL(file);el.src=preview;el.hidden=false;}else{el.hidden=!p.photo_url;if(p.photo_url)el.src=p.photo_url;}};
   q('#ffContactCancel').onclick=()=>root.history.back();
   f.onsubmit=async e=>{
@@ -88,7 +89,7 @@ root.FFH_CREATE_CONTACTS=ctx=>{
     if(version!==baseVersion)throw Error('Contacts changed. Return to Contacts and reopen this editor.');
     const values=Object.fromEntries(new FormData(f));
     const contact={id:p.id||root.crypto.randomUUID(),serial:1,deleted_at:null,category:values.category};if(!categories.some(([id])=>id===contact.category))throw Error('Choose a contact category.');
-    for(const key of ['name','designation','department','zone','whatsapp','email','about'])contact[key]=String(values[key]||'').trim();
+    for(const key of ['name','designation','designation2','department','zone','salesmen_names','route_names','whatsapp','email','about'])contact[key]=String(values[key]||'').trim();
     if(!contact.name)throw Error('Full name is required.');
     if(contact.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email))throw Error('Enter a valid email.');
     if(contact.whatsapp&&!/^\+?[\d\s()-]+$/.test(contact.whatsapp))throw Error('Enter WhatsApp number with country code.');
@@ -107,6 +108,7 @@ root.FFH_CREATE_CONTACTS=ctx=>{
   };
  }
  async function uploadPhoto(file){
+  const edited=ctx.editedPhoto?.(file);if(edited)return ctx.uploadEdited(edited); 
   if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>10*1024*1024)throw Error('Choose a JPG, PNG or WebP photo under 10 MB.');
   const url=URL.createObjectURL(file);
   try{
@@ -119,6 +121,7 @@ root.FFH_CREATE_CONTACTS=ctx=>{
  }
  async function refresh(){if(!active()||saving||document.activeElement?.id==='ffContactSearch')return;try{await load();render();}catch(e){if(active())setStatus(e.message,true);}}
  async function search(term){await load();const found=visible().filter(p=>matches(p,String(term).trim()));if(!found.length)return false;searchTerm=String(term).trim();category=null;ctx.setPage('contacts');ctx.navigate('contacts',()=>render());return true;}
- return {home,edit,refresh,search};
+ async function lookup(term){await load();return copy(visible().filter(p=>matches(p,String(term).trim())));}
+ return {home,edit,refresh,search,lookup};
 };
 })(window);

@@ -10,3 +10,8 @@ select option{background:#18232f;color:#fff}input[type=date],input[type=month],i
 .homeGrid .module{min-width:0;overflow-wrap:anywhere}
 .homeGrid .module[data-page=communication]{grid-column:2}
 .homeGrid .module[data-page=contacts]{grid-column:3}
+.ffContactTags{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px!important;margin-top:12px}
+.ffContactTags span{display:flex!important;flex-direction:column;align-items:flex-start;text-align:left;border-radius:12px!important;padding:9px 12px!important;background:linear-gradient(140deg,#ffab4820,#1a2730)!important;border:1px solid #d990465c!important;overflow-wrap:anywhere}
+.ffContactTags small{color:#c7a16f;font-size:10px;text-transform:uppercase;letter-spacing:.06em}.ffContactTags b{color:#ffe1b2;font-size:13px;margin-top:4px}
+.ffContactTop h2{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap}.ffContactPostTwo{padding-left:10px;border-left:1px solid #d69450}
+.ffContactCategories button{background:linear-gradient(145deg,#3b2814,#121c24)!important;border:1px solid #b67b3e!important;color:#ffdaa3!important;box-shadow:inset 0 1px #ffe0a522,0 8px 20px #0005!important}.ffContactCategories button.selected{border-color:#ffc878!important;box-shadow:0 0 16px #ff9b4333!important}.ffContactCard{background:radial-gradient(at top right,#b16d282b,transparent 45%),linear-gradient(145deg,#16232b,#080f16)!important}.ffContactPhoto{object-fit:contain!important;background:#05080a}
