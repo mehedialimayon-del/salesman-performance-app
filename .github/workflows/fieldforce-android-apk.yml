@@ -12,9 +12,15 @@ on:
           - test
           - production
   push:
-    branches: [main, ffh-duty-communication, ffh-notice-meetings-1-5]
+    branches: [main, ffh-duty-communication, ffh-notice-meetings-1-5, ffh-contacts-zone-20261018, ffh-unified-20261018]
     paths:
       - 'android/**'
+      - 'tests/**'
+      - 'contacts.js'
+      - 'contacts.css'
+      - 'accounts.js'
+      - 'app.js'
+      - 'earnings-core.js'
       - '.github/workflows/fieldforce-android-apk.yml'
       - 'an-logo.png'
 
@@ -114,3 +120,30 @@ jobs:
           path: dist/*
           if-no-files-found: error
           retention-days: 30
+
+  web-regression:
+    name: Web regression and mobile browser checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install test dependencies
+        run: npm --prefix /tmp/ffh-qa install --no-save jsdom@26.1.0 typescript@5.9.3 xlsx@0.18.5 playwright@1.58.2
+      - name: Run regression scripts
+        env:
+          NODE_PATH: /tmp/ffh-qa/node_modules
+        run: |
+          set -euo pipefail
+          for file in tests/*.cjs; do
+            case "$file" in *duty-ui.cjs) continue ;; esac
+            node "$file"
+          done
+      - name: Run actual Chromium mobile scenarios
+        env:
+          NODE_PATH: /tmp/ffh-qa/node_modules
+          FFH_CHROMIUM: /usr/bin/google-chrome
+        run: |
+          python3 -m http.server 8765 >/tmp/ffh-server.log 2>&1 &
+          node tests/duty-ui.cjs

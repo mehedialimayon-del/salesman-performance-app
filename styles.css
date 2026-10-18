@@ -859,3 +859,16 @@ html,body,#app{background:#05090d!important}
 }
 /* V49 catalogue-driven incentive groups */
 .incGroup{margin:12px 0;padding:14px;border:1px solid rgba(255,123,25,.42);border-radius:16px;background:linear-gradient(145deg,rgba(255,125,28,.08),rgba(4,12,17,.68))}.incGroup>b{color:#ff8a28;font-size:16px}.incBuilder{margin:12px 0!important;background:rgba(7,15,20,.72)!important}.incBuilder .row{margin-bottom:10px}.incBuilder .danger{width:auto;padding:7px 10px}
+/* Discoverable controls and readable foreground notification. */
+#ffLiveNotice{background:#fff3cd!important;color:#281b04!important;border:2px solid #ffb526!important;border-radius:16px!important;padding:18px!important}
+#ffLiveNotice strong,#ffLiveNotice .miniStat{color:#281b04!important;opacity:1!important}
+input[type=month],input[type=date],input[type=datetime-local],input[type=time],select{color-scheme:dark;background-color:#19394a!important;border:2px solid #67c9ed!important;color:#fff!important;min-height:48px;padding:12px;border-radius:12px}
+input::-webkit-calendar-picker-indicator{opacity:1;cursor:pointer;background-color:#ffc75f;border-radius:5px;padding:6px}
+select:focus,input[type=month]:focus,input[type=date]:focus{outline:3px solid #ffb526;outline-offset:2px}
+.ffPermissionTable{overflow-x:auto}.ffPermissionRow{display:grid;grid-template-columns:minmax(110px,1fr) repeat(3,58px);gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #44606c}
+.ffPermissionRow label{margin:0}.ffPermissionRow input{width:23px!important;height:23px!important;accent-color:#ff9e25}
+.ffAuditJson{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;background:#12232c;color:#ecf7fc;padding:12px;border-radius:10px}
+fieldset{border:1px solid #5caac4;border-radius:12px;padding:12px;min-width:0}legend{font-weight:700;color:#7ed8f7}
+.ffCampaignInfo .ffActiveBadge[data-status=Expired],.ffCampaignInfo .ffActiveBadge[data-status=Inactive]{background:#652e2e;color:#fff;border-color:#ff9a9a}
+
+.cpoDots{width:auto!important;min-width:64px;padding:8px!important;font-size:13px!important;font-weight:800!important}

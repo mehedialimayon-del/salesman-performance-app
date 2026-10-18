@@ -1,4 +1,4 @@
-const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require('/tmp/ffh-qa/node_modules/jsdom'),C=require('../ai-work-core.js');
+const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require('jsdom'),C=require('../ai-work-core.js');
 const context={staff:[{id:'M22328',name:'MD MUNNAF ALI'},{id:'M22075',name:'MOHAMMAD EMON'}],today:'2026-10-06',catalogue:[{id:'P1',name:'Juice'}],allowed:['notice','penalty','incentive','task','cpo','target','catalogue']};
 for(const kind of context.allowed){const p=C.localPlan(C.example(kind,context),context);assert.equal(p.actions.length,1,kind+': '+p.clarification);assert.equal(p.actions[0].kind,kind);}
 assert.equal(C.localPlan('মুন্নাফকে ৫০ RM ইনসেনটিভ দাও ভালো সেলসের জন্য',context).actions[0].data.amount,50);

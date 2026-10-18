@@ -1,4 +1,4 @@
-const fs=require('fs'),assert=require('node:assert/strict'),{JSDOM}=require('/tmp/ffh-qa/node_modules/jsdom');
+const fs=require('fs'),assert=require('node:assert/strict'),{JSDOM}=require('jsdom');
 (async()=>{
  const dom=new JSDOM('<div id="app"></div>',{url:'https://app.example',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window;
  for(const file of ['session-recovery.js','ai-match.js','photo-viewer.js'])w.eval(fs.readFileSync(file,'utf8'));
