@@ -1,0 +1,10 @@
+const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require('jsdom');
+(async()=>{
+const dom=new JSDOM('',{url:'https://app.test',runScripts:'outside-only'}),w=dom.window;let finish,called,opened;
+const RealDate=w.Date;w.Date=class extends RealDate{constructor(...args){super(...(args.length?args:['2026-10-19T13:33:09Z']));}};
+w.ffhSafeDownload=async(blob,name)=>{called=name;return new Promise(resolve=>finish=resolve)};w.FieldForceNative={openDownload:async value=>{opened=JSON.parse(value).filename}};
+w.eval(fs.readFileSync('download-feedback.js','utf8'));
+const pending=w.ffhSafeDownload(new w.Blob(['xlsx']),'Report-SR-S1.xlsx');assert.match(called,/Report-SR-S1-2026-10-19_213309-MYT.xlsx$/);assert.equal(w.document.querySelector('#ffDownloadReceipt'),null,'no success until native acknowledgement');finish({saved:true,filename:called,location:'Downloads / FieldForce Hub'});const result=await pending;assert.equal(result.savedAt,'2026-10-19T13:33:09.000Z');let receipt=w.document.querySelector('#ffDownloadReceipt');assert.match(receipt.textContent,/✓ File saved/);assert.match(receipt.textContent,/21:33:09/);await receipt.querySelector('.primary').onclick();assert.equal(opened,called);receipt.querySelector('.secondary').click();assert.equal(w.document.querySelector('#ffDownloadReceipt'),null);
+const browser=w.ffhSafeDownload(new w.Blob(['pdf']),'Catalogue.pdf');finish({started:true,filename:called});await browser;receipt=w.document.querySelector('#ffDownloadReceipt');assert.match(receipt.textContent,/not confirmed/);assert.equal(receipt.querySelector('.primary'),null);assert.ok(!receipt.textContent.includes('✓'));
+const retry=w.ffhSafeDownload(new w.Blob(['bad']),'Fail.pdf');finish({});await assert.rejects(retry,/not confirmed/);assert.equal(w.document.querySelector('#ffDownloadReceipt'),null,'old success does not survive a failed attempt');dom.window.close();console.log('PASS receipt only after confirmed save, MYT filename/clock, exact-file open, browser handoff and failed receipt');
+})().catch(e=>{console.error(e);process.exit(1)});
