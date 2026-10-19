@@ -167,6 +167,7 @@ jobs:
         with:
           name: FieldForce-Report-UI-${{ github.run_number }}
           path: |
+            /tmp/ffh-report-buttons-qa.png
             /tmp/ffh-reports-qa.png
             /tmp/ffh-summary-qa.png
           if-no-files-found: ignore
