@@ -14,9 +14,8 @@ import org.json.JSONObject;
 final class DownloadNotifications {
  static final String CHANNEL="ffh_downloads_v1";
  static Intent fileIntent(Context context,Uri uri,String filename,String mime){
-  return new Intent(Intent.ACTION_VIEW).setDataAndType(uri,mime)
-   .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-   .setClipData(ClipData.newUri(context.getContentResolver(),filename,uri));
+  Intent view=new Intent(Intent.ACTION_VIEW).setDataAndType(uri,mime).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+  view.setClipData(ClipData.newUri(context.getContentResolver(),filename,uri));return view;
  }
  static void completed(Context context,Uri uri,String filename,String mime){
   try{
