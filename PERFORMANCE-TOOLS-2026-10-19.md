@@ -15,4 +15,13 @@ Home now includes Offline Sync, Approval Inbox and Outlet History. These reuse e
 - New DOM/unit regression: offline persistence and recovery; online retry; blocked automatic retries; account and SR isolation; no SR self-approval; grant/refresh failure hides direct review; outlet code shared by different SRs stays isolated; date validation; partial history failures; lost-response duplicate reconciliation and correction conflict.
 - Existing local Node/DOM regression scripts passed, including five integrated owner/manager/SR sessions, attendance gate, reports, income, catalogue, contacts and messaging. Updated mobile Chromium CI scenario opens all three modules, exercises Back and checks outlet history mobile width.
 - Live read-only database verification: sales/tasks/outlets/campaign executions all have RLS enabled; task proof/reviewer columns and current delegated task-review guard present; production sales count remained 0. No production staff grants or business rows were changed.
-- Local Chromium download was unavailable. Hosted CI/mobile Chromium result must be recorded separately; no physical Android handset acceptance is claimed.
+- Standard local Chromium download was unavailable. An alternate Chromium executable ran the complete mobile fixture scenarios for Manager before/after attendance and SR: all passed, including the three new tools, Back, mobile width, preserved dashboard charts, chat and actual report/PDF downloads. These are controlled browser tests, not production-role phone sessions. No physical Android handset acceptance is claimed.
+- Initial hosted mobile checks identified Home grid alignment and history input overflow. Compact separate shortcuts and constrained responsive filters fixed both.
+- Final live hosted index/app/module/CSS byte comparison passed. Final source commit: 24031963db7f54e07e085e1abef9b9066b23d2d1.
+- Live transactional database regression passed: delegated Manager task review, foreign-zone denial, immediate grant revocation and SR self-approval denial. All temporary profiles/tasks/zones rolled back; follow-up readback found zero fixtures and production sales remained 0.
+
+## Final hosted evidence
+
+- Web regression and actual mobile Chromium job: https://github.com/mehedialimayon-del/salesman-performance-app/actions/runs/39190151091/job/117860964872 — success.
+- Pages deployment: https://github.com/mehedialimayon-del/salesman-performance-app/actions/runs/39190150610 — success.
+- All 41 Node/DOM regression scripts and controlled mobile SR/Manager scenarios passed on the final source commit. Existing signed APK can load the hosted change; no new production APK is distributed by this change.
