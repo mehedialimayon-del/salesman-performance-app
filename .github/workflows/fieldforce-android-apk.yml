@@ -169,6 +169,7 @@ jobs:
           path: |
             /tmp/ffh-home-20-qa.png
             /tmp/ffh-daily-summary-qa.png
+            /tmp/ffh-personal-income-qa.png
             /tmp/ffh-report-buttons-qa.png
             /tmp/ffh-reports-qa.png
             /tmp/ffh-summary-qa.png
