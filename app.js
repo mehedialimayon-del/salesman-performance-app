@@ -437,7 +437,37 @@ async function ffhEnsureXlsx(){
  for(const url of urls){try{await new Promise((resolve,reject)=>{const el=document.createElement('script');el.src=url;el.onload=resolve;el.onerror=reject;document.head.appendChild(el)});if(window.XLSX)return window.XLSX}catch(e){console.warn('Excel library failed',url,e)}}
  throw new Error('Excel library unavailable. Please connect to internet and retry.');
 }
-async function ffhSafeDownload(blob,filename){if(window.FieldForceNative?.saveFile){const dot=filename.lastIndexOf('.'),suffix='-'+Date.now().toString(36)+'-'+crypto.randomUUID().slice(0,8);filename=dot>0?filename.slice(0,dot)+suffix+filename.slice(dot):filename+suffix;if(blob.size>20*1024*1024)throw Error('Export exceeds 20 MB. Download with Chrome.');const encoded=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=no;r.readAsDataURL(blob)});await window.FieldForceNative.saveFile(JSON.stringify({base64:encoded,filename,mime:blob.type||'application/octet-stream'}));return;}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},60000)}
+async function ffhSafeDownload(blob,filename){
+ const native=!!window.FieldForceNative||/FFHNative\/1/.test(navigator.userAgent)||!!window.FFHBridge;
+ if(native){
+  const dot=filename.lastIndexOf('.'),suffix='-'+Date.now().toString(36)+'-'+crypto.randomUUID().slice(0,8);
+  filename=dot>0?filename.slice(0,dot)+suffix+filename.slice(dot):filename+suffix;
+  if(blob.size>20*1024*1024)throw Error('Export exceeds 20 MB. Download with Chrome.');
+  const encoded=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=()=>no(Error('Could not read export bytes'));r.readAsDataURL(blob)});
+  const payload={base64:encoded,filename,mime:blob.type||'application/octet-stream'};
+  let save;
+  if(window.FieldForceNative?.saveFile)save=()=>window.FieldForceNative.saveFile(JSON.stringify(payload));
+  else if(window.ffhNativeCall)save=()=>window.ffhNativeCall('saveFile',payload);
+  else if(window.FFHBridge?.postMessage){
+   // Recover file handoff if WebView's page-finished injection was interrupted.
+   save=()=>new Promise((resolve,reject)=>{
+    const id=crypto.randomUUID(),previous=window.ffhNativeReply;
+    const reply=(request,result)=>{if(request!==id){if(previous)previous(request,result);return;}
+     if(window.ffhNativeReply===reply)window.ffhNativeReply=previous;
+     result?.error?reject(Error(result.error)):resolve(result);
+    };
+    window.ffhNativeReply=reply;
+    try{window.FFHBridge.postMessage(JSON.stringify({action:'saveFile',payload:JSON.stringify({...payload,request_id:id})}));}
+    catch(e){if(window.ffhNativeReply===reply)window.ffhNativeReply=previous;reject(e);}
+   });
+  }else throw Error('Android file service is not ready. Close and reopen the app, then retry.');
+  const result=await save();
+  if(result?.saved!==true)throw Error('Android did not confirm that the file was saved. Retry the download.');
+  return {saved:true,filename:result.filename||filename,location:result.uri?'Downloads / FieldForce Hub':'Selected folder'};
+ }
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},60000);
+ return {started:true,filename};
+}
 async function exportWorkbook(){
  const names=['Executive Summary','SR Performance','Daily Sales','Delivered Sales','Outlet Wise','SKU Wise','Targets & Shortfall','Income Breakdown','Sales Commission','Product Incentives','Other Incentives','Zero Sales','CPO Execution','Promotion Execution','Route & Visits'];
  const btn=q('#xls');if(btn){btn.disabled=true;btn.textContent='GENERATING EXCEL...'}
