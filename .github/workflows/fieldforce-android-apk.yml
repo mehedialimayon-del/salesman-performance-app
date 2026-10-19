@@ -12,7 +12,7 @@ on:
           - test
           - production
   push:
-    branches: [main, ffh-duty-communication, ffh-notice-meetings-1-5, ffh-contacts-zone-20261018, ffh-unified-20261018]
+    branches: [main, ffh-daily-20261020, ffh-duty-communication, ffh-notice-meetings-1-5, ffh-contacts-zone-20261018, ffh-unified-20261018]
     paths:
       - 'android/**'
       - 'tests/**'
@@ -167,6 +167,8 @@ jobs:
         with:
           name: FieldForce-Report-UI-${{ github.run_number }}
           path: |
+            /tmp/ffh-home-20-qa.png
+            /tmp/ffh-daily-summary-qa.png
             /tmp/ffh-report-buttons-qa.png
             /tmp/ffh-reports-qa.png
             /tmp/ffh-summary-qa.png

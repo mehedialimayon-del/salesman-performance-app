@@ -24,7 +24,7 @@ assert.equal(C.offerStatus(five,'2026-10-06'),'Expired');
 assert.equal(C.rewards(rows,[five],'S1','2026-10')[0].amount,75,'expiry retains rewards already earned on time');
 // Render the app's real incentive screen: expired/upcoming offers remain visible to SRs.
 const fs=require('node:fs'),vm=require('node:vm'),app=fs.readFileSync('app.js','utf8');let html='';
-const ui={currentSr:()=> 'S1',user:{id:'S1'},db:{incentives:[five,{...five,name:'Upcoming offer',startDate:'2026-11-01',endDate:'2026-11-05'},{...five,name:'Other staff only',sr:'S2'}]},catalogueProducts:()=>[],ffhIncentiveProgress:(x,g)=>C.progress(rows,x,g,'S1'),ffhOfferStatus:x=>C.offerStatus(x,'2026-10-06'),esc:String,rm:n=>'RM '+n,shell:s=>{html=s},back:()=>'',isMgr:()=>false,ffhMay:()=>false,bindBack(){},bindScope(){},q:()=>null};
+const ui={window:{},currentSr:()=> 'S1',user:{id:'S1'},db:{incentives:[five,{...five,name:'Upcoming offer',startDate:'2026-11-01',endDate:'2026-11-05'},{...five,name:'Other staff only',sr:'S2'}]},catalogueProducts:()=>[],ffhIncentiveProgress:(x,g)=>C.progress(rows,x,g,'S1'),ffhOfferStatus:x=>C.offerStatus(x,'2026-10-06'),esc:String,rm:n=>'RM '+n,shell:s=>{html=s},back:()=>'',isMgr:()=>false,ffhMay:()=>false,bindBack(){},bindScope(){},q:()=>null};
 vm.createContext(ui);vm.runInContext(app.slice(app.indexOf('function incentive(){'),app.indexOf('function cpo(){')),ui);ui.incentive();
 assert.ok(html.includes('Five-day RM2000')&&html.includes('Expired'));
 assert.ok(html.includes('Upcoming offer')&&html.includes('Upcoming'));

@@ -16,7 +16,7 @@ function groups(name,m){const s=m.summary,c=m.compare,rows=m.rows(name),sum=i=>r
  if(name==='Other Incentives')items=[metric('Incentives',sum(3),'rm','green'),metric('Entries',rows.length-1)];
  if(name==='Product Incentives')items=[metric('Earned reward',sum(8),'rm','green'),metric('Campaign / group entries',rows.length-1),metric('Earned entries',rows.slice(1).filter(r=>r.at(-1)==='EARNED').length,'number','green')];
  if(name==='CPO Execution'||name==='Promotion Execution')items=[metric('Execution entries',rows.length-1),metric('Photo proof saved',rows.slice(1).filter(r=>r[8]==='YES').length,'number','green'),metric('Without photo proof',rows.slice(1).filter(r=>r[8]!=='YES').length,'number','amber')];
- return [{title:name+' · selected dates',items}];
+ return [{title:name+' · selected dates',note:['Income Breakdown','Sales Commission'].includes(name)?'Personal income only. Fixed pay is the selected month setup. Growth compares sales with the previous full month; pending history is excluded from the estimated total.':undefined,items}];
 }
 function cards(group){return `<section class="ffReportGroup"><h2>${escape(group.title)}</h2>${group.note?`<p class="ffReportNote">${escape(group.note)}</p>`:''}<div class="ffReportMetrics">${group.items.map(x=>`<div class="ffReportMetric ffTone-${x.tone}"><span>${escape(x.label)}</span><strong>${escape(display(x))}</strong></div>`).join('')}</div></section>`;}
 function tableBox(title,headers,rows,classes=''){

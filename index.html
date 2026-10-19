@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <script>if(/FFHNative\/1/.test(navigator.userAgent)&&!/FFHSafeInsets\/1/.test(navigator.userAgent)){document.documentElement.style.setProperty('--ffh-safe-top','24px');document.documentElement.style.setProperty('--ffh-safe-bottom','48px');}</script>
   <meta name="theme-color" content="#070a0d">
   <title>FieldForce Hub</title>
   <link rel="manifest" href="manifest.json">
@@ -15,6 +16,7 @@
   <link rel="stylesheet" href="performance-tools.css?v=20261019-3">
   <link rel="stylesheet" href="download-feedback.css?v=20261019-1">
   <link rel="stylesheet" href="reports-presentation.css?v=compact-20261019-3">
+  <link rel="stylesheet" href="daily-performance.css?v=20261020-1">
 </head>
 <body>
   <div id="app"></div>
@@ -23,8 +25,11 @@
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script src="ffh-onesignal.js?v=7" defer></script>
   <script src="vendor/leaflet.js"></script>
-  <script src="earnings-core.js?v=admin-insights-20261018-1"></script>
-  <script src="earnings.js?v=management-targets-20261019-1"></script>
+  <script src="daily-performance-core.js?v=20261020-1"></script>
+  <script src="daily-performance.js?v=20261020-1"></script>
+  <script src="reward-campaigns.js?v=20261020-1"></script>
+  <script src="earnings-core.js?v=personal-daily-20261020-1"></script>
+  <script src="earnings.js?v=personal-daily-20261020-1"></script>
   <script src="duty-core.js?v=1"></script>
   <script src="duty.js?v=attendance-visible-20261019-1"></script>
   <script src="catalogue-voice.js?v=native-3"></script>
@@ -44,13 +49,14 @@
   <script src="session-recovery.js?v=1"></script>
   <script src="ai-match.js?v=1"></script>
   <script src="ai-sales.js?v=final-20261019-1"></script>
-  <script src="dashboard-comparison.js?v=20261019-1"></script>
+  <script src="dashboard-comparison.js?v=daily-20261020-1"></script>
   <script src="vendor/xlsx-style.js?v=1.2.0"></script>
-  <script src="reports-core.js?v=compare-20261019-2"></script>
-  <script src="reports-presentation.js?v=compact-20261019-3"></script>
-  <script src="reports-ui.js?v=compact-20261019-7"></script>
-  <script src="performance-tools.js?v=20261019-1"></script>
+  <script src="personal-income.js?v=20261020-1"></script>
+  <script src="reports-core.js?v=personal-20261020-1"></script>
+  <script src="reports-presentation.js?v=personal-20261020-1"></script>
+  <script src="reports-ui.js?v=personal-20261020-1"></script>
+  <script src="performance-tools.js?v=daily-20261020-1"></script>
   <script src="download-feedback.js?v=20261019-2"></script>
-  <script src="app.js?v=download-notify-20261019-4"></script>
+  <script src="app.js?v=daily-20261020-1"></script>
 </body>
 </html>

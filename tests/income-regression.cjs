@@ -17,13 +17,10 @@ const db = {
 };
 const C=require('../earnings-core.js');const productIncome = new Function('db','FFH_EARNINGS_CORE',source.slice(start,end)+'return ffhProductIncome;')(db,C);
 assert.equal(productIncome('M21954','2026-10')[0].amount,50);
-const managerStart=source.indexOf('function managerIncome(){');
-const managerEnd=source.indexOf("shell(back('Manager Income')",managerStart);
-assert.ok(managerEnd>managerStart);
-const managerBody=source.slice(managerStart+'function managerIncome(){'.length,managerEnd);
-const calculate=new Function('db','user','month','today','rangeQty','srIds','delivered','target','ffhCampaignIncome','ffhProductIncome','FFH_EARNINGS_CORE','incomeMonth','incomePeriodEnd','ffhManagerExtraIncome',managerBody+'return {total,ownBonuses,earned};');
-const result=calculate(db,{id:'M21954'},()=> '2026-10',()=> '2026-10-05',id=>id==='M21954'?100:250,()=>['M21954','M22075'],()=>0,()=>100000,()=>[],productIncome,C,()=>'2026-10',()=>'2026-10-05',()=>[]);
-assert.deepEqual(result,{total:2200,ownBonuses:50,earned:50});
+const P=require('../personal-income');
+const context={viewerId:'M21954',currentMonth:'2026-10',today:'2026-10-05',db,people:[{id:'M21954',can_sell:true,can_manage:true,zone:'Z'},{id:'M22075',can_sell:true,zone:'Z'}],rules:{},target:()=>100000};
+const result=P.build(context,'M21954','2026-10','2026-10-01','2026-10-05');
+assert.equal(result.basic,2100);assert.equal(result.bonus,100);assert.equal(result.total,2200);
 db.incentives[0].active=false;
 assert.equal(productIncome('M21954','2026-10').length,0);
 console.log('PASS: basic once; own 50 + team 50; prior month/other SR/pending/inactive excluded');
