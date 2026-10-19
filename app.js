@@ -468,6 +468,7 @@ async function ffhSafeDownload(blob,filename){
  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},60000);
  return {started:true,filename};
 }
+if(window.FFH_WRAP_DOWNLOAD)ffhSafeDownload=window.FFH_WRAP_DOWNLOAD(ffhSafeDownload);
 async function exportWorkbook(){
  const names=['Executive Summary','SR Performance','Daily Sales','Delivered Sales','Outlet Wise','SKU Wise','Targets & Shortfall','Income Breakdown','Sales Commission','Product Incentives','Other Incentives','Zero Sales','CPO Execution','Promotion Execution','Route & Visits'];
  const btn=q('#xls');if(btn){btn.disabled=true;btn.textContent='GENERATING EXCEL...'}
