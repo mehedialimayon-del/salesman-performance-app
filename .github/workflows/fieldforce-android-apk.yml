@@ -61,6 +61,7 @@ jobs:
           mkdir -p unsigned-release
           cp android/app/build/outputs/apk/release/app-release-unsigned.apk unsigned-release/FieldForce-Hub-unsigned.apk
           cp -r android/app/build/test-results unsigned-release/
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" unsigned-release/
       - name: Preserve verified unsigned release
         uses: actions/upload-artifact@v4
         with:
@@ -159,3 +160,14 @@ jobs:
         run: |
           python3 -m http.server 8765 >/tmp/ffh-server.log 2>&1 &
           node tests/duty-ui.cjs
+
+      - name: Preserve controlled report layout screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: FieldForce-Report-UI-${{ github.run_number }}
+          path: |
+            /tmp/ffh-reports-qa.png
+            /tmp/ffh-summary-qa.png
+          if-no-files-found: ignore
+          retention-days: 7
