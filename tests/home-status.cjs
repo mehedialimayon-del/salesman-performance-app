@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict'),H=require('../home-status-core'),E=require('../earnings-core'),P=require('../personal-income');
+const rule={lowerLimit:80,upperLimit:100,lowerRate:.5,middleRate:1,upperRate:2};
+for(const [sales,want] of [[0,0],[79999,400],[80000,400],[80001,800.01],[100000,1000],[120000,1400]])assert.equal(H.tierCommission(sales,100000,rule),want);
+assert.equal(E.commission(80000,100000),400);assert.equal(E.commission(120000,100000),1400);
+assert.deepEqual(H.pace(120000,60000,'2026-10-20'),{shortfall:60000,remainingDays:12,daily:5000});assert.equal(H.pace(1000,1200,'2026-10-31').daily,0);assert.equal(H.pace(1000,0,'2028-02-29').daily,1000);
+assert.ok(H.active({active:true,start_date:'2026-10-20',end_date:'2026-10-20'},'2026-10-20'));assert.ok(!H.active({active:true,startDate:'2026-10-20',endDate:'2026-10-20'},'2026-10-21'));
+assert.ok(!H.visibleIncome({id:'S',can_manage:false},{id:'M',can_manage:true}));assert.ok(!H.visibleIncome({id:'M',can_manage:true},{id:'M2',can_manage:true}));assert.ok(H.visibleIncome({id:'M',can_manage:true},{id:'S',can_manage:false}));
+const people=[{id:'M',can_manage:true,can_sell:false,zone:'Z'},{id:'S',can_sell:true,zone:'Z'}],db={sales:[{sr:'S',date:'2026-10-20',status:'Delivered',deliveredAmount:120000}],incomeMonthlySetup:{'2026-10':{M:{basic:3000},S:{basic:1800}}},managerMonthlyRules:{'2026-10':{M:{commissionMode:'tiers',commission:{...rule,lowerRate:.1,middleRate:.25,upperRate:.5}},S:{commission:rule}}},incentives:[]};
+const c={people,db,viewerId:'M',target:()=>100000,currentMonth:'2026-10',today:'2026-10-20',baselines:[]};let r=P.build(c,'M','2026-10');assert.equal(r.salesCommission,350);assert.equal(r.basic,3000);assert.equal(r.growthRate,0);assert.equal(r.total,3350);assert.equal(P.build(c,'S','2026-10').comm,1400);assert.equal(P.build(c,'M','2026-09').total,0);assert.throws(()=>P.build({...c,viewerId:'S'},'M','2026-10'),/private/);
+console.log('PASS commission boundaries and custom tiers, monthly isolation, manager own pay, no default growth, income privacy, day-wise pace and campaign expiry');

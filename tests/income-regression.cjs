@@ -13,7 +13,7 @@ const db = {
  {sr:'M21954',status:'Pending',date:'2026-10-05',sku:'SKU1',qty:500}
  ],
  managerIncome:{basic:2100,fixed:0,targetQty:300,reward:50,teamCommissionRate:0},
- adjustments:[]
+ incomeMonthlySetup:{'2026-10':{M21954:{basic:2100}}},adjustments:[]
 };
 const C=require('../earnings-core.js');const productIncome = new Function('db','FFH_EARNINGS_CORE',source.slice(start,end)+'return ffhProductIncome;')(db,C);
 assert.equal(productIncome('M21954','2026-10')[0].amount,50);

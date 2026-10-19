@@ -1,6 +1,6 @@
 (function(root){'use strict';
 const money=n=>Math.round((+n||0)*100)/100;
-function commission(delivered,actual){delivered=Math.max(0,+delivered||0);actual=+actual||0;if(actual<=0)return 0;const ratio=delivered/actual;return money(ratio<.8?delivered*.005:ratio<=1?delivered*.01:actual*.01+(delivered-actual)*.02);}
+function commission(delivered,actual){delivered=Math.max(0,+delivered||0);actual=+actual||0;if(actual<=0)return 0;const ratio=delivered/actual;return money(ratio<=.8?delivered*.005:ratio<=1?delivered*.01:actual*.01+(delivered-actual)*.02);}
 function offerStatus(x,day){if(x.active===false)return 'Inactive';if(day<x.startDate)return 'Upcoming';if(day>x.endDate)return 'Expired';return 'Active';}
 const localDay=stamp=>{const ms=Date.parse(stamp);return Number.isFinite(ms)?new Date(ms+8*3600000).toISOString().slice(0,10):null;};
 const orderBasis=(x,g={})=>g.basis==='order'||x.basis==='order'||g.saleBasis==='submitted'||x.saleBasis==='submitted';

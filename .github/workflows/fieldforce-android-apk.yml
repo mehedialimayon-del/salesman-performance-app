@@ -150,7 +150,7 @@ jobs:
         run: |
           set -euo pipefail
           for file in tests/*.cjs; do
-            case "$file" in *duty-ui.cjs) continue ;; esac
+            case "$file" in *duty-ui.cjs|*home-board-ui.cjs) continue ;; esac
             node "$file"
           done
       - name: Run actual Chromium mobile scenarios
@@ -160,6 +160,7 @@ jobs:
         run: |
           python3 -m http.server 8765 >/tmp/ffh-server.log 2>&1 &
           node tests/duty-ui.cjs
+          node tests/home-board-ui.cjs
 
       - name: Preserve controlled report layout screenshots
         if: always()

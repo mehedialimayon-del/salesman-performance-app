@@ -6,7 +6,7 @@ const c={db,people,allowedIds:['A','B','C','X'],viewerId:'M',currentMonth:'2026-
 let r=P.build(c,'M','2026-10');assert.equal(r.d,120000);assert.equal(r.previous,100000);assert.equal(r.salesCommission,300);assert.equal(r.growthCommission,14000);assert.equal(r.total,17480);assert.equal(r.ownCommission,0);assert.equal(r.basic,3000);
 const model=R.build(c,{from:'2026-10-01',to:'2026-10-20',sr:'A',chain:'MISSING',outlet:'',product:'',manager:'',zone:''});
 assert.deepEqual(model.incomeIds,['M']);const rows=model.rows('Income Breakdown');assert.equal(rows.length,2);assert.equal(rows[1][2],3000);assert.equal(rows[1][10],17480,'sales filters do not replace manager pay with SR payroll');
-const sr=R.build(c,{from:'2026-10-01',to:'2026-10-20',incomeStaff:'A'}).rows('Income Breakdown');assert.equal(sr.length,2);assert.equal(sr[1][2],2350);assert.equal(sr[1][6],400);assert.equal(sr[1][11],'SR');
+const sr=R.build(c,{from:'2026-10-01',to:'2026-10-20',incomeStaff:'A'}).rows('Income Breakdown');assert.equal(sr.length,2);assert.equal(sr[1][2],2350);assert.equal(sr[1][6],200);assert.equal(sr[1][11],'SR');
 const noHistory=P.build({...c,baselines:[]},'M','2026-10');assert.equal(noHistory.growthCommission,null);assert.equal(noHistory.growthPending,true);assert.equal(noHistory.total,3480,'no invented growth payout without history');
 db.sales[0].deliveredAmount=10000;db.sales[1].deliveredAmount=10000;db.sales[2].deliveredAmount=10000;r=P.build(c,'M','2026-10');assert.equal(r.growthCommission,0);assert.equal(r.salesCommission,75);
 db.managerMonthlyRules['2026-10'].M.salesCommissionRate=0;db.managerMonthlyRules['2026-10'].M.growthCommissionRate=0;r=P.build(c,'M','2026-10');assert.equal(r.salesCommission,0);assert.equal(r.growthCommission,0);

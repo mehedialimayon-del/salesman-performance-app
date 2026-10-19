@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),C=require('../earnings-core.js');
-assert.equal(C.commission(39999,50000),200);assert.equal(C.commission(40000,50000),400);assert.equal(C.commission(50000,50000),500);assert.equal(C.commission(55000,50000),600);assert.equal(C.commission(9999,0),0);
+assert.equal(C.commission(39999,50000),200);assert.equal(C.commission(40000,50000),200);assert.equal(C.commission(50000,50000),500);assert.equal(C.commission(55000,50000),600);assert.equal(C.commission(9999,0),0);
 const offer={sr:'ALL',name:'20–27 offer',startDate:'2026-10-20',endDate:'2026-10-27',groups:[{name:'20k bonus',mode:'sales',target:20000,reward:100}]};
 const sales=[{sr:'S1',status:'Delivered',date:'2026-10-20',deliveredAt:'2026-10-20T01:00:00Z',deliveredAmount:10000},{sr:'S1',status:'Delivered',date:'2026-10-27',deliveredAt:'2026-10-27T15:59:59Z',deliveredAmount:10000},{sr:'S1',status:'Delivered',date:'2026-10-27',deliveredAt:'2026-10-27T16:00:00Z',deliveredAmount:99999},{sr:'S2',status:'Delivered',date:'2026-10-21',deliveredAmount:99999},{sr:'S1',status:'Pending',date:'2026-10-21',deliveredAmount:99999}];
 assert.equal(C.progress(sales,offer,offer.groups[0],'S1'),20000);assert.equal(C.rewards(sales,[offer],'S1','2026-10')[0].amount,100);assert.equal(C.rewards(sales,[offer],'S1','2026-11').length,0);
