@@ -100,3 +100,10 @@
 #app .ffCompactCpo .ffWeapons strong{font-size:16px!important}
 #app .ffCompactCpo .ffIncentivesCover{background:linear-gradient(135deg,#29303a,#0b1218)!important;border-color:#b47b39!important;box-shadow:inset 0 1px #ffffff14!important}
 @media(max-height:700px){#app .ffNotificationPage .ffPriorityTasks{max-height:66px}#app .ffNotificationPage .ffPrioritySummary{padding:3px 7px!important}#app .ffMeetingShortcutGrid{max-height:82px}}
+
+#app .ffCampaignHub .ffCampaignCard{background:radial-gradient(ellipse at 50% 0%,#b7702526,transparent 75%),linear-gradient(145deg,#1d272e,#0a1116)!important;border-color:#9b682e!important;box-shadow:inset 0 1px #ffdfb326,0 5px 15px #0005!important}
+#app .ffCampaignHub .ffCampaignCard strong{font-size:18px!important;letter-spacing:.6px;color:#ffe3ba}
+#app .ffCampaignHub .ffCampaignIcon{color:#ffad52;font-size:24px!important}
+#app .ffCampaignHub .ffCampaignCard:active{border-color:#ffbf65!important;box-shadow:inset 0 0 22px #ff951f25!important}
+#app .ffTaskScope .scope{margin:5px 0!important;gap:5px}
+#app .ffTaskScope .ffZoneScope{font-size:11px!important}
