@@ -208,3 +208,6 @@ body:has(.ffTrackingCard) #orb,body:has(.ffTrackingCard) #nudge{display:none!imp
 body:has(.ffDashboardFrame) #orb,body:has(.ffDashboardFrame) #nudge{display:none!important}
 
 #app .ffDashboardFrame .refKpi{height:74px!important;min-height:74px!important}
+#app .ffCataloguePage #categoryFolders{grid-template-rows:repeat(var(--ff-category-rows,6),minmax(64px,1fr))!important}
+#app #categoryFolders .categoryFolder{min-height:0!important}
+@media(max-height:780px){#app .app>main.wrap.ffDashboardFrame{gap:4px}#app .ffDashboardFrame .refKpi{height:60px!important;min-height:60px!important;padding:6px 8px!important}#app .ffDashboardFrame .refKpi strong{font-size:17px!important;margin:2px 0!important}#app .ffDashboardFrame .refKpi small{font-size:8px!important}#app .ffDashboardPanels{min-height:60px}}
