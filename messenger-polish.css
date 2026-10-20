@@ -65,3 +65,7 @@
 .ffChatDialog{max-height:85dvh;overflow:auto;border:1px solid #ce9b51!important;background:linear-gradient(135deg,#1a2b32,#0b151c)!important}
 .ffChatDialog h2{font-size:18px}.ffChatActionMenu{display:grid;gap:8px;margin-top:15px}.ffChatActionMenu button{min-height:44px;padding:10px;text-align:left;font-size:13px;box-shadow:none}
 @media(max-width:370px){#app .ffMeetingLaunch{grid-template-columns:minmax(0,1fr) 110px}#app .ffMeetingJoin{font-size:11px;padding:7px}#app .ffMeetingJoin>span:first-child{display:none}#app .ffChatHoldHint{font-size:8px}#app .ffMessenger .ffChatHeader .two{gap:6px}}
+/* The assistant bubble must not cover the microphone or send controls. */
+body:has(.ffMessenger) #orb,body:has(.ffMessenger) #aiHello{display:none!important}
+#app .ffMessenger .ffChatImageBox button{min-height:32px!important;margin-top:7px;padding:5px 9px!important;border:1px solid #a1875066!important;border-radius:8px!important;background:#183035!important;color:#e5cd98!important;box-shadow:none!important;font-size:10px!important;line-height:1.3}
+#app .ffMessenger audio,#app .ffMessenger video{color-scheme:dark}
