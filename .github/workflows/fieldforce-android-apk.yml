@@ -12,7 +12,7 @@ on:
           - test
           - production
   push:
-    branches: [main, ffh-notification-sound-20261021, ffh-ui-delivery-20261020, ffh-daily-20261020, ffh-duty-communication, ffh-notice-meetings-1-5, ffh-contacts-zone-20261018, ffh-unified-20261018]
+    branches: [main, ffh-simple-hub-20261021, ffh-notification-sound-20261021, ffh-ui-delivery-20261020, ffh-daily-20261020, ffh-duty-communication, ffh-notice-meetings-1-5, ffh-contacts-zone-20261018, ffh-unified-20261018]
     paths:
       - 'android/**'
       - 'tests/**'
@@ -150,7 +150,7 @@ jobs:
         run: |
           set -euo pipefail
           for file in tests/*.cjs; do
-            case "$file" in *duty-ui.cjs|*home-board-ui.cjs) continue ;; esac
+            case "$file" in *duty-ui.cjs|*home-board-ui.cjs|*simple-hub-ui.cjs) continue ;; esac
             node "$file"
           done
       - name: Run actual Chromium mobile scenarios
@@ -159,6 +159,7 @@ jobs:
           FFH_CHROMIUM: /usr/bin/google-chrome
         run: |
           python3 -m http.server 8765 >/tmp/ffh-server.log 2>&1 &
+          node tests/simple-hub-ui.cjs
           node tests/duty-ui.cjs
           node tests/home-board-ui.cjs
 
@@ -169,6 +170,10 @@ jobs:
           name: FieldForce-Report-UI-${{ github.run_number }}
           path: |
             /tmp/ffh-home-20-qa.png
+            /tmp/ffh-chat-full-qa.png
+            /tmp/ffh-daily-form-qa.png
+            /tmp/ffh-picker-qa.png
+            /tmp/ffh-claims-cards-qa.png
             /tmp/ffh-daily-summary-qa.png
             /tmp/ffh-personal-income-qa.png
             /tmp/ffh-report-buttons-qa.png

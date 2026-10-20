@@ -43,7 +43,7 @@ function build(c,f){
   // when its optional day-by-day baseline was not supplied. Never prorate it.
   if(!complete&&!filtered&&!c.baselineError&&f.from.slice(0,7)===f.to.slice(0,7)&&f.from.endsWith('-01')&&+f.to.slice(8)===new Date(Date.UTC(+f.to.slice(0,4),+f.to.slice(5,7),0)).getUTCDate()){
    const pm=days.find(d=>d.previousDate)?.previousDate.slice(0,7),pd=pm?new Date(Date.UTC(+pm.slice(0,4),+pm.slice(5,7),0)).getUTCDate():0;
-   if(pm&&days.filter(d=>d.previousDate).length===pd){const totals=ids.map(id=>{const b=baseline(id,pm),actual=allDelivered.filter(s=>s.sr===id&&s.date?.startsWith(pm));if(b)return Math.max(num(b.total_sales),amount(actual));return actual.length?amount(actual):null;});if(ids.length&&totals.every(v=>v!==null)){previous=round(totals.reduce((a,b)=>a+b,0));complete=true;}}
+   if(pm&&days.filter(d=>d.previousDate).length===pd){const totals=ids.map(id=>{const b=baseline(id,pm),actual=allDelivered.filter(s=>s.sr===id&&s.date?.startsWith(pm));if(b&&!b.daily_only)return Math.max(num(b.total_sales),amount(actual));return actual.length?amount(actual):null;});if(ids.length&&totals.every(v=>v!==null)){previous=round(totals.reduce((a,b)=>a+b,0));complete=true;}}
   }
   const delta=complete?round(current-previous):null;return{days,current,previous:complete?previous:null,delta,percent:delta===null?null:previous>0?round(delta/previous*100):current===0?0:null,previousFrom:days.find(d=>d.previousDate)?.previousDate||null,previousTo:[...days].reverse().find(d=>d.previousDate)?.previousDate||null,missingDays:days.filter(d=>d.status==='NOT ENTERED').length,unmatchedDays:days.filter(d=>!d.previousDate).length,filtered,baselineError:c.baselineError||''};
  }
