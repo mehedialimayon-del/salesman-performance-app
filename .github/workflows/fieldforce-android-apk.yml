@@ -183,6 +183,7 @@ jobs:
             /tmp/ffh-home-20-qa.png
             /tmp/ffh-chat-full-qa.png
             /tmp/ffh-messenger-final-*.png
+            /tmp/ffh-cpo-compact-*.png
             /tmp/ffh-meeting-final-*.png
             /tmp/ffh-daily-form-qa.png
             /tmp/ffh-picker-qa.png
