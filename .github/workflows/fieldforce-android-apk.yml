@@ -12,13 +12,17 @@ on:
           - test
           - production
   push:
-    branches: [main, ffh-compact-pages-20261021, ffh-notification-panel-20261021, ffh-simple-hub-20261021, ffh-notification-sound-20261021, ffh-ui-delivery-20261020, ffh-daily-20261020, ffh-duty-communication, ffh-notice-meetings-1-5, ffh-contacts-zone-20261018, ffh-unified-20261018]
+    branches: [main, ffh-chat-polish-20261021, ffh-compact-pages-20261021, ffh-notification-panel-20261021, ffh-simple-hub-20261021, ffh-notification-sound-20261021, ffh-ui-delivery-20261020, ffh-daily-20261020, ffh-duty-communication, ffh-notice-meetings-1-5, ffh-contacts-zone-20261018, ffh-unified-20261018]
     paths:
       - 'android/**'
       - 'tests/**'
       - 'contacts.js'
       - 'contacts.css'
       - 'compact-pages.css'
+      - 'messenger-polish.css'
+      - 'chat-media.js'
+      - 'duty.js'
+      - 'backend/chat-actions.sql'
       - 'history-ui.js'
       - 'reports-ui.js'
       - 'work-board.js'
@@ -178,6 +182,8 @@ jobs:
           path: |
             /tmp/ffh-home-20-qa.png
             /tmp/ffh-chat-full-qa.png
+            /tmp/ffh-messenger-final-*.png
+            /tmp/ffh-meeting-final-*.png
             /tmp/ffh-daily-form-qa.png
             /tmp/ffh-picker-qa.png
             /tmp/ffh-claims-cards-qa.png

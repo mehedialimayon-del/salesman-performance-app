@@ -17,6 +17,7 @@ public class ContactIntentTest {
   Intent intent=MainActivity.contactIntent(uri);
   assertEquals(Intent.ACTION_VIEW,intent.getAction());assertEquals(uri,intent.getData());
  }
+ @Test public void sharedContactUsesPhoneDialer(){Intent i=MainActivity.contactIntent(Uri.parse("tel:+60123456789"));assertEquals(Intent.ACTION_DIAL,i.getAction());}
  @Test public void arbitrarySchemesAreBlocked(){
   assertNull(MainActivity.contactIntent(Uri.parse("javascript:alert(1)")));
   assertNull(MainActivity.contactIntent(Uri.parse("file:///etc/passwd")));
