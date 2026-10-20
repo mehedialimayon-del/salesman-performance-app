@@ -194,7 +194,7 @@ const ffEditedImages=new WeakMap();
 function fileData(file,max=1800000){return new Promise((res,rej)=>{if(!file)return res('');let edited=ffEditedImages.get(file);if(edited)return res(edited);if(file.size>max)return rej(new Error('File too large. Keep under '+Math.round(max/1000000*10)/10+' MB.'));let r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file)})}
 function installUniversalImageEditor(){
  if(window.__ffImageEditorInstalled)return;window.__ffImageEditorInstalled=true;
- document.addEventListener('change',e=>{let input=e.target;if(!(input instanceof HTMLInputElement)||input.type!=='file'||!String(input.accept||'').includes('image'))return;let file=input.files&&input.files[0];if(!file)return;openUniversalImageEditor(file,input)},true)
+ document.addEventListener('change',e=>{let input=e.target;if(!(input instanceof HTMLInputElement)||input.type!=='file'||!String(input.accept||'').includes('image')||input.id==='ffChatPhoto')return;let file=input.files&&input.files[0];if(!file||!file.type.startsWith('image/'))return;openUniversalImageEditor(file,input)},true)
 }
 function openUniversalImageEditor(file,input){
  let rd=new FileReader();rd.onload=()=>{let img=new Image();img.onload=()=>{
