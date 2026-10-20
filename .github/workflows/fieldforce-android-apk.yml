@@ -12,12 +12,17 @@ on:
           - test
           - production
   push:
-    branches: [main, ffh-notification-panel-20261021, ffh-simple-hub-20261021, ffh-notification-sound-20261021, ffh-ui-delivery-20261020, ffh-daily-20261020, ffh-duty-communication, ffh-notice-meetings-1-5, ffh-contacts-zone-20261018, ffh-unified-20261018]
+    branches: [main, ffh-compact-pages-20261021, ffh-notification-panel-20261021, ffh-simple-hub-20261021, ffh-notification-sound-20261021, ffh-ui-delivery-20261020, ffh-daily-20261020, ffh-duty-communication, ffh-notice-meetings-1-5, ffh-contacts-zone-20261018, ffh-unified-20261018]
     paths:
       - 'android/**'
       - 'tests/**'
       - 'contacts.js'
       - 'contacts.css'
+      - 'compact-pages.css'
+      - 'history-ui.js'
+      - 'reports-ui.js'
+      - 'work-board.js'
+      - 'index.html'
       - 'accounts.js'
       - 'app.js'
       - 'earnings-core.js'
@@ -150,7 +155,7 @@ jobs:
         run: |
           set -euo pipefail
           for file in tests/*.cjs; do
-            case "$file" in *duty-ui.cjs|*home-board-ui.cjs|*notification-panel-ui.cjs|*simple-hub-ui.cjs) continue ;; esac
+            case "$file" in *duty-ui.cjs|*home-board-ui.cjs|*notification-panel-ui.cjs|*simple-hub-ui.cjs|*compact-pages-ui.cjs) continue ;; esac
             node "$file"
           done
       - name: Run actual Chromium mobile scenarios
@@ -163,6 +168,7 @@ jobs:
           node tests/duty-ui.cjs
           node tests/home-board-ui.cjs
           node tests/notification-panel-ui.cjs
+          node tests/compact-pages-ui.cjs
 
       - name: Preserve controlled report layout screenshots
         if: always()
@@ -179,6 +185,7 @@ jobs:
             /tmp/ffh-personal-income-qa.png
             /tmp/ffh-report-buttons-qa.png
             /tmp/ffh-reports-qa.png
+            /tmp/ffh-compact-*.png
             /tmp/ffh-summary-qa.png
           if-no-files-found: ignore
           retention-days: 7

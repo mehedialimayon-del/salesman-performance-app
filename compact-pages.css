@@ -1,0 +1,109 @@
+/* Shared compact controls: keep records visible and preserve 44px touch targets. */
+#app .ffCompactHistory.ffHistoryControls{position:static!important;display:block!important;padding:0!important;margin:0 0 8px!important;border:0!important;background:transparent!important;flex:none;z-index:auto}
+#app .ffHistoryActionBar{display:flex;align-items:center;gap:8px;min-height:44px}
+#app .ffHistoryActionBar button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px!important;margin:0!important;padding:6px 10px!important;background:linear-gradient(145deg,#1d272e,#0d151b)!important;color:#ffc477!important;border:1px solid #9b682e!important;border-radius:11px!important;box-shadow:inset 0 1px #ffffff12!important;font-size:12px!important;line-height:1.2}
+#app .ffHistoryActionBar .ffIconButton{width:44px!important;min-width:44px!important;padding:8px!important;flex:none}
+#app .ffHistoryCount{margin-left:auto;font-size:11px;color:#b5c0c7;font-variant-numeric:tabular-nums}
+#app [data-history-active]{width:6px;height:6px;border-radius:50%;background:#ff9b37}
+#app .ffHistoryFilterFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px;margin-top:6px;background:#101a21;border:1px solid #92602c66;border-radius:12px}
+#app .ffHistoryFilterFields[hidden],#app [data-history-active][hidden]{display:none!important}
+#app .ffHistoryFilterFields label{font-size:11px!important;min-width:0}
+#app .ffHistoryFilterFields input{height:44px!important;min-height:44px!important;padding:7px!important;font-size:13px!important;width:100%;box-sizing:border-box}
+#app .ffHistoryFilterFields button{min-height:44px;padding:7px 10px!important;font-size:12px!important}
+#app .ffCompactHistoryPanel{min-width:0}
+#app .ffCompactHistoryPanel>.cardTitle{position:static!important;top:auto!important;transform:none!important;font-size:14px;line-height:1.4;margin:0 0 6px;order:-1}
+#app .ffCompactHistoryPanel>.ffHistoryScroll{min-height:0!important;touch-action:pan-y}
+#app .wrap .ffHistoryExpanded{box-sizing:border-box!important;inset:12px!important;height:calc(100dvh - 24px)!important;max-height:calc(100dvh - 24px)!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:12px!important}
+#app .wrap .ffHistoryExpanded>.ffHistoryScroll{flex:1!important;min-height:0!important;max-height:none!important;overflow:auto!important}
+#app .wrap.ffNotificationPage,#app .wrap.ffTaskPage,#app .wrap:has(.ffWorkBoard #ffNoticeStream){box-sizing:border-box;height:calc(100dvh - 64px - var(--ffh-safe-top,0px))!important;min-height:0!important;padding:8px 10px calc(82px + var(--ffh-safe-bottom,0px))!important;display:flex;flex-direction:column;gap:6px;overflow:hidden!important}
+#app .ffNotificationPage>.ffNotificationHeading,#app .ffTaskPage>.head,#app .wrap:has(.ffWorkBoard #ffNoticeStream)>.head{flex:none;margin:0!important;min-height:44px}
+#app .ffNotificationPage .head h1,#app .ffTaskPage>.head h1,#app .wrap:has(.ffWorkBoard #ffNoticeStream)>.head h1{font-size:20px!important;line-height:1.2}
+#app .ffNotificationPage .ffPriorityMetrics{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0;flex:none}
+#app .ffNotificationPage .ffPriorityMetrics .alertBox{padding:6px 10px!important;min-height:0!important;display:flex;align-items:center;justify-content:space-between;gap:6px}
+#app .ffNotificationPage .ffPriorityMetrics .alertBox span{font-size:9px!important}
+#app .ffNotificationPage .ffPriorityMetrics .alertBox b{font-size:16px!important;margin:0!important}
+#app .ffNotificationPage .ffPrioritySummary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:6px 9px!important;margin:0!important;flex:none}
+#app .ffNotificationPage .ffPrioritySummary>.row{display:flex;align-items:center;padding:2px!important;gap:3px;border:0;min-width:0}
+#app .ffNotificationPage .ffPrioritySummary b{font-size:10px!important;font-weight:600;line-height:1.2;display:block}
+#app .ffNotificationPage .ffPrioritySummary .miniStat{display:none}
+#app .ffNotificationPage .ffPrioritySummary .row>span{font-size:14px!important;font-weight:800}
+#app .ffNotificationPage .ffPriorityTasks{flex:none;max-height:92px;overflow:auto;padding:6px 10px!important;margin:0!important}
+#app .ffNotificationPage .ffPriorityTasks .row{padding:3px 0!important;min-height:0!important}
+#app .ffNotificationPage .ffPriorityTasks b{font-size:11px!important}
+#app .ffNotificationPage #ffOpenImportantTasks{min-height:32px!important;padding:4px 8px!important;font-size:10px!important;box-shadow:none!important}
+#app .ffNotificationPage .ffInboxScroller{display:flex;flex-direction:column;flex:1;min-height:110px!important;max-height:none!important;margin:0!important;padding:8px!important;overflow:hidden!important}
+#app .ffNotificationPage .ffInboxScroller>.row{padding:4px 0!important;min-height:0!important;font-size:12px}
+#app .ffNotificationPage .ffInboxScroller>.ffHistoryScroll{flex:1;min-height:0!important;max-height:none!important;overflow:auto!important}
+#app .ffNotificationPage .ffNoticeRow{padding:10px 3px!important;font-size:13px;gap:8px}
+#app .ffNotificationPage .ffOpenNotice{font-size:13px!important;line-height:1.5}
+#app .ffNotificationPage #ffMarkAllNotices,#app .ffNotificationPage .ffMarkNotice{font-size:9px!important;padding:6px!important;min-height:36px;box-shadow:none!important}
+#app .ffNotificationPage>.miniStat{flex:none;margin:0;font-size:9px!important;line-height:1.2}
+#app .ffNotificationPage>.devFooter,#app .ffTaskPage>.devFooter,#app .wrap:has(.ffWorkBoard #ffNoticeStream)>.devFooter{display:none!important}
+#app .ffTaskPage>.ffTaskScope{flex:none;border:1px solid #9b682e66;border-radius:10px;background:#10191f;padding:0 10px}
+#app .ffTaskScope>summary{cursor:pointer;font-size:12px;min-height:38px;display:flex;align-items:center;color:#ffc477}
+#app .ffTaskScope select{min-height:40px!important;padding:7px!important;font-size:12px!important}
+#app .ffTaskScope .tabs{margin:4px 0!important}
+#app .ffTaskScope button{min-height:36px!important;padding:6px 10px!important;font-size:11px!important}
+#app .ffTaskPage>.ffTaskList{display:flex;flex-direction:column;flex:1;min-height:140px;max-height:none!important;overflow:hidden!important;padding:10px!important;margin:0!important}
+#app .ffTaskList .ffHistoryScroll{flex:1;max-height:none!important;overflow:auto!important}
+#app .ffTaskList .taskRow{position:static!important;gap:8px;padding:11px 0!important;align-items:flex-start}
+#app .ffTaskList .taskRow b{font-size:14px!important;line-height:1.35}
+#app .ffTaskList .taskRow .miniStat{font-size:11px!important;line-height:1.45}
+#app .ffTaskList .taskRow button{padding:6px 9px!important;min-height:40px!important;font-size:10px!important;box-shadow:none!important}
+#app .ffTaskPage>.ffTaskComposer,#app .ffTaskPage>.ffPrivateNoteDrawer{flex:none;padding:0 10px!important;margin:0!important}
+#app .ffTaskPage>.ffTaskComposer>summary,#app .ffTaskPage>.ffPrivateNoteDrawer>summary{padding:10px 0;font-size:12px!important;min-height:20px;cursor:pointer}
+#app .wrap.ffTaskPage:has(>.ffTaskComposer[open]),#app .wrap.ffTaskPage:has(>.ffPrivateNoteDrawer[open]),#app .wrap.ffTaskPage:has(>.ffTaskScope[open]){overflow:auto!important}
+#app .ffTaskPage:has(>details[open])>.ffTaskList{flex:0 0 260px}
+#app .ffWorkBoard:has(#ffNoticeStream){display:flex;flex-direction:column;flex:1;min-height:0;gap:6px}
+#app .ffWorkBoard:has(#ffNoticeStream)>details{flex:none;padding:0 10px!important;margin:0!important}
+#app .ffWorkBoard:has(#ffNoticeStream)>details>summary{padding:10px 0;font-size:12px!important;cursor:pointer}
+#app .ffMeetingShortcutGrid{flex:none;max-height:155px;overflow:auto;display:grid;grid-template-columns:1fr;gap:6px}
+#app .ffMeetingShortcutGrid .ffBoardCover{margin:0!important;border-radius:12px;display:grid;grid-template-columns:74px 1fr;background:linear-gradient(130deg,#19252d,#0b1218)!important;box-shadow:inset 0 1px #ffffff14!important}
+#app .ffMeetingShortcutGrid .ffBoardCover:not(:has(img)){display:block;padding:3px 0}
+#app .ffMeetingShortcutGrid .ffBoardCover img{grid-row:span 2;height:74px;width:74px;object-fit:cover}
+#app .ffMeetingShortcutGrid .ffBoardCoverTitle{font-size:13px!important;line-height:1.35;padding:9px 10px 4px!important;font-weight:700}
+#app .ffMeetingShortcutGrid .ffBoardCover small{font-size:10px;line-height:1.3;padding:0 10px 9px}
+#app .ffWorkBoard .ffNoticeBoardLink{flex:none;margin:0!important;border-radius:11px!important;display:flex!important;align-items:center;justify-content:space-between;padding:2px!important;box-shadow:none!important}
+#app .ffNoticeBoardLink .ffBoardCoverTitle{font-size:14px!important;gap:14px;padding:8px!important}
+#app .ffNoticeBoardLink small{display:none!important}
+#app .ffWorkBoard #ffBoardBackMeetings{align-self:flex-start;min-height:36px;padding:5px 10px!important;font-size:11px;box-shadow:none!important}
+#app .ffWorkBoard #ffNoticeStream{display:flex;flex-direction:column;flex:1;min-height:100px!important;overflow:hidden;padding:8px;margin:0}
+#app #ffNoticeStream>.ffHistoryScroll{flex:1;max-height:none!important;min-height:0!important;overflow:auto!important}
+#app .ffNoticeBubble{padding:11px;margin:6px 0}
+#app .ffNoticeBubble>b{font-size:14px!important;line-height:1.4}
+#app .ffNoticeBubble p{font-size:13px!important;line-height:1.6}
+#app .ffNoticeBubble .row{flex-wrap:wrap;gap:3px}
+#app .ffNoticeBubble .ffBoardTools button{min-height:36px;padding:6px 9px!important;font-size:10px;box-shadow:none!important;background:#17222a!important;color:#ffd08b!important;border:1px solid #946633!important}
+#app .ffNoticeBubble .ffBoardTools button.danger{color:#ffaaaa!important;border-color:#8d4444!important}
+#app .wrap:has(.ffWorkBoard #ffBoardNoticeForm) .ffWorkBoard:has(>details[open]){overflow:auto}
+#app .ffReports{font-size:13px}
+#app .wrap:has(.ffReports)>.head h1{font-size:22px!important}
+#app .ffReports>.notice{font-size:11px!important;padding:8px 10px!important;line-height:1.4;margin:6px 0!important}
+#app .ffReports .ffReportFilterPanel{padding:0 10px!important;margin:8px 0!important}
+#app .ffReportFilterPanel>summary{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;list-style:none;font-size:13px!important;color:#ffd08b}
+#app .ffReportFilterPanel>summary::-webkit-details-marker{display:none}
+#app .ffReportFilterPanel>summary small{font-size:10px;color:#b8c0c6;font-weight:500;text-align:right}
+#app .ffReportFilterPanel[open]{padding-bottom:10px!important}
+#app .ffReportFilterPanel input,#app .ffReportFilterPanel select{height:44px!important;min-height:44px!important;padding:7px 9px!important;font-size:12px!important}
+#app .ffReportFilterPanel label{font-size:11px!important}
+#app .ffReportFilterPanel .form{gap:9px!important}
+#app .ffReportFilterPanel .miniStat{font-size:10px!important;line-height:1.4;margin:0!important}
+#app .ffReportFilterPanel button{min-height:40px;padding:7px!important;font-size:11px;box-shadow:none!important}
+#app .ffReports .ffReportSource{padding:4px 10px!important;margin:6px 0!important}
+#app .ffReports .ffReportSource summary{font-size:10px!important}
+#app .ffReports>.card:has(.ffReportRow){padding:7px!important;margin-top:8px}
+#app .ffReports .ffReportRow{margin:5px 0;padding:8px;grid-template-columns:minmax(0,1fr) 56px 56px;gap:6px;background:linear-gradient(125deg,#1b242c,#0c141a)!important;border-color:#875e3266;border-radius:11px}
+#app .ffReports .ffReportRow h3{font-size:12px!important;color:#f7e5cf}
+#app .ffReports .ffReportRow .ffReportAction{width:100%;min-height:40px;height:40px;max-height:none;font-size:10px!important;color:#ffd08b;border-color:#966935;background:#ff9b2710!important;box-shadow:none!important}
+#app .ffReports button:focus-visible,#app .ffHistoryActionBar button:focus-visible{outline:2px solid #ffbf65;outline-offset:2px}
+#app .ffCompactCpo .ffWeapons{background:linear-gradient(135deg,#1e2931,#0d141a)!important;border:1px solid #b97a37!important;color:#ffe1b5;box-shadow:inset 0 1px #ffffff14!important}
+#app .ffCompactCpo .ffWeapons strong{font-size:16px!important}
+#app .ffCompactCpo .ffIncentivesCover{background:linear-gradient(135deg,#29303a,#0b1218)!important;border-color:#b47b39!important;box-shadow:inset 0 1px #ffffff14!important}
+@media(max-height:700px){#app .ffNotificationPage .ffPriorityTasks{max-height:66px}#app .ffNotificationPage .ffPrioritySummary{padding:3px 7px!important}#app .ffMeetingShortcutGrid{max-height:82px}}
+
+#app .ffCampaignHub .ffCampaignCard{background:radial-gradient(ellipse at 50% 0%,#b7702526,transparent 75%),linear-gradient(145deg,#1d272e,#0a1116)!important;border-color:#9b682e!important;box-shadow:inset 0 1px #ffdfb326,0 5px 15px #0005!important}
+#app .ffCampaignHub .ffCampaignCard strong{font-size:18px!important;letter-spacing:.6px;color:#ffe3ba}
+#app .ffCampaignHub .ffCampaignIcon{color:#ffad52;font-size:24px!important}
+#app .ffCampaignHub .ffCampaignCard:active{border-color:#ffbf65!important;box-shadow:inset 0 0 22px #ff951f25!important}
+#app .ffTaskScope .scope{margin:5px 0!important;gap:5px}
+#app .ffTaskScope .ffZoneScope{font-size:11px!important}
