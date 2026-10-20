@@ -1,0 +1,13 @@
+const {JSDOM}=require('jsdom'),assert=require('node:assert/strict'),fs=require('node:fs');const fixture=require('./notification-panel-fixture.js');
+(async()=>{
+ for(const [role,allowed,expected] of [['owner',true,1],['manager',true,1],['manager',false,0],['sr',true,0]]){
+  const dom=new JSDOM(fixture.html,{runScripts:'outside-only',url:'https://example.test/'}),w=dom.window;w.eval('('+fixture.setup.toString()+')('+JSON.stringify(role)+','+allowed+',100);');w.eval(fixture.scripts+'\n'+fixture.functionSource);w.notifications();
+  assert.equal(w.document.querySelectorAll('#notifySetup').length,expected,role);assert.equal(w.document.querySelectorAll('.ffNoticeRow').length,100);assert.ok(w.q('.wrap').classList.contains('ffNotificationPage'));
+  if(expected){const b=w.q('#notifySetup');assert.equal(b.getAttribute('aria-label'),'Notification settings');assert.equal(b.textContent,'');assert.ok(b.closest('.ffNotificationHeading'));assert.ok(!b.closest('.ffInboxScroller'));b.click();assert.equal(w.opened,'notify');}
+  const full=w.q('[data-history-expand]');full.click();assert.ok(w.q('.ffInboxScroller').classList.contains('ffHistoryExpanded'));full.click();assert.ok(!w.q('.ffInboxScroller').classList.contains('ffHistoryExpanded'));
+  await w.q('.ffOpenNotice').onclick();assert.equal(w.opened,'tasks');dom.window.close();
+ }
+ const dom=new JSDOM('',{runScripts:'outside-only',url:'https://example.test/'}),w=dom.window;w.eval(fs.readFileSync('notification-test.js','utf8'));let nativeCalls=0,browserCalls=0;w.FieldForceNative={testNotification:async()=>{nativeCalls++;return{posted:true};}};w.Notification=class{constructor(){browserCalls++;}};w.Notification.permission='granted';assert.ok((await w.FFH_TEST_NOTIFICATION()).posted);assert.equal(nativeCalls,1);assert.equal(browserCalls,0);
+ w.FieldForceNative={};await assert.rejects(w.FFH_TEST_NOTIFICATION(),/1.17/);w.FieldForceNative={testNotification:async()=>{throw Error('Allow FieldForce notifications in phone settings, then retry.');}};await assert.rejects(w.FFH_TEST_NOTIFICATION(),/phone settings/);
+ delete w.FieldForceNative;w.Notification.permission='denied';await assert.rejects(w.FFH_TEST_NOTIFICATION(),/Allow notifications/);w.Notification.permission='granted';w.navigator.serviceWorker={getRegistration:async()=>({showNotification:async()=>{browserCalls++;}})};assert.ok((await w.FFH_TEST_NOTIFICATION()).posted);assert.equal(browserCalls,1);dom.window.close();console.log('PASS settings icon owner/delegated/SR visibility, 100-notice inbox, fullscreen/details, native-first test and permission errors');
+})().catch(e=>{console.error(e);process.exit(1)});

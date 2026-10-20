@@ -1,0 +1,9 @@
+const fs=require('node:fs');
+const source=fs.readFileSync('app.js','utf8'),start=source.indexOf('function notifications(){'),end=source.indexOf('\nfunction profile()',start);
+const functionSource=source.slice(start,end);
+function setup(role,allowed,count){
+ window.q=s=>document.querySelector(s);window.qa=s=>[...document.querySelectorAll(s)];window.user={id:role==='owner'?'M21954':'S1',mode:role==='sr'?'SR':'MANAGER'};
+ window.isMgr=()=>role!=='sr';window.ffhMay=()=>allowed;window.currentSr=()=>null;window.db={sales:[],tasks:[],notifications:Array.from({length:count},(_,i)=>({id:String(i),title:'Notice '+i,body:'Details of task '+i+' — outlet follow-up and work reminder.',date:'2026-10-21',page:'tasks',read:false}))};
+ window.zeroCount=window.scopeTarget=window.scopeDelivered=()=>0;window.rm=x=>String(x);window.esc=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;');window.back=t=>'<div class="head"><h1>'+t+'</h1></div>';window.shell=s=>q('.wrap').innerHTML=s;window.bindBack=window.updateNotifyBadges=window.save=()=>{};window.navStack=[];window.view='ALL';window.opened='';window.navigate=(page,fn)=>{window.opened=page;};window.controlPage=x=>window.opened=x;window.ffhReadCloudNotice=async n=>{n.read=true;};window.tasks=window.sales=window.cpo=window.ffhBriefings=()=>{};window.ffClaims={home(){}};window.ffAssistant={learning(){}};window.openAIPopup=()=>{};window.ffDuty={communication(){},tracking(){},attendance(){}};
+}
+module.exports={functionSource,setup,html:'<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+['styles.css','ui-polish.css','work-board.css','notifications.css'].map(f=>fs.readFileSync(f,'utf8')).join('\n')+'</style><div id="app"><div class="app"><main class="wrap"></main></div></div>',scripts:fs.readFileSync('history-ui.js','utf8')+'\n'+fs.readFileSync('notification-test.js','utf8')};
