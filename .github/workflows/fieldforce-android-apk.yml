@@ -159,9 +159,9 @@ jobs:
           FFH_CHROMIUM: /usr/bin/google-chrome
         run: |
           python3 -m http.server 8765 >/tmp/ffh-server.log 2>&1 &
+          node tests/simple-hub-ui.cjs
           node tests/duty-ui.cjs
           node tests/home-board-ui.cjs
-          node tests/simple-hub-ui.cjs
 
       - name: Preserve controlled report layout screenshots
         if: always()

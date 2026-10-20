@@ -26,3 +26,14 @@ reset role;
 select set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000009603","role":"authenticated"}',true);set local role authenticated;
 do $$begin if exists(select 1 from storage.objects where bucket_id='ffh-chat-images' and name='QA_PERF_S1/QA_PERF_S2/test.webm') then raise exception 'Unrelated SR reads private attachment';end if;end$$;
 reset role;
+select set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000009604","role":"authenticated"}',true);set local role authenticated;
+do $$declare d date:=(now() at time zone 'Asia/Kuala_Lumpur')::date;p jsonb;r jsonb;begin
+p:=jsonb_build_object('submission_id',gen_random_uuid(),'entry_kind','daily','entry_scope','staff','staff_id','QA_PERF_S4','sale_date',d,'expected_version',0,'order_amount',10000,'ppr_amount',2000,'active_sales_amount',8000,'delivered_amount',8000,'order_count',0,'delivered_count',0,'order_cartons',4,'delivered_cartons',4,'product_lines','[{"sku":"QA Mango A","order_qty":4,"delivered_qty":4,"outlets":[{"outlet_name":"","order_qty":4,"delivered_qty":4}]}]'::jsonb,'outlet_lines','[]'::jsonb,'previous_sales_amount',6000);
+r:=public.ffh_daily_sales('save',p);if r->>'saved'<>'true' then raise exception 'Unified daily save failed';end if;
+if not exists(select 1 from public.ffh_daily_updates where staff_id='QA_PERF_S4' and delivered_amount=8000 and ppr_amount=2000 and active_sales_amount=8000 and delivered_cartons=4) then raise exception 'Unified actual sales/prepare/incentive data missing';end if;
+if not exists(select 1 from public.ffh_daily_comparison_history where staff_id='QA_PERF_S4' and amount=6000) then raise exception 'Same form did not save prior comparison';end if;
+r:=public.ffh_daily_sales('save',p);if r->>'duplicate'<>'true' then raise exception 'Same-form retry duplicated';end if;
+perform public.ffh_save_sales_baseline('QA_PERF_S4',to_char(d-interval '1 month','YYYY-MM'),50000,jsonb_build_object(extract(day from d-interval '1 month')::int::text,6000));
+if exists(select 1 from public.ffh_sales_baselines where staff_id='QA_PERF_S4' and daily_only) then raise exception 'Explicit monthly setup kept incomplete flag';end if;
+end$$;
+reset role;
