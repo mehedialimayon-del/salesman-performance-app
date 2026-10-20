@@ -12,3 +12,10 @@ db.sales[0].deliveredAmount=10000;db.sales[1].deliveredAmount=10000;db.sales[2].
 db.managerMonthlyRules['2026-10'].M.salesCommissionRate=0;db.managerMonthlyRules['2026-10'].M.growthCommissionRate=0;r=P.build(c,'M','2026-10');assert.equal(r.salesCommission,0);assert.equal(r.growthCommission,0);
 const old=P.build(c,'M','2026-09');assert.equal(old.basic,0,'October salary is not reused in September');assert.equal(old.setupMissing,true);
 console.log('PASS manager personal salary, exact .25% sales + 70% positive sales growth, scoped team, SR individual pay, reports, missing history, zero rates and month isolation');
+db.managerMonthlyRules['2026-10'].M.basicInclusive=true;
+db.managerMonthlyRules['2026-10'].M.foodLow=100;
+db.managerMonthlyRules['2026-10'].M.fixed=150;
+const combined=P.build(c,'M','2026-10');
+assert.equal(combined.fuel+combined.house+combined.food+combined.fixed,0,'combined Basic does not double-count allowances');
+assert.equal(combined.total,combined.basic+combined.comm+combined.pos+combined.bonus-combined.pen);
+console.log('PASS combined Basic and net income without duplicate food, fuel, rent or fixed amounts');
