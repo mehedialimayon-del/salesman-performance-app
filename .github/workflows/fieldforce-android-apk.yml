@@ -169,19 +169,21 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m http.server 8765 >/tmp/ffh-server.log 2>&1 &
-          node tests/brand-layout-ui.cjs
-          node tests/ticker-details-browser.cjs
-          node tests/campaign-screen-ui.cjs
-          node tests/page-frame-ui.cjs
-          node tests/premium-mobile.cjs
-          node tests/simple-hub-ui.cjs
-          node tests/duty-ui.cjs
-          node tests/home-board-ui.cjs
-          node tests/notification-panel-ui.cjs
-          node tests/compact-pages-ui.cjs
-          node tests/interaction-refresh-ui.cjs
-          node tests/screen-refinements-ui.cjs
-          node tests/screen-corrections-ui.cjs
+          ffh_browser_status=0
+          node tests/brand-layout-ui.cjs || ffh_browser_status=1
+          node tests/ticker-details-browser.cjs || ffh_browser_status=1
+          node tests/campaign-screen-ui.cjs || ffh_browser_status=1
+          node tests/page-frame-ui.cjs || ffh_browser_status=1
+          node tests/premium-mobile.cjs || ffh_browser_status=1
+          node tests/simple-hub-ui.cjs || ffh_browser_status=1
+          node tests/duty-ui.cjs || ffh_browser_status=1
+          node tests/home-board-ui.cjs || ffh_browser_status=1
+          node tests/notification-panel-ui.cjs || ffh_browser_status=1
+          node tests/compact-pages-ui.cjs || ffh_browser_status=1
+          node tests/interaction-refresh-ui.cjs || ffh_browser_status=1
+          node tests/screen-refinements-ui.cjs || ffh_browser_status=1
+          node tests/screen-corrections-ui.cjs || ffh_browser_status=1
+          exit "$ffh_browser_status"
 
       - name: Preserve controlled report layout screenshots
         if: always()
