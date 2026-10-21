@@ -1,11 +1,11 @@
 /* Shared compact controls: keep records visible and preserve 44px touch targets. */
 #app .ffCompactHistory.ffHistoryControls{position:static!important;display:block!important;padding:0!important;margin:0 0 8px!important;border:0!important;background:transparent!important;flex:none;z-index:auto}
 #app .ffHistoryActionBar{display:flex;align-items:center;gap:8px;min-height:44px}
-#app .ffHistoryActionBar button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px!important;margin:0!important;padding:6px 10px!important;background:linear-gradient(145deg,#1d272e,#0d151b)!important;color:#ffc477!important;border:1px solid #9b682e!important;border-radius:11px!important;box-shadow:inset 0 1px #ffffff12!important;font-size:12px!important;line-height:1.2}
+#app .ffHistoryActionBar button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px!important;margin:0!important;padding:6px 10px!important;background:linear-gradient(145deg,#2c2420,#171311)!important;color:#ffc477!important;border:1px solid #9b682e!important;border-radius:11px!important;box-shadow:inset 0 1px #ffffff12!important;font-size:12px!important;line-height:1.2}
 #app .ffHistoryActionBar .ffIconButton{width:44px!important;min-width:44px!important;padding:8px!important;flex:none}
-#app .ffHistoryCount{margin-left:auto;font-size:11px;color:#b5c0c7;font-variant-numeric:tabular-nums}
+#app .ffHistoryCount{margin-left:auto;font-size:11px;color:#d3bca9;font-variant-numeric:tabular-nums}
 #app [data-history-active]{width:6px;height:6px;border-radius:50%;background:#ff9b37}
-#app .ffHistoryFilterFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px;margin-top:6px;background:#101a21;border:1px solid #92602c66;border-radius:12px}
+#app .ffHistoryFilterFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px;margin-top:6px;background:#1c1815;border:1px solid #92602c66;border-radius:12px}
 #app .ffHistoryFilterFields[hidden],#app [data-history-active][hidden]{display:none!important}
 #app .ffHistoryFilterFields label{font-size:11px!important;min-width:0}
 #app .ffHistoryFilterFields input{height:44px!important;min-height:44px!important;padding:7px!important;font-size:13px!important;width:100%;box-sizing:border-box}
@@ -39,7 +39,7 @@
 #app .ffNotificationPage #ffMarkAllNotices,#app .ffNotificationPage .ffMarkNotice{font-size:9px!important;padding:6px!important;min-height:36px;box-shadow:none!important}
 #app .ffNotificationPage>.miniStat{flex:none;margin:0;font-size:9px!important;line-height:1.2}
 #app .ffNotificationPage>.devFooter,#app .ffTaskPage>.devFooter,#app .wrap:has(.ffWorkBoard #ffNoticeStream)>.devFooter{display:none!important}
-#app .ffTaskPage>.ffTaskScope{flex:none;border:1px solid #9b682e66;border-radius:10px;background:#10191f;padding:0 10px}
+#app .ffTaskPage>.ffTaskScope{flex:none;border:1px solid #9b682e66;border-radius:10px;background:#1b1714;padding:0 10px}
 #app .ffTaskScope>summary{cursor:pointer;font-size:12px;min-height:38px;display:flex;align-items:center;color:#ffc477}
 #app .ffTaskScope select{min-height:40px!important;padding:7px!important;font-size:12px!important}
 #app .ffTaskScope .tabs{margin:4px 0!important}
@@ -58,7 +58,7 @@
 #app .ffWorkBoard:has(#ffNoticeStream)>details{flex:none;padding:0 10px!important;margin:0!important}
 #app .ffWorkBoard:has(#ffNoticeStream)>details>summary{padding:10px 0;font-size:12px!important;cursor:pointer}
 #app .ffMeetingShortcutGrid{flex:none;max-height:155px;overflow:auto;display:grid;grid-template-columns:1fr;gap:6px}
-#app .ffMeetingShortcutGrid .ffBoardCover{margin:0!important;border-radius:12px;display:grid;grid-template-columns:74px 1fr;background:linear-gradient(130deg,#19252d,#0b1218)!important;box-shadow:inset 0 1px #ffffff14!important}
+#app .ffMeetingShortcutGrid .ffBoardCover{margin:0!important;border-radius:12px;display:grid;grid-template-columns:74px 1fr;background:linear-gradient(130deg,#29221d,#14110f)!important;box-shadow:inset 0 1px #ffffff14!important}
 #app .ffMeetingShortcutGrid .ffBoardCover:not(:has(img)){display:block;padding:3px 0}
 #app .ffMeetingShortcutGrid .ffBoardCover img{grid-row:span 2;height:74px;width:74px;object-fit:cover}
 #app .ffMeetingShortcutGrid .ffBoardCoverTitle{font-size:13px!important;line-height:1.35;padding:9px 10px 4px!important;font-weight:700}
@@ -73,7 +73,7 @@
 #app .ffNoticeBubble>b{font-size:14px!important;line-height:1.4}
 #app .ffNoticeBubble p{font-size:13px!important;line-height:1.6}
 #app .ffNoticeBubble .row{flex-wrap:wrap;gap:3px}
-#app .ffNoticeBubble .ffBoardTools button{min-height:36px;padding:6px 9px!important;font-size:10px;box-shadow:none!important;background:#17222a!important;color:#ffd08b!important;border:1px solid #946633!important}
+#app .ffNoticeBubble .ffBoardTools button{min-height:36px;padding:6px 9px!important;font-size:10px;box-shadow:none!important;background:#26201b!important;color:#ffd08b!important;border:1px solid #946633!important}
 #app .ffNoticeBubble .ffBoardTools button.danger{color:#ffaaaa!important;border-color:#8d4444!important}
 #app .wrap:has(.ffWorkBoard #ffBoardNoticeForm) .ffWorkBoard:has(>details[open]){overflow:auto}
 #app .ffReports{font-size:13px}
@@ -82,7 +82,7 @@
 #app .ffReports .ffReportFilterPanel{padding:0 10px!important;margin:8px 0!important}
 #app .ffReportFilterPanel>summary{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;list-style:none;font-size:13px!important;color:#ffd08b}
 #app .ffReportFilterPanel>summary::-webkit-details-marker{display:none}
-#app .ffReportFilterPanel>summary small{font-size:10px;color:#b8c0c6;font-weight:500;text-align:right}
+#app .ffReportFilterPanel>summary small{font-size:10px;color:#d3bdab;font-weight:500;text-align:right}
 #app .ffReportFilterPanel[open]{padding-bottom:10px!important}
 #app .ffReportFilterPanel input,#app .ffReportFilterPanel select{height:44px!important;min-height:44px!important;padding:7px 9px!important;font-size:12px!important}
 #app .ffReportFilterPanel label{font-size:11px!important}
@@ -92,16 +92,16 @@
 #app .ffReports .ffReportSource{padding:4px 10px!important;margin:6px 0!important}
 #app .ffReports .ffReportSource summary{font-size:10px!important}
 #app .ffReports>.card:has(.ffReportRow){padding:7px!important;margin-top:8px}
-#app .ffReports .ffReportRow{margin:5px 0;padding:8px;grid-template-columns:minmax(0,1fr) 56px 56px;gap:6px;background:linear-gradient(125deg,#1b242c,#0c141a)!important;border-color:#875e3266;border-radius:11px}
+#app .ffReports .ffReportRow{margin:5px 0;padding:8px;grid-template-columns:minmax(0,1fr) 56px 56px;gap:6px;background:linear-gradient(125deg,#29231e,#161210)!important;border-color:#875e3266;border-radius:11px}
 #app .ffReports .ffReportRow h3{font-size:12px!important;color:#f7e5cf}
 #app .ffReports .ffReportRow .ffReportAction{width:100%;min-height:40px;height:40px;max-height:none;font-size:10px!important;color:#ffd08b;border-color:#966935;background:#ff9b2710!important;box-shadow:none!important}
 #app .ffReports button:focus-visible,#app .ffHistoryActionBar button:focus-visible{outline:2px solid #ffbf65;outline-offset:2px}
-#app .ffCompactCpo .ffWeapons{background:linear-gradient(135deg,#1e2931,#0d141a)!important;border:1px solid #b97a37!important;color:#ffe1b5;box-shadow:inset 0 1px #ffffff14!important}
+#app .ffCompactCpo .ffWeapons{background:linear-gradient(135deg,#2e2621,#171310)!important;border:1px solid #b97a37!important;color:#ffe1b5;box-shadow:inset 0 1px #ffffff14!important}
 #app .ffCompactCpo .ffWeapons strong{font-size:16px!important}
-#app .ffCompactCpo .ffIncentivesCover{background:linear-gradient(135deg,#29303a,#0b1218)!important;border-color:#b47b39!important;box-shadow:inset 0 1px #ffffff14!important}
+#app .ffCompactCpo .ffIncentivesCover{background:linear-gradient(135deg,#39302a,#14110f)!important;border-color:#b47b39!important;box-shadow:inset 0 1px #ffffff14!important}
 @media(max-height:700px){#app .ffNotificationPage .ffPriorityTasks{max-height:66px}#app .ffNotificationPage .ffPrioritySummary{padding:3px 7px!important}#app .ffMeetingShortcutGrid{max-height:82px}}
 
-#app .ffCampaignHub .ffCampaignCard{background:radial-gradient(ellipse at 50% 0%,#b7702526,transparent 75%),linear-gradient(145deg,#1d272e,#0a1116)!important;border-color:#9b682e!important;box-shadow:inset 0 1px #ffdfb326,0 5px 15px #0005!important}
+#app .ffCampaignHub .ffCampaignCard{background:radial-gradient(ellipse at 50% 0%,#b7702526,transparent 75%),linear-gradient(145deg,#2c2420,#13100d)!important;border-color:#9b682e!important;box-shadow:inset 0 1px #ffdfb326,0 5px 15px #0005!important}
 #app .ffCampaignHub .ffCampaignCard strong{font-size:18px!important;letter-spacing:.6px;color:#ffe3ba}
 #app .ffCampaignHub .ffCampaignIcon{color:#ffad52;font-size:24px!important}
 #app .ffCampaignHub .ffCampaignCard:active{border-color:#ffbf65!important;box-shadow:inset 0 0 22px #ff951f25!important}

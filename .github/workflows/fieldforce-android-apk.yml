@@ -159,7 +159,7 @@ jobs:
         run: |
           set -euo pipefail
           for file in tests/*.cjs; do
-            case "$file" in *duty-ui.cjs|*home-board-ui.cjs|*notification-panel-ui.cjs|*simple-hub-ui.cjs|*compact-pages-ui.cjs|*premium-mobile.cjs|*page-frame-ui.cjs|*campaign-screen-ui.cjs|*ticker-details-browser.cjs) continue ;; esac
+            case "$file" in *brand-layout-ui.cjs|*duty-ui.cjs|*home-board-ui.cjs|*notification-panel-ui.cjs|*simple-hub-ui.cjs|*compact-pages-ui.cjs|*premium-mobile.cjs|*page-frame-ui.cjs|*campaign-screen-ui.cjs|*ticker-details-browser.cjs) continue ;; esac
             node "$file"
           done
       - name: Run actual Chromium mobile scenarios
@@ -168,6 +168,7 @@ jobs:
           FFH_CHROMIUM: /usr/bin/google-chrome
         run: |
           python3 -m http.server 8765 >/tmp/ffh-server.log 2>&1 &
+          node tests/brand-layout-ui.cjs
           node tests/ticker-details-browser.cjs
           node tests/campaign-screen-ui.cjs
           node tests/page-frame-ui.cjs

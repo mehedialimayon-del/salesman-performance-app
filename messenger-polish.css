@@ -1,6 +1,6 @@
 /* Clear meeting identity, lively notices and a consistent team messenger. */
 #app .ffMeetingShortcutGrid{max-height:190px!important;gap:8px}
-#app .ffMeetingLaunch{display:grid;grid-template-columns:minmax(0,1fr) 132px;gap:0;background:linear-gradient(120deg,#392109,#182128);border:1px solid #efad52;border-radius:14px;overflow:hidden;box-shadow:0 4px 18px #ff96251c;min-height:88px}
+#app .ffMeetingLaunch{display:grid;grid-template-columns:minmax(0,1fr) 132px;gap:0;background:linear-gradient(120deg,#392109,#251f1b);border:1px solid #efad52;border-radius:14px;overflow:hidden;box-shadow:0 4px 18px #ff96251c;min-height:88px}
 #app .ffMeetingLaunch .ffBoardCover{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;grid-template-columns:62px 1fr!important;min-width:0}
 #app .ffMeetingLaunch .ffBoardCover img{width:62px!important;height:88px!important;object-fit:cover}
 #app .ffMeetingLaunch .ffBoardCoverTitle{font-size:12px!important;padding:10px 8px 4px!important;color:#fff2d5;line-height:1.35}
@@ -10,44 +10,44 @@
 #app .ffMeetingJoin>span:first-child{font-size:22px}
 #app .ffMeetingJoin small{display:block;font-size:8px;font-weight:700;margin-top:5px;color:#67400b}
 #app .ffMeetingJoin b{font-size:16px}
-#app .ffNoticeBoardLink{background:linear-gradient(120deg,#251f17,#111c24)!important;border-color:#ad793b!important}
-#app .ffNoticeBubble{background:radial-gradient(ellipse at 100% 0%,#d6973730,transparent 65%),linear-gradient(135deg,#202d36,#112029)!important;border:1px solid #b3844566!important;border-radius:14px!important;border-left:3px solid #e5a54d!important;box-shadow:0 5px 18px #0003}
+#app .ffNoticeBoardLink{background:linear-gradient(120deg,#251f17,#1f1a16)!important;border-color:#ad793b!important}
+#app .ffNoticeBubble{background:radial-gradient(ellipse at 100% 0%,#d6973730,transparent 65%),linear-gradient(135deg,#322a24,#221c18)!important;border:1px solid #b3844566!important;border-radius:14px!important;border-left:3px solid #e5a54d!important;box-shadow:0 5px 18px #0003}
 #app .ffNoticeBubble .ffNoticeAuthor{color:#ffcd88;letter-spacing:.3px;font-size:11px}
 #app .ffNoticeBubble>b{display:block;color:#fff0d7;margin-top:9px}
 #app .ffNoticeBubble .ffBoardTools{display:flex;align-items:center;gap:5px;flex-wrap:wrap;border-top:1px solid #d2a56526;margin-top:12px;padding-top:9px}
 #app .ffNoticeBubble .ffBoardTools button{height:34px!important;min-height:34px!important;border-radius:9px!important;font-size:10px!important;padding:5px 9px!important;margin:0!important;font-weight:650;line-height:1.2;box-shadow:none!important}
-#app .ffNoticeBubble .ffBoardTools .ffNoticeIncentive{color:#b5f8c8!important;border-color:#4c9d6b!important;background:#17382b!important}
+#app .ffNoticeBubble .ffBoardTools .ffNoticeIncentive{color:#b5f8c8!important;border-color:#4c9d6b!important;background:#2e2621!important}
 #app .ffNoticeBubble .ffBoardTools [data-notice-penalty]{color:#ffbea4!important;border-color:#a96847!important;background:#39241c!important}
 #app .ffWorkBoard:has(>details[open]){overflow:auto}
 #app .ffCampaignHub{grid-template-rows:repeat(3,minmax(76px,1fr)) minmax(110px,1.1fr)!important;min-height:440px!important}
-#app .ffCampaignHub .ffWeapons{align-self:stretch;display:grid!important;grid-template-columns:1fr 1fr;align-items:center;gap:7px;padding:16px!important;background:radial-gradient(ellipse at 0% 100%,#e499363a,transparent 70%),linear-gradient(120deg,#24312b,#33200e,#12202a)!important;border-color:#d59b50!important;position:relative;overflow:hidden}
+#app .ffCampaignHub .ffWeapons{align-self:stretch;display:grid!important;grid-template-columns:1fr 1fr;align-items:center;gap:7px;padding:16px!important;background:radial-gradient(ellipse at 0% 100%,#e499363a,transparent 70%),linear-gradient(120deg,#24312b,#33200e,#231d19)!important;border-color:#d59b50!important;position:relative;overflow:hidden}
 #app .ffCampaignHub .ffWeapons:after{content:'↗';position:absolute;right:30px;top:-28px;font-size:160px;color:#ffb64a0b;font-weight:900;pointer-events:none}
 #app .ffCampaignHub .ffWeapons strong{font-size:22px!important;line-height:1.1;color:#ffda9f}
 #app .ffCampaignHub .ffWeapons small{grid-column:1/-1;grid-row:2;font-size:8px!important;letter-spacing:1px}
 #app .ffCampaignHub .ffWeapons b{text-align:right;font-size:14px!important;color:#fff1d7;line-height:1.4}
 #app .ffMessenger{height:calc(100dvh - 155px - var(--ffh-safe-top,0px) - var(--ffh-safe-bottom,0px));min-height:380px;gap:6px}
-#app .ffMessenger .ffChatHeader{padding:10px;border-radius:14px;background:linear-gradient(115deg,#18292e,#111d24);border-color:#c68b4555;box-shadow:inset 0 1px #ffedca12}
+#app .ffMessenger .ffChatHeader{padding:10px;border-radius:14px;background:linear-gradient(115deg,#29221d,#1f1a16);border-color:#c68b4555;box-shadow:inset 0 1px #ffedca12}
 #app .ffChatIdentity{display:flex;align-items:center;gap:8px;margin-bottom:7px}
 #app .ffChatIdentity strong{font-size:15px;color:#ffdfae}
-#app .ffChatIdentity small{display:block;font-size:9px;color:#a8bdc0;margin-top:2px}
+#app .ffChatIdentity small{display:block;font-size:9px;color:#ccb29c;margin-top:2px}
 #app .ffChatOnlineDot{width:9px;height:9px;border-radius:50%;background:#62d698;box-shadow:0 0 0 4px #62d69812}
-#app .ffMessenger .ffChatHeader select,#app .ffMessenger .ffSelectTrigger{height:40px!important;min-height:40px!important;font-size:11px!important;padding:6px 9px!important;background:#14252e!important;border:1px solid #836944!important;border-radius:10px!important;color:#eee2cb;box-shadow:none!important}
+#app .ffMessenger .ffChatHeader select,#app .ffMessenger .ffSelectTrigger{height:40px!important;min-height:40px!important;font-size:11px!important;padding:6px 9px!important;background:#26201c!important;border:1px solid #836944!important;border-radius:10px!important;color:#eee2cb;box-shadow:none!important}
 #app .ffMessenger .ffChatHeader label{font-size:9px}
 #app .ffMessenger .ffChatConversation>.cardTitle{font-size:12px!important;color:#d9bc8f;margin:3px 7px}
-#app .ffMessenger .ffChatThread{background:radial-gradient(ellipse at 100% 0%,#b9762520,transparent 65%),repeating-linear-gradient(35deg,#ffffff02 0 1px,transparent 1px 22px),#0d191f;border:1px solid #6c5b433b;padding:11px;border-radius:14px}
+#app .ffMessenger .ffChatThread{background:radial-gradient(ellipse at 100% 0%,#b9762520,transparent 65%),repeating-linear-gradient(35deg,#ffffff02 0 1px,transparent 1px 22px),#1a1512;border:1px solid #6c5b433b;padding:11px;border-radius:14px}
 #app .ffChatWelcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:180px;text-align:center;gap:12px;color:#ddc69e;padding:20px;box-sizing:border-box}
 #app .ffChatWelcome>span{font-size:42px;color:#d19c50}
 #app .ffChatWelcome strong{font-size:16px;line-height:1.4;max-width:210px}
-#app .ffChatWelcome small{font-size:11px;line-height:1.5;color:#91a9ad;max-width:240px}
-#app .ffMessenger .ffChatBubble{position:relative;margin:8px 0;max-width:88%;border:1px solid #36535b;background:linear-gradient(135deg,#20353d,#172830);border-radius:12px 12px 12px 3px;padding:10px 32px 9px 11px;box-shadow:0 2px 5px #0002}
+#app .ffChatWelcome small{font-size:11px;line-height:1.5;color:#be9c80;max-width:240px}
+#app .ffMessenger .ffChatBubble{position:relative;margin:8px 0;max-width:88%;border:1px solid #54473d;background:linear-gradient(135deg,#362d27,#29231e);border-radius:12px 12px 12px 3px;padding:10px 32px 9px 11px;box-shadow:0 2px 5px #0002}
 #app .ffMessenger .ffChatOwn{margin-left:auto;border-color:#866a3c;background:linear-gradient(135deg,#3d3522,#26362d);border-radius:12px 12px 3px 12px}
 #app .ffMessenger .ffChatBubble p{font-size:13px;line-height:1.55;margin:0 0 5px;white-space:pre-wrap;overflow-wrap:anywhere}
 #app .ffMessenger .ffChatBubble>small{font-size:8px;color:#adc0b7;display:block;text-align:right}
 #app .ffMessenger .ffChatUnsent{opacity:.75;font-style:italic}
-#app .ffMessenger .ffChatComposer{padding:7px!important;border-radius:16px!important;background:#15252b!important;border:1px solid #99723e77!important;gap:3px!important;box-shadow:0 -3px 16px #0002}
+#app .ffMessenger .ffChatComposer{padding:7px!important;border-radius:16px!important;background:#251f1b!important;border:1px solid #99723e77!important;gap:3px!important;box-shadow:0 -3px 16px #0002}
 #app .ffChatInputRow{display:flex;align-items:center;gap:6px}
-#app .ffMessenger .ffChatInputRow textarea{flex:1;width:0;min-width:0;min-height:42px!important;height:42px;max-height:95px;border:1px solid #53625a66!important;background:#0d1a20!important;border-radius:13px!important;font-size:13px!important;padding:10px!important;line-height:1.4;resize:none;box-sizing:border-box}
-#app .ffChatIcon{display:inline-flex;align-items:center;justify-content:center;flex:none;width:40px!important;height:40px!important;min-height:40px!important;min-width:40px!important;border-radius:50%!important;padding:7px!important;margin:0!important;border:1px solid #9b7a4644!important;background:#1b3035!important;color:#edcc95!important;box-shadow:none!important;cursor:pointer;box-sizing:border-box;touch-action:manipulation;user-select:none}
+#app .ffMessenger .ffChatInputRow textarea{flex:1;width:0;min-width:0;min-height:42px!important;height:42px;max-height:95px;border:1px solid #53625a66!important;background:#1a1613!important;border-radius:13px!important;font-size:13px!important;padding:10px!important;line-height:1.4;resize:none;box-sizing:border-box}
+#app .ffChatIcon{display:inline-flex;align-items:center;justify-content:center;flex:none;width:40px!important;height:40px!important;min-height:40px!important;min-width:40px!important;border-radius:50%!important;padding:7px!important;margin:0!important;border:1px solid #9b7a4644!important;background:#2e2722!important;color:#edcc95!important;box-shadow:none!important;cursor:pointer;box-sizing:border-box;touch-action:manipulation;user-select:none}
 #app .ffMessenger .ffChatAttach input{display:none}
 #app .ffMessenger .ffChatSend{background:linear-gradient(135deg,#ffd179,#f99b33)!important;color:#32210b!important;border-color:#ffdc98!important}
 #app .ffMessenger .ffChatComposerActions{display:flex!important;align-items:center;gap:5px;flex-wrap:nowrap!important}
@@ -58,22 +58,22 @@
 #app .ffMessenger .ffChatComposer [role=status]{font-size:10px;line-height:1.4;color:#f5ce92;padding:2px 7px}
 #app .ffChatMessageMenu{position:absolute;top:3px;right:1px;width:28px!important;min-width:28px!important;height:30px!important;min-height:30px!important;padding:5px!important;border:0!important;background:transparent!important;color:#bfc9bd!important}
 #app .ffChatMessageMenu svg{width:16px;height:16px}
-#app .ffChatDocument,#app .ffChatFilePreview{display:block;padding:13px;border-radius:10px;border:1px solid #997b4855;background:#152b2f;overflow-wrap:anywhere;font-size:12px}
-#app .ffChatLocationCard,#app .ffChatContactCard{display:flex;gap:9px;align-items:center;text-decoration:none;color:#ffd598;border:1px solid #b58a4855;background:#122a2d;padding:9px;border-radius:11px;margin:7px 0;font-size:12px}
-#app .ffChatLocationCard small,#app .ffChatContactCard a{display:block;font-size:11px;color:#b9d5cd;margin-top:5px}
+#app .ffChatDocument,#app .ffChatFilePreview{display:block;padding:13px;border-radius:10px;border:1px solid #997b4855;background:#27211d;overflow-wrap:anywhere;font-size:12px}
+#app .ffChatLocationCard,#app .ffChatContactCard{display:flex;gap:9px;align-items:center;text-decoration:none;color:#ffd598;border:1px solid #b58a4855;background:#251f1a;padding:9px;border-radius:11px;margin:7px 0;font-size:12px}
+#app .ffChatLocationCard small,#app .ffChatContactCard a{display:block;font-size:11px;color:#d9c5b5;margin-top:5px}
 #app .ffChatContactCard>div{flex:1;min-width:0}
-.ffChatDialog{max-height:85dvh;overflow:auto;border:1px solid #ce9b51!important;background:linear-gradient(135deg,#1a2b32,#0b151c)!important}
+.ffChatDialog{max-height:85dvh;overflow:auto;border:1px solid #ce9b51!important;background:linear-gradient(135deg,#2c2520,#171310)!important}
 .ffChatDialog h2{font-size:18px}.ffChatActionMenu{display:grid;gap:8px;margin-top:15px}.ffChatActionMenu button{min-height:44px;padding:10px;text-align:left;font-size:13px;box-shadow:none}
 @media(max-width:370px){#app .ffMeetingLaunch{grid-template-columns:minmax(0,1fr) 110px}#app .ffMeetingJoin{font-size:11px;padding:7px}#app .ffMeetingJoin>span:first-child{display:none}#app .ffChatHoldHint{font-size:8px}#app .ffMessenger .ffChatHeader .two{gap:6px}}
 /* The assistant bubble must not cover the microphone or send controls. */
 body:has(.ffMessenger) #orb,body:has(.ffMessenger) #aiHello{display:none!important}
-#app .ffMessenger .ffChatImageBox button{min-height:32px!important;margin-top:7px;padding:5px 9px!important;border:1px solid #a1875066!important;border-radius:8px!important;background:#183035!important;color:#e5cd98!important;box-shadow:none!important;font-size:10px!important;line-height:1.3}
+#app .ffMessenger .ffChatImageBox button{min-height:32px!important;margin-top:7px;padding:5px 9px!important;border:1px solid #a1875066!important;border-radius:8px!important;background:#2d2520!important;color:#e5cd98!important;box-shadow:none!important;font-size:10px!important;line-height:1.3}
 #app .ffMessenger audio,#app .ffMessenger video{color-scheme:dark}
 /* The same compact fullscreen control is used by daily sales and report tables. */
-#app .ffDaily #ffDailyFull,#app .ffReports .ffReportExpand{position:relative;width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;padding:8px!important;font-size:0!important;line-height:0!important;border:1px solid #a07b4666!important;border-radius:10px!important;color:#ffd08b!important;background:#18272d!important;box-shadow:none!important;flex:none}
+#app .ffDaily #ffDailyFull,#app .ffReports .ffReportExpand{position:relative;width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;padding:8px!important;font-size:0!important;line-height:0!important;border:1px solid #a07b4666!important;border-radius:10px!important;color:#ffd08b!important;background:#28221d!important;box-shadow:none!important;flex:none}
 #app .ffDaily #ffDailyFull:before,#app .ffReports .ffReportExpand:before{content:'';display:block;width:22px;height:22px;background:center/22px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffd08b' stroke-width='1.8'%3E%3Cpath d='M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5'/%3E%3C/svg%3E")}
 #app .ffReportExpanded #ffDailyFull:before,#app .ffReportExpanded .ffReportExpand:before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffd08b' stroke-width='1.8'%3E%3Cpath d='m6 6 12 12M18 6 6 18'/%3E%3C/svg%3E")}
-#app .ffDaily .ffDailyActions .secondary{height:36px;min-height:36px;font-size:11px!important;padding:6px 10px!important;border-radius:10px!important;background:linear-gradient(135deg,#253038,#142128)!important;color:#f3ca8d!important;border:1px solid #956f3f88!important;box-shadow:none!important;line-height:1.2}
+#app .ffDaily .ffDailyActions .secondary{height:36px;min-height:36px;font-size:11px!important;padding:6px 10px!important;border-radius:10px!important;background:linear-gradient(135deg,#362d27,#231d19)!important;color:#f3ca8d!important;border:1px solid #956f3f88!important;box-shadow:none!important;line-height:1.2}
 
 #app .ffCampaignHub .ffCampaignCard .ffCampaignMeta>span{font-size:10px!important;line-height:1.25!important;font-weight:600!important}
 body:has(.ffCampaignHub) #aiHello,body:has(.ffWorkBoard) #aiHello{display:none!important}
