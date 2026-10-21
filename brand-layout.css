@@ -54,3 +54,14 @@
 @media(max-height:680px){#app .ffCataloguePage #categoryFolders{grid-template-rows:repeat(var(--ff-category-rows,7),minmax(52px,1fr))!important}#app #categoryFolders .categoryFolder{min-height:52px!important}#app #categoryFolders .ffCategorySummary{font-size:7px!important}}
 #app #categoryFolders .categoryFolder:before{display:block!important;content:''!important;background-image:linear-gradient(90deg,#090b0c10,#090b0ced 46%),var(--category-art)!important;background-size:100% 100%!important}
 #app #categoryFolders .categoryFolder .ffCategorySummary{display:block!important;position:static!important;padding:0!important;margin:0!important;min-height:0!important;border:0!important;background:transparent!important;font-weight:500!important}
+
+#app .app>main.wrap :is(h1,h2,h3,.cardTitle){color:#ff963e!important}
+.ffTickerDialog[hidden]{display:none!important}
+.ffTickerPreview{width:min(1000px,100%);height:calc(100dvh - 10px);display:flex;flex-direction:column;overflow:hidden;border:1px solid #e58b40;border-radius:12px;background:#0d0d0c;color:#ffcb9a}
+.ffTickerPreview header{display:flex;align-items:center;gap:8px;padding:9px;border-bottom:1px solid #985b2a;flex:none}
+.ffTickerPreview header strong{flex:1;min-width:0;overflow-wrap:anywhere;font-size:12px}
+.ffTickerPreview button{background:#3b2413;border:1px solid #a96730;border-radius:7px;color:#ffcf9b;padding:8px;font-size:11px;cursor:pointer}
+.ffTickerPreviewBody{flex:1;min-height:0;overflow:auto;display:flex;align-items:center;justify-content:center}
+.ffTickerPreviewBody :is(img,iframe){display:block;width:100%;height:100%;object-fit:contain;border:0;background:#0b0c0d}
+.ffTickerPreview footer{padding:8px;font-size:11px;flex:none;color:#d2b69d}
+.ffTickerPreview footer a{color:#ffae62}
