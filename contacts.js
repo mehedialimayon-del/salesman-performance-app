@@ -6,7 +6,7 @@ const mailIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" wi
 root.FFH_CONTACT_ICON=bookIcon;
 root.FFH_CREATE_CONTACTS=ctx=>{
  const {FFH_SUPABASE:sb,esc,shell,back,bindBack,q,qa}=ctx;
- let rows=[],version=null,undo=null,loading=0,saving=false,category=null,searchTerm='';
+ let rows=[],version=null,undo=null,loading=0,saving=false,category='all',searchTerm='';
  const categories=[['management','Management'],['manager','Manager'],['dic','DIC'],['accounts','Accounts'],['delivery','DM / Deliveryman']];
  const categoryOf=p=>categories.some(([id])=>id===p.category)?p.category:/account/i.test(p.designation+' '+p.department)?'accounts':/delivery|deliveryman|\bdm\b/i.test(p.designation+' '+p.department)?'delivery':/\bdic\b|distribution.*charge/i.test(p.designation+' '+p.department)?'dic':/manager/i.test(p.designation)&&!/general manager/i.test(p.designation)?'manager':'management';
  const matches=(p,term)=>[p.name,p.designation,p.designation2,p.department,p.zone,p.salesmen_names,p.route_names,categories.find(([id])=>id===categoryOf(p))?.[1]].some(v=>String(v||'').normalize('NFKC').toLowerCase().includes(term.normalize('NFKC').toLowerCase()));

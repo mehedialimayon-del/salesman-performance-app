@@ -1,0 +1,75 @@
+/* Final requested accents; surface changes are scoped to the named pages. */
+#app .app>main.wrap .ffRequestedOrange{color:#ff7417!important;-webkit-text-fill-color:#ff7417!important;font-weight:850}
+#app .app>main.wrap .ffRequestedWhite{color:#fff!important;-webkit-text-fill-color:#fff!important;font-weight:850}
+#app .app>main.wrap>.head{align-items:center;gap:5px!important}
+#app .app>main.wrap>.head h1{flex:1;min-width:0}
+#app .app>main.wrap .ffCompactIcon,#app .app>main.wrap #ffMainFilterToggle.ffCompactIcon{display:inline-grid;place-items:center;width:32px!important;min-width:32px!important;height:32px!important;min-height:32px!important;flex:none;margin:0!important;padding:0!important;border:1px solid #a65a27!important;border-radius:9px!important;background:#17110c!important;color:#ff7417!important;font-size:21px!important;line-height:1!important;box-shadow:none!important}
+#app .app>main.wrap .ffCompactSearch[hidden]{display:none!important}
+/* Category artwork fills the tile; captions are bold and centred over its lower edge. */
+#app .app>main.wrap.ffRequestedCatalogue>.head{margin-bottom:4px!important;min-height:33px}
+#app .app>main.wrap.ffRequestedCatalogue #categoryFolders.ffTwoColumnFolders{grid-template-rows:repeat(4,minmax(106px,1fr))!important;gap:7px!important}
+#app .app>main.wrap.ffRequestedCatalogue #categoryFolders.ffTwoColumnFolders .categoryFolder{position:relative!important;display:block!important;height:100%!important;min-height:106px!important;padding:0!important;border:1px solid #b86b32!important;background:#080808!important;border-radius:12px!important;isolation:isolate}
+#app .app>main.wrap.ffRequestedCatalogue #categoryFolders.ffTwoColumnFolders .categoryFolder img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;object-fit:contain!important;object-position:center!important;border-radius:0!important;background:#080808!important}
+#app .app>main.wrap.ffRequestedCatalogue #categoryFolders.ffTwoColumnFolders .categoryFolder>span{position:absolute!important;inset:auto 0 0!important;display:flex!important;flex-direction:column;justify-content:end!important;gap:3px!important;padding:22px 4px 6px!important;box-sizing:border-box;background:linear-gradient(transparent,#000e 30%,#000f)!important;width:100%!important;text-align:center!important;z-index:1}
+#app .app>main.wrap.ffRequestedCatalogue #categoryFolders.ffTwoColumnFolders .categoryFolder>span>b{font-size:clamp(13px,3.8vw,18px)!important;line-height:1.12!important;font-weight:900!important;text-align:center!important;color:#ff7417!important;text-shadow:0 1px 3px #000}
+#app .app>main.wrap.ffRequestedCatalogue #categoryFolders.ffTwoColumnFolders .categoryFolder .ffCategorySummary{display:flex!important;justify-content:center!important;gap:3px;flex-wrap:wrap;font-size:clamp(7px,2vw,10px)!important;line-height:1.15!important;font-weight:600!important;text-align:center!important;margin:0!important;order:1}
+#app .app>main.wrap.ffRequestedCatalogue #categoryFolders.ffTwoColumnFolders .categoryFolder>span>small{position:static!important;display:block!important;order:2;align-self:center;padding:1px 4px!important;background:#0009!important;font-size:7px!important;font-weight:600;color:#fff!important}
+#app .app>main.wrap.ffRequestedCatalogue .ffCatalogueHead{min-height:29px;justify-content:end}
+#app .app>main.wrap.ffRequestedCatalogue .ffCatalogueHead button{height:29px!important;min-height:29px!important;padding:4px 7px!important}
+#app .app>main.wrap.ffRequestedCatalogue .ffSearchWithFilter{display:block!important}
+/* Contacts: compact actions at the title, category counts in the corner. */
+#app .app>main.wrap.ffRequestedContacts{display:flex!important;flex-direction:column;gap:6px;overflow:hidden!important}
+#app .app>main.wrap.ffRequestedContacts>.head{flex:none}
+#app .app>main.wrap.ffRequestedContacts .ffContactToolbar{display:flex;gap:4px;flex:none;flex-wrap:nowrap}
+#app .app>main.wrap.ffRequestedContacts .ffContactHero{flex:none;display:block!important;min-height:0!important;margin:0!important;padding:5px 0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+#app .app>main.wrap.ffRequestedContacts .ffContactHero :is(.ffContactHeroIcon,small,p){display:none!important}
+#app .app>main.wrap.ffRequestedContacts .ffContactHero h2{font-size:15px!important;margin:0!important}
+#app .app>main.wrap.ffRequestedContacts .ffContactSearchLabel{flex:none;margin:0!important;font-size:0!important;gap:0!important}
+#app .app>main.wrap.ffRequestedContacts #ffContactSearch{height:34px!important;min-height:34px!important;padding:5px 9px!important;font-size:12px!important}
+#app .app>main.wrap.ffRequestedContacts .ffContactCategories{flex:none;display:grid;grid-template-columns:1fr 1fr;gap:6px!important;margin:0!important}
+#app .app>main.wrap.ffRequestedContacts .ffContactCategory{position:relative;min-height:48px!important;padding:10px 32px 10px 10px!important;font-size:12px!important;text-align:left!important}
+#app .app>main.wrap.ffRequestedContacts .ffContactCategory small{position:absolute;right:8px;top:7px;min-width:20px;height:20px;display:grid;place-items:center;margin:0!important;border-radius:7px;background:#05050599;color:#ff7417!important;font-size:12px!important;font-weight:850}
+#app .app>main.wrap.ffRequestedContacts #ffContactResultsLabel{flex:none;margin:2px 0!important;font-size:12px!important;color:#fff!important}
+#app .app>main.wrap.ffRequestedContacts #ffContactStatus:empty{display:none}
+#app .app>main.wrap.ffRequestedContacts .ffContactList{display:flex!important;flex-direction:column;flex:1;min-height:0;overflow:auto;padding:0!important;gap:8px}
+#app .app>main.wrap.ffRequestedContacts .ffContactCard{flex:none}
+#app .ffContactMotivation{flex:none;min-height:95px;border:1px solid #83522d;border-radius:12px;padding:12px;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(90deg,#000c,#0003),url('home-motivation.png') center 55%/cover}
+#app .ffContactMotivation strong{font-size:18px;line-height:1.15;color:#fff}
+#app .ffContactMotivation strong span{color:#ff7417}
+#app .ffContactMotivation>small{font-size:8px;color:#fff;margin-top:7px}
+body:has(.ffRequestedContacts) #orb,body:has(.ffRequestedContacts) #nudge{display:none!important}
+/* A blue meeting strip and an independent black notice board. */
+#app .app>main.wrap .ffMeetingLaunch{background:#10293f!important;border:1px solid #367daa!important;border-radius:12px!important;overflow:hidden}
+#app .app>main.wrap .ffMeetingLaunch .ffBoardCover{background:linear-gradient(115deg,#102a43,#071727)!important}
+#app .app>main.wrap .ffMeetingLaunch .ffMeetingJoin{background:linear-gradient(120deg,#1469a6,#0a385b)!important;color:#fff!important;border-left:1px solid #4799ce!important}
+#app .app>main.wrap .ffMeetingLaunch .ffNotebookButtonLabel{background:#0b2133!important;border-color:#3c7a9f!important;color:#fff!important}
+#app .app>main.wrap .ffNoticeBoard{background:#080808!important;border-color:#8c542f!important}
+#app .app>main.wrap #ffNoticeStream>.ffNoticeOwn{background:#172934!important;border-color:#477088!important}
+#app .app>main.wrap #ffNoticeStream>.ffNoticeOther{background:#1d1d1d!important;border-color:#626262!important}
+#app .app>main.wrap #ffNoticeStream .ffNoticeAuthor{color:#9cc9e5!important;font-size:10px}
+#app .app>main.wrap #ffNoticeStream .ffNoticeBubble>b{display:block;font-size:14px!important;line-height:1.4!important;font-weight:850;margin:8px 0 5px}
+#app .app>main.wrap #ffNoticeStream .ffNoticeBubble p{color:#fff!important}
+/* Only the main dashboard date bar sticks. The daily filter belongs to its records. */
+#app .app>main.wrap #ffMonthlyComparison .ffDailyRange{position:static!important;top:auto!important;z-index:auto!important;background:#080808!important;padding:6px!important;margin:0!important}
+#app .app>main.wrap .ffDailyFilter{position:static!important;background:#080808!important;border:1px solid #7b4927;border-radius:9px;margin:8px 0;padding:0!important}
+#app .ffDailyFilter>summary{cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:6px;padding:9px;color:#fff;font-size:11px}
+#app .ffDailyFilter>summary span{color:#ff7417;font-weight:800}
+#app .ffDailyFilter>summary small{font-size:9px;color:#fff}
+#app .app>main.wrap #ffMonthlyComparison .ffSelectedPeriodSummary{background:#080808!important;border-color:#68462d!important;color:#fff!important}
+#app .app>main.wrap #ffMonthlyComparison .ffSelectedPeriodSummary>b{color:#fff!important}
+#app .app>main.wrap #ffMonthlyComparison .ffComparisonScroll :is(tr,td){background:#090909!important;color:#fff!important;border-color:#3d3025!important}
+#app .app>main.wrap #ffMonthlyComparison .ffComparisonScroll td:first-child{background:#171717!important;color:#fff!important}
+/* Restore the home tile icon treatment without changing tile order or actions. */
+#app .app:has(.homeGrid) .homeGrid .module .mi{background:#ff741714!important;color:#ff7417!important;border:1px solid #ff74174d!important;box-shadow:none!important}
+#app .app:has(.homeGrid) .homeGrid .module .mi :is(svg,path,circle,rect,line,polyline){color:#ff7417!important;stroke:#ff7417!important}
+#app .app:has(.homeGrid) .homeGrid .module{background:linear-gradient(145deg,#25180e,#100e0b)!important;color:#fff!important;border-color:#89502a!important;box-shadow:inset 0 1px #ffffff10!important}
+#app .app:has(.homeGrid) .homeGrid .module :is(b,strong,small){color:#fff!important}
+@media(max-height:700px){#app .ffContactMotivation{min-height:65px;padding:9px}#app .ffContactMotivation strong{font-size:15px}#app .app>main.wrap.ffRequestedContacts .ffContactCategory{min-height:42px!important}}
+#app .app>main.wrap.ffRequestedCatalogue .ffSearchWithFilter.ffCompactSearch[hidden],#app .app>main.wrap.ffRequestedContacts .ffContactSearchLabel.ffCompactSearch[hidden]{display:none!important}
+#app .app>main.wrap.ffRequestedCatalogue #categoryFolders.ffTwoColumnFolders .categoryFolder .ffCategorySummary{position:static!important;inset:auto!important;padding:0!important;min-height:0!important;width:100%!important;height:auto!important;background:none!important;border:0!important}
+#app .app>main.wrap.ffRequestedCatalogue #categoryFolders.ffTwoColumnFolders .categoryFolder .ffCategoryKeyword{position:static!important;inset:auto!important;display:inline!important;flex:none!important;padding:0!important;margin:0!important;width:auto!important;height:auto!important;min-height:0!important;background:none!important;border:0!important;font-size:inherit!important;line-height:1.2!important;font-weight:600!important;letter-spacing:0!important}
+
+#app .app>main.wrap .ffMeetingLaunch .ffBoardCoverTitle{display:block!important;line-height:1.35!important}
+#app .app>main.wrap .ffMeetingLaunch .ffBoardCoverTitle>span{display:inline!important}
+#app .app>main.wrap .ffMeetingLaunch .ffMeetingJoin small{color:#d9efff!important}
+#app .app>main.wrap.ffRequestedContacts #ffContactAdd.ffCompactIcon{background:#17110c!important;color:#ff7417!important;border-color:#a65a27!important}
