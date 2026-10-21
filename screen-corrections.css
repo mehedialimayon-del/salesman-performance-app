@@ -141,3 +141,5 @@ body:has(.ffFindings) #orb,body:has(.ffReports) #orb,body:has(.ffProposalPage) #
 #app .app>main.wrap #categoryFolders.ffTwoColumnFolders .categoryFolder:before,#app .app>main.wrap #categoryFolders.ffTwoColumnFolders .categoryFolder:after{display:none!important;content:none!important;background:none!important}
 #app .app>main.wrap .ffNotebookHeading h2{color:#fff!important}
 #app .app>main.wrap .ffNotebookHeading h2>span{color:#ff963f!important}
+
+#app .app>main.wrap #categoryFolders.ffTwoColumnFolders .categoryFolder>span>b{text-align:center!important;width:100%}
