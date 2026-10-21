@@ -1,0 +1,74 @@
+/* Solid black surfaces and solid text colours, inspired by the identity card. */
+:root{--orange:#ff7417;--white:#fff;--ff-deep-orange:#ff7417;--ff-pure-white:#fff;--ff-glow:0 0 10px #ff74173d,inset 0 1px 0 #ffffff0d}
+html body.ffGlowOn #app .app.ffBlackGlow{color:#fff;background:#030303}
+html body.ffGlowOn #app .app.ffBlackGlow :is(button,a.primary,a.secondary,.ffSelectTrigger){background:linear-gradient(145deg,#101010,#000)!important;background-color:#000!important;color:#fff!important;border-color:#bd5617!important;box-shadow:var(--ff-glow)!important;opacity:1}
+html body.ffGlowOn #app .app.ffBlackGlow :is(button,a.primary,a.secondary,.ffSelectTrigger):is(:hover,:focus-visible){border-color:#ff7417!important;box-shadow:0 0 15px #ff741766!important}
+html body.ffGlowOn #app .app.ffBlackGlow :is(button,.ffSelectTrigger):disabled{opacity:.65}
+html body.ffGlowOn #app .app.ffBlackGlow :is(.card,.module,.ffReportRow,.ffContactCard,.ffChatHeader,.ffChatComposer,.ffNoticeBoard,.ffIncomeHero,.ffIncomeMetrics>div,.ffIncomeOpportunity,.ffTaskScope,.ffHistoryEntry){background:linear-gradient(145deg,#0c0c0c,#000)!important;border-color:#943f14!important;box-shadow:0 0 9px #ff741723,inset 0 1px #ffffff09!important}
+html body.ffGlowOn #app .app.ffBlackGlow :is(.miniStat,.muted,small,button>small,.ffCategorySummary,.ffChatWelcome small,.brandTag){color:#fff!important;opacity:1!important}
+html body.ffGlowOn #app .app.ffBlackGlow :is(.orange,.ffAccent,.ffHeadingAccent,.ffRequestedOrange,.ffCampaignAccent,.ffNameOrange,.ffGlowOrange){color:#ff7417!important;-webkit-text-fill-color:#ff7417!important;opacity:1!important;text-shadow:none!important}
+html body.ffGlowOn #app .app.ffBlackGlow :is(.ffHeadingRest,.ffRequestedWhite,.ffCampaignWhite,.ffNameWhite,.ffGlowWhite){color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important;text-shadow:none!important}
+html body.ffGlowOn #app .app.ffBlackGlow :is(.ffGlowTitle,.ffGlowButtonLabel){font-weight:850}
+html body.ffGlowOn #app .app.ffBlackGlow .ffGlowButtonLabel,html body.ffGlowOn #app .app.ffBlackGlow .ffGlowButtonLabel *{pointer-events:none}
+html body.ffGlowOn #app .app.ffBlackGlow .ffGlowTitle>span,html body.ffGlowOn #app .app.ffBlackGlow .ffGlowButtonLabel>span{display:inline!important;background:none!important;padding:0!important;position:static!important}
+html body.ffGlowOn #app .app.ffBlackGlow :is(input,textarea,select){background:#050505!important;color:#fff!important;border-color:#a34d1b!important}
+html body.ffGlowOn #app .app.ffBlackGlow :is(input,textarea)::placeholder{color:#fff!important;opacity:.75}
+html body.ffGlowOn #app .app.ffBlackGlow .homeGrid .module{background:linear-gradient(145deg,#0d0d0d,#000)!important;border-color:#a64610!important;box-shadow:0 0 11px #ff741733,inset 0 1px #ffffff0f!important}
+html body.ffGlowOn #app .app.ffBlackGlow .homeGrid .module .mi{background:#000!important;color:#ff7417!important;border-color:#ff7417!important;box-shadow:0 0 10px #ff74174d!important}
+html body.ffGlowOn #app .app.ffBlackGlow .homeGrid .module .moduleTitle :is(.ffGlowOrange,.ffGlowWhite){font-weight:850!important}
+html body.ffGlowOn #app .app.ffBlackGlow .homeGrid .module .moduleTitle .ffGlowOrange{color:#ff7417!important}
+html body.ffGlowOn #app .app.ffBlackGlow .homeGrid .module .moduleTitle .ffGlowWhite{color:#fff!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffReportRow :is([data-r],[data-report-export]){background:#000!important;color:#fff!important;border-color:#ff7417!important;box-shadow:0 0 10px #ff74174d!important}
+html body.ffGlowOn #app .app.ffBlackGlow :is(.ffReportControls,.ffCampaignControls,.dashRange){background:#030303!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffContactTop{background:#080808!important;border-color:#943f14!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffContactTags span{background:#050505!important;border-color:#943f14!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffContactMotivation{box-shadow:0 0 10px #ff741733}
+/* Preserve full catalogue images; remove only faded caption text. */
+html body.ffGlowOn #app .app.ffBlackGlow #categoryFolders .categoryFolder{background-color:#000!important;box-shadow:0 0 9px #ff741738!important;border-color:#ff7417!important}
+html body.ffGlowOn #app .app.ffBlackGlow #categoryFolders .ffCategoryKeyword.ffRequestedOrange{color:#ff7417!important}
+html body.ffGlowOn #app .app.ffBlackGlow #categoryFolders .ffCategoryKeyword.ffRequestedWhite{color:#fff!important}
+/* Notebook is orange; Join is black on pure white. */
+html body.ffGlowOn #app .app.ffBlackGlow .ffMeetingLaunch{background:#000!important;border:1px solid #ff7417!important;box-shadow:0 0 12px #ff741744!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMeetingLaunch .ffBoardCover{background:#000!important;border-color:#ff7417!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMeetingLaunch .ffNotebookButtonLabel{background:#ff7417!important;color:#000!important;border-color:#ff7417!important;font-weight:850!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMeetingLaunch .ffMeetingJoin{background:#fff!important;color:#000!important;border-left:1px solid #fff!important;box-shadow:none!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMeetingLaunch .ffMeetingJoin :is(span,small){color:#000!important;-webkit-text-fill-color:#000!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMeetingLaunch .ffNotebookButtonLabel :is(span,small){color:#000!important;-webkit-text-fill-color:#000!important}
+html body.ffGlowOn #app .app.ffBlackGlow #ffNoticeStream .ffNoticeBubble{background:#06141d!important;border-color:#a14b19!important;box-shadow:0 0 9px #ff741723!important}
+html body.ffGlowOn #app .app.ffBlackGlow #ffNoticeStream .ffNoticeBubble p{color:#fff!important}
+/* Communication frames are black; messages keep a crisp orange edge. */
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger :is(.ffChatHeader,.ffChatThread,.ffChatComposer,.ffChatBubble,.ffChatOwn,.ffChatFile,.ffChatInputRow textarea){background:#030303!important;color:#fff!important;border-color:#bd5617!important;box-shadow:0 0 8px #ff74172b!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger .ffChatBubble p{color:#fff!important;font-size:14px!important;line-height:1.5}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger .ffChatBubble>small{color:#fff!important;font-size:10px!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger #ffChatTitle{font-size:14px!important;line-height:1.4}
+html body.ffGlowOn #app .app.ffBlackGlow .ffChatIcon.recording{border-color:#ff3c3c!important;box-shadow:0 0 12px #ff3c3c88!important}
+/* The inbox uses compact seen indicators, not tall action buttons. */
+html body.ffGlowOn #app .app.ffBlackGlow .ffNotificationPage .ffNoticeRow{display:grid!important;grid-template-columns:minmax(0,1fr) 24px!important;align-items:start;gap:7px!important;padding:12px 8px!important;margin:6px 0!important;border:1px solid #78401d!important;border-radius:11px;background:#050505!important;box-shadow:none!important;flex:none}
+html body.ffGlowOn #app .app.ffBlackGlow .ffNotificationPage .ffNoticeRow.ffNoticeUnread{border-left:3px solid #ff3838!important;box-shadow:0 0 10px #ff38382b!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffNotificationPage .ffOpenNotice{display:block;width:100%;min-width:0;min-height:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important;text-align:left!important;color:#fff!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffNotificationPage .ffOpenNotice>b{display:block!important;font-size:15px!important;line-height:1.35!important;font-weight:850!important;margin-bottom:5px}
+html body.ffGlowOn #app .app.ffBlackGlow .ffNotificationPage .ffOpenNotice>div{font-size:13px!important;line-height:1.5!important;color:#fff!important;font-weight:500}
+html body.ffGlowOn #app .app.ffBlackGlow .ffNotificationPage .ffNoticeRow small{font-size:10px!important;line-height:1.4}
+html body.ffGlowOn #app .app.ffBlackGlow .ffSeenIndicator{display:grid;place-items:center;width:22px;height:22px;min-width:22px;border-radius:50%;border:1px solid #ff3838;background:#240000;color:#ff3838!important;font-size:13px;font-weight:850;margin-top:2px}
+html body.ffGlowOn #app .app.ffBlackGlow .ffNoticeSeen .ffSeenIndicator{background:#050505;border-color:#ff7417;color:#fff!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffNoticeSeen{border-left-color:#5a3119!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffNoticeSeen .ffOpenNotice{font-weight:500!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffNotificationPage .ffHistoryScroll{padding-right:1px!important}
+/* The foreground banner follows the same black/orange/white theme. */
+html body.ffGlowOn #app #ffLiveNotice.card{background:#000!important;color:#fff!important;border-color:#ff7417!important;box-shadow:0 0 16px #ff741755!important}
+html body.ffGlowOn #app #ffLiveNotice.card strong{color:#ff7417!important}
+html body.ffGlowOn #app #ffLiveNotice.card .miniStat{color:#fff!important}
+
+html body.ffGlowOn #app .app.ffBlackGlow #categoryFolders .categoryFolder b.ffGlowTitle>span{display:inline!important;position:static!important;inset:auto!important;width:auto!important;min-height:0!important;padding:0!important;margin:0!important;background:none!important;border:0!important;font-size:inherit!important;line-height:inherit!important}
+html body.ffGlowOn #app .app.ffBlackGlow #categoryFolders .categoryFolder b.ffGlowTitle>.ffGlowOrange{color:#ff7417!important;-webkit-text-fill-color:#ff7417!important}
+html body.ffGlowOn #app .app.ffBlackGlow #categoryFolders .categoryFolder b.ffGlowTitle>.ffGlowWhite{color:#fff!important;-webkit-text-fill-color:#fff!important}
+
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffMeetingLaunch .ffMeetingJoin{background:#fff!important;color:#000!important;border-color:#fff!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffMeetingLaunch .ffMeetingJoin :is(span,small){color:#000!important;-webkit-text-fill-color:#000!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffMeetingLaunch .ffNotebookButtonLabel{background:#ff7417!important;color:#000!important;border-color:#ff7417!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffMeetingLaunch .ffNotebookButtonLabel :is(span,small){color:#000!important;-webkit-text-fill-color:#000!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap #ffBoardGiveNotice{background:#000!important;color:#fff!important;border-color:#ff7417!important;box-shadow:0 0 10px #ff741744!important}
+html body.ffGlowOn #app .app.ffBlackGlow :is(.moduleBadge,.ffStatusBadge,.moduleBadge b,.ffStatusBadge b,.taskCornerBadge){color:#fff!important;border-color:#ff7417!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffChatBubble audio{color-scheme:dark;background:#000;border-radius:20px}
+html body.ffGlowOn #app .app.ffBlackGlow :is(label,legend,.ffChatHeader label,.ffContactTags small,.ffHistoryCount,.ffZoneScope){color:#fff!important}
+html body.ffGlowOn #app .app.ffBlackGlow input::-webkit-calendar-picker-indicator{background-color:#ff7417!important;border-radius:7px;opacity:1}
