@@ -1,0 +1,31 @@
+/* Requested mobile layout: seven equal shortcuts and inset floating dialogs. */
+#app nav.bottomSeven{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:0!important;padding-left:2px!important;padding-right:2px!important}
+#app nav.bottomSeven button{min-width:0!important;padding:7px 1px!important;font-size:clamp(7px,2vw,10px)!important;overflow-wrap:normal;white-space:nowrap}
+#app nav.bottomSeven i{font-size:23px!important}
+#app .ffIdentityHero{min-height:104px!important;padding-bottom:12px!important}
+#app .ffIdentityHero .heroDate{top:43px!important;bottom:auto!important;right:8px!important;font-size:8px!important}
+#app .ffIdentityHero .ffIdentityCredit{position:absolute!important;right:8px!important;bottom:8px!important;margin:0!important;font-size:8px!important;padding:3px 5px!important;line-height:1.2!important;max-width:145px!important;white-space:nowrap}
+#app .ffIdentityCredit small{font-size:7px!important}
+#app .ffIdentityText{padding-right:2px!important}
+#app #ffHomeGreeting{font-size:clamp(12px,3.7vw,18px)!important}
+#app .ffGreetingGood{color:#ff8b2b}#app .ffGreetingTime{color:#fff}#app .ffGreetingSir{color:#e5bd67}
+#app .ffTicker{min-height:31px!important;padding-top:4px!important;padding-bottom:4px!important}
+.ffTickerBackdrop{position:fixed!important;inset:0!important;padding:clamp(20px,7vw,48px)!important;display:flex!important;align-items:center!important;justify-content:center!important;background:#0009!important;backdrop-filter:blur(7px);z-index:20000!important}
+.ffTickerBackdrop>.ffTickerDialog{position:relative!important;inset:auto!important;display:flex!important;flex-direction:column!important;width:min(100%,540px)!important;height:auto!important;min-height:200px!important;max-height:72dvh!important;border-radius:22px!important;border:1px solid #d88b46!important;background:linear-gradient(140deg,#261b13,#100e0c)!important;box-shadow:0 25px 80px #000c!important;animation:ffFloatIn .22s ease-out}
+.ffTickerDialogBody{min-height:0!important;overflow:auto!important;overscroll-behavior:contain}
+.ffTickerDialog>header,.ffTickerDialog>footer{flex:none!important}
+.ffTaskModalBackdrop{position:fixed;inset:0;z-index:22000;background:#000a;backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:clamp(22px,7vw,52px)}
+.ffTaskModal{width:min(100%,540px);max-height:76dvh;display:flex;flex-direction:column;overflow:hidden;border:1px solid #c87a36;border-radius:22px;background:linear-gradient(135deg,#2a1c12,#100e0c);box-shadow:0 24px 90px #000c;animation:ffFloatIn .22s ease-out;color:#fff}
+.ffTaskModal header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #ff9b3d44}.ffTaskModal h2{font-size:17px;margin:0;flex:1;color:#ff9a48}.ffTaskModal [data-task-close]{width:36px;height:36px;border:1px solid #d48c4e;border-radius:50%;background:#38251a;color:white;font-size:25px;flex:none}
+.ffTaskModalBody{min-height:0;overflow:auto;overscroll-behavior:contain;padding:14px 16px}.ffTaskModalBody .form{display:grid;gap:12px}.ffTaskModalBody label{display:grid;gap:6px;font-size:12px}.ffTaskModalBody input,.ffTaskModalBody select,.ffTaskModalBody textarea{min-width:0;width:100%;box-sizing:border-box;padding:10px;background:#15110f;color:#fff;border:1px solid #8e623f;border-radius:10px}.ffTaskModalBody textarea{min-height:90px}.ffTaskModalBody .primary{background:#cb570c;color:white;border:1px solid #ffac69;border-radius:12px;padding:12px;font-weight:800}.ffTaskCloseHint{font-size:10px;color:#bca38d;margin:8px 16px 0}.ffClosePrompt [data-task-close]{animation:ffClosePulse .7s ease 2}.ffClosePrompt .ffTaskCloseHint{color:#ffd079}
+#app .ffTaskPage .head h1{color:#ff8b2b!important}#app .ffTaskPage .head h1 .ffAccent{color:#fff!important}#app .ffTaskList .cardTitle{color:#ff8b2b!important;background:transparent!important}#app .ffTaskList .ffPendingLabel{color:#fff!important}#app .ffTaskScope summary small{float:right;color:#fff;font-size:10px;font-weight:500}#app .ffTaskComposer>summary{background:linear-gradient(115deg,#a64208,#df650c)!important;color:#fff!important;border:1px solid #ffb46e!important}#app .ffTaskComposer>summary span,#app .ffTaskComposer>summary b{color:#fff!important}
+#app .ffMessenger .ffChatComposer{margin:0!important;border-radius:18px!important;padding:6px!important;background:#241b15!important;gap:0!important;flex:none}
+#app .ffMessenger .ffChatInputRow{display:flex!important;align-items:flex-end!important;gap:3px!important;flex-wrap:nowrap!important}
+#app .ffMessenger .ffChatInputRow textarea{border:0!important;background:transparent!important;min-height:40px!important;flex:1!important;max-height:95px!important;padding:10px 3px!important}
+#app .ffMessenger .ffChatInputRow .ffChatIcon{width:34px!important;height:40px!important;min-width:34px!important;min-height:40px!important;padding:6px!important;flex:none!important;border-radius:50%!important;background:transparent!important;border:0!important;color:#e2c7b4!important}
+#app .ffMessenger .ffChatInputRow .ffChatSend,#app .ffMessenger .ffChatInputRow .ffChatMic{background:#e87522!important;color:white!important}
+#app .ffMessenger [hidden]{display:none!important}
+.ffAttachmentGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:15px 0}.ffAttachmentGrid button{display:flex;flex-direction:column;align-items:center;gap:8px;border:1px solid #8f603d;background:#241911;color:#ff9b4b;border-radius:15px;padding:14px 5px;font-size:26px}.ffAttachmentGrid span{font-size:10px;color:#fff;line-height:1.4}
+.ffChatDialog{max-height:75dvh!important;overflow:auto!important}.ffChatContactCard small{display:block;color:#c9ae97;font-size:10px}.ffChatContactCard a{display:block}
+@keyframes ffFloatIn{from{transform:translateY(24px) scale(.96);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}@keyframes ffClosePulse{50%{box-shadow:0 0 0 9px #ff9b3944;transform:scale(1.12)}}
+@media(prefers-reduced-motion:reduce){.ffTickerDialog,.ffTaskModal,.ffClosePrompt [data-task-close]{animation:none!important}}

@@ -2,10 +2,10 @@
 (() => {
   const layers = [];
   let serial = 0, pendingBack = 0;
-  window.FFH_OVERLAY = (element, dispose = () => element.remove()) => {
+  window.FFH_OVERLAY = (element, dispose = () => element.remove(), options = {}) => {
     const id = 'photo-' + (++serial);
     history.pushState({...history.state, ffhOverlay: id}, '', location.href);
-    const entry = {id, element, dispose};
+    const entry = {id, element, dispose, options, state: {...history.state}};
     layers.push(entry);
     return () => {
       const index = layers.indexOf(entry);
@@ -19,7 +19,7 @@
     if (pendingBack) { pendingBack--; event.stopImmediatePropagation(); return; }
     const top = layers.at(-1);
     if (top && event.state?.ffhOverlay !== top.id) {
-      layers.pop(); top.dispose(); event.stopImmediatePropagation();
+      if(top.options.closeOnly&&top.element.isConnected){history.pushState(top.state,'',location.href);top.options.onBack?.();}else{layers.pop();top.dispose();}event.stopImmediatePropagation();
     }
   }, true);
   window.FFH_OPEN_IMAGE = source => {
