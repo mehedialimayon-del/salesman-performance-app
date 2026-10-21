@@ -1,0 +1,74 @@
+name: FieldForce Hub - Windows Installer
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'windows/**'
+      - '.github/workflows/fieldforce-windows.yml'
+      - 'an-logo.png'
+permissions:
+  contents: read
+jobs:
+  windows-installer:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Create icon from the existing app logo
+        shell: pwsh
+        run: |
+          python -m pip install --quiet Pillow
+          python -c "from PIL import Image; Image.open('an-logo.png').convert('RGBA').save('windows/app.ico',sizes=[(16,16),(32,32),(48,48),(64,64),(128,128),(256,256)])"
+      - name: Build desktop host
+        shell: pwsh
+        run: |
+          dotnet build windows/FieldForceHub.Windows.csproj -c Release -o windows/publish
+          if ($LASTEXITCODE -ne 0) { throw 'Desktop build failed' }
+          if (-not (Test-Path windows/publish/FieldForceHub.exe)) { throw 'Missing executable' }
+          if (-not (Get-ChildItem windows/publish -Recurse -Filter WebView2Loader.dll)) { throw 'Missing native WebView2 loader' }
+      - name: Download verified Microsoft runtime bootstrapper
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force windows/runtime | Out-Null
+          Invoke-WebRequest 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -OutFile windows/runtime/MicrosoftEdgeWebview2Setup.exe
+          $signature = Get-AuthenticodeSignature windows/runtime/MicrosoftEdgeWebview2Setup.exe
+          if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'Microsoft Corporation') { throw 'Invalid Microsoft runtime signature' }
+          $runtime = Start-Process windows/runtime/MicrosoftEdgeWebview2Setup.exe -ArgumentList '/silent','/install' -Wait -PassThru
+          Write-Host "Microsoft runtime bootstrapper exit: $($runtime.ExitCode)"
+      - name: Compile installer
+        shell: pwsh
+        run: |
+          $iscc = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          if (-not (Test-Path $iscc)) { choco install innosetup --no-progress -y; if ($LASTEXITCODE -ne 0) { throw 'Installer compiler unavailable' } }
+          & $iscc windows/installer.iss
+          if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed' }
+      - name: Install, verify live login, and uninstall
+        shell: pwsh
+        run: |
+          $install = Join-Path $env:RUNNER_TEMP 'FieldForceHub-installed'
+          $log = Join-Path $env:RUNNER_TEMP 'ffh-install.log'
+          $setup = Start-Process dist-windows/FieldForce-Hub-Windows-Setup.exe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',"/DIR=$install","/LOG=$log" -Wait -PassThru
+          if ($setup.ExitCode -ne 0) { Get-Content $log; throw 'Silent installation failed' }
+          $exe = Join-Path $install 'FieldForceHub.exe'
+          $self = Start-Process $exe -ArgumentList '--self-test' -Wait -PassThru
+          if ($self.ExitCode -ne 0) { throw 'URL policy checks failed' }
+          $report = Join-Path $env:RUNNER_TEMP 'ffh-windows-smoke.txt'
+          $process = Start-Process $exe -ArgumentList '--smoke-test',$report -PassThru
+          if (-not $process.WaitForExit(90000)) { $process.Kill(); throw 'Installed application timed out' }
+          if (-not (Test-Path $report) -or (Get-Content $report -Raw) -notmatch '^PASS:') { if (Test-Path $report) { Get-Content $report }; throw 'Live Windows smoke test failed' }
+          Copy-Item $report dist-windows/Verification.txt
+          Copy-Item "$report.png" dist-windows/Windows-login.png
+          $remove = Start-Process (Join-Path $install 'unins000.exe') -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait -PassThru
+          if ($remove.ExitCode -ne 0 -or (Test-Path $exe)) { throw 'Uninstall check failed' }
+          $hash = Get-FileHash dist-windows/FieldForce-Hub-Windows-Setup.exe -Algorithm SHA256
+          "$($hash.Hash)  FieldForce-Hub-Windows-Setup.exe" | Set-Content dist-windows/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FieldForce-Hub-Windows-Installer
+          path: dist-windows/*
+          if-no-files-found: error
+          retention-days: 30
