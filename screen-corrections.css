@@ -1,0 +1,143 @@
+/* Orange accents, white text and dark surfaces for the requested screens. */
+#app .app>main.wrap>.head h1{background:none!important;-webkit-text-fill-color:initial!important;color:#fff!important}
+#app .app>main.wrap :is(.head h1,.ffReportRow h3,.ffContactHero h2,.ffNotebookHeading h2) .ffHeadingAccent{color:#ff963f!important;-webkit-text-fill-color:#ff963f!important}
+#app .app>main.wrap :is(.head h1,.ffReportRow h3,.ffContactHero h2,.ffNotebookHeading h2) .ffHeadingRest{color:#fff!important;-webkit-text-fill-color:#fff!important}
+#app .app>main.wrap .ffNotebookBoard{gap:5px!important}
+#app .app>main.wrap .ffNotebookBoard .ffPrivateNotebook{padding:8px!important;border-radius:12px!important}
+#app .app>main.wrap .ffNotebookHeading h2{color:#fff!important;font-size:14px!important}
+#app .app>main.wrap .ffNotebookHeading h2>span{color:#ff963f!important}
+#app .app>main.wrap .ffNotebookMeetingName{font-size:8px!important;line-height:1.3!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:2px 0 4px!important}
+#app .app>main.wrap .ffNotebookMeta{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:6px;flex:none}
+#app .app>main.wrap .ffNotebookBoard #ffNotebookForm label{font-size:9px!important;line-height:1.25}
+#app .app>main.wrap .ffNotebookBoard #ffNotebookForm :is(input,.ffSelectTrigger){height:28px!important;min-height:28px!important;margin-top:2px!important;font-size:11px!important;padding:4px 7px!important}
+#app .app>main.wrap .ffNotebookBoard #ffNotebookForm{gap:5px!important}
+#app .app>main.wrap .ffNotebookBoard #ffNotebookForm .ffNotebookWriting{min-height:100px;flex:1}
+#app .app>main.wrap .ffNotebookBoard #ffNotebookForm .ffNotebookWriting textarea{min-height:100px!important;height:100%!important;resize:none!important;font-size:14px!important;touch-action:pan-y}
+#app .app>main.wrap .ffNotebookActions button{min-height:32px!important;height:32px!important;font-size:10px!important;padding:5px 7px!important}
+#app .app>main.wrap .ffNotebookHistoryLaunch{flex:none!important;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:36px!important;font-size:11px!important;background:#2d1d12!important}
+#app .app>main.wrap .ffNotebookHistoryLaunch small{font-size:8px;color:#fff4e8}
+#app .app>main.wrap #ffNoteStatus:empty{display:none}
+.ffInsetDialog{padding:clamp(18px,5vh,60px) clamp(18px,5vw,70px)!important;align-items:stretch!important;justify-content:center;box-sizing:border-box}
+.ffInsetDialog>.globalSearchBox{width:min(720px,100%);height:100%;max-height:100%!important;min-height:0;display:flex;flex-direction:column;overflow:hidden;border:1px solid #e99342;border-radius:15px;background:#17120f;padding:12px;box-sizing:border-box}
+.ffInsetDialog header{display:flex;align-items:center;gap:8px;justify-content:space-between;flex:none;margin-bottom:9px}
+.ffInsetDialog header h2{font-size:17px!important;margin:0;color:#ffab63}
+.ffInsetDialog header [data-close]{width:32px;height:32px;min-height:32px;border:1px solid #bd8146;border-radius:8px;background:#302014;color:white;font-size:20px;flex:none}
+.ffInsetDialog form{overflow:auto;min-height:0;padding-right:2px}
+.ffNoteHistoryFilters{display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:none;margin-bottom:8px}
+.ffNoteHistoryFilters input,.ffNoteHistoryFilters select,.ffNoteHistoryFilters .ffSelectTrigger{min-width:0;width:100%;min-height:31px!important;height:31px;font-size:11px!important;padding:4px 7px!important;box-sizing:border-box}
+.ffNoteHistoryFilters input[type=search]{grid-column:1/-1}
+.ffNoteHistoryFilters button{min-height:30px;padding:4px;font-size:10px}
+.ffInsetHistoryRows,.ffIncomeHistoryPopup{flex:1;overflow:auto;min-height:0;touch-action:pan-y;overscroll-behavior:contain}
+.ffInsetHistoryRows article,.ffBinRow{padding:11px 0;border-bottom:1px solid #75502d66;overflow-wrap:anywhere}
+.ffInsetHistoryRows article>b,.ffBinRow>b{display:block;color:#fff;font-size:13px}
+.ffInsetHistoryRows article>small,.ffBinRow>small{display:block;color:#d3ab88;font-size:10px;margin:4px 0}
+.ffInsetHistoryRows article>p{white-space:pre-wrap;color:#fff0e4;font-size:12px;line-height:1.7}
+.ffInsetHistoryRows article button,.ffBinRow button{padding:6px;font-size:10px;margin-right:5px}
+/* Compact outlet counters leave most of the screen for comparisons. */
+#app .app>main.wrap .ffZeroBoard{gap:5px!important}
+#app .app>main.wrap .ffZeroSummary{display:flex;align-items:center;gap:8px;flex:none;padding:5px 8px;border:1px solid #804a27;border-radius:9px;background:#23160d;font-size:9px;color:#efddce}
+#app .app>main.wrap .ffZeroSummary b{font-size:18px;color:#ffb364}
+#app .app>main.wrap .ffZeroSummary>.ffSelectTrigger{margin-left:auto;height:29px!important;min-height:29px!important;width:auto!important;max-width:40%;font-size:10px!important;padding:3px 5px!important}
+#app .app>main.wrap .ffZeroBoard .ffScopeFilter{margin-bottom:0!important}
+#app .app>main.wrap .ffZeroBoard .ffOutletList{padding:7px!important;gap:5px!important}
+#app .app>main.wrap .ffZeroBoard .ffOutletSearch{height:33px!important;min-height:33px!important;font-size:11px!important;padding:5px 8px!important}
+#app .app>main.wrap .ffZeroBoard .cardTitle{font-size:13px!important;color:#fff!important;margin:3px 0!important}
+#app .app>main.wrap .ffZeroBoard .cardTitle>span{color:#ff9d4c}
+#app .app>main.wrap .ffZeroPeriod{font-size:8px;color:#c9ab94;margin:0 0 3px}
+#app .app>main.wrap .ffZeroOutlet{flex:none;padding:8px;border:1px solid #87542d88;border-left:3px solid #ff973c;border-radius:10px;background:linear-gradient(120deg,#2b1b10,#16120f);overflow-wrap:anywhere}
+#app .app>main.wrap .ffZeroOutletTitle{display:flex;align-items:start;gap:7px;justify-content:space-between}
+#app .app>main.wrap .ffZeroOutletTitle>b{font-size:11px;line-height:1.4;color:#fff}
+#app .app>main.wrap .ffZeroOutletTitle>span{font-size:8px;flex:none;padding:3px 5px}
+#app .app>main.wrap .ffZeroOutlet>small{font-size:8px;color:#d4b79f;display:block;margin:4px 0}
+#app .app>main.wrap .ffOutletNumbers{display:grid;grid-template-columns:1fr 1fr;gap:5px;border-top:1px solid #8c582b44;padding-top:5px}
+#app .app>main.wrap .ffOutletNumbers>span{font-size:8px;color:#c5aa94}
+#app .app>main.wrap .ffOutletNumbers b{display:block;font-size:11px;line-height:1.4;color:#fff}
+#app .app>main.wrap .ffZeroBoard .green{color:#86eeb0!important}#app .app>main.wrap .ffZeroBoard .red{color:#ff8b96!important}
+/* Reports use distinct orange View and white Excel actions. */
+#app .app>main.wrap .ffReports .ffReportRow{background:linear-gradient(110deg,#2c1b10,#171310)!important;border-color:#804b28!important;min-height:62px!important;padding:8px!important}
+#app .app>main.wrap .ffReports .ffReportRow h3{font-size:12px!important;color:#fff!important}
+#app .app>main.wrap .ffReports .ffReportRow [data-r]{background:linear-gradient(120deg,#ffaf55,#e77820)!important;border-color:#ffca8b!important;color:#251407!important;min-height:34px!important;padding:5px 8px!important;font-size:10px!important}
+#app .app>main.wrap .ffReports .ffReportRow [data-report-export]{background:linear-gradient(125deg,#fff6eb,#d9c9b9)!important;color:#25170c!important;border-color:#f4dcc1!important;min-height:34px!important;padding:5px 8px!important;font-size:10px!important}
+#app .app>main.wrap .ffReportFilterPanel{padding:0 9px!important;margin:5px 0!important}
+#app .app>main.wrap .ffReportFilterPanel>summary{min-height:34px!important;padding:7px 0!important}
+#app .app>main.wrap .ffReportSource{padding:7px 9px!important;margin:5px 0!important;font-size:10px!important}
+/* Saved salary is compact. Editing lives in Income settings. */
+#app .app>main.wrap .ffIncomeControls{gap:4px!important}
+#app .app>main.wrap .ffIncomeControls button{height:28px!important;min-height:28px!important;width:28px!important;font-size:17px!important}
+#app .app>main.wrap #ffIncomeMonth{height:28px!important;min-height:28px!important;padding:3px 6px!important;font-size:10px!important;max-width:150px}
+#app .app>main.wrap .ffIncomeHero{padding:7px 9px!important}
+#app .app>main.wrap .ffIncomeHero>strong{font-size:26px!important}
+#app .app>main.wrap .ffIncomeHero>h2{font-size:11px!important}
+#app .app>main.wrap .ffBasicSaved{display:flex;align-items:center;justify-content:space-between;padding-top:5px;margin-top:5px;font-size:9px}
+#app .app>main.wrap .ffBasicSaved>span{color:#cebbaa}
+#app .app>main.wrap .ffBasicSaved>b{color:#fff;font-size:12px}
+#app .app>main.wrap .ffIncomeLedgers summary{display:flex;align-items:center;gap:4px;padding:5px!important;line-height:1.4}
+#app .app>main.wrap .ffIncomeLedgers summary>b{margin-left:auto;font-size:9px}
+#app .app>main.wrap .ffIncomeLedgers summary button{padding:0!important;min-height:23px!important;height:23px!important;width:23px;border:1px solid #956338;border-radius:6px;font-size:14px;background:#302015;color:white}
+#app .app>main.wrap .ffIncomeLedgerRows article,#app .app>main.wrap .ffIncomeLedgerRows .card{padding:5px!important;font-size:9px!important}
+#app .app>main.wrap .ffIncomeLedgerRows :is(b,small,.miniStat){font-size:9px!important;line-height:1.4!important}
+#app .app>main.wrap .ffIncomeHistoryPopup .card{padding:10px!important;font-size:12px}
+/* Two vertical catalogue cards per row, with all seven categories and findings. */
+#app .app>main.wrap .ffCatalogueHead{gap:4px!important;margin:0 0 3px!important;min-height:28px!important}
+#app .app>main.wrap .ffCatalogueHead button{padding:3px 6px!important;font-size:9px!important;min-height:27px!important;height:27px!important}
+#app .app>main.wrap .ffCatalogueCount{font-size:10px!important}
+#app .app>main.wrap .ffCataloguePage>.ffSearchWithFilter{margin:0 0 4px!important;height:31px;flex:none}
+#app .app>main.wrap .ffCataloguePage>.ffSearchWithFilter input,#app .app>main.wrap .ffCataloguePage>.ffSearchWithFilter button{height:31px!important;min-height:31px!important;padding:4px 7px!important;font-size:10px!important}
+#app .app>main.wrap #categoryFolders.ffTwoColumnFolders{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important;gap:6px!important;flex:1;min-height:0!important;overflow:auto!important;padding:0!important}
+#app .app>main.wrap #categoryFolders.ffTwoColumnFolders>.ffCategoryWrap{min-height:0;height:100%;position:relative}
+#app .app>main.wrap #categoryFolders.ffTwoColumnFolders .categoryFolder{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:start!important;width:100%!important;height:100%!important;min-height:0!important;gap:2px;padding:4px 4px 15px!important;border-radius:11px!important;background:#18120e!important;border:1px solid #aa622d!important;overflow:hidden!important}
+#app .app>main.wrap #categoryFolders.ffTwoColumnFolders .categoryFolder img{position:static!important;display:block!important;flex:1!important;min-height:20px!important;max-height:none!important;width:100%!important;height:0!important;aspect-ratio:auto!important;object-fit:contain!important;opacity:1!important;background:transparent!important;border-radius:7px}
+#app .app>main.wrap #categoryFolders.ffTwoColumnFolders .categoryFolder>span{position:static!important;display:block!important;flex:none!important;padding:2px!important;border:0!important;background:transparent!important;min-width:0;width:100%;box-sizing:border-box;text-align:center!important}
+#app .app>main.wrap #categoryFolders.ffTwoColumnFolders .categoryFolder>span>b{display:block!important;color:#ff9f4b!important;font-size:10px!important;line-height:1.2!important;white-space:normal}
+#app .app>main.wrap #categoryFolders.ffTwoColumnFolders .categoryFolder .ffCategorySummary{position:static!important;display:block!important;padding:1px 0!important;background:transparent!important;border:0!important;font-size:8px!important;line-height:1.25!important;color:#fff3e7!important;font-weight:500;text-align:center}
+#app .app>main.wrap #categoryFolders.ffTwoColumnFolders .categoryFolder>span>small{position:absolute!important;right:5px!important;bottom:3px!important;display:block!important;font-size:7px!important;line-height:1.1!important;padding:2px 4px!important;margin:0!important;color:#ffb977!important;background:#3c2716!important;border-radius:4px}
+#app .app>main.wrap #categoryFolders.ffTwoColumnFolders .categoryFolder>em{display:none!important}
+#app .app>main.wrap #categoryFolders .ffCategoryEdit{width:22px!important;height:22px!important;min-height:22px!important;padding:0!important;top:3px!important;right:3px!important;font-size:13px!important;z-index:3}
+#app .app>main.wrap #categoryFolders .ffCompetitorTile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:9px!important;border:1px solid #ffab55;border-radius:11px;background:linear-gradient(135deg,#503016,#1c140e);color:#fff0e1;min-height:0}
+#app .app>main.wrap .ffCompetitorTile b{color:#ffa252;font-size:13px}
+#app .app>main.wrap .ffCompetitorTile span{color:#fff;font-size:9px;line-height:1.5}
+#app .app>main.wrap .ffCataloguePage>.ffCatDownloads{min-height:27px!important;margin-top:4px!important;flex:none}
+#app .app>main.wrap .ffCataloguePage>.ffCatDownloads button{height:27px!important;min-height:27px!important;font-size:9px!important;padding:4px!important}
+#app .app>main.wrap .ffCoverUnavailable:before{content:'◆';display:grid;place-items:center;color:#ff963f;font-size:30px;flex:1}
+/* Full width proposal artwork, with baked empty margins removed through CSS framing. */
+#app .app>main.wrap .ffProposalPage{margin:0 -10px;width:calc(100% + 20px)}
+#app .app>main.wrap .ffProposalHead{padding:0 10px}
+#app .app>main.wrap .ffProposalStack{gap:10px!important}
+#app .app>main.wrap .ffProposalStack .ffProposalStrip{border-radius:14px!important;overflow:hidden;background:transparent!important}
+#app .app>main.wrap .ffProposalStack .ffProposalVisual{position:relative;width:100%;aspect-ratio:3/1;background:transparent!important;border-radius:14px!important;overflow:hidden}
+#app .app>main.wrap .ffProposalVisual img.ffFramedArt{position:absolute!important;max-width:none!important;max-height:none!important;object-fit:fill!important;border-radius:0!important}
+#app .app>main.wrap .ffProposalActions{margin-top:4px!important;padding:0 3px;gap:4px!important}
+#app .app>main.wrap .ffProposalActions button{min-height:30px!important;height:30px!important;padding:4px!important;font-size:9px!important}
+#app .app>main.wrap .ffProposalActions [data-id]{color:#fff6ee!important}
+#app .app>main.wrap .ffProposalActions .primary{color:#291505!important}
+/* Contacts and management actions share orange accents and white labels. */
+#app .app>main.wrap .ffContactHero h2{color:#fff!important;font-size:19px!important}
+#app .app>main.wrap .ffContactHero{padding:13px!important;min-height:88px!important;background:linear-gradient(110deg,#3b2413,#18120e)!important}
+#app .app>main.wrap .ffContactHeroIcon{color:#ff9a48!important}
+#app .app>main.wrap .ffContactCategories .ffContactCategory{background:linear-gradient(120deg,#352013,#171310)!important;color:#fff!important;border-color:#a46633!important}
+#app .app>main.wrap .ffContactCategories .ffContactCategory small{color:#ffb371!important}
+#app .app>main.wrap .ffContactCategories .selected{border-color:#ffc07a!important;box-shadow:inset 3px 0 #ff9c43!important}
+#app .app>main.wrap .ctl.listBtn{background:linear-gradient(120deg,#382113,#15110e)!important;color:#fff!important;border:1px solid #b96d32!important;box-shadow:inset 3px 0 #ff9335!important;min-height:53px!important;padding:8px 10px!important;font-size:13px!important}
+#app .app>main.wrap .ctl.listBtn .ico{width:32px!important;height:32px!important;background:#512a10!important;color:#ffac59!important;border:1px solid #b96d32;border-radius:8px!important}
+#app .app>main.wrap .ctl.listBtn>b{color:#ff9b41!important}
+/* Market and competitor findings. */
+.ffFindingToolbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}
+.ffFindingToolbar button{font-size:11px!important;min-height:32px!important;padding:6px 8px!important}
+.ffFindingIntro{font-size:11px;color:#ddbea5;line-height:1.5}
+.ffFindingFilters{display:grid;grid-template-columns:1fr 135px;gap:6px;margin-bottom:8px}
+.ffFindingFilters input{min-width:0;font-size:11px;padding:6px;min-height:33px}
+.ffFindingCard{margin:7px 0;border:1px solid #9f5d2d;border-radius:12px;background:linear-gradient(120deg,#342011,#17120e);overflow:hidden}
+.ffFindingCard>button{display:flex;flex-direction:column;align-items:start;gap:5px;padding:12px!important;text-align:left;width:100%;background:transparent!important;border:0!important;color:white;overflow-wrap:anywhere}
+.ffFindingCard strong{font-size:14px;color:#fff}
+.ffFindingCard small,.ffFindingType{font-size:10px;color:#e1b994}
+.ffPendingPill{display:inline-block;font-size:9px;color:#ffc17f;padding:3px 6px;background:#472b12;border:1px solid #915423;border-radius:6px}
+.ffFindingDetails img{display:block;max-width:100%;max-height:280px;object-fit:contain;margin:10px auto}
+.ffFindingDetails dl{display:grid;gap:8px}
+.ffFindingDetails dl>div{border-bottom:1px solid #875b3744;padding-bottom:8px}
+.ffFindingDetails dt{font-size:10px;color:#ffb36c}
+.ffFindingDetails dd{font-size:13px;margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere;color:#fff4e8}
+body:has(.ffFindings) #orb,body:has(.ffReports) #orb,body:has(.ffProposalPage) #orb{display:none!important}
+
+#app .app>main.wrap #categoryFolders.ffTwoColumnFolders .categoryFolder:before,#app .app>main.wrap #categoryFolders.ffTwoColumnFolders .categoryFolder:after{display:none!important;content:none!important;background:none!important}
+#app .app>main.wrap .ffNotebookHeading h2{color:#fff!important}
+#app .app>main.wrap .ffNotebookHeading h2>span{color:#ff963f!important}
