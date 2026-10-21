@@ -1,0 +1,133 @@
+/* Scoped to the requested work boards. Other modules keep their existing layout. */
+#app .app>main.wrap:has(.ffWorkBoard #ffNoticeStream){height:auto!important;padding:6px 10px 8px!important;overflow:hidden!important}
+#app .ffMeetingSectionHeading,.ffNoticeBoardHeading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none}
+#app .ffMeetingSectionHeading h2,#app .ffNoticeBoardHeading h2{margin:0!important;font-size:15px!important;color:#fff!important}
+#app .ffMeetingSectionHeading h2 span,#app .ffNoticeBoardHeading h2 span{color:#ff973e}
+#app .ffWorkBoard #ffMeetingSettings{min-height:32px!important;padding:5px 10px!important;color:#ffd5b1!important;border-color:#dc893d!important;background:#382313!important}
+#app .ffMeetingShortcutGrid{max-height:150px!important;overflow:auto;flex:none}
+#app .ffMeetingLaunch{grid-template-columns:minmax(0,1fr) 112px!important;min-height:96px;border-color:#ef9b4d}
+#app .ffMeetingLaunch .ffBoardCover{display:grid!important;grid-template-columns:54px minmax(0,1fr)!important;margin:0!important;min-width:0}
+#app .ffMeetingLaunch .ffBoardCover:not(:has(img)){display:flex!important;flex-direction:column;justify-content:center;padding:8px!important}
+#app .ffMeetingLaunch .ffBoardCover img{width:54px!important;height:100%!important;min-height:96px;object-fit:contain!important;grid-row:1/3}
+#app .ffMeetingLaunch .ffBoardCoverTitle{font-size:11px!important;padding:8px 7px 3px!important;line-height:1.35;overflow-wrap:anywhere}
+#app .ffMeetingLaunch .ffBoardCover .ffNotebookButtonLabel{display:block!important;margin:2px 5px 7px!important;padding:5px!important;border:1px solid #e69a55;border-radius:6px;background:#452b16;color:#ffe9d6;font-size:9px!important;font-weight:800;line-height:1.4}
+#app .ffMeetingLaunch .ffMeetingJoin{display:flex!important;align-items:center;justify-content:center;padding:8px!important;background:linear-gradient(120deg,#ffbc59,#f17b20)!important;color:#241306!important;font-size:13px!important;font-weight:900;text-align:center;text-decoration:none}
+#app .ffMeetingJoin>span:first-child{display:block!important}
+#app .ffMeetingJoin small{display:block;font-size:9px;line-height:1.35;margin-top:6px;font-weight:600}
+#app .ffNoticeBoard{display:flex;flex-direction:column;gap:6px;flex:1;min-height:100px;overflow:hidden;border:1px solid #995b2c;border-radius:13px;background:#18120e;padding:8px}
+#app .ffNoticeBoardHeading{padding:3px 0 7px;border-bottom:1px solid #99633355}
+#app .ffNoticeBoardHeading h2{flex:1;text-align:center}
+#app .ffNoticeBoardHeading #ffBoardGiveNotice{min-height:34px!important;padding:5px 8px!important;font-size:10px!important;background:linear-gradient(120deg,#ffb354,#ee771b)!important;color:#201306!important;border-color:#ffcc8b!important}
+#app #ffBoardGiveNotice small{display:block;font-size:8px;font-weight:600}
+#app .ffWorkBoard #ffNoticeStream{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;padding:6px 2px;margin:0;border:0;border-radius:0;background:transparent;scrollbar-width:thin}
+#app #ffNoticeStream>.ffNoticeBubble{flex:none;width:88%;box-sizing:border-box;padding:9px!important;margin:0!important;box-shadow:none!important;border:1px solid #795434!important;border-radius:12px 12px 12px 2px!important;background:#2a221c!important}
+#app #ffNoticeStream>.ffNoticeOwn{align-self:flex-end;border-radius:12px 12px 2px 12px!important;background:#3a2818!important;border-color:#af7138!important}
+#app #ffNoticeStream>.ffNoticeOther{align-self:flex-start}
+#app #ffNoticeStream .ffNoticeMeta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:3px}
+#app #ffNoticeStream .ffNoticeAuthor{font-size:10px;color:#ffb878}
+#app #ffNoticeStream time{font-size:8px;color:#bfa995}
+#app #ffNoticeStream .ffNoticeBubble>b{margin-top:5px;font-size:12px!important;line-height:1.4;color:#fff4e7}
+#app #ffNoticeStream .ffNoticeBubble p{font-size:12px!important;line-height:1.5;margin:5px 0;color:#f6e9dc}
+#app #ffNoticeStream .ffBoardTools{gap:4px;padding-top:5px;margin-top:5px}
+#app #ffNoticeStream .ffBoardTools small{font-size:9px;color:#bbd7cd;margin-right:3px}
+#app #ffNoticeStream .ffBoardTools button{min-height:28px!important;height:28px!important;padding:4px 6px!important;margin:0!important;font-size:9px!important;box-shadow:none!important}
+#app .ffNoticeHint{font-size:8px;color:#c6ad96;margin:0;flex:none}
+.ffMeetingSettingsRows{max-height:55dvh;overflow:auto;margin-top:10px}
+.ffMeetingSettingsRows article{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 0;border-bottom:1px solid #75502c}
+.ffMeetingSettingsRows article b{font-size:13px;min-width:0;overflow-wrap:anywhere}
+.ffMeetingSettingsRows article>div{display:flex;gap:6px;flex:none}
+.ffNoticeComposer textarea{min-height:120px}
+.ffNoticeComposer .globalSearchBox,.ffMeetingSettings .globalSearchBox{max-height:85dvh;overflow:auto}
+/* Searchable SR/zone selectors replace horizontal lists of staff names. */
+#app .ffScopeFilter{flex:none;margin:2px 0 7px!important;padding:0!important;border:1px solid #8a512d;border-radius:10px;background:#21170f}
+#app .ffScopeFilter>summary{padding:8px 10px!important;min-height:34px!important;font-size:11px!important;cursor:pointer;overflow-wrap:anywhere;color:#ffe6d1;background:transparent!important}
+#app .ffScopeFilter>summary small{font-size:9px;margin-left:6px;color:#c5ad99}
+#app .ffScopeFilterBody{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px}
+#app .ffScopeFilterBody label{font-size:10px;min-width:0;color:#ffe0c3}
+#app .ffScopeFilterBody .ffSelectTrigger{width:100%;max-width:100%;margin-top:4px;background:#302117!important;color:#fff!important;border-color:#af743e!important}
+/* Dashboard is one long document; charts and report rows have no vertical sub-scroll. */
+#app .app>main.wrap.ffDashboardFrame{display:block!important;overflow-y:auto!important;overflow-x:hidden!important}
+#app .ffDashboardFrame>.ffDashboardTabs{display:grid!important;margin-bottom:7px!important}
+#app .ffDashboardFrame>.ffDashboardTabs button{font-size:10px!important;background:#241b15!important;color:#ffe8d6!important;border-color:#8f5931!important}
+#app .ffDashboardFrame>.ffDashboardTabs button.on{background:linear-gradient(110deg,#ffad4c,#e9771c)!important;color:#201306!important;border-color:#ffd3a1!important}
+#app .ffDashboardFrame>.dashHero{background:linear-gradient(110deg,#512c13,#261b13)!important;border:1px solid #b57037!important;min-height:48px!important;margin:7px 0!important}
+#app .ffDashboardFrame>.dashHero b{font-size:13px!important;color:#ff9d4d}
+#app .dashHero b span{display:inline;color:#fff;font-size:inherit}
+#app .dashHero small{display:block;font-size:9px;margin-top:4px;color:#dec8b8}
+#app .ffDashboardFrame>.dashRange{display:grid;margin-bottom:8px!important}
+#app .dashRange label{min-width:0;font-size:9px;color:#d8b599}
+#app .dashRange input{width:100%;margin-top:3px}
+#app .ffDashboardFrame>.refKpis{margin:8px 0!important;gap:8px}
+#app .ffDashboardFrame .refKpi{height:auto!important;min-height:100px!important;padding:10px!important;overflow:visible!important;box-sizing:border-box;display:flex;flex-direction:column;gap:4px;box-shadow:inset 0 1px #ffffff15!important}
+#app .ffDashboardFrame .refKpi span{font-size:10px!important;line-height:1.4}
+#app .ffDashboardFrame .refKpi strong{font-size:clamp(16px,4.8vw,23px)!important;line-height:1.3!important;margin:0!important;overflow-wrap:anywhere;word-break:normal}
+#app .ffDashboardFrame .refKpi strong em{font-size:11px;font-style:normal;color:#ff9f9f}
+#app .ffDashboardFrame .refKpi small{font-size:9px!important;line-height:1.45;color:#e1cdbf!important;margin-top:auto}
+#app .ffDashboardFrame .greenPanel{background:linear-gradient(135deg,#144535,#152820)!important;border-color:#418e6e!important}
+#app .ffDashboardFrame .orangePanel{background:linear-gradient(135deg,#633814,#2d2116)!important;border-color:#d88b37!important}
+#app .ffDashboardFrame .bluePanel{background:linear-gradient(135deg,#1e3d58,#1c2735)!important;border-color:#538ab9!important}
+#app .ffDashboardFrame .redPanel{background:linear-gradient(135deg,#51232b,#2d1920)!important;border-color:#bd5965!important}
+#app .ffDashboardFrame .violetPanel{background:linear-gradient(135deg,#44305b,#272035)!important;border-color:#9e78c4!important}
+#app .ffDashboardFrame .red{color:#ff8f99!important}
+#app .ffDashboardFrame .green{color:#8ef0b4!important}
+#app .ffDashboardFrame .dashTwo{display:grid;grid-template-columns:1fr!important;gap:9px;margin:10px 0!important}
+#app .ffDashboardFrame :is(.dashTwo>.card,.ffDashboardFocus,#ffMonthlyComparison){height:auto!important;max-height:none!important;overflow:visible!important;padding:12px!important}
+#app .ffDashboardFrame .refChart{height:180px!important;min-height:180px!important;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;align-items:end;overflow:visible!important;margin:18px 0 20px!important}
+#app .ffTrendColumn{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;min-width:0}
+#app .ffTrendColumn>b{font-size:8px;line-height:1.3;overflow-wrap:anywhere;text-align:center;color:#ffe5cb}
+#app .ffTrendColumn>.bar{width:65%;min-height:3px;max-height:135px;background:linear-gradient(#ffbf63,#f17b20);border-radius:5px 5px 0 0;flex-shrink:1}
+#app .ffTrendColumn>small{position:static!important;font-size:8px;color:#d3b9a3}
+#app .ffDashboardFrame .donutWrap{min-height:180px;flex-direction:row;justify-content:space-around}
+#app .ffDashboardFrame .legend{font-size:11px;gap:9px}
+#app .ffDashboardFocus article{padding:10px 0;border-bottom:1px solid #75502f55}
+#app .ffDashboardFocus article b{display:block;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+#app .ffDashboardFocus article small{display:block;font-size:10px;margin-top:4px;color:#cfb69f}
+#app .ffComparisonScroll{max-height:none!important;overflow-y:visible!important;overflow-x:auto!important}
+#app #ffMonthlyComparison .kpis{height:auto!important;max-height:none!important;overflow:visible!important}
+#app #ffMonthlyComparison .kpi{min-height:95px;height:auto!important;overflow:visible;padding:10px!important}
+#app #ffMonthlyComparison .kpi strong{font-size:18px;overflow-wrap:anywhere}
+#app #ffMonthlyComparison .kpi small{font-size:10px;line-height:1.45}
+/* Income reserves space for the claim buttons; only histories and requests scroll. */
+#app .app>main.wrap:has(.ffIncomeBoard){overflow:hidden!important}
+#app .ffIncomeBoard{display:grid!important;grid-template-rows:auto auto auto auto minmax(60px,1fr) auto;gap:5px!important;flex:1;min-height:0!important;height:100%;overflow:hidden}
+#app .ffIncomeHero{padding:8px 10px!important}
+#app .ffIncomeHero h2{font-size:12px!important;margin:3px 0!important}
+#app .ffIncomeHero>strong{font-size:27px!important;line-height:1.15}
+#app .ffIncomeBasic{padding-top:5px;margin-top:5px}
+#app .ffIncomeBasic label small{font-size:8px}
+#app .ffIncomeMetrics>div{padding:7px!important}
+#app .ffIncomeMetrics b{font-size:14px;margin-top:3px}
+#app .ffIncomeOpportunity{min-height:0;padding:7px 9px!important;overflow:auto;gap:3px;max-height:110px}
+#app .ffIncomeOpportunity>b{font-size:11px}
+#app .ffIncomeOpportunity>span{font-size:10px}
+#app .ffIncomeLedgers{min-height:0!important;overflow:hidden}
+#app .ffIncomeLedgers>details{min-height:0;overflow:hidden;display:flex!important;flex-direction:column}
+#app .ffIncomeLedgers summary{flex:none;font-size:10px;padding:6px}
+#app .ffIncomeLedgerRows{height:calc(100% - 28px)!important;min-height:0!important;max-height:none!important;padding:4px;overflow:auto}
+#app #ffIncomeExtras{display:flex;flex-direction:column;gap:5px;min-height:0}
+#app #ffIncomeExtras>details{margin:0!important;max-height:150px;overflow:auto;flex:none;order:2}
+#app #ffIncomeExtras>details>summary{min-height:28px!important;font-size:10px!important;padding:6px 8px!important}
+#app #ffIncomeExtras .ffClaimLaunchCards{flex:none;order:1;gap:6px!important}
+#app #ffIncomeExtras .ffLongAction{height:44px!important;min-height:44px!important;max-height:44px!important;padding:6px!important;background:linear-gradient(120deg,#653b17,#302016)!important;border-color:#d69c5e!important;color:#fff!important}
+/* The complete proposal artwork sits inside one consistent rounded card size. */
+#app .ffProposalStack{display:grid;gap:14px}
+#app .ffProposalStrip{position:relative;min-width:0;overflow:hidden;border-radius:17px!important;background:transparent!important}
+#app .ffProposalVisual{width:100%;aspect-ratio:3/1;overflow:hidden;border-radius:17px!important;display:flex;align-items:center;justify-content:center;background:#080808!important}
+#app .ffProposalVisual img{display:block!important;width:100%!important;height:100%!important;max-height:100%!important;object-fit:contain!important;border-radius:17px}
+#app .ffProposalGenerated{width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(115deg,#3e2310,#17100c);color:#ffbe76}
+#app .ffProposalGenerated span{font-size:12px;color:#fff;margin-top:8px}
+#app .ffProposalActions{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:6px;flex-wrap:wrap}
+#app .ffProposalActions button{flex:1;min-height:32px!important;padding:5px 7px!important;font-size:9px!important}
+#app .ffProposalActions .primary{background:linear-gradient(120deg,#ffb65b,#ee7921)!important;color:#251407!important;border-color:#ffc77d!important}
+#app .ffProposalDots{position:absolute;top:5px;right:5px;z-index:2}
+#app .ffProposalHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+#app .app>main.wrap:is(.ffDashboardFrame,:has(.ffWorkBoard),:has(.ffIncomeBoard),:has(.ffProposalPage),:has(.ffCampaignHub))>.head h1{background:linear-gradient(90deg,#ff963f 0 42%,#fff3e8 60%);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:#fff!important}
+#app .ffCpoShell .ffCampaignCard strong{color:#ffab54!important}
+#app .ffCpoShell .ffCampaignCard small{color:#fff1e5!important}
+@media(min-width:650px){#app .ffDashboardFrame .dashTwo{grid-template-columns:1fr 1fr!important}}
+@media(max-height:700px){#app .ffIncomeBoard{grid-template-rows:auto auto auto auto minmax(38px,1fr) auto;gap:4px!important}#app .ffIncomeHero{padding:6px 8px!important}#app .ffIncomeHero>strong{font-size:24px!important}#app .ffIncomeHero>p{margin:2px 0!important}#app .ffIncomeHero h2{font-size:11px!important}#app .ffIncomeBasic label small{display:none}#app .ffIncomeOpportunity>b{font-size:10px}#app .ffIncomeMetrics>div{padding:5px!important}#app .ffMeetingShortcutGrid{max-height:106px!important}}
+@media(max-height:540px){#app .app>main.wrap:has(.ffIncomeBoard){overflow:auto!important}#app .ffIncomeBoard{height:auto!important;min-height:425px!important}}
+
+body:has(.ffNoticeBoard) #orb,body:has(.ffNoticeBoard) #nudge{display:none!important}
+
+@media(max-width:600px){#app .ffDashboardFrame .ffComparisonScroll{overflow:visible!important}#app .ffDashboardFrame .ffComparisonScroll table{display:block;width:100%;min-width:0!important}#app .ffDashboardFrame .ffComparisonScroll thead{display:none}#app .ffDashboardFrame .ffComparisonScroll tbody{display:grid;gap:8px}#app .ffDashboardFrame .ffComparisonScroll tr{display:grid;grid-template-columns:1fr 1fr;min-width:0;border:1px solid #8a5a3455;border-radius:10px;overflow:hidden;background:#231912}#app .ffDashboardFrame .ffComparisonScroll td{display:block;min-width:0;white-space:normal;font-size:11px!important;padding:8px!important;overflow-wrap:anywhere}#app .ffDashboardFrame .ffComparisonScroll td:first-child{grid-column:1/-1;font-weight:800;background:#493019;color:#fff4e4}#app .ffDashboardFrame .ffComparisonScroll td:before{content:attr(data-label);display:block;font-size:8px;color:#cdb49e;margin-bottom:3px}}
