@@ -1,3 +1,4 @@
+importScripts('campaign-image-cache.js?v=20261021-1');
 /* Shared FieldForce + OneSignal worker at the GitHub Pages app scope. */
 self.addEventListener('notificationclick',event=>{
  if(!event.notification?.data?.ffhLocal)return;
