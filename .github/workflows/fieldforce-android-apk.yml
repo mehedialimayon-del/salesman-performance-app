@@ -186,6 +186,7 @@ jobs:
           node tests/black-glow-ui.cjs || ffh_browser_status=1
           node tests/inbox-visible-read-ui.cjs || ffh_browser_status=1
           node tests/directory-scroll-ui.cjs || ffh_browser_status=1
+          node tests/assistant-speech-ui.cjs || ffh_browser_status=1
           exit "$ffh_browser_status"
 
       - name: Preserve controlled report layout screenshots

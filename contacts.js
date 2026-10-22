@@ -6,7 +6,7 @@ const mailIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" wi
 root.FFH_CONTACT_ICON=bookIcon;
 root.FFH_CREATE_CONTACTS=ctx=>{
  const {FFH_SUPABASE:sb,esc,shell,back,bindBack,q,qa}=ctx;
- let rows=[],version=null,undo=null,loading=0,saving=false,category=null,searchTerm='';
+ let loadFlight=null;let rows=[],version=null,undo=null,loading=0,saving=false,category=null,searchTerm='';
  const categories=[['management','Management'],['manager','Manager'],['dic','DIC'],['accounts','Accounts'],['delivery','DM / Deliveryman'],['marketing','Marketing'],['spro','SPRO'],['others','Others']];
  const slogans={management:'Higher authority. Clear decisions.',manager:'Sales solutions. Problems resolved.',dic:'Invoice, stock & distribution support.',accounts:'Bills, incentives & penalty support.',delivery:'Your route. Safe product delivery.',marketing:'Market insight. Stronger growth.',spro:'Product solutions. Expert support.',others:'Additional support. One connected team.'};
  const buyers=root.FFH_CREATE_BUYERS?.({...ctx,returnHome:()=>{category=null;searchTerm='';home();}});
@@ -23,11 +23,14 @@ root.FFH_CREATE_CONTACTS=ctx=>{
  const input=(name,title,value='',extra='')=>`<label>${title}<input name="${name}" value="${esc(value??'')}" ${extra}></label>`;
  const setStatus=(s,error=false)=>{const el=q('#ffContactStatus');if(el){el.textContent=s;el.setAttribute('role',error?'alert':'status');}};
  async function load(){
-  const ticket=++loading;
-  const {data,error}=await sb.from('ffh_contacts').select('contacts,version').eq('id',1).single();
-  if(error)throw Error('Contacts could not load. '+error.message);
-  if(ticket!==loading)return false;
-  rows=Array.isArray(data.contacts)?data.contacts:[];version=data.version;return true;
+  if(loadFlight)return loadFlight;
+  loadFlight=(async()=>{const ticket=++loading;let lastError;
+   for(let attempt=0;attempt<2;attempt++){
+    try{const {data,error}=await sb.from('ffh_contacts').select('contacts,version').eq('id',1).single();if(error)throw error;if(!data)throw Error('Contacts are unavailable.');if(ticket!==loading)return false;rows=Array.isArray(data.contacts)?data.contacts:[];version=data.version;return true;}
+    catch(e){lastError=e;if(attempt||!/fetch|network|timeout/i.test(e.message||''))break;await new Promise(resolve=>setTimeout(resolve,700));}
+   }
+   throw Error('Unable to connect. Tap ↻ to try again.');
+  })();try{return await loadFlight;}finally{loadFlight=null;}
  }
  function postTitle(text){const words=String(text).trim().split(/\s+/),n=Math.ceil(words.length/2);return '<span class="ffRequestedOrange">'+esc(words.slice(0,n).join(' '))+'</span>'+ (words.length>n?' <span class="ffRequestedWhite">'+esc(words.slice(n).join(' '))+'</span>':'');}
  function contactCard(p){
@@ -80,8 +83,8 @@ root.FFH_CREATE_CONTACTS=ctx=>{
  async function home(selected=null){
   category=typeof selected==='string'?selected:null;searchTerm='';
   ctx.setPage('contacts');
-  shell(back('Company Contacts')+'<div class="card"><p>Loading company contacts…</p><p id="ffContactStatus" role="status"></p><button id="ffContactRetry" class="secondary">RETRY</button></div>');bindBack();q('#ffContactRetry').onclick=home;
-  try{await load();render();}catch(e){if(active())setStatus(e.message,true);}
+  const cached=version!==null;if(cached)render('Refreshing contacts…');else shell(back('Company Contacts')+'<div class="card"><p>Loading company contacts…</p><p id="ffContactStatus" role="status"></p><button id="ffContactRetry" class="secondary">RETRY</button></div>');bindBack();q('#ffContactRetry')?.addEventListener('click',()=>home(category));
+  try{await load();render();}catch(e){if(active())setStatus(cached?'Connection interrupted · showing last loaded contacts. Tap ↻ to retry.':e.message,!cached);}
  }
  function edit(id){
   if(!owner()){ctx.setPage('contacts');render();return;}
@@ -128,7 +131,7 @@ root.FFH_CREATE_CONTACTS=ctx=>{
    return await ctx.uploadPublic(new File([blob],'contact-'+root.crypto.randomUUID()+'.jpg',{type:'image/jpeg'}),'contacts');
   }finally{URL.revokeObjectURL(url);}
  }
- async function refresh(){if(!active()||saving||document.activeElement?.id==='ffContactSearch')return;try{const previous=version;await load();if(version!==previous){const draw=()=>render();root.FFH_KEEP_VIEW?root.FFH_KEEP_VIEW(draw,active):draw();}}catch(e){if(active())setStatus(e.message,true);}}
+ async function refresh(){if(!active()||saving||document.activeElement?.id==='ffContactSearch')return;try{const previous=version;await load();setStatus('');if(version!==previous){const draw=()=>render();root.FFH_KEEP_VIEW?root.FFH_KEEP_VIEW(draw,active):draw();}}catch(e){if(active())setStatus(version!==null?'Connection interrupted · showing last loaded contacts. Tap ↻ to retry.':e.message,version===null);}}
  async function search(term){await load();const found=visible().filter(p=>matches(p,String(term).trim()));if(!found.length)return false;searchTerm=String(term).trim();category=null;ctx.setPage('contacts');ctx.navigate('contacts',()=>render());return true;}
  async function lookup(term){await load();return copy(visible().filter(p=>matches(p,String(term).trim())));}
  return {home,edit,refresh,search,lookup};
