@@ -1,61 +1,30 @@
-# Sales Performance Hub
+# HomeForce — Ayon Family
 
-A mobile-first PWA prototype for four Sales Representatives + one Manager.
+A Bengali household app for six people, using Sites-hosted ChatGPT identity, D1 records and private R2 proof photos. Orange/navy responsive design with installable web manifest.
 
-## What already works in demo mode
-- Individual SR login (demo PINs)
-- Manager can switch between SRs
-- Daily sales entry
-- Manual Last Month Same Day, Active Order and PPR for Trip
-- SKU/carton entry
-- Monthly outlet target + targeted SKU planning
-- Automatic achievement / shortfall / growth calculation
-- Outlet-wise push list
-- Incentive progress (sold / target / remaining / reward)
-- Manager special tasks
-- Excel-style summary board
-- CSV export that opens in Excel
-- Installable PWA shell / mobile app-like UI
-- Data stored in browser localStorage for demo
+## Included
 
-## Demo users
-- manager / 2468
-- sayem / 1111
-- bappi / 2222
-- wasif / 3333
-- jamil / 4444
+- Six member dashboards, three editable teams, owner-controlled member emails and writing permissions.
+- Four-week meal roster transcribed from the supplied sheet: morning rice by 08:30, lunch by 14:00, dinner by 23:00, individual daytime cooks and team dinner assignments.
+- Sunday-only cleaning: team 1, team 2, team 3, Ayon + Shahriar, anchored 2026-10-25.
+- Add/reassign tasks, proof photo upload, submit/approve/reopen and dated audit trail.
+- Shopping list with quantity and assigned shopper; expenses entered separately.
+- Exact-cent equal/custom splits, loan and repayment ledger, settlement suggestions, void-with-reason history.
+- Fixed per-person bill templates with explicit posting after payment; duplicate-month protection.
+- Notices, read/unread inbox, in-app reminders, optional browser reminders while open.
+- Month-based report, Excel-compatible UTF-8 CSV, browser print/PDF.
+- 15-second refresh, revision-based conflict detection. Financial entries are not queued offline.
 
-## Put your actual data in
-Edit `app.js` > `CONFIG`:
-1. Replace the four salesman names.
-2. Replace `outlets` with your outlet list.
-3. Replace sample products with your actual 65 SKUs.
-4. Put product images inside `assets/products/` and set each product `image`, e.g. `assets/products/mango.png`.
-5. Set incentive target and RM reward per product.
+## Access and operational limits
 
-## Publish free on GitHub Pages
-Create a new repository such as `sales-performance-app`, upload these files, then Settings > Pages > deploy from the main branch/root.
+The Site starts owner-private. The first authorized owner starts the household. Other members need their own email assigned and Site viewer access; dashboard preview selection does not impersonate a member or create a login. Platform authentication is enforced on every API and image request. A development-only identity allows local QA; production does not use it.
 
-Do NOT store private sales data, PINs, passwords, API secrets or Google credentials in the GitHub repository. GitHub Pages is a public static frontend. Keep real data and authorization in the backend.
+The app is a hosted web/PWA app, not a compiled Android APK. Closed-app push scheduling and native APK packaging are not included. Browser notifications require the page open and permission granted. Device-local notification deduplication stores only reminder IDs. No offline private-data cache is used.
 
-## Google Sheets backend
-The `backend/Code.gs` file is a starter Apps Script backend.
+## Validation
 
-1. Open the Google Sheet that should become the master database.
-2. Extensions > Apps Script.
-3. Paste `backend/Code.gs`.
-4. Run `setupWorkbook()` once and authorize.
-5. Deploy > New deployment > Web app.
-6. Configure access only as broadly as your chosen authentication design requires.
-7. Copy the `/exec` URL.
-8. Paste it into `CONFIG.apiUrl` in `app.js`.
-9. Wire the frontend `save...` functions to the included `api()` helper before using real data.
+`node node_modules/typescript/bin/tsc --noEmit`
 
-### Production security note
-The included frontend logins are only a UI demo. Before real use, move authentication and authorization to the server. Every backend request must verify which SR is signed in and must only return that SR's records. The manager role may return all four.
+`node --experimental-strip-types tests/ledger.mts`
 
-## True push notifications
-The current prototype has in-app task badges. If you need notifications while the app is completely closed, add Firebase Cloud Messaging (FCM) or another Web Push service and save one push token per SR.
-
-## Excel by email
-The backend contains `emailXlsx_()` showing how the Apps Script owner can export the current Google Sheet as `.xlsx` and email it as an attachment. Restrict this function to authorized users before production.
+Run the Sites build helper and deploy through the source workflow. Schema migration lives under `drizzle/`. Local QA data is separate from hosted production records.
