@@ -17,7 +17,7 @@ public class MainActivity extends Activity {
   TextView brand=new TextView(this);brand.setText("HomeForce");brand.setTextSize(34);brand.setTextColor(Color.rgb(18,35,59));brand.setGravity(Gravity.CENTER);root.addView(brand);
   TextView subtitle=new TextView(this);subtitle.setText("আমাদের বাসা। আমাদের দায়িত্ব।\n৬ জন সদস্য · ৩টি টিম\n\nরান্না • পরিষ্কার • বাজার • হিসাব");
   subtitle.setTextSize(17);subtitle.setTextColor(Color.rgb(100,119,144));subtitle.setGravity(Gravity.CENTER);subtitle.setPadding(0,28,0,34);root.addView(subtitle);
-  Button open=new Button(this);open.setText("অ্যাপ খুলুন");open.setTextColor(Color.WHITE);open.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(237,130,68)));open.setOnClickListener(v->openHome());root.addView(open,new LinearLayout.LayoutParams(-1,60));
+  Button open=new Button(this);open.setText("অ্যাপ খুলুন");open.setTextColor(Color.WHITE);open.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(237,130,68)));open.setOnClickListener(v->openHome());root.addView(open,new LinearLayout.LayoutParams(-1,(int)(56*getResources().getDisplayMetrics().density)));
   TextView note=new TextView(this);note.setText("\nইন্টারনেট ও নিজের ChatGPT সাইনইন লাগবে।\nHomeForce নিরাপদ ব্রাউজারে খুলবে।");note.setTextSize(12);note.setGravity(Gravity.CENTER);note.setTextColor(Color.rgb(128,144,164));root.addView(note);
   setContentView(root);if(state==null)openHome();
  }
@@ -26,7 +26,7 @@ public class MainActivity extends Activity {
    Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(APP_URL));
    Bundle extras=new Bundle();extras.putBinder("android.support.customtabs.extra.SESSION",null);
    extras.putInt("android.support.customtabs.extra.TOOLBAR_COLOR",Color.rgb(18,35,59));
-   extras.putBoolean("android.support.customtabs.extra.TITLE_VISIBILITY",true);
+   extras.putInt("android.support.customtabs.extra.TITLE_VISIBILITY",1);
    intent.putExtras(extras);startActivity(intent);
   } catch (android.content.ActivityNotFoundException e) { Toast.makeText(this,"আগে Chrome বা একটি ব্রাউজার ইনস্টল করুন",Toast.LENGTH_LONG).show(); }
  }
