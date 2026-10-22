@@ -1,0 +1,64 @@
+/* Matching photographic category campaigns, with readable central labels. */
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedCatalogue #categoryFolders #ffCompetitorFindings{position:relative!important;isolation:isolate;overflow:hidden!important;min-height:100px!important}
+html body.ffGlowOn #app .app.ffBlackGlow #ffCompetitorFindings>.ffCompetitorArt{display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:fill!important;z-index:0!important;pointer-events:none}
+html body.ffGlowOn #app .app.ffBlackGlow #ffCompetitorFindings>:is(b,span){position:relative!important;z-index:1!important;text-shadow:0 1px 5px #000}
+/* Two rows of company contacts, one buyer row, and a shorter readable banner. */
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactHero{display:flex!important;flex:none!important;align-items:center!important;gap:8px!important;min-height:40px!important;height:50px!important;padding:5px 8px!important;margin:0!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactHero .ffContactHeroIcon{display:block!important;width:25px!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactHero :is(small,p){display:none!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactHero h2{font-size:14px!important;margin:0!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffBuyerCategories>h2{display:block!important;font-size:16px!important;line-height:1.2!important;margin:3px 0 7px!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory{height:clamp(66px,10.5dvh,92px)!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactMotivation{flex:none!important;min-height:70px!important;height:clamp(70px,11dvh,96px)!important;padding:10px!important;background-position:center 55%!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactMotivation strong{font-size:clamp(16px,4.4vw,21px)!important;line-height:1.15!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactMotivation small{font-size:9px!important;line-height:1.3!important}
+/* Whole designation in orange; whole name in white; complete words in tags. */
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactTop :is(h2,h2 *){color:#ff7417!important;-webkit-text-fill-color:#ff7417!important;word-break:normal!important;overflow-wrap:normal!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactTop h2{display:block!important;font-size:14px!important;line-height:1.3!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactIdentity :is(h3,h3 *){color:#fff!important;-webkit-text-fill-color:#fff!important;word-break:normal!important;overflow-wrap:normal!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactTags{grid-column:1 / -1!important;grid-template-columns:1fr!important;gap:5px!important;margin-top:5px!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactTags>span{min-width:0!important;padding:7px 9px!important;border-radius:8px!important;overflow:visible!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactTags b{display:block!important;width:100%!important;white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;line-height:1.2!important;margin:0!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactTags small{font-size:8px!important;white-space:nowrap!important;letter-spacing:0!important}
+/* Currency numbers carry the visual weight; units stay small. */
+html body.ffGlowOn #app .app.ffBlackGlow .ffMoney{display:inline-flex!important;align-items:baseline!important;gap:.24em!important;white-space:nowrap!important;font-size:inherit!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMoney>.ffMoneyUnit{font-size:.58em!important;font-weight:600!important;color:#ff7417!important;-webkit-text-fill-color:#ff7417!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMoney>.ffMoneyValue{font-size:1.28em!important;font-weight:850!important;color:#fff!important;-webkit-text-fill-color:#fff!important;line-height:1.2!important}
+html body.ffGlowOn #app .app.ffBlackGlow :is(.moduleBadge,.ffStatusBadge,.topNotifyBadge,.navBadge) .ffNumber{font-size:1.15em!important;font-weight:850!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffStatusBadge .ffCounterUnit{font-size:.7em!important}
+/* Leave as much tracking height as possible for the map. */
+html body.ffGlowOn #app .app.ffBlackGlow .ffTrackingCard>.cardTitle{display:none!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffTrackingCard>.miniStat{font-size:8px!important;line-height:1.2!important;margin:0!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffTrackingCard>.two{gap:6px!important;flex:none!important;margin:0!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffTrackingCard>.two label{font-size:9px!important;margin:0!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffTrackingCard>.two :is(input,select,.ffSelectTrigger){height:30px!important;min-height:30px!important;padding:5px 8px!important;font-size:11px!important;margin-top:3px!important}
+html body .ffMapFullscreen{background:#080808!important;color:#fff!important;border:1px solid #ff7417!important;box-shadow:0 0 8px #0008!important;border-radius:6px!important;width:34px!important;height:34px!important;padding:0!important;font-size:23px!important;cursor:pointer}
+html body .ffMapFullOverlay{position:fixed;inset:0;z-index:70000;display:flex;flex-direction:column;background:#050505;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+html body .ffMapFullOverlay #ffDutyMap{display:block!important;width:100%!important;flex:1!important;min-height:0!important;height:auto!important;margin:0!important;border-radius:0!important}
+html body .ffMapFullClose{flex:none;align-self:flex-end;padding:10px 16px;border:1px solid #ff7417;border-radius:7px;background:#080808;color:#fff;font-size:13px;margin:6px}
+/* Plain chat text, quiet receipts, and the notice board's dark blue surfaces. */
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger .ffChatThread{background:#05080a!important;box-shadow:inset 0 0 30px #06141d88!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger .ffChatBubble{background:#06141d!important;border-color:#754122!important;box-shadow:0 0 8px #ff741715!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger .ffChatBubble.ffChatOwn{background:#0b2230!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger .ffChatBubble p,
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger .ffChatBubble p *{color:#e9edef!important;-webkit-text-fill-color:#e9edef!important;font-size:12px!important;font-weight:400!important;line-height:1.5!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger .ffChatBubble>small,
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger .ffChatBubble>small *{color:#aebac1!important;-webkit-text-fill-color:#aebac1!important;font-size:8px!important;font-weight:400!important;line-height:1.3!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger .ffChatSender{display:block!important;color:#d0d8de!important;-webkit-text-fill-color:#d0d8de!important;font-size:9px!important;font-weight:600!important;line-height:1.3!important;margin-bottom:4px!important;padding-right:23px}
+html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger .ffChatSender::before{content:'●';color:#69d39c;margin-right:5px;font-size:7px}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedCatalogue #categoryFolders #ffCompetitorFindings{min-height:120px!important;border-radius:14px!important}
+html body.ffGlowOn #app .app.ffBlackGlow #ffCompetitorFindings>b{font-size:clamp(13px,3.8vw,18px)!important;line-height:1.2!important}
+html body.ffGlowOn #app .app.ffBlackGlow #ffCompetitorFindings>span{font-size:clamp(7px,2vw,10px)!important;line-height:1.2!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap:has(.ffTrackingCard)>.head{min-height:26px!important;margin-bottom:4px!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap:has(.ffTrackingCard)>.head h1{font-size:18px!important;line-height:1.2!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffTrackingCard{padding:8px!important;gap:5px!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffTrackingAccess{padding:6px!important;font-size:10px!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffTrackingAccess>summary{padding:6px!important;min-height:20px!important;font-size:10px!important}
+html body.ffGlowOn #app .app.ffBlackGlow .ffTrackingAccess>summary small{display:none!important}
+html body.ffGlowOn #app .app.ffBlackGlow #ffAttendanceProof{max-height:28px!important;font-size:9px!important}
+html body.ffGlowOn #app .app.ffBlackGlow #ffStopList .cardTitle{font-size:12px!important;line-height:1.2!important;margin:0!important}
+html body .ffMapFullscreen{display:grid!important;place-items:center!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedCatalogue #categoryFolders #ffCompetitorFindings>.ffCompetitorArt{z-index:1!important;opacity:1!important;visibility:visible!important;background:transparent!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedCatalogue #categoryFolders #ffCompetitorFindings>:is(b,span){z-index:2!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedCatalogue #categoryFolders #ffCompetitorFindings.ffCompetitorTile>b,
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedCatalogue #categoryFolders #ffCompetitorFindings.ffCompetitorTile>b span{font-size:clamp(13px,3.9vw,18px)!important;line-height:1.2!important}
