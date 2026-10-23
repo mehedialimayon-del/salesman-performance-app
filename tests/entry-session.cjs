@@ -10,7 +10,7 @@ const {JSDOM}=require('jsdom'),fs=require('node:fs'),assert=require('node:assert
  hidden=true;w.FFH_APP_VISIBILITY(true);now+=2000;hidden=false;w.FFH_APP_VISIBILITY(false);tick();assert.equal(shows,2,'app return on home greets once');entry.schedule();tick();assert.equal(shows,2);
  page='sales';hidden=true;w.FFH_APP_VISIBILITY(true);now+=2000;hidden=false;w.FFH_APP_VISIBILITY(false);tick();assert.equal(shows,2,'no greeting on child screen');page='home';entry.schedule();tick();assert.equal(shows,3);
  entry.schedule();hidden=true;w.FFH_APP_VISIBILITY(true);now+=100;hidden=false;w.FFH_APP_VISIBILITY(false);tick();assert.equal(shows,3,'brief system overlay does not repeat');
- id='M2';entry.schedule();tick();assert.equal(shows,4,'different account greets');
+ id='M2';entry.schedule();tick();assert.equal(shows,4,'different account greets');entry.reset();entry.schedule();tick();assert.equal(shows,5,'explicit same-account login greets again');
  w.eval(fs.readFileSync('session-recovery.js','utf8'));let outcome,signouts=0;
  const auth={getSession:async()=>({data:{session:{user:{id:'auth'}}}}),signOut:async options=>{assert.equal(options.scope,'local');signouts++;}};
  const run=profile=>w.FFH_RESTORE_SESSION({auth,profile,ready:()=>outcome='ready',signedOut:()=>outcome='login',unavailable:()=>outcome='retry'});

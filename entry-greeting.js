@@ -15,5 +15,5 @@ window.FFH_CREATE_ENTRY_GREETING=function({user,page,show,dismiss}){
  }
  document.addEventListener('visibilitychange',()=>visibility(document.hidden));
  window.FFH_APP_VISIBILITY=visibility;
- return{schedule};
+ return{schedule,reset:()=>{clearTimeout(timer);identity=null;pending=true;dismiss();}};
 };
