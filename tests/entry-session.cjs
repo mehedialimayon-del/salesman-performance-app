@@ -1,0 +1,23 @@
+const {JSDOM}=require('jsdom'),fs=require('node:fs'),assert=require('node:assert/strict');
+(async()=>{
+ const dom=new JSDOM('',{url:'https://mehedialimayon-del.github.io/salesman-performance-app/',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window;
+ let now=10000,timer,hidden=false,page='home',id='M1',shows=0;
+ w.Date.now=()=>now;w.setTimeout=f=>(timer=f,1);w.clearTimeout=()=>{timer=null;};Object.defineProperty(w.document,'hidden',{get:()=>hidden});
+ w.eval(fs.readFileSync('entry-greeting.js','utf8'));
+ const entry=w.FFH_CREATE_ENTRY_GREETING({user:()=>id,page:()=>page,show:()=>shows++,dismiss(){}}),tick=()=>{const f=timer;timer=null;f?.();};
+ entry.schedule();entry.schedule();tick();assert.equal(shows,1);
+ for(let n=0;n<5;n++){page='sales';entry.schedule();tick();page='home';entry.schedule();tick();}assert.equal(shows,1,'internal returns never repeat greeting');
+ hidden=true;w.FFH_APP_VISIBILITY(true);now+=2000;hidden=false;w.FFH_APP_VISIBILITY(false);tick();assert.equal(shows,2,'app return on home greets once');entry.schedule();tick();assert.equal(shows,2);
+ page='sales';hidden=true;w.FFH_APP_VISIBILITY(true);now+=2000;hidden=false;w.FFH_APP_VISIBILITY(false);tick();assert.equal(shows,2,'no greeting on child screen');page='home';entry.schedule();tick();assert.equal(shows,3);
+ entry.schedule();hidden=true;w.FFH_APP_VISIBILITY(true);now+=100;hidden=false;w.FFH_APP_VISIBILITY(false);tick();assert.equal(shows,3,'brief system overlay does not repeat');
+ id='M2';entry.schedule();tick();assert.equal(shows,4,'different account greets');
+ w.eval(fs.readFileSync('session-recovery.js','utf8'));let outcome,signouts=0;
+ const auth={getSession:async()=>({data:{session:{user:{id:'auth'}}}}),signOut:async options=>{assert.equal(options.scope,'local');signouts++;}};
+ const run=profile=>w.FFH_RESTORE_SESSION({auth,profile,ready:()=>outcome='ready',signedOut:()=>outcome='login',unavailable:()=>outcome='retry'});
+ await run(async()=>({active:true}));assert.equal(outcome,'ready');await run(async()=>{throw Error('offline')});assert.equal(outcome,'retry');assert.equal(signouts,0);
+ await run(async()=>({active:false}));assert.equal(outcome,'login');assert.equal(signouts,1);
+ auth.getSession=async()=>({error:{status:429,code:'over_request_rate_limit'}});await run(()=>{});assert.equal(outcome,'retry');
+ auth.getSession=async()=>({error:{status:400,code:'refresh_token_already_used'}});await run(()=>{});assert.equal(outcome,'login');
+ auth.getSession=async()=>({data:{session:null}});await run(()=>{});assert.equal(outcome,'login','new device needs authentication');
+ dom.window.close();console.log('PASS app-entry greeting, navigation, background/foreground, accounts, persistent session recovery and revocation');
+})().catch(e=>{console.error(e);process.exit(1)});
