@@ -1,8 +1,6 @@
 /* Recent conversations occupy the screen until a thread is selected. */
-#app .ffMessenger:not(.ffConversationOpen){grid-template-rows:minmax(0,1fr)!important}
-#app .ffMessenger:not(.ffConversationOpen) .ffChatHeader{display:flex;flex-direction:column;min-height:0;overflow:hidden}
 #app .ffMessenger [hidden]{display:none!important}
-#app .ffMessenger .ffConversationList{overflow-y:auto;min-height:0;flex:1;overscroll-behavior:contain;margin-top:10px}
+#app .ffMessenger .ffConversationList{overflow-y:auto;min-height:0;max-height:none;flex:1;overscroll-behavior:contain;margin-top:10px}
 #app .ffConversationRow{display:flex;align-items:center;gap:10px;width:100%;min-height:76px;padding:12px 5px!important;border:0!important;border-bottom:1px solid #bd925333!important;border-radius:0!important;background:transparent!important;text-align:left;color:#eee4d6;box-shadow:none!important}
 #app .ffConversationAvatar{display:grid;place-items:center;width:42px;height:42px;flex:none;border-radius:50%;background:#4a3821;color:#ffd28e;font-size:19px;font-weight:750}
 #app .ffConversationPreview{flex:1;min-width:0}
@@ -15,6 +13,4 @@
 #app .ffConversationUnread .ffConversationPreview small{color:#f1dfc3;font-weight:650}
 #app .ffMessenger .ffConversationsBack{padding:5px 8px!important;min-height:30px!important;font-size:11px!important;margin:0 5px 3px!important}
 
-html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger:not(.ffConversationOpen) .ffChatHeader{flex-direction:column!important;align-items:stretch!important;min-height:0!important}
-html body.ffGlowOn #app .app.ffBlackGlow .ffMessenger:not(.ffConversationOpen) :is(.ffChatIdentity,.ffChatSelectors){flex:0 0 auto!important}
 html body.ffGlowOn #app .app.ffBlackGlow .ffConversationList{width:100%;min-width:0}
