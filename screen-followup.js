@@ -14,3 +14,14 @@ const close=()=>{picker.open=false;};grid.addEventListener('click',e=>{if(e.targ
 }
 new MutationObserver(enhance).observe(document.body,{childList:true});enhance();
 })();
+
+/* Save the profile once; reopen its editor from the settings control. */
+(()=>{'use strict';const savedKey='ffh.aiProfile.saved.v1';
+function enhanceProfile(){const form=document.getElementById('kbForm');if(!form||form.dataset.ffProfileReady)return;form.dataset.ffProfileReady='1';const card=form.closest('.card');card.classList.add('ffAiProfileCard');const bar=document.createElement('div');bar.className='ffAiProfileBar';const identity=document.createElement('div'),name=document.createElement('strong'),designation=document.createElement('small'),settings=document.createElement('button');identity.append(name,designation);settings.type='button';settings.className='ffAiProfileSettings';settings.textContent='⚙';settings.setAttribute('aria-label','AI Profile Settings');settings.title='AI Profile Settings';bar.append(identity,settings);form.before(bar);
+const values=()=>Object.fromEntries(new FormData(form));const signature=()=>{const v=values();return JSON.stringify([v.creator,v.designation,v.company]);};const refresh=()=>{const v=values();name.textContent=v.creator||'AI Profile';designation.textContent=v.designation||'';};
+function setEditing(editing){form.hidden=!editing;settings.setAttribute('aria-expanded',String(editing));const button=form.querySelector('button');if(button&&card.dataset.profileSaved)button.textContent='SAVE CHANGES';}refresh();let saved=false;try{saved=localStorage.getItem(savedKey)===signature();}catch(_){}if(saved)card.dataset.profileSaved='1';setEditing(!saved);settings.onclick=()=>{const editing=form.hidden;setEditing(editing);if(editing)form.querySelector('input')?.focus();};
+form.addEventListener('ffh:ai-profile-saved',()=>{card.dataset.profileSaved='1';try{localStorage.setItem(savedKey,signature());}catch(_){}refresh();setEditing(false);bar.scrollIntoView?.({block:'nearest'});});
+}
+const originalAlert=window.alert;window.alert=function(message){const form=document.getElementById('kbForm');if(message==='AI Knowledge saved for all SR.'&&form?.dataset.ffProfileReady){form.dispatchEvent(new Event('ffh:ai-profile-saved'));return;}return originalAlert.call(window,message);};
+new MutationObserver(enhanceProfile).observe(document.getElementById('app'),{childList:true,subtree:true});enhanceProfile();
+})();
