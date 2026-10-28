@@ -1,27 +1,53 @@
-/* The directory uses the available frame; compact screens can still scroll. */
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding{gap:7px!important;padding-bottom:0!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory{height:clamp(80px,11dvh,106px)!important;gap:4px!important;padding:7px 3px!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory em{display:block!important;color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:clamp(7px,1.8vw,10px)!important;line-height:1.2!important;font-style:normal!important;font-weight:400!important;margin:0!important;max-width:100%;white-space:normal;overflow-wrap:normal}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactMotivation{flex:0 0 auto!important;box-sizing:border-box!important;min-height:80px!important;height:clamp(80px,11dvh,110px)!important;margin:0!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffOfficeCard{flex:1 0 auto;min-height:176px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;margin:0;padding:10px;border:1px solid #a35d2d;border-radius:13px;background:radial-gradient(ellipse at 50% 15%,#6a351a55,transparent 65%),linear-gradient(125deg,#140e0a,#050505 50%,#191008);box-shadow:inset 0 1px #ffbe6d25,0 0 12px #ff74171c;color:#fff}
-#app .ffOfficeHeader{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:7px;margin-bottom:8px;border-bottom:1px solid #a35d2d66}
-#app .ffOfficeHeader>span{color:#ff9b50;font-size:10px;font-weight:850;letter-spacing:1.5px}
-#app .ffOfficeHeader>small{color:#e5c2a7;font-size:8px}
-#app .ffOfficeColumns{display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);gap:7px;align-items:center;flex:1}
-#app .ffOfficeColumns address{min-width:0;display:flex;flex-direction:column;gap:3px;font-style:normal;font-size:clamp(8px,2.05vw,11px);line-height:1.4;overflow-wrap:anywhere}
-#app .ffOfficeColumns address:last-child{border-left:1px solid #a35d2d66;padding-left:8px}
-#app .ffOfficeColumns address strong{font-size:clamp(10px,2.45vw,14px);line-height:1.25;color:#fff}
-#app .ffOfficeColumns address p{font-size:inherit;line-height:1.45;margin:4px 0;color:#ded3c9}
-#app .ffOfficeColumns address a{display:block;color:#f9d4b2!important;text-decoration:none;line-height:1.45;padding:1px 0}
-#app .ffOfficeColumns address span{color:#b9a798;font-size:inherit}
-#app .ffOfficeCountry{font-size:clamp(7px,1.7vw,9px);font-weight:800;letter-spacing:.6px;color:#ff9b50}
-#app .ffOfficeRegistration{color:#b9a798;font-size:clamp(7px,1.6vw,9px)}
-#app .ffOfficeBrand{display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;min-width:0}
-#app .ffOfficeBrand>span{font-size:8px;font-weight:850;color:#ffc787;letter-spacing:.4px}
-#app .ffOfficeBrand>small{font-size:7px;color:#d3b39a;white-space:nowrap}
-/* Show the original supplied logo inside a viewport without modifying the image. */
-#app .ffPranLogo{position:relative;width:48px;height:44px;overflow:hidden;isolation:isolate;border-radius:50%;box-shadow:0 0 16px #ff871c33}
+/* A fixed directory frame: three generous tile rows and two slim office cards. */
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding{display:flex!important;flex-direction:column!important;overflow:hidden!important;gap:7px!important;padding:0!important;container-type:size}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactHero{height:44px!important;min-height:44px!important;flex:none!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding>.ffContactCategories{flex:2 1 0!important;min-height:0!important;grid-template-rows:repeat(2,minmax(0,1fr))!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffBuyerCategories{flex:1 1 24px!important;display:flex!important;flex-direction:column!important;min-height:0!important;gap:6px!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffBuyerCategories>h2{flex:none!important;line-height:20px!important;margin:0!important;font-size:16px!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffBuyerCategories>.ffContactCategories{flex:1 1 0!important;min-height:0!important;grid-template-rows:minmax(0,1fr)!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory{height:100%!important;min-height:0!important;padding:6px 3px!important;gap:5px!important;box-sizing:border-box!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory :is(svg,.ffContactTileIcon){width:30px!important;height:30px!important;min-height:0!important;flex-shrink:1!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory :is(.ffContactTileName,.ffContactTileName span){font-size:clamp(10px,2.9vw,14px)!important;line-height:1.15!important;margin:0!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory em{display:block!important;color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:clamp(7px,1.9vw,10px)!important;line-height:1.2!important;font-style:normal!important;font-weight:400!important;margin:0!important;max-width:100%;white-space:normal;overflow-wrap:normal;flex:none}
+#app .ffContactMotivation{display:none!important}
+#app .ffOfficeStack{flex:0 0 auto;display:grid;gap:7px;min-width:0}
+#app .ffOfficeStack .ffOfficeCard{display:grid;grid-template-columns:minmax(0,1fr) 55px;align-items:center;gap:9px;min-height:94px;box-sizing:border-box;margin:0;padding:8px 10px;border:1px solid #9d572b;border-radius:12px;background:radial-gradient(at right center,#75401d33,transparent 55%),linear-gradient(115deg,#17100b,#060504);box-shadow:inset 0 1px #ffbe6d22,0 0 9px #ff74171a;color:#fff}
+#app .ffOfficeStack address{display:flex;flex-direction:column;gap:2px;min-width:0;font-style:normal;font-size:clamp(8px,2.15vw,11px);line-height:1.3;overflow-wrap:anywhere}
+#app .ffOfficeStack address strong{font-size:clamp(11px,3vw,15px);line-height:1.25;color:#fff}
+#app .ffOfficeStack address p{font-size:inherit;line-height:1.35!important;margin:2px 0!important;color:#e1d5cb}
+#app .ffOfficeCountry{font-size:clamp(7px,1.8vw,9px);letter-spacing:.5px;font-weight:800;color:#ffa35b}
+#app .ffOfficeCountry>span{font-weight:400;color:#c9ab94;letter-spacing:0}
+#app .ffOfficeLinks{display:flex;flex-wrap:wrap;column-gap:9px;row-gap:2px;font-size:inherit;line-height:1.3}
+#app .ffOfficeLinks>a,#app .ffOfficeLinks>span{max-width:100%}
+#app .ffOfficeLinks a{color:#e8c8a9!important;text-decoration:none;line-height:inherit;padding:0!important}
+#app .ffOfficeLinks>span{color:#bda794}
+#app .ffOfficeBrand{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;text-align:center;border-left:1px solid #98512455;padding-left:7px}
+#app .ffOfficeBrand>span{font-size:8px;font-weight:800;color:#ffc787;white-space:nowrap}
+#app .ffOfficeBrand>small{font-size:7px;color:#c7aa92;white-space:nowrap}
+/* Display the supplied logo without changing the source image. */
+#app .ffPranLogo{position:relative;width:48px;height:44px;overflow:hidden;isolation:isolate;border-radius:50%;box-shadow:0 0 12px #ff871c22}
 #app .ffPranLogo img{position:absolute!important;width:246px!important;height:auto!important;max-width:none!important;left:-20px;top:-5px;display:block}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactDetail .ffOfficeStack{display:none!important}
+/* Reduce spacing only when the available frame is short. */
+@container(max-height:570px){
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory{padding:4px 2px!important;gap:3px!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory :is(svg,.ffContactTileIcon){width:24px!important;height:24px!important}
+#app .ffOfficeStack{gap:5px}
+#app .ffOfficeStack .ffOfficeCard{padding:6px 9px;min-height:84px}
+#app .ffOfficeStack address{font-size:8px}
+}
+@container(max-height:440px){
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactHero{height:34px!important;min-height:34px!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory{padding:2px!important;gap:2px!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory :is(svg,.ffContactTileIcon){width:18px!important;height:18px!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory :is(.ffContactTileName,.ffContactTileName span){font-size:9px!important;line-height:1.05!important}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory em{font-size:6px!important;line-height:1.1!important}
+#app .ffOfficeStack .ffOfficeCard{padding:4px 7px;min-height:76px;grid-template-columns:minmax(0,1fr) 45px;gap:5px}
+#app .ffOfficeStack address{font-size:7px;gap:1px}
+#app .ffOfficeStack address strong{font-size:10px}
+#app .ffOfficeCountry{font-size:6px}
+#app .ffOfficeBrand>small{display:none}
+}
 /* Editable posts belong to the name column, centered in the portrait's height. */
 html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactIdentity{grid-template-columns:clamp(104px,33vw,154px) minmax(0,1fr)!important;align-items:stretch!important;column-gap:12px!important}
 html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard :is(.ffContactPhotoButton,.ffContactIdentity>.ffContactInitial){grid-column:1!important;grid-row:1!important;width:100%!important;height:auto!important;aspect-ratio:1}
@@ -33,19 +59,4 @@ html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactPost
 html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactPosts>span{display:flex;align-items:center;justify-content:center;min-width:0;min-height:42px;box-sizing:border-box;padding:8px 6px;border-radius:9px;background:linear-gradient(145deg,#153e53,#081b2b)!important;border:1px solid #3d7894!important;box-shadow:inset 0 1px #b3e7ff22,0 3px 10px #0005;color:#e0f6ff!important;-webkit-text-fill-color:#e0f6ff!important;font-size:clamp(10px,2.6vw,14px);font-weight:750;line-height:1.4;text-align:center;overflow-wrap:anywhere}
 html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactPosts>span:nth-child(2){background:linear-gradient(145deg,#493057,#201225)!important;border-color:#896096!important;color:#f7e1ff!important;-webkit-text-fill-color:#f7e1ff!important}
 html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactDetail .ffOfficeCard{display:none!important}
-@media(min-width:600px){#app .ffOfficeColumns{grid-template-columns:minmax(0,1fr) 66px minmax(0,1fr);gap:14px}#app .ffOfficeColumns address{font-size:12px}#app .ffOfficeHeader>small{font-size:10px}}
-/* Keep the three rows legible while reserving room for both office addresses. */
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory{height:clamp(70px,8.6dvh,86px)!important;padding:4px 2px!important;gap:3px!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory :is(svg,.ffContactTileIcon){width:22px!important;height:22px!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory :is(.ffContactTileName,.ffContactTileName span){font-size:clamp(9px,2.6vw,12px)!important;line-height:1.1!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory em{font-size:clamp(6.5px,1.75vw,9px)!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactMotivation{height:80px!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffOfficeColumns address{font-size:clamp(7.5px,1.95vw,10px)!important;gap:2px!important;line-height:1.3!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffOfficeColumns address p{line-height:1.35!important;margin:3px 0!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffOfficeColumns address a{line-height:1.35!important;padding:0!important}
-@media(max-height:820px){
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding{gap:5px!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactCategory{height:64px!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactHero{height:42px!important;min-height:42px!important}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap.ffRequestedContacts .ffContactLanding .ffContactMotivation{height:68px!important;min-height:68px!important}
-}
+@container(max-height:440px){#app .ffOfficeBrand{padding-left:3px}#app .ffPranLogo{width:40px;height:37px}#app .ffPranLogo img{width:205px!important;left:-17px;top:-4px}#app .ffOfficeBrand>span{font-size:7px}}
