@@ -4,7 +4,7 @@ const symbols={management:'<circle cx="24" cy="12" r="5"/><circle cx="9" cy="17"
 root.FFH_CONTACT_TILE_ICON=id=>'<svg class="ffContactTileIcon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(symbols[id]||symbols.others)+'</svg>';
 root.FFH_CREATE_BUYERS=ctx=>{
  const {FFH_SUPABASE:sb,esc,shell,back,bindBack,q,qa}=ctx;
- const groups=[['management','Management','Outlet leadership. Clear decisions.'],['buyer','Buyer','Buyers & supervisors. Stronger partnerships.'],['staff','Staff','Day & night teams. Everyday support.'],['new','New Listing Buyer','New outlets. Your next opportunity.']];
+ const groups=[['management','Management','Outlet leadership'],['buyer','Buyer','Buying support'],['staff','Staff','Daily support'],['new','New Listing Buyer','New opportunities']];
  let group='buyer',items=[],outlets=[],people=[],ticket=0,saving=false,term='';
  const active=()=>ctx.page()==='buyerContacts';
  const status=(s,error=false)=>{const e=q('#ffBuyerStatus');if(e){e.textContent=s;e.setAttribute('role',error?'alert':'status');}};
