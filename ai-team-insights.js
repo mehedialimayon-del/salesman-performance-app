@@ -9,11 +9,11 @@ const bangla=[[/লিমন|লেমন/gu,'limon'],[/রাসেল|রস�
 function transliterate(s){let z=' '+norm(s)+' ';for(const [re,value] of bangla)z=z.replace(re,' '+value+' ');return norm(z);}
 const number=x=>Number(x)||0;
 const money=x=>'RM '+number(x).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
-const TEAM=/(ranking|rank|leaderboard|compare|comparison|which.*(?:sr|staff)|best.*(?:sr|staff)|worst.*(?:sr|staff)|team.*performance|সবার|সবাই|সকল|তুলনা|র‍্যাঙ্ক|র্যাঙ্ক|পিছিয়ে|পিছিয়ে|পেছনে|পিছনে|পিছে|পিসি|সেরা|আগে|সবচেয়ে|সবচেয়ে|কোন.*(?:এসআর|স্যার|sr)|কে.*(?:কম|বেশি|ভালো|আগে|পিছ))/iu;
+const TEAM=/(ranking|rank|leaderboard|compare|comparison|which.*(?:sr|staff)|best.*(?:sr|staff)|worst.*(?:sr|staff)|team.*performance|সবার|সবাই|সকল|তুলনা|র‍্যাঙ্ক|র্যাঙ্ক|পিছিয়ে|পিছিয়ে|পেছনে|পিছনে|পিছে|পিসি|সেরা|সবচেয়ে|সবচেয়ে|কোন.*(?:এসআর|স্যার|sr)|কে.*(?:কম|বেশি|ভালো|আগে|পিছ))/iu;
 const FULL=/(full.*(?:data|detail|report)|complete.*(?:data|detail)|all.*details|ফুল.*(?:ডাটা|ডেটা|তথ্য|রিপোর্ট)|পুরো.*(?:ডাটা|ডেটা|তথ্য)|সম্পূর্ণ.*(?:তথ্য|বিস্তারিত)|সব.*তথ্য|বিস্তারিত|ডিটেইল)/iu;
 const INCOME=/(income|salary|commission|earning|ইনকাম|বেতন|কমিশন|আয়|আয়)/iu;
 const DATA=/(sales?|target|achievement|performance|income|salary|commission|orders?|outlet|zero|shortfall|ranking|rank|সেল|বিক্রি|টার্গেট|অর্জন|পারফরম্যান্স|পারফরমেন্স|ইনকাম|আয়|আয়|বেতন|কমিশন|অর্ডার|আউটলেট|জিরো|শর্টফল|পিছ|পেছ|পিসি|হিসাব|ডাটা|তথ্য|রিপোর্ট)/iu;
-const OWN=/^(আমার|আমাকে|আমি|my|mine|নিজের)(\s|$)/iu;
+const OWN_DIRECT=/^(আমার|my)\s+(?:(?:এই|গত)\s*মাসের?\s+|আজকের?\s+)?(?:সেলস?|বিক্রি|ইনকাম|আয়|আয়|বেতন|কমিশন|টার্গেট|জিরো|sales?|income|salary|target|zero)(?:\s|$)/iu;
 function matchedPeople(q,people){
  const phrase=transliterate(q),tokens=new Set(words(phrase)),list=[];
  for(const p of people){
@@ -93,13 +93,13 @@ root.FFH_CREATE_APP_ANSWERS=ctx=>{
   let text='অনুমোদিত SR Performance · '+range+'\nRanking: '+(comparable?'Target achievement %':'Confirmed delivered sales (কিছু Target সেট নেই)')+'\n';
   text+=sorted.map((r,i)=>(i+1)+'. '+r.name+' · '+money(r.delivered)+(r.target>0?' · '+r.achievement.toFixed(2)+'%':'')+' · Zero outlets '+r.zero+'/'+r.assigned).join('\n');
   if(missing.length)text+='\nInput পাওয়া যায়নি ('+missing.length+' জন): '+missing.map(x=>x.name).join(', ')+'. এদের 0 sales ধরে rank করিনি।';
-  else if(sorted.length>1&&sorted[0].delivered===sorted.at(-1).delivered)text+='\nসবার confirmed sales সমান; কাউকে নিশ্চিতভাবে পিছিয়ে বলা যাচ্ছে না 😄।';
-  if(sorted.length>1&&sorted[0].delivered!==sorted.at(-1).delivered)text+='\nএখন '+sorted.at(-1).name+' পিছিয়ে আছেন ('+(comparable?'achievement':'delivered amount')+' অনুযায়ী)। Pending ও missing input যাচাই করুন।';
+  else if(sorted.length>1&&(comparable?sorted[0].achievement===sorted.at(-1).achievement:sorted[0].delivered===sorted.at(-1).delivered))text+='\nসবার তুলনাযোগ্য পারফরম্যান্স সমান; কাউকে নিশ্চিতভাবে পিছিয়ে বলা যাচ্ছে না 😄।';
+  if(sorted.length>1&&(comparable?sorted[0].achievement!==sorted.at(-1).achievement:sorted[0].delivered!==sorted.at(-1).delivered))text+='\nএখন '+sorted.at(-1).name+' পিছিয়ে আছেন ('+(comparable?'achievement':'delivered amount')+' অনুযায়ী)। Pending ও missing input যাচাই করুন।';
   text+='\nসঠিক ইনপুট হলে ranking আপডেট হবে।';
   return wrap(ctx,text,[['reports','SR PERFORMANCE REPORT'],['dashboard','DASHBOARD খুলুন']]);
  }
  return {...base,answer:async question=>{
-  if(!DATA.test(question))return base.answer(question);
+  if(!DATA.test(question)||(!TEAM.test(question)&&!FULL.test(question)&&OWN_DIRECT.test(norm(question))))return base.answer(question);
   // Do not treat 'my Limon income' as personal income; resolve the named SR first.
   try{
    const result=await teamAnswer(question);
