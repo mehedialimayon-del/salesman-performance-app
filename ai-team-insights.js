@@ -100,7 +100,7 @@ root.FFH_CREATE_APP_ANSWERS=ctx=>{
  }
  return {...base,answer:async question=>{
   if(!DATA.test(question))return base.answer(question);
-  if(!TEAM.test(question)&&!FULL.test(question)&&OWN.test(norm(question)))return base.answer(question);
+  // Do not treat 'my Limon income' as personal income; resolve the named SR first.
   try{
    const result=await teamAnswer(question);
    return result||base.answer(question);
