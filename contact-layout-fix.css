@@ -1,0 +1,25 @@
+/* Contact details: centered department and split orange/white headings */
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactTop h2.ffContactDesignation{
+ display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;
+ gap:3px!important;text-align:center!important;line-height:1.35!important;
+ white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important;
+}
+.ffContactCard .ffContactDesignationLine{display:block!important;max-width:100%;font-weight:850}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactTop h2.ffContactDesignation .ffContactAccent,
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactIdentity h3 .ffContactAccent{
+ color:#ff7417!important;-webkit-text-fill-color:#ff7417!important;
+}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactTop h2.ffContactDesignation .ffContactRest,
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffContactCard .ffContactIdentity h3 .ffContactRest{
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+}
+.ffContactCard .ffContactNamePanel{min-width:0;width:100%;text-align:center!important;justify-self:center}
+.ffContactCard .ffContactNamePanel h3{display:block!important;text-align:center!important;margin:0 0 6px!important;line-height:1.35!important;overflow-wrap:break-word!important;word-break:normal!important}
+.ffContactCard .ffContactDepartment{display:block;width:100%;max-width:100%;box-sizing:border-box;margin:5px auto 3px;padding:5px 7px;
+ text-align:center!important;color:#fff!important;font-size:clamp(10px,3vw,13px);font-weight:700;
+ border:1px solid #ff741755;border-radius:10px;background:#ff741711;white-space:normal;overflow-wrap:break-word;word-break:normal;
+}
+@media(max-width:380px){
+ .ffContactCard .ffContactIdentity{grid-template-columns:minmax(95px,116px) minmax(0,1fr)!important;column-gap:9px!important}
+ .ffContactCard .ffContactPhotoButton,.ffContactCard .ffContactPhoto,.ffContactCard .ffContactInitial{max-width:100%!important;width:100%!important}
+}
