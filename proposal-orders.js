@@ -144,32 +144,6 @@ async function openComposer(chain){
   };
  }catch(err){const box=pane('Create Proposal',`<div class="ffPoMessage"><strong>PDF SKU reading failed</strong><p>${H(err.message)}</p><button type="button" id="ffPoRetryAuto">↻ TRY PDF READING AGAIN</button></div>`);box.querySelector('#ffPoRetryAuto').onclick=()=>{cache.delete(chain.key);openComposer(chain)};box.querySelector('.ffPoClose').focus();}
 }
-async function openSetup(chain){
- if(!chain.manage)return;
- loading('Manage SKU Template');
- try{
-  const staffId=await identify();const lines=await getTemplate(chain);
-  const rows=lines.map(l=>`${l.code} | ${l.name}`).join('\n');
-  const box=pane('SKU Template Setup',banner(chain)+`<form id="ffPoTemplateForm" class="ffPoForm"><p class="ffPoHelp">Copy the exact Item Codes and Product Names from the original uploaded PDF. Put one item on each line using: <b>ITEM CODE | PRODUCT NAME</b>. Changes affect new proposals only; saved history stays unchanged.</p><label>Fixed SKU List<textarea name="lines" rows="12" spellcheck="false" placeholder="123456 | Product name">${H(rows)}</textarea></label><p class="ffPoHelp">Maximum 200 items. Do not include Balance Stock or Proposed Order here.</p><footer class="ffPoActions"><button type="submit" class="ffPoPrimary">SAVE FIXED SKU LIST</button><button type="button" id="ffPoBackToCreate">BACK</button></footer><p id="ffPoSetupStatus" role="status"></p></form>`);
-  box.querySelector('#ffPoBackToCreate').onclick=()=>openComposer(chain);
-  box.querySelector('form').onsubmit=async e=>{
-   e.preventDefault();const form=e.target,btn=form.querySelector('[type=submit]'),status=box.querySelector('#ffPoSetupStatus');
-   try{
-    btn.disabled=true;
-    const lines=form.elements.lines.value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map((line,i)=>{
-      const p=line.indexOf('|');if(p<1||p===line.length-1)throw Error('Line '+(i+1)+' must contain ITEM CODE | PRODUCT NAME');
-      const code=line.slice(0,p).trim(),name=line.slice(p+1).trim();
-      if(!code||!name||code.length>80||name.length>250)throw Error('Invalid SKU in line '+(i+1));
-      return {code,name};
-    });
-    if(!lines.length||lines.length>200)throw Error('Enter 1 to 200 SKUs.');
-    const seen=new Set();for(const line of lines){if(seen.has(line.code))throw Error('Duplicate item code: '+line.code);seen.add(line.code);}
-    const {error}=await API().from('ffh_proposal_item_templates').upsert({chain_key:chain.key,chain_name:chain.name,lines,updated_by:staffId,updated_at:new Date().toISOString()},{onConflict:'chain_key'});
-    if(error)throw error;cache.set(chain.key,lines);await openComposer(chain);
-   }catch(err){status.textContent=err.message;btn.disabled=false;}
-  };
- }catch(err){pane('SKU Template Setup',`<div class="ffPoMessage">${H(err.message)}</div>`)}
-}
 function printable(r,chain){
  const lines=Array.isArray(r.lines)?r.lines:[];
  const rows=lines.map((l,i)=>`<tr style="border-bottom:1px solid #b1b1b1"><td style="padding:8px;border:1px solid #bbb;text-align:center">${i+1}</td><td style="padding:8px;border:1px solid #bbb">${H(l.code)}</td><td style="padding:8px;border:1px solid #bbb">${H(l.name)}</td><td style="padding:8px;border:1px solid #bbb;text-align:center">${l.balance===null||l.balance===undefined?'':H(l.balance)}</td><td style="padding:8px;border:1px solid #bbb;text-align:center">${l.proposed===null||l.proposed===undefined?'':H(l.proposed)}</td></tr>`).join('');
