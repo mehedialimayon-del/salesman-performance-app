@@ -72,3 +72,5 @@ body.ffProposalModalOn{overflow:hidden!important}
 
 /* Keep the PDF export progress overlay visible above the proposal editor. */
 body.ffProposalModalOn>.globalSearchOverlay{z-index:300000!important}
+
+.ffPoSyncStatus{display:inline-flex;align-items:center;max-width:100%;padding:5px 9px;border:1px solid #e97621;border-radius:10px;background:#120b04;color:#ffad69;font-size:10px;font-weight:850;line-height:1.35;white-space:normal}
