@@ -10,6 +10,15 @@ const rows=(items,mapper)=>items.length?items.map(mapper).join(""):'<p class="li
 const showMsg=err=>{const e=document.getElementById("an-admin-note");if(e)e.textContent=err?.message||String(err);};
 async function all(table){const{data,error}=await db().from(table).select("*").limit(500);if(error)throw error;return data||[];}
 async function content(key){const{data,error}=await db().from("an_site_content").select("value").eq("key",key).maybeSingle();if(error)throw error;return data?.value;}
+async function adminUploadImage(file,prefix){
+ const mime={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"};
+ if(!(file instanceof File)||!mime[file.type]||file.size===0||file.size>8388608)throw Error("Only JPG, PNG or WebP images under 8 MB are accepted.");
+ const name=prefix+"-"+crypto.randomUUID()+"."+mime[file.type];
+ const bucket=db().storage.from("an-public-media");
+ const{error}=await bucket.upload(name,file,{contentType:file.type,upsert:false,cacheControl:"3600"});
+ if(error)throw error;
+ return bucket.getPublicUrl(name).data.publicUrl;
+}
 async function publish(key,value){const{error}=await db().from("an_site_content").upsert({key,value,updated_by:get().user.id,updated_at:new Date().toISOString()},{onConflict:"key"});if(error)throw error;await get().refreshPublic();}
 function renderAdmin(){
  document.body.classList.remove("home-view");
@@ -91,7 +100,23 @@ async function draw(){
  }
  if(section==="Universities"){
   saved.universities=await content("university_overrides")||[];
-  const form='<form id="admin-university-form"><div class="live-fieldgrid">'+field("ID","id")+field("Name","name")+field("Short Name","short")+field("Country","country","Malaysia")+field("Campus / City","city")+dropdown("Type","kind",["Public","Private"],"Public")+field("Official Website","site","https://")+field("Subjects (comma-separated)","programs","","textarea")+'</div><button class="btn mt" type="submit">Publish University</button></form>';
+  const options=U.map(u=>'<option value="'+esc(u.id)+'">'+esc(u.short)+' — '+esc(u.name)+'</option>').join('');
+  const form='<label style="display:block;margin-bottom:12px;color:#ffa440">Select Existing University<select id="admin-university-choice"><option value="">+ Create new institution</option>'+options+'</select></label>'
+   +'<form id="admin-university-form"><div class="live-fieldgrid">'
+   +field("University ID (lowercase)","id")+field("Official Name","name")+field("Short Name","short")
+   +field("Country","country","Malaysia")+field("Campus / City","city")+dropdown("Type","kind",["Public","Private"],"Public")
+   +field("Official Website","site","https://")+field("Programmes (comma-separated)","programs","","textarea")
+   +'</div><h3 style="margin:16px 0 8px;color:#ff9b28">University Photos & Logo</h3>'
+   +'<p style="font-size:12px">Images are added to the current university catalogue and portfolio after Publish. Existing official photos remain until you choose replacements.</p>'
+   +'<div class="live-fieldgrid">'
+   +field("Card / Cover Photo URL","cardImageUrl")+field("University Logo URL","logoImageUrl")
+   +field("Gallery Photo URLs (one per line)","galleryImages","","textarea")
+   +'<label>Upload New Card Photo<input type="file" name="card_file" accept="image/jpeg,image/png,image/webp"></label>'
+   +'<label>Upload New University Logo<input type="file" name="logo_file" accept="image/jpeg,image/png,image/webp"></label>'
+   +'<label class="full">Add Multiple Campus/Gallery Photos<input type="file" name="gallery_files" multiple accept="image/jpeg,image/png,image/webp"></label>'
+   +'</div><p style="font-size:11px;color:#ffbe70">Maximum 8 MB per photo, 12 gallery images. Upload only photos you own or have permission to publish.</p>'
+   +'<p id="an-university-upload-status" role="status" style="font-size:12px;color:#ffba5c"></p>'
+   +'<button class="btn mt" type="submit">Save & Publish University</button></form>';
   html=panel('<h2>University Catalogue Editor</h2><p>Enter official institution details.</p>'+form)+panel('<h2>Edited Listings</h2>'+rows(saved.universities,u=>'<div class="live-msg"><b>'+esc(u.name)+'</b><p>'+esc(u.city||"")+'</p><button data-admin-uni="'+esc(u.id)+'">Edit</button></div>'));
  }
  if(section==="Success Stories"){
@@ -134,7 +159,15 @@ function countryRow(i,v){
  +field("Country Name","country-name-"+i,v[0]||"")+field("Flag Emoji","country-flag-"+i,v[1]||"")
  +field("Image ID","country-photo-"+i,v[2]||"")+'</div><button type="button" data-remove-admin-row="country">Remove</button></div>';
 }
-document.addEventListener("change",e=>{if(e.target.id==="admin-student-select"){selectedStudent=e.target.value;void loadMessages();}});
+document.addEventListener("change",e=>{if(e.target.id==="admin-student-select"){selectedStudent=e.target.value;void loadMessages();}
+if(e.target.id==="admin-university-choice"){const id=e.target.value,form=document.getElementById("admin-university-form");if(!form)return;
+const u=saved.universities?.find(z=>z.id===id)||U.find(z=>z.id===id);
+if(!u){form.reset();return;}
+const source=UNIVERSITY_PROFILES[id];
+const vals={...u,cardImageUrl:u.cardImageUrl||u.cardPhoto||source?.images?.[0]?.url||"",logoImageUrl:u.logoImageUrl||u.logoImage||source?.logo||"",galleryImages:u.galleryImages||[]};
+for(const k of ["id","name","short","country","city","kind","site","programs","cardImageUrl","logoImageUrl","galleryImages"]){
+let el=form.elements[k];if(el)el.value=k==="programs"?(vals.programs||[]).join(", "):k==="galleryImages"?(vals.galleryImages||[]).join("\n"):(vals[k]||"");
+}}});
 document.addEventListener("click",async e=>{
  if(!get()?.isAdmin||!location.hash.startsWith("#/admin"))return;
  const t=e.target;
@@ -160,7 +193,7 @@ document.addEventListener("click",async e=>{
  if(t.dataset.adminStudent){const id=t.dataset.adminStudent;const op=t.dataset.revoke==="1"?db().from("an_student_access").delete().eq("user_id",id):db().from("an_student_access").insert({user_id:id,approved_by:get().user.id});const{error}=await op;if(error)throw error;await draw();}
  if(t.dataset.adminFile){const{data,error}=await db().storage.from("an-student-files").createSignedUrl(t.dataset.adminFile,90);if(error)throw error;window.open(data.signedUrl,"_blank","noopener");}
  if(t.dataset.adminEnquiry){const{error}=await db().from("an_enquiries").update({status:t.dataset.enquiryState}).eq("id",t.dataset.adminEnquiry);if(error)throw error;await draw();}
- if(t.dataset.adminUni){let u=saved.universities.find(z=>z.id===t.dataset.adminUni),f=document.getElementById("admin-university-form");if(u&&f)for(const key of ["id","name","short","country","city","kind","site","programs"])f.elements[key].value=key==="programs"?(u.programs||[]).join(", "):(u[key]||"");}
+ if(t.dataset.adminUni){let u=saved.universities.find(z=>z.id===t.dataset.adminUni)||U.find(z=>z.id===t.dataset.adminUni),f=document.getElementById("admin-university-form");if(u&&f){for(const key of ["id","name","short","country","city","kind","site","programs","cardImageUrl","logoImageUrl","galleryImages"]){let el=f.elements[key];if(el)el.value=key==="programs"?(u.programs||[]).join(", "):key==="galleryImages"?(u.galleryImages||[]).join("\n"):(u[key]||"");}document.getElementById('admin-university-choice').value=u.id;f.scrollIntoView({behavior:'smooth',block:'start'});}}
  if(t.dataset.adminStory!==undefined){let a=saved.stories.slice(),i=Number(t.dataset.adminStory);if(t.dataset.action==="toggle")a[i].approved=!a[i].approved;else if(confirm("Remove this story?"))a.splice(i,1);else return;await publish("success_stories",a);await draw();}
  if(t.dataset.mediaCopy){try{await navigator.clipboard.writeText(t.dataset.mediaCopy);showMsg("Image URL copied");}catch(_){showMsg(t.dataset.mediaCopy);}}
  }catch(e2){showMsg(e2);}
@@ -202,7 +235,21 @@ document.addEventListener("submit",async e=>{
    const i=el.dataset.countryIndex;return [v("country-name-"+i),v("country-flag-"+i),v("country-photo-"+i)];
   }).filter(a=>a[0]);if(!destinations.length)throw Error("Keep at least one country");await publish("countries",destinations);
  }
- if(id==="admin-university-form"){const row={id:v("id"),name:v("name"),short:v("short"),country:v("country"),city:v("city"),kind:v("kind"),site:v("site"),programs:v("programs").split(",").map(q=>q.trim()).filter(Boolean)};if(!/^[a-z0-9-]{2,60}$/.test(row.id)||!row.name||!/^https:\/\//.test(row.site))throw Error("Valid university ID, name and official URL are required");const a=saved.universities.filter(q=>q.id!==row.id);a.push(row);await publish("university_overrides",a);}
+ if(id==="admin-university-form"){
+ const id=v("id"),current=(saved.universities||[]).find(z=>z.id===id)||{};
+ const row={...current,id,name:v("name"),short:v("short"),country:v("country"),city:v("city"),kind:v("kind"),site:v("site"),programs:v("programs").split(",").map(q=>q.trim()).filter(Boolean),
+ cardImageUrl:v("cardImageUrl"),logoImageUrl:v("logoImageUrl"),galleryImages:v("galleryImages").split(/\r?\n/).map(q=>q.trim()).filter(Boolean)};
+ if(!/^[a-z0-9-]{2,60}$/.test(row.id)||!row.name||!/^https:\/\//.test(row.site))throw Error("Valid university ID, name and official website URL are required");
+ const status=document.getElementById("an-university-upload-status");
+ const cover=form.get("card_file"),logo=form.get("logo_file"),photos=f.querySelector('[name="gallery_files"]')?.files;
+ if(cover instanceof File&&cover.size){if(status)status.textContent="Uploading card photo...";row.cardImageUrl=await adminUploadImage(cover,"university-cover");}
+ if(logo instanceof File&&logo.size){if(status)status.textContent="Uploading university logo...";row.logoImageUrl=await adminUploadImage(logo,"university-logo");}
+ if(photos&&photos.length){if(photos.length>12)throw Error("Maximum 12 gallery photos per upload.");for(let i=0;i<photos.length;i++){if(status)status.textContent="Uploading gallery "+(i+1)+" / "+photos.length+" ...";row.galleryImages.push(await adminUploadImage(photos[i],"university-gallery"));}}
+ row.galleryImages=[...new Set(row.galleryImages)].slice(0,15);
+ if(row.galleryImages.some(u=>!/^https:\/\//i.test(u)))throw Error("Gallery image URLs must begin with https://");
+ const a=(saved.universities||[]).filter(q=>q.id!==row.id);a.push(row);
+ await publish("university_overrides",a);
+}
  if(id==="admin-story-form"){
    if(!form.has("consent"))throw Error("Consent confirmation is required.");
    const file=form.get("story_file");
