@@ -7,14 +7,19 @@ function installFlight(){
  host.classList.add('an-logo-fixed');
  const style=document.createElement('style');style.id='an-logo-flight-style';
  style.textContent=`
- .top .logo-motion.an-logo-fixed{position:relative!important;display:block!important;flex-shrink:0;isolation:isolate;transform:none!important;animation:none!important;overflow:visible!important;width:66px!important;height:60px!important;mix-blend-mode:normal!important}
- .top .logo-motion.an-logo-fixed::before,.top .logo-motion.an-logo-fixed::after{content:none!important;animation:none!important}
- .top .logo-motion.an-logo-fixed .logo-crop{position:relative!important;z-index:1;transform:none!important;animation:none!important;width:64px!important;height:60px!important;clip-path:none!important;overflow:hidden!important;border-radius:0!important}
- .top .logo-motion.an-logo-fixed .logo-crop img{animation:none!important;transform:none!important;display:block!important;width:245px!important;height:60px!important;max-width:none!important;object-fit:fill!important;object-position:left center!important;margin:0!important;filter:brightness(1.16) contrast(1.06)!important}
- .top .logo-motion .an-logo-flight{position:absolute;width:100px!important;height:80px!important;left:-18px!important;top:-10px!important;display:block;z-index:6!important;overflow:visible!important;pointer-events:none;animation:none!important}
- .top .an-logo-flight .an-orbit-soft{filter:drop-shadow(0 0 3px #ffc169)}
- .top .an-logo-flight .an-plane{filter:drop-shadow(0 0 2px #fff1a1) drop-shadow(0 0 4px #ffa035)}
- @media(prefers-reduced-motion:reduce){.top .an-logo-flight .an-animated-flight{display:none}}
+ .top{height:62px!important;min-height:62px!important;box-sizing:border-box!important;overflow:visible!important}
+ .top>.wrap{height:62px!important;min-height:62px!important;box-sizing:border-box!important;padding-top:0!important;padding-bottom:0!important;display:flex!important;align-items:center!important}
+ .top a.brand{height:58px!important;min-height:0!important;align-items:center!important;gap:7px!important;overflow:visible!important}
+ .top .logo-motion.an-logo-fixed{position:relative!important;display:block!important;flex:none!important;width:58px!important;height:50px!important;min-width:58px!important;min-height:50px!important;mix-blend-mode:normal!important;transform:none!important;animation:none!important;overflow:visible!important;isolation:isolate}
+ .top .logo-motion.an-logo-fixed::before,.top .logo-motion.an-logo-fixed::after{display:none!important;content:none!important;animation:none!important}
+ .top .logo-motion.an-logo-fixed .logo-crop{display:block!important;position:relative!important;width:58px!important;height:50px!important;min-width:58px!important;min-height:50px!important;max-height:50px!important;overflow:hidden!important;clip-path:none!important;transform:none!important;animation:none!important;border:0!important;z-index:1}
+ .top .logo-motion.an-logo-fixed .logo-crop img{position:absolute!important;top:5px!important;left:0!important;width:165px!important;height:40px!important;max-width:none!important;min-width:0!important;max-height:40px!important;object-fit:fill!important;object-position:left center!important;display:block!important;margin:0!important;padding:0!important;transform:none!important;animation:none!important;mix-blend-mode:screen!important;filter:brightness(1.18) contrast(1.08)!important}
+ .top .logo-motion.an-logo-fixed .an-logo-flight{position:absolute!important;display:block!important;width:92px!important;height:70px!important;top:-10px!important;left:-17px!important;z-index:5!important;overflow:visible!important;pointer-events:none!important}
+ .top .an-logo-flight .an-orbit-soft{filter:drop-shadow(0 0 3px #ffb13e)}
+ .top .an-logo-flight .an-plane{filter:drop-shadow(0 0 2px white) drop-shadow(0 0 5px #ff9815)}
+ .top .brand-copy{min-width:0!important}
+ @media(max-width:800px){.top>.wrap{height:62px!important;min-height:62px!important}.top a.brand{height:56px!important}}
+ @media(prefers-reduced-motion:reduce){.top .an-logo-flight .an-animated-flight{display:none!important}}
  `;
  document.head.appendChild(style);
  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
@@ -40,7 +45,7 @@ function installFlight(){
   <g class="an-plane">
    <path d="M-34 0 L-6 0" fill="none" stroke="url(#an-trail)" stroke-width="2.8" stroke-linecap="round"/>
    <path d="M-14 0 L-5 0" fill="none" stroke="#fff1b2" stroke-width="1.1" stroke-linecap="round"/>
-   <text x="-12" y="7" font-size="23" font-family="Segoe UI Symbol,Arial,sans-serif" fill="#ffffff" stroke="#ff9a1b" stroke-width=".65" paint-order="stroke" font-weight="bold">✈</text>
+   <g transform="scale(.65)"><path d="M 13 0 L -5 -4 L -9 -16 L -13 -16 L -13 -5 L -20 -5 L -25 -10 L -29 -10 L -25 0 L -29 10 L -25 10 L -20 5 L -13 5 L -13 16 L -9 16 L -5 4 Z" fill="#fffdf2" stroke="#ff9b1b" stroke-width="2.2" stroke-linejoin="round"/><circle cx="7" cy="0" r="1.8" fill="#ffc35c"/></g>
    <animateMotion dur="4.6s" repeatCount="indefinite" rotate="auto"><mpath href="#an-centre-orbit"/></animateMotion>
    <animate attributeName="opacity" values=".98;.30;.98" keyTimes="0;.5;1" dur="4.6s" repeatCount="indefinite"/>
   </g>
