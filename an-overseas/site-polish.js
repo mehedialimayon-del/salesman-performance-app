@@ -8,7 +8,9 @@ const servicePhotos=[
  'photo-1476514525535-07fb3b4ae5f1','photo-1551836022-d5d88e9218df',
  'photo-1523289333742-be1143f6b766','photo-1513258496099-48168024aec0'
 ];
-let latest=[],managerIndex=0,renderQueued=false;
+let latest=[],managerIndex=0,renderQueued=false,tickerSignature='',tickerWindowWidth=0;
+const AN_TICKER_SPEED=58; // readable pixels per second
+
 function where(){return location.hash.replace(/^#\/?/,'').split('?')[0].split('/')[0]||'home';}
 function bar(){
  let existing=document.getElementById('an-global-ticker');if(existing)return existing;
@@ -24,15 +26,47 @@ function normalize(input,fallback){
  return arr.filter(v=>v&&String(v.text||'').trim()).slice(0,30).map(v=>({text:String(v.text).slice(0,400).trim(),color:v.color==='white'?'white':'orange'}));
 }
 function ticker(input,fallback){
- latest=normalize(input,fallback||window.ANLive?.publicSettings?.ticker);
- let b=bar();if(!b)return;
- const p=b.querySelector('.an-updates-track');
- const make=()=>{let el=document.createElement('span');el.className='an-updates-group';latest.forEach(item=>{let span=document.createElement('span');span.className='an-update-item';span.dataset.color=item.color;span.textContent=item.text;el.appendChild(span);});return el;};
- p.replaceChildren(make(),make());
- const chars=latest.reduce((t,i)=>t+i.text.length,0);
- p.style.setProperty('--an-ticker-duration',Math.max(18,Math.min(85,Math.round(chars/6+15)))+'s');
+ const updated=normalize(input,fallback||window.ANLive?.publicSettings?.ticker);
+ const b=bar();if(!b)return;
+ const viewport=b.querySelector('.an-updates-window'),track=b.querySelector('.an-updates-track');
+ if(!viewport||!track)return;
+ const signature=JSON.stringify(updated),width=Math.round(viewport.getBoundingClientRect().width);
+ // The page rerenders often. Never restart an unchanged ticker on every route.
+ if(track.childElementCount===2&&tickerSignature===signature&&Math.abs(width-tickerWindowWidth)<10)return;
+ latest=updated;tickerSignature=signature;tickerWindowWidth=width;
+ if(width<1)return;
+ track.style.animation='none';
+ track.replaceChildren();
+ const createItem=item=>{
+  const node=document.createElement('span');
+  node.className='an-update-item';node.dataset.color=item.color;
+  node.textContent=item.text;
+  return node;
+ };
+ const group=document.createElement('span');group.className='an-updates-group';
+ group.setAttribute('aria-label','Latest announcements');
+ // The base message series may be very short. Repeat *whole* series until
+ // the sequence extends beyond the display. This prevents a dead empty zone.
+ let repeatCount=0;
+ do{
+  for(const item of latest)group.appendChild(createItem(item));
+  track.appendChild(group);
+  repeatCount++;
+ }while(group.getBoundingClientRect().width<width+120&&repeatCount<60);
+ const clone=group.cloneNode(true);clone.setAttribute('aria-hidden','true');
+ track.appendChild(clone);
+ const distance=group.getBoundingClientRect().width;
+ track.style.setProperty('--an-ticker-distance',distance+'px');
+ track.style.setProperty('--an-ticker-duration',Math.max(12,Math.round(distance/AN_TICKER_SPEED))+'s');
+ // With exactly identical adjacent groups, -distance and 0 are visually identical.
+ track.style.animation='';
 }
 window.ANUpdateTicker=ticker;
+window.addEventListener('resize',()=>{
+ const viewport=document.querySelector('.an-updates-window');
+ if(!viewport||Math.abs(Math.round(viewport.getBoundingClientRect().width)-tickerWindowWidth)<10)return;
+ ticker(latest,window.ANLive?.publicSettings?.ticker);
+}, {passive:true});
 const off=()=>window.ANLive?.publicSettings||{};
 function applyAbout(){
  const area=document.querySelector('#app>.wrap.content');if(!area)return;
