@@ -40,9 +40,25 @@ async function publicContent(){
  if(Array.isArray(by.services)&&by.services.length&&typeof serviceList!=='undefined'){serviceList.splice(0,serviceList.length,...by.services.filter(v=>Array.isArray(v)&&v.length>=3).map(v=>[String(v[0]),String(v[1]),String(v[2])]));}
  if(Array.isArray(by.countries)&&by.countries.length&&typeof countries!=='undefined'){countries.splice(0,countries.length,...by.countries.filter(v=>Array.isArray(v)&&v.length>=3).map(v=>[String(v[0]),String(v[1]),String(v[2])]));}
  (Array.isArray(by.university_overrides)?by.university_overrides:[]).forEach(x=>{
-  let u=U.find(z=>z.id===x.id);if(!u)return;
-  ['name','short','city','country','kind'].forEach(k=>{if(typeof x[k]==='string'&&x[k].trim())u[k]=x[k].trim();});
+  if(!x||!x.id)return;
+  let u=U.find(z=>z.id===x.id);
+  if(!u){
+   if(!x.name||!x.site||!/^https:\/\//i.test(x.site))return;
+   u={id:x.id,name:x.name,short:x.short||x.name,city:x.city||'',country:x.country||'Malaysia',kind:x.kind||'Private',site:x.site,programs:Array.isArray(x.programs)?x.programs:[],photo:''};
+   U.push(u);
+  }
+  ['name','short','city','country','kind','site'].forEach(k=>{if(typeof x[k]==='string'&&x[k].trim())u[k]=x[k].trim();});
   if(Array.isArray(x.programs)&&x.programs.length)u.programs=x.programs;
+  const urlOk=v=>typeof v==='string'&&/^https:\/\//i.test(v);
+  if(urlOk(x.cardImageUrl))u.cardPhoto=x.cardImageUrl;
+  if(urlOk(x.logoImageUrl))u.logoImage=x.logoImageUrl;
+  if(Array.isArray(x.galleryImages))u.galleryImages=x.galleryImages.filter(urlOk).slice(0,15);
+  const p=UNIVERSITY_PROFILES[u.id];
+  if(p){
+   if(urlOk(x.logoImageUrl))p.logo=x.logoImageUrl;
+   if(u.galleryImages?.length)p.images=u.galleryImages.map((url,i)=>({url,label:u.name+' — gallery '+(i+1),source:url}));
+   if(u.cardPhoto){if(!Array.isArray(p.images))p.images=[];if(!p.images.some(im=>im.url===u.cardPhoto))p.images.unshift({url:u.cardPhoto,label:u.name+' campus',source:u.cardPhoto});}
+  }
  });
  repaintPublic();
 }
