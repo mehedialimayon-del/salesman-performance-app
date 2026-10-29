@@ -203,7 +203,7 @@ document.addEventListener('click',async e=>{
  if(final){e.preventDefault();e.stopImmediatePropagation();if(!AN.db){msg('Secure connection not ready. Please try again.');return;}await submitApplication();return;}
  if(e.target.closest('#an-admin-switch-account')){if(AN.db)await AN.db.auth.signOut();await setUser(null);render();return;}
   if(e.target.closest('#an-logout')){await AN.db?.auth.signOut();await setUser(null);location.hash='#/home';return;}
- if(e.target.closest('#an-reset-password')){let email=document.querySelector('#an-auth-form [name=email]')?.value.trim();if(!email){msg('Enter your email address first.');return;}const{error}=await AN.db.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});msg(error?errorText(error):'If the address is registered, you will receive a password reset email.');}
+ if(e.target.closest('#an-reset-password')||e.target.closest('#an-admin-reset-password')){let email=(document.querySelector('#an-admin-auth-form [name=email]')||document.querySelector('#an-auth-form [name=email]'))?.value.trim();if(!email){msg('Enter your email address first.');return;}const{error}=await AN.db.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});msg(error?errorText(error):'If the address is registered, you will receive a password reset email.');}
  const file=e.target.closest('[data-open-file]');if(file&&AN.db){let{data,error}=await AN.db.storage.from(PRIVATE_BUCKET).createSignedUrl(file.dataset.openFile,90);if(error)msg(errorText(error));else window.open(data.signedUrl,'_blank','noopener');}
 },true);
 document.addEventListener('submit',async e=>{
@@ -229,7 +229,7 @@ document.addEventListener('submit',async e=>{
     render();
     return;
    }
-   if(id==='an-change-password'){const pw=String(f.get('password')||'');if(pw.length<8)throw Error('Password must be at least 8 characters.');const{error}=await AN.db.auth.updateUser({password:pw});if(error)throw error;msg('Password updated. You can now sign in.');location.hash='#/dashboard';}
+   if(id==='an-change-password'){const pw=String(f.get('password')||'');if(pw.length<8)throw Error('Password must be at least 8 characters.');const{error}=await AN.db.auth.updateUser({password:pw});if(error)throw error;await setUser(AN.user);msg('Password updated successfully.');location.hash=AN.isAdmin?'#/admin':'#/dashboard';}
   if(id==='an-auth-form'){
    const email=String(f.get('email')||'').trim(),password=String(f.get('password')||'');
    if(route()==='register'){if(password.length<8)throw Error('Password must be at least 8 characters.');const {data,error}=await AN.db.auth.signUp({email,password,options:{data:{full_name:String(f.get('full_name')||'').trim()},emailRedirectTo:location.href.split('#')[0]}});if(error)throw error;await setUser(data.user);msg(data.session?'Account created. Staff approval is required for application uploads.':'Check your email to confirm your account, then sign in.');if(data.session)location.hash='#/dashboard';}
