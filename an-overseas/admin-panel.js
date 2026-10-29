@@ -62,7 +62,7 @@ async function draw(){
  }
  if(section==="Website"){
   saved.settings=await content("settings")||{};
-  html=panel('<h2>Edit Website Settings</h2><form id="admin-settings-form"><div class="live-fieldgrid">'+["ticker","motto","heroLead","heroAccent","heroDescription","heroImage","about","work","malaysiaOffice","bangladeshOffice","phone","whatsapp","email"].map(k=>field(k,k,saved.settings[k]||"",/ticker|about|work/.test(k)?"textarea":"text")).join("")+'</div><button class="btn mt" type="submit">Publish Settings</button></form>');
+  html=panel('<h2>Edit Website Settings</h2><form id="admin-settings-form"><div class="live-fieldgrid">'+["ticker","motto","heroLead","heroAccent","heroDescription","heroImage","about","work","malaysiaOffice","bangladeshOffice","phone","whatsapp","email"].map(k=>field(k,k,saved.settings[k]||"",/ticker|about|work/.test(k)?"textarea":"text")).join("")+'</div><button class="btn mt" type="submit">Publish Settings</button></form><div class="mt"><h3>Homepage Image Upload</h3><p>Upload your preferred student/graduate photo. It will automatically replace the homepage background.</p><form id="admin-home-image-form"><input type="file" name="image" required accept="image/jpeg,image/png,image/webp"><button type="submit" class="btn mt">Upload & Set Home Image</button></form></div>');
  }
  if(section==="Management"){
   saved.management=await content("management")||[];
@@ -145,7 +145,7 @@ document.addEventListener("click",async e=>{
 },true);
 document.addEventListener("submit",async e=>{
  if(!get()?.isAdmin||!location.hash.startsWith("#/admin"))return;
- const f=e.target,id=f.id,allowed=["admin-case-form","admin-update-form","admin-message-form","admin-invoice-form","admin-settings-form","admin-management-form","admin-services-form","admin-countries-form","admin-university-form","admin-story-form","admin-media-form"];
+ const f=e.target,id=f.id,allowed=["admin-case-form","admin-update-form","admin-message-form","admin-invoice-form","admin-settings-form","admin-management-form","admin-services-form","admin-countries-form","admin-university-form","admin-story-form","admin-media-form","admin-home-image-form"];
  if(!allowed.includes(id))return;
  e.preventDefault();e.stopImmediatePropagation();
  const b=f.querySelector("[type=submit]");if(b)b.disabled=true;
@@ -173,6 +173,18 @@ document.addEventListener("submit",async e=>{
  }
  if(id==="admin-university-form"){const row={id:v("id"),name:v("name"),short:v("short"),country:v("country"),city:v("city"),kind:v("kind"),site:v("site"),programs:v("programs").split(",").map(q=>q.trim()).filter(Boolean)};if(!/^[a-z0-9-]{2,60}$/.test(row.id)||!row.name||!/^https:\/\//.test(row.site))throw Error("Valid university ID, name and official URL are required");const a=saved.universities.filter(q=>q.id!==row.id);a.push(row);await publish("university_overrides",a);}
  if(id==="admin-story-form"){if(!form.has("consent"))throw Error("Consent is required");if(!v("title")||!/^https:\/\//.test(v("media_url")))throw Error("Title and HTTPS media URL required");const a=saved.stories.slice();a.unshift({title:v("title"),description:v("description"),media_url:v("media_url"),type:v("type"),approved:true});await publish("success_stories",a);}
+ if(id==="admin-home-image-form"){
+  const img=form.get("image");
+  if(!(img instanceof File)||!["image/jpeg","image/png","image/webp"].includes(img.type)||img.size>4194304)throw Error("Use JPG/PNG/WebP smaller than 4MB");
+  const ext=img.type==="image/png"?"png":img.type==="image/webp"?"webp":"jpg";
+  const filename="hero-"+crypto.randomUUID()+"."+ext;
+  const bucket=db().storage.from("an-public-media");
+  const {error}=await bucket.upload(filename,img,{contentType:img.type,upsert:false});if(error)throw error;
+  const image=bucket.getPublicUrl(filename).data.publicUrl;
+  const settings=await content("settings")||{};
+  settings.heroImage=image;
+  await publish("settings",settings);
+ }
  if(id==="admin-media-form"){const img=form.get("image");if(!(img instanceof File)||!["image/jpeg","image/png","image/webp"].includes(img.type)||img.size>4194304)throw Error("Use a JPG, PNG or WEBP under 4MB");const ext=img.type==="image/png"?"png":img.type==="image/webp"?"webp":"jpg";const{error}=await db().storage.from("an-public-media").upload(crypto.randomUUID()+"."+ext,img,{contentType:img.type,upsert:false});if(error)throw error;}
  showMsg("Saved.");await draw();
  }catch(err){showMsg(err);}
