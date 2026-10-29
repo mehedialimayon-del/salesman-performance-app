@@ -1,13 +1,49 @@
 /* Mobile-friendly monthly claim dashboard. Existing claim/approval screens remain intact. */
 (function(root){'use strict';
 const app=document.getElementById('app');
-const CATS=['Fuel Expenses','Buyer Entertainment','Team Building','Training','Others'];
+const CATS=['Fuel Expenses','Buyer Entertainment','Team Building','New AC Training','Training','Others'];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=n=>'RM '+Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
 const sb=()=>root.FFH_SUPABASE;
 let overlay=null,observerBusy=false;
 async function rpc(action,payload){const {data,error}=await sb().rpc('ffh_claims_api',{action,payload:payload||{}});if(error)throw Error(error.message);return data}
 async function profile(){const r=await sb().rpc('ffh_my_staff_id');if(r.error||!r.data)throw Error('Approved login required');return String(r.data)}
+async function uploadReceipt(user,file){
+ if(!file?.size)return null;
+ if(file.size>12*1024*1024)throw Error('Receipt maximum size is 12 MB.');
+ if(!['image/jpeg','image/png','image/webp','application/pdf'].includes(file.type))throw Error('Upload JPG, PNG, WebP or PDF.');
+ const ext=file.type==='application/pdf'?'pdf':file.type==='image/jpeg'?'jpg':file.type.split('/')[1];
+ const uid=globalThis.crypto?.randomUUID?.();if(!uid)throw Error('Secure file ID unavailable');
+ const path=user+'/'+uid+'.'+ext;
+ const {error}=await sb().storage.from('ffh-expenses').upload(path,file,{contentType:file.type,upsert:false});
+ if(error)throw Error('Receipt upload failed: '+error.message);
+ return path;
+}
+function addQuickEntry(box,user,month,status){
+ const container=box.querySelector('#ffMonthlyQuickEntry');
+ if(!container)return;
+ const today=(()=>{const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kuala_Lumpur',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());return ['year','month','day'].map(k=>p.find(x=>x.type===k)?.value).join('-')})();
+ const range=root.FFH_CLAIM_MONTHLY.monthBounds(month);
+ const defaultDay=today.startsWith(month)?today:(today<range.from?range.from:range.to);
+ container.innerHTML='<form id="ffMonthlyQuickForm" class="ffMonthlyQuickForm"><h3>＋ Add Expense / Receipt</h3><div class="ffMonthlyQuickGrid"><label>Category<select name="category" required><option value="" selected disabled>Choose category</option>'+CATS.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('')+'</select></label><label class="ffMonthlyOther" hidden>Other Category<input name="custom_category" maxlength="80" placeholder="Category name"></label><label>Expense Date<input name="expense_date" type="date" min="'+range.from+'" max="'+(today<range.to?today:range.to)+'" value="'+defaultDay+'" required></label><label>Amount (RM)<input name="amount" type="number" min="0.01" max="9999999" step="0.01" inputmode="decimal" placeholder="0.00" required></label><label class="ffMonthlyWide">Reason (optional)<textarea name="reason" rows="2" maxlength="2000" placeholder="Expense purpose"></textarea></label><label class="ffMonthlyWide">Receipt Photo / PDF<input name="receipt" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" capture="environment"></label></div><div class="ffMonthlyQuickActions"><button type="submit">✓ SAVE EXPENSE</button><button type="button" id="ffMonthlyQuickCancel">CANCEL</button></div><p id="ffMonthlyQuickStatus" role="status">Each saved entry becomes part of this month’s category totals and final PDF.</p></form>';
+ const form=container.querySelector('form'),select=form.elements.category,other=container.querySelector('.ffMonthlyOther');
+ select.onchange=()=>{other.hidden=select.value!=='Others';form.elements.custom_category.required=select.value==='Others'};
+ container.querySelector('#ffMonthlyQuickCancel').onclick=()=>{container.hidden=true};
+ form.onsubmit=async e=>{
+  e.preventDefault();
+  const button=form.querySelector('[type=submit]'),message=form.querySelector('#ffMonthlyQuickStatus'),fd=new FormData(form);
+  const category=String(fd.get('category')||'')==='Others'?String(fd.get('custom_category')||'').trim():String(fd.get('category')||'').trim();
+  const day=String(fd.get('expense_date')||''),amount=Number(fd.get('amount'));
+  if(!category||category.length>80||!day.startsWith(month)||day>today||!Number.isFinite(amount)||amount<=0){message.textContent='Check the category, amount and expense date.';return}
+  button.disabled=true;message.textContent='Uploading receipt and saving expense…';
+  try{
+   const path=await uploadReceipt(user,fd.get('receipt'));
+   await rpc('receipt',{expense_date:day,amount:amount.toFixed(2),category,reason:String(fd.get('reason')||'').trim()||category,receipt_path:path});
+   status.textContent='Expense saved successfully.';
+   await openMonthly(month);
+  }catch(err){message.textContent=err.message;button.disabled=false}
+ };
+}
 function close(){overlay?.remove();overlay=null;document.body.classList.remove('ffMonthlyOverlayOpen')}
 function popup(){close();overlay=document.createElement('div');overlay.className='ffMonthlyOverlay';overlay.innerHTML='<section class="ffMonthlySheet" role="dialog" aria-label="Monthly Digital Claim"><header><div><small>FIELDFORCE HUB · EXPENSE CLAIM</small><h2>Monthly Digital Claim</h2></div><button type="button" class="ffMonthlyClose" aria-label="Close">✕</button></header><div class="ffMonthlyScroll"><p>Loading claim records…</p></div></section>';document.body.appendChild(overlay);document.body.classList.add('ffMonthlyOverlayOpen');overlay.querySelector('.ffMonthlyClose').onclick=close;overlay.onclick=e=>{if(e.target===overlay)close()};return overlay.querySelector('.ffMonthlyScroll')}
 function monthDefault(){const active=document.querySelector('#ffClaimMonth')?.value;if(/^\d{4}-(0[1-9]|1[0-2])$/.test(active||''))return active;const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kuala_Lumpur',year:'numeric',month:'2-digit'}).formatToParts(new Date());return p.find(x=>x.type==='year').value+'-'+p.find(x=>x.type==='month').value}
@@ -22,10 +58,12 @@ async function openMonthly(month){
  try{
   const user=await profile(),state=await rpc('state');
   const range=root.FFH_CLAIM_MONTHLY.monthBounds(month);
-  const mine=(state.receipts||[]).filter(r=>r.expense_date?.startsWith(month));
+  const monthReceipts=(state.receipts||[]).filter(r=>r.expense_date?.startsWith(month));
   const myClaims=(state.claims||[]).filter(c=>c.owner_staff_id===user&&c.claim_month===month);
+  const excluded=new Set(myClaims.filter(c=>c.status!=='Rejected').flatMap(c=>(c.lines||[]).filter(l=>l.excluded&&l.receipt_id).map(l=>String(l.receipt_id))));
+  const mine=monthReceipts.filter(r=>!excluded.has(String(r.id)));
   const buyerLines=myClaims.filter(c=>c.kind==='Buyer Entertainment Bill'&&c.status!=='Rejected').flatMap(c=>
-   (c.lines||[]).filter(l=>!l.receipt_id).map(l=>Object.assign({},l,{id:'buyer:'+l.id,category:l.category||'Buyer Entertainment'}))
+   (c.lines||[]).filter(l=>!l.receipt_id&&!l.excluded).map(l=>Object.assign({},l,{id:'buyer:'+l.id,category:l.category||'Buyer Entertainment'}))
   );
   const all=mine.concat(buyerLines).sort((a,b)=>String(a.expense_date).localeCompare(String(b.expense_date)));
   const grouped=root.FFH_CLAIM_MONTHLY.groupRows(all);
@@ -37,10 +75,12 @@ async function openMonthly(month){
   const receiptRows=all.map(r=>'<article class="ffMonthlyReceipt"><div><strong>'+esc(r.expense_date)+' · '+esc(r.category||'Others')+'</strong><small>'+esc(r.reason||'')+'</small></div><b>'+fmt(r.amount)+'</b>'+(r.receipt_path?'<button type="button" class="ffMonthlyView" data-path="'+esc(r.receipt_path)+'">RECEIPT</button>':'<small class="ffMonthlyNoReceipt">NO RECEIPT</small>')+'</article>').join('');
   const categories=grouped.groups.map(g=>'<div class="ffMonthlyGroup"><div><strong>'+esc(g.category)+'</strong><small>'+g.items.length+' expense(s)'+(g.reasons.length?' · '+esc(g.reasons.join('; ').slice(0,80)):'')+'</small></div><b>'+fmt(g.total)+'</b></div>').join('');
   const status=approved?'APPROVED BY MANAGER':'DRAFT · APPROVAL PENDING';
-  box.innerHTML='<div class="ffMonthlyIntro"><label>Claim Month<input id="ffMonthlyDate" type="month" value="'+esc(month)+'"></label><p>Expense period: '+range.from+' to '+range.to+'</p><div class="ffMonthlyTotal"><span>Grand Total · '+grouped.count+' expense(s)</span><strong>'+fmt(grouped.grandTotal)+'</strong><small>'+status+'</small></div></div><div class="ffMonthlySection"><h3>Category Summary</h3>'+(categories||'<p>No expenses saved this month.</p>')+'</div><div class="ffMonthlySection"><h3>Receipt History</h3>'+(receiptRows||'<p>No receipts yet.</p>')+'</div><div class="ffMonthlyActions"><button type="button" id="ffMonthlyExport" '+(grouped.count?'':'disabled')+'>⬇ DOWNLOAD ORIGINAL FORM + ALL RECEIPTS</button><button type="button" id="ffMonthlySubmit" '+(pending.length?'':'disabled')+'>SUBMIT '+pending.length+' NEW RECEIPTS FOR APPROVAL</button></div><p id="ffMonthlyStatus" role="status">The original uploaded company Claim PDF remains the first page. Only a real Manager approval adds the approval signature.</p><div id="ffMonthlySubmitPanel" hidden></div>';
+  box.innerHTML='<div class="ffMonthlyIntro"><label>Claim Month<input id="ffMonthlyDate" type="month" value="'+esc(month)+'"></label><p>Expense period: '+range.from+' to '+range.to+'</p><div class="ffMonthlyTotal"><span>Grand Total · '+grouped.count+' expense(s)</span><strong>'+fmt(grouped.grandTotal)+'</strong><small>'+status+'</small></div></div><div class="ffMonthlySection"><h3>Category Summary</h3>'+(categories||'<p>No expenses saved this month.</p>')+'</div><div class="ffMonthlySection"><h3>Receipt History</h3>'+(receiptRows||'<p>No receipts yet.</p>')+'</div><div class="ffMonthlyActions"><button type="button" id="ffMonthlyAdd">＋ ADD EXPENSE / RECEIPT</button><button type="button" id="ffMonthlyExport" '+(grouped.count?'':'disabled')+'>⬇ DOWNLOAD ORIGINAL FORM + ALL RECEIPTS</button><button type="button" id="ffMonthlySubmit" '+(pending.length?'':'disabled')+'>SUBMIT '+pending.length+' NEW RECEIPTS FOR APPROVAL</button></div><p id="ffMonthlyStatus" role="status">The original uploaded company Claim PDF remains the first page. Only a real Manager approval adds the approval signature.</p><div id="ffMonthlyQuickEntry" hidden></div><div id="ffMonthlySubmitPanel" hidden></div>';
   box.querySelector('#ffMonthlyDate').onchange=e=>openMonthly(e.target.value);
   box.querySelectorAll('.ffMonthlyView').forEach(b=>b.onclick=()=>viewReceipt(b.dataset.path));
   const progress=box.querySelector('#ffMonthlyStatus');
+  const quick=box.querySelector('#ffMonthlyQuickEntry');
+  box.querySelector('#ffMonthlyAdd').onclick=()=>{quick.hidden=false;addQuickEntry(box,user,month,progress);quick.scrollIntoView?.({behavior:'smooth',block:'start'});};
   const exportButton=box.querySelector('#ffMonthlyExport');
   exportButton.onclick=async()=>{
    exportButton.disabled=true;progress.textContent='Preparing original company Claim Form…';
