@@ -110,10 +110,22 @@ async function saveFile(blob,filename){
   if(blob.size>20*1024*1024)throw Error('PDF exceeds Android download limit. Please use a browser.');
   const base64=await new Promise((ok,no)=>{const reader=new FileReader();reader.onload=()=>ok(String(reader.result).split(',')[1]);reader.onerror=()=>no(Error('Cannot read PDF'));reader.readAsDataURL(blob)});
   const payload={base64,filename:filename.replace(/\.pdf$/i,'-'+Date.now().toString(36)+'.pdf'),mime:'application/pdf'};
-  let result;
-  if(window.FieldForceNative?.saveFile)result=await window.FieldForceNative.saveFile(JSON.stringify(payload));
-  else if(window.ffhNativeCall)result=await window.ffhNativeCall('saveFile',payload);
+  let save;
+  if(window.FieldForceNative?.saveFile)save=()=>window.FieldForceNative.saveFile(JSON.stringify(payload));
+  else if(window.ffhNativeCall)save=()=>window.ffhNativeCall('saveFile',payload);
+  else if(window.FFHBridge?.postMessage)save=()=>new Promise((resolve,reject)=>{
+   const id=crypto.randomUUID(),previous=window.ffhNativeReply;
+   const reply=(request,result)=>{
+    if(request!==id){if(previous)previous(request,result);return}
+    if(window.ffhNativeReply===reply)window.ffhNativeReply=previous;
+    result?.error?reject(Error(result.error)):resolve(result);
+   };
+   window.ffhNativeReply=reply;
+   try{window.FFHBridge.postMessage(JSON.stringify({action:'saveFile',payload:JSON.stringify({...payload,request_id:id})}));}
+   catch(e){if(window.ffhNativeReply===reply)window.ffhNativeReply=previous;reject(e)}
+  });
   else throw Error('Android download service not available. Please reopen app.');
+  const result=await save();
   if(result?.saved!==true)throw Error(result?.error||'Android did not confirm the PDF save.');
   return result;
  }
