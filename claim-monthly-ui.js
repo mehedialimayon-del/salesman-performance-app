@@ -75,7 +75,7 @@ function enhance(){
   if(form&&!form.querySelector('.ffExpenseCategory')){
    const first=form.querySelector('label');if(first){
     const holder=document.createElement('div');holder.className='ffCategoryChoice';
-    holder.innerHTML='<label>Expense Category<select name="category" class="ffExpenseCategory" required>'+CATS.map(c=>'<option value="'+c+'">'+c+'</option>').join('')+'</select></label><label class="ffClaimOther" hidden>Other Category<input name="custom_category" maxlength="80" placeholder="e.g. New AC Training"></label>';
+    holder.innerHTML='<label>Expense Category<select name="category" class="ffExpenseCategory" required><option value="" selected disabled>SELECT CATEGORY</option>'+CATS.map(c=>'<option value="'+c+'">'+c+'</option>').join('')+'</select></label><label class="ffClaimOther" hidden>Other Category<input name="custom_category" maxlength="80" placeholder="e.g. New AC Training"></label>';
     first.before(holder);holder.querySelector('select').onchange=e=>{holder.querySelector('.ffClaimOther').hidden=e.target.value!=='Others'};
    }
   }
