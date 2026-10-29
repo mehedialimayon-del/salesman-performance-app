@@ -54,7 +54,7 @@ function passesBudget(n){
  if(pref.budget==='Any Budget')return true;
  if(n===null)return false;
  if(pref.budget==='RM 90,000+')return n>=90000;
- var m=pref.budget.match(/[\d,]+/);return !m||n<=Number(m[0].replace(/,/g,''))*1000;
+ var m=pref.budget.match(/[\d,]+/);return !m||n<=Number(m[0].replace(/,/g,''));
 }
 renderResults=function(){
  var el=document.querySelector('#results');if(!el)return;
