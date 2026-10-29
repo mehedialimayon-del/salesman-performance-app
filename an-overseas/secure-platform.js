@@ -33,10 +33,12 @@ async function setUser(user){
 }
 async function publicContent(){
  if(!AN.db)return;
- const {data,error}=await AN.db.from('an_site_content').select('key,value').in('key',['settings','management','success_stories','university_overrides']);
+ const {data,error}=await AN.db.from('an_site_content').select('key,value').in('key',['settings','management','success_stories','university_overrides','services','countries']);
  if(error)return;
  const by=Object.fromEntries((data||[]).map(x=>[x.key,x.value]));
  AN.publicSettings=by.settings||{};AN.management=Array.isArray(by.management)?by.management:[];AN.stories=Array.isArray(by.success_stories)?by.success_stories:[];AN.loadedStory=true;
+ if(Array.isArray(by.services)&&by.services.length&&typeof serviceList!=='undefined'){serviceList.splice(0,serviceList.length,...by.services.filter(v=>Array.isArray(v)&&v.length>=3).map(v=>[String(v[0]),String(v[1]),String(v[2])]));}
+ if(Array.isArray(by.countries)&&by.countries.length&&typeof countries!=='undefined'){countries.splice(0,countries.length,...by.countries.filter(v=>Array.isArray(v)&&v.length>=3).map(v=>[String(v[0]),String(v[1]),String(v[2])]));}
  (Array.isArray(by.university_overrides)?by.university_overrides:[]).forEach(x=>{
   let u=U.find(z=>z.id===x.id);if(!u)return;
   ['name','short','city','country','kind'].forEach(k=>{if(typeof x[k]==='string'&&x[k].trim())u[k]=x[k].trim();});
@@ -49,6 +51,8 @@ function repaintPublic(){
  const ticker=document.querySelector('.ticker .marquee');if(ticker&&s.ticker)ticker.textContent=s.ticker;
  if(route()==='home'){
   const motto=document.querySelector('.campus-line');if(motto&&s.motto)motto.textContent=s.motto;
+  const heroTitle=document.querySelector('.hero h1');if(heroTitle&&s.heroLead&&s.heroAccent)heroTitle.innerHTML=ed(s.heroLead)+'<br><span class="gradient">'+ed(s.heroAccent)+'</span>';
+  const heroDescription=document.querySelector('.hero .home-description');if(heroDescription&&s.heroDescription)heroDescription.textContent=s.heroDescription;
   if(s.heroImage&&/^https:\/\//i.test(s.heroImage)){try{const u=new URL(s.heroImage);const hero=document.querySelector('.hero');if(hero){let style=document.getElementById('an-hero-image-override');if(!style){style=document.createElement('style');style.id='an-hero-image-override';document.head.appendChild(style);}style.textContent='body.home-view .hero:before{background-image:url("'+u.href.replace(/"/g,'%22')+'")!important;}';}}catch(e){}}
  }
  if(route()==='about'){
