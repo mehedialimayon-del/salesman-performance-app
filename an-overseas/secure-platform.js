@@ -201,19 +201,35 @@ async function submitApplication(){
 document.addEventListener('click',async e=>{
  const final=e.target.closest('[data-apply-nav="finish"]');
  if(final){e.preventDefault();e.stopImmediatePropagation();if(!AN.db){msg('Secure connection not ready. Please try again.');return;}await submitApplication();return;}
- if(e.target.closest('#an-logout')){await AN.db?.auth.signOut();await setUser(null);location.hash='#/home';return;}
+ if(e.target.closest('#an-admin-switch-account')){if(AN.db)await AN.db.auth.signOut();await setUser(null);render();return;}
+  if(e.target.closest('#an-logout')){await AN.db?.auth.signOut();await setUser(null);location.hash='#/home';return;}
  if(e.target.closest('#an-reset-password')){let email=document.querySelector('#an-auth-form [name=email]')?.value.trim();if(!email){msg('Enter your email address first.');return;}const{error}=await AN.db.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});msg(error?errorText(error):'If the address is registered, you will receive a password reset email.');}
  const file=e.target.closest('[data-open-file]');if(file&&AN.db){let{data,error}=await AN.db.storage.from(PRIVATE_BUCKET).createSignedUrl(file.dataset.openFile,90);if(error)msg(errorText(error));else window.open(data.signedUrl,'_blank','noopener');}
 },true);
 document.addEventListener('submit',async e=>{
  const form=e.target,id=form.id;
- if(!['an-auth-form','an-housing-form','an-contact-form','an-document-form','an-message-form','an-change-password'].includes(id))return;
+ if(!['an-admin-auth-form','an-auth-form','an-housing-form','an-contact-form','an-document-form','an-message-form','an-change-password'].includes(id))return;
  e.preventDefault();e.stopImmediatePropagation();
  if(!AN.db){msg('Secure platform is still connecting.');return;}
  const submit=form.querySelector('button[type=submit]');if(submit)submit.disabled=true;
  try{
   const f=new FormData(form);
-  if(id==='an-change-password'){const pw=String(f.get('password')||'');if(pw.length<8)throw Error('Password must be at least 8 characters.');const{error}=await AN.db.auth.updateUser({password:pw});if(error)throw error;msg('Password updated. You can now sign in.');location.hash='#/dashboard';}
+  if(id==='an-admin-auth-form'){
+    const email=String(f.get('email')||'').trim(),password=String(f.get('password')||'');
+    if(!email||!password)throw new Error('Enter the administrator email and password.');
+    const {data,error}=await AN.db.auth.signInWithPassword({email,password});
+    if(error)throw error;
+    await setUser(data.user);
+    if(!AN.isAdmin){
+      await AN.db.auth.signOut();
+      await setUser(null);
+      render();
+      throw new Error('It’s only for Admin. This email is not authorized to enter the Admin Panel.');
+    }
+    render();
+    return;
+   }
+   if(id==='an-change-password'){const pw=String(f.get('password')||'');if(pw.length<8)throw Error('Password must be at least 8 characters.');const{error}=await AN.db.auth.updateUser({password:pw});if(error)throw error;msg('Password updated. You can now sign in.');location.hash='#/dashboard';}
   if(id==='an-auth-form'){
    const email=String(f.get('email')||'').trim(),password=String(f.get('password')||'');
    if(route()==='register'){if(password.length<8)throw Error('Password must be at least 8 characters.');const {data,error}=await AN.db.auth.signUp({email,password,options:{data:{full_name:String(f.get('full_name')||'').trim()},emailRedirectTo:location.href.split('#')[0]}});if(error)throw error;await setUser(data.user);msg(data.session?'Account created. Staff approval is required for application uploads.':'Check your email to confirm your account, then sign in.');if(data.session)location.hash='#/dashboard';}
@@ -223,7 +239,7 @@ document.addEventListener('submit',async e=>{
   if(id==='an-housing-form'){if(!AN.user)throw Error('Please sign in.');const row={user_id:AN.user.id,room_type:String(f.get('room_type')),location:String(f.get('location')).trim(),notes:String(f.get('notes')||'')};const{error}=await AN.db.from('an_accommodation_requests').insert(row);if(error)throw error;form.reset();msg('Housing request submitted.');}
   if(id==='an-message-form'){if(!AN.user)throw Error('Please sign in.');const row={user_id:AN.user.id,sender_id:AN.user.id,body:String(f.get('body')||'').trim()};if(!row.body)throw Error('Type a message first.');const{error}=await AN.db.from('an_messages').insert(row);if(error)throw error;form.reset();msg('Message sent.');await loadMessages();}
   if(id==='an-document-form'){if(!AN.user||(!AN.isApproved&&!AN.isAdmin))throw Error('Account approval is required.');const file=f.get('file'),app=String(f.get('application_id')||'');const approved=['application/pdf','image/jpeg','image/png','image/webp'];if(!(file instanceof File)||!file.size||file.size>10485760||!approved.includes(file.type))throw Error('Choose PDF/JPG/PNG/WEBP no larger than 10 MB.');if(!app)throw Error('Please submit an application first.');const unique=(crypto.randomUUID?.()||Date.now().toString());const safeName=file.name.replace(/[^a-z0-9._-]/gi,'_').slice(-110);const path=AN.user.id+'/'+app+'/'+unique+'-'+safeName;const {error:uploadError}=await AN.db.storage.from(PRIVATE_BUCKET).upload(path,file,{contentType:file.type,upsert:false});if(uploadError)throw uploadError;const row={application_id:app,owner_id:AN.user.id,storage_path:path,display_name:file.name,category:String(f.get('category')||'Supporting document'),mime_type:file.type,size_bytes:file.size,uploaded_by:AN.user.id};const{error}=await AN.db.from('an_documents').insert(row);if(error)throw Error('File uploaded but metadata failed. Please notify support: '+errorText(error));msg('Document securely uploaded.');await hydrate();}
- }catch(e2){const m=errorText(e2);msg((id==='an-auth-form'&&/invalid login credentials/i.test(m))?'Email or password did not match a confirmed account. Check the address or use Reset Password below.':(id==='an-auth-form'&&/email not confirmed/i.test(m))?'Please verify your email using the confirmation link, then sign in.':m);}
+ }catch(e2){const m=errorText(e2);msg(((id==='an-auth-form'||id==='an-admin-auth-form')&&/invalid login credentials/i.test(m))?'Email or password did not match a confirmed account. Check the address or use Reset Password below.':((id==='an-auth-form'||id==='an-admin-auth-form')&&/email not confirmed/i.test(m))?'Please verify your email using the confirmation link, then sign in.':m);}
  finally{if(submit&&submit.isConnected)submit.disabled=false;}
 },true);
 const originalRender=render;
