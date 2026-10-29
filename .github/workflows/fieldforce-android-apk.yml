@@ -28,6 +28,7 @@ on:
       - 'work-board.js'
       - 'index.html'
       - 'proposal-orders.js'
+      - 'proposal-pdf-extractor.js'
       - 'proposal-orders.css'
       - 'accounts.js'
       - 'app.js'
