@@ -27,6 +27,8 @@ on:
       - 'reports-ui.js'
       - 'work-board.js'
       - 'index.html'
+      - 'proposal-orders.js'
+      - 'proposal-orders.css'
       - 'accounts.js'
       - 'app.js'
       - 'earnings-core.js'
