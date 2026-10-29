@@ -138,3 +138,20 @@ body.home-view .ticker{height:25px}
  body.home-view .hero .actions{margin-top:7px}
  body.home-view .home-description{font-size:11px}
 }
+
+/* Keep the full About section and its CTA within a typical laptop viewport. */
+@media(min-width:801px){
+ #app>.wrap.content:has(.split a[href="#/services"]) .split{gap:12px}
+ #app>.wrap.content:has(.split a[href="#/services"]) .white{padding:12px!important}
+ #app>.wrap.content:has(.split a[href="#/services"]) .white p{font-size:11px;line-height:1.42;margin:7px 0}
+ #app>.wrap.content:has(.split a[href="#/services"]) .white h2{font-size:18px;line-height:1.2;margin:6px 0}
+ #app>.wrap.content:has(.split a[href="#/services"]) .white .form-grid{gap:6px}
+ #app>.wrap.content:has(.split a[href="#/services"]) .white .notice{padding:8px;font-size:10px;line-height:1.4}
+ #app>.wrap.content:has(.split a[href="#/services"]) .split>.card{min-height:245px!important}
+ #app>.wrap.content:has(.split a[href="#/services"]) .split>.card h2{font-size:23px}
+ #app>.wrap.content:has(.callout) .card .inside{padding:10px!important}
+ #app>.wrap.content:has(.callout) .card .iconbox{width:36px;height:36px;font-size:18px;margin-bottom:5px}
+ #app>.wrap.content:has(.callout) .card h3{margin:5px 0 4px}
+ #app>.wrap.content:has(.callout) .card p{font-size:10px;line-height:1.4;margin:4px 0}
+ #app>.wrap.content:has(.callout) .callout{margin-top:8px!important;padding:12px}
+}
