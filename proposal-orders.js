@@ -28,10 +28,74 @@ async function refreshFiles(){
  const {data,error}=await API().from('ffh_proposals').select('id,name,file_url,filename').order('created_at',{ascending:false});
  if(error)throw error;cloud=Array.isArray(data)?data:[];
 }
-async function getTemplate(chain){
- if(cache.has(chain.key))return cache.get(chain.key);
- const {data,error}=await API().from('ffh_proposal_item_templates').select('lines').eq('chain_key',chain.key).maybeSingle();
- if(error)throw error;const lines=Array.isArray(data?.lines)?data.lines:[];cache.set(chain.key,lines);return lines;
+function matchingFile(chain){
+ const name=clean(chain.name),key=chain.key;
+ const aliases={
+  '01':['GIANT'], '02':['KKSUPERMART','KKSUPERMARKET'], '03':['NSKGROCER','NSK'],
+  '05':['AEONBIG'], '07':['LOTUS'], '15':['BIGBENSINDEPENDENTGROCER'],
+  '16':['TFVALUEMART'], '21':['MERCEARIA'], '23':['KECOMART']
+ };
+ return cloud.find(x=>String(x.id)===String(chain.id))||
+ cloud.find(x=>{
+  const n=clean(x.name),names=[name,...(aliases[key]||[])];
+  return names.some(a=>a&&(a.length>3)&&(n===a||n.includes(a)||a.includes(n)));
+ });
+}
+async function importPdf(chain,input,allowOCR=true){
+ if(!window.FFH_PROPOSAL_PDF_PARSE?.read)throw Error('PDF SKU reader is not loaded. Please refresh the app.');
+ const parsed=await window.FFH_PROPOSAL_PDF_PARSE.read(input||chain.file,{allowOCR,maxPages:35});
+ if(parsed.lines.length<2||parsed.confidence==='low')throw Error('The uploaded PDF does not contain a reliably readable Item Code + Product Name table. Please upload a clear/searchable PDF; no SKU was guessed or saved.');
+ cache.set(chain.key,parsed.lines);
+ if(chain.manage){
+  const staffId=await identify();
+  const row={chain_key:chain.key,chain_name:chain.name,source_pdf_url:chain.file||'',lines:parsed.lines,updated_by:staffId,updated_at:new Date().toISOString()};
+  const {error}=await API().from('ffh_proposal_item_templates').upsert(row,{onConflict:'chain_key'});
+  if(error)throw Error('PDF items were read, but SKU cloud sync failed: '+error.message);
+ }
+ return parsed.lines;
+}
+async function getTemplate(chain,options={}){
+ const match=matchingFile(chain);if(match?.file_url){chain.file=match.file_url;chain.filename=match.filename||chain.filename;}
+ if(cache.has(chain.key)&&!options.force)return cache.get(chain.key);
+ const {data,error}=await API().from('ffh_proposal_item_templates').select('lines,source_pdf_url').eq('chain_key',chain.key).maybeSingle();
+ if(error)throw error;
+ const lines=Array.isArray(data?.lines)?data.lines:[];
+ if(lines.length&&(data.source_pdf_url===chain.file||(!data.source_pdf_url&&!chain.file))){
+  cache.set(chain.key,lines);return lines;
+ }
+ if(!chain.file){if(lines.length){cache.set(chain.key,lines);return lines}return []}
+ return importPdf(chain,chain.file,options.allowOCR!==false);
+}
+async function autoImportUploaded({name,file_url,file,templateKey,id}){
+ await identify();
+ const key=templateKey||sourceKey(name)||('custom:'+String(id||clean(name)));
+ const chain={key,name:String(name||'Proposal'),id:id||'',file:file_url||'',manage:true};
+ cache.delete(key);
+ return {count:(await importPdf(chain,file||file_url,true)).length,key};
+}
+let scanning=false,scannedOnce=false;
+async function autoBackfill(){
+ if(scanning||scannedOnce)return;const page=APP?.querySelector('.ffProposalPage');
+ if(!page||!page.querySelector('.ffPropEdit'))return;
+ scanning=true;scannedOnce=true;
+ const status=document.createElement('span');status.className='ffPoSyncStatus';status.textContent='Reading uploaded PDFs…';
+ page.querySelector('.ffProposalHead')?.append(status);
+ let ready=0,failed=0,attempted=0;
+ try{
+  await refreshFiles();
+  const cards=[...page.querySelectorAll('.ffProposalStrip')];
+  for(const card of cards){
+   if(!APP?.contains(card))break;
+   const chain=chainFromCard(card),match=matchingFile(chain);
+   if(!match?.file_url)continue;
+   chain.file=match.file_url;chain.manage=true;
+   attempted++;status.textContent='Auto SKU import '+attempted+'…';
+   try{const list=await getTemplate(chain,{allowOCR:false});if(list.length>1)ready++;else failed++}
+   catch(e){failed++;console.warn('Proposal SKU import:',chain.name,e.message)}
+  }
+  status.textContent=attempted?('PDF SKUs: '+ready+' ready'+(failed?' · '+failed+' need scanning':'')):'SKU reader ready';
+ }catch(e){status.textContent='PDF SKU auto-sync unavailable';console.warn(e)}
+ finally{scanning=false}
 }
 function close(){if(modal){modal.remove();modal=null;document.body.classList.remove('ffProposalModalOn')}}
 function pane(title,inner){
@@ -52,12 +116,12 @@ function banner(chain){
 async function openComposer(chain){
  loading('Create Proposal');try{
   await identify();await refreshFiles();const lines=await getTemplate(chain);
-  if(!lines.length){const box=pane('Create Proposal',banner(chain)+emptyTemplate(chain));if(chain.manage)box.querySelector('#ffPoSetupNow').onclick=()=>openSetup(chain);return}
+  if(!lines.length){pane('Create Proposal',banner(chain)+emptyTemplate(chain));return}
   const cols=lines.map((it,i)=>`<tr><td class="ffPoNum">${i+1}</td><td class="ffPoItem"><strong>${H(it.code)}</strong><span>${H(it.name)}</span></td><td><input name="bal_${i}" type="number" min="0" max="9999999" step="1" inputmode="numeric" placeholder="—" aria-label="Balance Stock ${i+1}"></td><td><input name="qty_${i}" type="number" min="0" max="9999999" step="1" inputmode="numeric" placeholder="—" aria-label="Proposed Order ${i+1}"></td></tr>`).join('');
   const html=banner(chain)+`<form id="ffPoForm" class="ffPoForm"><div class="ffPoInfoGrid"><label>Outlet Name *<input name="outlet_name" maxlength="130" placeholder="Giant Ampang Point" required></label><label>Outlet / Store Code<input name="outlet_code" maxlength="70" placeholder="Outlet code"></label><label>Proposal Date *<input type="date" name="proposal_date" value="${DAY()}" required></label><label>Supplier Name<input name="supplier_name" maxlength="130" placeholder="Pinnacle Foods (M) Sdn Bhd"></label><label>Prepared By<input name="prepared_by" maxlength="100" placeholder="Your name"></label><label>Mobile Number<input name="phone" maxlength="40" inputmode="tel" placeholder="+60"></label><label>WhatsApp Number<input name="whatsapp" maxlength="40" inputmode="tel" placeholder="+60"></label></div><p class="ffPoHelp">Only Balance Stock and Proposed Order are editable for each SKU. Leave a quantity empty to keep its PDF cell blank.</p><div class="ffPoTableWrap"><table><thead><tr><th>No.</th><th>Item Code / Product Name</th><th>Balance<br>Stock (pcs)</th><th>Proposed<br>Order (pcs)</th></tr></thead><tbody>${cols}</tbody></table></div><footer class="ffPoActions"><button type="submit" class="ffPoPrimary">✓ SAVE PROPOSAL</button><button type="button" id="ffPoCancel">CANCEL</button>${chain.manage?'<button type="button" id="ffPoManageTemplate">⚙ SKU TEMPLATE</button>':''}</footer><p id="ffPoStatus" role="status"></p></form>`;
   const box=pane('Create Proposal',html),form=box.querySelector('#ffPoForm');
   box.querySelector('#ffPoCancel').onclick=close;
-  const edit=box.querySelector('#ffPoManageTemplate');if(edit)edit.onclick=()=>openSetup(chain);
+  const edit=box.querySelector('#ffPoManageTemplate');if(edit){edit.textContent='↻ RE-READ PDF SKUs';edit.onclick=()=>{cache.delete(chain.key);openComposer(chain)};}
   form.onsubmit=async e=>{
    e.preventDefault();const fd=new FormData(form),b=form.querySelector('button[type=submit]'),status=form.querySelector('#ffPoStatus');
    const qty=(field,i)=>{const v=String(fd.get(field+'_'+i)||'').trim();if(v==='')return null;const n=Number(v);if(!Number.isSafeInteger(n)||n<0||n>9999999)throw Error('Quantity must be a whole number from 0 to 9,999,999.');return n};
@@ -70,7 +134,7 @@ async function openComposer(chain){
     await showSaved(row,chain);
    }catch(err){status.textContent=err.message;b.disabled=false;}
   };
- }catch(err){const box=pane('Create Proposal',`<div class="ffPoMessage">${H(err.message)}</div>`);box.querySelector('.ffPoClose').focus();}
+ }catch(err){const box=pane('Create Proposal',`<div class="ffPoMessage"><strong>PDF SKU reading failed</strong><p>${H(err.message)}</p><button type="button" id="ffPoRetryAuto">↻ TRY PDF READING AGAIN</button></div>`);box.querySelector('#ffPoRetryAuto').onclick=()=>{cache.delete(chain.key);openComposer(chain)};box.querySelector('.ffPoClose').focus();}
 }
 async function openSetup(chain){
  if(!chain.manage)return;
@@ -168,6 +232,7 @@ function enhance(){
  if(head&&!head.querySelector('#ffPoHistoryButton')){
   const b=document.createElement('button');b.id='ffPoHistoryButton';b.className='secondary ffPoHistoryHeader';b.type='button';b.textContent='◷ History';b.onclick=()=>showHistory();head.append(b);
  }
+ if(!scannedOnce&&!scanning)setTimeout(autoBackfill,1200);
  page.querySelectorAll('.ffProposalStrip').forEach(card=>{
   const view=card.querySelector('.ffPropView');if(view&&!view.dataset.ffPoButton){
     view.dataset.ffPoButton='1';view.textContent='＋ CREATE PROPOSAL';view.onclick=()=>openComposer(chainFromCard(card));
@@ -180,5 +245,5 @@ function enhance(){
 }
 function schedule(){if(!queue){queue=true;requestAnimationFrame(enhance)}}
 if(APP){new MutationObserver(schedule).observe(APP,{childList:true,subtree:true});schedule()}
-window.FFH_PROPOSAL_ORDERS={openHistory:showHistory};
+window.FFH_PROPOSAL_ORDERS={openHistory:showHistory,autoImportUploaded,autoBackfill,refreshPdf:(chain)=>{cache.delete(chain.key);return getTemplate(chain,{force:true})}};
 })();
