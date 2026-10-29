@@ -62,7 +62,24 @@ function applyAbout(){
  managerIndex=(managerIndex+members.length)%members.length;
  const m=members[managerIndex]||{};
  const img=(typeof m.photo==='string'&&/^https:\/\//i.test(m.photo))?'<img loading="lazy" alt="'+E(m.name||'Management')+'" src="'+E(m.photo)+'">':'<div style="width:135px;height:160px;background:#1b140d;border:1px solid #9b5519;border-radius:10px;display:grid;place-items:center;color:#f7a539">A&N</div>';
- slot.innerHTML='<div class="an-management-profile">'+img+'<div><h3>'+E(m.name||'Management')+'</h3><p>'+E(m.designation||m.role||'')+'</p><p>'+E(m.department||'')+'</p><p>'+E(m.bio||m.description||'')+'</p></div></div>';
+ const isNusrat=managerIndex===0&&String(m.name||'').trim().toLowerCase()==='nusrat nasrin';
+ const portfolio=isNusrat?'https://mehedialimayon-del.github.io/Nusrat-Nasrin/?utm_source=chatgpt.com':m.portfolio;
+ const profileButton=(typeof portfolio==='string'&&/^https:\/\//i.test(portfolio))?'<a class="an-management-link" href="'+E(portfolio)+'" target="_blank" rel="noopener noreferrer">View Portfolio ↗</a>':'';
+ const adminButton=isNusrat?'<a class="an-management-link an-management-admin" href="#/admin"><span aria-hidden="true">🔐</span> Admin Panel</a>':'';
+ const phone=String(m.phone||'').trim();
+ const phoneHtml=phone?'<p class="an-management-contact">Phone: '+E(phone)+'</p>':'';
+ const email=String(m.email||'').trim();
+ const emailHtml=email?'<p class="an-management-contact">Email: '+E(email)+'</p>':'';
+ const title=m.designation||m.position||m.role||'';
+ const company=m.company||m.department||'';
+ const help=m.help||m.bio||m.description||(isNusrat?'Helping students plan their international education journey.':'');
+ slot.innerHTML='<div class="an-management-profile">'+img+'<div class="an-management-copy"><h3>'+E(m.name||'Management')+'</h3>'
+  +(title?'<p class="an-management-role">'+E(title)+'</p>':'')
+  +(company?'<p>'+E(company)+'</p>':'')
+  +(m.department&&m.department!==company?'<p>'+E(m.department)+'</p>':'')
+  +(help?'<p class="an-management-help">'+E(help)+'</p>':'')
+  +phoneHtml+emailHtml
+  +'<div class="an-management-links">'+profileButton+adminButton+'</div></div></div>';
  if(counter)counter.textContent=(managerIndex+1)+' / '+members.length;
 }
 function applyDetails(){
