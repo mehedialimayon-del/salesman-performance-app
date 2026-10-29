@@ -49,6 +49,7 @@ function repaintPublic(){
  const ticker=document.querySelector('.ticker .marquee');if(ticker&&s.ticker)ticker.textContent=s.ticker;
  if(route()==='home'){
   const motto=document.querySelector('.campus-line');if(motto&&s.motto)motto.textContent=s.motto;
+  if(s.heroImage&&/^https:\/\//i.test(s.heroImage)){try{const u=new URL(s.heroImage);const hero=document.querySelector('.hero');if(hero){let style=document.getElementById('an-hero-image-override');if(!style){style=document.createElement('style');style.id='an-hero-image-override';document.head.appendChild(style);}style.textContent='body.home-view .hero:before{background-image:url("'+u.href.replace(/"/g,'%22')+'")!important;}';}}catch(e){}}
  }
  if(route()==='about'){
   let description=document.querySelector('.page-head p');if(description&&s.about)description.textContent=s.about;
@@ -104,6 +105,28 @@ function messagesPage(){
  +'<div class="wrap content page-scroll">'+(!authRequired()?needAuth():
  '<div class="live-panel"><div id="an-message-list" class="live-msg-list">Loading messages...</div><form id="an-message-form" class="mt"><label class="field"><span>Send a message</span><textarea name="body" required maxlength="4000" placeholder="Your question or update"></textarea></label>'+B('submit','Send Message')+'</form><div id="an-feedback" class="live-form-msg"></div></div>')+'</div>';
 }
+/* Replace old preview messaging with authenticated application workflow. */
+const oldApply=applyPage,oldDrawApply=drawApply;
+applyPage=function(id){
+ if(!AN.user)return title('Secure Application','Log in before preparing your application.')+'<div class="wrap content">'+needAuth()+'</div>';
+ if(!AN.isApproved&&!AN.isAdmin)return title('Account Approval Required','Your student account is awaiting administrator approval.')+'<div class="wrap content"><div class="live-panel"><h2>Awaiting Approval</h2><p>You may explore universities now. Your application form and private document uploads unlock once the team approves your account.</p><a class="btn" href="#/dashboard">My Dashboard →</a></div></div>';
+ let html=oldApply(id);
+ html=html.replace('<b>● PREVIEW MODE</b>','<b>● SECURE ACCOUNT</b>').replace('This is a design preview, not a submitted application. Please do not enter passport numbers or upload confidential documents until your private student portal is activated.','After reviewing the details, you can submit a real application to the secure student portal. Upload private files only via My Documents.');
+ return html;
+};
+drawApply=function(){
+ oldDrawApply();
+ const el=document.querySelector('#apply-body');if(!el||!AN.user)return;
+ if(draft.step===3){
+  const h=el.querySelector('.notice');if(h)h.innerHTML='🔐 You can upload confidential application documents securely after submitting the application.';
+  el.querySelectorAll('.doccard .badge').forEach(b=>b.textContent='Secure document portal');
+  const row=el.querySelector('.row.between.mt');if(row)row.insertAdjacentHTML('beforebegin','<p><a class="cardlink" href="#/documents">Open My Private Documents →</a></p>');
+ }
+ if(draft.step===4){
+  const notice=el.querySelector('.notice');if(notice)notice.textContent='Submitting here will create a real application record in your secure dashboard. Your admission and visa status are not guaranteed.';
+  const finish=el.querySelector('[data-apply-nav="finish"]');if(finish)finish.textContent='Submit Application →';
+ }
+};
 const oldSuccess=successPage;
 successPage=function(){
  return title('Success Stories','Verified student experiences, university journeys and graduation moments.')
@@ -135,6 +158,8 @@ function updateContact(){
 }
 async function hydrate(){
  repaintPublic();updateContact();
+ const nav=document.getElementById('links');
+ if(nav){let el=document.getElementById('an-admin-nav');if(AN.isAdmin&&!el){el=document.createElement('a');el.id='an-admin-nav';el.href='#/admin';el.textContent='Admin Panel';nav.appendChild(el);}else if(!AN.isAdmin&&el)el.remove();}
  if(!AN.user||!AN.db)return;
  const p=route();
  if(p==='dashboard'){const el=document.getElementById('an-dashboard-data');if(el){const{data,error}=await AN.db.from('an_applications').select('id,university_id,programme,status,emgs_percent,created_at').order('created_at',{ascending:false});if(!el.isConnected)return;el.innerHTML=error?ed(errorText(error)):data.length?'<h2>My Applications</h2>'+data.map(a=>'<div class="live-msg"><b>'+ed(a.university_id)+' — '+ed(a.programme)+'</b><p>'+statusBadge(a.status)+' EMGS '+Number(a.emgs_percent||0)+'% · '+dt(a.created_at)+'</p></div>').join(''):'<h2>No Applications Yet</h2><p>Your submitted applications will appear here.</p>';}}
@@ -166,12 +191,13 @@ document.addEventListener('click',async e=>{
 },true);
 document.addEventListener('submit',async e=>{
  const form=e.target,id=form.id;
- if(!['an-auth-form','an-housing-form','an-contact-form','an-document-form','an-message-form'].includes(id))return;
+ if(!['an-auth-form','an-housing-form','an-contact-form','an-document-form','an-message-form','an-change-password'].includes(id))return;
  e.preventDefault();e.stopImmediatePropagation();
  if(!AN.db){msg('Secure platform is still connecting.');return;}
  const submit=form.querySelector('button[type=submit]');if(submit)submit.disabled=true;
  try{
   const f=new FormData(form);
+  if(id==='an-change-password'){const pw=String(f.get('password')||'');if(pw.length<8)throw Error('Password must be at least 8 characters.');const{error}=await AN.db.auth.updateUser({password:pw});if(error)throw error;msg('Password updated. You can now sign in.');location.hash='#/dashboard';}
   if(id==='an-auth-form'){
    const email=String(f.get('email')||'').trim(),password=String(f.get('password')||'');
    if(route()==='register'){if(password.length<8)throw Error('Password must be at least 8 characters.');const {data,error}=await AN.db.auth.signUp({email,password,options:{data:{full_name:String(f.get('full_name')||'').trim()},emailRedirectTo:location.href.split('#')[0]}});if(error)throw error;await setUser(data.user);msg(data.session?'Account created. Staff approval is required for application uploads.':'Check your email to confirm your account, then sign in.');if(data.session)location.hash='#/dashboard';}
@@ -189,6 +215,11 @@ render=function(){
  const p=route();
  if(p==='admin'){return window.ANRenderAdmin?.()||originalRender();}
  if(p==='messages'){document.body.classList.remove('home-view');app.innerHTML=messagesPage();document.title='Messages | A&N Overseas';window.scrollTo(0,0);}
+ if(p==='reset-password'){
+  document.body.classList.remove('home-view');
+  app.innerHTML=title('Reset Password','Set a new password for your verified account.')+'<div class="wrap content"><div class="live-panel live-login"><form id="an-change-password"><label>New Password<input type="password" name="password" required minlength="8" autocomplete="new-password"></label><button class="btn mt" type="submit">Update Password</button></form><p id="an-feedback" class="live-form-msg"></p></div></div>';
+  document.title='Reset Password | A&N Overseas';window.scrollTo(0,0);
+ }
  else originalRender();
  queueMicrotask(()=>{repaintPublic();updateContact();hydrate();if(p==='success'){const grid=document.getElementById('an-story-grid');if(grid)grid.innerHTML=storyMarkup();}});
 };
