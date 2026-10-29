@@ -1,0 +1,71 @@
+
+/* Digital Proposal Orders — no changes to other modules. */
+body.ffProposalModalOn{overflow:hidden!important}
+.ffPoOverlay{position:fixed;inset:0;z-index:200000;display:flex;align-items:center;justify-content:center;padding:8px;background:#000d;backdrop-filter:blur(8px)}
+.ffPoDialog{display:flex;flex-direction:column;width:min(760px,100%);height:min(94dvh,1000px);border:1px solid #ff801e;border-radius:20px;background:#060606;box-shadow:0 0 32px #ff74175c,0 25px 100px #000;overflow:hidden;color:#fff;font-family:Arial,sans-serif}
+.ffPoTop{flex-shrink:0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid #7b3915;background:linear-gradient(130deg,#15100b,#050505)}
+.ffPoTop small{display:block;color:#ff8b26;letter-spacing:1.6px;font-size:9px;font-weight:900}
+.ffPoTop h2{font-size:clamp(21px,5vw,30px);line-height:1.1;margin:5px 0 0;color:#fff}
+.ffPoClose{background:#16100b!important;color:#ff8c24!important;border:1px solid #a14f20!important;border-radius:10px!important;padding:8px 13px!important;font-size:20px!important}
+.ffPoScroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:12px 14px 20px}
+.ffPoBanner{position:relative;aspect-ratio:3/1;border:1px solid #ff8120;border-radius:15px;overflow:hidden;background:linear-gradient(120deg,#0d0d0d,#341805);margin:0 0 14px}
+.ffPoBanner img{width:100%;height:100%;object-fit:fill;display:block}
+.ffPoBanner span{display:none}
+.ffPoForm{display:grid;gap:12px}
+.ffPoInfoGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ffPoForm label,.ffPoHistoryFilters label{display:block;color:#ffab64;font-weight:800;font-size:12px;letter-spacing:.1px}
+.ffPoForm input,.ffPoForm textarea,.ffPoHistoryFilters input,.ffPoHistoryFilters select{box-sizing:border-box;width:100%;display:block;background:#111!important;border:1px solid #7d421e!important;color:#fff!important;border-radius:9px;padding:10px;font-size:14px;outline:none;margin-top:5px}
+.ffPoForm input:focus,.ffPoForm textarea:focus,.ffPoHistoryFilters input:focus{border-color:#ff9b32!important;box-shadow:0 0 8px #ff741755}
+.ffPoForm textarea{min-height:220px;font-family:monospace;white-space:pre;line-height:1.5}
+.ffPoHelp{margin:5px 0;color:#e8d7ca;font-size:12px;line-height:1.5}
+.ffPoTableWrap{max-width:100%;overflow:auto;border:1px solid #7a3d1a;border-radius:13px;background:#080808}
+.ffPoTableWrap table{width:100%;min-width:490px;border-collapse:collapse;font-size:12px}
+.ffPoTableWrap th{padding:10px 5px;background:#2a1509;color:#fff;border-right:1px solid #743c18;text-align:center}
+.ffPoTableWrap td{padding:7px 5px;border-top:1px solid #493322;border-right:1px solid #34261c;vertical-align:middle}
+.ffPoTableWrap tr:nth-child(2n){background:#120e0b}
+.ffPoNum{text-align:center;width:24px;color:#ff9c40;font-weight:900}
+.ffPoItem{min-width:170px}
+.ffPoItem strong{display:block;color:#ff9e4e;font-size:11px}
+.ffPoItem span{display:block;color:#fff;font-size:12px;line-height:1.4}
+.ffPoTableWrap td input{width:100%;min-width:76px;margin:0;box-sizing:border-box;border:1px solid #7d421e;border-radius:6px;background:#060606;color:#fff;font-size:15px;padding:8px 5px;text-align:center}
+.ffPoActions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.ffPoActions button,.ffPoHistoryRow button,.ffPoMessage button{background:linear-gradient(160deg,#180e08,#050505)!important;color:#ffb271!important;border:1px solid #f77a1b!important;border-radius:10px!important;padding:10px 13px!important;font-size:11px!important;font-weight:900!important;cursor:pointer}
+.ffPoActions .ffPoPrimary,.ffPoMessage button{background:linear-gradient(135deg,#ff9d30,#f15c06)!important;color:#fff!important;box-shadow:0 0 12px #ff741755}
+.ffPoActions button:disabled{opacity:.5;cursor:wait}
+.ffPoMessage{border:1px solid #904318;background:#15100c;border-radius:12px;padding:18px;line-height:1.6;color:#fff}
+.ffPoMessage strong{color:#ffa14c;font-size:17px}
+.ffPoMessage p{font-size:13px}
+.ffPoSuccess{padding:12px 14px;color:#6eff9a;font-weight:900;border:1px solid #287e41;background:#08170e;border-radius:9px;margin:0 0 12px}
+.ffPoPreview{background:#fff;color:#171717;overflow:auto;border-radius:11px;border:1px solid #dedede}
+.ffPoPreview>div{min-width:520px}
+.ffPoHistoryFilters{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;margin-bottom:15px}
+.ffPoHistoryRow{display:flex;justify-content:space-between;gap:8px;border:1px solid #693716;border-radius:12px;background:#130d09;padding:12px;margin:8px 0}
+.ffPoHistoryRow b{color:#fff;font-size:15px;display:block}
+.ffPoHistoryRow small{display:block;color:#e8c4a8;font-size:11px;line-height:1.4;margin-top:4px}
+.ffPoHistoryRow>div:last-child{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.ffPoHistoryRow button{padding:8px!important;font-size:10px!important}
+.ffProposalPage .ffPoHistoryHeader{font-size:11px!important;white-space:nowrap!important;padding:9px!important;margin-left:auto}
+.ffProposalPage .ffProposalHead{flex-wrap:wrap}
+.ffProposalPage .ffProposalStack .ffProposalVisual{background:linear-gradient(145deg,#050505,#241007)!important;width:100%!important;aspect-ratio:3/1!important;overflow:hidden!important}
+.ffProposalPage .ffProposalStack .ffProposalVisual>img{display:block!important;width:100%!important;height:100%!important;aspect-ratio:auto!important;object-fit:fill!important;max-width:none!important;max-height:none!important}
+.ffProposalPage .ffProposalStrip{width:100%!important;max-width:100%!important;overflow:hidden!important}
+.ffProposalPage .ffProposalActions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;width:100%!important;gap:5px!important;padding:3px 0!important}
+.ffProposalPage .ffProposalActions button{width:100%!important;white-space:normal!important;min-width:0!important;min-height:35px!important;font-size:10px!important;padding:7px 5px!important}
+.ffProposalPage .ffProposalActions.ffNoPdf{display:flex!important}
+.ffProposalPage .ffProposalActions.ffNoPdf button{max-width:60%}
+@media(max-width:570px){
+ .ffPoDialog{height:calc(100dvh - 56px);border-radius:13px}
+ .ffPoOverlay{padding:4px;align-items:flex-start}
+ .ffPoTop{padding:10px 12px}
+ .ffPoScroll{padding:10px}
+ .ffPoInfoGrid{gap:8px}
+ .ffPoInfoGrid label{font-size:11px}
+ .ffPoInfoGrid input{font-size:12px;padding:9px}
+ .ffPoHistoryFilters{grid-template-columns:1fr 1fr}
+ .ffPoHistoryFilters label:first-child{grid-column:1/-1}
+ .ffPoHistoryRow{display:block}
+ .ffPoHistoryRow>div:last-child{margin-top:10px}
+ .ffProposalPage .ffProposalHead{gap:7px}
+ .ffProposalPage .ffPoHistoryHeader{font-size:10px!important}
+ .ffProposalPage .ffProposalActions button{font-size:9px!important}
+}
