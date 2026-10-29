@@ -589,6 +589,398 @@
         "Communication",
         "Computer Science"
       ]
+    },
+    {
+      "id": "japan",
+      "name": "University of Tokyo",
+      "short": "UTokyo",
+      "country": "Japan",
+      "city": "Tokyo",
+      "kind": "Public",
+      "site": "https://www.u-tokyo.ac.jp/en/",
+      "programs": [
+        "Engineering",
+        "Economics",
+        "Science"
+      ]
+    },
+    {
+      "id": "kyoto",
+      "name": "Kyoto University",
+      "short": "Kyoto",
+      "country": "Japan",
+      "city": "Kyoto",
+      "kind": "Public",
+      "site": "https://www.kyoto-u.ac.jp/en",
+      "programs": [
+        "Science",
+        "Engineering",
+        "Humanities"
+      ]
+    },
+    {
+      "id": "tum",
+      "name": "Technical University of Munich",
+      "short": "TUM",
+      "country": "Germany",
+      "city": "Munich",
+      "kind": "Public",
+      "site": "https://www.tum.de/en/",
+      "programs": [
+        "Engineering",
+        "Informatics",
+        "Management"
+      ]
+    },
+    {
+      "id": "heidelberg",
+      "name": "Heidelberg University",
+      "short": "Heidelberg",
+      "country": "Germany",
+      "city": "Heidelberg",
+      "kind": "Public",
+      "site": "https://www.uni-heidelberg.de/en",
+      "programs": [
+        "Science",
+        "Medicine",
+        "Humanities"
+      ]
+    },
+    {
+      "id": "mit",
+      "name": "Massachusetts Institute of Technology",
+      "short": "MIT",
+      "country": "United States",
+      "city": "Cambridge, Massachusetts",
+      "kind": "Public",
+      "site": "https://www.mit.edu",
+      "programs": [
+        "Engineering",
+        "Computer Science",
+        "Economics"
+      ]
+    },
+    {
+      "id": "harvard",
+      "name": "Harvard University",
+      "short": "Harvard",
+      "country": "United States",
+      "city": "Cambridge, Massachusetts",
+      "kind": "Public",
+      "site": "https://www.harvard.edu",
+      "programs": [
+        "Public Health",
+        "Science",
+        "Humanities"
+      ]
+    },
+    {
+      "id": "auckland",
+      "name": "University of Auckland",
+      "short": "Auckland",
+      "country": "New Zealand",
+      "city": "Auckland",
+      "kind": "Public",
+      "site": "https://www.auckland.ac.nz/en.html",
+      "programs": [
+        "Business",
+        "Engineering",
+        "Science"
+      ]
+    },
+    {
+      "id": "otago",
+      "name": "University of Otago",
+      "short": "Otago",
+      "country": "New Zealand",
+      "city": "Dunedin",
+      "kind": "Public",
+      "site": "https://www.otago.ac.nz",
+      "programs": [
+        "Health",
+        "Science",
+        "Humanities"
+      ]
+    },
+    {
+      "id": "tcd",
+      "name": "Trinity College Dublin",
+      "short": "Trinity",
+      "country": "Ireland",
+      "city": "Dublin",
+      "kind": "Public",
+      "site": "https://www.tcd.ie",
+      "programs": [
+        "Science",
+        "Computer Science",
+        "Business"
+      ]
+    },
+    {
+      "id": "ucd",
+      "name": "University College Dublin",
+      "short": "UCD",
+      "country": "Ireland",
+      "city": "Dublin",
+      "kind": "Public",
+      "site": "https://www.ucd.ie",
+      "programs": [
+        "Agriculture",
+        "Business",
+        "Engineering"
+      ]
+    },
+    {
+      "id": "sorbonne",
+      "name": "Sorbonne University",
+      "short": "Sorbonne",
+      "country": "France",
+      "city": "Paris",
+      "kind": "Public",
+      "site": "https://www.sorbonne-universite.fr/en",
+      "programs": [
+        "Science",
+        "Medicine",
+        "Humanities"
+      ]
+    },
+    {
+      "id": "psl",
+      "name": "Université PSL",
+      "short": "PSL",
+      "country": "France",
+      "city": "Paris",
+      "kind": "Public",
+      "site": "https://psl.eu/en",
+      "programs": [
+        "Science",
+        "Management",
+        "Humanities"
+      ]
+    },
+    {
+      "id": "bologna",
+      "name": "University of Bologna",
+      "short": "Bologna",
+      "country": "Italy",
+      "city": "Bologna",
+      "kind": "Public",
+      "site": "https://www.unibo.it/en",
+      "programs": [
+        "Economics",
+        "Engineering",
+        "Law"
+      ]
+    },
+    {
+      "id": "sapienza",
+      "name": "Sapienza University of Rome",
+      "short": "Sapienza",
+      "country": "Italy",
+      "city": "Rome",
+      "kind": "Public",
+      "site": "https://www.uniroma1.it/en",
+      "programs": [
+        "Engineering",
+        "Science",
+        "Medicine"
+      ]
+    },
+    {
+      "id": "uamsterdam",
+      "name": "University of Amsterdam",
+      "short": "UvA",
+      "country": "Netherlands",
+      "city": "Amsterdam",
+      "kind": "Public",
+      "site": "https://www.uva.nl/en",
+      "programs": [
+        "Social Sciences",
+        "Economics",
+        "Science"
+      ]
+    },
+    {
+      "id": "tudelft",
+      "name": "Delft University of Technology",
+      "short": "TU Delft",
+      "country": "Netherlands",
+      "city": "Delft",
+      "kind": "Public",
+      "site": "https://www.tudelft.nl/en",
+      "programs": [
+        "Engineering",
+        "Architecture",
+        "Technology"
+      ]
+    },
+    {
+      "id": "lund",
+      "name": "Lund University",
+      "short": "Lund",
+      "country": "Sweden",
+      "city": "Lund",
+      "kind": "Public",
+      "site": "https://www.lunduniversity.lu.se",
+      "programs": [
+        "Science",
+        "Engineering",
+        "Social Sciences"
+      ]
+    },
+    {
+      "id": "kth",
+      "name": "KTH Royal Institute of Technology",
+      "short": "KTH",
+      "country": "Sweden",
+      "city": "Stockholm",
+      "kind": "Public",
+      "site": "https://www.kth.se/en",
+      "programs": [
+        "Engineering",
+        "Computer Science",
+        "Technology"
+      ]
+    },
+    {
+      "id": "helsinki",
+      "name": "University of Helsinki",
+      "short": "Helsinki",
+      "country": "Finland",
+      "city": "Helsinki",
+      "kind": "Public",
+      "site": "https://www.helsinki.fi/en",
+      "programs": [
+        "Agriculture",
+        "Science",
+        "Humanities"
+      ]
+    },
+    {
+      "id": "aalto",
+      "name": "Aalto University",
+      "short": "Aalto",
+      "country": "Finland",
+      "city": "Espoo",
+      "kind": "Public",
+      "site": "https://www.aalto.fi/en",
+      "programs": [
+        "Engineering",
+        "Design",
+        "Business"
+      ]
+    },
+    {
+      "id": "nus",
+      "name": "National University of Singapore",
+      "short": "NUS",
+      "country": "Singapore",
+      "city": "Singapore",
+      "kind": "Public",
+      "site": "https://nus.edu.sg",
+      "programs": [
+        "Business",
+        "Engineering",
+        "Science"
+      ]
+    },
+    {
+      "id": "ntu-sg",
+      "name": "Nanyang Technological University",
+      "short": "NTU",
+      "country": "Singapore",
+      "city": "Singapore",
+      "kind": "Public",
+      "site": "https://www.ntu.edu.sg",
+      "programs": [
+        "Engineering",
+        "Business",
+        "Science"
+      ]
+    },
+    {
+      "id": "khalifa",
+      "name": "Khalifa University",
+      "short": "Khalifa",
+      "country": "United Arab Emirates",
+      "city": "Abu Dhabi",
+      "kind": "Public",
+      "site": "https://www.ku.ac.ae",
+      "programs": [
+        "Engineering",
+        "Science",
+        "Medicine"
+      ]
+    },
+    {
+      "id": "uaeu",
+      "name": "United Arab Emirates University",
+      "short": "UAEU",
+      "country": "United Arab Emirates",
+      "city": "Al Ain",
+      "kind": "Public",
+      "site": "https://www.uaeu.ac.ae/en/",
+      "programs": [
+        "Agriculture",
+        "Engineering",
+        "Business"
+      ]
+    },
+    {
+      "id": "koc",
+      "name": "Koç University",
+      "short": "Koç",
+      "country": "Turkey",
+      "city": "Istanbul",
+      "kind": "Public",
+      "site": "https://www.ku.edu.tr/en/",
+      "programs": [
+        "Business",
+        "Engineering",
+        "Social Sciences"
+      ]
+    },
+    {
+      "id": "sabanci",
+      "name": "Sabancı University",
+      "short": "Sabancı",
+      "country": "Turkey",
+      "city": "Istanbul",
+      "kind": "Public",
+      "site": "https://www.sabanciuniv.edu/en",
+      "programs": [
+        "Engineering",
+        "Management",
+        "Social Sciences"
+      ]
+    },
+    {
+      "id": "chula",
+      "name": "Chulalongkorn University",
+      "short": "Chula",
+      "country": "Thailand",
+      "city": "Bangkok",
+      "kind": "Public",
+      "site": "https://www.chula.ac.th/en/",
+      "programs": [
+        "Business",
+        "Engineering",
+        "Science"
+      ]
+    },
+    {
+      "id": "mahidol",
+      "name": "Mahidol University",
+      "short": "Mahidol",
+      "country": "Thailand",
+      "city": "Nakhon Pathom / Bangkok",
+      "kind": "Public",
+      "site": "https://mahidol.ac.th",
+      "programs": [
+        "Health",
+        "Science",
+        "International Studies"
+      ]
     }
   ],
   "management": []
