@@ -73,29 +73,36 @@ async function autoImportUploaded({name,file_url,file,templateKey,id}){
  cache.delete(key);
  return {count:(await importPdf(chain,file||file_url,true)).length,key};
 }
-let scanning=false,scannedOnce=false;
+let scanning=false;const scannedSources=new Set();let nextScanTimer=null;
 async function autoBackfill(){
- if(scanning||scannedOnce)return;const page=APP?.querySelector('.ffProposalPage');
+ if(scanning)return;
+ const page=APP?.querySelector('.ffProposalPage');
  if(!page||!page.querySelector('.ffPropEdit'))return;
- scanning=true;scannedOnce=true;
- const status=document.createElement('span');status.className='ffPoSyncStatus';status.textContent='Reading uploaded PDFs…';
- page.querySelector('.ffProposalHead')?.append(status);
+ scanning=true;
+ let status=page.querySelector('.ffPoSyncStatus');
+ if(!status){status=document.createElement('span');status.className='ffPoSyncStatus';status.setAttribute('role','status');page.querySelector('.ffProposalHead')?.append(status)}
  let ready=0,failed=0,attempted=0;
  try{
   await refreshFiles();
-  const cards=[...page.querySelectorAll('.ffProposalStrip')];
-  for(const card of cards){
+  for(const card of [...page.querySelectorAll('.ffProposalStrip')]){
    if(!APP?.contains(card))break;
    const chain=chainFromCard(card),match=matchingFile(chain);
-   if(!match?.file_url)continue;
+   if(!match?.file_url||scannedSources.has(match.file_url))continue;
    chain.file=match.file_url;chain.manage=true;
-   attempted++;status.textContent='Auto SKU import '+attempted+'…';
+   scannedSources.add(chain.file);
+   attempted++;status.textContent='Reading SKU from uploaded PDF '+attempted+'…';
    try{const list=await getTemplate(chain,{allowOCR:false});if(list.length>1)ready++;else failed++}
-   catch(e){failed++;console.warn('Proposal SKU import:',chain.name,e.message)}
+   catch(e){failed++;console.warn('Proposal PDF SKU extraction:',chain.name,e.message)}
   }
-  status.textContent=attempted?('PDF SKUs: '+ready+' ready'+(failed?' · '+failed+' need scanning':'')):'SKU reader ready';
- }catch(e){status.textContent='PDF SKU auto-sync unavailable';console.warn(e)}
+  if(APP.contains(page)){
+   status.textContent=attempted?'SKU auto-sync: '+ready+' imported'+(failed?' · '+failed+' need OCR on opening':''):'Uploaded PDFs checked';
+  }
+ }catch(e){if(APP.contains(page))status.textContent='PDF SKU sync unavailable';console.warn(e)}
  finally{scanning=false}
+}
+function scheduleBackfill(){
+ if(nextScanTimer)clearTimeout(nextScanTimer);
+ nextScanTimer=setTimeout(()=>{nextScanTimer=null;autoBackfill()},1400);
 }
 function close(){if(modal){modal.remove();modal=null;document.body.classList.remove('ffProposalModalOn')}}
 function pane(title,inner){
@@ -232,7 +239,7 @@ function enhance(){
  if(head&&!head.querySelector('#ffPoHistoryButton')){
   const b=document.createElement('button');b.id='ffPoHistoryButton';b.className='secondary ffPoHistoryHeader';b.type='button';b.textContent='◷ History';b.onclick=()=>showHistory();head.append(b);
  }
- if(!scannedOnce&&!scanning)setTimeout(autoBackfill,1200);
+ scheduleBackfill();
  page.querySelectorAll('.ffProposalStrip').forEach(card=>{
   const view=card.querySelector('.ffPropView');if(view&&!view.dataset.ffPoButton){
     view.dataset.ffPoButton='1';view.textContent='＋ CREATE PROPOSAL';view.onclick=()=>openComposer(chainFromCard(card));
