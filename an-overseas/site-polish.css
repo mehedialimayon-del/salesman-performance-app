@@ -11,7 +11,7 @@ body.home-view #app>.ticker{display:none!important}
 .an-update-item:before{content:"✦";font-size:9px;color:#ff9b21}
 .an-update-item[data-color="orange"]{color:#ff9b20}
 .an-update-item[data-color="white"]{color:#fff}
-@keyframes an-ticker-move{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes an-ticker-move{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-1 * var(--an-ticker-distance, 600px)),0,0)}}
 .an-updates-bar:hover .an-updates-track,.an-updates-bar:focus-within .an-updates-track{animation-play-state:paused}
 @media(prefers-reduced-motion:reduce){.an-updates-track{animation:none;transform:none}}
 @media(min-width:801px){
