@@ -188,6 +188,7 @@ jobs:
           node tests/directory-scroll-ui.cjs || ffh_browser_status=1
           node tests/assistant-speech-ui.cjs || ffh_browser_status=1
           node tests/entry-conversations-ui.cjs || ffh_browser_status=1
+          node tests/proposal-orders-mobile-ui.cjs || ffh_browser_status=1
           exit "$ffh_browser_status"
 
       - name: Preserve controlled report layout screenshots
@@ -211,6 +212,7 @@ jobs:
             /tmp/ffh-reports-qa.png
             /tmp/ffh-compact-*.png
             /tmp/ffh-summary-qa.png
+            /tmp/ffh-proposal-phone-*.png
           if-no-files-found: ignore
           retention-days: 7
 
