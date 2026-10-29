@@ -113,7 +113,7 @@ function repaintCopy(){
    var panel=document.createElement('section');
    panel.id='owner-management';panel.className='white mt';
    panel.innerHTML='<h2><span style="color:#ff8500">Our</span> Management</h2><div class="grid">'
-   +siteCopy.management.map(function(p){return '<article class="card"><div class="inside"><h3>'+esc(p.name||'')+'</h3><p>'+esc(p.role||'')+'</p><p>'+esc(p.description||'')+'</p></div></article>';}).join('')+'</div>';
+   +siteCopy.management.map(function(p){var photo=/^https:\/\//i.test(p.photo||'')?'<img alt="'+esc(p.name||'Manager')+'" src="'+esc(p.photo)+'" loading="lazy" style="width:100%;height:140px;object-fit:contain;background:#101010">':'';return '<article class="card">'+photo+'<div class="inside"><h3>'+esc(p.name||'')+'</h3><p>'+esc(p.role||'')+'</p><p>'+esc(p.description||'')+'</p></div></article>';}).join('')+'</div>';
    host.appendChild(panel);
   }
  }
