@@ -190,7 +190,7 @@ select option{background:#10151c;color:#fff}
 @keyframes brandGlow{0%,100%{filter:drop-shadow(0 0 3px #ff9b1530);transform:translateY(0)}50%{filter:drop-shadow(0 0 10px #ff9b1580);transform:translateY(-2px)}}
 .top .brand-logo{animation:brandGlow 4s ease-in-out infinite}
 body.home-view .hero{background:#080b11;align-items:stretch}
-body.home-view .hero:before{inset:0;background-image:url('assets/malaysia-students.jpg');background-position:center;background-size:cover;opacity:1}
+body.home-view .hero:before{inset:0;background-image:url('assets/malaysia-skyline-clean.jpg');background-position:center;background-size:cover;opacity:1}
 body.home-view .hero:after{background:linear-gradient(90deg,#060a12f5 0%,#060a12d9 30%,#060a1240 65%,#060a1200 100%),linear-gradient(0deg,#06090fe8,transparent 32%)}
 body.home-view .hero .wrap{max-width:1230px;display:flex;flex-direction:column;justify-content:center;position:relative;width:100%;margin:0 auto;height:100%;padding-top:24px;padding-bottom:24px}
 body.home-view .hero h1{font-size:clamp(48px,6.4vw,88px);margin:18px 0 12px;line-height:1.0;max-width:660px}
@@ -269,9 +269,9 @@ body.home-view .campus-line{font-size:12px;letter-spacing:.35px;color:#ffd5a0;fo
 /* A&N homepage portraits: clear original Twin Towers view; no frosted backdrop. */
 body.home-view .hero .hero-portraits{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;isolation:isolate}
 body.home-view .hero .hero-portraits::before{content:none!important;display:none!important}
-body.home-view .hero .hero-portrait{display:block;position:absolute;bottom:-1px;width:auto;max-width:none;object-fit:contain;object-position:center bottom;z-index:1;filter:brightness(.93) saturate(.94) contrast(1.02) drop-shadow(0 6px 18px #06142666)}
-body.home-view .hero .hero-portrait--nusrat{left:51%;height:88%}
-body.home-view .hero .hero-portrait--ayon{right:0;height:85%;z-index:2}
+body.home-view .hero .hero-portrait{display:block;position:absolute;bottom:-1px;width:auto;max-width:none;object-fit:contain;object-position:center bottom;z-index:1;filter:brightness(.85) saturate(.86) contrast(.98) drop-shadow(0 6px 18px #06142666)}
+body.home-view .hero .hero-portrait--nusrat{left:51%;height:87%}
+body.home-view .hero .hero-portrait--ayon{right:0;height:84%;z-index:2}
 body.home-view .hero>.wrap{z-index:3}
 /* Keep the approved Malaysia skyline, preserve its original desktop crop and subtle text shading. */
 @media(min-width:801px){
@@ -280,21 +280,21 @@ body.home-view .hero>.wrap{z-index:3}
 }
 /* On mobile the skyline must fade into the text area, not end with a hard black cut. */
 @media(max-width:800px){
- body.home-view .hero:before{height:100%;background-size:auto 64%;background-repeat:no-repeat;background-position:75% top;opacity:1}
- body.home-view .hero:after{background:linear-gradient(180deg,rgba(6,9,15,.03) 0%,rgba(6,9,15,.08) 28%,rgba(6,9,15,.38) 43%,rgba(6,9,15,.76) 54%,#06090fe8 67%,#06090f 84%,#06090f 100%)}
- body.home-view .hero .hero-portraits{height:53%;bottom:auto}
- body.home-view .hero .hero-portrait--nusrat{left:4%;height:88%}
- body.home-view .hero .hero-portrait--ayon{right:-6%;height:87%}
+ body.home-view .hero:before{height:100%;background-size:auto 66%;background-repeat:no-repeat;background-position:80% top;opacity:1}
+ body.home-view .hero:after{z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(6,9,15,.02) 0%,rgba(6,9,15,.04) 29%,rgba(6,9,15,.28) 43%,rgba(6,9,15,.63) 57%,#06090fcf 70%,#06090f 89%)}
+ body.home-view .hero .hero-portraits{height:63%;bottom:auto;z-index:1;mask-image:linear-gradient(180deg,#000 0%,#000 70%,transparent 100%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 70%,transparent 100%)}
+ body.home-view .hero .hero-portrait--nusrat{left:4%;height:85%}
+ body.home-view .hero .hero-portrait--ayon{right:-6%;height:84%}
  body.home-view .hero .wrap{padding-bottom:clamp(34px,6vh,76px);justify-content:flex-end}
  body.home-view .hero h1{font-size:clamp(47px,11vw,67px);line-height:1.01;margin:7px 0 8px}
  body.home-view .eyebrow{background:rgba(4,7,12,.78);border-color:#ce8438a8;color:#ffd394;font-weight:800;font-size:clamp(9px,1.4vw,11px);letter-spacing:.55px;text-shadow:0 1px 4px #000}
  body.home-view .home-description{text-shadow:0 2px 6px #000c}
 }
 @media(max-width:520px){
- body.home-view .hero .hero-portraits{height:51%;bottom:auto}
- body.home-view .hero .hero-portrait--nusrat{left:4%;height:87%}
- body.home-view .hero .hero-portrait--ayon{right:-6%;height:86%}
- body.home-view .hero .wrap{padding:11px 15px clamp(28px,5vh,56px)}
+ body.home-view .hero .hero-portraits{height:62%;bottom:auto}
+ body.home-view .hero .hero-portrait--nusrat{left:4%;height:84%}
+ body.home-view .hero .hero-portrait--ayon{right:-6%;height:83%}
+ body.home-view .hero .wrap{padding:11px 15px clamp(52px,8vh,90px)}
  body.home-view .hero h1{font-size:clamp(46px,11.8vw,58px);margin:6px 0 8px}
  body.home-view .eyebrow{font-size:9px;letter-spacing:.35px;line-height:1.3;padding:7px 10px}
 }
