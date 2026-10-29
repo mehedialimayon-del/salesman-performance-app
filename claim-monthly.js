@@ -11,7 +11,7 @@ function groupRows(rows){
   const row=map.get(cat),amount=Math.round((+r.amount||0)*100);
   if(!(amount>0))continue;
   row.totalCents+=amount;row.items.push(r);
-  if(r.reason&&!row.reasons.includes(tidy(r.reason)))row.reasons.push(tidy(r.reason));
+  if(r.reason&&tidy(r.reason).toLowerCase()!==cat.toLowerCase()&&!row.reasons.includes(tidy(r.reason)))row.reasons.push(tidy(r.reason));
  }
  const groups=[...map.values()].filter(x=>x.items.length).map(x=>({...x,total:x.totalCents/100}));
  const grandCents=groups.reduce((s,g)=>s+g.totalCents,0);
