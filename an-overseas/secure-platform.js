@@ -98,7 +98,7 @@ dashPage=function(){
  if(!authRequired())return title('Student Portal','Secure student dashboard')+'<div class="wrap content">'+needAuth()+'</div>';
  const menu=[['dashboard','Overview'],['apply','Apply Now'],['tracking','Application Tracking'],['documents','My Documents'],['payments','Invoices'],['accommodation','Accommodation'],['messages','Messages']];
  return title('My Student Dashboard','Your personal applications, updates and university documents.')
- +'<div class="wrap content page-scroll"><div class="live-controls">'+menu.map(([to,label])=>'<a href="#/'+to+'">'+label+'</a>').join('')+(AN.isAdmin?'<a href="#/admin">Admin Control Panel</a>':'')+'<button id="an-logout">Sign Out</button></div>'
+ +'<div class="wrap content page-scroll"><div class="live-controls">'+menu.map(([to,label])=>'<a href="#/'+to+'">'+label+'</a>').join('')+(AN.isAdmin?'<a href="#/admin">Admin Control Panel</a>':'')+'<a href="#/change-password">Change Password</a><button id="an-logout">Sign Out</button></div>'
  +'<div class="live-panel mt"><h2>Welcome, '+ed(AN.user.user_metadata?.full_name||AN.user.email||'Student')+'</h2>'+(AN.isApproved||AN.isAdmin?'<p>Account approved for applications.</p>':'<p>Your account has been created. An administrator must approve it before you can submit an application or upload files.</p>')+'</div><div id="an-dashboard-data" class="live-panel"><p>Loading your applications...</p></div></div>';
 };
 trackingPage=function(){
@@ -148,6 +148,20 @@ drawApply=function(){
   const finish=el.querySelector('[data-apply-nav="finish"]');if(finish)finish.textContent='Submit Application →';
  }
 };
+function changePasswordPage(){
+ const back=AN.isAdmin?'#/admin':'#/dashboard',label=AN.isAdmin?'Admin Panel':'Student Dashboard';
+ if(!AN.user)return title('Password Change','A signed-in account is required.')+'<div class="wrap content page-scroll"><div class="live-panel live-login"><h2>Sign in to change your password</h2><p>For security, only the owner of a verified active session can choose a new password without email. If you are logged out, use account recovery or contact the account owner.</p><div class="live-controls"><a href="#/admin">Admin Login</a><a href="#/login">Student Login</a><a href="reset-password.html">Email Recovery</a></div></div></div>';
+ return title('Change Password','Set a new password for your signed-in '+(AN.isAdmin?'admin':'student')+' account.')
+ +'<div class="wrap content page-scroll"><div class="live-panel live-login"><h2><span style="color:#ff9c23">New</span> Password</h2>'
+ +'<p>Signed in as <strong>'+ed(AN.user.email||'Verified account')+'</strong>. No email link is needed while this account remains signed in.</p>'
+ +'<form id="an-self-change-password" autocomplete="on">'
+ +'<label class="field"><span>New Password</span><input class="input" type="password" name="password" autocomplete="new-password" required minlength="8" maxlength="200"></label>'
+ +'<label class="field"><span>Confirm New Password</span><input class="input" type="password" name="confirm_password" autocomplete="new-password" required minlength="8" maxlength="200"></label>'
+ +'<button class="btn" type="submit">Save New Password</button></form>'
+ +'<div id="an-feedback" class="live-form-msg" role="status" aria-live="polite"></div>'
+ +'<p class="live-mini">Your new password is saved securely by the authentication provider, not on this website or in your Gmail account.</p>'
+ +'<div class="live-controls"><a href="'+back+'">← '+label+'</a></div></div></div>';
+}
 const oldSuccess=successPage;
 successPage=function(){
  return title('Success Stories','Verified student experiences, university journeys and graduation moments.')
@@ -213,7 +227,7 @@ document.addEventListener('click',async e=>{
 },true);
 document.addEventListener('submit',async e=>{
  const form=e.target,id=form.id;
- if(!['an-admin-auth-form','an-auth-form','an-housing-form','an-contact-form','an-document-form','an-message-form','an-change-password'].includes(id))return;
+ if(!['an-admin-auth-form','an-auth-form','an-housing-form','an-contact-form','an-document-form','an-message-form','an-change-password','an-self-change-password'].includes(id))return;
  e.preventDefault();e.stopImmediatePropagation();
  if(!AN.db){msg('Secure platform is still connecting.');return;}
  const submit=form.querySelector('button[type=submit]');if(submit)submit.disabled=true;
@@ -234,6 +248,19 @@ document.addEventListener('submit',async e=>{
     render();
     return;
    }
+   if(id==='an-self-change-password'){
+    if(!AN.user)throw Error('You must be signed in before changing your password.');
+    const pw=String(f.get('password')||''),confirm=String(f.get('confirm_password')||'');
+    if(pw.length<8)throw Error('Please use a password containing at least 8 characters.');
+    if(pw!==confirm)throw Error('The two password fields do not match.');
+    const {data:identity,error:identityError}=await AN.db.auth.getUser();
+    if(identityError||!identity?.user||identity.user.id!==AN.user.id)throw Error('Your login session expired. Please sign in again to change your password.');
+    const {error:saveError}=await AN.db.auth.updateUser({password:pw});
+    if(saveError)throw Error('Password was not changed: '+errorText(saveError));
+    form.reset();
+    msg('Password changed successfully. Your new password is now active. You can return to your dashboard.');
+    return;
+   }
    if(id==='an-change-password'){const pw=String(f.get('password')||'');if(pw.length<8)throw Error('Password must be at least 8 characters.');const{error}=await AN.db.auth.updateUser({password:pw});if(error)throw error;await setUser(AN.user);msg('Password updated successfully.');location.hash=AN.isAdmin?'#/admin':'#/dashboard';}
   if(id==='an-auth-form'){
    const email=String(f.get('email')||'').trim(),password=String(f.get('password')||'');
@@ -252,10 +279,8 @@ render=function(){
  const p=route();
  if(p==='admin'){return window.ANRenderAdmin?.()||originalRender();}
  if(p==='messages'){document.body.classList.remove('home-view');app.innerHTML=messagesPage();document.title='Messages | A&N Overseas';window.scrollTo(0,0);}
- if(p==='reset-password'){
-  document.body.classList.remove('home-view');
-  app.innerHTML=title('Reset Password','Set a new password for your verified account.')+'<div class="wrap content"><div class="live-panel live-login"><form id="an-change-password"><label>New Password<input type="password" name="password" required minlength="8" autocomplete="new-password"></label><button class="btn mt" type="submit">Update Password</button></form><p id="an-feedback" class="live-form-msg"></p></div></div>';
-  document.title='Reset Password | A&N Overseas';window.scrollTo(0,0);
+ else if(p==='change-password'||p==='reset-password'){
+  document.body.classList.remove('home-view');app.innerHTML=changePasswordPage();document.title='Change Password | A&N Overseas';window.scrollTo(0,0);
  }
  else originalRender();
  queueMicrotask(()=>{repaintPublic();updateContact();if(typeof window.ANRenderPublicEnhancements==='function')window.ANRenderPublicEnhancements();hydrate();if(p==='success'){const grid=document.getElementById('an-story-grid');if(grid)grid.innerHTML=storyMarkup();}});
