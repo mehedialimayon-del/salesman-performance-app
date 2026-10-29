@@ -144,10 +144,20 @@ function latestRow(i,item){
  +'<button type="button" data-remove-latest aria-label="Remove announcement">×</button></div>';
 }
 function teamRow(i,v){
- return '<div class="live-msg" data-team-index="'+i+'"><h3>Team Member '+(i+1)+'</h3><div class="live-fieldgrid">'
- +field("Name","team-name-"+i,v.name||"")+field("Designation","team-designation-"+i,v.designation||v.role||"")
- +field("Department","team-department-"+i,v.department||"")+field("Public Photo URL","team-photo-"+i,v.photo||"")
- +field("Bio","team-bio-"+i,v.bio||"","textarea")+'</div><button type="button" data-remove-admin-row="team">Remove</button></div>';
+ const m=v||{};
+ return '<div class="live-msg" data-team-index="'+i+'" data-team-id="'+esc(m.id||'')+'"><h3>Management Profile '+(i+1)+'</h3><div class="live-fieldgrid">'
+ +field("Full Name","team-name-"+i,m.name||"")
+ +field("Designation / Title","team-designation-"+i,m.designation||m.role||"")
+ +field("Position (e.g. CEO & Marketing Head)","team-position-"+i,m.position||"")
+ +field("Company Name","team-company-"+i,m.company||m.department||"")
+ +field("Department","team-department-"+i,m.department||"")
+ +field("How This Person Helps Students","team-help-"+i,m.help||m.bio||m.description||"","textarea")
+ +field("Portfolio Website","team-portfolio-"+i,m.portfolio||"")
+ +field("Phone Number","team-phone-"+i,m.phone||"")
+ +field("Email","team-email-"+i,m.email||"")
+ +field("Existing Public Photo URL","team-photo-"+i,m.photo||"")
+ +'<label>Upload New Photo<input type="file" name="team-upload-'+i+'" accept="image/jpeg,image/png,image/webp"></label>'
+ +'</div><div class="live-controls"><button type="button" data-team-move="up">Move Up ↑</button><button type="button" data-team-move="down">Move Down ↓</button><button type="button" data-remove-admin-row="team">Remove</button></div></div>';
 }
 function serviceRow(i,v){
  return '<div class="live-msg" data-service-index="'+i+'"><h3>Service '+(i+1)+'</h3><div class="live-fieldgrid">'
@@ -182,11 +192,17 @@ document.addEventListener("click",async e=>{
  if(t.dataset.addAdminRow){
   const typ=t.dataset.addAdminRow,selector=typ==="team"?"#an-team-list":typ==="service"?"#an-services-list":"#an-countries-list";
   const list=document.querySelector(selector);if(list){
-    const i=list.children.length;
+    const existing=[...list.children].map(el=>Number(el.dataset.teamIndex??el.dataset.serviceIndex??el.dataset.countryIndex??-1));
+    const i=Math.max(-1,...existing)+1;
     list.insertAdjacentHTML("beforeend",typ==="team"?teamRow(i,{}):typ==="service"?serviceRow(i,["","",""]):countryRow(i,["","",""]));
   }
  }
  if(t.dataset.removeAdminRow){t.closest(".live-msg")?.remove();}
+  if(t.dataset.teamMove){
+   const card=t.closest('[data-team-index]');
+   if(card&&t.dataset.teamMove==='up'&&card.previousElementSibling)card.parentElement.insertBefore(card,card.previousElementSibling);
+   if(card&&t.dataset.teamMove==='down'&&card.nextElementSibling)card.parentElement.insertBefore(card.nextElementSibling,card);
+  }
  if(t.dataset.adminTab){section=t.dataset.adminTab;document.querySelectorAll("[data-admin-tab]").forEach(b=>b.classList.toggle("active",b.dataset.adminTab===section));await draw();}
  if(t.id==="admin-reload")await draw();
  if(t.dataset.adminApp){const a=saved.apps.find(v=>v.id===t.dataset.adminApp);if(!a)return;const f='<form id="admin-case-form" data-id="'+esc(a.id)+'"><div class="live-fieldgrid">'+dropdown("Case Status","status",["submitted","under_review","documents_required","university_submitted","offer_received","emgs_submitted","visa_processing","approved","completed","rejected"],a.status)+dropdown("Verified EMGS %","emgs_percent",[0,5,15,32,35,70,80,90,95,100],a.emgs_percent)+'</div><button class="btn mt" type="submit">Save Case</button></form>';document.getElementById("admin-app-form").innerHTML=panel('<h3>Update '+esc(a.applicant_name)+'</h3>'+f+'<form id="admin-update-form" data-id="'+esc(a.id)+'" class="mt">'+field("Update Title","title")+field("Message","body","","textarea")+'<button class="btn mt" type="submit">Notify Student</button></form>');}
@@ -221,11 +237,35 @@ document.addEventListener("submit",async e=>{
  }
  if(id==="admin-settings-form"){const s={...saved.settings};for(const k of ["ticker","motto","heroLead","heroAccent","heroDescription","heroImage","about","work","malaysiaOffice","bangladeshOffice","phone","whatsapp","email"])s[k]=v(k);await publish("settings",s);}
  if(id==="admin-management-form"){
-  const members=[...document.querySelectorAll("[data-team-index]")].map(el=>{
-    const i=el.dataset.teamIndex;return {name:v("team-name-"+i),designation:v("team-designation-"+i),department:v("team-department-"+i),photo:v("team-photo-"+i),bio:v("team-bio-"+i)};
-  }).filter(m=>m.name);await publish("management",members);
- }
- if(id==="admin-services-form"){
+   const members=[];
+   for(const el of f.querySelectorAll('[data-team-index]')){
+    const i=el.dataset.teamIndex;
+    const name=v('team-name-'+i);
+    if(!name)continue;
+    const file=form.get('team-upload-'+i);
+    let photo=v('team-photo-'+i);
+    if(file instanceof File&&file.size){showMsg('Uploading '+name+' photo...');photo=await adminUploadImage(file,'team-photo');}
+    const portfolio=v('team-portfolio-'+i);
+    if(portfolio&&!/^https:\/\//i.test(portfolio))throw Error('Portfolio links must use https://');
+    const help=v('team-help-'+i);
+    members.push({
+     id:el.dataset.teamId||'member-'+crypto.randomUUID(),
+     name,
+     designation:v('team-designation-'+i),
+     position:v('team-position-'+i),
+     company:v('team-company-'+i),
+     department:v('team-department-'+i),
+     help,bio:help,
+     portfolio,
+     phone:v('team-phone-'+i),
+     email:v('team-email-'+i),
+     photo
+    });
+   }
+   if(!members.length)throw Error('Add at least one management profile.');
+   await publish('management',members);
+  }
+  if(id==="admin-services-form"){
   const services=[...document.querySelectorAll("[data-service-index]")].map(el=>{
    const i=el.dataset.serviceIndex;return [v("service-icon-"+i),v("service-title-"+i),v("service-desc-"+i)];
   }).filter(a=>a[1]);if(!services.length)throw Error("Keep at least one service");await publish("services",services);
