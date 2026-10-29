@@ -124,7 +124,8 @@ grant insert on public.an_leads to anon,authenticated;
 grant select,update on public.an_leads to authenticated;
 grant select on public.an_admins to authenticated;
 grant select,insert,update,delete on public.an_student_accounts to authenticated;
-grant insert,select,update on public.an_password_help_requests to anon,authenticated;
+grant insert on public.an_password_help_requests to anon,authenticated;
+grant select,update on public.an_password_help_requests to authenticated;
 grant select,insert on public.an_account_audit to authenticated;
 
 -- The client never receives Supabase service_role credentials.
