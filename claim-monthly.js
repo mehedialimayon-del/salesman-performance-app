@@ -2,7 +2,7 @@
 (function(root){'use strict';
 const MONEY=n=>Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
 const tidy=s=>String(s??'').replace(/\s+/g,' ').trim();
-const categories=['Fuel Expenses','Buyer Entertainment','Team Building','Training','Others'];
+const categories=['Fuel Expenses','Buyer Entertainment','Team Building','New AC Training','Training','Others'];
 function groupRows(rows){
  const map=new Map();
  for(const r of rows||[]){
@@ -119,16 +119,19 @@ async function overlayOnCompanyForm(doc,raw,{month,summary,staff,claim}){
   ['Fuel Expenses',/FUEL|PETROL|DIESEL|TRAVEL EXPENSE/],
   ['Buyer Entertainment',/BUYER|ENTERTAINMENT/],
   ['Team Building',/TEAM BUILD|TEAM MEAL/],
+  ['New AC Training',/TRAINING|COURSE|AC LEARNING/],
   ['Training',/TRAINING|COURSE/],
   ['Others',/OTHERS?|MISCELLANEOUS/]
  ];
- const claimed=new Set();
+ const claimed=new Set(),usedAnchors=new Set();
  const boxTop=totalRow?.y ? Math.min(height*.65,totalRow.y+185):height*.49;
  const formRows=[];
  let nextY=boxTop;
  for(const group of summary.groups){
   const match=anchors.find(([cat])=>cat===group.category);
-  const anchored=match?findAnchor(rows,match[1]):null;
+  const detected=match?findAnchor(rows,match[1]):null;
+  const anchored=detected&&!usedAnchors.has(detected.y)?detected:null;
+  if(anchored)usedAnchors.add(anchored.y);
   let y=anchored?.y||nextY;
   if(!anchored){nextY-=24}
   claimed.add(group.category);
