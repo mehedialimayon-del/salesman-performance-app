@@ -36,6 +36,16 @@ const studentLogin=()=>{
  '<p id="an-portal-note" class="an-portal-note" role="status" aria-live="polite"></p>'+
  '<div class="an-portal-actions"><a href="#/password-help">Forgot Student ID / Password?</a><a href="#/register">First-time applicant? Apply Without Password</a><a href="#/login?method=email">Existing Email Login →</a></div>');
 };
+const ownerSetup=()=>heading('Owner Account Setup','Create the new A&N Overseas Admin identity securely.')+W(
+ '<h2>A&N Overseas Owner Setup</h2><p>This is a one-time Auth registration for the owner email. It does not automatically grant administrator privileges; email ownership must be verified first. Please choose a <strong>new password</strong> that has never been posted in a chat.</p>'+
+ '<form id="an-portal-owner-setup" class="an-portal-form">'+
+ '<label class="an-portal-field"><span>Owner Email</span><input type="email" name="email" value="mehedialimayon@gmail.com" readonly required></label>'+
+ field('Choose New Password (12+ characters)','password','password')+
+ field('Confirm New Password','confirm_password','password')+
+ '<button class="btn" type="submit">Create My Owner Login</button></form>'+
+ '<p id="an-portal-note" class="an-portal-note" role="status"></p>'+
+ '<p>After verification, your ownership can be added to the A&N administrator access table. The old FieldForce account will not be touched.</p>'
+);
 const help=()=>heading('Password Help','Ask the A&N team to verify and reset your student account.')+W(
  '<h2>Forgot Student ID / Password</h2><p>Send a request to our team. Your identity will be checked before a temporary password is issued. We do not retrieve or send old passwords.</p>'+
  '<form id="an-portal-help" class="an-portal-form">'+field('Student ID (optional — leave blank if forgotten)','student_code','text',false)+
@@ -111,12 +121,22 @@ function showTemporary(data){
 document.addEventListener('input',e=>{if(e.target?.id==='an-portal-search')paint();});
 document.addEventListener('submit',async e=>{
  const form=e.target;
- if(!['an-portal-lead','an-portal-login','an-portal-help'].includes(form?.id))return;
+ if(!['an-portal-lead','an-portal-login','an-portal-help','an-portal-owner-setup'].includes(form?.id))return;
  e.preventDefault();e.stopImmediatePropagation();
  const btn=form.querySelector('button[type=submit]');if(btn)btn.disabled=true;
  const f=Object.fromEntries(new FormData(form).entries());
  try{
-  if(form.id==='an-portal-lead'){
+  if(form.id==='an-portal-owner-setup'){
+    const email=String(f.email||'').trim().toLowerCase();
+    const password=String(f.password||'');
+    if(email!=='mehedialimayon@gmail.com')throw new Error('This owner setup is only for the approved A&N email.');
+    if(password.length<12||password!==String(f.confirm_password||''))throw new Error('Choose a unique password of at least 12 characters and confirm it correctly.');
+    if(!AN.db)throw new Error('Login service is not ready.');
+    const {data,error}=await AN.db.auth.signUp({email,password,options:{emailRedirectTo:'https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/'}});
+    if(error)throw error;
+    form.reset();
+    status(data.session?'Account created. Please contact A&N management for role activation.':'Registration request accepted. Verify your email, then request admin role activation.');
+  }else if(form.id==='an-portal-lead'){
     const d=await invokePublic({...f,action:'lead'});
     form.reset();status(d.message||'Your application has been submitted.');
   }else if(form.id==='an-portal-help'){
@@ -184,6 +204,9 @@ window.render=function(){
   document.title='Student Management | A&N Overseas';
   if(AN.isAdmin)void loadAdmin();
   return;
+ }
+ if(currentRoute()==='owner-setup'){
+  document.body.classList.remove('home-view');document.getElementById('app').innerHTML=ownerSetup();document.title='Owner Login Setup | A&N Overseas';return;
  }
  if(currentRoute()==='password-help'){
   document.body.classList.remove('home-view');document.getElementById('app').innerHTML=help();document.title='Password Help | A&N Overseas';return;
