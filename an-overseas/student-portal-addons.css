@@ -1,0 +1,26 @@
+/* A&N Overseas student onboarding — respect existing deep orange + white palette. */
+.an-portal-panel{margin:16px auto;max-width:1050px;padding:clamp(16px,3vw,28px);color:#fff}
+.an-portal-panel h2{margin:4px 0 10px;color:#ff9c24;font-size:clamp(18px,2.2vw,26px)}
+.an-portal-panel p{line-height:1.55;font-size:13px;color:#d7d3cb}
+.an-portal-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:15px}
+.an-portal-form>button{grid-column:1/-1}
+.an-portal-field{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#ffad4c;min-width:0}
+.an-portal-field input,.an-portal-field textarea{width:100%;padding:11px 13px;font-size:14px;border:1px solid #795023;border-radius:10px;background:#100e0c;color:#fff;outline:none;min-height:42px}
+.an-portal-field input:focus,.an-portal-field textarea:focus{border-color:#ffaa37;box-shadow:0 0 0 2px #ff97002e}
+.an-portal-field textarea{resize:vertical;min-height:65px}
+.an-portal-form>.an-portal-field:has(textarea){grid-column:1/-1}
+.an-portal-note{margin:14px 0;font-size:12px!important;min-height:22px}
+.an-portal-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin:15px 0}
+.an-portal-actions>a{padding:9px 12px;font-size:12px;text-decoration:none;color:#ffa633;border-radius:10px;border:1px solid #76491d;background:#170e06}
+.an-portal-actions>a:hover{background:#7a410b;color:#fff}
+.an-portal-tabs{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.an-portal-tabs button{font-size:12px;padding:9px 12px}
+.an-portal-item{border:1px solid #684017;background:#18130e;padding:14px;margin:10px 0;border-radius:13px;overflow-wrap:anywhere}
+.an-portal-item h3{font-size:16px;color:#ffb050;margin:0 0 7px}
+.an-portal-item p{font-size:12px;margin:5px 0 9px;color:#eee8e0}
+.an-portal-item button{font-size:11px;padding:9px 13px;margin-top:6px}
+.an-portal-credentials{margin:16px 0;padding:15px;border:2px solid #ffa524;border-radius:13px;background:#28190a}
+.an-portal-credentials h3{font-size:17px;color:#ffc277}
+.an-portal-credentials code{font-size:13px;word-break:break-all;color:#fff}
+@media(max-width:620px){.an-portal-form{grid-template-columns:1fr}.an-portal-panel{margin:9px 0}.an-portal-tabs button{flex:1;font-size:10px;min-width:110px}.an-portal-item button{max-width:100%}}
+@media(prefers-reduced-motion:reduce){.an-portal-panel *{scroll-behavior:auto!important;animation:none!important}}
