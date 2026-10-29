@@ -126,7 +126,7 @@ function applyDetails(){
 }
 function services(){
  const cards=document.querySelectorAll('#app>.wrap.content>.grid>.card');if(!cards.length)return;
- cards.forEach((card,i)=>{if(card.classList.contains('an-service-card'))return;card.classList.add('an-service-card');const figure=document.createElement('div');figure.className='an-service-picture';const img=document.createElement('img');img.loading='lazy';img.alt=card.querySelector('h3')?.textContent||'A&N student support';img.src='https://images.unsplash.com/'+servicePhotos[i%servicePhotos.length]+'?auto=format&fit=crop&w=630&q=77';figure.append(img);card.insertBefore(figure,card.firstChild);});
+ cards.forEach((card,i)=>{if(card.querySelector('.an-service-picture'))return;card.classList.add('an-service-card');const figure=document.createElement('div');figure.className='an-service-picture';const img=document.createElement('img');img.loading='lazy';img.alt=card.querySelector('h3')?.textContent||'A&N student support';img.src='https://images.unsplash.com/'+servicePhotos[i%servicePhotos.length]+'?auto=format&fit=crop&w=630&q=77';figure.append(img);card.insertBefore(figure,card.firstChild);});
 }
 function page(){
  bar();
