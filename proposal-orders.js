@@ -44,7 +44,7 @@ function matchingFile(chain){
 async function importPdf(chain,input,allowOCR=true){
  if(!window.FFH_PROPOSAL_PDF_PARSE?.read)throw Error('PDF SKU reader is not loaded. Please refresh the app.');
  const parsed=await window.FFH_PROPOSAL_PDF_PARSE.read(input||chain.file,{allowOCR,maxPages:35});
- if(parsed.lines.length<2||parsed.confidence==='low')throw Error('The uploaded PDF does not contain a reliably readable Item Code + Product Name table. Please upload a clear/searchable PDF; no SKU was guessed or saved.');
+ if(!parsed.lines.length||parsed.confidence==='low')throw Error('The uploaded PDF does not contain a reliably readable Item Code + Product Name table. Please upload a clear/searchable PDF; no SKU was guessed or saved.');
  cache.set(chain.key,parsed.lines);cachedSource.set(chain.key,chain.file||'');
  if(chain.manage){
   const staffId=await identify();
@@ -91,7 +91,7 @@ async function autoBackfill(){
    chain.file=match.file_url;chain.manage=true;
    scannedSources.add(chain.file);
    attempted++;status.textContent='Reading SKU from uploaded PDF '+attempted+'…';
-   try{const list=await getTemplate(chain,{allowOCR:false});if(list.length>1)ready++;else failed++}
+   try{const list=await getTemplate(chain,{allowOCR:false});if(list.length)ready++;else failed++}
    catch(e){failed++;console.warn('Proposal PDF SKU extraction:',chain.name,e.message)}
   }
   if(APP.contains(page)){
