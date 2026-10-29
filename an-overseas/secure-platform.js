@@ -33,10 +33,10 @@ async function setUser(user){
 }
 async function publicContent(){
  if(!AN.db)return;
- const {data,error}=await AN.db.from('an_site_content').select('key,value').in('key',['settings','management','success_stories','university_overrides','services','countries','latest_updates']);
+ const {data,error}=await AN.db.from('an_site_content').select('key,value').in('key',['settings','management','success_stories','university_overrides','services','countries','latest_updates','scholarships','offers']);
  if(error)return;
  const by=Object.fromEntries((data||[]).map(x=>[x.key,x.value]));
- AN.publicSettings=by.settings||{};AN.management=Array.isArray(by.management)?by.management:[];AN.stories=Array.isArray(by.success_stories)?by.success_stories:[];AN.latestUpdates=Array.isArray(by.latest_updates)?by.latest_updates:[];AN.loadedStory=true;
+ AN.publicSettings=by.settings||{};AN.management=Array.isArray(by.management)?by.management:[];AN.stories=Array.isArray(by.success_stories)?by.success_stories:[];AN.latestUpdates=Array.isArray(by.latest_updates)?by.latest_updates:[];AN.scholarships=Array.isArray(by.scholarships)?by.scholarships:[];AN.offers=Array.isArray(by.offers)?by.offers:[];AN.loadedStory=true;
  if(Array.isArray(by.services)&&by.services.length&&typeof serviceList!=='undefined'){serviceList.splice(0,serviceList.length,...by.services.filter(v=>Array.isArray(v)&&v.length>=3).map(v=>[String(v[0]),String(v[1]),String(v[2])]));}
  if(Array.isArray(by.countries)&&by.countries.length&&typeof countries!=='undefined'){countries.splice(0,countries.length,...by.countries.filter(v=>Array.isArray(v)&&v.length>=3).map(v=>[String(v[0]),String(v[1]),String(v[2])]));}
  (Array.isArray(by.university_overrides)?by.university_overrides:[]).forEach(x=>{
@@ -61,6 +61,7 @@ async function publicContent(){
   }
  });
  repaintPublic();
+ if(['universities','university','services','service','scholarships','offers','countries','apply'].includes(route()))queueMicrotask(()=>{if(typeof render==='function'&&!location.hash.startsWith('#/admin'))render();});
 }
 function repaintPublic(){
  const s=AN.publicSettings;
