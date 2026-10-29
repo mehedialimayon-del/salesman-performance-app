@@ -31,12 +31,12 @@ UNIVERSITY_PROFILES.uniten.programSource='https://www.uniten.edu.my/all-programm
 window.addEventListener('DOMContentLoaded',function(){
   var css=document.createElement('link');css.rel='stylesheet';css.href='compact-layout.css?v=20261029-2154';document.head.appendChild(css);
   var viewport=document.createElement('link');viewport.rel='stylesheet';viewport.href='viewport-final.css?v=20261029-2215';document.head.appendChild(viewport);
-  var flight=document.createElement('script');flight.src='logo-flight.js?v=20261029-completecrest-v3';document.body.appendChild(flight);
+  var flight=document.createElement('script');flight.src='logo-flight.js?v=20261029-airplane-v4';document.body.appendChild(flight);
   var js=document.createElement('script');js.src='catalogue-extras.js?v=20261029-2154';
   js.onload=function(){
-    var secure=document.createElement('script');secure.src='secure-platform.js?v=20261029-auth-v1';
+    var secure=document.createElement('script');secure.src='secure-platform.js?v=20261029-auth-v2';
     secure.onload=function(){
-      var admin=document.createElement('script');admin.src='admin-panel.js?v=20261029-admin-v1';admin.onload=function(){if(location.hash.startsWith('#/admin'))render();};
+      var admin=document.createElement('script');admin.src='admin-panel.js?v=20261029-admin-v2';admin.onload=function(){if(location.hash.startsWith('#/admin'))render();};
       document.body.appendChild(admin);
     };
     document.body.appendChild(secure);
