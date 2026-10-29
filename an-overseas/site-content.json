@@ -6,6 +6,590 @@
   "heroDescription": "Your global future starts here. University selection, admission guidance and student support—all in one place.",
   "aboutIntro": "Supporting students to discover and navigate international education opportunities.",
   "universityOverrides": {},
-  "additionalUniversities": [],
+  "additionalUniversities": [
+    {
+      "id": "usm",
+      "name": "Universiti Sains Malaysia",
+      "short": "USM",
+      "country": "Malaysia",
+      "city": "Gelugor, Penang",
+      "kind": "Public",
+      "site": "https://www.usm.my",
+      "programs": [
+        "Science",
+        "Engineering",
+        "Health",
+        "Education"
+      ]
+    },
+    {
+      "id": "uitm",
+      "name": "Universiti Teknologi MARA",
+      "short": "UiTM",
+      "country": "Malaysia",
+      "city": "Shah Alam, Selangor",
+      "kind": "Public",
+      "site": "https://www.uitm.edu.my",
+      "programs": [
+        "Business",
+        "Engineering",
+        "Architecture",
+        "Technology"
+      ]
+    },
+    {
+      "id": "iium",
+      "name": "International Islamic University Malaysia",
+      "short": "IIUM",
+      "country": "Malaysia",
+      "city": "Gombak, Selangor",
+      "kind": "Public",
+      "site": "https://www.iium.edu.my",
+      "programs": [
+        "Engineering",
+        "Law",
+        "Economics",
+        "Education"
+      ]
+    },
+    {
+      "id": "uthm",
+      "name": "Universiti Tun Hussein Onn Malaysia",
+      "short": "UTHM",
+      "country": "Malaysia",
+      "city": "Batu Pahat, Johor",
+      "kind": "Public",
+      "site": "https://www.uthm.edu.my",
+      "programs": [
+        "Engineering",
+        "Technology"
+      ]
+    },
+    {
+      "id": "utem",
+      "name": "Universiti Teknikal Malaysia Melaka",
+      "short": "UTeM",
+      "country": "Malaysia",
+      "city": "Durian Tunggal, Melaka",
+      "kind": "Public",
+      "site": "https://www.utem.edu.my",
+      "programs": [
+        "Engineering",
+        "Computer Science",
+        "Technology"
+      ]
+    },
+    {
+      "id": "usim",
+      "name": "Universiti Sains Islam Malaysia",
+      "short": "USIM",
+      "country": "Malaysia",
+      "city": "Nilai, Negeri Sembilan",
+      "kind": "Public",
+      "site": "https://www.usim.edu.my",
+      "programs": [
+        "Science",
+        "Health",
+        "Economics"
+      ]
+    },
+    {
+      "id": "upsi",
+      "name": "Universiti Pendidikan Sultan Idris",
+      "short": "UPSI",
+      "country": "Malaysia",
+      "city": "Tanjong Malim, Perak",
+      "kind": "Public",
+      "site": "https://www.upsi.edu.my",
+      "programs": [
+        "Education",
+        "Science"
+      ]
+    },
+    {
+      "id": "umt",
+      "name": "Universiti Malaysia Terengganu",
+      "short": "UMT",
+      "country": "Malaysia",
+      "city": "Kuala Nerus, Terengganu",
+      "kind": "Public",
+      "site": "https://www.umt.edu.my",
+      "programs": [
+        "Aquaculture",
+        "Marine Science",
+        "Management"
+      ]
+    },
+    {
+      "id": "ums",
+      "name": "Universiti Malaysia Sabah",
+      "short": "UMS",
+      "country": "Malaysia",
+      "city": "Kota Kinabalu, Sabah",
+      "kind": "Public",
+      "site": "https://www.ums.edu.my",
+      "programs": [
+        "Science",
+        "Aquaculture",
+        "Business"
+      ]
+    },
+    {
+      "id": "umpsa",
+      "name": "Universiti Malaysia Pahang Al-Sultan Abdullah",
+      "short": "UMPSA",
+      "country": "Malaysia",
+      "city": "Pekan / Gambang, Pahang",
+      "kind": "Public",
+      "site": "https://www.umpsa.edu.my",
+      "programs": [
+        "Engineering",
+        "Technology"
+      ]
+    },
+    {
+      "id": "unimas",
+      "name": "Universiti Malaysia Sarawak",
+      "short": "UNIMAS",
+      "country": "Malaysia",
+      "city": "Kota Samarahan, Sarawak",
+      "kind": "Public",
+      "site": "https://www.unimas.my",
+      "programs": [
+        "Computer Science",
+        "Science",
+        "Engineering"
+      ]
+    },
+    {
+      "id": "unimap",
+      "name": "Universiti Malaysia Perlis",
+      "short": "UniMAP",
+      "country": "Malaysia",
+      "city": "Arau, Perlis",
+      "kind": "Public",
+      "site": "https://www.unimap.edu.my",
+      "programs": [
+        "Engineering",
+        "Business",
+        "Technology"
+      ]
+    },
+    {
+      "id": "unisza",
+      "name": "Universiti Sultan Zainal Abidin",
+      "short": "UniSZA",
+      "country": "Malaysia",
+      "city": "Kuala Nerus, Terengganu",
+      "kind": "Public",
+      "site": "https://www.unisza.edu.my",
+      "programs": [
+        "Education",
+        "Health",
+        "Business"
+      ]
+    },
+    {
+      "id": "upnm",
+      "name": "Universiti Pertahanan Nasional Malaysia",
+      "short": "UPNM",
+      "country": "Malaysia",
+      "city": "Kuala Lumpur",
+      "kind": "Public",
+      "site": "https://www.upnm.edu.my",
+      "programs": [
+        "Engineering",
+        "Science",
+        "Management"
+      ]
+    },
+    {
+      "id": "umk",
+      "name": "Universiti Malaysia Kelantan",
+      "short": "UMK",
+      "country": "Malaysia",
+      "city": "Bachok / Kota Bharu, Kelantan",
+      "kind": "Public",
+      "site": "https://www.umk.edu.my",
+      "programs": [
+        "Business",
+        "Technology",
+        "Entrepreneurship"
+      ]
+    },
+    {
+      "id": "taylors",
+      "name": "Taylor's University",
+      "short": "Taylor's",
+      "country": "Malaysia",
+      "city": "Subang Jaya, Selangor",
+      "kind": "Private",
+      "site": "https://university.taylors.edu.my",
+      "programs": [
+        "Business",
+        "Hospitality",
+        "Computer Science"
+      ]
+    },
+    {
+      "id": "sunway",
+      "name": "Sunway University",
+      "short": "Sunway",
+      "country": "Malaysia",
+      "city": "Bandar Sunway, Selangor",
+      "kind": "Private",
+      "site": "https://sunwayuniversity.edu.my",
+      "programs": [
+        "Business",
+        "Computer Science",
+        "Science"
+      ]
+    },
+    {
+      "id": "ucsi",
+      "name": "UCSI University",
+      "short": "UCSI",
+      "country": "Malaysia",
+      "city": "Kuala Lumpur",
+      "kind": "Private",
+      "site": "https://www.ucsiuniversity.edu.my",
+      "programs": [
+        "Business",
+        "Music",
+        "Engineering"
+      ]
+    },
+    {
+      "id": "apu",
+      "name": "Asia Pacific University of Technology & Innovation",
+      "short": "APU",
+      "country": "Malaysia",
+      "city": "Bukit Jalil, Kuala Lumpur",
+      "kind": "Private",
+      "site": "https://www.apu.edu.my",
+      "programs": [
+        "Computer Science",
+        "Technology",
+        "Business"
+      ]
+    },
+    {
+      "id": "msu",
+      "name": "Management and Science University",
+      "short": "MSU",
+      "country": "Malaysia",
+      "city": "Shah Alam, Selangor",
+      "kind": "Private",
+      "site": "https://www.msu.edu.my",
+      "programs": [
+        "Health",
+        "Management",
+        "Business"
+      ]
+    },
+    {
+      "id": "mmu",
+      "name": "Multimedia University",
+      "short": "MMU",
+      "country": "Malaysia",
+      "city": "Cyberjaya / Melaka",
+      "kind": "Private",
+      "site": "https://www.mmu.edu.my",
+      "programs": [
+        "Computer Science",
+        "Communication",
+        "Engineering"
+      ]
+    },
+    {
+      "id": "utp",
+      "name": "Universiti Teknologi PETRONAS",
+      "short": "UTP",
+      "country": "Malaysia",
+      "city": "Seri Iskandar, Perak",
+      "kind": "Private",
+      "site": "https://www.utp.edu.my",
+      "programs": [
+        "Engineering",
+        "Technology",
+        "Business"
+      ]
+    },
+    {
+      "id": "monash-my",
+      "name": "Monash University Malaysia",
+      "short": "Monash MY",
+      "country": "Malaysia",
+      "city": "Bandar Sunway, Selangor",
+      "kind": "Private",
+      "site": "https://www.monash.edu.my",
+      "programs": [
+        "Engineering",
+        "Business",
+        "Science"
+      ]
+    },
+    {
+      "id": "nottingham-my",
+      "name": "University of Nottingham Malaysia",
+      "short": "Nottingham MY",
+      "country": "Malaysia",
+      "city": "Semenyih, Selangor",
+      "kind": "Private",
+      "site": "https://www.nottingham.edu.my",
+      "programs": [
+        "Engineering",
+        "Business",
+        "Education"
+      ]
+    },
+    {
+      "id": "curtin-my",
+      "name": "Curtin University Malaysia",
+      "short": "Curtin MY",
+      "country": "Malaysia",
+      "city": "Miri, Sarawak",
+      "kind": "Private",
+      "site": "https://curtin.edu.my",
+      "programs": [
+        "Engineering",
+        "Business",
+        "Science"
+      ]
+    },
+    {
+      "id": "heriotwatt-my",
+      "name": "Heriot-Watt University Malaysia",
+      "short": "Heriot-Watt",
+      "country": "Malaysia",
+      "city": "Putrajaya",
+      "kind": "Private",
+      "site": "https://www.hw.ac.uk/malaysia",
+      "programs": [
+        "Engineering",
+        "Business"
+      ]
+    },
+    {
+      "id": "xiamen-my",
+      "name": "Xiamen University Malaysia",
+      "short": "Xiamen MY",
+      "country": "Malaysia",
+      "city": "Sepang, Selangor",
+      "kind": "Private",
+      "site": "https://www.xmu.edu.my",
+      "programs": [
+        "Business",
+        "Computer Science",
+        "Communication"
+      ]
+    },
+    {
+      "id": "inti",
+      "name": "INTI International University",
+      "short": "INTI",
+      "country": "Malaysia",
+      "city": "Nilai, Negeri Sembilan",
+      "kind": "Private",
+      "site": "https://newinti.edu.my",
+      "programs": [
+        "Business",
+        "Engineering",
+        "Computer Science"
+      ]
+    },
+    {
+      "id": "segi",
+      "name": "SEGi University",
+      "short": "SEGi",
+      "country": "Malaysia",
+      "city": "Kota Damansara, Selangor",
+      "kind": "Private",
+      "site": "https://www.segi.edu.my",
+      "programs": [
+        "Business",
+        "Education",
+        "Health"
+      ]
+    },
+    {
+      "id": "help",
+      "name": "HELP University",
+      "short": "HELP",
+      "country": "Malaysia",
+      "city": "Kuala Lumpur / Selangor",
+      "kind": "Private",
+      "site": "https://university.help.edu.my",
+      "programs": [
+        "Business",
+        "Psychology",
+        "Education"
+      ]
+    },
+    {
+      "id": "mahsa",
+      "name": "MAHSA University",
+      "short": "MAHSA",
+      "country": "Malaysia",
+      "city": "Bandar Saujana Putra, Selangor",
+      "kind": "Private",
+      "site": "https://mahsa.edu.my",
+      "programs": [
+        "Health",
+        "Medicine",
+        "Business"
+      ]
+    },
+    {
+      "id": "imu",
+      "name": "IMU University",
+      "short": "IMU",
+      "country": "Malaysia",
+      "city": "Bukit Jalil, Kuala Lumpur",
+      "kind": "Private",
+      "site": "https://www.imu.edu.my",
+      "programs": [
+        "Health",
+        "Medicine",
+        "Science"
+      ]
+    },
+    {
+      "id": "city",
+      "name": "City University Malaysia",
+      "short": "City University",
+      "country": "Malaysia",
+      "city": "Petaling Jaya, Selangor",
+      "kind": "Private",
+      "site": "https://city.edu.my",
+      "programs": [
+        "Business",
+        "Engineering",
+        "Education"
+      ]
+    },
+    {
+      "id": "cyberjaya",
+      "name": "University of Cyberjaya",
+      "short": "UoC",
+      "country": "Malaysia",
+      "city": "Cyberjaya, Selangor",
+      "kind": "Private",
+      "site": "https://cyberjaya.edu.my",
+      "programs": [
+        "Health",
+        "Medicine",
+        "Business"
+      ]
+    },
+    {
+      "id": "albukhary",
+      "name": "Albukhary International University",
+      "short": "AIU",
+      "country": "Malaysia",
+      "city": "Alor Setar, Kedah",
+      "kind": "Private",
+      "site": "https://aiu.edu.my",
+      "programs": [
+        "Business",
+        "Education"
+      ]
+    },
+    {
+      "id": "nilai",
+      "name": "Nilai University",
+      "short": "Nilai",
+      "country": "Malaysia",
+      "city": "Nilai, Negeri Sembilan",
+      "kind": "Private",
+      "site": "https://www.nilai.edu.my",
+      "programs": [
+        "Business",
+        "Engineering"
+      ]
+    },
+    {
+      "id": "oum",
+      "name": "Open University Malaysia",
+      "short": "OUM",
+      "country": "Malaysia",
+      "city": "Petaling Jaya, Selangor",
+      "kind": "Private",
+      "site": "https://www.oum.edu.my",
+      "programs": [
+        "Education",
+        "Business",
+        "Management"
+      ]
+    },
+    {
+      "id": "aeu",
+      "name": "Asia e University",
+      "short": "AeU",
+      "country": "Malaysia",
+      "city": "Subang Jaya, Selangor",
+      "kind": "Private",
+      "site": "https://aeu.edu.my",
+      "programs": [
+        "Education",
+        "Management",
+        "Business"
+      ]
+    },
+    {
+      "id": "reading-my",
+      "name": "University of Reading Malaysia",
+      "short": "Reading MY",
+      "country": "Malaysia",
+      "city": "Iskandar Puteri, Johor",
+      "kind": "Private",
+      "site": "https://www.reading.edu.my",
+      "programs": [
+        "Business",
+        "Psychology"
+      ]
+    },
+    {
+      "id": "southampton-my",
+      "name": "University of Southampton Malaysia",
+      "short": "Southampton MY",
+      "country": "Malaysia",
+      "city": "Iskandar Puteri, Johor",
+      "kind": "Private",
+      "site": "https://www.southampton.ac.uk/malaysia",
+      "programs": [
+        "Engineering",
+        "Business"
+      ]
+    },
+    {
+      "id": "swinburne-my",
+      "name": "Swinburne University of Technology Sarawak Campus",
+      "short": "Swinburne",
+      "country": "Malaysia",
+      "city": "Kuching, Sarawak",
+      "kind": "Private",
+      "site": "https://www.swinburne.edu.my",
+      "programs": [
+        "Engineering",
+        "Business",
+        "Technology"
+      ]
+    },
+    {
+      "id": "uow-my",
+      "name": "UOW Malaysia",
+      "short": "UOW Malaysia",
+      "country": "Malaysia",
+      "city": "Selangor / Penang / Johor",
+      "kind": "Private",
+      "site": "https://www.uow.edu.my",
+      "programs": [
+        "Business",
+        "Communication",
+        "Computer Science"
+      ]
+    }
+  ],
   "management": []
 }
