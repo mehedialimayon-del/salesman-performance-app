@@ -94,5 +94,44 @@ document.addEventListener('click',function(e){
  var back=e.target.closest('.university-profile a[href="#/universities"]');
  if(back){var id=(location.hash.split('?')[0].split('/')[2]||''),u=U.find(function(x){return x.id===id;});if(u)back.href='#/universities?country='+encodeURIComponent(u.country);}
 },true);
+
+/* Owner-managed PUBLIC information, published by updating site-content.json in GitHub. */
+var siteCopy=null;
+function repaintCopy(){
+ if(!siteCopy)return;
+ var ticker=document.querySelector('.ticker .marquee');
+ if(ticker&&siteCopy.ticker)ticker.textContent=siteCopy.ticker;
+ var h=document.querySelector('body.home-view .hero h1');
+ if(h&&siteCopy.heroLead&&siteCopy.heroAccent)h.innerHTML=esc(siteCopy.heroLead)+'<br><span class="gradient">'+esc(siteCopy.heroAccent)+'</span>';
+ var desc=document.querySelector('body.home-view .home-description');
+ if(desc&&siteCopy.heroDescription)desc.textContent=siteCopy.heroDescription;
+ if(location.hash.indexOf('#/about')===0){
+  var lead=document.querySelector('.page-head p');
+  if(lead&&siteCopy.aboutIntro)lead.textContent=siteCopy.aboutIntro;
+  var host=document.querySelector('#app>.wrap.content');
+  if(host&&Array.isArray(siteCopy.management)&&siteCopy.management.length&&!document.querySelector('#owner-management')){
+   var panel=document.createElement('section');
+   panel.id='owner-management';panel.className='white mt';
+   panel.innerHTML='<h2><span style="color:#ff8500">Our</span> Management</h2><div class="grid">'
+   +siteCopy.management.map(function(p){return '<article class="card"><div class="inside"><h3>'+esc(p.name||'')+'</h3><p>'+esc(p.role||'')+'</p><p>'+esc(p.description||'')+'</p></div></article>';}).join('')+'</div>';
+   host.appendChild(panel);
+  }
+ }
+}
+window.addEventListener('hashchange',function(){queueMicrotask(repaintCopy);});
+fetch('site-content.json?v=20261029-2154',{cache:'no-cache'}).then(function(r){if(!r.ok)throw Error('Content not available');return r.json();}).then(function(cfg){
+ siteCopy=cfg;
+ (cfg.additionalUniversities||[]).forEach(function(u){
+  if(!u||!u.id||!u.name||U.some(function(o){return o.id===u.id;}))return;
+  U.push({id:String(u.id),name:String(u.name),short:String(u.short||u.name),country:String(u.country||'Malaysia'),city:String(u.city||''),kind:u.kind==='Private'?'Private':'Public',programs:Array.isArray(u.programs)?u.programs:[],site:/^https:\/\//i.test(u.site||'')?u.site:'https://www.mqa.gov.my',photo:''});
+ });
+ Object.keys(cfg.universityOverrides||{}).forEach(function(id){
+  var u=U.find(function(o){return o.id===id;}),v=cfg.universityOverrides[id];
+  if(!u||!v)return;
+  ['name','short','city'].forEach(function(k){if(typeof v[k]==='string'&&v[k].trim())u[k]=v[k].trim();});
+ });
+ render();repaintCopy();
+}).catch(function(){/* Preserve the normal site if optional content configuration fails. */});
+
 render();
 })();
