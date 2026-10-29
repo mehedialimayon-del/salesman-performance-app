@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A&N Overseas | Public Content Studio</title>
+<style>
+:root{font-family:Inter,system-ui,Arial,sans-serif;color:#fff;background:#080808}*{box-sizing:border-box}
+body{margin:0;background:#080808;color:#fff}header{border-bottom:1px solid #7e4012;background:#101010;padding:15px max(16px,4vw);display:flex;align-items:center;justify-content:space-between;gap:14px}
+header b{color:#ff981d;font-size:21px}header a,a{color:#ffae51}main{max-width:1200px;padding:20px 17px 55px;margin:auto}
+h1{font-size:clamp(23px,3vw,34px);margin:3px 0}h1 span,h2 span{color:#ff8500}h2{font-size:21px;margin:0 0 14px}
+p{color:#d1d1d1;line-height:1.6;font-size:13px}.panel{border:1px solid #633713;background:linear-gradient(130deg,#151515,#090909);border-radius:14px;padding:18px;margin-top:16px}
+.notice{border-left:3px solid #ff8500;background:#221408;color:#ffd6ad;padding:11px 14px;border-radius:6px}
+.controls{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}
+button,.button{cursor:pointer;background:#ff8500;border:1px solid #ff9e45;color:#100b03;border-radius:8px;padding:10px 15px;font-size:12px;font-weight:800;text-decoration:none}
+button.outline,.button.outline{background:#161616;color:#ffab4a}
+button.red{border-color:#8d2828;color:#ffb2b2;background:#2b1111}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #ffc15d;outline-offset:1px}
+label{display:block;min-width:0;color:#ffab4f;font-size:11px;font-weight:750}
+label span{display:block;margin-bottom:6px}
+input,textarea,select{display:block;background:#0c0c0c;border:1px solid #734218;border-radius:7px;color:#fff;width:100%;padding:10px;margin-top:5px;font:inherit;font-size:12px}
+textarea{min-height:75px;resize:vertical}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.span2{grid-column:1/-1}
+.item{border:1px solid #4f321c;border-radius:11px;padding:12px;margin:10px 0;background:#101010}
+.item-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}
+.item-head b{color:#ffad42}
+.item-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.muted{font-size:11px;color:#aaa}.hint{color:#d3b18e;font-size:11px}
+#status{min-height:20px;color:#ffbd62;font-size:12px;margin-top:10px}
+@media(max-width:720px){.fields,.item-grid{grid-template-columns:1fr}.span2{grid-column:auto}header b{font-size:16px}.panel{padding:13px}}
+</style></head>
+<body><header><b>A&N OVERSEAS <small style="color:white;font-size:11px">PUBLIC CONTENT STUDIO</small></b><a href="./#/home">← View website</a></header>
+<main><h1><span>Edit</span> Website Content</h1>
+<p>Prepare changes to your public website content without editing HTML or CSS.</p>
+<div class="notice">This studio saves drafts in this browser only. To make changes visible to everyone, export <b>site-content.json</b>, open the GitHub edit link below, replace the file contents, and commit. GitHub requires your own authenticated account. Do not enter student records, passwords, passport details or private documents.</div>
+<div class="controls">
+<button id="save" type="button">Save Draft on This Device</button>
+<button id="export" type="button">Download Updated JSON</button>
+<label class="button outline" style="cursor:pointer">Import JSON<input id="import" type="file" accept=".json,application/json" hidden></label>
+<button id="reset" class="outline" type="button">Load Published Version</button>
+<a class="button outline" target="_blank" rel="noopener noreferrer" href="https://github.com/mehedialimayon-del/salesman-performance-app/edit/main/an-overseas/site-content.json">Publish on GitHub ↗</a>
+</div><div id="status" role="status" aria-live="polite"></div>
+<section class="panel"><h2><span>01</span> Site & Headlines</h2>
+<div class="fields"><label class="span2"><span>News / announcement ticker</span><textarea id="ticker"></textarea></label>
+<label><span>Homepage headline: first part</span><input id="heroLead"></label>
+<label><span>Homepage headline: orange part</span><input id="heroAccent"></label>
+<label class="span2"><span>Homepage description</span><textarea id="heroDescription"></textarea></label>
+<label class="span2"><span>About Us introductory paragraph</span><textarea id="aboutIntro"></textarea></label></div></section>
+<section class="panel"><h2><span>02</span> Current University Cards</h2>
+<p>Edit the public catalogue titles and campus locations. Published research profiles, course fees and source links remain unchanged.</p><div id="current-schools"></div></section>
+<section class="panel"><h2><span>03</span> Add More Universities</h2>
+<p>New schools appear in the catalogue after publication. Their detailed profile will show the official university website until verified course and fee information is added.</p>
+<div id="extra-schools"></div><button id="add-school" type="button">+ Add University</button></section>
+<section class="panel"><h2><span>04</span> About Our Work / Management</h2>
+<p>Cards appear in About Us. Add only team members and public contact information you have permission to share.</p>
+<div id="management"></div><button id="add-manager" type="button">+ Add Management Card</button></section>
+<p class="hint">Publishing instructions: Click “Download Updated JSON”, open “Publish on GitHub”, use the editor to replace the existing JSON text with the exported file’s contents, then choose “Commit changes”. After GitHub Pages refreshes, the public site will use the new information.</p>
+</main>
+<script>
+'use strict';
+const ownerKey='an-overseas-public-draft-v1';
+const base=[
+ ['upm','Universiti Putra Malaysia','UPM','Serdang, Selangor'],
+ ['um','Universiti Malaya','UM','Kuala Lumpur'],
+ ['ukm','Universiti Kebangsaan Malaysia','UKM','Bangi, Selangor'],
+ ['utm','Universiti Teknologi Malaysia','UTM','Johor Bahru / Kuala Lumpur'],
+ ['uum','Universiti Utara Malaysia','UUM','Sintok, Kedah'],
+ ['unikl','Universiti Kuala Lumpur','UniKL','Specialist campuses across Peninsular Malaysia'],
+ ['klust','Kuala Lumpur University of Science and Technology','KLUST','Kajang, Selangor'],
+ ['uniten','Universiti Tenaga Nasional','UNITEN','Kajang, Selangor']
+];
+let doc={};
+const $=id=>document.getElementById(id),escapeHtml=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const input=(label,value,attr)=>'<label><span>'+escapeHtml(label)+'</span><input '+attr+' value="'+escapeHtml(value||'')+'"></label>';
+const status=s=>{$('status').textContent=s;};
+function show(){
+ for(let id of ['ticker','heroLead','heroAccent','heroDescription','aboutIntro'])$(id).value=doc[id]||'';
+ $('current-schools').innerHTML=base.map(u=>{
+  let v=doc.universityOverrides&&doc.universityOverrides[u[0]]||{};
+  return '<div class="item"><div class="item-head"><b>'+escapeHtml(u[2])+' · '+escapeHtml(u[0])+'</b></div><div class="item-grid">'
+    +['name','short','city'].map((k,i)=>input(['University name','Short name','Campus location'][i],v[k]||u[i+1],'data-base="'+u[0]+'" data-key="'+k+'"')).join('')+'</div></div>';
+ }).join('');
+ drawExtra();drawManagement();
+}
+function drawExtra(){
+ $('extra-schools').innerHTML=(doc.additionalUniversities||[]).map((u,i)=>
+  '<div class="item"><div class="item-head"><b>University '+(i+1)+'</b><button type="button" class="red" data-remove-school="'+i+'">Remove</button></div><div class="item-grid">'
+  +['id','name','short','country','city','kind','site','programs'].map(k=>input(k==='site'?'Official https:// website':k==='programs'?'Programmes / subjects (comma-separated)':k.toUpperCase(),Array.isArray(u[k])?u[k].join(', '):u[k],'data-extra="'+i+'" data-key="'+k+'"')).join('')+'</div></div>'
+ ).join('');
+}
+function drawManagement(){
+ $('management').innerHTML=(doc.management||[]).map((m,i)=>
+  '<div class="item"><div class="item-head"><b>Management Card '+(i+1)+'</b><button class="red" type="button" data-remove-manager="'+i+'">Remove</button></div><div class="item-grid">'
+  +['name','role','description','photo'].map(k=>input(k==='photo'?'Public https:// photo URL':k.toUpperCase(),m[k],'data-manager="'+i+'" data-key="'+k+'"')).join('')+'</div></div>'
+ ).join('');
+}
+function normalise(raw){
+ return Object.assign({version:1,ticker:'',heroLead:'Study in',heroAccent:'Malaysia.',heroDescription:'',aboutIntro:'',universityOverrides:{},additionalUniversities:[],management:[]},raw);
+}
+function collect(){
+ for(let id of ['ticker','heroLead','heroAccent','heroDescription','aboutIntro'])doc[id]=$(id).value.trim();
+ document.querySelectorAll('[data-base]').forEach(e=>{
+  const id=e.dataset.base,key=e.dataset.key;
+  if(!doc.universityOverrides[id])doc.universityOverrides[id]={};
+  doc.universityOverrides[id][key]=e.value.trim();
+ });
+ document.querySelectorAll('[data-extra]').forEach(e=>{
+  const i=Number(e.dataset.extra),key=e.dataset.key;
+  if(doc.additionalUniversities[i])doc.additionalUniversities[i][key]=key==='programs'?e.value.split(',').map(s=>s.trim()).filter(Boolean):e.value.trim();
+ });
+ document.querySelectorAll('[data-manager]').forEach(e=>{
+  const i=Number(e.dataset.manager);if(doc.management[i])doc.management[i][e.dataset.key]=e.value.trim();
+ });
+}
+function valid(){
+ for(const u of doc.additionalUniversities){
+  if(!/^[a-z0-9-]+$/.test(u.id||'')||!u.name||!/^https:\/\//.test(u.site||'')){status('Please add a unique lowercase ID, university name and https:// official website for every added university.');return false;}
+ }
+ let ids=doc.additionalUniversities.map(u=>u.id);
+ if(new Set(ids).size!==ids.length||ids.some(id=>base.some(b=>b[0]===id))){status('University IDs must be unique and must not duplicate existing IDs.');return false;}
+ return true;
+}
+$('save').onclick=()=>{collect();if(valid()){localStorage.setItem(ownerKey,JSON.stringify(doc));status('Draft saved on this device. It has NOT been published.');}};
+$('export').onclick=()=>{collect();if(!valid())return;const content=JSON.stringify(doc,null,2)+'\n';const file=new Blob([content],{type:'application/json'});const url=URL.createObjectURL(file);const a=document.createElement('a');a.href=url;a.download='site-content.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);status('Downloaded site-content.json. Publish it through GitHub to update the live website.');};
+$('import').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{doc=normalise(JSON.parse(await file.text()));show();status('Imported JSON into this editor. Not published.');}catch(err){status('Invalid JSON file.');}};
+$('add-school').onclick=()=>{collect();doc.additionalUniversities.push({id:'new-university-'+(doc.additionalUniversities.length+1),name:'',short:'',country:'Malaysia',city:'',kind:'Private',site:'https://',programs:[]});drawExtra();};
+$('add-manager').onclick=()=>{collect();doc.management.push({name:'',role:'',description:'',photo:''});drawManagement();};
+document.addEventListener('click',e=>{if(e.target.dataset.removeSchool!==undefined){collect();doc.additionalUniversities.splice(Number(e.target.dataset.removeSchool),1);drawExtra();}if(e.target.dataset.removeManager!==undefined){collect();doc.management.splice(Number(e.target.dataset.removeManager),1);drawManagement();}});
+$('reset').onclick=()=>{if(!confirm('Replace the local draft with currently published public content?'))return;localStorage.removeItem(ownerKey);load(true);};
+async function load(ignoreDraft){
+ try{const r=await fetch('site-content.json?v='+Date.now(),{cache:'no-cache'});if(!r.ok)throw Error();const published=await r.json();const local=!ignoreDraft&&localStorage.getItem(ownerKey);doc=normalise(local?JSON.parse(local):published);show();status(local?'Local draft loaded. Publish through GitHub when ready.':'Published public content loaded.');}
+ catch(e){doc=normalise({});show();status('Could not fetch published content. You may still prepare and export a draft.');}
+}
+load(false);
+</script></body></html>
