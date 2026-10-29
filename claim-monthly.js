@@ -27,8 +27,9 @@ function approvedForAll(rows,claims,month){
  const ids=new Set((rows||[]).map(r=>String(r.id)));
  if(!ids.size)return null;
  return (claims||[]).find(c=>{
-  if(c.kind!=='Expense Claim'||c.claim_month!==month||c.status!=='Approved'||!c.signature_png)return false;
-  const selected=(c.lines||[]).filter(l=>!l.excluded).map(l=>String(l.receipt_id||''));
+  if(!['Expense Claim','Buyer Entertainment Bill'].includes(c.kind)||c.claim_month!==month||c.status!=='Approved'||!c.signature_png)return false;
+  const selected=(c.lines||[]).filter(l=>!l.excluded).map(l=>String(l.receipt_id||('buyer:'+l.id)));
+
   return selected.length===ids.size&&selected.every(id=>ids.has(id));
  })||null;
 }
@@ -64,7 +65,7 @@ async function drawWords(doc,page,words,{x,y,maxWidth=300,size=9,bold=false,colo
  const font=await doc.embedFont(bold?root.PDFLib.StandardFonts.HelveticaBold:root.PDFLib.StandardFonts.Helvetica);
  if(safe){
   let value=str;while(value.length>2&&font.widthOfTextAtSize(value,size)>maxWidth)value=value.slice(0,-2);
-  if(value!==str)value=value.trimEnd()+'…';
+  if(value!==str)value=value.trimEnd()+'...';
   const w=font.widthOfTextAtSize(value,size);
   page.drawText(value,{x:align==='right'?x-w:x,y,size,font,color:rgb(color)});
   return;
@@ -206,6 +207,39 @@ async function appendReceipt(doc,receipt,signed){
  return 1;
 }
 root.FFH_CLAIM_MONTHLY={categories,groupRows,monthBounds,approvedForAll};
+
+async function saveCombinedPdf(blob,filename){
+ const native=!!root.FieldForceNative||/FFHNative\/1/.test(navigator.userAgent)||!!root.FFHBridge;
+ if(native){
+  if(blob.size>20*1024*1024)throw Error('Combined PDF exceeds Android 20 MB limit. Open in Chrome to download.');
+  const base64=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=()=>no(Error('Unable to encode PDF'));r.readAsDataURL(blob)});
+  const payload={base64,filename,mime:'application/pdf'};
+  let save;
+  if(root.FieldForceNative?.saveFile)save=()=>root.FieldForceNative.saveFile(JSON.stringify(payload));
+  else if(root.ffhNativeCall)save=()=>root.ffhNativeCall('saveFile',payload);
+  else if(root.FFHBridge?.postMessage)save=()=>new Promise((resolve,reject)=>{
+   const id=crypto.randomUUID(),previous=root.ffhNativeReply;
+   const reply=(rid,result)=>{
+    if(rid!==id){previous?.(rid,result);return}
+    if(root.ffhNativeReply===reply)root.ffhNativeReply=previous;
+    result?.error?reject(Error(result.error)):resolve(result);
+   };
+   root.ffhNativeReply=reply;
+   try{root.FFHBridge.postMessage(JSON.stringify({action:'saveFile',payload:JSON.stringify({...payload,request_id:id})}));}
+   catch(e){if(root.ffhNativeReply===reply)root.ffhNativeReply=previous;reject(e)}
+  });
+  else throw Error('Native Android file save unavailable');
+  const result=await save();
+  if(result?.saved!==true)throw Error(result?.error||'Android did not confirm file saved');
+  return result;
+ }
+ const url=URL.createObjectURL(blob),link=document.createElement('a');
+ link.href=url;link.download=filename;link.style.display='none';document.body.append(link);link.click();
+ setTimeout(()=>{link.remove();URL.revokeObjectURL(url)},45000);
+ return {started:true};
+}
+
+root.FFH_CLAIM_DOWNLOAD_FILE=saveCombinedPdf;
 root.FFH_EXPORT_MONTHLY_CLAIM=async function({month,receipts,templateUrl,staff='',claims=[],signed,download,onProgress}){
  const list=(receipts||[]).filter(r=>String(r.expense_date||'').startsWith(month)).sort((a,b)=>a.expense_date.localeCompare(b.expense_date));
  if(!list.length)throw Error('No receipts saved for this month');
@@ -222,7 +256,7 @@ root.FFH_EXPORT_MONTHLY_CLAIM=async function({month,receipts,templateUrl,staff='
  }
  const output=await doc.save();
  onProgress?.('Saving combined claim PDF…');
- await download(new Blob([output],{type:'application/pdf'}),'Claim_Bill_'+month+'_'+(approved?'APPROVED':'DRAFT')+'.pdf');
+ await (download||saveCombinedPdf)(new Blob([output],{type:'application/pdf'}),'Claim_Bill_'+month+'_'+(approved?'APPROVED':'DRAFT')+'.pdf');
  return {grandTotal:summary.grandTotal,count:list.length,categoryCount:summary.groups.length,approved:!!approved,mapping,pages:doc.getPageCount()};
 };
 })(window);
