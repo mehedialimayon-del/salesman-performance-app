@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const get=()=>window.ANLive, db=()=>get().db, esc=s=>get().ed(s), pretty=s=>get().dt(s);
-const sections=["Overview","Students","Applications","Documents","Enquiries","Messages","Invoices","Website","Universities","Success Stories","Media"];
+const sections=["Overview","Students","Applications","Documents","Enquiries","Messages","Invoices","Website","Management","Services","Countries","Universities","Success Stories","Media"];
 let section="Overview", selectedStudent="",saved={};
 const panel=s=>'<section class="live-panel">'+s+'</section>';
 const field=(label,key,value="",type="text")=>'<label>'+esc(label)+(type==="textarea"?'<textarea name="'+key+'">'+esc(value)+'</textarea>':'<input name="'+key+'" type="'+type+'" value="'+esc(value)+'">')+'</label>';
@@ -62,7 +62,22 @@ async function draw(){
  }
  if(section==="Website"){
   saved.settings=await content("settings")||{};
-  html=panel('<h2>Edit Website Settings</h2><form id="admin-settings-form"><div class="live-fieldgrid">'+["ticker","motto","about","work","malaysiaOffice","bangladeshOffice","phone","whatsapp","email"].map(k=>field(k,k,saved.settings[k]||"",/ticker|about|work/.test(k)?"textarea":"text")).join("")+'</div><button class="btn mt" type="submit">Publish Settings</button></form>');
+  html=panel('<h2>Edit Website Settings</h2><form id="admin-settings-form"><div class="live-fieldgrid">'+["ticker","motto","heroLead","heroAccent","heroDescription","heroImage","about","work","malaysiaOffice","bangladeshOffice","phone","whatsapp","email"].map(k=>field(k,k,saved.settings[k]||"",/ticker|about|work/.test(k)?"textarea":"text")).join("")+'</div><button class="btn mt" type="submit">Publish Settings</button></form>');
+ }
+ if(section==="Management"){
+  saved.management=await content("management")||[];
+  html=panel('<h2>Management & Team Profiles</h2><p>Add approved public details and images, then publish directly.</p><form id="admin-management-form"><div id="an-team-list">'
+  +rows(saved.management,(m,i)=>teamRow(i,m))+'</div><div class="live-controls mt"><button type="button" data-add-admin-row="team">+ Add Person</button><button type="submit" class="btn">Publish Team</button></div></form>');
+ }
+ if(section==="Services"){
+  saved.services=await content("services")||serviceList;
+  html=panel('<h2>Services Editor</h2><form id="admin-services-form"><div id="an-services-list">'
+  +rows(saved.services,(v,i)=>serviceRow(i,v))+'</div><div class="live-controls mt"><button type="button" data-add-admin-row="service">+ Add Service</button><button class="btn" type="submit">Publish Services</button></div></form>');
+ }
+ if(section==="Countries"){
+  saved.countries=await content("countries")||countries;
+  html=panel('<h2>Study Destinations Editor</h2><p>Campus images currently use Unsplash image identifiers.</p><form id="admin-countries-form"><div id="an-countries-list">'
+  +rows(saved.countries,(v,i)=>countryRow(i,v))+'</div><div class="live-controls mt"><button type="button" data-add-admin-row="country">+ Add Country</button><button class="btn" type="submit">Publish Destinations</button></div></form>');
  }
  if(section==="Universities"){
   saved.universities=await content("university_overrides")||[];
@@ -88,11 +103,35 @@ async function loadMessages(){
  const {data,error}=await db().from("an_messages").select("body,sender_id,created_at").eq("user_id",selectedStudent).order("created_at",{ascending:true});
  el.innerHTML=error?esc(error.message):rows(data||[],m=>'<div class="live-msg"><small>'+pretty(m.created_at)+' · '+(m.sender_id===selectedStudent?"Student":"Admin")+'</small>'+esc(m.body)+'</div>');
 }
+function teamRow(i,v){
+ return '<div class="live-msg" data-team-index="'+i+'"><h3>Team Member '+(i+1)+'</h3><div class="live-fieldgrid">'
+ +field("Name","team-name-"+i,v.name||"")+field("Designation","team-designation-"+i,v.designation||v.role||"")
+ +field("Department","team-department-"+i,v.department||"")+field("Public Photo URL","team-photo-"+i,v.photo||"")
+ +field("Bio","team-bio-"+i,v.bio||"","textarea")+'</div><button type="button" data-remove-admin-row="team">Remove</button></div>';
+}
+function serviceRow(i,v){
+ return '<div class="live-msg" data-service-index="'+i+'"><h3>Service '+(i+1)+'</h3><div class="live-fieldgrid">'
+ +field("Icon / Emoji","service-icon-"+i,v[0]||"")+field("Title","service-title-"+i,v[1]||"")
+ +field("Description","service-desc-"+i,v[2]||"","textarea")+'</div><button type="button" data-remove-admin-row="service">Remove</button></div>';
+}
+function countryRow(i,v){
+ return '<div class="live-msg" data-country-index="'+i+'"><h3>Country '+(i+1)+'</h3><div class="live-fieldgrid">'
+ +field("Country Name","country-name-"+i,v[0]||"")+field("Flag Emoji","country-flag-"+i,v[1]||"")
+ +field("Image ID","country-photo-"+i,v[2]||"")+'</div><button type="button" data-remove-admin-row="country">Remove</button></div>';
+}
 document.addEventListener("change",e=>{if(e.target.id==="admin-student-select"){selectedStudent=e.target.value;void loadMessages();}});
 document.addEventListener("click",async e=>{
  if(!get()?.isAdmin||!location.hash.startsWith("#/admin"))return;
  const t=e.target;
  try{
+ if(t.dataset.addAdminRow){
+  const typ=t.dataset.addAdminRow,selector=typ==="team"?"#an-team-list":typ==="service"?"#an-services-list":"#an-countries-list";
+  const list=document.querySelector(selector);if(list){
+    const i=list.children.length;
+    list.insertAdjacentHTML("beforeend",typ==="team"?teamRow(i,{}):typ==="service"?serviceRow(i,["","",""]):countryRow(i,["","",""]));
+  }
+ }
+ if(t.dataset.removeAdminRow){t.closest(".live-msg")?.remove();}
  if(t.dataset.adminTab){section=t.dataset.adminTab;document.querySelectorAll("[data-admin-tab]").forEach(b=>b.classList.toggle("active",b.dataset.adminTab===section));await draw();}
  if(t.id==="admin-reload")await draw();
  if(t.dataset.adminApp){const a=saved.apps.find(v=>v.id===t.dataset.adminApp);if(!a)return;const f='<form id="admin-case-form" data-id="'+esc(a.id)+'"><div class="live-fieldgrid">'+dropdown("Case Status","status",["submitted","under_review","documents_required","university_submitted","offer_received","emgs_submitted","visa_processing","approved","completed","rejected"],a.status)+dropdown("Verified EMGS %","emgs_percent",[0,5,15,32,35,70,80,90,95,100],a.emgs_percent)+'</div><button class="btn mt" type="submit">Save Case</button></form>';document.getElementById("admin-app-form").innerHTML=panel('<h3>Update '+esc(a.applicant_name)+'</h3>'+f+'<form id="admin-update-form" data-id="'+esc(a.id)+'" class="mt">'+field("Update Title","title")+field("Message","body","","textarea")+'<button class="btn mt" type="submit">Notify Student</button></form>');}
@@ -106,7 +145,7 @@ document.addEventListener("click",async e=>{
 },true);
 document.addEventListener("submit",async e=>{
  if(!get()?.isAdmin||!location.hash.startsWith("#/admin"))return;
- const f=e.target,id=f.id,allowed=["admin-case-form","admin-update-form","admin-message-form","admin-invoice-form","admin-settings-form","admin-university-form","admin-story-form","admin-media-form"];
+ const f=e.target,id=f.id,allowed=["admin-case-form","admin-update-form","admin-message-form","admin-invoice-form","admin-settings-form","admin-management-form","admin-services-form","admin-countries-form","admin-university-form","admin-story-form","admin-media-form"];
  if(!allowed.includes(id))return;
  e.preventDefault();e.stopImmediatePropagation();
  const b=f.querySelector("[type=submit]");if(b)b.disabled=true;
@@ -116,7 +155,22 @@ document.addEventListener("submit",async e=>{
  if(id==="admin-update-form"){const{error}=await db().from("an_application_updates").insert({application_id:f.dataset.id,title:v("title"),body:v("body")});if(error)throw error;}
  if(id==="admin-message-form"){if(!selectedStudent)throw Error("Choose student");const{error}=await db().from("an_messages").insert({user_id:selectedStudent,sender_id:get().user.id,body:v("body")});if(error)throw error;}
  if(id==="admin-invoice-form"){if(!(Number(v("amount"))>0))throw Error("Invalid amount");const{error}=await db().from("an_invoices").insert({user_id:v("user_id"),title:v("title"),amount:Number(v("amount")),currency:"MYR",status:v("status"),note:v("note")});if(error)throw error;}
- if(id==="admin-settings-form"){const s={...saved.settings};for(const k of ["ticker","motto","about","work","malaysiaOffice","bangladeshOffice","phone","whatsapp","email"])s[k]=v(k);await publish("settings",s);}
+ if(id==="admin-settings-form"){const s={...saved.settings};for(const k of ["ticker","motto","heroLead","heroAccent","heroDescription","heroImage","about","work","malaysiaOffice","bangladeshOffice","phone","whatsapp","email"])s[k]=v(k);await publish("settings",s);}
+ if(id==="admin-management-form"){
+  const members=[...document.querySelectorAll("[data-team-index]")].map(el=>{
+    const i=el.dataset.teamIndex;return {name:v("team-name-"+i),designation:v("team-designation-"+i),department:v("team-department-"+i),photo:v("team-photo-"+i),bio:v("team-bio-"+i)};
+  }).filter(m=>m.name);await publish("management",members);
+ }
+ if(id==="admin-services-form"){
+  const services=[...document.querySelectorAll("[data-service-index]")].map(el=>{
+   const i=el.dataset.serviceIndex;return [v("service-icon-"+i),v("service-title-"+i),v("service-desc-"+i)];
+  }).filter(a=>a[1]);if(!services.length)throw Error("Keep at least one service");await publish("services",services);
+ }
+ if(id==="admin-countries-form"){
+  const destinations=[...document.querySelectorAll("[data-country-index]")].map(el=>{
+   const i=el.dataset.countryIndex;return [v("country-name-"+i),v("country-flag-"+i),v("country-photo-"+i)];
+  }).filter(a=>a[0]);if(!destinations.length)throw Error("Keep at least one country");await publish("countries",destinations);
+ }
  if(id==="admin-university-form"){const row={id:v("id"),name:v("name"),short:v("short"),country:v("country"),city:v("city"),kind:v("kind"),site:v("site"),programs:v("programs").split(",").map(q=>q.trim()).filter(Boolean)};if(!/^[a-z0-9-]{2,60}$/.test(row.id)||!row.name||!/^https:\/\//.test(row.site))throw Error("Valid university ID, name and official URL are required");const a=saved.universities.filter(q=>q.id!==row.id);a.push(row);await publish("university_overrides",a);}
  if(id==="admin-story-form"){if(!form.has("consent"))throw Error("Consent is required");if(!v("title")||!/^https:\/\//.test(v("media_url")))throw Error("Title and HTTPS media URL required");const a=saved.stories.slice();a.unshift({title:v("title"),description:v("description"),media_url:v("media_url"),type:v("type"),approved:true});await publish("success_stories",a);}
  if(id==="admin-media-form"){const img=form.get("image");if(!(img instanceof File)||!["image/jpeg","image/png","image/webp"].includes(img.type)||img.size>4194304)throw Error("Use a JPG, PNG or WEBP under 4MB");const ext=img.type==="image/png"?"png":img.type==="image/webp"?"webp":"jpg";const{error}=await db().storage.from("an-public-media").upload(crypto.randomUUID()+"."+ext,img,{contentType:img.type,upsert:false});if(error)throw error;}
