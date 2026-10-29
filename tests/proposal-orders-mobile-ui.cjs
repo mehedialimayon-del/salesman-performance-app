@@ -16,11 +16,13 @@ if(await page.locator('#ffhEntryAllow').count())await page.locator('#ffhEntryAll
 await page.evaluate(id=>{
  const sb=window.FFH_SUPABASE,oldFrom=sb.from.bind(sb),oldRpc=sb.rpc.bind(sb);
  const fixed=Array.from({length:9},(_,i)=>({code:'QA-'+String(i+1).padStart(3,'0'),name:'Verified sample item '+(i+1)}));
- let lines=id==='M21954'?[]:fixed.slice();
+ let lines=[];
  const rows=[];
  window.qaProposal={rows,lines:()=>lines.slice()};
+ window.FFH_PROPOSAL_PDF_PARSE={read:async()=>({lines:fixed.slice(),confidence:'high',headerFound:true,source:'pdf-text'})};
  sb.rpc=(name,args)=>name==='ffh_my_staff_id'?Promise.resolve({data:id,error:null}):oldRpc(name,args);
  sb.from=table=>{
+  if(table==='ffh_proposals'){const q={select(){return q},order(){return Promise.resolve({data:[{id:'qa-giant',name:'Giant Hypermarket Biscuits Proposal Form',filename:'Giant.pdf',file_url:'https://svpgjrxeqnluipsgjywk.supabase.co/storage/v1/object/public/ffh-public/proposals/M21954/pdf/qa-giant.pdf'}],error:null})}};return q;}
   if(table==='ffh_proposal_item_templates'){
    const q={select(){return q},eq(){return q},maybeSingle(){return Promise.resolve({data:lines.length?{lines}:null,error:null})}};
    return {...q,upsert(data){lines=data.lines;return Promise.resolve({data:null,error:null})}};
@@ -46,11 +48,6 @@ for(const width of [320,390,412]){
  if(width===390){
    await first.locator('button').filter({hasText:'CREATE PROPOSAL'}).click();
    await page.locator('.ffPoDialog').waitFor();
-   if(id==='M21954'){
-     await page.getByRole('button',{name:'SET UP SKU LIST'}).click();
-     await page.locator('#ffPoTemplateForm textarea').fill(Array.from({length:9},(_,i)=>'QA-'+String(i+1).padStart(3,'0')+' | Verified sample item '+(i+1)).join('\n'));
-     await page.getByRole('button',{name:'SAVE FIXED SKU LIST'}).click();
-   }
    await page.locator('#ffPoForm').waitFor();
    assert.equal(await page.locator('#ffPoForm tbody tr').count(),9,'nine fixed rows');
    assert.equal(await page.locator('#ffPoManageTemplate').count(),id==='M21954'?1:0,'SR cannot change SKU template');
