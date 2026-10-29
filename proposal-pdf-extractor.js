@@ -62,7 +62,7 @@ function extractFromLines(lines){
   if(found.length>=200)break;
  }
  // Headers and two separate SKU rows reduce false positives from contact/date metadata.
- const confidence=found.length>=2 ? (sawHeader?'high':'medium') : 'low';
+ const confidence=found.length>=2 ? (sawHeader?'high':'medium') : (found.length===1&&sawHeader?'medium':'low');
  return {lines:found,confidence,headerFound:sawHeader,total:found.length};
 }
 async function pdfBytes(source){
@@ -84,7 +84,7 @@ async function read(source,options={}){
   const all=[],max=Math.min(doc.numPages,Math.max(1,options.maxPages||35));
   for(let i=1;i<=max;i++){const page=await doc.getPage(i),content=await page.getTextContent();all.push(...itemRows(content.items))}
   let parsed=extractFromLines(all);
-  if(parsed.total>=2)return {...parsed,pageCount:doc.numPages,source:'pdf-text'};
+  if(parsed.total>=2||(parsed.total===1&&parsed.headerFound))return {...parsed,pageCount:doc.numPages,source:'pdf-text'};
   if(options.allowOCR!==false){
    const ocr=await load(OCR_JS,'Tesseract');
    let text=[];
