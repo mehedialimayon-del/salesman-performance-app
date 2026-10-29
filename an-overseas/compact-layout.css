@@ -55,3 +55,6 @@ body:not(.home-view) .profile-section h2{font-size:clamp(18px,1.8vw,22px)}
 @media(max-height:720px) and (min-width:801px){body.home-view .hero h1{font-size:clamp(38px,4.2vw,55px)}body.home-view .campus-line{margin-top:8px}body.home-view .metrics{margin-top:11px}body.home-view .hero .wrap{padding-top:8px;padding-bottom:8px}}
 @media(max-width:520px){.logo-motion::after{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.logo-motion::after{animation:none}}
+
+/* Honest, polished monogram placeholder until an official campus image is supplied. */
+.uni-card div.campus-cover{background:radial-gradient(circle at 80% 20%,#784014 0%,transparent 48%),linear-gradient(135deg,#21180e,#0a0a0a 74%)!important;border-bottom:1px solid #a45b26;letter-spacing:1px}
