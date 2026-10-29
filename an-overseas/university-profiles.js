@@ -31,14 +31,14 @@ UNIVERSITY_PROFILES.uniten.programSource='https://www.uniten.edu.my/all-programm
 window.addEventListener('DOMContentLoaded',function(){
   var css=document.createElement('link');css.rel='stylesheet';css.href='compact-layout.css?v=20261029-2154';document.head.appendChild(css);
   var viewport=document.createElement('link');viewport.rel='stylesheet';viewport.href='viewport-final.css?v=20261029-fit-final-v3';document.head.appendChild(viewport);
-  var polishStyle=document.createElement('link');polishStyle.rel='stylesheet';polishStyle.href='site-polish.css?v=20261029-2308';document.head.appendChild(polishStyle);
-  var polish=document.createElement('script');polish.src='site-polish.js?v=20261029-2308';document.body.appendChild(polish);
-  var flight=document.createElement('script');flight.src='logo-flight.js?v=20261029-gold-aircraft-v6';document.body.appendChild(flight);
+  var polishStyle=document.createElement('link');polishStyle.rel='stylesheet';polishStyle.href='site-polish.css?v=20261029-2318';document.head.appendChild(polishStyle);
+  var polish=document.createElement('script');polish.src='site-polish.js?v=20261029-2318';document.body.appendChild(polish);
+  var flight=document.createElement('script');flight.src='logo-flight.js?v=20261029-gold-aircraft-v7';document.body.appendChild(flight);
   var js=document.createElement('script');js.src='catalogue-extras.js?v=20261029-2154';
   js.onload=function(){
-    var secure=document.createElement('script');secure.src='secure-platform.js?v=20261029-auth-ticker-v6';
+    var secure=document.createElement('script');secure.src='secure-platform.js?v=20261029-auth-ticker-v7';
     secure.onload=function(){
-      var admin=document.createElement('script');admin.src='admin-panel.js?v=20261029-gallery-v6';admin.onload=function(){if(location.hash.startsWith('#/admin'))render();};
+      var admin=document.createElement('script');admin.src='admin-panel.js?v=20261029-gallery-v7';admin.onload=function(){if(location.hash.startsWith('#/admin'))render();};
       document.body.appendChild(admin);
     };
     document.body.appendChild(secure);
