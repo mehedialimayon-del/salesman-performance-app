@@ -7,7 +7,7 @@ const DAY=()=>{const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kuala_Lum
 const clean=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]+/g,'');
 let modal=null,staff=null,queue=false,cloud=[],cache=new Map();
 function message(e){alert(e?.message||String(e||'Unable to complete action'))}
-async function identify(){if(staff)return staff;const {data,error}=await API().rpc('ffh_my_staff_id');if(error||!data)throw Error('Please sign in to your approved FieldForce Hub account.');return staff=String(data)}
+async function identify(){const {data,error}=await API().rpc('ffh_my_staff_id');if(error||!data)throw Error('Please sign in to your approved FieldForce Hub account.');return staff=String(data)}
 function sourceKey(name){
  const n=clean(name);
  if(n.includes('GIANT'))return '01';if(n.includes('KKSUPER'))return '02';if(n.includes('NSKGROCER'))return '03';
@@ -142,7 +142,7 @@ async function showHistory(chainKey=''){
   const paint=()=>{
    const q=clean(search.value);
    const filtered=rows.filter(r=>(!select.value||r.chain_key===select.value)&&(!date.value||r.proposal_date===date.value)&&(!q||clean([r.outlet_name,r.outlet_code,r.chain_name].join(' ')).includes(q)));
-   list.innerHTML=filtered.length?filtered.map(r=>`<article class="ffPoHistoryRow"><div><b>${H(r.outlet_name)}</b><small>${H(r.chain_name)} · ${H(r.proposal_date)} · ${H(r.outlet_code||'No code')}</small><small>Created by ${H(r.owner_staff_id)} · ${H((r.created_at||'').replace('T',' ').slice(0,16))}</small></div><div><button type="button" data-v="${H(r.id)}">👁 VIEW</button><button type="button" data-d="${H(r.id)}">⬇ PDF</button></div></article>`).join(''):'<div class="ffPoMessage">No matching proposals found.</div>';
+   list.innerHTML=filtered.length?filtered.map(r=>`<article class="ffPoHistoryRow"><div><b>${H(r.outlet_name)}</b><small>${H(r.chain_name)} · ${H(r.proposal_date)} · ${H(r.outlet_code||'No code')}</small><small>Created by ${H(r.owner_staff_id)} · ${H(r.created_at?new Date(r.created_at).toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur',hour12:false,day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'')}</small></div><div><button type="button" data-v="${H(r.id)}">👁 VIEW</button><button type="button" data-d="${H(r.id)}">⬇ PDF</button></div></article>`).join(''):'<div class="ffPoMessage">No matching proposals found.</div>';
    list.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>showSaved(rows.find(x=>x.id===b.dataset.v),null));
    list.querySelectorAll('[data-d]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await downloadFilled(rows.find(x=>x.id===b.dataset.d),null)}catch(e){message(e)}finally{b.disabled=false}});
   };
