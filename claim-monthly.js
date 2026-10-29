@@ -90,6 +90,7 @@ async function textLayout(templateBytes){
     const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';s.onload=ok;s.onerror=no;document.head.append(s);
    });
   }
+  if(root.pdfjsLib.GlobalWorkerOptions)root.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   const task=root.pdfjsLib.getDocument({data:new Uint8Array(templateBytes),disableFontFace:true,useSystemFonts:true});
   const doc=await task.promise,first=await doc.getPage(1),content=await first.getTextContent(),rows=[];
   for(const item of content.items){
