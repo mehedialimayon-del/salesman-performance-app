@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const get=()=>window.ANLive, db=()=>get().db, esc=s=>get().ed(s), pretty=s=>get().dt(s);
-const sections=["Overview","Students","Applications","Documents","Enquiries","Messages","Invoices","Website","Management","Services","Countries","Universities","Success Stories","Media"];
+const sections=["Overview","Students","Applications","Documents","Enquiries","Messages","Invoices","Latest Updates","Website","Management","Services","Countries","Universities","Success Stories","Media"];
 let section="Overview", selectedStudent="",saved={};
 const panel=s=>'<section class="live-panel">'+s+'</section>';
 const field=(label,key,value="",type="text")=>'<label>'+esc(label)+(type==="textarea"?'<textarea name="'+key+'">'+esc(value)+'</textarea>':'<input name="'+key+'" type="'+type+'" value="'+esc(value)+'">')+'</label>';
@@ -60,6 +60,16 @@ async function draw(){
   const opts=people.map(p=>'<option value="'+esc(p.user_id)+'">'+esc(p.full_name||p.email)+'</option>').join("");
   html=panel('<h2>Issue an Invoice</h2><form id="admin-invoice-form"><label>Student<select name="user_id">'+opts+'</select></label><div class="live-fieldgrid">'+field("Invoice Title","title")+field("Amount (MYR)","amount","","number")+dropdown("Status","status",["pending","paid","cancelled"],"pending")+field("Note","note","","textarea")+'</div><button class="btn mt" type="submit">Create Invoice</button></form>')+panel('<h2>Invoice History</h2>'+rows(items,i=>'<div class="live-msg"><b>'+esc(i.title)+'</b><p>'+esc(i.currency)+' '+Number(i.amount).toFixed(2)+' · '+esc(i.status)+'</p></div>'));
  }
+ if(section==="Latest Updates"){
+  saved.latest=await content("latest_updates")||[];
+  if(!Array.isArray(saved.latest)||!saved.latest.length){
+    const settings=await content("settings")||{};
+    saved.latest=String(settings.ticker||"Study in Malaysia with A&N Overseas").split(/\\s*[•|]\\s*/).filter(Boolean).map((text,i)=>({text,color:i%2?"white":"orange"}));
+  }
+  html=panel('<h2>Latest Updates — Moving Ticker</h2><p>Set one or more scrolling messages for every page. Choose Orange or Pure White separately for each message.</p><form id="admin-latest-form"><div class="an-latest-list" id="an-latest-list">'
+   +saved.latest.map((item,i)=>latestRow(i,item)).join("")
+   +'</div><div class="live-controls"><button type="button" data-add-latest>+ Add Announcement</button><button class="btn" type="submit">Publish Live Updates</button></div></form>');
+ }
  if(section==="Website"){
   saved.settings=await content("settings")||{};
   html=panel('<h2>Edit Website Settings</h2><form id="admin-settings-form"><div class="live-fieldgrid">'+["ticker","motto","heroLead","heroAccent","heroDescription","heroImage","about","work","malaysiaOffice","bangladeshOffice","phone","whatsapp","email"].map(k=>field(k,k,saved.settings[k]||"",/ticker|about|work/.test(k)?"textarea":"text")).join("")+'</div><button class="btn mt" type="submit">Publish Settings</button></form><div class="mt"><h3>Homepage Image Upload</h3><p>Upload your preferred student/graduate photo. It will automatically replace the homepage background.</p><form id="admin-home-image-form"><input type="file" name="image" required accept="image/jpeg,image/png,image/webp"><button type="submit" class="btn mt">Upload & Set Home Image</button></form></div>');
@@ -86,8 +96,8 @@ async function draw(){
  }
  if(section==="Success Stories"){
   saved.stories=await content("success_stories")||[];
-  const form='<form id="admin-story-form"><div class="live-fieldgrid">'+field("Title","title")+dropdown("Media Type","type",["image","video"],"image")+field("Public Image / Video URL","media_url","https://")+field("Description","description","","textarea")+'</div><label><input type="checkbox" name="consent" style="width:auto" required> I confirm permission to publish this student media</label><button class="btn mt" type="submit">Publish Story</button></form>';
-  html=panel('<h2>Student Success Gallery</h2>'+form)+panel('<h2>Published Items</h2>'+rows(saved.stories,(s,i)=>'<div class="live-msg"><b>'+esc(s.title)+'</b> · '+(s.approved?"Published":"Hidden")+'<p>'+esc(s.media_url)+'</p><button data-admin-story="'+i+'" data-action="toggle">Toggle Visibility</button> <button data-admin-story="'+i+'" data-action="delete">Remove</button></div>'));
+  const form='<form id="admin-story-form"><div class="live-fieldgrid">'+field("Title","title")+'<label>Upload Photo or Video<input name="story_file" type="file" required accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"></label>'+field("Caption / Graduation Details","description","","textarea")+'</div><p class="an-upload-help">Select an image (up to 8 MB) or video (up to 40 MB). No media URL required. New posts are private drafts until you choose Publish.</p><label><input type="checkbox" name="consent" style="width:auto" required> I confirm the student has consented to publication</label><button class="btn mt" type="submit">Upload as Draft</button><div id="an-story-upload-status" class="an-upload-progress" role="status"></div></form>';
+  html=panel('<h2>Student Success Gallery</h2>'+form)+panel('<h2>Published Items</h2>'+rows(saved.stories,(s,i)=>'<div class="live-msg"><b>'+esc(s.title)+'</b> · '+(s.approved?"Published":"Draft")+'<div style="margin:8px 0">'+(s.type==="video"?'<video controls playsinline preload="metadata" style="width:min(320px,100%);max-height:175px" src="'+esc(s.media_url)+'"></video>':'<img src="'+esc(s.media_url)+'" alt="'+esc(s.title)+'" style="width:min(250px,100%);max-height:150px;object-fit:contain">')+'</div><button data-admin-story="'+i+'" data-action="toggle">'+(s.approved?"Unpublish":"Publish")+'</button> <button data-admin-story="'+i+'" data-action="delete">Remove</button></div>'));
  }
  if(section==="Media"){
   const {data,error}=await db().storage.from("an-public-media").list("",{limit:100});if(error)throw error;
@@ -102,6 +112,11 @@ async function loadMessages(){
  let el=document.getElementById("admin-chat-history");if(!el||!selectedStudent)return;
  const {data,error}=await db().from("an_messages").select("body,sender_id,created_at").eq("user_id",selectedStudent).order("created_at",{ascending:true});
  el.innerHTML=error?esc(error.message):rows(data||[],m=>'<div class="live-msg"><small>'+pretty(m.created_at)+' · '+(m.sender_id===selectedStudent?"Student":"Admin")+'</small>'+esc(m.body)+'</div>');
+}
+function latestRow(i,item){
+ return '<div class="an-latest-row" data-latest-index="'+i+'"><label>Scrolling Message<textarea name="an-latest-text-'+i+'" required maxlength="400">'+esc(item.text||"")+'</textarea></label>'
+ +'<label>Text Colour<select name="an-latest-colour-'+i+'"><option value="orange"'+(item.color!=="white"?" selected":"")+'>Orange</option><option value="white"'+(item.color==="white"?" selected":"")+'>Pure White</option></select></label>'
+ +'<button type="button" data-remove-latest aria-label="Remove announcement">×</button></div>';
 }
 function teamRow(i,v){
  return '<div class="live-msg" data-team-index="'+i+'"><h3>Team Member '+(i+1)+'</h3><div class="live-fieldgrid">'
@@ -124,6 +139,13 @@ document.addEventListener("click",async e=>{
  if(!get()?.isAdmin||!location.hash.startsWith("#/admin"))return;
  const t=e.target;
  try{
+ if(t.hasAttribute("data-add-latest")){
+  const list=document.getElementById("an-latest-list");if(list){
+    const used=[...list.querySelectorAll("[data-latest-index]")].map(el=>Number(el.dataset.latestIndex));
+    const index=Math.max(-1,...used)+1;list.insertAdjacentHTML("beforeend",latestRow(index,{text:"",color:"orange"}));
+  }
+ }
+ if(t.hasAttribute("data-remove-latest")){t.closest("[data-latest-index]")?.remove();}
  if(t.dataset.addAdminRow){
   const typ=t.dataset.addAdminRow,selector=typ==="team"?"#an-team-list":typ==="service"?"#an-services-list":"#an-countries-list";
   const list=document.querySelector(selector);if(list){
@@ -145,7 +167,7 @@ document.addEventListener("click",async e=>{
 },true);
 document.addEventListener("submit",async e=>{
  if(!get()?.isAdmin||!location.hash.startsWith("#/admin"))return;
- const f=e.target,id=f.id,allowed=["admin-case-form","admin-update-form","admin-message-form","admin-invoice-form","admin-settings-form","admin-management-form","admin-services-form","admin-countries-form","admin-university-form","admin-story-form","admin-media-form","admin-home-image-form"];
+ const f=e.target,id=f.id,allowed=["admin-case-form","admin-update-form","admin-message-form","admin-invoice-form","admin-settings-form","admin-latest-form","admin-management-form","admin-services-form","admin-countries-form","admin-university-form","admin-story-form","admin-media-form","admin-home-image-form"];
  if(!allowed.includes(id))return;
  e.preventDefault();e.stopImmediatePropagation();
  const b=f.querySelector("[type=submit]");if(b)b.disabled=true;
@@ -155,6 +177,15 @@ document.addEventListener("submit",async e=>{
  if(id==="admin-update-form"){const{error}=await db().from("an_application_updates").insert({application_id:f.dataset.id,title:v("title"),body:v("body")});if(error)throw error;}
  if(id==="admin-message-form"){if(!selectedStudent)throw Error("Choose student");const{error}=await db().from("an_messages").insert({user_id:selectedStudent,sender_id:get().user.id,body:v("body")});if(error)throw error;}
  if(id==="admin-invoice-form"){if(!(Number(v("amount"))>0))throw Error("Invalid amount");const{error}=await db().from("an_invoices").insert({user_id:v("user_id"),title:v("title"),amount:Number(v("amount")),currency:"MYR",status:v("status"),note:v("note")});if(error)throw error;}
+ if(id==="admin-latest-form"){
+   const items=[...f.querySelectorAll("[data-latest-index]")].map(el=>{
+     const i=el.dataset.latestIndex;return {text:v("an-latest-text-"+i),color:v("an-latest-colour-"+i)==="white"?"white":"orange"};
+   }).filter(x=>x.text);
+   if(!items.length)throw Error("Add at least one announcement.");
+   if(items.length>30)throw Error("Maximum 30 announcements are supported.");
+   await publish("latest_updates",items);get().latestUpdates=items;
+   window.ANUpdateTicker?.(items);showMsg("Published scrolling updates across the website.");
+ }
  if(id==="admin-settings-form"){const s={...saved.settings};for(const k of ["ticker","motto","heroLead","heroAccent","heroDescription","heroImage","about","work","malaysiaOffice","bangladeshOffice","phone","whatsapp","email"])s[k]=v(k);await publish("settings",s);}
  if(id==="admin-management-form"){
   const members=[...document.querySelectorAll("[data-team-index]")].map(el=>{
@@ -172,7 +203,30 @@ document.addEventListener("submit",async e=>{
   }).filter(a=>a[0]);if(!destinations.length)throw Error("Keep at least one country");await publish("countries",destinations);
  }
  if(id==="admin-university-form"){const row={id:v("id"),name:v("name"),short:v("short"),country:v("country"),city:v("city"),kind:v("kind"),site:v("site"),programs:v("programs").split(",").map(q=>q.trim()).filter(Boolean)};if(!/^[a-z0-9-]{2,60}$/.test(row.id)||!row.name||!/^https:\/\//.test(row.site))throw Error("Valid university ID, name and official URL are required");const a=saved.universities.filter(q=>q.id!==row.id);a.push(row);await publish("university_overrides",a);}
- if(id==="admin-story-form"){if(!form.has("consent"))throw Error("Consent is required");if(!v("title")||!/^https:\/\//.test(v("media_url")))throw Error("Title and HTTPS media URL required");const a=saved.stories.slice();a.unshift({title:v("title"),description:v("description"),media_url:v("media_url"),type:v("type"),approved:true});await publish("success_stories",a);}
+ if(id==="admin-story-form"){
+   if(!form.has("consent"))throw Error("Consent confirmation is required.");
+   const file=form.get("story_file");
+   const images=["image/jpeg","image/png","image/webp"];
+   const videos=["video/mp4","video/webm","video/quicktime"];
+   if(!(file instanceof File)||!file.size)throw Error("Select a photo or video to upload.");
+   if(!images.includes(file.type)&&!videos.includes(file.type))throw Error("Please use JPG, PNG, WebP, MP4, WebM or MOV.");
+   const video=videos.includes(file.type),max=video?41943040:8388608;
+   if(file.size>max)throw Error(video?"Video must be 40 MB or smaller.":"Image must be 8 MB or smaller.");
+   if(!v("title"))throw Error("Enter the story title.");
+   const status=document.getElementById("an-story-upload-status");
+   if(status)status.textContent="Uploading media securely...";
+   const ext=({ "image/jpeg":"jpg","image/png":"png","image/webp":"webp","video/mp4":"mp4","video/webm":"webm","video/quicktime":"mov"})[file.type];
+   const name="success-story-"+crypto.randomUUID()+"."+ext;
+   const bucket=db().storage.from("an-public-media");
+   const{error:uploadError}=await bucket.upload(name,file,{upsert:false,contentType:file.type,cacheControl:"3600"});
+   if(uploadError)throw uploadError;
+   if(status)status.textContent="Media uploaded. Saving the story as draft...";
+   const media_url=bucket.getPublicUrl(name).data.publicUrl;
+   const a=saved.stories.slice();
+   a.unshift({title:v("title"),description:v("description"),media_url,type:video?"video":"image",approved:false,created_at:new Date().toISOString()});
+   await publish("success_stories",a);
+   showMsg("Uploaded as draft. Press Publish to make this story visible to visitors.");
+ }
  if(id==="admin-home-image-form"){
   const img=form.get("image");
   if(!(img instanceof File)||!["image/jpeg","image/png","image/webp"].includes(img.type)||img.size>4194304)throw Error("Use JPG/PNG/WebP smaller than 4MB");
