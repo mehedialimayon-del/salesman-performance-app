@@ -5,7 +5,7 @@
 const PROJECT_URL='https://svpgjrxeqnluipsgjywk.supabase.co';
 const PUBLISHABLE_KEY='sb_publishable_eR5TZxv2aWndxdwzU0RIUA_mXWcBcO3';
 const PUBLIC_BUCKET='an-public-media',PRIVATE_BUCKET='an-student-files';
-const AN=window.ANLive={db:null,user:null,isAdmin:false,isApproved:false,ready:false,stories:[],publicSettings:{},management:[],loadedStory:false};
+const AN=window.ANLive={db:null,user:null,isAdmin:false,isApproved:false,ready:false,stories:[],publicSettings:{},management:[],latestUpdates:[],loadedStory:false};
 const ed=window.esc||((s)=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])));
 const msg=(str)=>{const el=document.querySelector('#an-feedback');if(el)el.textContent=String(str);else if(typeof toast==='function')toast(str);};
 const errorText=e=>String(e?.message||'Request failed');
@@ -33,10 +33,10 @@ async function setUser(user){
 }
 async function publicContent(){
  if(!AN.db)return;
- const {data,error}=await AN.db.from('an_site_content').select('key,value').in('key',['settings','management','success_stories','university_overrides','services','countries']);
+ const {data,error}=await AN.db.from('an_site_content').select('key,value').in('key',['settings','management','success_stories','university_overrides','services','countries','latest_updates']);
  if(error)return;
  const by=Object.fromEntries((data||[]).map(x=>[x.key,x.value]));
- AN.publicSettings=by.settings||{};AN.management=Array.isArray(by.management)?by.management:[];AN.stories=Array.isArray(by.success_stories)?by.success_stories:[];AN.loadedStory=true;
+ AN.publicSettings=by.settings||{};AN.management=Array.isArray(by.management)?by.management:[];AN.stories=Array.isArray(by.success_stories)?by.success_stories:[];AN.latestUpdates=Array.isArray(by.latest_updates)?by.latest_updates:[];AN.loadedStory=true;
  if(Array.isArray(by.services)&&by.services.length&&typeof serviceList!=='undefined'){serviceList.splice(0,serviceList.length,...by.services.filter(v=>Array.isArray(v)&&v.length>=3).map(v=>[String(v[0]),String(v[1]),String(v[2])]));}
  if(Array.isArray(by.countries)&&by.countries.length&&typeof countries!=='undefined'){countries.splice(0,countries.length,...by.countries.filter(v=>Array.isArray(v)&&v.length>=3).map(v=>[String(v[0]),String(v[1]),String(v[2])]));}
  (Array.isArray(by.university_overrides)?by.university_overrides:[]).forEach(x=>{
@@ -48,7 +48,7 @@ async function publicContent(){
 }
 function repaintPublic(){
  const s=AN.publicSettings;
- const ticker=document.querySelector('.ticker .marquee');if(ticker&&s.ticker)ticker.textContent=s.ticker;
+ if(typeof window.ANUpdateTicker==='function')window.ANUpdateTicker(AN.latestUpdates,s.ticker);
  if(route()==='home'){
   const motto=document.querySelector('.campus-line');if(motto&&s.motto)motto.textContent=s.motto;
   const heroTitle=document.querySelector('.hero h1');if(heroTitle&&s.heroLead&&s.heroAccent)heroTitle.innerHTML=ed(s.heroLead)+'<br><span class="gradient">'+ed(s.heroAccent)+'</span>';
@@ -68,6 +68,7 @@ function repaintPublic(){
  }
 }
 authPage=function(mode){
+ if(AN.user)return title('Your Student Account','You are currently signed in securely.')+'<div class="wrap content"><div class="live-panel live-login"><h2>Signed In</h2><p>'+ed(AN.user.email||'Account')+'</p><div class="live-controls"><a class="btn" href="'+(AN.isAdmin?'#/admin':'#/dashboard')+'">Open '+(AN.isAdmin?'Admin Panel':'My Dashboard')+'</a><button id="an-logout">Sign Out</button></div></div></div>';
  const register=mode==='register';
  return title(register?'Create Student Account':'Secure Student Login',register?'Sign up with your email. Your account is reviewed before you can submit applications.':'Sign in to access your personal student dashboard and application status.')
  +'<div class="wrap content"><div class="live-panel live-login"><h2><span style="color:#ff8500">'+(register?'Student':'Welcome')+'</span> '+(register?'Registration':'Login')+'</h2><form id="an-auth-form" autocomplete="on">'
@@ -206,7 +207,7 @@ document.addEventListener('submit',async e=>{
   if(id==='an-housing-form'){if(!AN.user)throw Error('Please sign in.');const row={user_id:AN.user.id,room_type:String(f.get('room_type')),location:String(f.get('location')).trim(),notes:String(f.get('notes')||'')};const{error}=await AN.db.from('an_accommodation_requests').insert(row);if(error)throw error;form.reset();msg('Housing request submitted.');}
   if(id==='an-message-form'){if(!AN.user)throw Error('Please sign in.');const row={user_id:AN.user.id,sender_id:AN.user.id,body:String(f.get('body')||'').trim()};if(!row.body)throw Error('Type a message first.');const{error}=await AN.db.from('an_messages').insert(row);if(error)throw error;form.reset();msg('Message sent.');await loadMessages();}
   if(id==='an-document-form'){if(!AN.user||(!AN.isApproved&&!AN.isAdmin))throw Error('Account approval is required.');const file=f.get('file'),app=String(f.get('application_id')||'');const approved=['application/pdf','image/jpeg','image/png','image/webp'];if(!(file instanceof File)||!file.size||file.size>10485760||!approved.includes(file.type))throw Error('Choose PDF/JPG/PNG/WEBP no larger than 10 MB.');if(!app)throw Error('Please submit an application first.');const unique=(crypto.randomUUID?.()||Date.now().toString());const safeName=file.name.replace(/[^a-z0-9._-]/gi,'_').slice(-110);const path=AN.user.id+'/'+app+'/'+unique+'-'+safeName;const {error:uploadError}=await AN.db.storage.from(PRIVATE_BUCKET).upload(path,file,{contentType:file.type,upsert:false});if(uploadError)throw uploadError;const row={application_id:app,owner_id:AN.user.id,storage_path:path,display_name:file.name,category:String(f.get('category')||'Supporting document'),mime_type:file.type,size_bytes:file.size,uploaded_by:AN.user.id};const{error}=await AN.db.from('an_documents').insert(row);if(error)throw Error('File uploaded but metadata failed. Please notify support: '+errorText(error));msg('Document securely uploaded.');await hydrate();}
- }catch(e2){msg(errorText(e2));}
+ }catch(e2){const m=errorText(e2);msg((id==='an-auth-form'&&/invalid login credentials/i.test(m))?'Email or password did not match a confirmed account. Check the address or use Reset Password below.':(id==='an-auth-form'&&/email not confirmed/i.test(m))?'Please verify your email using the confirmation link, then sign in.':m);}
  finally{if(submit&&submit.isConnected)submit.disabled=false;}
 },true);
 const originalRender=render;
@@ -220,7 +221,7 @@ render=function(){
   document.title='Reset Password | A&N Overseas';window.scrollTo(0,0);
  }
  else originalRender();
- queueMicrotask(()=>{repaintPublic();updateContact();hydrate();if(p==='success'){const grid=document.getElementById('an-story-grid');if(grid)grid.innerHTML=storyMarkup();}});
+ queueMicrotask(()=>{repaintPublic();updateContact();if(typeof window.ANRenderPublicEnhancements==='function')window.ANRenderPublicEnhancements();hydrate();if(p==='success'){const grid=document.getElementById('an-story-grid');if(grid)grid.innerHTML=storyMarkup();}});
 };
 window.addEventListener('hashchange',()=>queueMicrotask(()=>render()));
 function loadSDK(){
