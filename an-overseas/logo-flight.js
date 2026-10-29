@@ -30,12 +30,12 @@ function installFlight(){
    </linearGradient>
  </defs>
  <g class="an-animated-flight">
-  <use href="#an-centre-orbit" fill="none" stroke="#ffc26f" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="36 165" class="an-orbit-soft">
-   <animate attributeName="stroke-dashoffset" from="0" to="-182" dur="3.8s" repeatCount="indefinite"/>
+  <use href="#an-centre-orbit" fill="none" stroke="#ffc26f" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="36 122" class="an-orbit-soft">
+   <animate attributeName="stroke-dashoffset" from="0" to="-158" dur="3.8s" repeatCount="indefinite"/>
    <animate attributeName="opacity" values=".45;.95;.5" keyTimes="0;.5;1" dur="3.8s" repeatCount="indefinite"/>
   </use>
-  <use href="#an-centre-orbit" fill="none" stroke="#fff7cb" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="18 183">
-   <animate attributeName="stroke-dashoffset" from="0" to="-182" dur="3.8s" repeatCount="indefinite"/>
+  <use href="#an-centre-orbit" fill="none" stroke="#fff7cb" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="18 140">
+   <animate attributeName="stroke-dashoffset" from="0" to="-158" dur="3.8s" repeatCount="indefinite"/>
   </use>
   <g class="an-plane">
    <path d="M-34 0 L-6 0" fill="none" stroke="url(#an-trail)" stroke-width="2.8" stroke-linecap="round"/>
