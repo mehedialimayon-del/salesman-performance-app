@@ -36,9 +36,9 @@ window.addEventListener('DOMContentLoaded',function(){
   var flight=document.createElement('script');flight.src='logo-flight.js?v=20261029-gold-aircraft-v7';document.body.appendChild(flight);
   var js=document.createElement('script');js.src='catalogue-extras.js?v=20261029-2154';
   js.onload=function(){
-    var secure=document.createElement('script');secure.src='secure-platform.js?v=20261030-recovery-live-v3';
+    var secure=document.createElement('script');secure.src='secure-platform.js?v=20261030-selfpass-v4';
     secure.onload=function(){
-      var admin=document.createElement('script');admin.src='admin-panel.js?v=20261030-admin-reset-v2';admin.onload=function(){if(location.hash.startsWith('#/admin'))render();};
+      var admin=document.createElement('script');admin.src='admin-panel.js?v=20261030-selfpass-v4';admin.onload=function(){if(location.hash.startsWith('#/admin'))render();};
       document.body.appendChild(admin);
     };
     document.body.appendChild(secure);
