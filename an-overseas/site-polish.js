@@ -70,11 +70,13 @@ function applyAbout(){
  const phoneHtml=phone?'<p class="an-management-contact">Phone: '+E(phone)+'</p>':'';
  const email=String(m.email||'').trim();
  const emailHtml=email?'<p class="an-management-contact">Email: '+E(email)+'</p>':'';
- const title=m.designation||m.position||m.role||'';
+ const title=m.designation||m.role||'';
+ const position=String(m.position||'').trim();
  const company=m.company||m.department||'';
  const help=m.help||m.bio||m.description||(isNusrat?'Helping students plan their international education journey.':'');
  slot.innerHTML='<div class="an-management-profile">'+img+'<div class="an-management-copy"><h3>'+E(m.name||'Management')+'</h3>'
   +(title?'<p class="an-management-role">'+E(title)+'</p>':'')
+  +(position?'<p class="an-management-position"><strong>Position:</strong> '+E(position)+'</p>':'')
   +(company?'<p>'+E(company)+'</p>':'')
   +(m.department&&m.department!==company?'<p>'+E(m.department)+'</p>':'')
   +(help?'<p class="an-management-help">'+E(help)+'</p>':'')
