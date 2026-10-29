@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const get=()=>window.ANLive, db=()=>get().db, esc=s=>get().ed(s), pretty=s=>get().dt(s);
-const sections=["Overview","Students","Applications","Documents","Enquiries","Messages","Invoices","Latest Updates","Website","Management","Services","Countries","Universities","Success Stories","Media"];
+const sections=["Overview","Students","Applications","Documents","Enquiries","Messages","Invoices","Latest Updates","Website","Management","Services","Service Requests","Service Prices","Countries","Universities","Success Stories","Media"];
 let section="Overview", selectedStudent="",saved={};
 const panel=s=>'<section class="live-panel">'+s+'</section>';
 const field=(label,key,value="",type="text")=>'<label>'+esc(label)+(type==="textarea"?'<textarea name="'+key+'">'+esc(value)+'</textarea>':'<input name="'+key+'" type="'+type+'" value="'+esc(value)+'">')+'</label>';
@@ -93,6 +93,8 @@ async function draw(){
   html=panel('<h2>Services Editor</h2><form id="admin-services-form"><div id="an-services-list">'
   +rows(saved.services,(v,i)=>serviceRow(i,v))+'</div><div class="live-controls mt"><button type="button" data-add-admin-row="service">+ Add Service</button><button class="btn" type="submit">Publish Services</button></div></form>');
  }
+ if(section==="Service Requests"){html=await window.ANServiceAdmin?.requests?.()||panel("Service request tools are loading...");}
+ if(section==="Service Prices"){html=await window.ANServiceAdmin?.prices?.()||panel("Service pricing tools are loading...");}
  if(section==="Countries"){
   saved.countries=await content("countries")||countries;
   html=panel('<h2>Study Destinations Editor</h2><p>Campus images currently use Unsplash image identifiers.</p><form id="admin-countries-form"><div id="an-countries-list">'
