@@ -33,10 +33,10 @@ async function setUser(user){
 }
 async function publicContent(){
  if(!AN.db)return;
- const {data,error}=await AN.db.from('an_site_content').select('key,value').in('key',['settings','management','success_stories','university_overrides','services','countries','latest_updates','scholarships','offers']);
+ const {data,error}=await AN.db.from('an_site_content').select('key,value').in('key',['settings','management','success_stories','university_overrides','services','countries','latest_updates','scholarships','offers','service_prices']);
  if(error)return;
  const by=Object.fromEntries((data||[]).map(x=>[x.key,x.value]));
- AN.publicSettings=by.settings||{};AN.management=Array.isArray(by.management)?by.management:[];AN.stories=Array.isArray(by.success_stories)?by.success_stories:[];AN.latestUpdates=Array.isArray(by.latest_updates)?by.latest_updates:[];AN.scholarships=Array.isArray(by.scholarships)?by.scholarships:[];AN.offers=Array.isArray(by.offers)?by.offers:[];AN.loadedStory=true;
+ AN.publicSettings=by.settings||{};AN.management=Array.isArray(by.management)?by.management:[];AN.stories=Array.isArray(by.success_stories)?by.success_stories:[];AN.latestUpdates=Array.isArray(by.latest_updates)?by.latest_updates:[];AN.scholarships=Array.isArray(by.scholarships)?by.scholarships:[];AN.offers=Array.isArray(by.offers)?by.offers:[];AN.servicePrices=Array.isArray(by.service_prices)?by.service_prices:[];AN.loadedStory=true;
  if(Array.isArray(by.services)&&by.services.length&&typeof serviceList!=='undefined'){serviceList.splice(0,serviceList.length,...by.services.filter(v=>Array.isArray(v)&&v.length>=3).map(v=>[String(v[0]),String(v[1]),String(v[2])]));}
  if(Array.isArray(by.countries)&&by.countries.length&&typeof countries!=='undefined'){countries.splice(0,countries.length,...by.countries.filter(v=>Array.isArray(v)&&v.length>=3).map(v=>[String(v[0]),String(v[1]),String(v[2])]));}
  (Array.isArray(by.university_overrides)?by.university_overrides:[]).forEach(x=>{
@@ -61,7 +61,7 @@ async function publicContent(){
   }
  });
  repaintPublic();
- if(['universities','university','services','service','scholarships','offers','countries','apply'].includes(route()))queueMicrotask(()=>{if(typeof render==='function'&&!location.hash.startsWith('#/admin'))render();});
+ if(['universities','university','services','service','scholarships','offers','countries','apply','my-services'].includes(route()))queueMicrotask(()=>{if(typeof render==='function'&&!location.hash.startsWith('#/admin'))render();});
 }
 function repaintPublic(){
  const s=AN.publicSettings;
@@ -97,10 +97,10 @@ authPage=function(mode){
 };
 dashPage=function(){
  if(!authRequired())return title('Student Portal','Secure student dashboard')+'<div class="wrap content">'+needAuth()+'</div>';
- const menu=[['dashboard','Overview'],['apply','Apply Now'],['tracking','Application Tracking'],['documents','My Documents'],['payments','Invoices'],['accommodation','Accommodation'],['messages','Messages']];
+ const menu=[['dashboard','Overview'],['apply','Apply Now'],['tracking','Application Tracking'],['documents','My Documents'],['payments','Invoices'],['accommodation','Accommodation'],['messages','Messages'],['my-services','My Services & Receipts']];
  return title('My Student Dashboard','Your personal applications, updates and university documents.')
  +'<div class="wrap content page-scroll"><div class="live-controls">'+menu.map(([to,label])=>'<a href="#/'+to+'">'+label+'</a>').join('')+(AN.isAdmin?'<a href="#/admin">Admin Control Panel</a>':'')+'<a href="#/change-password">Change Password</a><button id="an-logout">Sign Out</button></div>'
- +'<div class="live-panel mt"><h2>Welcome, '+ed(AN.user.user_metadata?.full_name||AN.user.email||'Student')+'</h2>'+(AN.isApproved||AN.isAdmin?'<p>Account approved for applications.</p>':'<p>Your account has been created. An administrator must approve it before you can submit an application or upload files.</p>')+'</div><div id="an-dashboard-data" class="live-panel"><p>Loading your applications...</p></div></div>';
+ +'<div class="live-panel mt"><h2>Welcome, '+ed(AN.user.user_metadata?.full_name||AN.user.email||'Student')+'</h2>'+(AN.isApproved||AN.isAdmin?'<p>Account approved for applications.</p>':'<p>Your account has been created. An administrator must approve it before you can submit an application or upload files.</p>')+'</div><div id="an-dashboard-data" class="live-panel"><p>Loading your applications...</p></div><div id="an-dashboard-services" class="live-panel mt"><h2>My Optional Services & Receipts</h2><p>Loading service updates...</p></div></div>';
 };
 trackingPage=function(){
  return title('Application Tracking','Your real application and EMGS milestones, updated by the A&N team.')
@@ -193,7 +193,9 @@ async function hydrate(){
  if(nav){let el=document.getElementById('an-admin-nav');if(AN.isAdmin&&!el){el=document.createElement('a');el.id='an-admin-nav';el.href='#/admin';el.textContent='Admin Panel';nav.appendChild(el);}else if(!AN.isAdmin&&el)el.remove();}
  if(!AN.user||!AN.db)return;
  const p=route();
+ if(p==='my-services')window.ANServiceJourney?.hydrate?.();
  if(p==='dashboard'){const el=document.getElementById('an-dashboard-data');if(el){const{data,error}=await AN.db.from('an_applications').select('id,university_id,programme,status,emgs_percent,created_at').order('created_at',{ascending:false});if(!el.isConnected)return;el.innerHTML=error?ed(errorText(error)):data.length?'<h2>My Applications</h2>'+data.map(a=>'<div class="live-msg"><b>'+ed(a.university_id)+' — '+ed(a.programme)+'</b><p>'+statusBadge(a.status)+' EMGS '+Number(a.emgs_percent||0)+'% · '+dt(a.created_at)+'</p></div>').join(''):'<h2>No Applications Yet</h2><p>Your submitted applications will appear here.</p>';}}
+ if(p==='dashboard'){const panel=document.getElementById('an-dashboard-services');if(panel){const {data,error}=await AN.db.from('an_service_requests').select('service_title,status,progress,amount,currency').order('created_at',{ascending:false}).limit(15);if(panel.isConnected)panel.innerHTML=error?'<p>'+ed(errorText(error))+'</p>':'<h2>My Optional Services & Receipts</h2>'+(data?.length?data.map(x=>'<div class="live-msg"><b>'+ed(x.service_title)+'</b><p>'+ed(x.status)+' · '+Number(x.progress||0)+'% progress · '+(x.amount==null?'Quotation pending':ed(x.currency||'MYR')+' '+Number(x.amount).toFixed(2))+'</p></div>').join(''):'<p>No optional services requested yet.</p>')+'<p><a class="btn outline" href="#/my-services">View Service Progress, Photos & Receipts →</a></p>';}}
  if(p==='tracking'){const el=document.getElementById('an-track-data');if(el){const {data,error}=await AN.db.from('an_applications').select('id,university_id,programme,emgs_percent,status,created_at').order('created_at',{ascending:false});if(el.isConnected)el.innerHTML=error?ed(errorText(error)):data.length?data.map(a=>'<div class="live-panel"><h2>'+ed(a.university_id)+' · '+ed(a.programme)+'</h2><p>'+statusBadge(a.status)+' · EMGS '+Number(a.emgs_percent||0)+'%</p><div class="progress"><div style="width:'+Math.min(100,Math.max(0,Number(a.emgs_percent||0)))+'%"></div></div><div class="live-msg-list" data-updates="'+ed(a.id)+'"></div></div>').join(''):'<p>No confirmed applications yet.</p>';if(data)for(const a of data){let q=document.querySelector('[data-updates="'+a.id+'"]');if(!q)continue;const updates=await AN.db.from('an_application_updates').select('title,body,created_at').eq('application_id',a.id).order('created_at',{ascending:false});q.innerHTML=(updates.data||[]).map(u=>'<p class="live-mini">'+dt(u.created_at)+' · '+ed(u.title)+': '+ed(u.body)+'</p>').join('');}}}
  if(p==='payments'){const el=document.getElementById('an-invoice-list');if(el){const {data,error}=await AN.db.from('an_invoices').select('title,amount,currency,status,note,created_at').order('created_at',{ascending:false});if(el.isConnected)el.innerHTML=error?ed(errorText(error)):data.length?'<h2>My Invoices</h2>'+data.map(x=>'<div class="live-msg"><b>'+ed(x.title)+' · '+ed(x.currency)+' '+Number(x.amount).toFixed(2)+'</b><p>'+statusBadge(x.status)+' · '+dt(x.created_at)+'</p><p>'+ed(x.note||'')+'</p></div>').join(''):'<h2>No Invoices</h2><p>Your verified invoices will appear here.</p>';}}
  if(p==='documents'){const list=document.getElementById('an-doc-list'),sel=document.getElementById('an-document-app');if(list){const [docs,apps]=await Promise.all([AN.db.from('an_documents').select('display_name,category,storage_path,created_at').order('created_at',{ascending:false}),AN.db.from('an_applications').select('id,university_id,programme').order('created_at',{ascending:false})]);if(!list.isConnected)return;sel&&(sel.innerHTML=(apps.data||[]).map(a=>'<option value="'+ed(a.id)+'">'+ed(a.university_id)+' · '+ed(a.programme)+'</option>').join(''));list.innerHTML=docs.error?ed(errorText(docs.error)):(docs.data||[]).map(d=>'<div class="live-msg"><b>'+ed(d.display_name)+'</b><p>'+ed(d.category)+' · '+dt(d.created_at)+'</p><button data-open-file="'+ed(d.storage_path)+'">Open securely ↗</button></div>').join('')||'<p>No documents uploaded.</p>';}}
@@ -211,7 +213,7 @@ async function submitApplication(){
  const university=U.find(u=>u.id===draft.university);
  const row={user_id:AN.user.id,country:draft.country||university?.country||'Malaysia',university_id:draft.university,programme:draft.programme, intake:draft.intake||'',applicant_name:draft.name||AN.user.user_metadata?.full_name||'Student',email:draft.email||AN.user.email||'',phone:draft.phone||'',nationality:draft.nationality||'',status:'submitted',emgs_percent:0};
  if(!row.university_id||!row.programme||!row.applicant_name){msg('Please complete the university, programme and applicant name fields.');return;}
- const {error}=await AN.db.from('an_applications').insert(row);if(error)msg('Could not submit: '+errorText(error));else{msg('Application submitted to your private dashboard.');location.hash='#/dashboard';}
+ const {data,error}=await AN.db.from('an_applications').insert(row).select('id').single();if(error){msg('Could not submit: '+errorText(error));return;}let notice='Application submitted to your private dashboard.';try{const n=await window.ANServiceJourney?.insertSelections?.(data.id,AN.user.id);if(n)notice+=' '+n+' optional service request(s) sent for quotation.';}catch(extraError){notice+=' Optional service requests could not be saved; please open My Services to request them separately. '+errorText(extraError);}msg(notice);location.hash='#/dashboard';
 }
 document.addEventListener('click',async e=>{
  const final=e.target.closest('[data-apply-nav="finish"]');
