@@ -185,6 +185,65 @@ select option{background:#10151c;color:#fff}
 .apply-intro > *{position:relative}
 @media(max-width:800px){.apply-intro:before{width:50%;opacity:.20}}
 
+
+/* Final homepage refinement: Malaysia focus, legible imagery and full-size shortcuts. */
+@keyframes brandGlow{0%,100%{filter:drop-shadow(0 0 3px #ff9b1530);transform:translateY(0)}50%{filter:drop-shadow(0 0 10px #ff9b1580);transform:translateY(-2px)}}
+.top .brand-logo{animation:brandGlow 4s ease-in-out infinite}
+body.home-view .hero{background:#080b11;align-items:stretch}
+body.home-view .hero:before{inset:0;background-image:url('assets/malaysia-students.jpg');background-position:center;background-size:cover;opacity:1}
+body.home-view .hero:after{background:linear-gradient(90deg,#060a12f5 0%,#060a12d9 30%,#060a1240 65%,#060a1200 100%),linear-gradient(0deg,#06090fe8,transparent 32%)}
+body.home-view .hero .wrap{max-width:1230px;display:flex;flex-direction:column;justify-content:center;position:relative;width:100%;margin:0 auto;height:100%;padding-top:24px;padding-bottom:24px}
+body.home-view .hero h1{font-size:clamp(48px,6.4vw,88px);margin:18px 0 12px;line-height:1.0;max-width:660px}
+body.home-view .eyebrow{align-self:flex-start;font-size:10px;letter-spacing:1.2px}
+body.home-view .home-description{max-width:440px;font-size:15px;line-height:1.6}
+.campus-line{color:#ffd8a0;font-size:10px;letter-spacing:1.6px;font-weight:700;margin-top:16px}
+.campus-line span{color:#ff8c10;padding:0 7px}
+body.home-view .actions{margin-top:22px}
+body.home-view .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:min(640px,100%);gap:12px;margin-top:28px}
+body.home-view .metric{min-width:0;min-height:88px;padding:16px 12px;background:linear-gradient(135deg,#18202bed,#0b1018ef);border:1px solid #b97b3b;border-radius:13px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px #0007}
+body.home-view .metric strong{font-size:13px;color:#ffcf81}
+body.home-view .metric span:not(.symbol){font-size:10px;margin-top:6px;line-height:1.4;color:#e0dfdc}
+body.home-view .ticker{height:27px;flex-basis:27px;font-size:10px}
+body.home-view .ticker b{font-size:9px;padding:6px 12px;margin-right:12px}
+@media(max-width:800px){
+ body.home-view .hero:before{height:57%;background-position:88% center}
+ body.home-view .hero:after{background:linear-gradient(0deg,#060a12 0%,#060a12 42%,#060a12bb 52%,transparent 72%)}
+ body.home-view .hero .wrap{justify-content:flex-end;padding:18px 18px 22px}
+ body.home-view .hero h1{font-size:clamp(44px,10vw,68px);margin:12px 0 9px}
+ body.home-view .home-description{font-size:12px;max-width:380px;line-height:1.45}
+ body.home-view .metrics{width:100%;gap:8px;margin-top:18px}
+ body.home-view .metric{flex-direction:column;text-align:center;gap:6px;min-height:104px;padding:13px 5px;justify-content:center}
+ body.home-view .metric .symbol{font-size:23px}
+ body.home-view .metric strong{font-size:11px;line-height:1.3}
+ body.home-view .metric span:not(.symbol){font-size:9px;margin-top:5px}
+ body.home-view .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+ body.home-view .btn.big{min-height:48px;font-size:12px;padding:10px 6px}
+ body.home-view .campus-line{font-size:9px;letter-spacing:1px;margin-top:12px}
+ body.home-view .eyebrow{font-size:8px;padding:7px 10px;letter-spacing:.8px}
+}
+@media(max-height:700px) and (max-width:800px){
+ body.home-view .hero .wrap{padding:12px 15px}
+ body.home-view .hero h1{font-size:42px;margin:8px 0}
+ body.home-view .metrics{display:grid;margin-top:12px}
+ body.home-view .metric{min-height:82px;padding:8px 4px}
+ body.home-view .home-description{font-size:11px}
+ body.home-view .campus-line{margin-top:9px}
+ body.home-view .actions{margin-top:12px}
+ body.home-view .btn.big{min-height:44px}
+}
+@media(max-height:470px){
+ body.home-view .hero .wrap{display:grid;grid-template-columns:1fr 1fr;align-content:center;column-gap:24px;padding:10px 22px}
+ body.home-view .hero h1{grid-column:1;font-size:40px;grid-row:1/3}
+ body.home-view .campus-line,body.home-view .home-description,body.home-view .eyebrow{display:none}
+ body.home-view .actions{grid-column:2;grid-row:1;display:flex;margin:0}
+ body.home-view .metrics{display:grid;grid-column:2;grid-row:2;margin-top:9px}
+ body.home-view .metric{min-height:60px;padding:5px;gap:2px}
+ body.home-view .metric .symbol{font-size:17px}
+ body.home-view .metric strong{font-size:10px}
+ body.home-view .metric span:not(.symbol){display:none}
+}
+@media(prefers-reduced-motion:reduce){.top .brand-logo{animation:none}*{scroll-behavior:auto!important;transition:none!important}}
+
 </style></head>
 <body><header class="top"><div class="wrap"><a class="brand" href="#/home" aria-label="A&N Overseas Home"><img class="brand-logo" src="assets/brand-logo.jpg" alt="A&N Overseas Education & Consultancy"></a><nav class="links" id="links"><a href="#/home">Home</a><a href="#/universities">Universities</a><a href="#/countries">Countries</a><a href="#/services">Our Services</a><a href="#/success">Success Stories</a><a href="#/about">About Us</a><a href="#/contact">Contact</a><a href="#/login">Student Login</a></nav><a class="btn tiny" href="#/apply">Apply Now ↗</a><button class="hamb" id="hamb" aria-label="Open menu" aria-expanded="false">☰</button></div></header><div id="app"></div><footer class="footer"><div class="wrap"><div class="footer-layout"><div><a class="brand" href="#/home"><img class="brand-logo" src="assets/brand-logo.jpg" alt="A&N Overseas Education & Consultancy"></a><p>Personalised education consultancy for students planning their study abroad journey, from choosing a programme to arrival support.</p></div><div><h4>Explore</h4><a href="#/countries">Destinations</a><a href="#/universities">Universities</a><a href="#/services">Services</a><a href="#/apply">Apply Now</a></div><div><h4>Student Portal</h4><a href="#/register">Register</a><a href="#/login">Login</a><a href="#/dashboard">Dashboard preview</a><a href="#/tracking">EMGS progress preview</a></div><div><h4>Our Offices</h4><p>📍 Kuala Lumpur, Malaysia<br>📍 Rangpur, Bangladesh</p><p>For the latest contact details, please use our contact page.</p></div></div><div class="copyright">© <span id="year"></span> A&N Overseas Education & Consultancy · Designed for your future</div></div></footer><div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script>
@@ -215,7 +274,7 @@ const title=(name,description)=>`<section class="page-head"><div class="wrap"><d
 const card=(u)=>`<article class="card"><div class="cover" style="background-image:url('${pic(u.photo)}')"></div><div class="inside"><span class="badge">${esc(u.kind)} · ${esc(u.country)}</span><h3 style="margin-top:12px">${esc(u.short)}</h3><div style="font-size:12px;min-height:32px;color:#d1d7e1">${esc(u.name)}</div><p>📍 ${esc(u.city)}</p>${a('university/'+u.id,'View Details →','cardlink')}</div></article>`;
 const countryTile=([name,flag,img])=>`<a href="#/universities?country=${encodeURIComponent(name)}" class="country" style="background-image:url('${pic(img)}')"><span class="flag">${flag}</span><strong>${esc(name)}</strong><small>View universities →</small></a>`;
 let draft={country:'Malaysia',university:'upm',programme:'Agricultural Economics',intake:'',name:'',email:'',phone:'',nationality:'',step:1};let selectedFiles={};let tab='Overview';let filterCountry='All Countries',searchTerm='';const app=document.querySelector('#app');
-function home(){return `<div class="ticker"><b>📣 Latest Updates</b><div class="marquee">University applications • Student guidance • Malaysia admission support • Explore programmes • Track your progress in one place</div></div><section class="hero"><div class="wrap"><span class="eyebrow">✦ A&N Overseas Education & Consultancy</span><h1>Dream Global.<br><span class="gradient">Build Your Tomorrow.</span></h1><p>Study Abroad &nbsp; | &nbsp; Expert Guidance &nbsp; | &nbsp; Brighter Career. Discover universities, follow your application and plan your future with confidence.</p><div class="actions">${a('apply','➤ &nbsp; Apply Now &nbsp; →','btn big')}${a('contact','▦ &nbsp; Book Consultation','btn big outline')}</div><div class="metrics home-shortcuts"><a class="metric" href="#/countries" aria-label="Explore study destinations"><span class="symbol">🌍</span><div><strong>Study Worldwide</strong><span>Explore destinations →</span></div></a><a class="metric" href="#/universities" aria-label="Open university catalogue"><span class="symbol">🏛️</span><div><strong>University Network</strong><span>Browse universities →</span></div></a><a class="metric" href="#/dashboard" aria-label="Preview student portal"><span class="symbol">🎓</span><div><strong>Student Portal</strong><span>View dashboard →</span></div></a></div></div></section>`}
+function home(){return `<div class="ticker"><b>📣 Latest Updates</b><div class="marquee">Malaysia admission guidance • Explore universities • Plan your application • Follow office-provided updates</div></div><section class="hero"><div class="wrap"><span class="eyebrow">🇲🇾 YOUR GATEWAY TO GLOBAL EDUCATION</span><h1>Study in<br><span class="gradient">Malaysia.</span></h1><p class="home-description">Your global future starts here. University selection, admission guidance and student support—all in one place.</p><div class="campus-line">KUALA LUMPUR <span>•</span> UPM <span>•</span> UM <span>•</span> UTM</div><div class="actions">${a('apply','➤ &nbsp; Apply Now &nbsp; →','btn big')}${a('contact','▦ &nbsp; Book Consultation','btn big outline')}</div><div class="metrics home-shortcuts"><a class="metric" href="#/countries" aria-label="Explore study destinations"><span class="symbol">🌍</span><div><strong>Study Worldwide</strong><span>Explore destinations →</span></div></a><a class="metric" href="#/universities" aria-label="Open university catalogue"><span class="symbol">🏛️</span><div><strong>University Network</strong><span>Browse universities →</span></div></a><a class="metric" href="#/dashboard" aria-label="Preview student portal"><span class="symbol">🎓</span><div><strong>Student Portal</strong><span>View dashboard →</span></div></a></div></div></section>`}
 function countriesPage(){return title('Choose Your Study Destination','Explore your study abroad options. Select a country to see universities in the catalogue.')+`<div class="wrap content"><div class="country-tiles">${countries.map(countryTile).join('')}</div><p class="muted mt">Universities shown are an initial catalogue; more can be added as their programme information is confirmed.</p></div>`}
 function universitiesPage(){const p=new URLSearchParams((location.hash.split('?')[1]||''));filterCountry=p.get('country')||'All Countries';return title('Explore Universities','Search the catalogue by university name, location or country and select an institution to see more details.')+`<div class="wrap content"><div class="filter"><input class="input" id="university-search" placeholder="🔍 Search universities or programmes" aria-label="Search universities"><select id="country-filter" aria-label="Filter by country"><option>All Countries</option>${countries.map(c=>`<option ${c[0]===filterCountry?'selected':''}>${esc(c[0])}</option>`).join('')}</select></div><div id="results" class="grid"></div><p class="muted mt" style="font-size:12px">Programme availability, fees, eligibility and intake must be confirmed on the university's official website before applying.</p></div>`}
 function renderResults(){const el=document.querySelector('#results');if(!el)return;let arr=U.filter(u=>(filterCountry==='All Countries'||u.country===filterCountry)&&([u.name,u.short,u.country,u.city,...u.programs].join(' ').toLowerCase().includes(searchTerm.toLowerCase())));el.innerHTML=arr.length?arr.map(card).join(''):`<div class="empty">No results. Try another country or a different search term.</div>`}
