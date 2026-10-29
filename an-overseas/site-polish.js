@@ -37,6 +37,10 @@ const off=()=>window.ANLive?.publicSettings||{};
 function applyAbout(){
  const area=document.querySelector('#app>.wrap.content');if(!area)return;
  let members=Array.isArray(window.ANLive?.management)?window.ANLive.management:[];
+ const sNow=off();
+ const signature=JSON.stringify([members,sNow.malaysiaOffice,sNow.bangladeshOffice,managerIndex]);
+ if(area.dataset.anAboutSignature===signature&&area.querySelector('.an-about-shell'))return;
+ area.dataset.anAboutSignature=signature;
  if(!area.querySelector('.an-about-shell')){
   area.innerHTML='<div class="an-about-shell"><section class="an-about-copy">'
    +'<span style="color:#ff9f38;font-size:11px;letter-spacing:1px;font-weight:800">ABOUT A&N OVERSEAS</span>'
