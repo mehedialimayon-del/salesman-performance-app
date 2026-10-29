@@ -1,0 +1,91 @@
+/* A&N global ticker and responsive public-page enhancements. */
+(function(){
+'use strict';
+const E=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const servicePhotos=[
+ 'photo-1541339907198-e08756dedf3f','photo-1492538368677-f6e0afe31dcc',
+ 'photo-1566073771259-6a8506099945','photo-1436491865332-7a61a109cc05',
+ 'photo-1476514525535-07fb3b4ae5f1','photo-1551836022-d5d88e9218df',
+ 'photo-1523289333742-be1143f6b766','photo-1513258496099-48168024aec0'
+];
+let latest=[],managerIndex=0,renderQueued=false;
+function where(){return location.hash.replace(/^#\/?/,'').split('?')[0].split('/')[0]||'home';}
+function bar(){
+ let existing=document.getElementById('an-global-ticker');if(existing)return existing;
+ const header=document.querySelector('header.top');if(!header)return null;
+ const b=document.createElement('div');b.id='an-global-ticker';b.className='an-updates-bar';b.setAttribute('aria-label','Latest A&N Overseas announcements');
+ b.innerHTML='<div class="an-updates-label">📣 Latest Updates</div><div class="an-updates-window"><div class="an-updates-track"></div></div>';
+ header.insertAdjacentElement('afterend',b);return b;
+}
+function normalize(input,fallback){
+ let arr=Array.isArray(input)?input:[];
+ if(!arr.length&&fallback)arr=String(fallback).split(/\s*[•|]\s*/).filter(Boolean).map((text,i)=>({text,color:i%2?'white':'orange'}));
+ if(!arr.length)arr=[{text:'Study abroad with A&N Overseas — Explore destinations, universities and student support.',color:'orange'}];
+ return arr.filter(v=>v&&String(v.text||'').trim()).slice(0,30).map(v=>({text:String(v.text).slice(0,400).trim(),color:v.color==='white'?'white':'orange'}));
+}
+function ticker(input,fallback){
+ latest=normalize(input,fallback||window.ANLive?.publicSettings?.ticker);
+ let b=bar();if(!b)return;
+ const p=b.querySelector('.an-updates-track');
+ const make=()=>{let el=document.createElement('span');el.className='an-updates-group';latest.forEach(item=>{let span=document.createElement('span');span.className='an-update-item';span.dataset.color=item.color;span.textContent=item.text;el.appendChild(span);});return el;};
+ p.replaceChildren(make(),make());
+ const chars=latest.reduce((t,i)=>t+i.text.length,0);
+ p.style.setProperty('--an-ticker-duration',Math.max(18,Math.min(85,Math.round(chars/6+15)))+'s');
+}
+window.ANUpdateTicker=ticker;
+const off=()=>window.ANLive?.publicSettings||{};
+function applyAbout(){
+ const area=document.querySelector('#app>.wrap.content');if(!area)return;
+ let members=Array.isArray(window.ANLive?.management)?window.ANLive.management:[];
+ if(!area.querySelector('.an-about-shell')){
+  area.innerHTML='<div class="an-about-shell"><section class="an-about-copy">'
+   +'<span style="color:#ff9f38;font-size:11px;letter-spacing:1px;font-weight:800">ABOUT A&N OVERSEAS</span>'
+   +'<h2><span>Education</span> & Consultancy</h2>'
+   +'<p>University admission guidance, student visa documentation, accommodation planning and arrival support for international education.</p>'
+   +'<p>We work with students preparing to study abroad, helping them understand available options and the documents required at each stage.</p>'
+   +'<div class="an-office-grid"><div>🇲🇾 <strong>Malaysia Office</strong><div id="an-about-office-my">Kuala Lumpur</div></div><div>🇧🇩 <strong>Bangladesh Office</strong><div id="an-about-office-bd">Rangpur</div></div></div>'
+   +'<p><a class="btn tiny outline" href="#/aboutdetails">More About Us →</a></p></section>'
+   +'<section class="an-management-panel"><h2><span>Our</span> Management</h2><div id="an-management-body"></div>'
+   +'<div class="an-management-control"><button type="button" data-an-manager="-1" aria-label="Previous management profile">‹</button><span id="an-management-counter">Management</span><button type="button" data-an-manager="1" aria-label="Next management profile">›</button></div></section></div>';
+ }
+ let s=off();
+ const my=area.querySelector('#an-about-office-my'),bd=area.querySelector('#an-about-office-bd');
+ if(my)my.textContent=s.malaysiaOffice||'Kuala Lumpur';
+ if(bd)bd.textContent=s.bangladeshOffice||'Rangpur';
+ const slot=area.querySelector('#an-management-body'),counter=area.querySelector('#an-management-counter');
+ if(!slot)return;
+ if(!members.length){slot.innerHTML='<div class="an-management-blank">Management profiles will appear here after they are published by the A&N team.</div>';if(counter)counter.textContent='0 profiles';return;}
+ managerIndex=(managerIndex+members.length)%members.length;
+ const m=members[managerIndex]||{};
+ const img=(typeof m.photo==='string'&&/^https:\/\//i.test(m.photo))?'<img loading="lazy" alt="'+E(m.name||'Management')+'" src="'+E(m.photo)+'">':'<div style="width:135px;height:160px;background:#1b140d;border:1px solid #9b5519;border-radius:10px;display:grid;place-items:center;color:#f7a539">A&N</div>';
+ slot.innerHTML='<div class="an-management-profile">'+img+'<div><h3>'+E(m.name||'Management')+'</h3><p>'+E(m.designation||m.role||'')+'</p><p>'+E(m.department||'')+'</p><p>'+E(m.bio||m.description||'')+'</p></div></div>';
+ if(counter)counter.textContent=(managerIndex+1)+' / '+members.length;
+}
+function applyDetails(){
+ let root=document.querySelector('#app');if(!root||root.querySelector('#an-about-details'))return;
+ const s=off();
+ root.innerHTML='<section class="page-head"><div class="wrap"><div class="bread">HOME › ABOUT US</div><h1><span style="color:#ff9c2c">About</span> A&N Overseas</h1><p>Explore our work and educational support in detail.</p></div></section>'
+ +'<div class="wrap content page-scroll" id="an-about-details"><div class="live-panel"><h2>Our Education & Consultancy</h2><p>'+E(s.about||'We support students from university discovery through admissions, documentation and arrival planning.')+'</p><h3>How We Work</h3><p>'+E(s.work||'We provide practical, step-by-step education guidance based on each student’s circumstances.')+'</p><p>University admissions and visa approvals are determined by universities and relevant authorities.</p><a class="btn outline" href="#/about">← Back to About</a></div></div>';
+}
+function services(){
+ const cards=document.querySelectorAll('#app>.wrap.content>.grid>.card');if(!cards.length)return;
+ cards.forEach((card,i)=>{if(card.classList.contains('an-service-card'))return;card.classList.add('an-service-card');const figure=document.createElement('div');figure.className='an-service-picture';const img=document.createElement('img');img.loading='lazy';img.alt=card.querySelector('h3')?.textContent||'A&N student support';img.src='https://images.unsplash.com/'+servicePhotos[i%servicePhotos.length]+'?auto=format&fit=crop&w=630&q=77';figure.append(img);card.insertBefore(figure,card.firstChild);});
+}
+function page(){
+ bar();
+ const p=where();
+ if(p==='about')applyAbout();
+ if(p==='aboutdetails')applyDetails();
+ if(p==='services')services();
+}
+function schedule(){if(renderQueued)return;renderQueued=true;queueMicrotask(()=>{renderQueued=false;page();});}
+function install(){
+ bar();ticker(window.ANLive?.latestUpdates,window.ANLive?.publicSettings?.ticker);
+ const app=document.getElementById('app');if(app)new MutationObserver(schedule).observe(app,{childList:true});
+ window.addEventListener('hashchange',()=>setTimeout(page,0));
+ document.addEventListener('click',e=>{const t=e.target.closest('[data-an-manager]');if(!t||where()!=='about')return;managerIndex+=Number(t.dataset.anManager)||0;applyAbout();});
+ page();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+window.ANRenderPublicEnhancements=page;
+})();
