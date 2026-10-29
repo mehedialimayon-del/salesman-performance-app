@@ -145,12 +145,7 @@ function storyMarkup(){
  +(x.type==='video'?'<video src="'+ed(x.media_url)+'" controls preload="metadata" playsinline></video>':'<img src="'+ed(x.media_url)+'" alt="'+ed(x.title)+'" loading="lazy">')
  +'<div class="inside"><h3>'+ed(x.title)+'</h3><p>'+ed(x.description||'')+'</p></div></article>').join('');
 }
-const oldServices=servicesPage;
-servicesPage=function(){
- let output=oldServices();
- const extra='<div class="contact-action-card"><div><h3>Begin Your Journey</h3><p>Explore university admissions, visa support, travel planning and more.</p></div><a class="btn" href="#/contact">Contact Our Team →</a></div>';
- return output.replace(/<\/div>\s*$/,extra+'</div>');
-};
+/* Keep the eight service cards and their single Contact Our Team CTA. */
 contactPage=function(){
  return title('Contact Our Team','Reach out for university admission, accommodation and visa guidance.')
  +'<div class="wrap content"><div class="split"><div class="live-panel"><h2><span style="color:#ff8500">Our</span> Offices</h2><h3>🇲🇾 Malaysia Office</h3><p id="an-office-my">Kuala Lumpur, Malaysia</p><h3>🇧🇩 Bangladesh Office</h3><p id="an-office-bd">Rangpur, Bangladesh</p><p id="an-office-phone"></p><p id="an-office-email"></p></div><div class="live-panel"><h2>Send an Enquiry</h2><form id="an-contact-form"><div class="live-fieldgrid"><label>Your Name<input name="full_name" required maxlength="130"></label><label>Email<input type="email" name="email" required></label><label>Phone (optional)<input name="phone"></label><label>Interested Country<input name="country" placeholder="Malaysia"></label><label class="full">Message<textarea name="message" required maxlength="4000"></textarea></label></div><div class="mt">'+B('submit','Send Your Enquiry')+'</div></form><div id="an-feedback" class="live-form-msg"></div></div></div></div>';
