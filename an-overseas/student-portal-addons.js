@@ -38,7 +38,7 @@ const studentLogin=()=>{
 };
 const help=()=>heading('Password Help','Ask the A&N team to verify and reset your student account.')+W(
  '<h2>Forgot Student ID / Password</h2><p>Send a request to our team. Your identity will be checked before a temporary password is issued. We do not retrieve or send old passwords.</p>'+
- '<form id="an-portal-help" class="an-portal-form">'+field('Your Student ID','student_code')+
+ '<form id="an-portal-help" class="an-portal-form">'+field('Student ID (optional — leave blank if forgotten)','student_code','text',false)+
  field('Your Name','contact_name','text',false)+field('Your Email or Phone','contact_method')+
  '<label class="an-portal-field"><span>Request Notes (optional)</span><textarea name="note" maxlength="450" rows="2"></textarea></label>'+
  '<button class="btn" type="submit">Send Help Request →</button></form>'+
