@@ -1,0 +1,48 @@
+/* Compact site-wide headings and four-column university catalogue */
+html,body{max-width:100%;overflow-x:clip}
+body:not(.home-view) .page-head{padding:15px 0 17px;min-height:0;overflow:hidden}
+body:not(.home-view) .page-head h1{font-family:Inter,system-ui,sans-serif;font-size:clamp(23px,2.5vw,32px);line-height:1.14;margin:5px 0 6px;letter-spacing:-.6px;overflow-wrap:anywhere}
+body:not(.home-view) .page-head .bread{font-size:10px;margin:0 0 3px}
+body:not(.home-view) .page-head p{font-size:12px;line-height:1.4;max-width:850px}
+body:not(.home-view) .content{padding-top:15px;padding-bottom:42px}
+body:not(.home-view) .white h2{font-size:clamp(18px,2vw,24px)}
+body:not(.home-view) .profile-banner{padding:16px 0}
+body:not(.home-view) .profile-breadcrumb{margin-bottom:12px}
+body:not(.home-view) .profile-identity h1{font-size:clamp(18px,2vw,25px);line-height:1.15;margin:4px 0}
+body:not(.home-view) .profile-identity h1 span{font-size:clamp(22px,2.6vw,32px)}
+body:not(.home-view) .profile-facts{margin-top:12px}
+body:not(.home-view) .profile-facts>div{padding:11px}
+body:not(.home-view) .profile-facts strong{font-size:clamp(12px,1.3vw,15px)}
+body:not(.home-view) .profile-section{padding:19px}
+body:not(.home-view) .profile-section h2{font-size:clamp(18px,1.8vw,22px)}
+.university-catalogue.wrap{max-width:1440px;padding:0 19px}
+.university-catalogue .catalogue-tools{margin-bottom:10px}
+.university-catalogue .catalogue-count{margin:0 0 10px}
+.university-catalogue #results{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.uni-card{min-width:0;display:flex;flex-direction:column;border-radius:12px}
+.uni-card .campus-cover{height:119px;object-fit:cover;object-position:center;width:100%}
+.uni-card .uni-card-logo{width:53px;height:41px;left:8px;bottom:7px;padding:4px}
+.uni-card .inside{padding:10px 11px;display:flex;flex-direction:column;flex:1;min-width:0}
+.uni-card .badge{align-self:flex-start;font-size:9px;padding:3px 7px}
+.uni-card .inside h3{font-size:20px;line-height:1.15;margin:6px 0 2px}
+.uni-card .university-fullname{font-size:11px;min-height:0;line-height:1.35;overflow-wrap:anywhere}
+.uni-card .university-location{font-size:10px;margin:6px 0}
+.uni-card .uni-summary{margin:auto 0 9px;padding-top:7px}
+.uni-card .uni-summary b{font-size:11px;margin-top:2px}
+.uni-card .card-open{font-size:11px;padding:8px;border-radius:7px}
+.catalogue-filter summary{width:auto;min-width:42px;height:44px;padding:0 12px;gap:6px;font-size:16px;white-space:nowrap}
+.catalogue-filter .filter-word{font-size:11px;font-weight:800}
+.catalogue-filter-panel{width:min(550px,calc(100vw - 30px));max-height:65vh;overflow-y:auto;padding:14px;top:52px}
+.catalogue-filter-panel .filter-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.catalogue-filter-panel label{margin:0;min-width:0}
+.catalogue-filter-panel label span{display:block;font-size:10px;font-weight:800;color:#ffa034;margin-bottom:5px}
+.catalogue-filter-panel select,.catalogue-filter-panel input{width:100%;min-width:0;min-height:37px;height:37px;background:#111;color:#fff;border:1px solid #7c491e;border-radius:7px;padding:7px;font-size:11px}
+.catalogue-filter-panel .filter-actions{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:12px;padding-top:11px;border-top:1px solid #6c3711}
+.catalogue-filter-panel .filter-actions small{font-size:10px;color:#bbb}
+.catalogue-clear{border:1px solid #a96727;background:#261609;color:#ffb46f;border-radius:7px;padding:8px;font-size:11px}
+.other-university{margin-top:15px;padding:12px;border:1px dashed #965117;border-radius:10px;font-size:12px;color:#ddd}
+.other-university a{color:#ffa43c;text-decoration:underline}
+@media(max-width:1050px) and (min-width:801px){.university-catalogue #results{gap:8px}.uni-card .campus-cover{height:105px}.uni-card .inside{padding:8px}.uni-card .inside h3{font-size:18px}}
+@media(max-width:800px){.university-catalogue #results{grid-template-columns:repeat(2,minmax(0,1fr))}.page-head h1{font-size:26px}.catalogue-filter-panel{right:0}}
+@media(max-width:520px){body:not(.home-view) .page-head{padding:14px 0}body:not(.home-view) .page-head h1{font-size:23px}body:not(.home-view) .page-head p{font-size:11px}.university-catalogue.wrap{padding:0 12px}.university-catalogue #results{gap:9px}.uni-card .campus-cover{height:103px}.uni-card .uni-card-logo{width:43px;height:33px}.uni-card .inside{padding:9px}.uni-card .inside h3{font-size:18px}.uni-card .university-fullname{font-size:10px;min-height:0}.uni-card .university-location{font-size:9px;min-height:0}.uni-card .uni-summary{font-size:8px;margin:5px 0}.uni-card .uni-summary b{font-size:9px}.uni-card .card-open{font-size:9px;padding:7px}.catalogue-filter .filter-word{display:none}.catalogue-filter summary{width:43px;padding:0 8px}.catalogue-filter-panel{width:min(360px,calc(100vw - 24px));padding:11px}.catalogue-filter-panel select,.catalogue-filter-panel input{font-size:10px}}
+@media(max-width:350px){.university-catalogue #results{grid-template-columns:1fr}.uni-card .campus-cover{height:140px}.catalogue-filter-panel .filter-fields{grid-template-columns:1fr}}
