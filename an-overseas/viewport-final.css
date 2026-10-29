@@ -1,0 +1,140 @@
+/* A&N Overseas: viewport-first layout, desktop fixed shell and inner scrolling. */
+html,body{min-height:100%;max-width:100%;overflow-x:hidden}
+body{min-height:100dvh}
+.footer{display:none!important}
+.top{height:62px!important;min-height:62px}
+.top .wrap{max-width:1510px;gap:10px}
+.top .brand{min-width:210px;gap:6px}
+.top .logo-motion,.top .logo-crop{width:54px;height:50px}
+.top .brand-copy{min-width:145px}
+.top .brand-copy strong{font-size:17px;min-height:22px}
+.top .brand-copy small{font-size:6.5px;margin-top:2px}
+.top .links{gap:10px}
+.top .links a{font-size:11px}
+.top .btn.tiny{font-size:11px;padding:7px 10px}
+body:not(.home-view) .page-head{padding:8px 0 9px!important;flex:0 0 auto}
+body:not(.home-view) .page-head .bread{font-size:9px;margin:0 0 3px}
+body:not(.home-view) .page-head h1{font-size:clamp(18px,1.9vw,24px)!important;margin:2px 0 3px;line-height:1.08}
+body:not(.home-view) .page-head p{font-size:10.5px;line-height:1.3}
+body:not(.home-view) .content{padding-top:12px!important;padding-bottom:14px!important;min-height:0}
+body:not(.home-view) .white{padding:15px}
+body:not(.home-view) .card .inside{padding:12px}
+body:not(.home-view) .card h3{font-size:clamp(13px,1.6vw,18px)}
+body:not(.home-view) .grid{gap:10px}
+body:not(.home-view) .white h2{font-size:clamp(16px,1.6vw,20px)}
+#app{min-width:0}
+.page-scroll,.page-scroll *{min-width:0}
+.page-scroll{scrollbar-color:#a66226 #111;overscroll-behavior:contain}
+.page-scroll::-webkit-scrollbar{width:7px}
+.page-scroll::-webkit-scrollbar-thumb{background:#a66226;border-radius:5px}
+body:not(.home-view) .country-tiles{gap:10px}
+body:not(.home-view) .country{min-height:clamp(128px,22vh,200px);padding:13px}
+body:not(.home-view) .sect{padding:20px 0}
+body:not(.home-view) .section-title{margin-bottom:12px}
+body:not(.home-view) .section-title h2{font-size:clamp(18px,2vw,24px)}
+body:not(.home-view) .sect .grid .card .inside{padding:12px}
+body:not(.home-view) .card p{font-size:11px;line-height:1.45}
+body:not(.home-view) .btn{min-height:34px;padding:8px 12px;font-size:11px}
+body:not(.home-view) .field{margin-bottom:10px}
+body:not(.home-view) .input,body:not(.home-view) select,body:not(.home-view) textarea{min-height:36px;padding:8px 10px}
+body:not(.home-view) .page-head:before{width:245px;height:200px;right:-70px;top:-100px}
+.uni-card .inside{padding:8px 10px!important}
+.uni-card .campus-cover{height:clamp(82px,15vh,126px)}
+.uni-card .university-fullname{font-size:10px}
+.uni-card .university-location{font-size:9px;margin:4px 0}
+.uni-card .uni-summary{margin:auto 0 7px}
+.uni-card .card-open{padding:6px 7px}
+.catalogue-filter-panel{position:absolute;z-index:90}
+.contact-action-card{padding:14px;border:1px solid #924f20;background:linear-gradient(120deg,#271709,#080808);border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:12px}
+.contact-action-card h3{margin:0 0 4px;color:#fff;font-size:16px}
+.contact-action-card p{margin:0;font-size:11px;color:#ddd}
+.story-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.story-card{min-height:0;border:1px solid #874312;border-radius:14px;overflow:hidden;background:#101010}
+.story-card img,.story-card video{display:block;width:100%;height:clamp(170px,37vh,320px);object-fit:cover;background:#0b0b0b}
+.story-card .inside{padding:12px}
+.story-card h3{font-size:16px!important;color:#ff9d33}
+.story-card p{font-size:11px;color:#ddd;margin:4px 0 0}
+.story-empty{padding:22px;border:1px dashed #8e4b1b;border-radius:13px;color:#d1d1d1;text-align:center;grid-column:1/-1}
+.live-form-msg{color:#ffb54f;font-size:12px;margin-top:11px}
+.live-panel{background:linear-gradient(130deg,#161616,#080808);border:1px solid #763b16;border-radius:14px;padding:15px;margin-bottom:12px}
+.live-panel h2{margin:0 0 12px;font-size:18px;color:#fff}
+.live-panel .field>span{color:#ffa440}
+.live-login{max-width:495px;margin:8px auto}
+.live-login h2{font-size:19px}
+.live-login .btn{width:100%}
+.live-badge{padding:3px 8px;border-radius:12px;background:#3e260f;color:#ffd199;font-size:11px;display:inline-flex}
+.live-controls{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.live-controls button,.live-controls a{min-height:34px;padding:7px 10px;border:1px solid #99551d;background:#191109;color:#ffba66;border-radius:8px;font-size:11px}
+.live-controls button.active{background:#ff8705;color:#0d0905}
+.live-table{overflow:auto;max-height:50dvh}
+.live-table table{width:100%;border-collapse:collapse;min-width:600px;font-size:12px}
+.live-table th,.live-table td{text-align:left;padding:10px;border-bottom:1px solid #382010;vertical-align:top}
+.live-table th{color:#ffab43;position:sticky;top:0;background:#16100b}
+.live-fieldgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.live-fieldgrid .full{grid-column:1/-1}
+.live-fieldgrid label{font-size:11px;color:#ffae4d}
+.live-fieldgrid input,.live-fieldgrid textarea,.live-fieldgrid select{margin-top:4px;width:100%;background:#080808;color:#fff}
+.live-mini{font-size:11px;color:#aaa}
+.live-msg-list{display:grid;gap:8px;max-height:43vh;overflow:auto}
+.live-msg{padding:10px;border-radius:9px;border:1px solid #653c1b;background:#101010}
+.live-msg small{display:block;color:#ffb34c}
+body.home-view .hero{min-height:0!important;flex:1;height:100%;position:relative;background:#060709}
+body.home-view .hero:before{background-image:url('assets/malaysia-students.jpg');background-position:64% center;background-size:cover}
+body.home-view .hero:after{background:linear-gradient(90deg,#07090f 0%,#07090fe0 25%,#07090f45 65%,transparent 90%),linear-gradient(0deg,#03030570,transparent 35%)}
+body.home-view .hero .wrap{padding-top:10px;padding-bottom:10px}
+body.home-view .hero h1{font-size:clamp(40px,5.2vw,67px)}
+body.home-view .metrics{margin-top:16px;gap:8px}
+body.home-view .metric{min-height:64px;padding:7px 9px}
+body.home-view .ticker{height:25px}
+@media(min-width:801px){
+ html,body{height:100%;overflow:hidden}
+ .top{position:relative;top:auto}
+ #app{height:calc(100dvh - 62px);max-height:calc(100dvh - 62px);overflow:hidden;display:flex;flex-direction:column}
+ body:not(.home-view) #app>.page-head{flex:none}
+ body:not(.home-view) #app>.wrap.content,
+ body:not(.home-view) #app>.university-catalogue,
+ body:not(.home-view) #app>.page-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+ body:not(.home-view) #app>.wrap.content:has(.country-tiles){overflow-y:auto}
+ body:not(.home-view) #app>.wrap.content:has(.contact-action-card){overflow-y:auto}
+ body:not(.home-view) #app>.wrap.content:has(.live-panel){overflow-y:auto}
+ body.home-view .hero{min-height:0;overflow:hidden}
+ body.home-view #app>.ticker{flex:none}
+ .university-catalogue #results{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .top .links{gap:8px}
+}
+@media(max-width:1080px) and (min-width:801px){.top .wrap{padding:0 15px;gap:5px}.top .brand{min-width:198px}.top .links a{font-size:9.5px}}
+@media(max-width:800px){
+ html,body{height:auto;overflow-x:hidden;overflow-y:auto}
+ #app{height:auto;min-height:calc(100dvh - 62px);overflow:visible}
+ .top{height:62px!important;position:sticky;top:0}
+ .top .links{top:62px}
+ body:not(.home-view) #app>.wrap.content{overflow:visible}
+ body:not(.home-view) .page-head{padding:9px 0!important}
+ body:not(.home-view) .page-head h1{font-size:22px!important}
+ .country-tiles{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .country{min-height:145px!important}
+ .story-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .contact-action-card{align-items:flex-start;flex-direction:column}
+ .live-table{max-height:none}
+ body.home-view .hero{min-height:calc(100dvh - 88px)!important}
+ body.home-view .hero:before{background-position:68% top;opacity:1}
+ body.home-view .hero:after{background:linear-gradient(0deg,#06090fe9,#06090f95 42%,transparent 86%)}
+}
+@media(max-width:500px){
+ .top .brand-copy strong{font-size:17px}
+ .story-grid{grid-template-columns:1fr}
+ .story-card img,.story-card video{height:220px}
+ .live-fieldgrid{grid-template-columns:1fr}
+ .live-fieldgrid .full{grid-column:auto}
+ .live-panel{padding:12px}
+ body.home-view .hero h1{font-size:clamp(34px,8vw,46px)}
+ body:not(.home-view) .page-head h1{font-size:21px!important}
+ .university-catalogue #results{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-height:620px) and (min-width:801px){
+ body.home-view .hero h1{font-size:clamp(35px,4.4vw,51px);margin:5px 0}
+ body.home-view .metrics{margin-top:7px}
+ body.home-view .metric{min-height:49px}
+ body.home-view .hero .actions{margin-top:7px}
+ body.home-view .home-description{font-size:11px}
+}
