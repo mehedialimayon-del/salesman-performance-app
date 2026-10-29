@@ -69,3 +69,6 @@ body.ffProposalModalOn{overflow:hidden!important}
  .ffProposalPage .ffPoHistoryHeader{font-size:10px!important}
  .ffProposalPage .ffProposalActions button{font-size:9px!important}
 }
+
+/* Keep the PDF export progress overlay visible above the proposal editor. */
+body.ffProposalModalOn>.globalSearchOverlay{z-index:300000!important}
