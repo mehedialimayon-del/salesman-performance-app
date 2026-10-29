@@ -16,7 +16,7 @@ function installFlight(){
  .top .logo-motion.an-logo-fixed .logo-crop img{position:absolute!important;top:5px!important;left:0!important;width:165px!important;height:40px!important;max-width:none!important;min-width:0!important;max-height:40px!important;object-fit:fill!important;object-position:left center!important;display:block!important;margin:0!important;padding:0!important;transform:none!important;animation:none!important;mix-blend-mode:screen!important;filter:brightness(1.18) contrast(1.08)!important}
  .top .logo-motion.an-logo-fixed .an-logo-flight{position:absolute!important;display:block!important;width:80px!important;height:64px!important;top:-7px!important;left:-9px!important;z-index:5!important;overflow:visible!important;pointer-events:none!important}
  .top .an-logo-flight .an-orbit-soft{filter:drop-shadow(0 0 3px #ffb13e)}
- .top .an-logo-flight .an-plane{filter:drop-shadow(0 0 2px white) drop-shadow(0 0 5px #ff9815)}
+ .top .an-logo-flight .an-plane{filter:drop-shadow(0 0 1.5px #ffbf5a) drop-shadow(0 0 3px #b86d12)}
  .top .brand-copy{min-width:0!important}
  @media(max-width:800px){.top>.wrap{height:62px!important;min-height:62px!important}.top a.brand{height:56px!important}}
  @media(prefers-reduced-motion:reduce){.top .an-logo-flight .an-animated-flight{display:none!important}}
@@ -43,9 +43,9 @@ function installFlight(){
    <animate attributeName="stroke-dashoffset" from="0" to="-151" dur="4.6s" repeatCount="indefinite"/>
   </use>
   <g class="an-plane">
-   <path d="M-34 0 L-6 0" fill="none" stroke="url(#an-trail)" stroke-width="2.8" stroke-linecap="round"/>
-   <path d="M-14 0 L-5 0" fill="none" stroke="#fff1b2" stroke-width="1.1" stroke-linecap="round"/>
-   <g transform="scale(.82)"><path d="M 13 0 L -5 -4 L -9 -16 L -13 -16 L -13 -5 L -20 -5 L -25 -10 L -29 -10 L -25 0 L -29 10 L -25 10 L -20 5 L -13 5 L -13 16 L -9 16 L -5 4 Z" fill="#ffffff" stroke="#6f3809" stroke-width="1.7" stroke-linejoin="round"/><circle cx="7" cy="0" r="1.8" fill="#ffc35c"/></g>
+   <path d="M-34 0 L-6 0" fill="none" stroke="url(#an-trail)" stroke-width="1.8" stroke-linecap="round"/>
+   <path d="M-14 0 L-5 0" fill="none" stroke="#fff1b2" stroke-width=".85" stroke-linecap="round"/>
+   <g transform="rotate(0) scale(.53)"><path d="M 21 -1 C 24 -1 27 -.5 28 0 C 27 .5 24 1 21 1 L -3 2.4 L -10 16.5 Q -11 18.5 -13 17 L -14.5 3.6 L -25 4.2 L -29 9.2 L -32 9.2 L -30 1.9 L -34 1.4 L -34 -1.4 L -30 -1.9 L -32 -9.2 L -29 -9.2 L -25 -4.2 L -14.5 -3.6 L -13 -17 Q -11 -18.5 -10 -16.5 L -3 -2.4 Z" fill="#f5b63a" stroke="#f6d37c" stroke-width="0.65" stroke-linejoin="round"/><path d="M 20 0 L -23 0" fill="none" stroke="#8d4c12" stroke-width=".9"/><circle cx="7" cy="0" r=".8" fill="#fff2b7"/></g>
    <animateMotion dur="4.6s" repeatCount="indefinite" rotate="auto"><mpath href="#an-centre-orbit"/></animateMotion>
    <animate attributeName="opacity" values=".98;.30;.98" keyTimes="0;.5;1" dur="4.6s" repeatCount="indefinite"/>
   </g>
