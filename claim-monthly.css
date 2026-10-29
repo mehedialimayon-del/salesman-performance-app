@@ -47,3 +47,19 @@ body.ffMonthlyOverlayOpen{overflow:hidden!important}
  .ffMonthlyReceipt{flex-wrap:wrap}
  .ffMonthlyReceipt .ffMonthlyView{min-width:58px}
 }
+
+/* Save daily expenses directly inside the monthly claim screen. */
+.ffMonthlyQuickForm{padding:14px;border:1px solid #ff8124;background:linear-gradient(150deg,#160c06,#070707);border-radius:15px;margin:12px 0 18px;box-shadow:0 0 13px #ff74173b}
+.ffMonthlyQuickForm h3{margin:0 0 11px;color:#ff9743;font-size:18px}
+.ffMonthlyQuickGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 12px}
+.ffMonthlyQuickGrid label{min-width:0}
+.ffMonthlyQuickGrid .ffMonthlyWide{grid-column:1/-1}
+.ffMonthlyQuickGrid textarea{resize:vertical;min-height:62px}
+.ffMonthlyOther[hidden],#ffMonthlyQuickEntry[hidden]{display:none!important}
+.ffMonthlyQuickActions{display:grid;grid-template-columns:2fr 1fr;gap:9px;margin-top:12px}
+.ffMonthlyQuickActions button{border:1px solid #ff8124!important;border-radius:10px!important;padding:11px 8px!important;font-weight:900!important;background:linear-gradient(120deg,#ff9a24,#e95700)!important;color:#fff!important}
+.ffMonthlyQuickActions #ffMonthlyQuickCancel{background:#120c08!important;color:#ffaf77!important}
+.ffMonthlyQuickActions button:disabled{opacity:.55}
+#ffMonthlyQuickStatus{font-size:12px;line-height:1.45;color:#ffe2c8}
+.ffMonthlyActions #ffMonthlyAdd{background:#110a05!important;color:#ffb96c!important}
+@media(max-width:380px){.ffMonthlyQuickGrid{grid-template-columns:1fr}.ffMonthlyQuickActions{grid-template-columns:1fr 1fr}}
