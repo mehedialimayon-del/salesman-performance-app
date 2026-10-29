@@ -5,7 +5,7 @@ const APP=document.getElementById('app');
 const H=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const DAY=()=>{const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kuala_Lumpur',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());return ['year','month','day'].map(k=>p.find(x=>x.type===k)?.value).join('-')};
 const clean=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]+/g,'');
-let modal=null,staff=null,queue=false,cloud=[],cache=new Map();
+let modal=null,staff=null,queue=false,cloud=[],cache=new Map(),cachedSource=new Map();
 function message(e){alert(e?.message||String(e||'Unable to complete action'))}
 async function identify(){const {data,error}=await API().rpc('ffh_my_staff_id');if(error||!data)throw Error('Please sign in to your approved FieldForce Hub account.');return staff=String(data)}
 function sourceKey(name){
@@ -45,7 +45,7 @@ async function importPdf(chain,input,allowOCR=true){
  if(!window.FFH_PROPOSAL_PDF_PARSE?.read)throw Error('PDF SKU reader is not loaded. Please refresh the app.');
  const parsed=await window.FFH_PROPOSAL_PDF_PARSE.read(input||chain.file,{allowOCR,maxPages:35});
  if(parsed.lines.length<2||parsed.confidence==='low')throw Error('The uploaded PDF does not contain a reliably readable Item Code + Product Name table. Please upload a clear/searchable PDF; no SKU was guessed or saved.');
- cache.set(chain.key,parsed.lines);
+ cache.set(chain.key,parsed.lines);cachedSource.set(chain.key,chain.file||'');
  if(chain.manage){
   const staffId=await identify();
   const row={chain_key:chain.key,chain_name:chain.name,source_pdf_url:chain.file||'',lines:parsed.lines,updated_by:staffId,updated_at:new Date().toISOString()};
@@ -56,14 +56,14 @@ async function importPdf(chain,input,allowOCR=true){
 }
 async function getTemplate(chain,options={}){
  const match=matchingFile(chain);if(match?.file_url){chain.file=match.file_url;chain.filename=match.filename||chain.filename;}
- if(cache.has(chain.key)&&!options.force)return cache.get(chain.key);
+ if(cache.has(chain.key)&&!options.force&&cachedSource.get(chain.key)===(chain.file||''))return cache.get(chain.key);
  const {data,error}=await API().from('ffh_proposal_item_templates').select('lines,source_pdf_url').eq('chain_key',chain.key).maybeSingle();
  if(error)throw error;
  const lines=Array.isArray(data?.lines)?data.lines:[];
  if(lines.length&&(data.source_pdf_url===chain.file||(!data.source_pdf_url&&!chain.file))){
-  cache.set(chain.key,lines);return lines;
+  cache.set(chain.key,lines);cachedSource.set(chain.key,chain.file||'');return lines;
  }
- if(!chain.file){if(lines.length){cache.set(chain.key,lines);return lines}return []}
+ if(!chain.file){if(lines.length){cache.set(chain.key,lines);cachedSource.set(chain.key,'');return lines}return []}
  return importPdf(chain,chain.file,options.allowOCR!==false);
 }
 async function autoImportUploaded({name,file_url,file,templateKey,id}){
@@ -95,7 +95,7 @@ async function autoBackfill(){
    catch(e){failed++;console.warn('Proposal PDF SKU extraction:',chain.name,e.message)}
   }
   if(APP.contains(page)){
-   status.textContent=attempted?'SKU auto-sync: '+ready+' imported'+(failed?' · '+failed+' need OCR on opening':''):'Uploaded PDFs checked';
+   if(attempted){const update='SKU auto-sync: '+ready+' imported'+(failed?' · '+failed+' need OCR on opening':'');if(status.textContent!==update)status.textContent=update}
   }
  }catch(e){if(APP.contains(page))status.textContent='PDF SKU sync unavailable';console.warn(e)}
  finally{scanning=false}
@@ -115,7 +115,8 @@ function pane(title,inner){
 }
 function loading(title){return pane(title,'<div class="ffPoMessage" role="status">Loading proposal data…</div>')}
 function emptyTemplate(chain){
- return `<div class="ffPoMessage"><strong>SKU template not configured</strong><p>${H(chain.name)}-এর PDF থেকে Item Code এবং Product Name একবার Manager সেট করবেন। ভুল SKU অনুমান করে অর্ডার তৈরি করা যাবে না।</p>${chain.manage?'<button type="button" id="ffPoSetupNow">SET UP SKU LIST</button>':'<p>Manager-কে SKU template সেট করতে বলুন।</p>'}</div>`;
+ if(!chain.file)return '<div class="ffPoMessage"><strong>PDF not uploaded yet</strong><p>Upload the chain proposal PDF first. SKU Item Codes and Product Names will be read automatically from it.</p></div>';
+ return '<div class="ffPoMessage"><strong>SKU not found in the PDF</strong><p>The uploaded PDF has no reliably detected Item Code and Product Name rows. A clear PDF or searchable scan is required. SKU is not entered manually.</p></div>';
 }
 function banner(chain){
  return `<div class="ffPoBanner">${chain.image?`<img src="${H(chain.image)}" alt="${H(chain.name)}" onerror="this.style.display='none'">`:''}<span>${H(chain.name)} · PROPOSED ORDER</span></div>`;
