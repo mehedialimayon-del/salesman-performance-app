@@ -203,7 +203,12 @@ document.addEventListener('click',async e=>{
  if(final){e.preventDefault();e.stopImmediatePropagation();if(!AN.db){msg('Secure connection not ready. Please try again.');return;}await submitApplication();return;}
  if(e.target.closest('#an-admin-switch-account')){if(AN.db)await AN.db.auth.signOut();await setUser(null);render();return;}
   if(e.target.closest('#an-logout')){await AN.db?.auth.signOut();await setUser(null);location.hash='#/home';return;}
- if(e.target.closest('#an-reset-password')||e.target.closest('#an-admin-reset-password')){let email=(document.querySelector('#an-admin-auth-form [name=email]')||document.querySelector('#an-auth-form [name=email]'))?.value.trim();if(!email){msg('Enter your email address first.');return;}const{error}=await AN.db.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});msg(error?errorText(error):'If the address is registered, you will receive a password reset email.');}
+ if(e.target.closest('#an-reset-password')||e.target.closest('#an-admin-reset-password')){
+    e.preventDefault();
+    const origin=e.target.closest('#an-admin-reset-password')?'admin':'student';
+    window.location.assign('reset-password.html?from='+origin);
+    return;
+  }
  const file=e.target.closest('[data-open-file]');if(file&&AN.db){let{data,error}=await AN.db.storage.from(PRIVATE_BUCKET).createSignedUrl(file.dataset.openFile,90);if(error)msg(errorText(error));else window.open(data.signedUrl,'_blank','noopener');}
 },true);
 document.addEventListener('submit',async e=>{
@@ -232,7 +237,7 @@ document.addEventListener('submit',async e=>{
    if(id==='an-change-password'){const pw=String(f.get('password')||'');if(pw.length<8)throw Error('Password must be at least 8 characters.');const{error}=await AN.db.auth.updateUser({password:pw});if(error)throw error;await setUser(AN.user);msg('Password updated successfully.');location.hash=AN.isAdmin?'#/admin':'#/dashboard';}
   if(id==='an-auth-form'){
    const email=String(f.get('email')||'').trim(),password=String(f.get('password')||'');
-   if(route()==='register'){if(password.length<8)throw Error('Password must be at least 8 characters.');const {data,error}=await AN.db.auth.signUp({email,password,options:{data:{full_name:String(f.get('full_name')||'').trim()},emailRedirectTo:location.href.split('#')[0]}});if(error)throw error;await setUser(data.user);msg(data.session?'Account created. Staff approval is required for application uploads.':'Check your email to confirm your account, then sign in.');if(data.session)location.hash='#/dashboard';}
+   if(route()==='register'){if(password.length<8)throw Error('Password must be at least 8 characters.');const {data,error}=await AN.db.auth.signUp({email,password,options:{data:{full_name:String(f.get('full_name')||'').trim()},emailRedirectTo:'https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/#/login'}});if(error)throw error;await setUser(data.user);msg(data.session?'Account created. Staff approval is required for application uploads.':'Check your email to confirm your account, then sign in.');if(data.session)location.hash='#/dashboard';}
    else{await loginAccount(email,password);}
   }
   if(id==='an-contact-form'){const row={full_name:String(f.get('full_name')||'').trim(),email:String(f.get('email')||'').trim(),phone:String(f.get('phone')||''),country:String(f.get('country')||''),message:String(f.get('message')||''),status:'new'};if(!row.full_name||!row.email||!row.message)throw Error('Please complete required fields.');const {error}=await AN.db.from('an_enquiries').insert(row);if(error)throw error;form.reset();msg('Your enquiry was submitted successfully.');}
