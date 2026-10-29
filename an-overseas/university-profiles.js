@@ -26,3 +26,9 @@ UNIVERSITY_PROFILES.um.programs.push('Bachelor of Economics','Bachelor of Civil 
 UNIVERSITY_PROFILES.klust.pgSource='https://klust.edu.my/programme/master-in-communication/';
 UNIVERSITY_PROFILES.uum.housingSource='https://www.uum.edu.my/campus-life/services/student-residential-hall';
 UNIVERSITY_PROFILES.uniten.programSource='https://www.uniten.edu.my/all-programmes';
+
+/* Load responsive site fixes after the page scripts have initialised. */
+window.addEventListener('DOMContentLoaded',function(){
+  var css=document.createElement('link');css.rel='stylesheet';css.href='compact-layout.css?v=20261029-2154';document.head.appendChild(css);
+  var js=document.createElement('script');js.src='catalogue-extras.js?v=20261029-2154';document.body.appendChild(js);
+});
