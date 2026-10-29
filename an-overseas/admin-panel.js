@@ -27,7 +27,7 @@ function renderAdmin(){
  else if(!get().isAdmin)app.innerHTML=title("Admin Only","This panel is restricted to authorized A&N management accounts")+'<div class="wrap content">'+panel('<h2>It’s only for Admin</h2><p>The account currently signed in is not an administrator. Use the authorized Admin email and password to continue.</p><button class="btn" id="an-admin-switch-account">Sign Out & Use Admin Account</button>')+'</div>';
  else{
  const tabs=sections.map(s=>'<button data-admin-tab="'+esc(s)+'" class="'+(section===s?"active":"")+'">'+esc(s)+'</button>').join("");
- app.innerHTML=title("Admin Control Panel","Manage the A&N website, students and applications")+'<div class="wrap content page-scroll"><div class="live-controls"><a href="#/home">Website</a><button id="admin-reload">Refresh</button><button id="an-logout">Sign Out</button></div><div class="live-controls mt">'+tabs+'</div><p class="live-form-msg" id="an-admin-note"></p><div id="admin-body"></div></div>';
+ app.innerHTML=title("Admin Control Panel","Manage the A&N website, students and applications")+'<div class="wrap content page-scroll"><div class="live-controls"><a href="#/home">Website</a><a href="#/change-password">Change Password</a><button id="admin-reload">Refresh</button><button id="an-logout">Sign Out</button></div><div class="live-controls mt">'+tabs+'</div><p class="live-form-msg" id="an-admin-note"></p><div id="admin-body"></div></div>';
  void draw();
  }
  document.title="A&N Admin Panel";return true;
