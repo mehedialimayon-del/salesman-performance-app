@@ -53,8 +53,10 @@ function applyPage(){
  // Only the fixed About carousel in an-premium-public.js can render management members.
  // This bridge updates public text in place; it must never append a second team grid.
  if(location.hash.split('?')[0]==='#/about'){
-  // The fixed screen uses a concise founder-approved mission; longer CMS copy belongs on the details page.
-  // Avoid replacing the one-screen summary with long CMS text and causing hidden/overflowing content.
+  // Concise mission copy is editable in the secure Admin Website Editor.
+  // The fixed visual design limits overflow without altering the published wording.
+  const summary=document.getElementById('an-about-intro');
+  if(summary&&settings.about&&summary.textContent!==settings.about)summary.textContent=settings.about;
   const office=document.querySelectorAll('#an-about-fixed .an-about-locations span');
   if(office.length===2){
    office[0].textContent='🇲🇾 '+(settings.malaysiaOffice||'Kuala Lumpur, Malaysia');
@@ -62,8 +64,8 @@ function applyPage(){
   }
  }
  if(location.hash.split('?')[0]==='#/aboutdetails'){
-  // Rich About and Vision copy is intentionally laid out in dedicated sections.
-  // Other dynamic settings such as office locations remain live on the main page.
+  const work=document.getElementById('an-about-work');
+  if(work&&settings.work&&work.textContent!==settings.work)work.textContent=settings.work;
  }
  if(location.hash.startsWith('#/contact')){
   const c=document.querySelector('#app .wrap.content .card .inside');
