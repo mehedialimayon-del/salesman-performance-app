@@ -134,7 +134,19 @@ document.addEventListener('click',e=>{
  if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','');
 });
 document.addEventListener('click',e=>{if(e.target.closest('[data-an-close]')){const dlg=document.getElementById('an-preview-dialog');if(dlg?.close)dlg.close();else dlg?.removeAttribute('open');}});
-window.addEventListener('hashchange',()=>setTimeout(apply,70));
+// The university CMS can re-render #app after this gallery has already filled the
+// About carousel. Observe only its direct children to restore a lost management
+// profile without recursively observing updates inside the carousel itself.
+function restoreAboutAfterRender(){
+ if(current()!=='about'||!activeMembers().length)return;
+ const card=document.getElementById('an-manager-card');
+ if(card&&!card.querySelector('.an-manager-name-box'))showTeam();
+}
+const appRoot=document.getElementById('app');
+if(appRoot)new MutationObserver(()=>{
+ if(current()==='about')requestAnimationFrame(restoreAboutAfterRender);
+}).observe(appRoot,{childList:true});
+window.addEventListener('hashchange',()=>setTimeout(()=>{apply();restoreAboutAfterRender();},70));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void load();});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>void load());else void load();
 setInterval(()=>{if(!document.hidden)void load();},45000);
