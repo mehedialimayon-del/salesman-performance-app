@@ -35,3 +35,15 @@
 @media(max-width:850px){.country-tiles{grid-template-columns:repeat(2,minmax(0,1fr))!important}.an-youtube-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:590px){.an-youtube-grid{grid-template-columns:1fr;gap:20px}.an-youtube-media,.an-youtube-media img,.an-youtube-media video{aspect-ratio:16/9}.an-youtube-card{border-radius:16px}.an-youtube-info{padding:13px 14px 17px}.an-story-copy h3{font-size:16px!important}.an-story-avatar{width:40px;height:40px;min-width:40px}.an-team-grid{grid-template-columns:1fr}.an-team-photo,.an-team-monogram{height:275px}#an-public-management.an-team-section{padding:15px}.an-team-head h2{font-size:24px}.country-tiles{gap:11px!important}.country-tiles .country,.country-tiles .an-country-card{min-height:178px;padding:13px}.country-tiles .country strong{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.an-youtube-card,.an-youtube-media img,.country-tiles .country{transition:none}}
+
+/* Replace generic white content panels with A&N's deep-black, warm-white and glowing-orange brand theme. */
+body:not(.home-view) #app .white{background:linear-gradient(145deg,#191b23 0%,#0e1016 85%);color:#fafafa;border:1px solid #62401e;box-shadow:0 12px 38px #0006}
+body:not(.home-view) #app .white h2,body:not(.home-view) #app .white h3,body:not(.home-view) #app .white h4{color:#fff}
+body:not(.home-view) #app .white p{color:#d8dce5}
+body:not(.home-view) #app .white .notice{background:linear-gradient(135deg,#35200d,#181510);color:#ffe0b8;border:1px solid #8d541f}
+body:not(.home-view) #app .white .badge{background:#302012;color:#ffc077;border-color:#7e4e1b}
+body:not(.home-view) #app .white .field span,body:not(.home-view) #app .white label{color:#f3bd83}
+body:not(.home-view) #app .white input,body:not(.home-view) #app .white textarea,body:not(.home-view) #app .white select{background:#07090e;color:#fff;border:1px solid #695036}
+body:not(.home-view) #app .white input::placeholder,body:not(.home-view) #app .white textarea::placeholder{color:#a9afbb}
+body:not(.home-view) #app .white .doccard{background:#171a22;border-color:#604324;color:#fff}
+body:not(.home-view) #app .white .doccard b{color:#fff}
