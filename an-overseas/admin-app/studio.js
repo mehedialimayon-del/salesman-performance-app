@@ -72,7 +72,7 @@ async function showManagement(){
 }
 async function saveManagement(){
  const rows=[...document.querySelectorAll('#studio-team-list .team-item')];
- if(!rows.length)throw Error('Keep at least one management member');
+ // Publishing an empty array intentionally removes all public management cards.
  const result=[];
  for(const row of rows){
   const i=Number(row.dataset.index);
