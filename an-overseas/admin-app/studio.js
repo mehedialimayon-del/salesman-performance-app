@@ -12,7 +12,10 @@ const fld=(name,label,val='',type='text')=>'<label class="field">'+E(label)+'<in
 const area=(name,label,val='')=>'<label class="field wide">'+E(label)+'<textarea name="'+E(name)+'">'+E(val)+'</textarea></label>';
 const fileField=(name,label,types='image/jpeg,image/png,image/webp')=>'<label class="field wide studio-upload"><span>'+E(label)+'</span><input type="file" name="'+E(name)+'" accept="'+types+'"><small>Choose a file from your phone or computer</small></label>';
 const action=(label,cmd,id='',cl='alt')=>'<button type="button" class="btn sm '+cl+'" data-studio="'+E(cmd)+'" data-id="'+E(id)+'">'+E(label)+'</button>';
-const wrap=(title,sub,html)=>{document.querySelector('#main').innerHTML='<p class="eyebrow">A&N Overseas · Admin Studio</p><h1 class="title">'+title+'</h1><p class="sub">'+E(sub)+'</p>'+html;window.scrollTo(0,0);};
+const fallbackUrl=section=>new URL('../open-upload.html?section='+encodeURIComponent(section||'management'),location.href).href;
+const browserUploadButton=()=>['management','success','countries','universities'].includes(mode)
+ ?'<div class="studio-legacy-fallback"><strong>Gallery button not opening?</strong><p>Older installed APKs need your phone browser for file selection. This opens the same secure Admin Editor in Chrome — no APK reinstall.</p><a class="btn" href="'+E(fallbackUrl(mode))+'">📁 Open Gallery Upload in Chrome</a></div>':'';
+const wrap=(title,sub,html)=>{document.querySelector('#main').innerHTML='<p class="eyebrow">A&N Overseas · Admin Studio</p><h1 class="title">'+title+'</h1><p class="sub">'+E(sub)+'</p>'+browserUploadButton()+html;window.scrollTo(0,0);};
 const panel=h=>'<section class="panel">'+h+'</section>';
 const uuid=()=>globalThis.crypto?.randomUUID?.()||String(Date.now())+Math.random().toString(36).slice(2);
 const store=D;
@@ -198,6 +201,17 @@ const studio={
  }
 };
 window.ANStudio=studio;
+// Legacy Android WebView cannot open <input type=file> without a native onShowFileChooser.
+// Redirect only legacy installed APKs to Chrome, where the browser owns the file picker.
+// Newer APKs may advertise hasNativeFilePicker() and keep the native Gallery chooser.
+document.addEventListener('click',e=>{
+ const input=e.target.closest('input[type="file"]');
+ if(!input||!authorized()||!window.ANAndroid)return;
+ try{if(typeof window.ANAndroid.hasNativeFilePicker==='function'&&window.ANAndroid.hasNativeFilePicker())return;}catch(_){}
+ e.preventDefault();e.stopImmediatePropagation();
+ const section=['management','countries','success','universities'].includes(mode)?mode:'universities';
+ location.assign(fallbackUrl(section));
+},true);
 document.addEventListener('click',async e=>{
  const button=e.target.closest('[data-studio]');if(!button||!authorized())return;
  e.preventDefault();e.stopImmediatePropagation();
