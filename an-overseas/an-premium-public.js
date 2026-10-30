@@ -39,45 +39,48 @@ function showCountries(){
 function contactNumber(n){return String(n||'').replace(/[^0-9+]/g,'');}
 function activeMembers(){return team.filter(m=>m&&String(m.name||'').trim());}
 function positionHeading(role){
- const words=String(role||'MANAGEMENT').trim().split(/\s+/).filter(Boolean);
- const cut=Math.max(1,Math.ceil(words.length/2));
- const orange=esc(words.slice(0,cut).join(' ')),white=esc(words.slice(cut).join(' '));
- return '<span class="an-role-orange">'+orange+'</span>'+(white?' <span class="an-role-white">'+white+'</span>':'');
+ return '<span class="an-role-orange">'+esc(String(role||'MANAGEMENT').trim().toUpperCase())+'</span>';
+}
+function managerField(label,value,extraClass=''){
+ if(!value)return '';
+ return '<div class="an-manager-field '+extraClass+'"><span class="an-manager-field-label">'+esc(label.toUpperCase())+'</span><span class="an-manager-field-value">'+esc(value)+'</span></div>';
 }
 function showTeam(){
  if(current()!=='about')return;
  const panel=document.getElementById('an-manager-card'),counter=document.getElementById('an-manager-counter');
  if(!panel||!counter)return;
- const members=activeMembers();
- const buttons=[...document.querySelectorAll('.an-manager-controls [data-an-manager]')];
+ const members=activeMembers(),arrows=[...document.querySelectorAll('.an-manager-controls [data-an-manager]')];
  if(!members.length){
-  panel.innerHTML='<div class="an-manager-role-banner">OUR TEAM</div><div class="an-manager-empty">Management profiles will appear here after publication.</div>';
-  counter.textContent='0 / 0';buttons.forEach(x=>x.disabled=true);return;
+  panel.innerHTML='<div class="an-manager-role-banner">OUR MANAGEMENT TEAM</div><div class="an-manager-empty">Management profiles will appear here after publication.</div>';
+  counter.textContent='0 / 0';arrows.forEach(x=>x.disabled=true);return;
  }
  teamIndex=(teamIndex+members.length)%members.length;
- buttons.forEach(x=>x.disabled=members.length<2);
- const m=members[teamIndex],photo=url(m.photo),portfolio=url(m.portfolio),
-       email=String(m.email||'').trim(),phone=contactNumber(m.phone);
+ arrows.forEach(x=>x.disabled=members.length<2);
+ const m=members[teamIndex];
+ const photo=url(m.photo),portfolio=url(m.portfolio),email=String(m.email||'').trim(),phone=contactNumber(m.phone);
+ const validEmail=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
  const role=String(m.position||m.designation||m.role||'Management').trim();
  const otherRole=String(m.designation||m.role||'').trim();
- const company=m.company||m.department||'';
- const help=m.help||m.bio||m.description||'';
+ const company=String(m.company||m.department||'').trim();
+ const help=String(m.help||m.bio||m.description||'').trim();
  const isOwner=m.id==='nusrat-nasrin'||String(m.name).trim().toLowerCase()==='nusrat nasrin';
  const imageHtml=photo?'<img class="an-manager-photo" src="'+esc(photo)+'" alt="'+esc(m.name)+'" loading="lazy">'
-   :'<div class="an-manager-photo an-manager-photo-empty"><span>A</span>&amp;<span>N</span></div>';
- const buttonsHtml=
-   (portfolio?'<a class="an-manager-action" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">View Portfolio ↗</a>':'')
-  +(isOwner?'<a class="an-manager-action an-manager-action-secondary" href="./admin-app/" target="_blank" rel="noopener noreferrer">Admin Panel ↗</a>':'')
-  +(phone.length>=8?'<a class="an-manager-contact-link" href="tel:'+esc(phone)+'" aria-label="Call '+esc(m.name)+'">☎</a>':'')
-  +(email&&/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)?'<a class="an-manager-contact-link" href="mailto:'+encodeURIComponent(email)+'" aria-label="Email '+esc(m.name)+'">✉</a>':'');
+  :'<div class="an-manager-photo an-manager-photo-empty"><span>A</span>&amp;<span>N</span></div>';
+ const emailHtml=validEmail?'<a class="an-manager-field an-manager-email-box" href="mailto:'+esc(email)+'" aria-label="Send email to '+esc(m.name)+'"><span class="an-manager-field-label">EMAIL <span aria-hidden="true">↗</span></span><span class="an-manager-field-value">'+esc(email)+'</span></a>':'';
+ const phoneHtml=phone.length>=8?'<a class="an-manager-field an-manager-phone-box" href="tel:'+esc(phone)+'" aria-label="Call '+esc(m.name)+'"><span class="an-manager-field-label">CONTACT NUMBER ↗</span><span class="an-manager-field-value">'+esc(m.phone)+'</span></a>':'';
+ const buttonsHtml=(portfolio?'<a class="an-manager-action" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">VIEW PORTFOLIO ↗</a>':'')
+  +(isOwner?'<a class="an-manager-action an-manager-action-secondary" href="./admin-app/" target="_blank" rel="noopener noreferrer">ADMIN PANEL ↗</a>':'');
  panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role)+'</div>'
   +'<div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
-  +'<div class="an-manager-information"><h3>'+esc(m.name)+'</h3>'
-  +(otherRole&&otherRole!==role?'<p class="an-manager-small-role">'+esc(otherRole)+'</p>':'')
-  +(company?'<p class="an-manager-company">'+esc(company)+'</p>':'')
-  +(help?'<p class="an-manager-bio">'+esc(help)+'</p>':'')
-  +(m.department&&m.department!==company?'<small class="an-manager-department">'+esc(m.department)+'</small>':'')
-  +'<div class="an-manager-actions">'+buttonsHtml+'</div></div></div>';
+  +'<div class="an-manager-information">'
+  +managerField('NAME',m.name,'an-manager-name-box')
+  +(otherRole&&otherRole!==role?managerField('DESIGNATION',otherRole):'')
+  +managerField('COMPANY',company,'an-manager-company-box')
+  +managerField('STUDENT SUPPORT',help,'an-manager-bio-box')
+  +(m.department&&m.department!==company?managerField('DEPARTMENT',m.department):'')
+  +emailHtml+phoneHtml
+  +'<div class="an-manager-actions">'+buttonsHtml+'</div>'
+  +'</div></div>';
  counter.textContent=(teamIndex+1)+' / '+members.length;
 }
 function apply(){
