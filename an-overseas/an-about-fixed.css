@@ -112,3 +112,149 @@ body.an-about-locked .footer{display:none!important}
 @media(max-width:390px){#app .an-manager-field{padding:4px 6px}#app .an-manager-field-value{font-size:9.5px}
  #app .an-manager-name-box .an-manager-field-value{font-size:13.5px}
  #app .an-about-summary h1{font-size:17px}}
+
+
+/* 2026-10-31 FieldForce visual parity: EXACT TWO-TONE headings, balanced About/Management viewport.
+   The About panel and Management panel each use half of the available content screen.
+   Intrinsic scroll is allowed only inside long information on very small phones. */
+body.an-about-locked #app>.an-about-fixed{
+ grid-template-rows:minmax(0,1fr) minmax(0,1fr)!important;
+ align-items:stretch!important;
+ gap:10px!important;
+}
+#app .an-about-summary,
+#app .an-about-management{height:100%;min-height:0!important;max-height:100%;overflow:hidden}
+#app .an-about-summary{
+ display:flex!important;flex-direction:column;justify-content:center!important;
+ padding:16px 21px!important;
+ background:linear-gradient(122deg,#1b1b21,#101116 62%,#0c0d11)!important
+}
+#app .an-about-summary .an-about-summary-top{flex:0 0 auto;align-items:center;gap:10px}
+#app .an-about-summary h1,#app .an-manager-heading h2{
+ color:#fff!important;text-transform:uppercase!important;
+ font-weight:900!important;letter-spacing:.2px!important;
+ line-height:1.16!important
+}
+#app .an-about-summary .an-accent,
+#app .an-manager-heading .an-accent,
+#app .an-about-eyebrow .an-accent{color:#ff8016!important;-webkit-text-fill-color:#ff8016!important}
+#app .an-about-summary .an-light,
+#app .an-manager-heading .an-light,
+#app .an-about-eyebrow .an-light{color:#fff!important;-webkit-text-fill-color:#fff!important}
+#app .an-about-summary .an-about-eyebrow,#app .an-manager-heading .an-about-eyebrow{color:#ff8016!important}
+#app .an-about-summary #an-about-intro{
+ color:#fff!important;
+ display:block!important;
+ -webkit-line-clamp:unset!important;
+ overflow:visible!important;
+ font-size:clamp(12px,1.25vw,15px)!important;
+ line-height:1.5!important;margin:11px 0!important;
+ max-width:900px
+}
+#app .an-about-locations{gap:8px}
+#app .an-about-locations span{background:linear-gradient(115deg,#2a1b12,#11131a);color:#fff!important;border-color:#7e4f24}
+#app .an-about-readmore{color:#ffab58!important;background:linear-gradient(120deg,#38220e,#18191d)!important}
+#app .an-about-management{
+ padding:11px 14px 9px!important;
+ background:linear-gradient(132deg,#181920,#101116 70%,#0b0e12)!important
+}
+#app .an-manager-heading{min-height:0;margin-bottom:6px!important;gap:7px}
+#app .an-manager-heading h2{white-space:normal!important;font-size:clamp(17px,2vw,21px)!important}
+#app .an-manager-card{
+ flex:1 1 0!important;min-height:0!important;max-height:100%;
+ padding:7px 9px!important;border-color:#a3682a!important;
+ background:linear-gradient(135deg,#1b1410,#101218 60%,#090b0e)!important
+}
+#app .an-manager-role-banner{
+ margin:0 0 6px!important;padding:5px 9px!important;
+ line-height:1.15!important;min-height:30px!important;
+ font-size:clamp(13px,1.65vw,19px)!important;letter-spacing:.3px!important;
+ background:linear-gradient(110deg,#3a210e,#1b1d22 78%)!important
+}
+#app .an-manager-role-banner .an-role-orange{color:#ff8016!important;-webkit-text-fill-color:#ff8016!important}
+#app .an-manager-role-banner .an-role-white{color:#fff!important;-webkit-text-fill-color:#fff!important}
+#app .an-manager-main{
+ align-items:stretch!important;
+ grid-template-columns:minmax(0,40%) minmax(0,1fr)!important;
+ gap:10px!important;
+ min-height:0!important;
+ height:100%!important
+}
+#app .an-manager-photo-box{
+ height:100%!important;min-height:0!important;min-width:0!important;
+ align-items:stretch!important;justify-content:stretch!important;overflow:hidden!important;
+ border-radius:10px;border:1px solid #af6729;background:#111216
+}
+#app .an-manager-photo{
+ display:block!important;height:100%!important;width:100%!important;
+ max-height:none!important;max-width:none!important;
+ object-fit:cover!important;object-position:center center!important;
+ aspect-ratio:auto!important;border:0!important;border-radius:9px!important
+}
+#app .an-manager-information{
+ align-items:stretch!important;justify-content:flex-start!important;
+ min-width:0!important;max-height:100%!important;min-height:0!important;
+ overflow-x:hidden!important;overflow-y:auto!important;
+ gap:4px!important;padding:0 1px!important;scrollbar-width:thin
+}
+#app .an-manager-field{
+ flex:0 0 auto!important;min-width:0!important;
+ border:1px solid #6f4925!important;border-left:3px solid #ff8016!important;
+ padding:5px 8px!important;gap:2px!important;
+ border-radius:8px!important;
+ background:linear-gradient(110deg,#292019,#10131b)!important
+}
+#app .an-manager-field:nth-child(2n){background:linear-gradient(110deg,#1e212b,#1b140e)!important}
+#app .an-manager-field-label{color:#ff8016!important;-webkit-text-fill-color:#ff8016!important}
+#app .an-manager-field-value{color:#fff!important;-webkit-text-fill-color:#fff!important;line-height:1.24!important}
+#app .an-manager-name-box .an-manager-field-value{font-size:clamp(14px,1.8vw,20px)!important}
+#app .an-manager-actions{margin-top:2px!important;gap:5px!important;flex-shrink:0}
+#app .an-manager-action{
+ text-transform:uppercase!important;font-weight:850!important;
+ border-color:#ff8e1c!important;
+ min-height:28px!important;padding:5px 8px!important
+}
+#app .an-manager-action-secondary{background:#241c15!important;color:#fff!important}
+#app .an-manager-controls{
+ flex:0 0 35px!important;margin-top:5px!important;
+ padding:4px 1px 0!important
+}
+#app .an-manager-controls button{height:28px!important;width:39px!important}
+#app .an-manager-counter{color:#fff!important}
+@media(min-width:801px){
+ body.an-about-locked #app>.an-about-fixed{max-width:1050px;gap:15px!important}
+ #app .an-about-summary{padding:26px 29px!important}
+ #app .an-manager-main{grid-template-columns:minmax(0,35%) minmax(0,1fr)!important;gap:20px!important}
+ #app .an-manager-card{padding:10px 13px!important}
+ #app .an-manager-information{gap:8px!important}
+ #app .an-manager-field{padding:7px 12px!important}
+ #app .an-manager-role-banner{font-size:clamp(16px,2vw,22px)!important}
+}
+@media(max-width:800px){
+ body.an-about-locked #app>.an-about-fixed{padding:8px 10px 9px!important;gap:8px!important}
+ #app .an-about-summary{padding:12px 15px!important}
+ #app .an-about-summary h1{font-size:clamp(19px,5.8vw,24px)!important}
+ #app .an-about-summary #an-about-intro{font-size:clamp(11px,3.4vw,14px)!important;line-height:1.42!important}
+ #app .an-about-locations span{font-size:9px!important;padding:4px 6px!important}
+ #app .an-about-management{padding:9px 10px 7px!important}
+ #app .an-manager-heading{margin-bottom:5px!important}
+ #app .an-manager-heading h2{font-size:clamp(16px,4.6vw,20px)!important}
+ #app .an-manager-role-banner{font-size:clamp(13px,3.9vw,17px)!important}
+ #app .an-manager-main{grid-template-columns:minmax(0,40%) minmax(0,1fr)!important;gap:8px!important}
+ #app .an-manager-information{gap:3px!important}
+ #app .an-manager-field{padding:4px 6px!important;gap:1px!important}
+ #app .an-manager-field-label{font-size:8px!important;letter-spacing:.35px!important}
+ #app .an-manager-field-value{font-size:10px!important}
+ #app .an-manager-name-box .an-manager-field-value{font-size:14px!important}
+ #app .an-manager-actions{margin-top:2px!important;gap:4px!important}
+ #app .an-manager-action{font-size:9px!important;padding:5px 7px!important}
+ #app .an-manager-email-box .an-manager-field-value{overflow-wrap:anywhere!important}
+}
+@media(max-height:675px){
+ #app .an-about-summary #an-about-intro{font-size:11px!important;line-height:1.3!important;margin:6px 0!important}
+ #app .an-about-summary{padding:7px 11px!important}
+ #app .an-manager-heading h2{font-size:15px!important}
+ #app .an-manager-field{padding:3px 6px!important}
+ #app .an-manager-role-banner{min-height:25px!important;margin-bottom:4px!important}
+ #app .an-manager-information{gap:2px!important}
+}
