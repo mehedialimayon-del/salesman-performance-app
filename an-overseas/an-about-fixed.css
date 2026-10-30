@@ -137,11 +137,11 @@ body.an-about-locked #app>.an-about-fixed{
 }
 #app .an-about-summary .an-accent,
 #app .an-manager-heading .an-accent,
-#app .an-about-eyebrow .an-accent{color:#ff8016!important;-webkit-text-fill-color:#ff8016!important}
+#app .an-about-eyebrow .an-accent{color:#ff7417!important;-webkit-text-fill-color:#ff7417!important}
 #app .an-about-summary .an-light,
 #app .an-manager-heading .an-light,
 #app .an-about-eyebrow .an-light{color:#fff!important;-webkit-text-fill-color:#fff!important}
-#app .an-about-summary .an-about-eyebrow,#app .an-manager-heading .an-about-eyebrow{color:#ff8016!important}
+#app .an-about-summary .an-about-eyebrow,#app .an-manager-heading .an-about-eyebrow{color:#ff7417!important}
 #app .an-about-summary #an-about-intro{
  color:#fff!important;
  display:block!important;
@@ -171,7 +171,7 @@ body.an-about-locked #app>.an-about-fixed{
  font-size:clamp(13px,1.65vw,19px)!important;letter-spacing:.3px!important;
  background:linear-gradient(110deg,#3a210e,#1b1d22 78%)!important
 }
-#app .an-manager-role-banner .an-role-orange{color:#ff8016!important;-webkit-text-fill-color:#ff8016!important}
+#app .an-manager-role-banner .an-role-orange{color:#ff7417!important;-webkit-text-fill-color:#ff7417!important}
 #app .an-manager-role-banner .an-role-white{color:#fff!important;-webkit-text-fill-color:#fff!important}
 #app .an-manager-main{
  align-items:stretch!important;
@@ -199,13 +199,13 @@ body.an-about-locked #app>.an-about-fixed{
 }
 #app .an-manager-field{
  flex:0 0 auto!important;min-width:0!important;
- border:1px solid #6f4925!important;border-left:3px solid #ff8016!important;
+ border:1px solid #6f4925!important;border-left:3px solid #ff7417!important;
  padding:5px 8px!important;gap:2px!important;
  border-radius:8px!important;
  background:linear-gradient(110deg,#292019,#10131b)!important
 }
 #app .an-manager-field:nth-child(2n){background:linear-gradient(110deg,#1e212b,#1b140e)!important}
-#app .an-manager-field-label{color:#ff8016!important;-webkit-text-fill-color:#ff8016!important}
+#app .an-manager-field-label{color:#ff7417!important;-webkit-text-fill-color:#ff7417!important}
 #app .an-manager-field-value{color:#fff!important;-webkit-text-fill-color:#fff!important;line-height:1.24!important}
 #app .an-manager-name-box .an-manager-field-value{font-size:clamp(14px,1.8vw,20px)!important}
 #app .an-manager-actions{margin-top:2px!important;gap:5px!important;flex-shrink:0}
