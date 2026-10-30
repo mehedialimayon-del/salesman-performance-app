@@ -130,17 +130,30 @@ async function managementPage(){
  page(head('Team &','Management','Update public team member profiles.')+panel('<h2>Public Management Cards</h2><form id="management-form"><div id="management-list">'+management.map((m,i)=>cardTeam(m,i)).join('')+'</div><div class="actions">'+btn('Add New Person','add-person','alt')+'<button type="submit" class="btn">Publish Team</button></div></form>')+'<p class="help">Use public image URLs that you own or have permission to share.</p>');
 }
 function cardTeam(m,i){return '<div class="record team-item" data-i="'+i+'"><div class="split"><b>Team Member '+(i+1)+'</b><button class="btn sm danger" data-remove-person="'+i+'" type="button">Remove</button></div>'+field('name','Full Name',m.name||'')+field('role','Designation',m.role||'')+field('photo','Public Photo URL',m.photo||'')+field('description','Description',m.description||'',false,true)+'</div>';}
+async function uploadUniversityImage(file,prefix){
+ if(!(file instanceof File)||!file.size)return '';
+ const types={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'};
+ if(!types[file.type]||file.size>8388608)throw Error('Select a JPG, PNG or WebP smaller than 8 MB.');
+ const dest=prefix+'-'+crypto.randomUUID()+'.'+types[file.type],bucket=db.storage.from('an-public-media');
+ const {error}=await bucket.upload(dest,file,{contentType:file.type,upsert:false,cacheControl:'3600'});
+ if(error)throw error;
+ return bucket.getPublicUrl(dest).data.publicUrl;
+}
 async function universityPage(){
  universityItems=await getContent('university_overrides',[]);
- page(head('University','Editor','Manage catalogue overrides published to the website.')+panel('<h2>Add / Edit a University</h2><p class="muted">Use the exact lowercase ID from the public catalogue, for example <b>upm</b>, to update an existing university.</p><form id="university-form"><div class="grid-fields">'
- +field('id','University ID', '',true)
- +field('name','Official Name','',true)+field('short','Short Name')
+ page(head('University','Editor','Upload official campus, logo and gallery photos straight from your phone or laptop.')
+ +panel('<h2>Add / Edit a University</h2><p class="muted">Use an existing ID such as <b>upm</b>, or create a new lowercase institution ID. Uploading a photo replaces the selected image; leaving it blank keeps the current one.</p><form id="university-form"><div class="grid-fields">'
+ +field('id','University ID', '',true)+field('name','Official Name','',true)+field('short','Short Name')
  +field('city','City / Campus Location')+field('country','Country','Malaysia')
  +'<label class="field">Type<select name="kind"><option>Public</option><option>Private</option></select></label>'
- +field('site','Official Website URL','https://',true)
+ +field('site','Official University Website (https://)','https://',true)
  +field('programs','Courses (comma separated)','',true,true)
- +'</div><button class="btn" type="submit" style="width:100%;margin-top:15px">Save / Publish University</button></form>')
- +panel('<h2>Published Overrides ('+universityItems.length+')</h2>'+(universityItems.length?universityItems.map(u=>'<div class="record"><b>'+esc(u.name||u.id)+'</b><p>'+esc(u.id)+' · '+esc(u.city||'')+'</p><button class="btn sm alt" data-edit-university="'+esc(u.id)+'">Edit in Form</button></div>').join(''):empty('No overrides added yet. The default university catalogue is unchanged.'))));
+ +'<label class="field studio-upload wide">Upload University Cover Photo<input type="file" name="cover_file" accept="image/jpeg,image/png,image/webp"></label>'
+ +'<label class="field studio-upload wide">Upload University Logo<input type="file" name="logo_file" accept="image/jpeg,image/png,image/webp"></label>'
+ +'<label class="field studio-upload wide">Add Multiple Campus / Gallery Photos<input type="file" name="gallery_files" accept="image/jpeg,image/png,image/webp" multiple></label>'
+ +'<p class="help">No photo URL is required. Images must be permitted for publication and smaller than 8 MB each.</p>'
+ +'</div><button class="btn" type="submit" style="width:100%;margin-top:15px">Upload & Publish University</button></form>')
+ +panel('<h2>Edited Universities ('+universityItems.length+')</h2>'+(universityItems.length?universityItems.map(u=>'<div class="record"><b>'+esc(u.name||u.id)+'</b><p>'+esc(u.id)+' · '+esc(u.city||'')+'</p><button class="btn sm alt" data-edit-university="'+esc(u.id)+'">Edit in Form</button></div>').join(''):empty('No overrides added yet. Existing university profiles are unchanged.'))));
 }
 async function servicesPage(){
  requests=await query('an_service_requests',{order:'created_at',limit:150});
@@ -236,7 +249,19 @@ document.addEventListener('submit',async e=>{
    const id=String(data.id||'').trim().toLowerCase();
    if(!/^[a-z0-9-]{2,80}$/.test(id)||!data.name?.trim())throw Error('Enter a valid lowercase university ID and official name.');
    if(data.site&&data.site!=='https://'&&!/^https:\/\//.test(data.site))throw Error('Official URL must begin https://');
-   const item={id,name:String(data.name).trim(),short:String(data.short||'').trim(),country:String(data.country||'Malaysia').trim(),city:String(data.city||'').trim(),kind:data.kind==='Private'?'Private':'Public',site:data.site||'',programs:String(data.programs||'').split(',').map(s=>s.trim()).filter(Boolean)};
+   const previous=universityItems.find(x=>x.id===id)||{};
+   const item={...previous,id,name:String(data.name).trim(),short:String(data.short||'').trim(),country:String(data.country||'Malaysia').trim(),city:String(data.city||'').trim(),kind:data.kind==='Private'?'Private':'Public',site:data.site||'',programs:String(data.programs||'').split(',').map(s=>s.trim()).filter(Boolean)};
+   const cover=form.querySelector('[name="cover_file"]')?.files?.[0];
+   const logo=form.querySelector('[name="logo_file"]')?.files?.[0];
+   const gallery=form.querySelector('[name="gallery_files"]')?.files;
+   if(cover?.size){toast('Uploading university cover image...');item.cardImageUrl=await uploadUniversityImage(cover,'uni-cover');}
+   if(logo?.size){toast('Uploading official logo...');item.logoImageUrl=await uploadUniversityImage(logo,'uni-logo');}
+   if(gallery?.length){
+    if(gallery.length>12)throw Error('Upload up to 12 gallery photos at once.');
+    item.galleryImages=Array.isArray(previous.galleryImages)?previous.galleryImages.slice():[];
+    for(let i=0;i<gallery.length;i++){toast('Uploading gallery image '+(i+1)+' / '+gallery.length);item.galleryImages.push(await uploadUniversityImage(gallery[i],'uni-gallery'));}
+    item.galleryImages=[...new Set(item.galleryImages)].slice(-24);
+   }
    const list=universityItems.filter(x=>x.id!==id);list.push(item);await publish('university_overrides',list);universityItems=list;await universityPage();return;
   }
  }catch(err){errorMsg(err);}
