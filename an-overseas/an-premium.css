@@ -1,0 +1,37 @@
+/* A&N Overseas premium public media, team and study destinations */
+#an-success-gallery{width:100%;min-height:260px}
+.an-youtube-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:23px 16px;align-items:start}
+.an-youtube-card{min-width:0;background:linear-gradient(160deg,#1b1e26,#101217);border:1px solid #75451c;border-radius:18px;overflow:hidden;box-shadow:0 10px 32px #0009;transition:transform .2s,border-color .2s}
+.an-youtube-card:hover{transform:translateY(-4px);border-color:#ff991d}
+.an-youtube-media{width:100%;aspect-ratio:16/9;display:block;position:relative;border:0;padding:0;margin:0;background:#040609;overflow:hidden;cursor:pointer}
+.an-youtube-media img,.an-youtube-media video{display:block;width:100%;height:100%;aspect-ratio:16/9;object-fit:cover;object-position:center}
+.an-youtube-media video{background:#030303;cursor:auto}
+.an-youtube-media img{transition:transform .35s ease}
+.an-youtube-media:hover img{transform:scale(1.075)}
+.an-zoom{position:absolute;right:12px;bottom:12px;padding:6px 10px;color:#fff;background:#0b0e12d9;border:1px solid #ff9719;border-radius:8px;font-size:11px;font-weight:800}
+.an-youtube-info{display:flex;gap:11px;padding:14px 13px 17px}
+.an-story-avatar{width:35px;height:35px;min-width:35px;border-radius:50%;border:1px solid #ff990c;background:#191007;display:flex;align-items:center;justify-content:center;letter-spacing:-1px;font-family:Georgia,serif;font-size:12px;font-weight:900;color:#fff}
+.an-story-avatar span{color:#ff9100}
+.an-story-copy{min-width:0}.an-story-copy h3{color:#fff!important;font-size:15px!important;line-height:1.42;margin:0 0 7px;font-weight:850}.an-story-copy p{color:#e3d3c0!important;font-size:12px;line-height:1.5;margin:0 0 9px;white-space:pre-line;overflow-wrap:anywhere}
+.an-story-copy small{color:#ffb554;font-size:10px}
+.an-premium-empty{padding:50px 25px;text-align:center;border:1px solid #6c4628;border-radius:22px;background:linear-gradient(140deg,#17191f,#080a0f)}
+.an-premium-empty>span{font-size:37px;color:#ff920e}.an-premium-empty h2{color:#fff!important}.an-premium-empty p{color:#d1c3b3}
+.an-preview-dialog{border:1px solid #e58c20;border-radius:20px;background:#101218;color:#fff;padding:24px;max-width:min(94vw,1000px);max-height:90dvh;box-shadow:0 25px 90px #000e}
+.an-preview-dialog::backdrop{background:#000d}.an-preview-dialog img{max-width:100%;max-height:72dvh;object-fit:contain}.an-preview-dialog p{font-size:13px;color:#ffb450}.an-dialog-close{position:absolute;right:6px;top:5px;color:#fff;background:#a44a10;border:0;border-radius:50%;width:32px;height:32px;font-size:23px;cursor:pointer}
+.country-tiles{width:100%!important;max-width:100%!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important;justify-items:stretch!important}
+.country-tiles .country,.country-tiles .an-country-card{width:100%;min-width:0;min-height:215px;border:1px solid #af6321;background-color:#161921;background-position:center;background-size:cover;border-radius:18px;padding:17px;box-shadow:0 10px 25px #0007;transition:transform .22s,border-color .22s;display:flex;align-items:flex-start;justify-content:flex-end;flex-direction:column;text-align:left}
+.country-tiles .country:before{background:linear-gradient(0deg,#06090df5 0%,#0e0f13b5 40%,#10121b29 100%)}
+.country-tiles .country:hover{transform:translateY(-4px);border-color:#ff9b18}
+.country-tiles .country strong{color:#fff;font-size:17px;line-height:1.25}.country-tiles .country small{font-size:12px;color:#ffb14c}.country-tiles .country .flag{font-size:31px;margin-bottom:auto;filter:drop-shadow(0 2px 6px #000a)}
+#an-public-management.an-team-section{margin-top:30px;border:1px solid #64411f;border-radius:23px;padding:24px;background:linear-gradient(130deg,#17191f,#0a0d13)}
+.an-team-head span{font-size:11px;font-weight:800;letter-spacing:2px;color:#ff9515}.an-team-head h2{color:#fff;margin:8px 0 24px;font-size:27px}.an-team-head h2 em{color:#ff930d;font-style:normal}
+.an-team-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.an-team-card{min-width:0;background:#0e1117;border:1px solid #583d22;border-radius:17px;overflow:hidden}
+.an-team-photo,.an-team-monogram{display:block;width:100%;height:230px;object-fit:cover;object-position:center;background:radial-gradient(circle at 50% 25%,#884516,#0e1117)}
+.an-team-monogram{display:flex;align-items:center;justify-content:center;font:900 64px Georgia,serif;color:#fff}.an-team-monogram span{color:#ff9508}
+.an-team-body{padding:17px}.an-team-body h3{color:#fff;font-size:19px;margin:0 0 6px}.an-team-body>b{color:#ff9d20;display:block;font-size:13px}.an-team-body small,.an-team-position{color:#e1c3a4;display:block;margin-top:6px;font-size:12px}.an-team-body p{color:#d0d2da;margin:11px 0;line-height:1.55;font-size:12px}
+.an-team-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.an-team-button{color:#100c08!important;background:linear-gradient(110deg,#ffb94c,#ff7b00);border:1px solid #ffb452;border-radius:9px;padding:8px 10px;font-size:11px;font-weight:850;text-decoration:none}.an-team-button.alt{background:#292119;color:#ffcb86!important;border-color:#74491f}
+@media(max-width:1050px){.an-youtube-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.an-team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:850px){.country-tiles{grid-template-columns:repeat(2,minmax(0,1fr))!important}.an-youtube-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:590px){.an-youtube-grid{grid-template-columns:1fr;gap:20px}.an-youtube-media,.an-youtube-media img,.an-youtube-media video{aspect-ratio:16/9}.an-youtube-card{border-radius:16px}.an-youtube-info{padding:13px 14px 17px}.an-story-copy h3{font-size:16px!important}.an-story-avatar{width:40px;height:40px;min-width:40px}.an-team-grid{grid-template-columns:1fr}.an-team-photo,.an-team-monogram{height:275px}#an-public-management.an-team-section{padding:15px}.an-team-head h2{font-size:24px}.country-tiles{gap:11px!important}.country-tiles .country,.country-tiles .an-country-card{min-height:178px;padding:13px}.country-tiles .country strong{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.an-youtube-card,.an-youtube-media img,.country-tiles .country{transition:none}}
