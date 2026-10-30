@@ -58,3 +58,57 @@ body.an-about-locked .footer{display:none!important}
 @media(max-height:690px){#app .an-about-summary{padding-top:9px;padding-bottom:9px}#app .an-manager-bio{-webkit-line-clamp:2}#app .an-about-summary .an-about-locations{gap:4px}#app .an-manager-main{align-items:center}}
 @media(max-height:575px){#app>.an-about-fixed{gap:6px;padding-top:5px;padding-bottom:5px}#app .an-about-summary p{-webkit-line-clamp:1;margin-bottom:4px}#app .an-about-locations{display:none}#app .an-manager-card{padding:6px 8px}#app .an-manager-actions{margin-top:0}#app .an-manager-information{gap:3px}#app .an-manager-bio{-webkit-line-clamp:1}}
 @media(prefers-reduced-motion:reduce){#app .an-manager-action{transition:none}}
+
+
+/* CONTACT-STYLE DETAILS: one uppercase orange heading and distinct bordered rows per field. */
+#app .an-about-summary h1,
+#app .an-manager-heading h2,
+#app .an-about-eyebrow{font-weight:900;text-transform:uppercase;letter-spacing:.65px}
+#app .an-manager-heading h2,
+#app .an-manager-heading h2 span{color:#ff981c!important}
+#app .an-about-summary h1,
+#app .an-about-summary h1 span{color:#ff981c!important}
+#app .an-about-summary p{color:#fff!important}
+#app .an-manager-role-banner{text-transform:uppercase;color:#ff9d20!important;border-color:#ec8b1c;
+ background:linear-gradient(100deg,#40210b,#25180d 55%,#101217);
+ box-shadow:inset 0 1px #ffb8523b,0 0 20px #ff8a1819}
+#app .an-manager-role-banner .an-role-orange,
+#app .an-manager-role-banner .an-role-white{color:#ff9d20!important}
+#app .an-manager-information{gap:6px;justify-content:center;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#87481d #111015;padding:1px}
+#app .an-manager-field{display:flex;flex-direction:column;gap:3px;min-width:0;padding:7px 9px;
+ border-radius:10px;border:1px solid #6e4724;background:linear-gradient(120deg,#241a13,#11141b 80%);
+ box-shadow:inset 3px 0 0 #ed8f1a,0 2px 11px #0004;text-decoration:none}
+#app .an-manager-field:nth-child(2n){background:linear-gradient(110deg,#22242c,#15100c);border-color:#885521}
+#app .an-manager-field-label{display:block;color:#ff9c25!important;font-weight:900;font-size:9px!important;
+ line-height:1.2;letter-spacing:1.05px;text-transform:uppercase}
+#app .an-manager-field-value{display:block;color:#fff!important;font-weight:620;font-size:clamp(10px,1.22vw,13px);
+ line-height:1.3;overflow-wrap:anywhere;word-break:normal;white-space:normal}
+#app .an-manager-name-box{border-color:#b87831;background:linear-gradient(112deg,#39200f,#15171e)}
+#app .an-manager-name-box .an-manager-field-value{font-size:clamp(15px,2vw,22px);font-weight:900;color:#fff!important}
+#app .an-manager-bio-box .an-manager-field-value{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+#app .an-manager-email-box,#app .an-manager-phone-box{cursor:pointer;border-color:#cb7a23;background:linear-gradient(100deg,#33200d,#121417)}
+#app .an-manager-email-box:hover,#app .an-manager-email-box:focus-visible,
+#app .an-manager-phone-box:hover,#app .an-manager-phone-box:focus-visible{border-color:#ffc15f;background:#3f260e}
+#app .an-manager-email-box .an-manager-field-label span{font-size:12px}
+#app .an-manager-email-box .an-manager-field-value{text-decoration:underline;text-decoration-color:#fa8d16;text-underline-offset:3px}
+#app .an-manager-actions{margin-top:3px;gap:7px;flex-wrap:wrap}
+#app .an-manager-action{text-transform:uppercase;letter-spacing:.4px;border-color:#ff9c21;color:#100d09!important}
+#app .an-manager-action-secondary{color:#fff!important}
+#app .an-manager-controls button:not(:disabled){box-shadow:inset 0 0 0 1px #ffad4826,0 0 10px #ff8c1628}
+#app .an-about-readmore{text-transform:uppercase;letter-spacing:.5px}
+#app .an-about-locations span{color:#fff;background:#1d1713;border-color:#ac6721}
+@media(max-width:800px){
+ #app .an-manager-information{gap:4px}
+ #app .an-manager-field{padding:5px 7px;gap:2px;border-radius:8px}
+ #app .an-manager-field-label{font-size:8px!important;letter-spacing:.65px}
+ #app .an-manager-field-value{font-size:10px;line-height:1.26}
+ #app .an-manager-name-box .an-manager-field-value{font-size:15px}
+ #app .an-manager-bio-box .an-manager-field-value{-webkit-line-clamp:2}
+ #app .an-manager-actions{margin-top:1px;gap:5px}
+ #app .an-manager-action{font-size:9px}
+ #app .an-about-summary h1{font-size:19px}
+ #app .an-manager-heading h2{font-size:18px}
+}
+@media(max-width:390px){#app .an-manager-field{padding:4px 6px}#app .an-manager-field-value{font-size:9.5px}
+ #app .an-manager-name-box .an-manager-field-value{font-size:13.5px}
+ #app .an-about-summary h1{font-size:17px}}
