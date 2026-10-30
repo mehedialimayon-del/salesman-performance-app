@@ -10,7 +10,7 @@ const go=(mode)=>window.ANStudio.show(mode);
 const dstr=x=>{try{return new Date(x).toLocaleString('en-MY',{dateStyle:'medium',timeStyle:'short'});}catch{return'';}};
 const fld=(name,label,val='',type='text')=>'<label class="field">'+E(label)+'<input type="'+type+'" name="'+E(name)+'" value="'+E(val)+'" autocomplete="off"></label>';
 const area=(name,label,val='')=>'<label class="field wide">'+E(label)+'<textarea name="'+E(name)+'">'+E(val)+'</textarea></label>';
-const fileField=(name,label,types='image/jpeg,image/png,image/webp')=>'<label class="field wide studio-upload"><span>'+E(label)+'</span><input type="file" name="'+E(name)+'" accept="'+types+'"><small>Choose a file from your phone or computer</small></label>';
+const fileField=(name,label,types='image/jpeg,image/png,image/webp')=>'<label class="field wide studio-upload"><span>'+E(label)+'</span><input type="file" name="'+E(name)+'" accept="'+types+'"><small>Select photo → Zoom &amp; Position → Use This Photo → Publish</small></label>';
 const action=(label,cmd,id='',cl='alt')=>'<button type="button" class="btn sm '+cl+'" data-studio="'+E(cmd)+'" data-id="'+E(id)+'">'+E(label)+'</button>';
 const fallbackUrl=section=>new URL('../open-upload.html?section='+encodeURIComponent(section||'management'),location.href).href;
 const browserUploadButton=()=>['management','success','countries','universities'].includes(mode)
@@ -59,7 +59,7 @@ function teamRow(p,i){
  +fld('email','Email Address',p.email||'','email')+fld('portfolio','Personal Portfolio Website (https://)',p.portfolio||'','url')
  +area('help','Biography / How This Person Helps Students',desc)+fileField('photo_file','Upload / Replace Profile Photo')
  +'</div><input type="hidden" name="photo" value="'+E(p.photo||'')+'">'
- +'<p class="help">A portfolio is optional. If available, its website link will appear on the public profile card. No photo URL is required.</p></article>';
+ +'<div class="actions">'+(safeUrl(p.photo)?action('Zoom / Position Existing Photo','adjust-team',i):'')+'</div><p class="help">Adjust selected photos before publishing. Existing photos can be repositioned too.</p></article>';
 }
 function paintManagement(){
  wrap('Management <em>& Contacts</em>','Edit existing profiles or add new people. Changes appear publicly only after Publish.',
@@ -87,7 +87,7 @@ async function saveManagement(){
   if(portfolio&&!safeUrl(portfolio))throw Error('Portfolio must start with https://');
   const email=get('email');
   if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw Error('Invalid email for '+name);
-  const file=row.querySelector('[name="photo_file"]')?.files?.[0];
+  const file=await window.ANPhotoEditor.selectedFile(row.querySelector('[name="photo_file"]'));
   const photo=file?.size?await upload(file,'team'):get('photo');
   const help=get('help'),designation=get('designation');
   result.push({...old,id:old.id||'member-'+uuid(),name,role:designation,designation,
@@ -101,7 +101,7 @@ async function saveManagement(){
 function storiesPanel(){
  const row=(s,i)=>'<article class="studio-media-row" data-story-id="'+E(s.id||'index:'+i)+'"><div class="studio-preview">'+
  (s.type==='video'?'<video src="'+E(s.media_url)+'" playsinline muted preload="metadata"></video>':'<img alt="" src="'+E(s.media_url)+'" loading="lazy">')+
- '</div><div><b>'+E(s.title||'Untitled')+'</b><p>'+E(s.description||'')+'</p><small>'+dstr(s.created_at)+' · '+(s.approved?'Published':'Draft')+'</small></div><div class="actions">'+action(s.approved?'Unpublish':'Publish','toggle-story',s.id||'index:'+i)+' '+action('Edit','edit-story',s.id||'index:'+i)+' '+action('Remove','remove-story',s.id||'index:'+i,'danger')+'</div></article>';
+ '</div><div><b>'+E(s.title||'Untitled')+'</b><p>'+E(s.description||'')+'</p><small>'+dstr(s.created_at)+' · '+(s.approved?'Published':'Draft')+'</small></div><div class="actions">'+action(s.approved?'Unpublish':'Publish','toggle-story',s.id||'index:'+i)+' '+action('Edit','edit-story',s.id||'index:'+i)+(s.type==='image'?' '+action('Zoom / Position','adjust-story',s.id||'index:'+i):'')+' '+action('Remove','remove-story',s.id||'index:'+i,'danger')+'</div></article>';
  wrap('Success <em>Stories</em>','Publish YouTube-style photo and video cards with captions, playable directly on the public site.',
  panel('<h2>Upload a Success Story</h2><form id="studio-story-form">'+fld('title','Video / Photo Title','')
  +area('description','Description / Student Achievement','')
@@ -118,7 +118,7 @@ async function addStory(f){
  const title=String(data.get('title')||'').trim(),description=String(data.get('description')||'').trim();
  if(!title)throw Error('Enter a story title');
  if(!data.has('consent'))throw Error('Media permission confirmation required');
- const media=data.get('media');if(!(media instanceof File)||!media.size)throw Error('Choose a photo or video');
+ const media=await window.ANPhotoEditor.selectedFile(f.querySelector('[name="media"]'));if(!(media instanceof File)||!media.size)throw Error('Choose a photo or video and finish adjusting it.');
  const url=await upload(media,'success-story');
  const result=[{id:'story-'+uuid(),title,description,media_url:url,type:media.type.startsWith('video/')?'video':'image',approved:true,created_at:new Date().toISOString()},...stories];
  progress('Publishing success story...');
@@ -143,7 +143,7 @@ function countryRow(c,i){
  ((c[2]&&safeUrl(c[2]))?'<img class="studio-country-preview" src="'+E(c[2])+'" alt="" loading="lazy">':'')+
  '<div class="grid-fields">'+fld('name','Country Name',c[0])+fld('flag','Flag Emoji',c[1])+
  fileField('photo_file','Upload / Replace Country Photo')+
- '</div><input type="hidden" name="photo" value="'+E(c[2]||'')+'"><p class="help">Choose a new photo from your device; no URL needed.</p></article>';
+ '</div><input type="hidden" name="photo" value="'+E(c[2]||'')+'"><div class="actions">'+(safeUrl(c[2])?action('Zoom / Position Existing Photo','adjust-country',i):'')+'</div><p class="help">Crop to the destination card frame before publishing.</p></article>';
 }
 function paintCountries(){
  wrap('Study <em>Destinations</em>','Manage full-width country cards, with four cards per row on laptop screens.',
@@ -163,7 +163,7 @@ async function saveCountries(){
    const name=row.querySelector('[name=name]')?.value.trim();
    if(!name)throw Error('Each country must have a name');
    const flag=row.querySelector('[name=flag]')?.value.trim()||'🌍';
-   const file=row.querySelector('[name=photo_file]')?.files?.[0];
+   const file=await window.ANPhotoEditor.selectedFile(row.querySelector('[name=photo_file]'));
    const photo=file?.size?await upload(file,'destination'):row.querySelector('[name=photo]')?.value||'';
    result.push([name,flag,photo]);
  }
@@ -226,6 +226,25 @@ document.addEventListener('click',async e=>{
   else if(command==='add-country'){const i=countries.length;countries.push(['','','']);document.querySelector('#studio-country-list')?.insertAdjacentHTML('beforeend',countryRow(['','',''],i));}
   else if(command==='remove-country'){button.closest('.country-item')?.remove();}
   else if(command==='save-countries')await saveCountries();
+  else if(command==='adjust-team'||command==='adjust-country'){
+    const row=button.closest(command==='adjust-team'?'.team-item':'.country-item');
+    const src=row?.querySelector('[name="photo"]')?.value;
+    if(!src)throw Error('Choose a photo first');
+    const adjusted=await window.ANPhotoEditor.editUrl(src,command==='adjust-team'?'team':'country');
+    if(adjusted){
+     const url=await upload(adjusted,command==='adjust-team'?'team-adjust':'country-adjust');
+     row.querySelector('[name="photo"]').value=url;
+     let preview=row.querySelector(command==='adjust-team'?'.studio-avatar':'.studio-country-preview');
+     if(!preview){preview=document.createElement('img');preview.className=command==='adjust-team'?'studio-avatar':'studio-country-preview';row.querySelector('.grid-fields')?.insertAdjacentElement('beforebegin',preview);}
+     preview.src=url;progress('Adjusted photo ready. Press Publish to make the change live.');
+    }
+   }
+  else if(command==='adjust-story'){
+    const i=id.startsWith('index:')?Number(id.slice(6)):stories.findIndex(x=>String(x.id)===id);
+    const story=stories[i];if(!story||story.type!=='image')throw Error('This item is not an image.');
+    const adjusted=await window.ANPhotoEditor.editUrl(story.media_url,'success');
+    if(adjusted){const url=await upload(adjusted,'success-adjust');const list=stories.map(x=>({...x}));list[i].media_url=url;await publish('success_stories',list);await showStories();}
+   }
   else if(['toggle-story','remove-story','edit-story'].includes(command))await mutateStory(command,id);
   else if(command==='restore')await restore(id);
  }catch(err){progress(err.message||String(err));alert(err.message||String(err));}
