@@ -24,7 +24,12 @@ jobs:
         run: |
           mkdir -p qa-artifacts
           python3 -m http.server 8765 --directory an-overseas >/tmp/an-about-test-http.log 2>&1 &
-          curl --fail --silent --max-time 10 http://127.0.0.1:8765/index.html >/dev/null
+          ready=0
+          for attempt in $(seq 1 25); do
+            if curl --fail --silent --max-time 2 http://127.0.0.1:8765/index.html >/dev/null; then ready=1; break; fi
+            sleep 0.4
+          done
+          if [ "$ready" -ne 1 ]; then cat /tmp/an-about-test-http.log; exit 1; fi
           timeout 130s node <<'JS'
           const {chromium}=require('playwright');
           const fs=require('fs');
