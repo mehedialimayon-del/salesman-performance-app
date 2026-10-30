@@ -29,3 +29,19 @@ Use a separate secure Supabase project or another private backend for student au
 - `site-content.json` holds owner-editable **public** site copy, management cards and additional universities. Edit using `owner-studio.html`: drafts remain on the device until the exported JSON file is committed via the authenticated GitHub account.
 - Studio URL: https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/owner-studio.html
 - Neither `owner-studio.html` nor the public website is a password-protected administrator system. Do not store student records or private files there. Secure student account login, confidential document handling and automatic CMS publishing still require a protected backend and permissions.
+
+## October 30, 2026 — Dedicated Admin App (installable PWA)
+
+URL: https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/admin-app/
+
+Files: `admin-app/index.html`, `app.js`, `style.css`, `manifest.webmanifest`, `sw.js`, `icon.svg`.
+
+- Dedicated private admin interface using existing Supabase project, verified Supabase Auth and RLS-protected `an_admins` authorization.
+- Login persists on the device; no service-role keys are embedded. Only the registered administrator is allowed access.
+- Inbox: enquiry management, mail/WhatsApp follow-up shortcuts, registered-student chat replies.
+- Applications: existing leads, application status, EMGS progress, private document signed links (90-second expiry).
+- CMS: homepage settings, ticker, university overrides, public management profiles and service-request progress.
+- Public website now loads `an-live-content.js`, which reads public `an_site_content` data. The public contact form can submit to `an_enquiries` using anon INSERT privileges under RLS. No private student data is fetched publicly.
+- Persistent bottom navigation has an explicit Website shortcut. Use Android Chrome's **Add to Home screen** / **Install app**.
+- Foreground/in-app notifications and periodic refresh are implemented. Background push while the app is completely closed is NOT configured.
+- Technical caveats: this is a PWA, not a compiled APK. Live browser login, Android installation and real application messaging still need owner-device smoke tests. The static public site still contains some preview-only student journeys, which are outside the scope of this Admin App.
