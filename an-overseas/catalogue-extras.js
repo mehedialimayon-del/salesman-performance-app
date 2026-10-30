@@ -130,7 +130,7 @@ fetch('site-content.json?v=20261029-2154',{cache:'no-cache'}).then(function(r){i
   if(!u||!v)return;
   ['name','short','city'].forEach(function(k){if(typeof v[k]==='string'&&v[k].trim())u[k]=v[k].trim();});
  });
- render();repaintCopy();
+ window.ANExpandUniversityProfiles?.();render();repaintCopy();
 }).catch(function(){/* Preserve the normal site if optional content configuration fails. */});
 
 render();
