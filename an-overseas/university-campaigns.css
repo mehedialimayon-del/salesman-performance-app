@@ -1,0 +1,38 @@
+/* A&N university portfolios: semester PDF, scholarships, private-university promotions */
+.an-uni-discount{position:absolute;top:9px;right:9px;z-index:5;padding:7px 10px;border-radius:10px;background:linear-gradient(135deg,#ffa61c,#ff7014);box-shadow:0 4px 18px #0009;color:#16100a;font-size:11px;font-weight:900;letter-spacing:.1px;max-width:90%;text-align:center;border:1px solid #ffd29a}
+.uni-cover-wrap{position:relative}
+.an-scholarship-only{display:flex;align-items:center;gap:8px;color:#ffb460;font-size:12px;font-weight:800;white-space:nowrap;padding:8px 10px;background:rgba(255,143,16,.08);border:1px solid #a66a33;border-radius:12px;cursor:pointer}
+.an-scholarship-only input{width:17px;height:17px;accent-color:#ff9214}
+.an-university-extras{margin-top:20px;display:grid;gap:15px}
+.an-uni-feature{display:flex;gap:15px;align-items:flex-start;border:1px solid #9d5c25;border-radius:18px;padding:20px;background:linear-gradient(120deg,#221206,#0c0d10 60%,#0a0a0e);box-shadow:0 12px 28px #0004;position:relative;overflow:hidden}
+.an-uni-feature-icon{display:flex;align-items:center;justify-content:center;border:1px solid #dc8b36;border-radius:13px;min-width:53px;height:53px;background:#361c0d;font-size:28px}
+.an-uni-feature-copy{flex:1;min-width:0}
+.an-uni-feature h2{font-family:Georgia,serif;font-size:clamp(22px,2.6vw,30px);color:#fff;margin:5px 0 10px;line-height:1.14}
+.an-uni-feature h2 span{color:#ffa52f}
+.an-uni-feature p{font-size:13px;color:#ededed;line-height:1.68;margin:5px 0 13px}
+.an-uni-feature small{color:#d9cfc3;font-size:11px;line-height:1.55}
+.an-uni-eyebrow{color:#ffb85c;font-weight:800;letter-spacing:1px;font-size:10px}
+.an-uni-pdf-buttons{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.an-uni-pdf-buttons a,.an-uni-feature-link{display:inline-flex;align-items:center;justify-content:center;padding:11px 15px;border:1px solid #e48729;border-radius:12px;color:#ffb86c;background:#120c09;font-weight:800;font-size:12px;text-decoration:none}
+.an-uni-pdf-buttons a:hover,.an-uni-feature-link:hover{background:#ff921b;color:#0b0b0c}
+.an-support-logo{width:85px;height:85px;object-fit:cover;object-position:center;border:1px solid #bf7837;border-radius:15px;background:#000}
+.an-support-list{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.an-support-list span{display:inline-block;border:1px solid #634325;border-radius:50px;padding:5px 9px;color:#ffe6c0;background:#1b120d;font-size:11px}
+.an-free-ticket{display:flex;flex-direction:column;gap:6px;padding:13px 15px;margin:12px 0 14px;border:1px solid #e9a249;border-radius:12px;background:linear-gradient(110deg,#64320e,#241609 70%);color:#ffd69b}
+.an-free-ticket strong{color:#fff;font-size:16px}
+.an-free-ticket span{font-size:12px;line-height:1.5}
+.an-uni-admin h2{color:#fff}
+.an-uni-admin h2 span{color:#ffa327}
+.an-admin-uni-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px;border-radius:10px;border:1px solid #805126;background:#110f0e;margin:8px 0;color:#f6f6f6;font-size:12px}
+.an-admin-uni-row strong{color:#ffab51}
+.an-admin-uni-row button{padding:8px 10px;border-radius:9px;border:1px solid #c27d33;background:#201007;color:#ffba65;cursor:pointer}
+.an-admin-uni-row a{color:#ffb55b;text-decoration:underline}
+.an-journey-services .grid{grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch}
+.an-journey-services .an-service-card{height:100%;display:flex;flex-direction:column}
+.an-journey-services .an-service-card .inside{display:flex;flex-direction:column;flex:1}
+.an-journey-services .an-service-card .an-service-go{margin-top:auto}
+.an-journey-services .an-service-card .an-service-picture{height:170px;overflow:hidden}
+.an-journey-services .an-service-picture img{width:100%;height:100%;object-fit:cover}
+@media(max-width:1100px){.an-journey-services .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:800px){.an-journey-services .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.an-journey-services .an-service-picture{height:125px!important}.an-university-extras{gap:11px}.an-uni-feature{padding:15px}.an-support-logo{width:56px;height:56px}.an-uni-feature-icon{min-width:42px;height:42px;font-size:22px}.an-uni-feature h2{font-size:21px}}
+@media(max-width:360px){.an-journey-services .an-service-card .inside{padding:12px}.an-journey-services .an-service-card h3{font-size:15px}.an-journey-services .an-service-go{font-size:11px;padding:8px}.an-uni-feature{gap:9px;padding:12px}.an-support-logo{width:45px;height:45px}}

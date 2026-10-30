@@ -33,10 +33,10 @@ async function setUser(user){
 }
 async function publicContent(){
  if(!AN.db)return;
- const {data,error}=await AN.db.from('an_site_content').select('key,value').in('key',['settings','management','success_stories','university_overrides','services','countries','latest_updates','scholarships','offers','service_prices']);
+ const {data,error}=await AN.db.from('an_site_content').select('key,value').in('key',['settings','management','success_stories','university_overrides','services','countries','latest_updates','scholarships','offers','service_prices','university_costing']);
  if(error)return;
  const by=Object.fromEntries((data||[]).map(x=>[x.key,x.value]));
- AN.publicSettings=by.settings||{};AN.management=Array.isArray(by.management)?by.management:[];AN.stories=Array.isArray(by.success_stories)?by.success_stories:[];AN.latestUpdates=Array.isArray(by.latest_updates)?by.latest_updates:[];AN.scholarships=Array.isArray(by.scholarships)?by.scholarships:[];AN.offers=Array.isArray(by.offers)?by.offers:[];AN.servicePrices=Array.isArray(by.service_prices)?by.service_prices:[];AN.loadedStory=true;
+ AN.publicSettings=by.settings||{};AN.management=Array.isArray(by.management)?by.management:[];AN.stories=Array.isArray(by.success_stories)?by.success_stories:[];AN.latestUpdates=Array.isArray(by.latest_updates)?by.latest_updates:[];AN.scholarships=Array.isArray(by.scholarships)?by.scholarships:[];AN.offers=Array.isArray(by.offers)?by.offers:[];AN.servicePrices=Array.isArray(by.service_prices)?by.service_prices:[];AN.universityCostings=Array.isArray(by.university_costing)?by.university_costing:[];AN.loadedStory=true;
  if(Array.isArray(by.services)&&by.services.length&&typeof serviceList!=='undefined'){serviceList.splice(0,serviceList.length,...by.services.filter(v=>Array.isArray(v)&&v.length>=3).map(v=>[String(v[0]),String(v[1]),String(v[2])]));}
  if(Array.isArray(by.countries)&&by.countries.length&&typeof countries!=='undefined'){countries.splice(0,countries.length,...by.countries.filter(v=>Array.isArray(v)&&v.length>=3).map(v=>[String(v[0]),String(v[1]),String(v[2])]));}
  (Array.isArray(by.university_overrides)?by.university_overrides:[]).forEach(x=>{

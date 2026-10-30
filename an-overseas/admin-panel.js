@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const get=()=>window.ANLive, db=()=>get().db, esc=s=>get().ed(s), pretty=s=>get().dt(s);
-const sections=["Overview","Students","Applications","Documents","Enquiries","Messages","Invoices","Latest Updates","Website","Management","Services","Service Requests","Service Prices","Countries","Universities","Success Stories","Media"];
+const sections=["Overview","Students","Applications","Documents","Enquiries","Messages","Invoices","Latest Updates","Website","Management","Services","Service Requests","Service Prices","Countries","Universities","University Offers & PDFs","Success Stories","Media"];
 let section="Overview", selectedStudent="",saved={};
 const panel=s=>'<section class="live-panel">'+s+'</section>';
 const field=(label,key,value="",type="text")=>'<label>'+esc(label)+(type==="textarea"?'<textarea name="'+key+'">'+esc(value)+'</textarea>':'<input name="'+key+'" type="'+type+'" value="'+esc(value)+'">')+'</label>';
@@ -121,6 +121,7 @@ async function draw(){
    +'<button class="btn mt" type="submit">Save & Publish University</button></form>';
   html=panel('<h2>University Catalogue Editor</h2><p>Enter official institution details.</p>'+form)+panel('<h2>Edited Listings</h2>'+rows(saved.universities,u=>'<div class="live-msg"><b>'+esc(u.name)+'</b><p>'+esc(u.city||"")+'</p><button data-admin-uni="'+esc(u.id)+'">Edit</button></div>'));
  }
+ if(section==="University Offers & PDFs"){html=await window.ANUniversityTools?.adminUI?.()||panel("University offers module unavailable.");}
  if(section==="Success Stories"){
   saved.stories=await content("success_stories")||[];
   const form='<form id="admin-story-form"><div class="live-fieldgrid">'+field("Title","title")+'<label>Upload Photo or Video<input name="story_file" type="file" required accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"></label>'+field("Caption / Graduation Details","description","","textarea")+'</div><p class="an-upload-help">Select an image (up to 8 MB) or video (up to 40 MB). No media URL required. New posts are private drafts until you choose Publish.</p><label><input type="checkbox" name="consent" style="width:auto" required> I confirm the student has consented to publication</label><button class="btn mt" type="submit">Upload as Draft</button><div id="an-story-upload-status" class="an-upload-progress" role="status"></div></form>';
