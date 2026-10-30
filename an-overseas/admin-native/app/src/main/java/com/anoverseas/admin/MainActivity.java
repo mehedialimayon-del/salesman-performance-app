@@ -19,6 +19,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.ValueCallback;
 import android.webkit.WebView.WebViewTransport;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -28,6 +29,8 @@ public class MainActivity extends Activity {
     private static final String HOME = "https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/admin-app/";
     private static final String CHANNEL = "an_admin_foreground";
     private WebView web;
+    private ValueCallback<Uri[]> pendingFilePicker;
+    private static final int FILE_PICKER_REQUEST = 5101;
     private long lastBack = 0L;
 
     private boolean isAdminPage(Uri uri) {
@@ -128,6 +131,28 @@ public class MainActivity extends Activity {
         });
 
         web.setWebChromeClient(new WebChromeClient() {
+            @Override public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback,
+                               WebChromeClient.FileChooserParams params) {
+                if (view == null || view.getUrl() == null || !isAdminPage(Uri.parse(view.getUrl()))) {
+                    callback.onReceiveValue(null);
+                    return true;
+                }
+                if (pendingFilePicker != null) pendingFilePicker.onReceiveValue(null);
+                pendingFilePicker = callback;
+                try {
+                    Intent chooser = params.createIntent();
+                    chooser.addCategory(Intent.CATEGORY_OPENABLE);
+                    chooser.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,
+                        params.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE);
+                    startActivityForResult(chooser, FILE_PICKER_REQUEST);
+                    return true;
+                } catch (Exception ex) {
+                    pendingFilePicker.onReceiveValue(null);
+                    pendingFilePicker = null;
+                    Toast.makeText(MainActivity.this, "Cannot open the file picker.", Toast.LENGTH_LONG).show();
+                    return true;
+                }
+            }
             @Override public boolean onCreateWindow(WebView view, boolean isDialog,
                            boolean isUserGesture, Message resultMsg) {
                 if (!isUserGesture) return false;
@@ -159,6 +184,15 @@ public class MainActivity extends Activity {
         web.loadUrl(HOME);
     }
 
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != FILE_PICKER_REQUEST) return;
+        if (pendingFilePicker == null) return;
+        Uri[] result = WebChromeClient.FileChooserParams.parseResult(resultCode, data);
+        pendingFilePicker.onReceiveValue(result);
+        pendingFilePicker = null;
+    }
+
     @Override protected void onSaveInstanceState(Bundle state) {
         web.saveState(state);
         super.onSaveInstanceState(state);
@@ -177,6 +211,10 @@ public class MainActivity extends Activity {
     }
 
     @Override protected void onDestroy() {
+        if (pendingFilePicker != null) {
+            pendingFilePicker.onReceiveValue(null);
+            pendingFilePicker = null;
+        }
         if (web != null) {
             web.removeJavascriptInterface("ANAndroid");
             web.destroy();
