@@ -38,7 +38,7 @@ window.addEventListener('DOMContentLoaded',function(){
   js.onload=function(){
     var secure=document.createElement('script');secure.src='secure-platform.js?v=20261030-selfpass-v4';
     secure.onload=function(){
-      var admin=document.createElement('script');admin.src='admin-panel.js?v=20261030-selfpass-v4';admin.onload=function(){
+      var admin=document.createElement('script');admin.src='admin-panel.js?v=20261030-login-feedback-v5';admin.onload=function(){
         var style=document.createElement('link');style.rel='stylesheet';style.href='student-portal-addons.css?v=20261030-admin-enquiries-v1';document.head.appendChild(style);
         var addon=document.createElement('script');addon.src='student-portal-addons.js?v=20261030-admin-enquiries-v3';addon.onload=function(){render();};document.body.appendChild(addon);
       };
