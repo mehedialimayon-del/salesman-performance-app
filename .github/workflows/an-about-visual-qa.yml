@@ -1,0 +1,90 @@
+name: A&N About mobile visual QA
+on:
+  push:
+    paths:
+      - ".github/workflows/an-about-visual-qa.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  about-layout-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install browser test tooling
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Inspect About layout in phone and laptop viewports
+        shell: bash
+        run: |
+          mkdir -p qa-artifacts
+          python3 -m http.server 8765 --directory an-overseas >/tmp/an-about-test-http.log 2>&1 &
+          node <<'JS'
+          const {chromium}=require('playwright');
+          const fs=require('fs');
+          (async()=>{
+           const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+           const metrics=[];
+           const fixtures=[
+             {key:'management',value:[{id:'nusrat-nasrin',name:'Nusrat Nasrin',position:'CEO & Marketing Head',company:'A&N Overseas Education & Consultancy',department:'A&N Overseas Education & Consultancy',help:'Helping students plan their international education journey.',email:'nusratnasrin043@gmail.com',portfolio:'https://example.org/founder-portfolio',photo:'https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/assets/hero-nusrat-20261030.webp'}]},
+             {key:'settings',value:{about:'Founded in 2024, A&N Overseas makes Malaysian higher education more accessible. Our Malaysia-focused team guides public and private university applications, while separate specialists support other destinations. We help families explore practical, more affordable study pathways and career-ready futures.',malaysiaOffice:'Kuala Lumpur, Malaysia',bangladeshOffice:'Rangpur, Bangladesh'}},
+             {key:'latest_updates',value:[]},{key:'countries',value:[]},{key:'success_stories',value:[]}
+           ];
+           for(const [w,h] of [[360,760],[375,812],[412,900],[1366,768]]){
+            const page=await browser.newPage({viewport:{width:w,height:h},deviceScaleFactor:1});
+            await page.route(/https:\/\/svpgjrxeqnluipsgjywk\.supabase\.co\/rest\/v1\/an_site_content.*/,route=>route.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify(fixtures)}));
+            const errors=[];page.on('pageerror',e=>errors.push(e.message));
+            await page.goto('http://127.0.0.1:8765/#/about',{waitUntil:'domcontentloaded',timeout:35000});
+            await page.waitForFunction(()=>document.querySelector('.an-manager-name-box')?.textContent.includes('Nusrat'),{timeout:18000});
+            await page.waitForTimeout(900);
+            const info=await page.evaluate(()=>{
+             const rect=s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),height:Math.round(r.height),width:Math.round(r.width)}};
+             const i=document.querySelector('.an-manager-information');
+             const a=document.querySelector('.an-about-summary'),m=document.querySelector('.an-about-management');
+             const t=document.querySelector('.an-manager-trust'),b=document.querySelector('.an-manager-actions'),email=document.querySelector('.an-manager-email-box');
+             const covers=(parent,child)=>{if(!parent||!child)return false;const p=parent.getBoundingClientRect(),c=child.getBoundingClientRect();return c.top>=p.top-2&&c.bottom<=p.bottom+2};
+             const heading=document.querySelector('.an-manager-role-banner');
+             return {
+              viewport:innerWidth+'x'+innerHeight,
+              pageOverflow:document.documentElement.scrollHeight-document.documentElement.clientHeight,
+              managerOverflow:i?i.scrollHeight-i.clientHeight:999,
+              aboutOverflow:a?a.scrollHeight-a.clientHeight:999,
+              carouselCount:document.querySelectorAll('#an-manager-card').length,
+              companyFields:document.querySelectorAll('.an-manager-company-box').length,
+              centeredRole:heading?getComputedStyle(heading).justifyContent:'missing',
+              hasMailto:!!document.querySelector('.an-manager-email-box[href^="mailto:"]'),
+              portrait:rect('.an-manager-photo'),
+              info:rect('.an-manager-information'),
+              about:rect('.an-about-summary'),
+              management:rect('.an-about-management'),
+              trustVisible:covers(i,t),
+              portfolioVisible:covers(i,b),
+              emailVisible:covers(i,email),
+              proofCards:document.querySelectorAll('.an-about-proof-card').length,
+              headingColors:[...document.querySelectorAll('.an-manager-role-banner span')].map(x=>getComputedStyle(x).color)
+             };
+            });
+            metrics.push({...info,jsErrors:errors.slice(0,4)});
+            await page.screenshot({path:'qa-artifacts/about-'+w+'x'+h+'.png',fullPage:true});
+            await page.close();
+           }
+           fs.writeFileSync('qa-artifacts/qa-results.json',JSON.stringify(metrics,null,2));
+           console.log(JSON.stringify(metrics,null,2));
+           await browser.close();
+           const failure=metrics.some(x=>x.carouselCount!==1||x.companyFields!==0||x.pageOverflow>3||x.managerOverflow>4||x.aboutOverflow>4||!x.hasMailto||!x.trustVisible||!x.portfolioVisible||!x.emailVisible||x.proofCards!==3||x.centeredRole!=='center');
+           if(failure){console.error('AN ABOUT VISUAL QA FAILED: layout, clipping or interaction mismatch');process.exitCode=1}
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          JS
+      - name: Save review screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: A-N-About-Viewport-Review
+          path: qa-artifacts/
+          if-no-files-found: warn
+          retention-days: 7
