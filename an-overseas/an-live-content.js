@@ -24,10 +24,15 @@ function applyUniversities(){
  universityOverrides.forEach(data=>{
   if(!data||!data.id||!data.name)return;
   let u=U.find(x=>x.id===data.id);
-  if(!u){u={id:String(data.id),name:String(data.name),short:String(data.short||data.name),country:String(data.country||'Malaysia'),city:String(data.city||''),kind:data.kind==='Private'?'Private':'Public',programs:Array.isArray(data.programs)?data.programs:[],site:safeLink(data.site)||'https://www.mqa.gov.my',photo:''};U.push(u);changed=true;return;}
+  if(!u){u={id:String(data.id),name:String(data.name),short:String(data.short||data.name),country:String(data.country||'Malaysia'),city:String(data.city||''),kind:data.kind==='Private'?'Private':'Public',programs:Array.isArray(data.programs)?data.programs:[],site:safeLink(data.site)||'https://www.mqa.gov.my',photo:''};U.push(u);changed=true;}
   ['name','short','city','country','kind','site'].forEach(k=>{
    if(typeof data[k]==='string'&&data[k]&&u[k]!==data[k]){u[k]=data[k];changed=true;}
   });
+  const cover=safeLink(data.cardImageUrl||data.cardPhoto);
+  const logo=safeLink(data.logoImageUrl||data.logoImage);
+  if(cover&&u.cardPhoto!==cover){u.cardPhoto=cover;changed=true;}
+  if(logo&&u.logoImage!==logo){u.logoImage=logo;changed=true;}
+  if(Array.isArray(data.galleryImages)){const urls=data.galleryImages.map(safeLink).filter(Boolean);if(JSON.stringify(u.galleryImages||[])!==JSON.stringify(urls)){u.galleryImages=urls;changed=true;}}
   if(Array.isArray(data.programs)&&JSON.stringify(u.programs)!==JSON.stringify(data.programs)){u.programs=data.programs;changed=true;}
  });
  if(changed&&typeof render==='function')render();
