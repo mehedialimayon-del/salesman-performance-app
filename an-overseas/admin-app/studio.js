@@ -96,9 +96,9 @@ async function saveManagement(){
  await showManagement();
 }
 function storiesPanel(){
- const row=s=>'<article class="studio-media-row" data-story-id="'+E(s.id||'')+'"><div class="studio-preview">'+
+ const row=(s,i)=>'<article class="studio-media-row" data-story-id="'+E(s.id||'index:'+i)+'"><div class="studio-preview">'+
  (s.type==='video'?'<video src="'+E(s.media_url)+'" playsinline muted preload="metadata"></video>':'<img alt="" src="'+E(s.media_url)+'" loading="lazy">')+
- '</div><div><b>'+E(s.title||'Untitled')+'</b><p>'+E(s.description||'')+'</p><small>'+dstr(s.created_at)+' · '+(s.approved?'Published':'Draft')+'</small></div><div class="actions">'+action(s.approved?'Unpublish':'Publish','toggle-story',s.id)+' '+action('Edit','edit-story',s.id)+' '+action('Remove','remove-story',s.id,'danger')+'</div></article>';
+ '</div><div><b>'+E(s.title||'Untitled')+'</b><p>'+E(s.description||'')+'</p><small>'+dstr(s.created_at)+' · '+(s.approved?'Published':'Draft')+'</small></div><div class="actions">'+action(s.approved?'Unpublish':'Publish','toggle-story',s.id||'index:'+i)+' '+action('Edit','edit-story',s.id||'index:'+i)+' '+action('Remove','remove-story',s.id||'index:'+i,'danger')+'</div></article>';
  wrap('Success <em>Stories</em>','Publish YouTube-style photo and video cards with captions, playable directly on the public site.',
  panel('<h2>Upload a Success Story</h2><form id="studio-story-form">'+fld('title','Video / Photo Title','')
  +area('description','Description / Student Achievement','')
@@ -123,7 +123,7 @@ async function addStory(f){
  await showStories();
 }
 async function mutateStory(cmd,id){
- const i=stories.findIndex(x=>String(x.id)===id);if(i<0)throw Error('Story not found');
+ const i=id.startsWith('index:')?Number(id.slice(6)):stories.findIndex(x=>String(x.id)===id);if(!Number.isInteger(i)||i<0||i>=stories.length)throw Error('Story not found');
  const list=stories.map(x=>({...x}));
  if(cmd==='toggle-story'){list[i].approved=!list[i].approved;}
  else if(cmd==='remove-story'){if(!confirm('Remove this story from the website?'))return;list.splice(i,1);}
@@ -204,12 +204,12 @@ document.addEventListener('click',async e=>{
  const command=button.dataset.studio,id=button.dataset.id||'';
  button.disabled=true;
  try{
-  if(command==='add-team'){management.push({});paintManagement();}
+  if(command==='add-team'){const i=management.length;management.push({});document.querySelector('#studio-team-list')?.insertAdjacentHTML('beforeend',teamRow({},i));}
   else if(command==='remove-team'){
    if(!confirm('Remove this person after publishing?'))return;
    const row=button.closest('.team-item');row?.remove();
   }else if(command==='save-team')await saveManagement();
-  else if(command==='add-country'){countries.push(['','','']);paintCountries();}
+  else if(command==='add-country'){const i=countries.length;countries.push(['','','']);document.querySelector('#studio-country-list')?.insertAdjacentHTML('beforeend',countryRow(['','',''],i));}
   else if(command==='remove-country'){button.closest('.country-item')?.remove();}
   else if(command==='save-countries')await saveCountries();
   else if(['toggle-story','remove-story','edit-story'].includes(command))await mutateStory(command,id);
