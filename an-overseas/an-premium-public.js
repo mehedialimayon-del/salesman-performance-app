@@ -59,29 +59,28 @@ function showTeam(){
  }
  teamIndex=(teamIndex+members.length)%members.length;
  arrows.forEach(x=>x.disabled=members.length<2);
- const m=members[teamIndex];
- const photo=url(m.photo),portfolio=url(m.portfolio),email=String(m.email||'').trim(),phone=contactNumber(m.phone);
+ const m=members[teamIndex],photo=url(m.photo),portfolio=url(m.portfolio);
+ const email=String(m.email||'').trim(),phone=contactNumber(m.phone);
  const validEmail=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
  const role=String(m.position||m.designation||m.role||'Management').trim();
- const otherRole=String(m.designation||m.role||'').trim();
- const company=String(m.company||m.department||'').trim();
  const help=String(m.help||m.bio||m.description||'').trim();
- const isOwner=m.id==='nusrat-nasrin'||String(m.name).trim().toLowerCase()==='nusrat nasrin';
+ const isFounder=m.id==='nusrat-nasrin'||String(m.name).trim().toLowerCase()==='nusrat nasrin';
  const imageHtml=photo?'<img class="an-manager-photo" src="'+esc(photo)+'" alt="'+esc(m.name)+'" loading="lazy">'
   :'<div class="an-manager-photo an-manager-photo-empty"><span>A</span>&amp;<span>N</span></div>';
- const emailHtml=validEmail?'<a class="an-manager-field an-manager-email-box" href="mailto:'+esc(email)+'" aria-label="Send email to '+esc(m.name)+'"><span class="an-manager-field-label">EMAIL <span aria-hidden="true">↗</span></span><span class="an-manager-field-value">'+esc(email)+'</span></a>':'';
- const phoneHtml=phone.length>=8?'<a class="an-manager-field an-manager-phone-box" href="tel:'+esc(phone)+'" aria-label="Call '+esc(m.name)+'"><span class="an-manager-field-label">CONTACT NUMBER ↗</span><span class="an-manager-field-value">'+esc(m.phone)+'</span></a>':'';
- const buttonsHtml=(portfolio?'<a class="an-manager-action" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">VIEW PORTFOLIO ↗</a>':'')
-  +(isOwner?'<a class="an-manager-action an-manager-action-secondary" href="./admin-app/" target="_blank" rel="noopener noreferrer">ADMIN PANEL ↗</a>':'');
+ const nameHtml=managerField('NAME',m.name,'an-manager-name-box');
+ const supportHtml=managerField('STUDENT SUPPORT',help,'an-manager-bio-box');
+ const emailHtml=validEmail?'<a class="an-manager-field an-manager-email-box" href="mailto:'+esc(email)+'" aria-label="Email '+esc(m.name)+'"><span class="an-manager-field-label">EMAIL ↗</span><span class="an-manager-field-value">'+esc(email)+'</span></a>':'';
+ const phoneHtml=phone.length>=8?'<a class="an-manager-field an-manager-phone-box" href="tel:'+esc(phone)+'" aria-label="Call '+esc(m.name)+'"><span class="an-manager-field-label">PHONE ↗</span><span class="an-manager-field-value">'+esc(m.phone)+'</span></a>':'';
+ const storyHtml=portfolio
+  ?'<div class="an-manager-trust"><span class="an-manager-trust-label">'+(isFounder?'MEET THE PERSON BEHIND A&N':'DISCOVER THE PERSON BEHIND THE ROLE')+'</span><span class="an-manager-trust-copy">'+(isFounder?'Explore her real academic and professional journey, beyond a company introduction.':'Explore the published background and journey behind this profile.')+'</span></div>'
+  :'';
+ const buttonsHtml=
+   (portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'EXPLORE FOUNDER’S JOURNEY':'EXPLORE THEIR JOURNEY')+' ↗</a>':'')
+  +(isFounder?'<a class="an-manager-action an-manager-action-secondary" href="./admin-app/" target="_blank" rel="noopener noreferrer">ADMIN ↗</a>':'');
  panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role)+'</div>'
   +'<div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
   +'<div class="an-manager-information">'
-  +managerField('NAME',m.name,'an-manager-name-box')
-  +(otherRole&&otherRole!==role?managerField('DESIGNATION',otherRole):'')
-  +managerField('COMPANY',company,'an-manager-company-box')
-  +managerField('STUDENT SUPPORT',help,'an-manager-bio-box')
-  +(m.department&&m.department!==company?managerField('DEPARTMENT',m.department):'')
-  +emailHtml+phoneHtml
+  +nameHtml+supportHtml+emailHtml+phoneHtml+storyHtml
   +'<div class="an-manager-actions">'+buttonsHtml+'</div>'
   +'</div></div>';
  counter.textContent=(teamIndex+1)+' / '+members.length;
