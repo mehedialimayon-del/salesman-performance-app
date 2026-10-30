@@ -51,6 +51,8 @@ public class MainActivity extends Activity {
 
     private final class Notifications {
         @JavascriptInterface
+        public boolean hasNativeFilePicker() { return true; }
+        @JavascriptInterface
         public void notifyNew(String title, String body) {
             runOnUiThread(() -> postAlert(title, body));
         }
