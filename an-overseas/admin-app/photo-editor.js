@@ -144,5 +144,63 @@ async function editBlob(blob,kind){
   throw err;
  }
 }
-window.ANPhotoEditor={editFile,editUrl};
+const guessKind=input=>{
+ if(input.name==='media'||input.name==='story_file')return 'success';
+ if(input.name==='cover_file'||input.name==='card_file')return 'university';
+ if(input.name==='logo_file')return 'logo';
+ if(input.name==='gallery_files')return 'gallery';
+ if(input.closest('.country-item'))return 'country';
+ if(input.closest('.team-item'))return 'team';
+ return 'success';
+};
+async function selectedFile(input,index=0){
+ if(!input)return null;
+ if(input._anCropPending)await input._anCropPending;
+ if(input._anEditedFiles)return input._anEditedFiles[index]||null;
+ return input.files?.[index]||null;
+}
+async function selectedFiles(input){
+ if(!input)return [];
+ if(input._anCropPending)await input._anCropPending;
+ return input._anEditedFiles||Array.from(input.files||[]);
+}
+document.addEventListener('change',event=>{
+ const input=event.target;
+ if(!(input instanceof HTMLInputElement)||input.type!=='file'||!input.files?.length)return;
+ const items=Array.from(input.files);
+ if(!items.some(f=>f.type.startsWith('image/')))return;
+ input._anEditedFiles=null;
+ const promise=(async()=>{
+  const output=[];
+  const preview=input.parentElement?.querySelector('.an-crop-ready')||document.createElement('div');
+  preview.className='an-crop-ready';preview.setAttribute('role','status');
+  if(!preview.isConnected)input.insertAdjacentElement('afterend',preview);
+  preview.textContent='Opening photo adjustment…';
+  for(const file of items){
+   if(!file.type.startsWith('image/')){output.push(file);continue;}
+   const cropped=await editFile(file,guessKind(input));
+   if(!cropped){
+    input.value='';input._anEditedFiles=[];
+    preview.textContent='Photo edit cancelled. Select a photo again when ready.';
+    return;
+   }
+   output.push(cropped);
+  }
+  input._anEditedFiles=output;
+  preview.textContent=output.length+' photo'+(output.length===1?'':'s')+' adjusted ✓ · Zoom and position saved. Press Publish to upload.';
+  if(output.length===1&&output[0].type.startsWith('image/')){
+   const u=URL.createObjectURL(output[0]);
+   let img=preview.querySelector('img');
+   if(!img){img=document.createElement('img');img.className='an-adjusted-preview';preview.appendChild(img);}
+   img.src=u;img.onload=()=>URL.revokeObjectURL(u);
+  }
+ })();
+ input._anCropPending=promise;
+ promise.catch(err=>{
+  input._anEditedFiles=[];input.value='';
+  const label=input.parentElement?.querySelector('.an-crop-ready');
+  if(label)label.textContent='Unable to adjust photo: '+(err.message||err);
+ }).finally(()=>{if(input._anCropPending===promise)input._anCropPending=null;});
+},true);
+window.ANPhotoEditor={editFile,editUrl,selectedFile,selectedFiles};
 })();
