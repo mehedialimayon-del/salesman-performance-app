@@ -30,7 +30,7 @@ universitiesPage=function(){
  +'<div class="wrap content university-catalogue"><div class="catalogue-tools"><label class="catalogue-search"><span>⌕</span><input id="university-search" type="search" value="'+esc(searchTerm)+'" placeholder="Search universities or programmes" aria-label="Search universities and programmes"></label>'
  +'<details class="catalogue-filter"><summary aria-label="Filter universities" title="Filter universities">☷ <span class="filter-word">Filters</span></summary><div class="catalogue-filter-panel">'
  +controls+'<div class="filter-actions"><small>Fee ranges use verified programme examples, not fixed university-wide prices.</small><button type="button" class="catalogue-clear" id="reset-university-filters">Reset filters</button></div>'
- +'</div></details></div><div id="catalogue-count" class="catalogue-count" aria-live="polite"></div><div id="results" class="grid"></div>'
+ +'</div></details><label class="an-scholarship-only"><input id="scholarship-filter" type="checkbox" '+(scholarshipOnly?'checked':'')+'> 🎓 Scholarships only</label></div><div id="catalogue-count" class="catalogue-count" aria-live="polite"></div><div id="results" class="grid"></div>'
  +'<div class="other-university">Your preferred university is not listed? <a href="#/contact">Ask A&N Overseas about another university ↗</a></div>'
  +'<p class="catalogue-footnote">Fees, eligibility and study levels depend on the exact programme. Published fee examples may have different durations and exclusions; always confirm with the official university offer.</p></div>';
 };
@@ -64,7 +64,7 @@ renderResults=function(){
   var all=[u.name,u.short,u.country,u.city].concat(u.programs||[],p.programs||[]).join(' ').toLowerCase();
   var entries=[p.entry,p.intake].join(' ').toLowerCase();
   var subject=pref.subject==='All Subjects'||all.indexOf(pref.subject.toLowerCase())>=0||(pref.subject==='Science'&&/science|biology|chemistry/.test(all));
-  return (filterCountry==='All Countries'||u.country===filterCountry)
+  return (filterCountry==='All Countries'||u.country===filterCountry)&&(!scholarshipOnly||!!window.ANUniversityTools?.scholarship(u.id))
    &&(pref.kind==='All Types'||u.kind===pref.kind)
    &&hasLevel(u,pref.level)&&subject&&passesBudget(feeEstimate(u))
    &&(!requirement||entries.indexOf(requirement)>=0)&&all.indexOf(term)>=0;
@@ -81,7 +81,7 @@ renderResults=function(){
 };
 document.addEventListener('change',function(e){
  var map={'type-filter':'kind','level-filter':'level','subject-filter':'subject','budget-filter':'budget','order-filter':'order'};
- if(map[e.target.id]){pref[map[e.target.id]]=e.target.value;renderResults();}
+ if(map[e.target.id]){pref[map[e.target.id]]=e.target.value;renderResults();}if(e.target.id==='scholarship-filter'){scholarshipOnly=e.target.checked;renderResults();}
 });
 document.addEventListener('input',function(e){
  if(e.target.id==='requirements-filter'){pref.requirement=e.target.value;renderResults();}
@@ -89,7 +89,7 @@ document.addEventListener('input',function(e){
 document.addEventListener('click',function(e){
  if(e.target.id==='reset-university-filters'){
   pref={kind:'All Types',level:'All Levels',subject:'All Subjects',budget:'Any Budget',order:'Featured',requirement:''};
-  filterCountry='Malaysia';searchTerm='';render();return;
+  filterCountry='Malaysia';searchTerm='';scholarshipOnly=false;render();return;
  }
  var back=e.target.closest('.university-profile a[href="#/universities"]');
  if(back){var id=(location.hash.split('?')[0].split('/')[2]||''),u=U.find(function(x){return x.id===id;});if(u)back.href='#/universities?country='+encodeURIComponent(u.country);}
