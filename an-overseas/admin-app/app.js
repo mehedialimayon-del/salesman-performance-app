@@ -14,7 +14,8 @@ const panel=x=>'<section class="panel">'+x+'</section>';
 const empty=x=>'<div class="empty">'+esc(x)+'</div>';
 const btn=(label,action,extra='')=>'<button class="btn '+extra+'" type="button" data-action="'+esc(action)+'">'+esc(label)+'</button>';
 const phoneLink=v=>{let n=String(v||'').replace(/[^0-9]/g,'');return n.length>=8?'https://wa.me/'+n:'';};
-let db=null,user=null,admin=false,tab='overview',showEnquiries=true,selectedStudent='',content={},latest=[],management=[],students=[],messages=[],enquiries=[],leads=[],applications=[],requests=[],universityItems=[],badgeSnapshot=null,watch=null;
+const availableTabs=['overview','inbox','applications','website','management','universities','services','success','countries','history','more'];
+let db=null,user=null,admin=false,tab=(availableTabs.includes(location.hash.replace(/^#/,''))?location.hash.slice(1):'overview'),showEnquiries=true,selectedStudent='',content={},latest=[],management=[],students=[],messages=[],enquiries=[],leads=[],applications=[],requests=[],universityItems=[],badgeSnapshot=null,watch=null;
 function toast(msg){const e=$('toast');e.textContent=String(msg);e.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>e.classList.remove('show'),4800);}
 function errorMsg(e){toast(e?.message||String(e));}
 function loading(){ $('main').innerHTML='<div class="loading"><div class="spinner"></div><p>Loading securely…</p></div>'; }
