@@ -96,11 +96,14 @@ async function inbox(){
  await badgeUpdate(false);
 }
 async function files(){
+ const docsPromise=query('an_documents',{order:'created_at',limit:250});
  [applications,leads]=await Promise.all([query('an_applications',{order:'created_at',limit:250}),query('an_portal_leads',{order:'created_at',limit:250})]);
+ const documents=await docsPromise;
  let statuses=['submitted','review','documents_required','offer','visa_processing','visa_approved','arrived','closed'];
  const apps=applications.map(a=>'<article class="record"><div class="split"><b>'+esc(a.applicant_name)+'</b><span class="pill">'+esc(a.status)+'</span></div><p>'+esc(a.university_id||'')+' · '+esc(a.programme||'')+'</p><p class="meta">'+date(a.created_at)+' · '+esc(a.email||'')+'</p><form data-application="'+esc(a.id)+'"><div class="grid-fields"><label class="field">Application Status<select name="status">'+statuses.map(s=>option(s,a.status)).join('')+'</select></label><label class="field">EMGS Progress (0–100%)<input type="number" name="emgs_percent" min="0" max="100" value="'+Number(a.emgs_percent||0)+'"></label></div><button class="btn sm" type="submit" style="margin-top:10px">Save Live Status</button></form></article>').join('');
  const ls=leads.map(x=>'<div class="record"><div class="split"><b>'+esc(x.full_name)+'</b><span class="pill">'+esc(x.state)+'</span></div><p>'+esc(x.email)+' · '+esc(x.mobile)+'</p><p>'+esc(x.country||'')+' / '+esc(x.university||'')+'</p><form data-lead="'+esc(x.id)+'"><div class="grid-fields"><label class="field">Review<select name="state">'+['new','review','approved','closed'].map(s=>option(s,x.state)).join('')+'</select></label><label class="field">Payment<select name="payment_status">'+['unpaid','pending','confirmed'].map(s=>option(s,x.payment_status)).join('')+'</select></label></div><button type="submit" class="btn sm" style="margin-top:10px">Update</button></form></div>').join('');
- page(head('Student','Files','Application management and verified EMGS progress.')+panel('<h2>Applications ('+applications.length+')</h2>'+(apps||empty('No applications submitted yet.')))+panel('<h2>Student Leads ('+leads.length+')</h2>'+(ls||empty('No new student registration leads yet.'))));
+ const docsHtml=documents.map(d=>'<div class="record"><b>'+esc(d.display_name||'Student document')+'</b><p>'+esc(d.category||'')+' · '+date(d.created_at)+'</p><button type="button" class="btn sm alt" data-private-document="'+esc(d.storage_path)+'">Open Secure File ↗</button></div>').join('');
+ page(head('Student','Files','Application management and verified EMGS progress.')+panel('<h2>Applications ('+applications.length+')</h2>'+(apps||empty('No applications submitted yet.')))+panel('<h2>Student Leads ('+leads.length+')</h2>'+(ls||empty('No new student registration leads yet.')))+panel('<h2>Private Documents ('+documents.length+')</h2><p class="help">Access restricted; links expire after 90 seconds.</p>'+(docsHtml||empty('No private documents yet.'))));
 }
 async function website(){
  content=await getContent('settings',{});
@@ -196,6 +199,7 @@ document.addEventListener('click',async e=>{
  const rm=e.target.closest('[data-remove-person]');if(rm){rm.closest('.team-item').remove();return;}
  const en=e.target.closest('[data-enquiry]');
  if(en){try{const{error}=await db.from('an_enquiries').update({status:en.dataset.status}).eq('id',en.dataset.enquiry);if(error)throw error;toast('Enquiry updated.');await inbox();}catch(err){errorMsg(err);}return;}
+ const file=e.target.closest('[data-private-document]');if(file){try{const{data,error}=await db.storage.from('an-student-files').createSignedUrl(file.dataset.privateDocument,90);if(error)throw error;window.open(data.signedUrl,'_blank','noopener');}catch(err){errorMsg(err);}return;}
  const uni=e.target.closest('[data-edit-university]');if(uni){const u=universityItems.find(x=>x.id===uni.dataset.editUniversity);if(u){const f=$('university-form');Object.keys(u).forEach(k=>{const c=f.elements.namedItem(k);if(c)c.value=Array.isArray(u[k])?u[k].join(', '):u[k]||'';});f.scrollIntoView({behavior:'smooth'});}return;}
 });
 document.addEventListener('change',async e=>{if(e.target.id==='choose-student'){selectedStudent=e.target.value;await inbox();}});
