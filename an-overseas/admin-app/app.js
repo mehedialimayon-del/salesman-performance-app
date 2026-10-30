@@ -51,7 +51,7 @@ async function draw(next,fromBack=false){
   else if(tab==='inbox')await inbox();
   else if(tab==='applications')await files();
   else if(tab==='website')await website();
-  else if(tab==='management')await managementPage();
+  else if(['management','success','countries','history'].includes(tab))await window.ANStudio.show(tab);
   else if(tab==='universities')await universityPage();
   else if(tab==='services')await servicesPage();
   else await more();
@@ -149,7 +149,10 @@ async function servicesPage(){
 }
 async function more(){
  page(head('Admin','Tools','Manage the entire A&N Overseas business.')+panel('<h2>Additional Management</h2>'
- +'<button class="link-card" data-action="team" style="width:100%">Management / Team <span>↗</span></button>'
+ +'<button class="link-card" data-action="team" style="width:100%">Management & Personal Contacts <span>↗</span></button>'
+ +'<button class="link-card" data-action="success" style="width:100%">Success Stories · Upload Photos & Videos <span>↗</span></button>'
+ +'<button class="link-card" data-action="countries" style="width:100%">Study Destinations · Photos <span>↗</span></button>'
+ +'<button class="link-card" data-action="history" style="width:100%">Website Change History & Restore <span>↗</span></button>'
  +'<button class="link-card" data-action="unis" style="width:100%">University Catalogue <span>↗</span></button>'
  +'<button class="link-card" data-action="service" style="width:100%">Student Service Requests <span>↗</span></button>')
  +panel('<h2>Account & Website</h2><p class="muted">'+esc(user.email||'')+'</p>'
@@ -192,6 +195,7 @@ document.addEventListener('click',async e=>{
   if(a==='refresh')await draw();
   if(a==='open-inbox')await draw('inbox');if(a==='open-files')await draw('applications');if(a==='open-website')await draw('website');
   if(a==='team')await draw('management');if(a==='unis')await draw('universities');if(a==='service')await draw('services');
+  if(a==='success')await draw('success');if(a==='countries')await draw('countries');if(a==='history')await draw('history');
   if(a==='logout')await signOut();if(a==='notifications')await notifications();
   if(a==='show-enquiries'){showEnquiries=true;await inbox();}
   if(a==='show-messages'){showEnquiries=false;await inbox();}
@@ -239,15 +243,14 @@ document.addEventListener('submit',async e=>{
  finally{if(submit)submit.disabled=false;}
 });
 function newFormFromRow(row){const form=document.createElement('form');row.querySelectorAll('input,textarea,select').forEach(x=>{const c=x.cloneNode(true);c.value=x.value;form.appendChild(c);});return form;}
-$('notify').addEventListener('click',notifications);
-$('refresh').addEventListener('click',()=>draw());
 $('refresh').addEventListener('click',()=>{void draw();});
 $('notify').addEventListener('click',()=>{void notifications();});
-window.addEventListener('popstate',event=>{const requested=event.state?.anAdminTab||location.hash.slice(1)||'overview';const allowed=['overview','inbox','applications','website','management','universities','services','more'];void draw(allowed.includes(requested)?requested:'overview',true);});
+window.addEventListener('popstate',event=>{const requested=event.state?.anAdminTab||location.hash.slice(1)||'overview';const allowed=['overview','inbox','applications','website','management','universities','services','success','countries','history','more'];void draw(allowed.includes(requested)?requested:'overview',true);});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&admin)badgeUpdate(true);});
 setInterval(()=>{if(admin&&document.visibilityState==='visible')badgeUpdate(true);},45000);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 if(!window.supabase||!window.supabase.createClient){loginUI('Connection library unavailable. Please check your internet access.');return;}
 db=window.supabase.createClient(URL_ROOT,PUBLIC_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'an-admin-app-session'}});
+window.ANAdminBridge={db:()=>db,authorized:()=>admin,getContent,publish,user:()=>user};
 void checkAuth();
 })();
