@@ -269,7 +269,7 @@ document.addEventListener('submit',async e=>{
  finally{if(submit)submit.disabled=false;}
 });
 function newFormFromRow(row){const form=document.createElement('form');row.querySelectorAll('input,textarea,select').forEach(x=>{const c=x.cloneNode(true);c.value=x.value;form.appendChild(c);});return form;}
-$('refresh').addEventListener('click',()=>{void draw();});
+$('refresh').addEventListener('click',()=>{window.location.reload();});
 $('notify').addEventListener('click',()=>{void notifications();});
 window.addEventListener('popstate',event=>{const requested=event.state?.anAdminTab||location.hash.slice(1)||'overview';const allowed=['overview','inbox','applications','website','management','universities','services','success','countries','history','more'];void draw(allowed.includes(requested)?requested:'overview',true);});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&admin)badgeUpdate(true);});
