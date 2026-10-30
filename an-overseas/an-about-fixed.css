@@ -389,3 +389,29 @@ body.an-about-locked #app>.an-about-fixed{grid-template-rows:minmax(0,1fr) minma
  #app .an-manager-field{padding:2px 5px!important}
  #app .an-manager-information{gap:1px!important}
 }
+
+
+/* Automated visual QA 360x760 + 1366x768: prevent portfolio/action clipping. */
+#app .an-manager-information{gap:2px!important;justify-content:center!important}
+#app .an-manager-field{padding:2px 6px!important;gap:0!important}
+#app .an-manager-trust{padding:2px 6px!important;gap:1px!important}
+#app .an-manager-actions{gap:3px!important;margin-top:0!important}
+#app .an-manager-actions .an-manager-action{
+ min-height:23px!important;
+ padding:3px 6px!important;
+ font-size:clamp(8px,.82vw,10px)!important
+}
+@media(min-width:801px){
+ #app .an-manager-main{grid-template-columns:minmax(125px,195px) minmax(0,1fr)!important;gap:15px!important}
+ #app .an-manager-photo-box{max-width:195px!important}
+ #app .an-manager-photo{object-position:center 20%!important}
+ #app .an-manager-information{gap:2px!important}
+ #app .an-manager-field{padding:3px 7px!important}
+ #app .an-manager-trust{padding:2px 7px!important}
+}
+@media(max-width:800px){
+ #app .an-manager-field{padding:2px 5px!important}
+ #app .an-manager-trust{padding:2px 5px!important}
+ #app .an-manager-trust-copy{line-height:1.1!important}
+ #app .an-manager-actions .an-manager-action{padding:3px 4px!important;min-height:23px!important}
+}
