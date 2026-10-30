@@ -25,7 +25,7 @@ async function publish(key,value){if(!admin||!user)throw Error('Admin access req
 function loginUI(message=''){
  $('nav').hidden=true;
  page('<div class="panel hero-panel" style="margin-top:14px"><p class="eyebrow">Secure management access</p><strong>A&N <span style="color:#ff961b">Overseas</span></strong><small>ADMIN APP · AUTHORIZED ACCOUNT ONLY</small></div>'
- +panel('<h2>Welcome back</h2><p class="sub">Sign in once. Your encrypted session is retained on this device until sign-out or expiry.</p><form id="login-form">'
+ +panel('<h2>Welcome back</h2><p class="sub">Sign in once. Your secure login stays saved on this device until sign-out or session expiry.</p><form id="login-form">'
  +field('email','Admin Email',ADMIN_EMAIL,false,false,'email')+field('password','Password','',false,false,'password')
  +'<button class="btn" style="width:100%;margin-top:20px" type="submit">Sign In Securely</button></form>'
  +(message?'<p class="sub" style="color:#f88">'+esc(message)+'</p>':'')
@@ -42,8 +42,8 @@ async function checkAuth(){
 }
 async function signOut(){if(watch){db.removeChannel(watch);watch=null;}await db.auth.signOut();user=null;admin=false;badgeSnapshot=null;loginUI();}
 function setNav(active){document.querySelectorAll('[data-nav]').forEach(n=>n.classList.toggle('active',n.dataset.nav===active));}
-async function draw(next){
- if(next)tab=next;
+async function draw(next,fromBack=false){
+ if(next&&next!==tab){if(!fromBack)history.pushState({anAdminTab:next},'', '#'+next);tab=next;}
  if(!admin)return loginUI();
  loading();setNav(tab);
  try{
@@ -167,6 +167,7 @@ async function badgeUpdate(alertNew){
  const n=en.error?0:en.count||0;const bubble=$('inbox-count');bubble.hidden=!n;bubble.textContent=n>99?'99+':n;
 }
 async function notifyUser(title,body){
+ if(window.ANAndroid&&typeof window.ANAndroid.notifyNew==='function'){window.ANAndroid.notifyNew(title,body);return;}
  if(!('Notification' in window)||Notification.permission!=='granted'||!('serviceWorker' in navigator))return;
  try{const reg=await navigator.serviceWorker.ready;await reg.showNotification(title,{body,icon:'./icon.svg',tag:'an-admin-alert'});}catch(_){}
 }
@@ -178,6 +179,7 @@ function startWatch(){
  badgeUpdate(false);
 }
 async function notifications(){
+ if(window.ANAndroid&&typeof window.ANAndroid.notifyNew==='function'){toast('Android app alerts are available while the app is open. Allow notifications in Android Settings.');return;}
  if(!('Notification' in window)){toast('This browser does not support notification permission.');return;}
  if(Notification.permission==='granted'){toast('Notifications enabled while the app is active.');return;}
  const p=await Notification.requestPermission();toast(p==='granted'?'Alerts enabled for this device.':'Notification permission not granted.');
@@ -239,6 +241,9 @@ document.addEventListener('submit',async e=>{
 function newFormFromRow(row){const form=document.createElement('form');row.querySelectorAll('input,textarea,select').forEach(x=>{const c=x.cloneNode(true);c.value=x.value;form.appendChild(c);});return form;}
 $('notify').addEventListener('click',notifications);
 $('refresh').addEventListener('click',()=>draw());
+$('refresh').addEventListener('click',()=>{void draw();});
+$('notify').addEventListener('click',()=>{void notifications();});
+window.addEventListener('popstate',event=>{const requested=event.state?.anAdminTab||location.hash.slice(1)||'overview';const allowed=['overview','inbox','applications','website','management','universities','services','more'];void draw(allowed.includes(requested)?requested:'overview',true);});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&admin)badgeUpdate(true);});
 setInterval(()=>{if(admin&&document.visibilityState==='visible')badgeUpdate(true);},45000);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
