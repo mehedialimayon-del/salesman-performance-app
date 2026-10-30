@@ -50,17 +50,21 @@ function applyPage(){
  }
  const d=document.querySelector('body.home-view .home-description');
  if(d&&settings.heroDescription&&d.textContent!==settings.heroDescription)d.textContent=settings.heroDescription;
- if(location.hash.startsWith('#/about')){
-  const wrap=document.querySelector('#app>.wrap.content');
-  const about=wrap?.querySelector('.white > p');
-  if(about&&settings.about&&about.textContent!==settings.about)about.textContent=settings.about;
-  if(wrap&&team.length&&!document.getElementById('an-public-management')){
-   const el=document.createElement('section');el.id='an-public-management';el.className='white mt';
-   el.innerHTML='<h2>Our Management Team</h2><div class="grid">'+team.map(p=>{
-    const photo=safeLink(p.photo);
-    return '<article class="card">'+(photo?'<img alt="'+esc(p.name||'')+'" src="'+esc(photo)+'" loading="lazy" style="width:100%;height:140px;object-fit:cover">':'')+'<div class="inside"><h3>'+esc(p.name)+'</h3><p>'+esc(p.role)+'</p><p>'+esc(p.description)+'</p></div></article>';
-   }).join('')+'</div>';wrap.appendChild(el);
+ // Only the fixed About carousel in an-premium-public.js can render management members.
+ // This bridge updates public text in place; it must never append a second team grid.
+ if(location.hash.split('?')[0]==='#/about'){
+  const summary=document.getElementById('an-about-intro');
+  if(summary&&settings.about)summary.textContent=settings.about;
+  const office=document.querySelectorAll('#an-about-fixed .an-about-locations span');
+  if(office.length===2){
+   office[0].textContent='🇲🇾 '+(settings.malaysiaOffice||'Kuala Lumpur, Malaysia');
+   office[1].textContent='🇧🇩 '+(settings.bangladeshOffice||'Rangpur, Bangladesh');
   }
+ }
+ if(location.hash.split('?')[0]==='#/aboutdetails'){
+  const full=document.getElementById('an-about-full'),work=document.getElementById('an-about-work');
+  if(full&&settings.about)full.textContent=settings.about;
+  if(work&&settings.work)work.textContent=settings.work;
  }
  if(location.hash.startsWith('#/contact')){
   const c=document.querySelector('#app .wrap.content .card .inside');
