@@ -152,7 +152,7 @@ async function universityPage(){
  +'<label class="field studio-upload wide">Upload University Cover Photo<input type="file" name="cover_file" accept="image/jpeg,image/png,image/webp"></label>'
  +'<label class="field studio-upload wide">Upload University Logo<input type="file" name="logo_file" accept="image/jpeg,image/png,image/webp"></label>'
  +'<label class="field studio-upload wide">Add Multiple Campus / Gallery Photos<input type="file" name="gallery_files" accept="image/jpeg,image/png,image/webp" multiple></label>'
- +'<p class="help">No photo URL is required. Images must be permitted for publication and smaller than 8 MB each.</p>'
+ +'<p class="help">After choosing a photo, drag to reposition, pinch or slide to zoom, then tap Use This Photo. The saved crop fits its card shape. JPG, PNG and WebP under 8 MB.</p>'
  +'</div><button class="btn" type="submit" style="width:100%;margin-top:15px">Upload & Publish University</button></form>')
  +panel('<h2>Edited Universities ('+universityItems.length+')</h2>'+(universityItems.length?universityItems.map(u=>'<div class="record"><b>'+esc(u.name||u.id)+'</b><p>'+esc(u.id)+' · '+esc(u.city||'')+'</p><button class="btn sm alt" data-edit-university="'+esc(u.id)+'">Edit in Form</button></div>').join(''):empty('No overrides added yet. Existing university profiles are unchanged.'))));
 }
@@ -252,9 +252,9 @@ document.addEventListener('submit',async e=>{
    if(data.site&&data.site!=='https://'&&!/^https:\/\//.test(data.site))throw Error('Official URL must begin https://');
    const previous=universityItems.find(x=>x.id===id)||{};
    const item={...previous,id,name:String(data.name).trim(),short:String(data.short||'').trim(),country:String(data.country||'Malaysia').trim(),city:String(data.city||'').trim(),kind:data.kind==='Private'?'Private':'Public',site:data.site||'',programs:String(data.programs||'').split(',').map(s=>s.trim()).filter(Boolean)};
-   const cover=form.querySelector('[name="cover_file"]')?.files?.[0];
-   const logo=form.querySelector('[name="logo_file"]')?.files?.[0];
-   const gallery=form.querySelector('[name="gallery_files"]')?.files;
+   const cover=await window.ANPhotoEditor.selectedFile(form.querySelector('[name="cover_file"]'));
+   const logo=await window.ANPhotoEditor.selectedFile(form.querySelector('[name="logo_file"]'));
+   const gallery=await window.ANPhotoEditor.selectedFiles(form.querySelector('[name="gallery_files"]'));
    if(cover?.size){toast('Uploading university cover image...');item.cardImageUrl=await uploadUniversityImage(cover,'uni-cover');}
    if(logo?.size){toast('Uploading official logo...');item.logoImageUrl=await uploadUniversityImage(logo,'uni-logo');}
    if(gallery?.length){
