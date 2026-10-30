@@ -3,7 +3,7 @@
 'use strict';
 const ROOT='https://svpgjrxeqnluipsgjywk.supabase.co';
 const KEY='sb_publishable_eR5TZxv2aWndxdwzU0RIUA_mXWcBcO3';
-let stories=[],countries=null,team=[],snapshot='',working=false;
+let stories=[],countries=null,team=[],teamIndex=0,snapshot='',working=false;
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const url=x=>{try{const u=new URL(x);return u.protocol==='https:'?u.href:'';}catch{return'';}};
 const img=x=>url(x)||(String(x||'').startsWith('photo-')?'https://images.unsplash.com/'+x+'?w=900&q=85&auto=format&fit=crop':'');
@@ -37,29 +37,48 @@ function showCountries(){
  }).join('');
 }
 function contactNumber(n){return String(n||'').replace(/[^0-9+]/g,'');}
+function activeMembers(){return team.filter(m=>m&&String(m.name||'').trim());}
+function positionHeading(role){
+ const words=String(role||'MANAGEMENT').trim().split(/\s+/).filter(Boolean);
+ const cut=Math.max(1,Math.ceil(words.length/2));
+ const orange=esc(words.slice(0,cut).join(' ')),white=esc(words.slice(cut).join(' '));
+ return '<span class="an-role-orange">'+orange+'</span>'+(white?' <span class="an-role-white">'+white+'</span>':'');
+}
 function showTeam(){
  if(current()!=='about')return;
- const mount=document.querySelector('#app>.wrap.content');if(!mount)return;
- let el=document.getElementById('an-public-management');
- if(!team.length){if(el)el.remove();return;}
- if(!el){el=document.createElement('section');el.id='an-public-management';mount.appendChild(el);}
- el.className='an-team-section';
- el.innerHTML='<div class="an-team-head"><span>THE PEOPLE BEHIND YOUR JOURNEY</span><h2><em>Meet Our</em> Management</h2></div><div class="an-team-grid">'
- +team.filter(p=>p&&p.name).map(p=>{
-  const photo=url(p.photo),portfolio=url(p.portfolio),phone=contactNumber(p.phone),email=String(p.email||'');
-  const title=p.designation||p.role||p.position||'',subtitle=p.position&&p.position!==title?p.position:'';
-  const description=p.help||p.bio||p.description||'';
-  const badge=photo?'<img class="an-team-photo" src="'+esc(photo)+'" alt="'+esc(p.name)+'" loading="lazy">'
-    :'<div class="an-team-monogram">A<span>&</span>N</div>';
-  const links=(portfolio?'<a class="an-team-button" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">View Portfolio ↗</a>':'')
-   +(phone.length>=8?'<a class="an-team-button alt" href="tel:'+esc(phone)+'">Call / Contact</a>':'')
-   +(email&&/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)?'<a class="an-team-button alt" href="mailto:'+encodeURIComponent(email)+'">Email</a>':'');
-  return '<article class="an-team-card">'+badge+'<div class="an-team-body"><h3>'+esc(p.name)+'</h3><b>'+esc(title)+'</b>'
-  +(subtitle?'<div class="an-team-position">'+esc(subtitle)+'</div>':'')
-  +(p.department?'<small>'+esc(p.department)+'</small>':'')
-  +(description?'<p>'+esc(description)+'</p>':'')
-  +'<div class="an-team-links">'+links+'</div></div></article>';
- }).join('')+'</div>';
+ const panel=document.getElementById('an-manager-card'),counter=document.getElementById('an-manager-counter');
+ if(!panel||!counter)return;
+ const members=activeMembers();
+ const buttons=[...document.querySelectorAll('.an-manager-controls [data-an-manager]')];
+ if(!members.length){
+  panel.innerHTML='<div class="an-manager-role-banner">OUR TEAM</div><div class="an-manager-empty">Management profiles will appear here after publication.</div>';
+  counter.textContent='0 / 0';buttons.forEach(x=>x.disabled=true);return;
+ }
+ teamIndex=(teamIndex+members.length)%members.length;
+ buttons.forEach(x=>x.disabled=members.length<2);
+ const m=members[teamIndex],photo=url(m.photo),portfolio=url(m.portfolio),
+       email=String(m.email||'').trim(),phone=contactNumber(m.phone);
+ const role=String(m.position||m.designation||m.role||'Management').trim();
+ const otherRole=String(m.designation||m.role||'').trim();
+ const company=m.company||m.department||'';
+ const help=m.help||m.bio||m.description||'';
+ const isOwner=m.id==='nusrat-nasrin'||String(m.name).trim().toLowerCase()==='nusrat nasrin';
+ const imageHtml=photo?'<img class="an-manager-photo" src="'+esc(photo)+'" alt="'+esc(m.name)+'" loading="lazy">'
+   :'<div class="an-manager-photo an-manager-photo-empty"><span>A</span>&amp;<span>N</span></div>';
+ const buttonsHtml=
+   (portfolio?'<a class="an-manager-action" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">View Portfolio ↗</a>':'')
+  +(isOwner?'<a class="an-manager-action an-manager-action-secondary" href="./admin-app/" target="_blank" rel="noopener noreferrer">Admin Panel ↗</a>':'')
+  +(phone.length>=8?'<a class="an-manager-contact-link" href="tel:'+esc(phone)+'" aria-label="Call '+esc(m.name)+'">☎</a>':'')
+  +(email&&/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)?'<a class="an-manager-contact-link" href="mailto:'+encodeURIComponent(email)+'" aria-label="Email '+esc(m.name)+'">✉</a>':'');
+ panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role)+'</div>'
+  +'<div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
+  +'<div class="an-manager-information"><h3>'+esc(m.name)+'</h3>'
+  +(otherRole&&otherRole!==role?'<p class="an-manager-small-role">'+esc(otherRole)+'</p>':'')
+  +(company?'<p class="an-manager-company">'+esc(company)+'</p>':'')
+  +(help?'<p class="an-manager-bio">'+esc(help)+'</p>':'')
+  +(m.department&&m.department!==company?'<small class="an-manager-department">'+esc(m.department)+'</small>':'')
+  +'<div class="an-manager-actions">'+buttonsHtml+'</div></div></div>';
+ counter.textContent=(teamIndex+1)+' / '+members.length;
 }
 function apply(){
  if(current()==='success')showStories();
@@ -82,6 +101,25 @@ async function load(){
   apply();
  }finally{working=false;}
 }
+document.addEventListener('click',e=>{
+ const arrow=e.target.closest('[data-an-manager]');
+ if(!arrow||current()!=='about'||arrow.disabled)return;
+ const count=activeMembers().length;
+ if(count<2)return;
+ teamIndex=(teamIndex+Number(arrow.dataset.anManager)+count)%count;
+ showTeam();
+});
+let startX=null;
+document.addEventListener('touchstart',e=>{
+ if(current()==='about'&&e.target.closest('#an-manager-card'))startX=e.touches[0]?.clientX??null;
+},{passive:true});
+document.addEventListener('touchend',e=>{
+ if(startX===null||current()!=='about')return;
+ const next=e.changedTouches[0]?.clientX??startX,delta=next-startX;
+ startX=null;
+ if(Math.abs(delta)<50||activeMembers().length<2)return;
+ teamIndex=(teamIndex+(delta<0?1:-1)+activeMembers().length)%activeMembers().length;showTeam();
+},{passive:true});
 document.addEventListener('click',e=>{
  const target=e.target.closest('[data-an-preview]');if(!target)return;
  const src=url(target.dataset.anPreview);if(!src)return;
