@@ -47,3 +47,8 @@ body:not(.home-view) #app .white input,body:not(.home-view) #app .white textarea
 body:not(.home-view) #app .white input::placeholder,body:not(.home-view) #app .white textarea::placeholder{color:#a9afbb}
 body:not(.home-view) #app .white .doccard{background:#171a22;border-color:#604324;color:#fff}
 body:not(.home-view) #app .white .doccard b{color:#fff}
+
+/* The uploaded editor crop ratio must equal the displayed photo ratio. */
+#an-public-management .an-team-photo,#an-public-management .an-team-monogram{height:auto!important;max-height:none!important;aspect-ratio:4/5;object-fit:cover;object-position:center}
+.country-tiles .country,.country-tiles .an-country-card{aspect-ratio:4/3!important;min-height:0!important;background-position:center!important}
+@media(max-width:590px){.country-tiles .country,.country-tiles .an-country-card{aspect-ratio:4/3!important;min-height:0!important;padding:9px!important}.country-tiles .country strong{font-size:13px!important}.country-tiles .country small{font-size:10px!important}.country-tiles .country .flag{font-size:24px!important}}
