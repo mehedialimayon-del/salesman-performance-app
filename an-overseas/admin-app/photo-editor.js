@@ -51,7 +51,13 @@ async function editBlob(blob,kind){
    +'<button type="button" class="an-crop-secondary" data-crop="cancel">Cancel</button><button type="button" class="an-crop-primary" data-crop="save">✓ Use This Photo</button></div>'
    +'<p class="an-crop-status" role="status"></p></div>';
   document.body.appendChild(dialog);
-  const canvas=dialog.querySelector('canvas'),ctx=canvas.getContext('2d',{alpha:false});
+  const canvas=dialog.querySelector('canvas'),ctx=canvas.getContext('2d',{alpha:kind==='logo'});
+  const box=dialog.querySelector('.an-crop-canvas-box');
+  const maxW=Math.max(220,Math.min(600,window.innerWidth-48));
+  const maxH=Math.max(170,Math.min(515,window.innerHeight*.49));
+  const actualW=Math.min(maxW,maxH*ratio.w/ratio.h);
+  box.style.width=actualW+'px';box.style.height=(actualW*ratio.h/ratio.w)+'px';
+  canvas.style.width='100%';canvas.style.height='100%';
   const w=canvas.width,h=canvas.height,base=Math.max(w/iw,h/ih);
   const slider=dialog.querySelector('[data-crop-zoom]'),label=dialog.querySelector('[data-zoom-value]');
   let zoom=1,offsetX=0,offsetY=0,frame=null,finished=false;
@@ -65,7 +71,8 @@ async function editBlob(blob,kind){
   };
   const render=()=>{
    frame=null;clamp();
-   ctx.fillStyle='#090a0e';ctx.fillRect(0,0,w,h);
+   ctx.clearRect(0,0,w,h);
+   if(kind!=='logo'){ctx.fillStyle='#090a0e';ctx.fillRect(0,0,w,h);}
    const sw=iw*base*zoom,sh=ih*base*zoom;
    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
    ctx.drawImage(photo,(w-sw)/2+offsetX,(h-sh)/2+offsetY,sw,sh);
@@ -127,9 +134,10 @@ async function editBlob(blob,kind){
     const status=dialog.querySelector('.an-crop-status');
     try{
      render();
-     const result=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('Cannot export adjusted photo.')),'image/jpeg',.91));
-     const name='an-photo-'+Date.now()+'.jpg';
-     close(new File([result],name,{type:'image/jpeg',lastModified:Date.now()}));
+     const type=kind==='logo'?'image/png':'image/jpeg';
+     const result=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('Cannot export adjusted photo.')),type,.91));
+     const name='an-photo-'+Date.now()+(kind==='logo'?'.png':'.jpg');
+     close(new File([result],name,{type,lastModified:Date.now()}));
     }catch(err){status.textContent=err.message||String(err);button.disabled=false;}
    }
   });
