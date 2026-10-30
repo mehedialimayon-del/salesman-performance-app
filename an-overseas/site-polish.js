@@ -8,6 +8,7 @@ const servicePhotos=[
  'photo-1476514525535-07fb3b4ae5f1','photo-1551836022-d5d88e9218df',
  'photo-1523289333742-be1143f6b766','photo-1513258496099-48168024aec0'
 ];
+const namedServicePhotos={'Job Search Assistance':'photo-1497366754035-f200968a6e72','Air Ticket Assistance':'photo-1436491865332-7a61a109cc05','Hotel Booking Support':'photo-1566073771259-6a8506099945','Tourist Visa Guidance':'photo-1488646953014-85cb44e25828'};
 let latest=[],managerIndex=0,renderQueued=false,tickerSignature='',tickerWindowWidth=0;
 const AN_TICKER_SPEED=58; // readable pixels per second
 
@@ -126,7 +127,7 @@ function applyDetails(){
 }
 function services(){
  const cards=document.querySelectorAll('#app>.wrap.content>.grid>.card');if(!cards.length)return;
- cards.forEach((card,i)=>{if(card.querySelector('.an-service-picture'))return;card.classList.add('an-service-card');const figure=document.createElement('div');figure.className='an-service-picture';const img=document.createElement('img');img.loading='lazy';img.alt=card.querySelector('h3')?.textContent||'A&N student support';img.src='https://images.unsplash.com/'+servicePhotos[i%servicePhotos.length]+'?auto=format&fit=crop&w=630&q=77';figure.append(img);card.insertBefore(figure,card.firstChild);});
+ cards.forEach((card,i)=>{if(card.querySelector('.an-service-picture'))return;card.classList.add('an-service-card');const figure=document.createElement('div');figure.className='an-service-picture';const img=document.createElement('img');img.loading='lazy';img.alt=card.querySelector('h3')?.textContent||'A&N student support';img.src='https://images.unsplash.com/'+(namedServicePhotos[card.querySelector('h3')?.textContent?.trim()]||servicePhotos[i%servicePhotos.length])+'?auto=format&fit=crop&w=630&q=77';figure.append(img);card.insertBefore(figure,card.firstChild);});
 }
 function page(){
  bar();
