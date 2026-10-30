@@ -209,7 +209,7 @@ document.addEventListener('click',e=>{
  if(!input||!authorized()||!window.ANAndroid)return;
  try{if(typeof window.ANAndroid.hasNativeFilePicker==='function'&&window.ANAndroid.hasNativeFilePicker())return;}catch(_){}
  e.preventDefault();e.stopImmediatePropagation();
- const section=['management','countries','success','universities'].includes(mode)?mode:'universities';
+ const section=input.closest('#university-form')?'universities':(['management','countries','success'].includes(mode)?mode:'management');
  location.assign(fallbackUrl(section));
 },true);
 document.addEventListener('click',async e=>{
