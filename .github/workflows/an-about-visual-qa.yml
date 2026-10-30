@@ -3,6 +3,9 @@ on:
   push:
     paths:
       - ".github/workflows/an-about-visual-qa.yml"
+      - "an-overseas/an-premium-public.js"
+      - "an-overseas/an-about-fixed.css"
+      - "an-overseas/index.html"
   workflow_dispatch:
 permissions:
   contents: read
