@@ -178,7 +178,7 @@ body.an-about-locked #app>.an-about-fixed{
  grid-template-columns:minmax(0,40%) minmax(0,1fr)!important;
  gap:10px!important;
  min-height:0!important;
- height:100%!important
+ height:auto!important
 }
 #app .an-manager-photo-box{
  height:100%!important;min-height:0!important;min-width:0!important;
