@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark"><title>A&N Admin — Open Upload</title>
+<style>body{background:#090b0e;color:#fff;font:15px Arial,sans-serif;margin:0;padding:28px 18px}
+main{max-width:540px;margin:5vh auto;background:linear-gradient(135deg,#1c1b20,#0e1014);padding:24px;border:1px solid #855221;border-radius:20px}
+h1{font-size:23px;margin:0 0 12px}strong{color:#ff9218}p{color:#e2d3c2;line-height:1.65}
+a{display:inline-block;background:linear-gradient(100deg,#ffb133,#ff7900);padding:13px 18px;border-radius:12px;color:#101010;text-decoration:none;font-weight:bold;margin-top:14px}
+small{color:#c9a77a;display:block;margin-top:20px}</style></head>
+<body><main><h1>A&N <strong>Overseas</strong> — Upload</h1>
+<p>Opening the secure Admin Editor in your phone browser so Gallery and Files can be used without replacing the old Android app.</p>
+<a id="continue" href="./admin-app/">Open Secure Upload Editor</a>
+<small>Sign in with your existing admin account if your browser asks. Your installed app remains unchanged.</small></main>
+<script>
+(function(){
+var allowed=['management','success','countries','universities'];
+var v=new URLSearchParams(location.search).get('section')||'management';
+var section=allowed.indexOf(v)>=0?v:'management';
+var destination=new URL('./admin-app/',location.href);
+destination.searchParams.set('browser_upload','1');
+destination.hash=section;
+document.getElementById('continue').href=destination.href;
+setTimeout(function(){location.replace(destination.href)},150);
+})();
+</script></body></html>
