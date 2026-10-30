@@ -16,3 +16,10 @@
 .studio-country-preview{height:120px;width:100%;border-radius:12px;object-fit:cover;margin:7px 0}
 .studio-history-record{border-top:1px solid #50361f;padding:14px 0}.studio-history-record b{color:#fff;text-transform:capitalize}.studio-history-record small{font-size:10px;color:#f8b867;white-space:nowrap}.studio-history-record pre{max-height:180px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#08090e;border:1px solid #403628;padding:11px;color:#ddd2c5;border-radius:10px;font-size:10px}.studio-history-record details summary{color:#ffba61;cursor:pointer;font-size:12px;font-weight:750}
 @media(max-width:540px){.studio-editor{padding:12px}.studio-media-row{grid-template-columns:100px minmax(0,1fr)}.studio-preview{width:100px;height:65px}}
+
+/* Compatibility path for pre-1.1 native WebView installs */
+.studio-legacy-fallback{margin:14px 0 20px;background:linear-gradient(135deg,#2e1c0e,#15161b);
+border:1px solid #b96e24;border-radius:15px;padding:15px;box-shadow:0 9px 25px #0005}
+.studio-legacy-fallback strong{color:#ffc47e;font-size:15px}
+.studio-legacy-fallback p{color:#dfd3c4;font-size:12px;line-height:1.55;margin:8px 0 12px}
+.studio-legacy-fallback a.btn{display:inline-flex;text-decoration:none;color:#17110b;background:linear-gradient(110deg,#ffbb51,#ff8006);border:0;border-radius:10px;padding:11px 14px;font-size:12px;font-weight:850}
