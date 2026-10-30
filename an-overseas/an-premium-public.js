@@ -72,10 +72,10 @@ function showTeam(){
  const emailHtml=validEmail?'<a class="an-manager-field an-manager-email-box" href="mailto:'+esc(email)+'" aria-label="Email '+esc(m.name)+'"><span class="an-manager-field-label">EMAIL ↗</span><span class="an-manager-field-value">'+esc(email)+'</span></a>':'';
  const phoneHtml=phone.length>=8?'<a class="an-manager-field an-manager-phone-box" href="tel:'+esc(phone)+'" aria-label="Call '+esc(m.name)+'"><span class="an-manager-field-label">PHONE ↗</span><span class="an-manager-field-value">'+esc(m.phone)+'</span></a>':'';
  const storyHtml=portfolio
-  ?'<div class="an-manager-trust"><span class="an-manager-trust-label">'+(isFounder?'MEET THE PERSON BEHIND A&N':'DISCOVER THE PERSON BEHIND THE ROLE')+'</span><span class="an-manager-trust-copy">'+(isFounder?'Explore her real academic and professional journey, beyond a company introduction.':'Explore the published background and journey behind this profile.')+'</span></div>'
+  ?'<div class="an-manager-trust"><span class="an-manager-trust-label">'+(isFounder?'BEHIND THE BRAND · A REAL JOURNEY':'THE PERSON BEHIND THE ROLE')+'</span><span class="an-manager-trust-copy">'+(isFounder?'Education · Achievements · Professional story':'Background · Experience · Personal journey')+'</span></div>'
   :'';
  const buttonsHtml=
-   (portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'EXPLORE FOUNDER’S JOURNEY':'EXPLORE THEIR JOURNEY')+' ↗</a>':'')
+   (portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'DISCOVER THE FOUNDER':'VIEW THEIR PORTFOLIO')+' ↗</a>':'')
   +(isFounder?'<a class="an-manager-action an-manager-action-secondary" href="./admin-app/" target="_blank" rel="noopener noreferrer">ADMIN ↗</a>':'');
  panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role)+'</div>'
   +'<div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
