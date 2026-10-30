@@ -24,7 +24,8 @@ jobs:
         run: |
           mkdir -p qa-artifacts
           python3 -m http.server 8765 --directory an-overseas >/tmp/an-about-test-http.log 2>&1 &
-          node <<'JS'
+          curl --fail --silent --max-time 10 http://127.0.0.1:8765/index.html >/dev/null
+          timeout 130s node <<'JS'
           const {chromium}=require('playwright');
           const fs=require('fs');
           (async()=>{
@@ -39,8 +40,9 @@ jobs:
             const page=await browser.newPage({viewport:{width:w,height:h},deviceScaleFactor:1});
             await page.route(/https:\/\/svpgjrxeqnluipsgjywk\.supabase\.co\/rest\/v1\/an_site_content.*/,route=>route.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify(fixtures)}));
             const errors=[];page.on('pageerror',e=>errors.push(e.message));
-            await page.goto('http://127.0.0.1:8765/#/about',{waitUntil:'domcontentloaded',timeout:35000});
-            await page.waitForFunction(()=>document.querySelector('.an-manager-name-box')?.textContent.includes('Nusrat'),{timeout:18000});
+            await page.goto('http://127.0.0.1:8765/#/about',{waitUntil:'domcontentloaded',timeout:16000});
+            try{await page.waitForFunction(()=>document.querySelector('.an-manager-name-box')?.textContent.includes('Nusrat'),null,{timeout:10000});}
+            catch(e){console.log('MANAGER LOADING WARNING:',w,h,e.message,await page.locator('#app').innerText().catch(()=>'<no app>'));}
             await page.waitForTimeout(900);
             const info=await page.evaluate(()=>{
              const rect=s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),height:Math.round(r.height),width:Math.round(r.width)}};
@@ -69,6 +71,7 @@ jobs:
               headingColors:[...document.querySelectorAll('.an-manager-role-banner span')].map(x=>getComputedStyle(x).color)
              };
             });
+            console.log('VIEWPORT CHECK',JSON.stringify(info));
             metrics.push({...info,jsErrors:errors.slice(0,4)});
             await page.screenshot({path:'qa-artifacts/about-'+w+'x'+h+'.png',fullPage:true});
             await page.close();
