@@ -39,7 +39,10 @@ function showCountries(){
 function contactNumber(n){return String(n||'').replace(/[^0-9+]/g,'');}
 function activeMembers(){return team.filter(m=>m&&String(m.name||'').trim());}
 function positionHeading(role){
- return '<span class="an-role-orange">'+esc(String(role||'MANAGEMENT').trim().toUpperCase())+'</span>';
+ const words=String(role||'MANAGEMENT').trim().toUpperCase().split(/\s+/).filter(Boolean);
+ const cut=Math.max(1,Math.ceil(words.length/2));
+ const first=words.slice(0,cut).join(' '),last=words.slice(cut).join(' ');
+ return '<span class="an-role-orange">'+esc(first)+'</span>'+(last?' <span class="an-role-white">'+esc(last)+'</span>':'');
 }
 function managerField(label,value,extraClass=''){
  if(!value)return '';
