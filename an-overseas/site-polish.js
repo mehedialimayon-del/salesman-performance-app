@@ -70,6 +70,8 @@ window.addEventListener('resize',()=>{
 }, {passive:true});
 const off=()=>window.ANLive?.publicSettings||{};
 function applyAbout(){
+ // The fixed About page owns the only visible Management carousel.
+ if(document.getElementById('an-about-fixed'))return;
  const area=document.querySelector('#app>.wrap.content');if(!area)return;
  let members=Array.isArray(window.ANLive?.management)?window.ANLive.management:[];
  const sNow=off();
