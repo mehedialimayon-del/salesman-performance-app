@@ -101,7 +101,7 @@ async function saveManagement(){
 function storiesPanel(){
  const row=(s,i)=>'<article class="studio-media-row" data-story-id="'+E(s.id||'index:'+i)+'"><div class="studio-preview">'+
  (s.type==='video'?'<video src="'+E(s.media_url)+'" playsinline muted preload="metadata"></video>':'<img alt="" src="'+E(s.media_url)+'" loading="lazy">')+
- '</div><div><b>'+E(s.title||'Untitled')+'</b><p>'+E(s.description||'')+'</p><small>'+dstr(s.created_at)+' · '+(s.approved?'Published':'Draft')+'</small></div><div class="actions">'+action(s.approved?'Unpublish':'Publish','toggle-story',s.id||'index:'+i)+' '+action('Edit','edit-story',s.id||'index:'+i)+(s.type==='image'?' '+action('Zoom / Position','adjust-story',s.id||'index:'+i):'')+' '+action('Remove','remove-story',s.id||'index:'+i,'danger')+'</div></article>';
+ '</div><div><b>'+E(s.title||'Untitled')+'</b><p>'+E(s.description||'')+'</p><small>'+dstr(s.created_at)+' · '+(s.approved?'Published':'Draft')+'</small></div><div class="actions">'+action(s.approved?'Unpublish':'Publish','toggle-story',s.id||'index:'+i)+' '+action('Edit','edit-story',s.id||'index:'+i)+' '+action('Replace Media','replace-story',s.id||'index:'+i)+(s.type==='image'?' '+action('Zoom / Position','adjust-story',s.id||'index:'+i):'')+' '+action('Remove','remove-story',s.id||'index:'+i,'danger')+'</div><input hidden type="file" name="media" data-media-replace="story" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"></article>';
  wrap('Success <em>Stories</em>','Publish YouTube-style photo and video cards with captions, playable directly on the public site.',
  panel('<h2>Upload a Success Story</h2><form id="studio-story-form">'+fld('title','Video / Photo Title','')
  +area('description','Description / Student Achievement','')
@@ -149,7 +149,8 @@ function updatePanel(){
    action(u.approved?'Unpublish':'Publish','toggle-update',u.id||'index:'+i)+
    action(u.featured?'Unpin':'Feature','feature-update',u.id||'index:'+i)+
    action('Edit Text','edit-update',u.id||'index:'+i)+
-   action('Remove','remove-update',u.id||'index:'+i,'danger')+'</div></article>';
+   action('Replace Media','replace-update',u.id||'index:'+i)+
+   action('Remove','remove-update',u.id||'index:'+i,'danger')+'</div><input hidden type="file" name="media" data-media-replace="update" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"></article>';
  }).join('');
  wrap('Study <em>Updates & Insights</em>','Your own Facebook-inspired resource library. New posts appear in the left panel of the public Success Stories page.', 
  panel('<h2>Publish a New Resource</h2><form id="studio-update-form">'+
@@ -338,9 +339,34 @@ document.addEventListener('click',async e=>{
    }
   else if(['toggle-story','remove-story','edit-story'].includes(command))await mutateStory(command,id);
   else if(['toggle-update','feature-update','remove-update','edit-update'].includes(command))await mutateUpdate(command,id);
+  else if(['replace-update','replace-story'].includes(command)){
+    const input=button.closest('.studio-media-row')?.querySelector('input[data-media-replace]');
+    if(!input)throw Error('Media replacement input missing');
+    input.click();
+  }
   else if(command==='restore')await restore(id);
  }catch(err){progress(err.message||String(err));alert(err.message||String(err));}
  finally{if(button.isConnected)button.disabled=false;}
+},true);
+document.addEventListener('change',async e=>{
+ const input=e.target.closest('input[data-media-replace]');
+ if(!input||!authorized())return;
+ const row=input.closest('.studio-media-row'),which=input.dataset.mediaReplace;
+ const id=(which==='story'?row?.dataset.storyId:row?.dataset.updateId)||'';
+ try{
+  const file=await window.ANPhotoEditor.selectedFile(input);
+  if(!file?.size)return;
+  if(which==='story'&&!confirm('Confirm permission to publish this replacement student media.'))return;
+  const media=await upload(file,which==='story'?'success-original':'update-original');
+  const current=which==='story'?stories:updates;
+  const i=id.startsWith('index:')?Number(id.slice(6)):current.findIndex(x=>String(x.id)===id);
+  if(i<0||i>=current.length)throw Error('Post not found');
+  const list=current.map(x=>({...x}));
+  list[i].media_url=media;list[i].type=file.type.startsWith('video/')?'video':'image';
+  progress('Saving full original media...');
+  await publish(which==='story'?'success_stories':'study_insights',list);
+  if(which==='story')await showStories();else await showUpdates();
+ }catch(err){progress(err.message||String(err));alert(err.message||String(err));}
 },true);
 document.addEventListener('submit',async e=>{
  if(e.target.id!=='studio-update-form'||!authorized())return;
