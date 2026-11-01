@@ -25,4 +25,4 @@ assert.equal((await f.call({...handover,new_staff_id:'WAHID_ADMIN'})).status,400
 assert.equal(f.count().created,0);
 f=fixture('admin');Object.assign(f.tables.ffh_profiles.find(p=>p.staff_id==='M22075'),{can_sell:true,can_manage:false});assert.equal((await f.call(handover)).status,403);
 
-console.log('PASS owner-only cloud provisioning, genuine auth/profile linkage, delegation, duplicate/target rejection, zone creation and rollback');})().catch(e=>{console.error(e);process.exit(1)});
+console.log('PASS owner-only cloud provisioning, secure SR replacement, route/target preservation, outgoing auth suspension, delegation, duplicate/target rejection, zone creation and rollback');})().catch(e=>{console.error(e);process.exit(1)});
