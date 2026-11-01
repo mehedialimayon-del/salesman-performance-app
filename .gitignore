@@ -2,3 +2,7 @@ node_modules
 android/.gradle/
 android/**/build/
 android/app/signing.jks
+
+# Private report imports are applied to the authenticated database only.
+/config/company-roster.json
+/backend/company-roster-seed.sql

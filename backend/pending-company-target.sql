@@ -1,0 +1,1 @@
+alter table public.ffh_profiles add column target_pending boolean not null default false; alter table public.ffh_profiles drop constraint ffh_profiles_monthly_target_check; alter table public.ffh_profiles add constraint ffh_profiles_monthly_target_check check(monthly_target>=0 and (not can_sell or monthly_target>=50000 or (target_pending and monthly_target=0)));
