@@ -34,6 +34,7 @@ Deno.serve(async(req:Request)=>{
   const {data:conflicts,error:lookupError}=await sb.from('ffh_profiles').select('staff_id,full_name').or('staff_id.eq.'+incomingId+',company_staff_id.eq.'+incomingId).neq('staff_id',id).limit(1);
   if(lookupError)throw Error('Staff ID availability check failed. Nothing changed.');
   if(conflicts?.length)throw Error('Staff ID '+incomingId+' already belongs to '+conflicts[0].full_name+' ('+conflicts[0].staff_id+'). Choose an unused ID; existing accounts and sales cannot be silently overwritten.');
+  const outgoingAuthId=existing.auth_user_id;
   const {data:created,error:createError}=await sb.auth.admin.createUser({email:incomingId.toLowerCase()+'@fieldforce.app',password:incomingPassword,email_confirm:true});
   if(createError||!created?.user)throw createError||Error('Could not create the new SR login');
   // New Auth identity means the outgoing staff's sessions no longer map to this profile.
@@ -44,8 +45,8 @@ Deno.serve(async(req:Request)=>{
    throw Error(saveError.code==='23505'?'New Staff ID is already assigned. No account was replaced.':'Replacement failed. Original SR route and login were left unchanged: '+saveError.message);
   }
   let oldLoginBanned=true;
-  if(existing.auth_user_id&&existing.auth_user_id!==created.user.id){
-   const {error:banError}=await sb.auth.admin.updateUserById(existing.auth_user_id,{ban_duration:'876000h'});
+  if(outgoingAuthId&&outgoingAuthId!==created.user.id){
+   const {error:banError}=await sb.auth.admin.updateUserById(outgoingAuthId,{ban_duration:'876000h'});
    oldLoginBanned=!banError;
   }
   return out({saved:true,staff_id:id,login_id:incomingId,route_preserved:true,old_login_detached:true,old_login_banned:oldLoginBanned});
