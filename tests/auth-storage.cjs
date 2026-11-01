@@ -1,0 +1,11 @@
+const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require('jsdom'),{indexedDB}=require('fake-indexeddb');
+(async()=>{
+ const d=new JSDOM('',{url:'https://app.example',runScripts:'outside-only'}),w=d.window;w.indexedDB=indexedDB;
+ const source=fs.readFileSync('auth-storage.js','utf8'),key='sb-svpgjrxeqnluipsgjywk-auth-token';w.eval(source);let store=w.FFH_AUTH_STORAGE;
+ assert.equal(store.remembered(),true);await store.setItem(key,'session-one');w.eval(source);store=w.FFH_AUTH_STORAGE;assert.equal(await store.getItem(key),'session-one','survives application reinitialization');
+ const original=w.Storage.prototype.setItem;w.Storage.prototype.setItem=function(k,v){if(k===key&&this===w.localStorage)throw new w.DOMException('Full','QuotaExceededError');return original.call(this,k,v);};await store.setItem(key,'rotated-session');assert.equal(await store.getItem(key),'rotated-session','quota failure must not retain the stale refresh token');assert.equal(w.localStorage.getItem(key),null);w.eval(source);store=w.FFH_AUTH_STORAGE;assert.equal(await store.getItem(key),'rotated-session','fallback survives app reinitialization');w.Storage.prototype.setItem=original;
+ await store.setRemember(false);assert.equal(store.remembered(),false);assert.equal(w.localStorage.getItem(key),null);assert.equal(w.sessionStorage.getItem(key),'rotated-session');await store.setItem(key,'temporary-session');await store.setRemember(true);assert.equal(w.sessionStorage.getItem(key),null);assert.equal(await store.getItem(key),'temporary-session');
+ await store.removeItem(key);w.eval(source);assert.equal(await w.FFH_AUTH_STORAGE.getItem(key),null,'explicit logout must clear both token stores');
+ w.indexedDB={open(){throw Error('IndexedDB unavailable');}};await w.FFH_AUTH_STORAGE.setItem(key,'local-only');assert.equal(await w.FFH_AUTH_STORAGE.getItem(key),'local-only');await w.FFH_AUTH_STORAGE.removeItem(key);assert.equal(await w.FFH_AUTH_STORAGE.getItem(key),null);
+ d.window.close();console.log('PASS persistent login, quota fallback/new refresh token, reopen, Remember Me modes, logout without session resurrection, private-storage fallback');
+})().catch(e=>{console.error(e);process.exit(1)});
