@@ -13,13 +13,13 @@ const area=(name,label,val='')=>'<label class="field wide">'+E(label)+'<textarea
 const fileField=(name,label,types='image/jpeg,image/png,image/webp')=>'<label class="field wide studio-upload"><span>'+E(label)+'</span><input type="file" name="'+E(name)+'" accept="'+types+'"><small>Select photo → Zoom &amp; Position → Use This Photo → Publish</small></label>';
 const action=(label,cmd,id='',cl='alt')=>'<button type="button" class="btn sm '+cl+'" data-studio="'+E(cmd)+'" data-id="'+E(id)+'">'+E(label)+'</button>';
 const fallbackUrl=section=>new URL('../open-upload.html?section='+encodeURIComponent(section||'management'),location.href).href;
-const browserUploadButton=()=>['management','success','countries','universities'].includes(mode)
+const browserUploadButton=()=>['management','success','updates','countries','universities'].includes(mode)
  ?'<div class="studio-legacy-fallback"><strong>Gallery button not opening?</strong><p>Older installed APKs need your phone browser for file selection. This opens the same secure Admin Editor in Chrome — no APK reinstall.</p><a class="btn" href="'+E(fallbackUrl(mode))+'">📁 Open Gallery Upload in Chrome</a></div>':'';
 const wrap=(title,sub,html)=>{document.querySelector('#main').innerHTML='<p class="eyebrow">A&N Overseas · Admin Studio</p><h1 class="title">'+title+'</h1><p class="sub">'+E(sub)+'</p>'+browserUploadButton()+html;window.scrollTo(0,0);};
 const panel=h=>'<section class="panel">'+h+'</section>';
 const uuid=()=>globalThis.crypto?.randomUUID?.()||String(Date.now())+Math.random().toString(36).slice(2);
 const store=D;
-let management=[],stories=[],countries=[],historyRows=[],mode='';
+let management=[],stories=[],updates=[],countries=[],historyRows=[],mode='';
 const mimeExt={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm','video/quicktime':'mov'};
 const defaultCountries=[
 ['Malaysia','🇲🇾','photo-1508062878650-88b52897f298'],['United Kingdom','🇬🇧','photo-1513635269975-59663e0ac1ad'],
@@ -138,6 +138,72 @@ async function mutateStory(cmd,id){
  }
  await publish('success_stories',list);await showStories();
 }
+
+const updateCategories=['Study Tips','University Updates','Application Guide','Visa Guidance','Student Life','FAQ','Announcement','Offers'];
+const updateCategoryOptions=(v)=>updateCategories.map(x=>'<option value="'+E(x)+'"'+(x===v?' selected':'')+'>'+E(x)+'</option>').join('');
+function updatePanel(){
+ const rows=updates.map((u,i)=>{
+  const identifier=E(u.id||'index:'+i),title=E(u.title||'Untitled');
+  const media=u.type==='video'&&safeUrl(u.media_url)?'<video src="'+E(u.media_url)+'" controls playsinline preload="metadata"></video>':u.type==='image'&&safeUrl(u.media_url)?'<img src="'+E(u.media_url)+'" alt="" loading="lazy">':'<div class="studio-update-text-preview">✦</div>';
+  return '<article class="studio-media-row" data-update-id="'+identifier+'"><div class="studio-preview">'+media+'</div><div><b>'+title+'</b><p>'+E(u.description||'')+'</p><small>'+E(u.category||'Study Tips')+' · '+dstr(u.created_at)+' · '+(u.approved?'Published':'Draft')+(u.featured?' · Featured':'')+'</small></div><div class="actions">'+
+   action(u.approved?'Unpublish':'Publish','toggle-update',u.id||'index:'+i)+
+   action(u.featured?'Unpin':'Feature','feature-update',u.id||'index:'+i)+
+   action('Edit Text','edit-update',u.id||'index:'+i)+
+   action('Remove','remove-update',u.id||'index:'+i,'danger')+'</div></article>';
+ }).join('');
+ wrap('Study <em>Updates & Insights</em>','Your own Facebook-inspired resource library. New posts appear in the left panel of the public Success Stories page.', 
+ panel('<h2>Publish a New Resource</h2><form id="studio-update-form">'+
+  fld('title','Post Title / Headline','')+
+  area('description','Post Description / Full Caption','')+
+  '<label class="field wide">Content Category<select name="category">'+updateCategoryOptions('Study Tips')+'</select></label>'+
+  fileField('media','Upload Poster, Photo or Video (optional)','image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime')+
+  '<label class="field studio-check"><input type="checkbox" name="featured"> Feature this post in the upper announcement banner</label>'+
+  '<p class="help">Photo: up to 8 MB; video: up to 40 MB. A text-only update is also allowed. Verify any offers and facts before publishing. Photos involving students require permission.</p>'+
+  '<button type="submit" class="btn">Upload & Publish to Website</button></form><p id="studio-progress" class="help" role="status"></p>')+
+ panel('<h2>Published / Draft Updates ('+updates.length+')</h2>'+(rows||'<div class="empty">No Study Updates yet. Publish your first post above.</div>')));
+}
+async function showUpdates(){
+ const data=await api().getContent('study_insights',[]);
+ updates=Array.isArray(data)?data:[];
+ updatePanel();
+}
+async function addUpdate(f){
+ const data=new FormData(f);
+ const title=String(data.get('title')||'').trim(),description=String(data.get('description')||'').trim();
+ if(!title)throw Error('Post title is required.');
+ if(!description)throw Error('Enter a useful caption or description.');
+ const picker=f.querySelector('[name="media"]');
+ const file=await window.ANPhotoEditor.selectedFile(picker);
+ const mediaUrl=file?.size?await upload(file,'study-update'):'';
+ const record={
+  id:'update-'+uuid(),title,description,category:String(data.get('category')||'Study Tips'),
+  media_url:mediaUrl,type:file?.type?.startsWith('video/')?'video':file?.size?'image':'text',
+  featured:data.has('featured'),approved:true,created_at:new Date().toISOString()
+ };
+ progress('Publishing to your public website...');
+ await publish('study_insights',[record,...updates]);
+ await showUpdates();
+}
+async function mutateUpdate(command,id){
+ const i=id.startsWith('index:')?Number(id.slice(6)):updates.findIndex(x=>String(x.id)===id);
+ if(i<0||i>=updates.length||!Number.isInteger(i))throw Error('Update not found');
+ const list=updates.map(x=>({...x}));const item=list[i];
+ if(command==='toggle-update')item.approved=!item.approved;
+ if(command==='feature-update')item.featured=!item.featured;
+ if(command==='remove-update'){
+  if(!confirm('Remove this update from the public site?'))return;
+  list.splice(i,1);
+ }
+ if(command==='edit-update'){
+  const title=prompt('Update Headline',item.title||'');if(title===null)return;
+  const desc=prompt('Edit Caption / Description',item.description||'');if(desc===null)return;
+  if(!title.trim()||!desc.trim())throw Error('Headline and description cannot be empty.');
+  item.title=title.trim();item.description=desc.trim();
+ }
+ await publish('study_insights',list);
+ await showUpdates();
+}
+
 function countryRow(c,i){
  return '<article class="studio-editor country-item" data-index="'+i+'"><div class="split"><b>Destination '+(i+1)+'</b>'+action('Remove','remove-country',i,'danger')+'</div>'+
  ((c[2]&&safeUrl(c[2]))?'<img class="studio-country-preview" src="'+E(c[2])+'" alt="" loading="lazy">':'')+
@@ -195,6 +261,7 @@ const studio={
   try{
    if(which==='management')return await showManagement();
    if(which==='success')return await showStories();
+   if(which==='updates')return await showUpdates();
    if(which==='countries')return await showCountries();
    if(which==='history')return await showHistory();
   }catch(e){wrap('Unable to <em>Load</em>','Please try again.',panel('<p>'+E(e.message||e)+'</p>')); }
@@ -209,7 +276,7 @@ document.addEventListener('click',e=>{
  if(!input||!authorized()||!window.ANAndroid)return;
  try{if(typeof window.ANAndroid.hasNativeFilePicker==='function'&&window.ANAndroid.hasNativeFilePicker())return;}catch(_){}
  e.preventDefault();e.stopImmediatePropagation();
- const section=input.closest('#university-form')?'universities':(['management','countries','success'].includes(mode)?mode:'management');
+ const section=input.closest('#university-form')?'universities':(['management','countries','success','updates'].includes(mode)?mode:'management');
  location.assign(fallbackUrl(section));
 },true);
 document.addEventListener('click',async e=>{
@@ -246,9 +313,17 @@ document.addEventListener('click',async e=>{
     if(adjusted){const url=await upload(adjusted,'success-adjust');const list=stories.map(x=>({...x}));list[i].media_url=url;await publish('success_stories',list);await showStories();}
    }
   else if(['toggle-story','remove-story','edit-story'].includes(command))await mutateStory(command,id);
+  else if(['toggle-update','feature-update','remove-update','edit-update'].includes(command))await mutateUpdate(command,id);
   else if(command==='restore')await restore(id);
  }catch(err){progress(err.message||String(err));alert(err.message||String(err));}
  finally{if(button.isConnected)button.disabled=false;}
+},true);
+document.addEventListener('submit',async e=>{
+ if(e.target.id!=='studio-update-form'||!authorized())return;
+ e.preventDefault();e.stopImmediatePropagation();
+ const b=e.target.querySelector('[type=submit]');if(b)b.disabled=true;
+ try{await addUpdate(e.target);}catch(err){progress(err.message||String(err));alert(err.message||String(err));}
+ finally{if(b&&b.isConnected)b.disabled=false;}
 },true);
 document.addEventListener('submit',async e=>{
  if(e.target.id!=='studio-story-form'||!authorized())return;
