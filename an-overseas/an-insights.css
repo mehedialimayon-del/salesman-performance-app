@@ -1,0 +1,63 @@
+/* A&N Overseas | student resources and success stories two-column hub */
+body.an-community-mode{height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+body.an-community-mode .top{flex:0 0 auto;position:relative!important;top:auto!important}
+body.an-community-mode .an-updates-bar{position:relative!important;top:auto!important;flex:0 0 auto}
+body.an-community-mode .footer{display:none!important}
+body.an-community-mode #app{flex:1 1 0;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+#app .an-community-page{height:100%;min-height:0;max-width:1530px;width:100%;margin:0 auto;padding:14px 22px 18px;display:flex;flex-direction:column;gap:13px;overflow:hidden}
+#app .an-community-intro{display:flex;align-items:center;justify-content:space-between;gap:16px;flex:0 0 auto}
+#app .an-community-intro h1{margin:0;color:#fff;font-size:clamp(21px,2.3vw,34px);line-height:1.1}
+#app .an-community-intro h1 em{font-style:normal;color:#ff9215}
+#app .an-community-intro p{margin:5px 0 0;font-size:12px;color:#bfc7d1}
+#app .an-community-eyebrow{color:#ffb259;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+#app .an-community-intro-pill{padding:9px 15px;border:1px solid #895323;border-radius:999px;background:#22170e;color:#ffd299;font-size:11px;font-weight:750;white-space:nowrap}
+#app .an-community-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:15px;flex:1 1 0;min-height:0}
+#app .an-community-panel{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;border:1px solid #87501e;border-radius:19px;background:linear-gradient(148deg,#1c1a1b,#0e1218 58%,#0a0c12);box-shadow:0 13px 40px #0008,inset 0 1px 0 #ffae5140}
+#app .an-community-panel-head{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:14px 16px 12px;flex:0 0 auto;border-bottom:1px solid #6c411d;background:linear-gradient(100deg,#29180e,#13151c 62%)}
+#app .an-community-panel-head h2{font-size:clamp(15px,1.6vw,20px);color:#fff;margin:3px 0 0;font-weight:850}
+#app .an-community-panel-head h2 span{color:#ff941b}
+#app .an-community-panel-head small{display:block;color:#bfb4a7;font-size:10px;margin-top:4px}
+#app .an-community-panel-head .an-panel-icon{height:37px;width:37px;flex-shrink:0;display:grid;place-items:center;color:#111;border-radius:11px;background:linear-gradient(130deg,#ffc86b,#ff7904);font-size:20px}
+#app .an-community-featured{flex:0 0 auto;padding:10px 15px;margin:11px 13px 0;border:1px solid #8a531b;border-radius:11px;background:linear-gradient(110deg,#482307,#221712);display:flex;gap:10px;align-items:center;font-size:11px;color:#ffe0af}
+#app .an-community-featured b{font-size:10px;background:#ff9913;color:#14100c;border-radius:5px;padding:5px 7px;white-space:nowrap}
+#app .an-community-featured span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#app .an-community-scroll{flex:1 1 0;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:13px;scrollbar-color:#a76422 #171820;scrollbar-width:thin}
+#app .an-community-scroll::-webkit-scrollbar{width:7px}#app .an-community-scroll::-webkit-scrollbar-thumb{background:#a96822;border-radius:12px}
+#app .an-community-grid,#app .an-community-panel .an-youtube-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:12px}
+#app .an-community-card,#app .an-community-panel .an-youtube-card{min-width:0;overflow:hidden;background:linear-gradient(145deg,#202027,#101218);border:1px solid #4e3a25;border-radius:14px;box-shadow:0 8px 25px #0005}
+#app .an-community-card:hover,#app .an-community-panel .an-youtube-card:hover{border-color:#ffa127;transform:none}
+#app .an-community-media{position:relative;width:100%;aspect-ratio:4/5;background:#0a0f17;display:block;overflow:hidden;border:0;padding:0}
+#app .an-community-media img,#app .an-community-media video{width:100%;height:100%;object-fit:cover;display:block}
+#app .an-community-media video{object-fit:contain}
+#app .an-community-media.is-image{cursor:pointer}
+#app .an-community-media.is-text{display:grid;place-items:center;text-align:center;padding:18px;background:radial-gradient(circle at 75% 25%,#5c2d0d,#101824 70%)}
+#app .an-community-media.is-text span{font-size:30px;color:#ffb45c}
+#app .an-community-media.is-text b{display:block;color:#fff;font-size:clamp(13px,1.3vw,19px);line-height:1.4;overflow-wrap:anywhere}
+#app .an-community-panel .an-youtube-media{aspect-ratio:16/10}
+#app .an-community-panel .an-youtube-info{padding:11px;gap:8px}
+#app .an-community-panel .an-story-avatar{width:27px;height:27px;min-width:27px;font-size:10px}
+#app .an-community-panel .an-story-copy h3{font-size:13px!important;margin-bottom:4px}
+#app .an-community-panel .an-story-copy p{font-size:11px;color:#ded2c4!important;line-height:1.5}
+#app .an-community-copy{padding:11px}
+#app .an-community-category{font-size:10px;font-weight:800;letter-spacing:.6px;color:#ffb65d;margin-bottom:5px}
+#app .an-community-copy h3{color:#fff;font-size:14px;line-height:1.35;margin:2px 0 7px;overflow-wrap:anywhere}
+#app .an-community-desc,#app .an-community-panel .an-story-copy p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden;white-space:pre-line;overflow-wrap:anywhere}
+#app .an-community-desc{font-size:11px;color:#d5d0cc;line-height:1.55;margin:0 0 8px}
+#app .an-community-expanded .an-community-desc,#app .an-community-expanded .an-story-copy p{display:block;overflow:visible;-webkit-line-clamp:unset;line-clamp:unset}
+#app .an-community-meta{color:#b8a592;font-size:10px}
+#app .an-community-more{border:0;background:transparent;color:#ffad46;padding:7px 0 1px;text-decoration:underline;text-underline-offset:3px;font-size:11px;font-weight:750;cursor:pointer}
+#app .an-community-panel .an-premium-empty{background:transparent;box-shadow:none;border:1px dashed #63411d;padding:28px 12px}
+#app .an-community-panel .an-premium-empty h2{font-size:16px}
+@media(max-width:780px){
+ body.an-community-mode{height:auto;min-height:100dvh;overflow-y:auto;display:block}
+ body.an-community-mode #app{display:block;overflow:visible;min-height:0}
+ #app .an-community-page{height:auto;min-height:0;max-height:none;padding:15px 11px 26px;overflow:visible}
+ #app .an-community-intro{align-items:flex-start}
+ #app .an-community-intro-pill{font-size:9px;white-space:normal;text-align:center}
+ #app .an-community-columns{display:flex;flex-direction:column;gap:13px;min-height:0}
+ #app .an-community-panel{height:min(570px,69dvh);min-height:410px;flex:0 0 auto}
+ #app .an-community-scroll{padding:10px}
+ #app .an-community-grid,#app .an-community-panel .an-youtube-grid{gap:9px}
+ #app .an-community-panel-head{padding:11px}
+}
+@media(max-width:380px){#app .an-community-copy{padding:8px}#app .an-community-panel .an-youtube-info{padding:8px}}
