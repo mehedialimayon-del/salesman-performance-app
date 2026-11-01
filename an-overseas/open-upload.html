@@ -12,7 +12,7 @@ small{color:#c9a77a;display:block;margin-top:20px}</style></head>
 <small>Sign in with your existing admin account if your browser asks. Your installed app remains unchanged.</small></main>
 <script>
 (function(){
-var allowed=['management','success','countries','universities'];
+var allowed=['management','success','updates','countries','universities'];
 var v=new URLSearchParams(location.search).get('section')||'management';
 var section=allowed.indexOf(v)>=0?v:'management';
 var destination=new URL('./admin-app/',location.href);
