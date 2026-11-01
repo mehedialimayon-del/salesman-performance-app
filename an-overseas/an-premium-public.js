@@ -3,7 +3,7 @@
 'use strict';
 const ROOT='https://svpgjrxeqnluipsgjywk.supabase.co';
 const KEY='sb_publishable_eR5TZxv2aWndxdwzU0RIUA_mXWcBcO3';
-let stories=[],countries=null,team=[],teamIndex=0,snapshot='',working=false;
+let stories=[],insights=[],countries=null,team=[],teamIndex=0,snapshot='',working=false;
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const url=x=>{try{const u=new URL(x);return u.protocol==='https:'?u.href:'';}catch{return'';}};
 const img=x=>url(x)||(String(x||'').startsWith('photo-')?'https://images.unsplash.com/'+x+'?w=900&q=85&auto=format&fit=crop':'');
@@ -17,8 +17,37 @@ function storyCard(s,i){
  const d=s.created_at?new Date(s.created_at):null;
  const date=d&&!isNaN(d.getTime())?d.toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'}):'';
  return '<article class="an-youtube-card">'+visual+'<div class="an-youtube-info"><div class="an-story-avatar">A<span>&</span>N</div><div class="an-story-copy"><h3>'+title+'</h3>'
- +(desc?'<p>'+desc+'</p>':'')+'<small>A&N Overseas'+(date?' · '+esc(date):'')+'</small></div></div></article>';
+ +(desc?'<p>'+desc+'</p><button type="button" class="an-community-more" data-an-expand aria-expanded="false">Read more</button>':'')+'<small>A&N Overseas'+(date?' · '+esc(date):'')+'</small></div></div></article>';
 }
+
+function insightCard(s){
+ const title=esc(s.title||'Study Resource'),desc=esc(s.description||'');
+ const media=url(s.media_url),type=s.type||'text';
+ const category=esc(s.category||'Student Guidance');
+ const visual=(type==='video'&&media)
+  ?'<div class="an-community-media is-video"><video controls playsinline preload="metadata" src="'+esc(media)+'" aria-label="'+title+'"></video></div>'
+  :(type==='image'&&media)
+  ?'<button class="an-community-media is-image" type="button" data-an-preview="'+esc(media)+'" data-an-title="'+title+'" aria-label="View '+title+'"><img src="'+esc(media)+'" alt="'+title+'" loading="lazy"></button>'
+  :'<div class="an-community-media is-text"><span>✦</span><b>'+title+'</b></div>';
+ const d=s.created_at?new Date(s.created_at):null;
+ const date=d&&!isNaN(d.getTime())?d.toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'}):'';
+ return '<article class="an-community-card">'+visual+
+ '<div class="an-community-copy"><div class="an-community-category">'+(s.featured?'★ FEATURED · ':'')+category+'</div><h3>'+title+'</h3>'+
+ (desc?'<p class="an-community-desc">'+desc+'</p><button type="button" class="an-community-more" data-an-expand aria-expanded="false">Read more</button>':'')+
+ '<small class="an-community-meta">A&N Overseas'+(date?' · '+esc(date):'')+'</small></div></article>';
+}
+function showInsights(){
+ const mount=document.querySelector('#an-insights-gallery');
+ if(!mount)return;
+ const live=insights.filter(s=>s&&s.approved===true&&String(s.title||'').trim());
+ live.sort((a,b)=>Number(!!b.featured)-Number(!!a.featured)||(new Date(b.created_at||0)-new Date(a.created_at||0)));
+ const top=live.find(s=>s.featured);
+ const feature=document.querySelector('#an-community-featured');
+ if(feature)feature.innerHTML='<b>'+(top?'FEATURED':'STUDY HUB')+'</b><span>'+esc(top?top.title:'University news, application tips and practical student resources')+'</span>';
+ mount.innerHTML=live.length?'<div class="an-community-grid">'+live.map(insightCard).join('')+'</div>'
+ :'<div class="an-premium-empty"><span>✦</span><h2>Study Updates & Insights</h2><p>University guides, FAQs, posters and videos will appear here after the administrator publishes them.</p></div>';
+}
+
 function showStories(){
  const mount=document.querySelector('#an-success-gallery');
  if(!mount)return;
@@ -86,20 +115,20 @@ function showTeam(){
  counter.textContent=(teamIndex+1)+' / '+members.length;
 }
 function apply(){
- if(current()==='success')showStories();
+ if(current()==='success'){showInsights();showStories();}
  if(current()==='countries')showCountries();
  if(current()==='about')showTeam();
 }
 async function load(){
  if(working)return;working=true;
  try{
-  const r=await fetch(ROOT+'/rest/v1/an_site_content?select=key,value&key=in.(success_stories,countries,management)',{
+  const r=await fetch(ROOT+'/rest/v1/an_site_content?select=key,value&key=in.(success_stories,study_insights,countries,management)',{
    headers:{apikey:KEY},cache:'no-store'
   });
   if(!r.ok)throw Error('Could not load public media');
   const rows=await r.json(),data={};rows.forEach(r=>data[r.key]=r.value);
   const next=JSON.stringify(data);
-  if(snapshot!==next){snapshot=next;stories=Array.isArray(data.success_stories)?data.success_stories:[];
+  if(snapshot!==next){snapshot=next;stories=Array.isArray(data.success_stories)?data.success_stories:[];insights=Array.isArray(data.study_insights)?data.study_insights:[];
    countries=Array.isArray(data.countries)?data.countries:null;team=Array.isArray(data.management)?data.management:[];}
   apply();
  }catch(e){
@@ -125,6 +154,15 @@ document.addEventListener('touchend',e=>{
  if(Math.abs(delta)<50||activeMembers().length<2)return;
  teamIndex=(teamIndex+(delta<0?1:-1)+activeMembers().length)%activeMembers().length;showTeam();
 },{passive:true});
+
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-an-expand]');
+ if(!b)return;
+ const card=b.closest('.an-community-card,.an-youtube-card');if(!card)return;
+ const expand=card.classList.toggle('an-community-expanded');
+ b.textContent=expand?'Read less':'Read more';
+ b.setAttribute('aria-expanded',String(expand));
+});
 document.addEventListener('click',e=>{
  const target=e.target.closest('[data-an-preview]');if(!target)return;
  const src=url(target.dataset.anPreview);if(!src)return;
@@ -149,5 +187,5 @@ if(appRoot)new MutationObserver(()=>{
 window.addEventListener('hashchange',()=>setTimeout(()=>{apply();restoreAboutAfterRender();},70));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void load();});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>void load());else void load();
-setInterval(()=>{if(!document.hidden)void load();},45000);
+setInterval(()=>{if(!document.hidden)void load();},15000);
 })();
