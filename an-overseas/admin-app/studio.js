@@ -271,6 +271,30 @@ window.ANStudio=studio;
 // Legacy Android WebView cannot open <input type=file> without a native onShowFileChooser.
 // Redirect only legacy installed APKs to Chrome, where the browser owns the file picker.
 // Newer APKs may advertise hasNativeFilePicker() and keep the native Gallery chooser.
+// Open complete original photos from editor cards without cropping or leaving the current tab.
+let adminPhotoOpen=false;
+const adminClosePhoto=()=>{
+ const dlg=document.getElementById('an-admin-photo-dialog');if(dlg){try{dlg.close?.();}catch(_){ }dlg.removeAttribute('open');}
+ adminPhotoOpen=false;
+};
+document.addEventListener('click',e=>{
+ const img=e.target.closest('.studio-preview img,.studio-avatar,.studio-country-preview');
+ if(!img||!authorized())return;
+ const src=safeUrl(img.currentSrc||img.src);if(!src)return;
+ e.preventDefault();e.stopPropagation();
+ let dlg=document.getElementById('an-admin-photo-dialog');
+ if(!dlg){dlg=document.createElement('dialog');dlg.id='an-admin-photo-dialog';dlg.className='an-admin-photo-dialog';document.body.appendChild(dlg);}
+ dlg.innerHTML='<button type="button" aria-label="Close full photo" data-admin-photo-close>× Close</button><img src="'+E(src)+'" alt="Full uploaded photo">';
+ dlg.showModal?.();
+ adminPhotoOpen=true;
+ history.pushState({anAdminPhoto:true},'',location.href);
+},true);
+window.addEventListener('popstate',()=>{if(adminPhotoOpen)adminClosePhoto();});
+document.addEventListener('click',e=>{
+ if(!e.target.closest('[data-admin-photo-close]'))return;
+ if(adminPhotoOpen)history.back();else adminClosePhoto();
+},true);
+document.addEventListener('cancel',e=>{if(e.target?.id==='an-admin-photo-dialog'){e.preventDefault();if(adminPhotoOpen)history.back();else adminClosePhoto();}},true);
 document.addEventListener('click',e=>{
  const input=e.target.closest('input[type="file"]');
  if(!input||!authorized()||!window.ANAndroid)return;
