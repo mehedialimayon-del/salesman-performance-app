@@ -48,7 +48,7 @@ async function editBlob(blob,kind){
    +'<p class="an-crop-instruction">Move the photo with your finger or mouse. Pinch or slide to zoom until it fits the frame.</p>'
    +'<div class="an-crop-slider"><button type="button" data-crop="minus" aria-label="Zoom out">−</button><input type="range" min="100" max="500" step="1" value="100" aria-label="Zoom" data-crop-zoom><button type="button" data-crop="plus" aria-label="Zoom in">+</button><output data-zoom-value>100%</output></div>'
    +'<div class="an-crop-actions"><button type="button" class="an-crop-secondary" data-crop="reset">Reset</button>'
-   +'<button type="button" class="an-crop-secondary" data-crop="cancel">Cancel</button><button type="button" class="an-crop-primary" data-crop="save">✓ Use This Photo</button></div>'
+   +'<button type="button" class="an-crop-secondary" data-crop="cancel">Cancel</button><button type="button" class="an-crop-primary" data-crop="original">✓ Keep Full Original</button><button type="button" class="an-crop-primary" data-crop="save">Use Cropped Version</button></div>'
    +'<p class="an-crop-status" role="status"></p></div>';
   document.body.appendChild(dialog);
   const canvas=dialog.querySelector('canvas'),ctx=canvas.getContext('2d',{alpha:kind==='logo'});
@@ -126,6 +126,7 @@ async function editBlob(blob,kind){
    const name=e.target.closest('[data-crop]')?.dataset.crop;
    if(!name)return;
    if(name==='cancel'){close(null);return;}
+   if(name==='original'){close(new File([blob],blob.name||('an-original-'+Date.now()+'.jpg'),{type:blob.type||'image/jpeg',lastModified:Date.now()}));return;}
    if(name==='plus'){setZoom(zoom+.15);return;}
    if(name==='minus'){setZoom(zoom-.15);return;}
    if(name==='reset'){zoom=1;offsetX=0;offsetY=0;setZoom(1);return;}
@@ -177,6 +178,15 @@ document.addEventListener('change',event=>{
  if(!(input instanceof HTMLInputElement)||input.type!=='file'||!input.files?.length)return;
  const items=Array.from(input.files);
  if(!items.some(f=>f.type.startsWith('image/')))return;
+ // Poster and success-story media must be uploaded unchanged: cropping is only a card display decision.
+ if(input.name==='media'||input.name==='story_file'){
+  input._anEditedFiles=items;
+  const note=input.parentElement?.querySelector('.an-crop-ready')||document.createElement('div');
+  note.className='an-crop-ready';note.setAttribute('role','status');
+  if(!note.isConnected)input.insertAdjacentElement('afterend',note);
+  note.textContent='✓ Full original selected, no crop or resize. The card preview may be zoomed, but tapping it shows this complete image.';
+  return;
+ }
  input._anEditedFiles=null;
  const promise=(async()=>{
   const output=[];
@@ -195,7 +205,7 @@ document.addEventListener('change',event=>{
    output.push(cropped);
   }
   input._anEditedFiles=output;
-  preview.textContent=output.length+' photo'+(output.length===1?'':'s')+' adjusted ✓ · Zoom and position saved. Press Publish to upload.';
+  preview.textContent=output.length+' photo'+(output.length===1?'':'s')+' ready ✓ · Original or adjusted version selected. Press Publish to upload.';
   if(output.length===1&&output[0].type.startsWith('image/')){
    const u=URL.createObjectURL(output[0]);
    let img=preview.querySelector('img');
