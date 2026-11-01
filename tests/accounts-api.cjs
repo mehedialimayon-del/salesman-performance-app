@@ -14,4 +14,15 @@ f=fixture();assert.equal((await f.call({...body,staff_id:'QAMGMTONLY',can_sell:f
 const pending={action:'update',staff_id:'PERVES_HIRA',full_name:'PERVES HIRA',business_title:'HEAD_OF_SALES',zone_id:'PRIMARY',can_sell:false,owner_access:false,password:'head-office-initial-test-password'};
 assert.equal((await f.call({...pending,password:''})).status,200);assert.equal(f.count().created,0);assert.equal((await f.call({...pending,company_staff_id:'M77777'})).status,200);assert.equal(f.tables.createdAuth.email,'m77777@fieldforce.app');assert.equal(f.tables.ffh_profiles.find(p=>p.staff_id==='PERVES_HIRA').auth_user_id,'new-auth-1');assert.equal(f.tables.ffh_profiles.find(p=>p.staff_id==='PERVES_HIRA').company_staff_id,'M77777');
 f=fixture('admin');f.tables.ffh_profiles.push({staff_id:'PERVES_HIRA',auth_user_id:'head',active:true});assert.equal((await f.call(pending)).status,403);
+f=fixture();const outgoing=f.tables.ffh_profiles.find(p=>p.staff_id==='M22075');Object.assign(outgoing,{full_name:'Outgoing Limon',company_staff_id:'M22075',login_alias:'m22075',can_sell:true,can_manage:false,monthly_target:65000,route_name:'Limon route',photo_url:'old-photo'});
+const handover={action:'replace_sr',staff_id:'M22075',new_staff_id:'M33333',full_name:'Incoming Naimul',password:'Ab12!6'};
+let response=await f.call(handover);assert.equal(response.status,200,await response.text());let result=await response.json();
+assert.equal(result.route_preserved,true);assert.equal(result.old_login_detached,true);
+assert.equal(outgoing.staff_id,'M22075');assert.equal(outgoing.company_staff_id,'M33333');assert.equal(outgoing.full_name,'Incoming Naimul');assert.equal(outgoing.monthly_target,65000);assert.equal(outgoing.route_name,'Limon route');assert.equal(outgoing.photo_url,null);assert.equal(outgoing.auth_user_id,'new-auth-1');assert.equal(f.tables.createdAuth.email,'m33333@fieldforce.app');assert.ok(f.tables.passwordWrites.some(x=>x.id==='sr'&&x.ban_duration==='876000h'));
+assert.equal((await f.call(handover)).status,400);
+f=fixture();Object.assign(f.tables.ffh_profiles.find(p=>p.staff_id==='M22075'),{can_sell:true,can_manage:false});
+assert.equal((await f.call({...handover,new_staff_id:'WAHID_ADMIN'})).status,400);
+assert.equal(f.count().created,0);
+f=fixture('admin');Object.assign(f.tables.ffh_profiles.find(p=>p.staff_id==='M22075'),{can_sell:true,can_manage:false});assert.equal((await f.call(handover)).status,403);
+
 console.log('PASS owner-only cloud provisioning, genuine auth/profile linkage, delegation, duplicate/target rejection, zone creation and rollback');})().catch(e=>{console.error(e);process.exit(1)});
