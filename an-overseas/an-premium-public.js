@@ -94,7 +94,7 @@ function showTeam(){
  const role=String(m.position||m.designation||m.role||'Management').trim();
  const help=String(m.help||m.bio||m.description||'').trim();
  const isFounder=m.id==='nusrat-nasrin'||String(m.name).trim().toLowerCase()==='nusrat nasrin';
- const imageHtml=photo?'<img class="an-manager-photo" src="'+esc(photo)+'" alt="'+esc(m.name)+'" loading="lazy">'
+ const imageHtml=photo?'<button class="an-manager-photo-button" type="button" data-an-preview="'+esc(photo)+'" data-an-title="'+esc(m.name)+'" aria-label="View full photo of '+esc(m.name)+'"><img class="an-manager-photo" src="'+esc(photo)+'" alt="'+esc(m.name)+'" loading="lazy"></button>'
   :'<div class="an-manager-photo an-manager-photo-empty"><span>A</span>&amp;<span>N</span></div>';
  const nameHtml=managerField('NAME',m.name,'an-manager-name-box');
  const supportHtml=managerField('STUDENT SUPPORT',help,'an-manager-bio-box');
@@ -163,15 +163,33 @@ document.addEventListener('click',e=>{
  b.textContent=expand?'Read less':'Read more';
  b.setAttribute('aria-expanded',String(expand));
 });
+// Full-resolution, uncropped photo viewer. Android Back closes the image before changing routes.
+let anPhotoPopPending=false;
+function closeAnPhotoFromHistory(){
+ const dlg=document.getElementById('an-preview-dialog');
+ if(dlg?.open){dlg.close?.();dlg.removeAttribute('open');}
+ anPhotoPopPending=false;
+}
 document.addEventListener('click',e=>{
  const target=e.target.closest('[data-an-preview]');if(!target)return;
  const src=url(target.dataset.anPreview);if(!src)return;
  let dlg=document.getElementById('an-preview-dialog');
  if(!dlg){dlg=document.createElement('dialog');dlg.id='an-preview-dialog';dlg.className='an-preview-dialog';document.body.appendChild(dlg);}
- dlg.innerHTML='<button type="button" class="an-dialog-close" data-an-close aria-label="Close photo">×</button><img src="'+esc(src)+'" alt="'+esc(target.dataset.anTitle||'Student photo')+'"><p>'+esc(target.dataset.anTitle||'')+'</p>';
+ if(dlg.open)closeAnPhotoFromHistory();
+ dlg.innerHTML='<button type="button" class="an-dialog-close" data-an-close aria-label="Close photo">×</button><img src="'+esc(src)+'" alt="'+esc(target.dataset.anTitle||'Full photo')+'"><p>'+esc(target.dataset.anTitle||'')+'</p>';
  if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','');
+ history.pushState({anPhotoPreview:true},'',window.location.href);
+ anPhotoPopPending=true;
 });
-document.addEventListener('click',e=>{if(e.target.closest('[data-an-close]')){const dlg=document.getElementById('an-preview-dialog');if(dlg?.close)dlg.close();else dlg?.removeAttribute('open');}});
+window.addEventListener('popstate',()=>{if(anPhotoPopPending)closeAnPhotoFromHistory();});
+document.addEventListener('click',e=>{
+ if(!e.target.closest('[data-an-close]'))return;
+ if(anPhotoPopPending)history.back();else closeAnPhotoFromHistory();
+});
+document.addEventListener('cancel',e=>{
+ if(e.target?.id!=='an-preview-dialog')return;
+ if(anPhotoPopPending){e.preventDefault();history.back();}
+});
 // The university CMS can re-render #app after this gallery has already filled the
 // About carousel. Observe only its direct children to restore a lost management
 // profile without recursively observing updates inside the carousel itself.
