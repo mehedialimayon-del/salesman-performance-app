@@ -13,6 +13,16 @@ alerted='';await f.onsubmit({preventDefault(){},submitter:f.querySelector('butto
 assert.match(alerted,/already in use/i);assert.equal(calls.filter(x=>x.body?.action==='update').length,updateCallsBefore);
 q('#ffEditExistingLoginId').click();assert.equal(q('#ffAccountForm').elements.staff_id.value,'S200');assert.equal(q('#ffAccountForm').elements.company_staff_id.value,'M22405');
 
+q('#ffCancelAccount').click();await new Promise(r=>setTimeout(r,0));assert.ok(q('.ffReplaceAccount[data-id=S100]'));q('.ffReplaceAccount[data-id=S100]').click();
+f=q('#ffReplaceSRForm');assert.equal(f.elements.password.minLength,6);assert.ok(q('#ffReplaceSrConflict'));
+f.elements.full_name.value='Incoming Naimul';f.elements.new_staff_id.value='M22405';f.elements.new_staff_id.dispatchEvent(new w.Event('input',{bubbles:true}));
+assert.equal(q('#ffReplaceSrConflict').hidden,false);let callsBefore=calls.filter(x=>x.body?.action==='replace_sr').length;
+f.elements.password.value='Ab12!6';f.elements.confirm_password.value='Ab12!6';
+await f.onsubmit({preventDefault(){},submitter:f.querySelector('button.primary')});assert.equal(calls.filter(x=>x.body?.action==='replace_sr').length,callsBefore);
+f.elements.new_staff_id.value='M44331';f.elements.new_staff_id.dispatchEvent(new w.Event('input',{bubbles:true}));
+assert.equal(q('#ffReplaceSrConflict').hidden,true);alerted='';
+await f.onsubmit({preventDefault(){},submitter:f.querySelector('button.primary')});
+const handoverCall=calls.find(x=>x.body?.action==='replace_sr');assert.equal(handoverCall.body.staff_id,'S100');assert.equal(handoverCall.body.new_staff_id,'M44331');assert.equal(handoverCall.body.password,'Ab12!6');assert.ok(q('#ffCreateAccount'));
 me={id:'S100'};await w.FFH_CREATE_ACCOUNTS(ctx)();assert.equal(q('#ffCreateAccount'),null);assert.equal(q('.ffEditAccount'),null);assert.ok(q('#ffChangeRequest'));assert.equal(q('#ffHistory'),null);assert.equal(q('#ffTrash'),null);
 me={id:'WAHID_ADMIN'};fixture.administrator=true;fixture.profiles.push({staff_id:'WAHID_ADMIN',full_name:'Wahidur Rahman',designation:'SALES_ADMIN',role:'MANAGER',zone_id:'PRIMARY',active:true,can_manage:true,owner_access:true});
 await w.FFH_CREATE_ACCOUNTS(ctx)();assert.ok(q('#ffCreateAccount'));assert.equal(q('.ffEditAccount[data-id=M21954]'),null);assert.equal(q('.ffEditAccount[data-id=WAHID_ADMIN]'),null);q('.ffEditAccount[data-id=S100]').click();f=q('#ffAccountForm');assert.equal(f.elements.password,undefined);assert.equal(f.elements.administrator,undefined);assert.equal(f.elements.ai_access,undefined);assert.equal(q('[data-module=kb]'),null);
