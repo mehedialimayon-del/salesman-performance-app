@@ -161,7 +161,7 @@ jobs:
         with:
           node-version: '24'
       - name: Install test dependencies
-        run: npm --prefix /tmp/ffh-qa install --no-save jsdom@26.1.0 typescript@5.9.3 xlsx@0.18.5 playwright@1.58.2
+        run: npm --prefix /tmp/ffh-qa install --no-save jsdom@26.1.0 typescript@5.9.3 xlsx@0.18.5 playwright@1.58.2 fake-indexeddb@6.2.4
       - name: Run regression scripts
         env:
           NODE_PATH: /tmp/ffh-qa/node_modules
