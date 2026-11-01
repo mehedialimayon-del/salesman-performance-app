@@ -17,7 +17,7 @@ Deno.serve(async(req:Request)=>{
  if(action==='list'){const {data:profiles,error}=await ownerDb.from('ffh_profiles').select('staff_id,full_name,role,active,login_approved,monthly_target,can_manage,can_sell,zone_id,owner_access,business_title,access_all_zones,accessible_zones,team_name,route_name').order('full_name');if(error)throw error;const {data:zones,error:ze}=await ownerDb.from('ffh_zones').select('*');if(ze)throw ze;return out({profiles,zones});}
  const id=String(p.staff_id||'').trim().toUpperCase();if(!/^[A-Z][A-Z0-9_-]{2,29}$/.test(id))throw Error('Use a valid staff ID');
  const {data:existing,error:ee}=await ownerDb.from('ffh_profiles').select('auth_user_id,staff_id').eq('staff_id',id).maybeSingle();if(ee)throw ee;
- if(!rootOwner&&(id==='M21954'||id===actor.staff_id))return out({error:'Only Ayon can change owner or administrator own account'},403);
+ if(!rootOwner&&(id==='M21954'||id===actor.staff_id||id==='PERVES_HIRA'))return out({error:'Only Ayon can change owner or administrator own account'},403);
  if(action==='password'){if(!rootOwner)return out({error:'Only Ayon changes passwords'},403);if(!existing?.auth_user_id)throw Error('Account not found');await setAccountPassword(sb,existing.auth_user_id,p.password);const {error}=await ownerDb.from('ffh_profiles').update({must_change_password:false}).eq('staff_id',id);if(error)throw error;return out({saved:true,password_changed:true});}
  if(!['create','update'].includes(action))throw Error('Unknown account action');
  if(id==='M21954')throw Error('Owner permissions cannot be changed here');
@@ -28,6 +28,14 @@ Deno.serve(async(req:Request)=>{
  const selling=!manager||p.can_sell!==false;const target=selling?Number(p.monthly_target??50000):0;if(!Number.isFinite(target)||(selling&&target<50000))throw Error('Own SR route target minimum RM 50,000');
  if(!rootOwner&&(p.owner_access===true||p.password!==undefined&&action==='update'))return out({error:'Only Ayon changes passwords or delegates administrator authority'},403);
  const row={staff_id:id,full_name:name,role:manager?'MANAGER':'SR',business_title:title,display_title:String(p.display_title||'').trim().slice(0,150),team_name:String(p.team_name||'').trim().slice(0,150),route_name:String(p.route_name||'').trim().slice(0,150),access_all_zones:manager&&p.access_all_zones===true,accessible_zones:manager?accessible:[],can_manage:manager,can_sell:manager?p.can_sell!==false:true,zone_id:zone,...(rootOwner?{owner_access:manager&&p.owner_access===true}:{}),active:p.active!==false,login_approved:true,monthly_target:target,updated_at:new Date().toISOString()};
+ if(action==='update'&&!existing?.auth_user_id){
+ if(!rootOwner)return out({error:'Only Ayon enables a pending login'},403);
+ if(String(p.password||'').length<12)throw Error('Set an initial password of at least 12 characters');
+ const {data:created,error:ce}=await sb.auth.admin.createUser({email:id.toLowerCase()+'@fieldforce.app',password:p.password,email_confirm:true});if(ce||!created.user)throw ce||Error('Login creation failed');
+ const {error}=await ownerDb.from('ffh_profiles').update({...row,auth_user_id:created.user.id,must_change_password:false}).eq('staff_id',id);
+ if(error){await sb.auth.admin.deleteUser(created.user.id);throw Error('Login setup rolled back; profile could not save');}
+ return out({saved:true,staff_id:id,password_changed:true});
+ }
  if(action==='update'){if(p.password!==undefined&&String(p.password).length<12)throw Error('Password needs at least 12 characters');if(p.password!==undefined)await setAccountPassword(sb,existing.auth_user_id,p.password);const {error}=await ownerDb.from('ffh_profiles').update({...row,...(p.password!==undefined?{must_change_password:false}:{})}).eq('staff_id',id);if(error)throw Error(p.password!==undefined?'Password changed, but profile update failed; retry profile save.':'Profile update failed');return out({saved:true,staff_id:id,password_changed:p.password!==undefined});}
  if(String(p.password||'').length<12)throw Error('Password needs at least 12 characters');
  const {data:newAuth,error:ce}=await sb.auth.admin.createUser({email:id.toLowerCase()+'@fieldforce.app',password:p.password,email_confirm:true});if(ce||!newAuth.user)throw ce||Error('Login creation failed');
