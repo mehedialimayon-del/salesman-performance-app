@@ -16,9 +16,40 @@ Deno.serve(async(req:Request)=>{
  if(action==='zone'){const id=String(p.zone_id||'').trim().toUpperCase(),name=String(p.name||'').trim();if(!/^[A-Z0-9_-]{1,40}$/.test(id)||!name||name.length>150)throw Error('Zone ID and name required');const {error}=await ownerDb.from('ffh_zones').upsert({id,name,active:true});if(error)throw error;return out({saved:true});}
  if(action==='list'){const {data:profiles,error}=await ownerDb.from('ffh_profiles').select('staff_id,full_name,role,active,login_approved,monthly_target,can_manage,can_sell,zone_id,owner_access,business_title,access_all_zones,accessible_zones,team_name,route_name').order('full_name');if(error)throw error;const {data:zones,error:ze}=await ownerDb.from('ffh_zones').select('*');if(ze)throw ze;return out({profiles,zones});}
  const id=String(p.staff_id||'').trim().toUpperCase();if(!/^[A-Z][A-Z0-9_-]{2,29}$/.test(id))throw Error('Use a valid staff ID');
- const {data:existing,error:ee}=await ownerDb.from('ffh_profiles').select('auth_user_id,staff_id,company_staff_id,target_pending,login_alias').eq('staff_id',id).maybeSingle();if(ee)throw ee;
+ const {data:existing,error:ee}=await ownerDb.from('ffh_profiles').select('auth_user_id,staff_id,company_staff_id,target_pending,login_alias,full_name,can_sell,can_manage').eq('staff_id',id).maybeSingle();if(ee)throw ee;
  if(!rootOwner&&(id==='M21954'||id===actor.staff_id||id==='PERVES_HIRA'))return out({error:'Only Ayon can change owner or administrator own account'},403);
  if(action==='password'){if(!rootOwner)return out({error:'Only Ayon changes passwords'},403);if(!existing?.auth_user_id)throw Error('Account not found');await setAccountPassword(sb,existing.auth_user_id,p.password);const {error}=await ownerDb.from('ffh_profiles').update({must_change_password:false}).eq('staff_id',id);if(error)throw error;return out({saved:true,password_changed:true});}
+
+ if(action==='replace_sr'){
+  // Owner-only handover: keep the route identity and all staff-ID-linked operational records.
+  if(!rootOwner)return out({error:'Only Ayon can replace an SR account'},403);
+  if(id==='M21954'||!existing||existing.can_sell!==true||existing.can_manage===true)throw Error('Select an existing SR route account. Managers and the owner cannot be replaced.');
+  const incomingId=String(p.new_staff_id||'').trim().toUpperCase();
+  const incomingName=String(p.full_name||'').trim();
+  const incomingPassword=String(p.password||'');
+  if(!/^[A-Z][A-Z0-9_-]{2,29}$/.test(incomingId))throw Error('Enter the new SR Staff ID');
+  if(!incomingName||incomingName.length>150)throw Error('Enter the new SR full name');
+  if(incomingPassword.length<6)throw Error('Password needs at least 6 characters');
+  if(incomingId===id||incomingId===String(existing.company_staff_id||'').toUpperCase())throw Error('Use the NEW SR Staff ID to revoke the departing employee login. For ordinary edits use Edit.');
+  const {data:conflicts,error:lookupError}=await sb.from('ffh_profiles').select('staff_id,full_name').or('staff_id.eq.'+incomingId+',company_staff_id.eq.'+incomingId).neq('staff_id',id).limit(1);
+  if(lookupError)throw Error('Staff ID availability check failed. Nothing changed.');
+  if(conflicts?.length)throw Error('Staff ID '+incomingId+' already belongs to '+conflicts[0].full_name+' ('+conflicts[0].staff_id+'). Choose an unused ID; existing accounts and sales cannot be silently overwritten.');
+  const {data:created,error:createError}=await sb.auth.admin.createUser({email:incomingId.toLowerCase()+'@fieldforce.app',password:incomingPassword,email_confirm:true});
+  if(createError||!created?.user)throw createError||Error('Could not create the new SR login');
+  // New Auth identity means the outgoing staff's sessions no longer map to this profile.
+  const replacement={company_staff_id:incomingId,login_alias:incomingId.toLowerCase(),full_name:incomingName,auth_user_id:created.user.id,photo_url:null,active:true,login_approved:true,must_change_password:false,updated_at:new Date().toISOString()};
+  const {error:saveError}=await ownerDb.from('ffh_profiles').update(replacement).eq('staff_id',id);
+  if(saveError){
+   await sb.auth.admin.deleteUser(created.user.id);
+   throw Error(saveError.code==='23505'?'New Staff ID is already assigned. No account was replaced.':'Replacement failed. Original SR route and login were left unchanged: '+saveError.message);
+  }
+  let oldLoginBanned=true;
+  if(existing.auth_user_id&&existing.auth_user_id!==created.user.id){
+   const {error:banError}=await sb.auth.admin.updateUserById(existing.auth_user_id,{ban_duration:'876000h'});
+   oldLoginBanned=!banError;
+  }
+  return out({saved:true,staff_id:id,login_id:incomingId,route_preserved:true,old_login_detached:true,old_login_banned:oldLoginBanned});
+ }
  if(!['create','update'].includes(action))throw Error('Unknown account action');
  if(id==='M21954')throw Error('Owner permissions cannot be changed here');
  if(action==='create'&&existing)throw Error('Staff ID already exists');if(action==='update'&&!existing)throw Error('Account not found');
