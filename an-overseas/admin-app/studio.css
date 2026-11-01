@@ -32,3 +32,8 @@ border:1px solid #b96e24;border-radius:15px;padding:15px;box-shadow:0 9px 25px #
 .an-admin-photo-dialog>img{display:block;object-fit:contain;width:auto;height:auto;max-width:calc(96vw - 24px);max-height:calc(94dvh - 80px);margin:12px auto}
 .an-admin-photo-dialog [data-admin-photo-close]{display:block;margin-left:auto;background:#ff9319;color:#111;padding:8px 14px;border:0;border-radius:10px;font-weight:800;cursor:pointer}
 .studio-update-text-preview{display:grid;place-items:center;width:100%;height:100%;font-size:28px;color:#ff9219}
+
+/* Keep the admin list compact even when a full Facebook caption is saved. */
+.studio-media-row p{display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line;overflow-wrap:anywhere}
+.studio-media-row .actions{display:flex;flex-wrap:wrap;gap:8px}
+.studio-media-row .studio-preview{overflow:hidden;flex-shrink:0}
