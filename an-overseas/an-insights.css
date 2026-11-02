@@ -80,3 +80,31 @@ body.an-community-mode #app{flex:1 1 0;min-height:0;overflow:hidden;display:flex
  #app .an-community-panel .an-youtube-media{aspect-ratio:16/10}
  #app .an-community-card,#app .an-community-panel .an-youtube-card{max-width:100%}
 }
+
+/* 2026-11-03: Mobile Success button only. Preserve every other website page. */
+@media(max-width:780px){
+ body.an-community-mode{height:100vh;height:100dvh;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+ body.an-community-mode .top{flex:0 0 auto}
+ body.an-community-mode .an-updates-bar{flex:0 0 auto}
+ body.an-community-mode #app{display:flex;flex:1 1 0;min-height:0;overflow:hidden;flex-direction:column}
+ body.an-community-mode #app .an-community-page{height:100%;flex:1 1 0;min-height:0;max-height:100%;padding:7px 9px 8px;overflow:hidden;gap:7px}
+ body.an-community-mode #app .an-community-intro{display:flex;flex:0 0 auto;flex-direction:row;align-items:center;gap:5px}
+ body.an-community-mode #app .an-community-intro h1{font-size:17px;line-height:1.15}
+ body.an-community-mode #app .an-community-intro .an-community-eyebrow{font-size:8px;letter-spacing:.6px}
+ body.an-community-mode #app .an-community-intro p,body.an-community-mode #app .an-community-intro-pill{display:none}
+ body.an-community-mode #app .an-community-columns{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(2,minmax(0,1fr));gap:8px;flex:1 1 0;min-height:0;overflow:hidden}
+ body.an-community-mode #app .an-community-panel{height:100%;min-height:0;flex:initial;border-radius:12px}
+ body.an-community-mode #app .an-community-panel-head{padding:7px 9px 6px}
+ body.an-community-mode #app .an-community-panel-head h2{font-size:14px;margin:1px 0}
+ body.an-community-mode #app .an-community-panel-head small{display:none}
+ body.an-community-mode #app .an-community-panel-head .an-community-eyebrow{font-size:8px;letter-spacing:.5px}
+ body.an-community-mode #app .an-community-panel-head .an-panel-icon{width:29px;height:29px;font-size:16px}
+ body.an-community-mode #app .an-community-featured{margin:5px 7px 0;padding:5px 7px;font-size:9px}
+ body.an-community-mode #app .an-community-featured b{font-size:9px;padding:4px 5px}
+ body.an-community-mode #app .an-community-scroll{flex:1 1 0;min-height:0;max-height:100%;padding:6px;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+ body.an-community-mode #app .an-community-grid,body.an-community-mode #app .an-community-panel .an-youtube-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ body.an-community-mode #app .an-community-copy,body.an-community-mode #app .an-community-panel .an-youtube-info{padding:7px}
+ body.an-community-mode #app .an-community-copy h3,body.an-community-mode #app .an-community-panel .an-story-copy h3{font-size:11px!important}
+ body.an-community-mode #app .an-community-desc{font-size:10px;line-height:1.4}
+ body.an-community-mode #app .an-community-panel .an-premium-empty{padding:12px 9px}
+}
