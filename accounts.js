@@ -4,7 +4,35 @@ window.FFH_CREATE_ACCOUNTS=ctx=>async function(){
  const modules=['accounts','sales','income','tasks','cpo','catalogue','outlets','routes','proposals','briefings','settings','claims','notifications','contacts','income_salary','income_targets','income_commission','income_incentives','income_penalties'];
  const rpc=async(action,payload={})=>{const {data,error}=await sb.rpc('ffh_governance',{action,payload});if(error)throw Error(error.message);return data;};
  const api=async body=>{let {data,error}=await sb.functions.invoke('ffh-accounts',{body});if(error){try{const detail=await error.context?.json();if(detail?.error)throw Error(detail.error);}catch(e){if(e.message!==error.message&&e.message!=='Unexpected end of JSON input')throw e;}throw Error(error.message+' · Your changes were not confirmed. Retry after reconnecting.');}if(data?.error)throw Error(data.error);return data;};
- const page=(title,html)=>{ctx.setPage?.('control:users');shell(back(title)+html);bindBack();};
+ let accountReturnScreen=null,skipNextAccountHistory=false;
+ const page=(title,html)=>{
+  const root=title==='Staff, Zones & Permissions'||title==='Staff Management';
+  const returnScreen=root?null:(title==='Owner · Archived staff data'?'deleted-history':'directory');
+  if(returnScreen&&!skipNextAccountHistory){
+   history.pushState({ffhPage:'control:users',ffhAccountSubview:true,returnScreen},'',location.href);
+  }
+  accountReturnScreen=returnScreen;
+  ctx.setPage?.('control:users');
+  const header=back(title)
+   .replace('class="head ffNoScreenBack"','class="head ffAccountNavHeader" data-ff-account-subpage="'+(returnScreen?'true':'false')+'"')
+   .replace('<h1>','<button type="button" id="back" class="secondary ffAccountPageBack" aria-label="Back to previous screen">‹ BACK</button><h1>');
+  shell(header+html);bindBack();
+  const goBack=q('#back');
+  if(goBack)goBack.onclick=()=>{if(history.length>1)history.back();else if(accountReturnScreen)home();};
+ };
+ const accountHardwareBack=e=>{
+  if(!accountReturnScreen||!q('.ffAccountNavHeader[data-ff-account-subpage="true"]'))return;
+  e.stopImmediatePropagation();
+  const target=accountReturnScreen;accountReturnScreen=null;skipNextAccountHistory=true;
+  const restore=target==='deleted-history'?deletedStaffHistory():home();
+  Promise.resolve(restore).catch(error=>alert(error.message)).finally(()=>{skipNextAccountHistory=false;});
+ };
+ window.__FFH_ACCOUNT_BACK_HANDLER=accountHardwareBack;
+ if(!window.__FFH_ACCOUNT_BACK_BOUND){
+  window.__FFH_ACCOUNT_BACK_BOUND=true;
+  window.addEventListener('popstate',e=>window.__FFH_ACCOUNT_BACK_HANDLER?.(e),true);
+ }
+
  const busy=async(button,work)=>{button.disabled=true;try{await work();}catch(e){alert(e.message);}finally{if(button.isConnected)button.disabled=false;}};
  let data;
  async function load(){data=await rpc('state');admin=owner||data.administrator===true;data.profiles??=[];data.zones??=[];data.grants??=[];data.zone_access??=[];data.requests??=[];}
