@@ -1,0 +1,36 @@
+name: FieldForce Hub Staff Photo QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'staff-photos.js'
+      - 'index.html'
+      - 'tests/staff-photos-dom.cjs'
+      - 'tests/staff-photos-browser.cjs'
+      - '.github/workflows/ffh-staff-photo-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  photo-unit-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install deterministic UI test dependencies
+        run: npm --prefix /tmp/ffh-photo-qa install --no-save jsdom@26.1.0 playwright@1.58.2
+      - name: Validate JavaScript and synchronized profile UI
+        env:
+          NODE_PATH: /tmp/ffh-photo-qa/node_modules
+        run: |
+          node --check staff-photos.js
+          node tests/staff-photos-dom.cjs
+      - name: Test real mobile Chromium with mocked Supabase login
+        env:
+          NODE_PATH: /tmp/ffh-photo-qa/node_modules
+          FFH_CHROMIUM: /usr/bin/google-chrome
+        run: |
+          python3 -m http.server 8765 >/tmp/ffh-photo-qa-http.log 2>&1 &
+          node tests/staff-photos-browser.cjs
