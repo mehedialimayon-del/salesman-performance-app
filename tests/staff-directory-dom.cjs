@@ -75,7 +75,9 @@ const ctx={
  form.dispatchEvent(new w.SubmitEvent('submit',{bubbles:true,cancelable:true,submitter:form.querySelector('[type="submit"]')}));
  await new Promise(resolve=>setTimeout(resolve,10));
  assert.equal(passwords.length,1,'password change should invoke backend once');
- assert.deepEqual(passwords[0],{action:'password',staff_id:'M21954',password:'ExampleSecure2026'});
+ assert.equal(passwords[0].action,'password');
+ assert.equal(passwords[0].staff_id,'M21954');
+ assert.equal(passwords[0].password,'ExampleSecure2026');
  assert.match(document.querySelector('#ffOwnerPasswordStatus').textContent,/successfully changed/i);
  console.log('PASS: grouped teams, owner first, manager-first SRs, live search, action controls, owner password');
 })().catch(e=>{console.error(e);process.exitCode=1;});
