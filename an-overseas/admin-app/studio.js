@@ -36,7 +36,7 @@ const defaultCountries=[
 const progress=msg=>{const el=document.querySelector('#studio-progress');if(el)el.textContent=msg;};
 const publish=async(key,value)=>{if(!authorized())throw Error('Admin login required');await api().publish(key,value);};
 const verifyPublished=async(key,record)=>{const latest=await api().getContent(key,[]);if(!Array.isArray(latest)||!latest.some(x=>x&&x.id===record.id&&x.approved===true&&x.media_url===record.media_url))throw Error('Publish request was sent, but the saved item could not be verified. Please refresh History before trying again.');return latest;};
-const liveHubUrl=()=>new URL('../index.html#/success',location.href).href;
+const liveHubUrl=()=>new URL('../index.html?hub_refresh=20261103-fresh-1#/success',location.href).href;
 async function upload(file,prefix){
  if(!authorized())throw Error('Admin authorization required');
  if(!(file instanceof File)||!file.size)return '';
