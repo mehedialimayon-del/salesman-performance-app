@@ -43,7 +43,7 @@ const ctx={
   }
  },
  shell:markup=>{document.querySelector('#app').innerHTML=markup;},
- back:()=>'<button id="back">BACK</button>',
+ back:title=>'<div class="head ffNoScreenBack"><h1>'+esc(title)+'</h1></div>',
  esc,bindBack:()=>{},q:s=>document.querySelector(s),qa:s=>Array.from(document.querySelectorAll(s)),
  user:()=>({id:'M21954',name:'MEHEDI ALIM AYON',can_manage:true}),
  setPage:()=>{},ffhLoadCloud:async()=>{}
