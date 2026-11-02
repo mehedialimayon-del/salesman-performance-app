@@ -69,3 +69,14 @@ body.an-community-mode #app{flex:1 1 0;min-height:0;overflow:hidden;display:flex
 .an-preview-dialog{max-width:96vw!important;max-height:94dvh!important;overflow:auto}
 .an-preview-dialog img{display:block;width:auto!important;height:auto!important;max-width:calc(96vw - 48px)!important;max-height:76dvh!important;object-fit:contain!important;margin:0 auto}
 .an-community-card .an-community-media.is-image img{object-fit:cover;object-position:center}
+
+/* 2026-11-03: two distinct sections, mobile feed readability, no original-photo cropping in viewer. */
+#app .an-community-intro-pill{max-width:45%;white-space:normal;text-align:center;line-height:1.35}
+@media(max-width:540px){
+ #app .an-community-intro{flex-direction:column;gap:9px}
+ #app .an-community-intro-pill{max-width:100%;text-align:left}
+ #app .an-community-grid,#app .an-community-panel .an-youtube-grid{grid-template-columns:minmax(0,1fr)}
+ #app .an-community-media{aspect-ratio:16/10}
+ #app .an-community-panel .an-youtube-media{aspect-ratio:16/10}
+ #app .an-community-card,#app .an-community-panel .an-youtube-card{max-width:100%}
+}
