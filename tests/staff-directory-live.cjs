@@ -11,13 +11,14 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
   page.on('pageerror',e=>console.log('Site script warning:',e.message.slice(0,240)));
   let ready=false;
   for(let n=0;n<12;n++){
-   const response=await page.goto(site+'?qa_version=leadership3&attempt='+n,{waitUntil:'domcontentloaded',timeout:50000});
+   const response=await page.goto(site+'?qa_version=outlets-avatar-mobile1&attempt='+n,{waitUntil:'domcontentloaded',timeout:50000});
    console.log('Live HTTP status:',response?.status(),'URL:',page.url());
    try{
     await page.waitForFunction(()=>!!(window.FFH_STAFF_DIRECTORY&&window.FFH_CREATE_ACCOUNTS&&
-      document.querySelector('link[href*="staff-directory.css?v=leadership-"]')&&
-      document.querySelector('script[src*="accounts.js?v=leadership-"]')&&
-      document.querySelector('script[src*="staff-directory.js?v=leadership-20261103-3"]')),
+      document.querySelector('link[href*="account-outlet-access.css?v=20261103-responsive-1"]')&&
+      document.querySelector('script[src*="accounts.js?v=20261103-outlets-edit-1"]')&&
+      document.querySelector('script[src*="staff-directory.js?v=20261103-all-zone-avatars-1"]')&&
+      document.querySelector('script[src*="account-outlet-access.js?v=20261103-owner-excel-1"]')),
     null,{timeout:7000});
     ready=true;break;
    }catch(e){
@@ -40,8 +41,18 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
    ];
    const zones=[{id:'PRIMARY',name:'KL',active:true},{id:'HEAD_OFFICE',name:'Head Office',active:true},{id:'CHERAS',name:'Cheras',active:true}];
    const esc=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;');
+   window.__qaOutletSaved=null;
+   const outletBase={can_sell:true,active_total:2,inactive_total:0,
+    outlets:[{code:'00012',name:'First Outlet',category:'NSK',total_sku:10,active:true},
+             {code:'00013',name:'Second Outlet',category:'Giant',total_sku:8,active:true}]};
    const ctx={FFH_SUPABASE:{
-    rpc:async()=>({data:{owner:true,administrator:true,profiles:staff,zones,grants:[{staff_id:'M22328',module:'sales',can_edit:true,can_upload:false,can_delete:true}],zone_access:[],requests:[],outlets:[]},error:null}),
+    rpc:async(name,args)=>{
+     if(name==='ffh_owner_outlet_access'){
+      if(args?.action==='import'){window.__qaOutletSaved=args.payload.rows;return{data:{...outletBase,imported:args.payload.rows.length,active_total:4},error:null};}
+      return {data:outletBase,error:null};
+     }
+     return {data:{owner:true,administrator:true,profiles:staff,zones,grants:[{staff_id:'M22328',module:'sales',can_edit:true,can_upload:false,can_delete:true}],zone_access:[],requests:[],outlets:[]},error:null};
+    },
     functions:{invoke:async()=>({data:{password_changed:true},error:null})}
    },shell:html=>qa.innerHTML=html,back:t=>'<div class="head ffNoScreenBack"><h1>'+esc(t)+'</h1></div>',
    bindBack:()=>{},q:s=>document.querySelector(s),qa:s=>[...document.querySelectorAll(s)],
@@ -69,6 +80,28 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
   assert.equal(await tick.isChecked(),true);
   const appearance=await tick.evaluate(el=>getComputedStyle(el).appearance);
   assert.notEqual(appearance,'none','Permission tick must use visible checkbox appearance');
+  const editOverflow=await section.locator('#ffAccountForm').evaluate(form=>({
+    formWidth:form.getBoundingClientRect().width,
+    viewWidth:document.documentElement.clientWidth,
+    documentScroll:document.documentElement.scrollWidth
+  }));
+  assert.ok(editOverflow.documentScroll<=editOverflow.viewWidth+6,
+   'Edit/permissions screen must not overflow 393px mobile viewport: '+JSON.stringify(editOverflow));
+  await section.locator('#ffEditOutletAccessOpen').click();
+  await section.locator('#ffOutletAccessRows .ffOutletListRow').first().waitFor();
+  assert.match(await section.locator('.ffOutletTotals').innerText(),/TOTAL OUTLETS: 2/);
+  assert.equal(await section.locator('.ffOutletListRow').count(),2);
+  assert.match(await section.locator('.ffOutletListRow').first().innerText(),/1\\. First Outlet/);
+  page.on('dialog',dialog=>dialog.accept());
+  await section.locator('#ffOutletExcelFile').setInputFiles({
+    name:'staff-outlets.csv',mimeType:'text/csv',
+    buffer:Buffer.from('Outlet Code,Outlet Name,Category,Total SKU\\n00021,New Outlet,NSK,6\\n00022,Another Outlet,Giant,0')
+  });
+  await section.locator('#ffOutletUploadSave:not([disabled])').waitFor({timeout:10000});
+  await section.locator('#ffOutletUploadSave').click();
+  await page.waitForFunction(()=>Array.isArray(window.__qaOutletSaved),null,{timeout:10000});
+  assert.equal(await page.evaluate(()=>window.__qaOutletSaved.length),2);
+  assert.match(await section.locator('#ffOutletAccessStatus').innerText(),/Saved 2 outlets/);
   await section.locator('#back').click();
   await section.locator('#ffStaffSearch').waitFor({timeout:10000});
   assert.equal(await section.locator('.ffTeamZone').count(),3,'Back returns directory instead of Home');
