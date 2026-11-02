@@ -64,6 +64,8 @@ for(const id of ['M21954','M22075']){
  await page.locator('.ffItemPicker .ffPickerOption').first().waitFor({timeout:5000});
  await page.locator('.ffItemPicker .ffPickerAvatar').first().waitFor({timeout:8000});
  assert.ok(await page.locator('.ffItemPicker .ffPickerAvatar').count()>=1,'chat contact picker includes portrait');
+ await page.locator('.ffItemPicker .globalSearchBox > .row button.secondary').first().click();
+ await page.locator('.ffItemPicker').waitFor({state:'detached',timeout:4000});
  await page.evaluate(()=>{
   const select=document.createElement('select');select.id='ffAssignQaSelect';select.multiple=true;
   select.innerHTML='<option value="M22075">Test Colleague</option><option value="M21954">MEHEDI ALIM AYON</option>';
