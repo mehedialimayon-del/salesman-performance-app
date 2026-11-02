@@ -1,0 +1,41 @@
+name: FieldForce Staff Zone Directory QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'accounts.js'
+      - 'staff-directory.js'
+      - 'staff-directory.css'
+      - 'index.html'
+      - 'tests/staff-directory-dom.cjs'
+      - '.github/workflows/ffh-staff-directory-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  zone-directory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Validate JavaScript syntax
+        run: |
+          node --check accounts.js
+          node --check staff-directory.js
+          node --check tests/staff-directory-dom.cjs
+      - name: Test owner management, team grouping, and search
+        run: node tests/staff-directory-dom.cjs
+      - name: Verify live entrypoint and CSS wiring
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const html=fs.readFileSync('index.html','utf8');
+          for(const n of ['staff-directory.js?v=zone-team-search-20261103-1','staff-directory.css?v=zone-team-search-20261103-1','accounts.js?v=zone-team-search-password-20261103-1']){
+            if(!html.includes(n))throw Error('Missing asset in index: '+n);
+          }
+          console.log('PASS: all new live assets referenced');
+          NODE
