@@ -132,7 +132,7 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
   page.on('dialog',dialog=>dialog.accept());
   await section.locator('#ffOutletExcelFile').setInputFiles({
     name:'staff-outlets.csv',mimeType:'text/csv',
-    buffer:Buffer.from('Outlet Code,Outlet Name,Category,Total SKU\\n00021,New Outlet,NSK,6\\n00022,Another Outlet,Giant,0')
+    buffer:Buffer.from('Outlet Code,Outlet Name,Category,Total SKU\n00021,New Outlet,NSK,6\n00022,Another Outlet,Giant,0')
   });
   await page.waitForTimeout(450);
   console.log('OUTLET FILE CHECK',JSON.stringify(await section.evaluate(el=>({
