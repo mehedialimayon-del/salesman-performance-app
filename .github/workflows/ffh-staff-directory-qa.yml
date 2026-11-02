@@ -27,6 +27,15 @@ jobs:
           node --check accounts.js
           node --check staff-directory.js
           node --check tests/staff-directory-dom.cjs
+      - name: Inspect app navigation contract
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),src=fs.readFileSync('app.js','utf8');
+          for(const marker of ['function back(', 'function bindBack(', 'function go(', 'function controlPage(', 'function shell(', 'FFH_CREATE_ACCOUNTS']){
+            const p=src.indexOf(marker);
+            console.log('NAV', marker, p, p>=0?src.slice(p,p+920).replaceAll('\\n',' '):'not found');
+          }
+          NODE
       - name: Test owner management, team grouping, and search
         run: node tests/staff-directory-dom.cjs
       - name: Verify live entrypoint and CSS wiring
