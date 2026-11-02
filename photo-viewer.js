@@ -85,7 +85,7 @@
   document.addEventListener('click', e => {
     const im=e.target.closest('.zoomable,.ffSkuModalHero img,.ffBulkPhoto,#ffSkuPhotoPreview');
     if(!im?.src)return;
-    e.preventDefault();e.stopPropagation();window.FFH_OPEN_IMAGE(im.src);
+    e.preventDefault();e.stopPropagation();window.FFH_OPEN_IMAGE(im.dataset.fullSrc || im.src);
   }, true);
   const style=document.createElement('style');
   style.textContent='.ffPhotoViewer{position:fixed;inset:0;z-index:30000;background:#05080bf5;display:flex;flex-direction:column;color:white}.ffPhotoToolbar{display:flex;align-items:center;justify-content:center;gap:12px;padding:12px;padding-top:max(12px,env(safe-area-inset-top));flex-shrink:0}.ffPhotoToolbar button{min-width:42px;min-height:44px;background:#19232e;color:white;border:1px solid #e99c54;border-radius:10px;font-size:20px}.ffPhotoToolbar output{min-width:52px;text-align:center}.ffPhotoStage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;user-select:none}.ffPhotoStage img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transform-origin:center;pointer-events:none}.ffPhotoHint{text-align:center;font-size:12px;padding:8px;color:#d8dce0}.ffBulkPhoto{width:100px;height:100px;object-fit:contain;border-radius:50%;cursor:zoom-in;border:1px solid #e99c54}';
