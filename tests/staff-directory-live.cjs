@@ -127,7 +127,7 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
   await section.locator('#ffOutletAccessRows .ffOutletListRow').first().waitFor();
   assert.match(await section.locator('.ffOutletTotals').innerText(),/TOTAL OUTLETS: 2/);
   assert.equal(await section.locator('.ffOutletListRow').count(),2);
-  assert.match(await section.locator('.ffOutletListRow').first().innerText(),/1\\. First Outlet/);
+  assert.match(await section.locator('.ffOutletListRow').first().innerText(),/1\\.\\s*First Outlet/);
   page.on('dialog',dialog=>dialog.accept());
   await section.locator('#ffOutletExcelFile').setInputFiles({
     name:'staff-outlets.csv',mimeType:'text/csv',
