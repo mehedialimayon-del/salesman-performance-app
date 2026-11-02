@@ -134,6 +134,13 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
     name:'staff-outlets.csv',mimeType:'text/csv',
     buffer:Buffer.from('Outlet Code,Outlet Name,Category,Total SKU\\n00021,New Outlet,NSK,6\\n00022,Another Outlet,Giant,0')
   });
+  await page.waitForTimeout(450);
+  console.log('OUTLET FILE CHECK',JSON.stringify(await section.evaluate(el=>({
+    status:el.querySelector('#ffOutletAccessStatus')?.textContent,
+    preview:el.querySelector('#ffOutletExcelPreview')?.textContent?.slice(0,260),
+    filename:el.querySelector('#ffOutletExcelFile')?.files?.[0]?.name,
+    xlsxLoaded:!!window.XLSX?.read,buttonDisabled:el.querySelector('#ffOutletUploadSave')?.disabled
+  }))));
   await section.locator('#ffOutletUploadSave:not([disabled])').waitFor({timeout:10000});
   await section.locator('#ffOutletUploadSave').click();
   await page.waitForFunction(()=>Array.isArray(window.__qaOutletSaved),null,{timeout:10000});
