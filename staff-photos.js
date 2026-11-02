@@ -6,6 +6,7 @@
  const pickId=()=>{try{return String(JSON.parse(localStorage.getItem('ffh_session')||'null')?.id||'').trim().toUpperCase();}catch{return '';}};
  const safeUrl=value=>{try{const u=new URL(String(value||''));return u.protocol==='https:'?u.href:'';}catch{return '';}};
  const person=id=>avatars.get(String(id||'').toUpperCase());
+ const fullPhoto=url=>url&&url.includes('/photo-v2-')?url.replace('/photo-v2-','/full-v2-'):url;
  const emptyPortrait='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><rect width="80" height="80" rx="40" fill="#21150e"/><circle cx="40" cy="29" r="15" fill="#f48a3a"/><path d="M13 77c1-19 12-29 27-29s26 10 27 29" fill="#f48a3a"/></svg>');
  const byName=name=>[...avatars.values()].find(p=>p.full_name?.trim().toLowerCase()===String(name||'').trim().toLowerCase());
  function patchAvatar(container,id,classes='ffStaffCircle'){
@@ -14,7 +15,7 @@
   container.dataset.ffProfileSource=url;container.dataset.ffProfileStaff=String(id||'');
   const img=container.querySelector(':scope > img.ffStaffPhoto');
   if(url&&!broken.has(url)){let image=img;if(!image){container.replaceChildren();image=document.createElement('img');image.className='ffStaffPhoto zoomable';image.loading='lazy';container.append(image);}
-   image.src=url;image.alt=name+' profile photo';image.title='Tap to enlarge photo';image.onerror=()=>{broken.add(url);if(image.isConnected){container.dataset.ffProfileSource='';patchAvatar(container,id,classes);}};container.classList.add('ffHasStaffPhoto');
+   image.src=url;image.dataset.fullSrc=fullPhoto(url);image.alt=name+' profile photo';image.title='Tap to enlarge photo';image.onerror=()=>{broken.add(url);if(image.isConnected){container.dataset.ffProfileSource='';patchAvatar(container,id,classes);}};container.classList.add('ffHasStaffPhoto');
   }else{container.replaceChildren();container.textContent=initial;container.classList.remove('ffHasStaffPhoto');}
   container.classList.add(...classes.split(' '));
  }
@@ -24,9 +25,9 @@
   for(const img of document.querySelectorAll('.ffIdentityHero .editableAvatar,.profile .editableAvatar')){
    let p=person(id),url=safeUrl(p?.photo_url);
    if(p){const next=url&&!broken.has(url)?url:emptyPortrait;if(img.dataset.ffServerPhoto!==next){img.dataset.ffServerPhoto=next;img.src=next;}}
-   img.classList.add('zoomable');img.title='View full profile photo';img.alt='My profile photo';
+   img.classList.add('zoomable');img.dataset.fullSrc=fullPhoto(url)||img.src;img.title='View full profile photo';img.alt='My profile photo';
    img.tabIndex=0;img.setAttribute('role','button');img.setAttribute('aria-label','Enlarge my profile photo');
-   if(!img.dataset.ffPhotoKeyboard){img.dataset.ffPhotoKeyboard='yes';img.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();window.FFH_OPEN_IMAGE?.(img.src);}});}
+   if(!img.dataset.ffPhotoKeyboard){img.dataset.ffPhotoKeyboard='yes';img.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();window.FFH_OPEN_IMAGE?.(img.dataset.fullSrc||img.src);}});}
    // Avatar opens the full-size zoom viewer. Photo changes live in the top-right Settings menu.
   }
  }
@@ -72,12 +73,33 @@
    patchAvatar(slot,id,'ffChatSenderAvatar ffStaffCircle');
   }
  }
+
  function pickers(){
   for(const row of document.querySelectorAll('.ffItemPicker .ffPickerOption')){
-   if(row.querySelector(':scope > .ffPickerAvatar'))continue;
-   const text=row.querySelector('strong')?.textContent||'';
-   const p=person(row.dataset.staffId)||byName(text)||[...avatars.values()].find(x=>text.includes(x.staff_id));if(!p)continue;
-   const circle=makeAvatar(p.staff_id,'ffPickerAvatar ffStaffCircle');row.prepend(circle);
+   const text=row.querySelector('strong,.ffPickerText')?.textContent||row.querySelector('span:not(.ffPickerAvatar)')?.textContent||'';
+   const p=person(row.dataset.staffId)||byName(text)||[...avatars.values()].find(x=>text.includes(x.staff_id));
+   if(!p)continue;
+   let avatar=row.querySelector(':scope > .ffPickerAvatar');
+   if(!avatar){
+    avatar=makeAvatar(p.staff_id,'ffPickerAvatar ffStaffCircle');
+    const box=row.querySelector('.ffPickerText,.ffMultiOption > span');
+    if(box)row.insertBefore(avatar,box);else row.prepend(avatar);
+   }else patchAvatar(avatar,p.staff_id,'ffPickerAvatar ffStaffCircle');
+  }
+  for(const select of document.querySelectorAll('select[data-ff-picker="1"]:not([multiple])')){
+   const button=select.nextElementSibling;
+   if(!button?.classList.contains('ffSelectTrigger'))continue;
+   const p=person(select.value);
+   const old=button.querySelector('.ffSelectStaffAvatar');
+   if(!p){
+    if(old){button.textContent=select.selectedOptions?.[0]?.textContent||'Select';button.removeAttribute('data-staff-photo');}
+    continue;
+   }
+   if(!old||button.dataset.staffPhoto!==p.staff_id){
+    const avatar=makeAvatar(p.staff_id,'ffSelectStaffAvatar ffStaffCircle');
+    const label=document.createElement('span');label.className='ffSelectStaffLabel';label.textContent=select.selectedOptions?.[0]?.textContent||p.full_name;
+    button.replaceChildren(avatar,label);button.dataset.staffPhoto=p.staff_id;
+   }else patchAvatar(old,p.staff_id,'ffSelectStaffAvatar ffStaffCircle');
   }
  }
  function render(){scheduled=false;if(!pickId())return;own();dashboard();accountCards();chat();pickers();}
@@ -96,7 +118,7 @@
   }catch(err){console.warn('Staff profile photos are temporarily unavailable:',err.message||err);}finally{fetching=null;}})();
   return fetching;
  }
- function sessionTick(){const id=pickId();if(id!==viewer){viewer=id;avatars.clear();lastRead=0;if(channel){sb()?.removeChannel?.(channel);channel=null;}}if(id)refresh();}
+ function sessionTick(){const id=pickId();if(id!==viewer){viewer=id;avatars.clear();lastRead=0;if(channel){sb()?.removeChannel?.(channel);channel=null;}}if(id){refresh();connectRealtime();}}
  const st=document.createElement('style');
  st.textContent=`
  .ffIdentityHero .editableAvatar,.profile .editableAvatar{border-radius:50%!important;object-fit:cover!important;cursor:zoom-in!important}
@@ -113,8 +135,17 @@
  #ffChatTitle{display:flex;align-items:center}
  .ffChatSender{display:inline-flex;align-items:center;gap:5px}
  .ffChatSenderAvatar{width:20px;height:20px;min-width:20px;font-size:10px}
- .ffPickerOption{display:flex!important;align-items:center;gap:9px}
- .ffPickerAvatar{width:32px;height:32px;min-width:32px}
+ .ffPickerOption{display:flex!important;align-items:center;flex-direction:row!important;gap:10px!important;min-height:56px!important;padding:7px 10px!important;text-align:left}
+ .ffPickerText{display:flex;flex:1;min-width:0;flex-direction:column;justify-content:center;gap:2px;text-align:left}
+ .ffPickerText strong{font-size:13px!important;line-height:1.25!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .ffPickerText small{font-size:10px!important;line-height:1.2!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .ffMultiOption input[type=checkbox]{flex:0 0 auto}
+ .ffMultiOption>span:not(.ffStaffCircle){flex:1;font-size:13px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .ffSelectTrigger:has(.ffSelectStaffAvatar){display:flex!important;align-items:center;gap:9px!important;min-height:46px!important;text-align:left}
+ .ffSelectStaffAvatar{width:38px!important;height:38px!important;min-width:38px!important}
+ .ffSelectStaffLabel{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+
+ .ffPickerAvatar{width:40px!important;height:40px!important;min-width:40px!important;flex:none}
  .ffRosterAvatar{width:34px;height:34px;min-width:34px}
  .ffStaffPhoto.zoomable{touch-action:manipulation}
  `;
@@ -125,12 +156,19 @@
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh(true)});
  document.addEventListener('ffh-staff-updated',()=>refresh(true));
  window.addEventListener('storage',e=>{if(e.key==='ffh_session')sessionTick()});
- queue();sessionTick();setInterval(()=>{if(document.hidden)return;sessionTick();},35000);
+ const connectRealtime=()=>{
+  if(channel||!sb()?.channel||!pickId())return;
+  try{channel=sb().channel('ffh-shared-staff-photo-'+pickId())
+   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'ffh_profiles'},()=>refresh(true))
+   .subscribe();}catch(err){console.warn('Profile photo realtime fallback:',err);}
+ };
+ window.addEventListener('ffh-staff-updated',()=>refresh(true));
+ queue();sessionTick();setInterval(()=>{if(document.hidden)return;sessionTick();refresh();},8000);
  window.FFH_STAFF_PHOTOS={refresh,render:queue,find:id=>person(id),updateOwn:(id,url)=>{
   if(!id||!safeUrl(url))return;
   const key=String(id).toUpperCase(),old=person(key)||{staff_id:key,full_name:key};
   avatars.set(key,{...old,photo_url:url});broken.delete(url);
-  document.querySelectorAll('.ffIdentityHero .editableAvatar,.profile .editableAvatar').forEach(img=>{img.dataset.ffServerPhoto=url;img.src=url;});
+  document.querySelectorAll('.ffIdentityHero .editableAvatar,.profile .editableAvatar').forEach(img=>{img.dataset.ffServerPhoto=url;img.src=url;img.dataset.fullSrc=fullPhoto(url);});
   queue();
  }};
 })();
