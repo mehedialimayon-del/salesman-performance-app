@@ -46,6 +46,12 @@
   const scope=document.querySelector('.ffScopeFilter summary');if(scope){let slot=scope.querySelector('.ffScopeAvatar');if(!slot){slot=document.createElement('span');slot.className='ffScopeAvatar ffStaffCircle';scope.prepend(slot);}patchAvatar(slot,p.staff_id,'ffScopeAvatar ffStaffCircle');}
  }
  function accountCards(){
+  // Zone staff cards are not .row elements. Reconcile by immutable staff ID,
+  // not by name or list index; reusing the shared photo store preserves zoom.
+  for(const avatar of document.querySelectorAll('.ffTeamAvatar[data-ff-staff-avatar]')){
+   const id=avatar.dataset.ffStaffAvatar;
+   if(id)patchAvatar(avatar,id,'ffTeamAvatar ffStaffCircle');
+  }
   for(const button of document.querySelectorAll('.ffEditAccount,.ffReplaceAccount')){
    const id=button.dataset.id,row=button.closest('.row');if(!row||!id||!person(id))continue;
    let circle=row.querySelector(':scope > .ffStaffCardAvatar');if(!circle){circle=document.createElement('span');circle.className='ffStaffCardAvatar ffStaffCircle';row.prepend(circle);}patchAvatar(circle,id,'ffStaffCardAvatar ffStaffCircle');
