@@ -10,8 +10,9 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
   const page=await context.newPage();
   page.on('pageerror',e=>console.log('Site script warning:',e.message.slice(0,240)));
   let ready=false;
-  for(let n=0;n<14;n++){
-   await page.goto(site,{waitUntil:'domcontentloaded',timeout:50000});
+  for(let n=0;n<4;n++){
+   const response=await page.goto(site,{waitUntil:'domcontentloaded',timeout:50000});
+   console.log('Live HTTP status:',response?.status(),'URL:',page.url());
    try{
     await page.waitForFunction(()=>!!(window.FFH_STAFF_DIRECTORY&&window.FFH_CREATE_ACCOUNTS&&
       document.querySelector('link[href*="staff-directory.css?v=leadership-"]')&&
@@ -19,7 +20,7 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
     null,{timeout:7000});
     ready=true;break;
    }catch(e){
-    console.log('Published site not updated, refreshing',n+1);
+    console.log('Site diagnosis',JSON.stringify(await page.evaluate(()=>({title:document.title,htmlSize:document.documentElement.outerHTML.length,script:document.querySelector('script[src*="accounts.js"]')?.getAttribute('src'),css:document.querySelector('link[href*="staff-directory.css"]')?.getAttribute('href'),accounts:!!window.FFH_CREATE_ACCOUNTS,directory:!!window.FFH_STAFF_DIRECTORY,body:document.body?.innerText.slice(0,140)}))),'refresh',n+1);
     await page.waitForTimeout(4500);
    }
   }
