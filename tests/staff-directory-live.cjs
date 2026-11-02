@@ -27,9 +27,10 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
    }
   }
   assert.ok(ready,'Latest changed assets were not published on live GitHub Pages.');
+  await page.addStyleTag({content:'#onesignal-slidedown-container,.onesignal-slidedown-container {display:none!important;pointer-events:none!important}'});
   await page.evaluate(async()=>{
    const qa=document.createElement('div');qa.id='ffLiveQa';
-   qa.style.cssText='width:393px;max-width:100%;margin:0 auto;padding:10px;background:#090909;color:white;min-height:100vh;position:relative;z-index:2147483640';
+   qa.style.cssText='width:393px;max-width:100%;margin:0 auto;padding:10px;background:#090909;color:white;min-height:100vh;position:relative;z-index:100';
    document.body.appendChild(qa);
    const staff=[
     {staff_id:'M21954',company_staff_id:'M21954',full_name:'MEHEDI ALIM AYON',zone_id:'PRIMARY',designation:'MANAGER',can_manage:true,can_sell:false,active:true,manager_id:'PERVES_HIRA'},
