@@ -29,6 +29,7 @@ for(const id of ['M21954','M22075']){
  await page.locator('#ffChooseChatPerson').waitFor({timeout:10000});
  await page.locator('#ffChooseChatPerson').click();
  await page.locator('.ffItemPicker .ffPickerOption').first().waitFor({timeout:5000});
+ await page.locator('.ffItemPicker .ffPickerAvatar').first().waitFor({timeout:8000});
  assert.ok(await page.locator('.ffItemPicker .ffPickerAvatar').count()>=1,'chat contact picker includes portrait');
  console.log('PASS Chromium home profile zoom/edit, manager scoped dashboard and chat staff selection: '+id);
  await ctx.close();
