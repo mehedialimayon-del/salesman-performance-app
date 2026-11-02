@@ -9,7 +9,7 @@ window.FFH_CREATE_ACCOUNTS=ctx=>async function(){
   const root=title==='Staff, Zones & Permissions'||title==='Staff Management';
   const returnScreen=root?null:(title==='Owner · Archived staff data'?'deleted-history':'directory');
   if(returnScreen&&!skipNextAccountHistory){
-   history.pushState({ffhPage:'control:users',ffhAccountSubview:true,returnScreen},'',location.href);
+   window.history.pushState({ffhPage:'control:users',ffhAccountSubview:true,returnScreen},'',window.location.href);
   }
   accountReturnScreen=returnScreen;
   ctx.setPage?.('control:users');
@@ -18,7 +18,7 @@ window.FFH_CREATE_ACCOUNTS=ctx=>async function(){
    .replace('<h1>','<button type="button" id="back" class="secondary ffAccountPageBack" aria-label="Back to previous screen">‹ BACK</button><h1>');
   shell(header+html);bindBack();
   const goBack=q('#back');
-  if(goBack)goBack.onclick=()=>{if(history.length>1)history.back();else if(accountReturnScreen)home();};
+  if(goBack)goBack.onclick=()=>{if(window.history.length>1)window.history.back();else if(accountReturnScreen)home();};
  };
  const accountHardwareBack=e=>{
   if(!accountReturnScreen||!q('.ffAccountNavHeader[data-ff-account-subpage="true"]'))return;
