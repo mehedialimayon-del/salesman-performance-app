@@ -34,3 +34,25 @@
  .ffTeamInfo strong {font-size:15px;}
  .ffTeamDetails {font-size:12px;}
 }
+
+/* Restore clearly visible native checkmarks on every account permission.
+   Do not change saved permission state or business rules. */
+#ffAccountForm .ffPermissionRow{grid-template-columns:minmax(124px,1fr) repeat(3,minmax(35px,48px))!important;gap:5px!important;}
+#ffAccountForm .ffPermissionTable{max-width:100%;overflow-x:auto;}
+#ffAccountForm .ffPermissionRow label{display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;visibility:visible!important;opacity:1!important;}
+#ffAccountForm .ffPermissionRow input[type="checkbox"],
+#ffAccountForm input.ffAccessZone[type="checkbox"],
+#ffAccountForm #ffAllZones[type="checkbox"]{
+ appearance:auto!important;-webkit-appearance:checkbox!important;
+ display:inline-block!important;opacity:1!important;visibility:visible!important;
+ width:22px!important;height:22px!important;min-width:22px!important;
+ max-width:22px!important;margin:0 auto!important;padding:0!important;
+ accent-color:#ff822b!important;border-radius:4px!important;
+ transform:none!important;position:static!important;clip:auto!important;
+}
+#ffAccountForm .ffPermissionRow input[type="checkbox"]:checked{accent-color:#ff7a20!important;}
+#ffAccountForm .ffPermissionRow input[type="checkbox"]:focus-visible{outline:2px solid #fff!important;outline-offset:2px!important;}
+@media(max-width:460px){
+ #ffAccountForm .ffPermissionRow{grid-template-columns:minmax(118px,1fr) repeat(3,39px)!important;gap:3px!important;font-size:12px!important;}
+ #ffAccountForm .ffPermissionRow input[type="checkbox"]{width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;}
+}
