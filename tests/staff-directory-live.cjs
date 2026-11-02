@@ -61,6 +61,42 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
    window.__QA_ACCOUNTS=window.FFH_CREATE_ACCOUNTS(ctx);
    await window.__QA_ACCOUNTS();
   });
+  // The published site is tested with an isolated, mocked photo directory.
+  // No real user's profile or Auth data is modified by this browser test.
+  await page.route('https://qa.fieldforce.test/profiles/**',route=>route.fulfill({
+   contentType:'image/png',
+   body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y5AAsoAAAAASUVORK5CYII=','base64')
+  }));
+  await page.evaluate(async()=>{
+   localStorage.setItem('ffh_session',JSON.stringify({id:'M21954'}));
+   const sb=window.FFH_SUPABASE;
+   const original=sb.rpc.bind(sb);
+   window.__qaPhotoVersion='a';
+   sb.rpc=(name,payload)=>name==='ffh_staff_photo_directory'?
+    Promise.resolve({data:['M21954','PERVES_HIRA','WAHID_ADMIN','M22328','M22075','M22320']
+      .map(id=>({staff_id:id,full_name:id,photo_url:'https://qa.fieldforce.test/profiles/'+id.toLowerCase()+'/photo-v2-'+window.__qaPhotoVersion+'.png'})),error:null}):
+    original(name,payload);
+   await window.FFH_STAFF_PHOTOS.refresh(true);
+   window.FFH_STAFF_PHOTOS.render();
+  });
+  await page.locator('#ffLiveQa [data-ff-staff-avatar="M21954"] img.ffStaffPhoto').waitFor({timeout:8000});
+  assert.equal(await page.locator('#ffLiveQa [data-ff-staff-avatar] img.zoomable').count(),6,
+    'Every tested team member gets the correct round profile image');
+  const photoSource=await page.locator('#ffLiveQa [data-ff-staff-avatar="PERVES_HIRA"] img.ffStaffPhoto').getAttribute('src');
+  assert.ok(photoSource.includes('/perves_hira/'),'Parvez uses his own ID-specific photo, not owner photo');
+  await page.locator('#ffLiveQa [data-ff-staff-avatar="M21954"] img.zoomable').click();
+  await page.locator('.ffPhotoViewer').waitFor();
+  assert.ok((await page.locator('.ffPhotoViewer img').getAttribute('src')).includes('/full-v2-'),
+    'Zoom opens full original portrait, not cropped thumbnail');
+  await page.locator('.ffPhotoViewer [data-action="in"]').click();
+  assert.notEqual(await page.locator('.ffPhotoViewer output').textContent(),'100%');
+  await page.locator('.ffPhotoViewer [data-action="close"]').click();
+  await page.evaluate(async()=>{
+   window.__qaPhotoVersion='b';
+   await window.FFH_STAFF_PHOTOS.refresh(true);
+   window.FFH_STAFF_PHOTOS.render();
+  });
+  await page.waitForFunction(()=>document.querySelector('#ffLiveQa [data-ff-staff-avatar="M21954"] img')?.src.includes('photo-v2-b'),null,{timeout:8000});
   const section=page.locator('#ffLiveQa');
   await section.locator('#ffStaffSearch').waitFor();
   const titles=await section.locator('.ffTeamZoneHeader h3').allTextContents();
