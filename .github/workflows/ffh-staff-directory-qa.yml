@@ -31,7 +31,7 @@ jobs:
         run: |
           node - <<'NODE'
           const fs=require('fs'),src=fs.readFileSync('app.js','utf8');
-          for(const marker of ['function back(', 'function bindBack(', 'function go(', 'function controlPage(', 'function shell(', 'FFH_CREATE_ACCOUNTS']){
+          for(const marker of ['function back(', 'function bindBack(', 'function go(', 'function controlPage(', 'function shell(', 'FFH_CREATE_ACCOUNTS', 'popstate', 'pushState', 'setPage:', 'setPage(']){
             const p=src.indexOf(marker);
             console.log('NAV', marker, p, p>=0?src.slice(p,p+920).replaceAll('\\n',' '):'not found');
           }
