@@ -50,7 +50,7 @@ jobs:
           node - <<'NODE'
           const fs=require('fs');
           const html=fs.readFileSync('index.html','utf8');
-          for(const n of ['staff-directory.js?v=leadership-20261103-2','staff-directory.css?v=leadership-20261103-2','accounts.js?v=leadership-20261103-2']){
+          for(const n of ['staff-directory.js?v=leadership-20261103-3','staff-directory.css?v=leadership-20261103-2','accounts.js?v=leadership-20261103-2']){
             if(!html.includes(n))throw Error('Missing asset in index: '+n);
           }
           console.log('PASS: all new live assets referenced');
