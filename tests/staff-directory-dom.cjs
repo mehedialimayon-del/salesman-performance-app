@@ -36,7 +36,7 @@ let passwords=[];
 const ctx={
  FFH_SUPABASE:{
   rpc: async(name)=>({data:name==='ffh_governance'?{
-    owner:true,administrator:true,profiles:people,zones,grants:[],zone_access:[],requests:[],outlets:[]
+    owner:true,administrator:true,profiles:people,zones,grants:[{staff_id:'M22328',module:'sales',can_edit:true,can_upload:false,can_delete:true}],zone_access:[],requests:[],outlets:[]
   }:[],error:null}),
   functions:{
    invoke: async(name,{body})=>{if(body.action==='password')passwords.push(body);return{data:{password_changed:true},error:null};}
@@ -72,6 +72,17 @@ const ctx={
  assert.equal(document.querySelectorAll('[data-ff-staff-item]:not([hidden])').length,0);
  assert.equal(document.querySelector('#ffStaffNoMatches').hidden,false);
  input.value='';input.dispatchEvent(new w.Event('input',{bubbles:true}));
+ document.querySelector('.ffEditAccount[data-id="M22328"]').click();
+ assert.ok(document.querySelector('#ffAccountForm'),'edit opens the permission matrix');
+ const salesPerm=document.querySelector('.ffPermissionRow[data-module="sales"]');
+ assert.equal(salesPerm.querySelector('[data-verb="edit"]').checked,true,'saved Edit permission remains visibly checked');
+ assert.equal(salesPerm.querySelector('[data-verb="delete"]').checked,true,'saved Delete permission remains visibly checked');
+ assert.equal(salesPerm.querySelector('[data-verb="upload"]').checked,false,'unchecked Upload is preserved');
+ assert.ok(document.querySelector('#back'),'subpage provides visible Back button');
+ w.dispatchEvent(new w.PopStateEvent('popstate',{state:{ffhPage:'control:users'}}));
+ await new Promise(resolve=>setTimeout(resolve,25));
+ assert.ok(document.querySelector('#ffStaffSearch'),'Android/browser Back returns to Staff List, not app Home');
+ assert.ok(document.querySelector('[data-zone-id="HEAD_OFFICE_LEADERSHIP"]'),'back restores the same Head Office box');
  document.querySelector('.ffOwnerOwnPassword').click();
  const form=document.querySelector('#ffOwnerOwnPasswordForm');
  assert.ok(form,'owner can open password-change form');
