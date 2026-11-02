@@ -2,10 +2,11 @@
 (()=>{'use strict';
  const app=document.getElementById('app');if(!app)return;
  const sb=()=>window.FFH_SUPABASE,avatars=new Map(),broken=new Set();
- let viewer='',timer=0,scheduled=false,fetching=null,channel=null,lastRead=0;
+ let viewer='',scheduled=false,fetching=null,channel=null,lastRead=0;
  const pickId=()=>{try{return String(JSON.parse(localStorage.getItem('ffh_session')||'null')?.id||'').trim().toUpperCase();}catch{return '';}};
  const safeUrl=value=>{try{const u=new URL(String(value||''));return u.protocol==='https:'?u.href:'';}catch{return '';}};
  const person=id=>avatars.get(String(id||'').toUpperCase());
+ const emptyPortrait='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><rect width="80" height="80" rx="40" fill="#21150e"/><circle cx="40" cy="29" r="15" fill="#f48a3a"/><path d="M13 77c1-19 12-29 27-29s26 10 27 29" fill="#f48a3a"/></svg>');
  const byName=name=>[...avatars.values()].find(p=>p.full_name?.trim().toLowerCase()===String(name||'').trim().toLowerCase());
  function patchAvatar(container,id,classes='ffStaffCircle'){
   if(!container)return;const p=person(id),url=safeUrl(p?.photo_url),name=p?.full_name||String(id||''),initial=(name.trim().charAt(0)||'•').toUpperCase();
@@ -22,7 +23,7 @@
   const id=pickId();if(!id)return;
   for(const img of document.querySelectorAll('.ffIdentityHero .editableAvatar,.profile .editableAvatar')){
    let p=person(id),url=safeUrl(p?.photo_url);
-   if(url&&!broken.has(url)&&img.dataset.ffServerPhoto!==url){img.dataset.ffServerPhoto=url;img.src=url;}
+   if(p){const next=url&&!broken.has(url)?url:emptyPortrait;if(img.dataset.ffServerPhoto!==next){img.dataset.ffServerPhoto=next;img.src=next;}}
    img.classList.add('zoomable');img.title='View full profile photo';img.alt='My profile photo';
    img.tabIndex=0;img.setAttribute('role','button');img.setAttribute('aria-label','Enlarge my profile photo');
    if(!img.dataset.ffPhotoKeyboard){img.dataset.ffPhotoKeyboard='yes';img.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();window.FFH_OPEN_IMAGE?.(img.src);}});}
@@ -44,7 +45,7 @@
   let p=(selected&&selected!=='ALL'?person(selected):null);
   if(!p&&!selected&&!/combined|all\s+team/i.test(text))p=[...avatars.values()].find(x=>x.full_name&&text.includes(x.full_name));
   const old=hero.querySelector('.ffDashStaffIdentity');
-  if(!p){old?.remove();return;}
+  if(!p){old?.remove();document.querySelector('.ffScopeFilter .ffScopeAvatar')?.remove();return;}
   if(old?.dataset.staffId===p.staff_id){patchAvatar(old.querySelector('.ffDashStaffAvatar'),p.staff_id,'ffDashStaffAvatar ffStaffCircle');return;}
   old?.remove();const block=document.createElement('div');block.className='ffDashStaffIdentity';block.dataset.staffId=p.staff_id;
   const circle=makeAvatar(p.staff_id,'ffDashStaffAvatar ffStaffCircle');const label=document.createElement('span');label.className='ffDashStaffName';label.textContent=p.full_name;
@@ -87,7 +88,7 @@
    const circle=makeAvatar(p.staff_id,'ffPickerAvatar ffStaffCircle');row.prepend(circle);
   }
  }
- function render(){scheduled=false;viewer=pickId();if(!viewer)return;own();dashboard();accountCards();chat();pickers();}
+ function render(){scheduled=false;if(!pickId())return;own();dashboard();accountCards();chat();pickers();}
  function queue(){if(scheduled)return;scheduled=true;requestAnimationFrame(render);}
  async function refresh(force=false){
   const id=pickId();if(!id||!sb()?.rpc)return;
