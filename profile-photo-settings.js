@@ -89,6 +89,7 @@
     }
    }catch(error){console.warn('Profile photo local cache:',error);}
    window.FFH_STAFF_PHOTOS?.updateOwn?.(staffId,url);
+   window.FFH_STAFF_PHOTOS?.announce?.(staffId);
    setStatus(notice,'Photo saved successfully. Your new photo is now visible.');
    await window.FFH_STAFF_PHOTOS?.refresh?.(true);
    return true;
