@@ -10,13 +10,14 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
   const page=await context.newPage();
   page.on('pageerror',e=>console.log('Site script warning:',e.message.slice(0,240)));
   let ready=false;
-  for(let n=0;n<4;n++){
+  for(let n=0;n<12;n++){
    const response=await page.goto(site,{waitUntil:'domcontentloaded',timeout:50000});
    console.log('Live HTTP status:',response?.status(),'URL:',page.url());
    try{
     await page.waitForFunction(()=>!!(window.FFH_STAFF_DIRECTORY&&window.FFH_CREATE_ACCOUNTS&&
       document.querySelector('link[href*="staff-directory.css?v=leadership-"]')&&
-      document.querySelector('script[src*="accounts.js?v=leadership-"]')),
+      document.querySelector('script[src*="accounts.js?v=leadership-"]')&&
+      document.querySelector('script[src*="staff-directory.js?v=leadership-20261103-3"]')),
     null,{timeout:7000});
     ready=true;break;
    }catch(e){
