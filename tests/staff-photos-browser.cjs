@@ -24,7 +24,7 @@ for(const id of ['M21954','M22075']){
  await page.goto(process.env.FFH_TEST_URL||'http://127.0.0.1:8765');
  await page.locator('.ffIdentityHero .editableAvatar').waitFor({timeout:25000});
  if(await page.locator('#ffhEntryAllow').count())await page.locator('#ffhEntryAllow').click();
- await page.locator('#ffSetProfilePicture').waitFor({timeout:20000});assert.equal(await page.locator('.ffOwnPhotoEdit').count(),0);
+ await page.locator('#ffSetProfilePicture').waitFor({state:'attached',timeout:20000});assert.equal(await page.locator('.ffOwnPhotoEdit').count(),0);
  await page.waitForFunction(()=>!!window.FFH_STAFF_PHOTOS?.find('M22075'),null,{timeout:12000});
  assert.equal(await page.locator('.ffIdentityHero .editableAvatar.zoomable').count(),1,'own image supports zoom');
  await page.locator('.ffIdentityHero .editableAvatar').click();
