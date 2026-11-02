@@ -10,7 +10,7 @@ const go=(mode)=>window.ANStudio.show(mode);
 const dstr=x=>{try{return new Date(x).toLocaleString('en-MY',{dateStyle:'medium',timeStyle:'short'});}catch{return'';}};
 const fld=(name,label,val='',type='text')=>'<label class="field">'+E(label)+'<input type="'+type+'" name="'+E(name)+'" value="'+E(val)+'" autocomplete="off"></label>';
 const area=(name,label,val='')=>'<label class="field wide">'+E(label)+'<textarea name="'+E(name)+'">'+E(val)+'</textarea></label>';
-const fileField=(name,label,types='image/jpeg,image/png,image/webp')=>'<label class="field wide studio-upload"><span>'+E(label)+'</span><input type="file" name="'+E(name)+'" accept="'+types+'"><small>Select photo → Zoom &amp; Position → Use This Photo → Publish</small></label>';
+const fileField=(name,label,types='image/jpeg,image/png,image/webp')=>'<label class="field wide studio-upload"><span>'+E(label)+'</span><input type="file" name="'+E(name)+'" accept="'+types+'"><small>'+(name==='media'?'Choose the original photo or video; the full file is saved without cropping. Press Publish to make it live.':'Select photo → Zoom &amp; Position → Use This Photo → Publish')+'</small></label>';
 const action=(label,cmd,id='',cl='alt')=>'<button type="button" class="btn sm '+cl+'" data-studio="'+E(cmd)+'" data-id="'+E(id)+'">'+E(label)+'</button>';
 const fallbackUrl=section=>new URL('../open-upload.html?section='+encodeURIComponent(section||'management'),location.href).href;
 const browserUploadButton=()=>['management','success','updates','countries','universities'].includes(mode)
@@ -35,6 +35,8 @@ const defaultCountries=[
 ];
 const progress=msg=>{const el=document.querySelector('#studio-progress');if(el)el.textContent=msg;};
 const publish=async(key,value)=>{if(!authorized())throw Error('Admin login required');await api().publish(key,value);};
+const verifyPublished=async(key,record)=>{const latest=await api().getContent(key,[]);if(!Array.isArray(latest)||!latest.some(x=>x&&x.id===record.id&&x.approved===true&&x.media_url===record.media_url))throw Error('Publish request was sent, but the saved item could not be verified. Please refresh History before trying again.');return latest;};
+const liveHubUrl=()=>new URL('../index.html#/success',location.href).href;
 async function upload(file,prefix){
  if(!authorized())throw Error('Admin authorization required');
  if(!(file instanceof File)||!file.size)return '';
@@ -109,7 +111,7 @@ function storiesPanel(){
  +'<label class="field studio-check"><input type="checkbox" name="consent" required> I confirm permission to publish this student media</label>'
  +'<p class="help">Images up to 8 MB, videos up to 40 MB. Uploading and pressing Publish makes the item live. Videos play within the page.</p>'
  +'<button type="submit" class="btn">Upload & Publish</button></form><p class="help" id="studio-progress" role="status"></p>')+
- panel('<h2>Published / Draft History ('+stories.length+')</h2>'+
+ panel('<p class="help">Live public section: <a href="'+E(liveHubUrl())+'" target="_blank" rel="noopener noreferrer">Open Student Resource &amp; Success Hub ↗</a></p><h2>Published / Draft History ('+stories.length+')</h2>'+
  (stories.length?'<div>'+stories.map(row).join('')+'</div>':'<div class="empty">No student success media yet.</div>')));
 }
 async function showStories(){const v=await api().getContent('success_stories',[]);stories=Array.isArray(v)?v:[];storiesPanel();}
@@ -120,10 +122,12 @@ async function addStory(f){
  if(!data.has('consent'))throw Error('Media permission confirmation required');
  const media=await window.ANPhotoEditor.selectedFile(f.querySelector('[name="media"]'));if(!(media instanceof File)||!media.size)throw Error('Choose a photo or video and finish adjusting it.');
  const url=await upload(media,'success-story');
- const result=[{id:'story-'+uuid(),title,description,media_url:url,type:media.type.startsWith('video/')?'video':'image',approved:true,created_at:new Date().toISOString()},...stories];
+ const record={id:'story-'+uuid(),title,description,media_url:url,type:media.type.startsWith('video/')?'video':'image',approved:true,created_at:new Date().toISOString()};
+ const result=[record,...stories];
  progress('Publishing success story...');
  await publish('success_stories',result);
- await showStories();
+ stories=await verifyPublished('success_stories',record);
+ storiesPanel();progress('Published and verified ✓. Your Success Story is saved in the live database. Open the website to check the card.');
 }
 async function mutateStory(cmd,id){
  const i=id.startsWith('index:')?Number(id.slice(6)):stories.findIndex(x=>String(x.id)===id);if(!Number.isInteger(i)||i<0||i>=stories.length)throw Error('Story not found');
@@ -161,7 +165,7 @@ function updatePanel(){
   '<label class="field studio-check"><input type="checkbox" name="featured"> Feature this post in the upper announcement banner</label>'+
   '<p class="help">Photo: up to 8 MB; video: up to 40 MB. A text-only update is also allowed. Verify any offers and facts before publishing. Photos involving students require permission.</p>'+
   '<button type="submit" class="btn">Upload & Publish to Website</button></form><p id="studio-progress" class="help" role="status"></p>')+
- panel('<h2>Published / Draft Updates ('+updates.length+')</h2>'+(rows||'<div class="empty">No Study Updates yet. Publish your first post above.</div>')));
+ panel('<p class="help">Live public section: <a href="'+E(liveHubUrl())+'" target="_blank" rel="noopener noreferrer">Open Student Resource &amp; Success Hub ↗</a></p><h2>Published / Draft Updates ('+updates.length+')</h2>'+(rows||'<div class="empty">No Study Updates yet. Publish your first post above.</div>')));
 }
 async function showUpdates(){
  const data=await api().getContent('study_insights',[]);
@@ -183,7 +187,8 @@ async function addUpdate(f){
  };
  progress('Publishing to your public website...');
  await publish('study_insights',[record,...updates]);
- await showUpdates();
+ updates=await verifyPublished('study_insights',record);
+ updatePanel();progress('Published and verified ✓. This Study Update is saved in the live database. Open the website to check the card.');
 }
 async function mutateUpdate(command,id){
  const i=id.startsWith('index:')?Number(id.slice(6)):updates.findIndex(x=>String(x.id)===id);
