@@ -84,7 +84,7 @@
   for(const row of document.querySelectorAll('.ffItemPicker .ffPickerOption')){
    if(row.querySelector(':scope > .ffPickerAvatar'))continue;
    const text=row.querySelector('strong')?.textContent||'';
-   const p=byName(text)||[...avatars.values()].find(x=>text.includes(x.staff_id));if(!p)continue;
+   const p=person(row.dataset.staffId)||byName(text)||[...avatars.values()].find(x=>text.includes(x.staff_id));if(!p)continue;
    const circle=makeAvatar(p.staff_id,'ffPickerAvatar ffStaffCircle');row.prepend(circle);
   }
  }
@@ -129,7 +129,7 @@
  `;
  document.head.append(st);
  const observer=new MutationObserver(queue);observer.observe(app,{subtree:true,childList:true});
- const overlayObserver=new MutationObserver(queue);overlayObserver.observe(document.body,{childList:true,subtree:false});
+ const observedPickers=new WeakSet();const overlayObserver=new MutationObserver(records=>{queue();for(const record of records)for(const node of record.addedNodes)if(node.nodeType===1&&node.matches?.('.ffItemPicker')&&!observedPickers.has(node)){observedPickers.add(node);new MutationObserver(queue).observe(node,{subtree:true,childList:true});}});overlayObserver.observe(document.body,{childList:true,subtree:false});
  window.addEventListener('pageshow',()=>{sessionTick();queue()});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh(true)});
  document.addEventListener('ffh-staff-updated',()=>refresh(true));
