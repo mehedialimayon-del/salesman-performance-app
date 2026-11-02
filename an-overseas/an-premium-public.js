@@ -52,6 +52,7 @@ function showStories(){
  const mount=document.querySelector('#an-success-gallery');
  if(!mount)return;
  const live=stories.filter(s=>s&&s.approved===true&&(s.type==='video'||s.type==='image')&&url(s.media_url));
+ live.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
  mount.innerHTML=live.length?'<div class="an-youtube-grid">'+live.map(storyCard).join('')+'</div>'
  :'<div class="an-premium-empty"><span>✦</span><h2>Our Student Stories</h2><p>Verified student photos and videos will appear here once published with permission.</p></div>';
 }
@@ -132,9 +133,13 @@ async function load(){
    countries=Array.isArray(data.countries)?data.countries:null;team=Array.isArray(data.management)?data.management:[];}
   apply();
  }catch(e){
-  apply();
+  if(!snapshot&&current()==='success'){
+   const msg='<div class="an-premium-empty" role="alert"><span>!</span><h2>Live content temporarily unavailable</h2><p>Could not load published posts. Check your connection and tap Refresh to try again.</p><button type="button" class="an-community-more" data-an-gallery-refresh>Refresh posts ↻</button></div>';
+   ['an-insights-gallery','an-success-gallery'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=msg;});
+  }else apply();
  }finally{working=false;}
 }
+document.addEventListener('click',e=>{if(e.target.closest('[data-an-gallery-refresh]'))void load();});
 document.addEventListener('click',e=>{
  const arrow=e.target.closest('[data-an-manager]');
  if(!arrow||current()!=='about'||arrow.disabled)return;
