@@ -10,7 +10,7 @@ const augment=()=>{const original=window.supabase.createClient;window.supabase.c
   if(key==='update')return changes=>{window.__qaPhotoSave=changes;window.__qaPhotoRows.find(x=>x.staff_id===window.__qaCurrentId).photo_url=changes.photo_url;const c={eq:()=>c,select:()=>c,maybeSingle:async()=>({data:{staff_id:window.__qaCurrentId,photo_url:changes.photo_url},error:null})};return c;};
   return target[key];
  }});};
- sb.storage.from=bucket=>bucket==='ffh-public'?{upload:async(path,blob,options)=>{window.__qaPhotoUploads.push({path,size:blob.size,options});return {error:null};},getPublicUrl:path=>({data:{publicUrl:'https://qa.fieldforce.test/photos/updated-'+window.__qaCurrentId+'.jpg'}})}:originalStorage(bucket);
+ sb.storage.from=bucket=>bucket==='ffh-public'?{upload:async(path,blob,options)=>{const im=await createImageBitmap(blob);window.__qaPhotoUploads.push({path,size:blob.size,width:im.width,height:im.height,options});im.close();return {error:null};},getPublicUrl:path=>({data:{publicUrl:'https://qa.fieldforce.test/photos/'+path.split('/').pop()}})}:originalStorage(bucket);
  return sb;};};
 (async()=>{const browser=await chromium.launch({headless:true,...(process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHROMIUM,args:['--no-sandbox','--disable-dev-shm-usage']}: {})});
 try{
@@ -35,12 +35,24 @@ for(const id of ['M21954','M22075']){
  assert.equal(await page.locator('#ffProfilePhotoFile').getAttribute('accept'),'.jpg,.jpeg,.png,.webp');
  const png=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=96;c.height=120;const x=c.getContext('2d');x.fillStyle='#ff7a18';x.fillRect(0,0,96,120);return c.toDataURL('image/png').split(',')[1];});await page.locator('#ffProfilePhotoFile').setInputFiles({name:'portrait.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});
  await page.locator('#ffProfilePhotoPreview').waitFor({state:'visible'});
+ const shape=await page.locator('#ffProfileCropStage').evaluate(el=>getComputedStyle(el).borderRadius);
+ assert.ok(shape.includes('50%'),'crop frame is actually circular');
+ await page.locator('#ffPhotoCropPlus').click();
+ assert.ok(Number(await page.locator('#ffPhotoCropZoom').inputValue())>100,'zoom in updates crop');
+ const rect=await page.locator('#ffProfileCropStage').boundingBox();
+ await page.mouse.move(rect.x+rect.width/2,rect.y+rect.height/2);
+ await page.mouse.down();await page.mouse.move(rect.x+rect.width/2+14,rect.y+rect.height/2+12,{steps:4});await page.mouse.up();
+ assert.match(await page.locator('#ffProfilePhotoPreview').getAttribute('style'),/translate\(/,'drag positions crop');
  await page.locator('#ffProfilePhotoSave').click();
  try{await page.waitForFunction(()=>!!window.__qaPhotoSave,null,{timeout:12000});}catch(ex){const detail=await page.evaluate(()=>({status:document.querySelector('#ffProfilePhotoStatus')?.textContent,uploads:window.__qaPhotoUploads,currentId:window.__qaCurrentId,auth:!!window.FFH_SUPABASE?.auth}));throw Error('Profile save did not finish: '+JSON.stringify(detail));}
- assert.equal(await page.evaluate(()=>window.__qaPhotoUploads.length),1,'one own-path upload');
- assert.equal(await page.evaluate(()=>window.__qaPhotoUploads[0].path.startsWith('profiles/'+window.__qaCurrentId.toLowerCase()+'/')),true,'own account only');
+ assert.equal(await page.evaluate(()=>window.__qaPhotoUploads.length),2,'full original and cropped avatar both uploaded');
+ assert.equal(await page.evaluate(()=>window.__qaPhotoUploads.every(x=>x.path.startsWith('profiles/'+window.__qaCurrentId.toLowerCase()+'/'))),true,'both images in own staff folder');
+ assert.equal(await page.evaluate(()=>window.__qaPhotoUploads[1].width),640,'avatar crop is 640px square');
+ assert.equal(await page.evaluate(()=>window.__qaPhotoUploads[1].height),640,'avatar crop is 640px square');
+ assert.equal(await page.evaluate(()=>window.__qaPhotoUploads[0].height>window.__qaPhotoUploads[0].width),true,'full photo keeps portrait aspect ratio');
  await page.locator('#ffProfilePhotoDialog').waitFor({state:'detached',timeout:12000});
- await page.waitForFunction(staff=>document.querySelector('.ffIdentityHero .editableAvatar')?.src.endsWith('updated-'+staff+'.jpg'),id,{timeout:10000});
+ await page.waitForFunction(()=>document.querySelector('.ffIdentityHero .editableAvatar')?.src.includes('/photo-v2-'),null,{timeout:10000});
+ assert.ok((await page.locator('.ffIdentityHero .editableAvatar').getAttribute('data-full-src')).includes('/full-v2-'),'avatar click preserves the uncropped photo for zoom');
  if(id==='M21954'){
   await page.locator('[data-page="dashboard"]').click();
   await page.locator('.dashHero').waitFor();
@@ -52,7 +64,7 @@ for(const id of ['M21954','M22075']){
  await page.locator('.ffItemPicker .ffPickerOption').first().waitFor({timeout:5000});
  await page.locator('.ffItemPicker .ffPickerAvatar').first().waitFor({timeout:8000});
  assert.ok(await page.locator('.ffItemPicker .ffPickerAvatar').count()>=1,'chat contact picker includes portrait');
- console.log('PASS Chromium verified own-photo upload/save, immediate avatar, full zoom, manager dashboard and chat selection: '+id);
+ console.log('PASS Chromium circular pinch-ready crop, drag and zoom, saved cropped + original photo, manager dashboard and chat: '+id);
  await ctx.close();
 }
 }finally{await browser.close()}
