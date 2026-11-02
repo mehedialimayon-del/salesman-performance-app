@@ -53,7 +53,7 @@
       const canEdit=admin&&!own&&(owner||(p.staff_id!==viewerId&&p.staff_id!=='PERVES_HIRA'));
       const initials=String(p.full_name||p.staff_id||'?').trim().charAt(0).toLocaleUpperCase();
       return '<article class="ffTeamPerson" data-ff-staff-item data-staff-search="'+E(searchable)+'">'
-        +'<div class="ffTeamIdentity"><span class="ffTeamAvatar" aria-hidden="true">'+E(initials)+'</span>'
+        +'<div class="ffTeamIdentity"><span class="ffTeamAvatar ffStaffCircle" data-ff-staff-avatar="'+E(p.staff_id)+'" aria-label="'+E(p.full_name||p.staff_id)+' profile photo">'+E(initials)+'</span>'
         +'<div class="ffTeamInfo"><strong>'+E(p.full_name||p.staff_id)+'</strong>'
         +'<div class="ffTeamDetails"><span class="ffStaffPublicId">'+E(publicId)+'</span> · '+E(role)
         +' · '+(p.active===false?'INACTIVE':'ACTIVE')+(p.can_sell?' · SR ROUTE':'')+'</div>'
