@@ -27,15 +27,7 @@
    img.classList.add('zoomable');img.title='View full profile photo';img.alt='My profile photo';
    img.tabIndex=0;img.setAttribute('role','button');img.setAttribute('aria-label','Enlarge my profile photo');
    if(!img.dataset.ffPhotoKeyboard){img.dataset.ffPhotoKeyboard='yes';img.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();window.FFH_OPEN_IMAGE?.(img.src);}});}
-   const holder=img.closest('.ffOwnPhotoSlot');if(holder)continue;
-   const wrap=document.createElement('span');wrap.className='ffOwnPhotoSlot';img.replaceWith(wrap);wrap.append(img);
-   const edit=document.createElement('button');edit.type='button';edit.className='ffOwnPhotoEdit';
-   edit.textContent='✎';edit.title='Change my profile picture';edit.setAttribute('aria-label','Change my profile picture');
-   edit.onclick=e=>{e.preventDefault();e.stopPropagation();
-    if(typeof window.changeOwnPhoto==='function'){window.changeOwnPhoto();setTimeout(()=>refresh(true),1800);setTimeout(()=>refresh(true),5500);}
-    else alert('Profile image editor is not available. Reopen FieldForce Hub and try again.');
-   };
-   wrap.append(edit);
+   // Avatar opens the full-size zoom viewer. Photo changes live in the top-right Settings menu.
   }
  }
  function dashboard(){
@@ -107,9 +99,8 @@
  function sessionTick(){const id=pickId();if(id!==viewer){viewer=id;avatars.clear();lastRead=0;if(channel){sb()?.removeChannel?.(channel);channel=null;}}if(id)refresh();}
  const st=document.createElement('style');
  st.textContent=`
- .ffOwnPhotoSlot{position:relative;display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center}
- .ffIdentityHero .ffOwnPhotoSlot .avatar,.profile .ffOwnPhotoSlot .avatar{width:52px!important;height:52px!important;min-width:52px!important;border-radius:50%!important;object-fit:cover!important;cursor:zoom-in}
- .ffOwnPhotoEdit{position:absolute!important;bottom:-5px;right:-6px;z-index:5!important;width:27px!important;height:27px!important;min-height:27px!important;padding:0!important;border-radius:50%!important;background:#ff7a18!important;border:2px solid #0d0b09!important;color:#fff!important;font-size:16px!important;line-height:1!important;display:grid!important;place-items:center!important}
+ .ffIdentityHero .editableAvatar,.profile .editableAvatar{border-radius:50%!important;object-fit:cover!important;cursor:zoom-in!important}
+ .ffOwnPhotoEdit{display:none!important}
  .ffStaffCircle{width:36px;height:36px;min-width:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid #e66f2c;background:#241711;color:#ffab63;font-size:15px;font-weight:750;vertical-align:middle}
  .ffStaffCircle .ffStaffPhoto{width:100%;height:100%;object-fit:cover;cursor:zoom-in;display:block}
  .ffStaffCardAvatar{width:38px;height:38px;min-width:38px}
@@ -135,5 +126,11 @@
  document.addEventListener('ffh-staff-updated',()=>refresh(true));
  window.addEventListener('storage',e=>{if(e.key==='ffh_session')sessionTick()});
  queue();sessionTick();setInterval(()=>{if(document.hidden)return;sessionTick();},35000);
- window.FFH_STAFF_PHOTOS={refresh,render:queue,find:id=>person(id)};
+ window.FFH_STAFF_PHOTOS={refresh,render:queue,find:id=>person(id),updateOwn:(id,url)=>{
+  if(!id||!safeUrl(url))return;
+  const key=String(id).toUpperCase(),old=person(key)||{staff_id:key,full_name:key};
+  avatars.set(key,{...old,photo_url:url});broken.delete(url);
+  document.querySelectorAll('.ffIdentityHero .editableAvatar,.profile .editableAvatar').forEach(img=>{img.dataset.ffServerPhoto=url;img.src=url;});
+  queue();
+ }};
 })();
