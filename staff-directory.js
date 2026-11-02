@@ -49,7 +49,7 @@
       const managerName=byId.get(p.manager_id)?.full_name||'';
       const publicId=p.company_staff_id??(Object.hasOwn(p,'company_staff_id')?'Staff ID pending':p.staff_id);
       const role=String(p.designation||p.role||(manager?'MANAGER':'SR')).replace(/_/g,' ');
-      const searchable=normalize([p.full_name,p.staff_id,p.company_staff_id,role,p.zone_id,p.team_name,managerName].filter(Boolean).join(' '));
+      const searchable=normalize([p.full_name,p.staff_id,p.company_staff_id,role,p.zone_id,p.team_name].filter(Boolean).join(' '));
       const canEdit=admin&&!own&&(owner||(p.staff_id!==viewerId&&p.staff_id!=='PERVES_HIRA'));
       const initials=String(p.full_name||p.staff_id||'?').trim().charAt(0).toLocaleUpperCase();
       return '<article class="ffTeamPerson" data-ff-staff-item data-staff-search="'+E(searchable)+'">'
