@@ -38,12 +38,18 @@ jobs:
           NODE
       - name: Test owner management, team grouping, and search
         run: node tests/staff-directory-dom.cjs
+      - name: Install browser smoke-test dependency
+        run: npm install --no-save playwright@1.58.2
+      - name: Verify live published site in mobile Chromium
+        env:
+          FFH_CHROMIUM: /usr/bin/google-chrome
+        run: node tests/staff-directory-live.cjs
       - name: Verify live entrypoint and CSS wiring
         run: |
           node - <<'NODE'
           const fs=require('fs');
           const html=fs.readFileSync('index.html','utf8');
-          for(const n of ['staff-directory.js?v=zone-team-search-20261103-1','staff-directory.css?v=zone-team-search-20261103-1','accounts.js?v=zone-team-search-password-20261103-1']){
+          for(const n of ['staff-directory.js?v=leadership-20261103-2','staff-directory.css?v=leadership-20261103-2','accounts.js?v=leadership-20261103-2']){
             if(!html.includes(n))throw Error('Missing asset in index: '+n);
           }
           console.log('PASS: all new live assets referenced');
