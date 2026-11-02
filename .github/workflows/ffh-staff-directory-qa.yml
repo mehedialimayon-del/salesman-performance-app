@@ -8,6 +8,7 @@ on:
       - 'staff-directory.css'
       - 'index.html'
       - 'tests/staff-directory-dom.cjs'
+      - 'tests/staff-directory-live.cjs'
       - '.github/workflows/ffh-staff-directory-qa.yml'
   workflow_dispatch:
 permissions:
