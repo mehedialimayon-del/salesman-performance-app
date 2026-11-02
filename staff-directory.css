@@ -1,0 +1,36 @@
+/* FieldForce Hub staff directory: zone cards, mobile-safe staff controls. */
+.ffStaffDirectory { display:grid;gap:14px;min-width:0;margin-top:14px; }
+.ffStaffDirectorySearch { padding:15px!important;display:grid;gap:9px; }
+.ffStaffDirectorySearch strong {font-size:13px;color:#ff8234;letter-spacing:.06em;}
+#ffStaffSearch { width:100%;box-sizing:border-box;min-width:0;background:#0b0b0d;color:#fff;border:1px solid #a64d22;border-radius:12px;padding:13px 15px;font:inherit;outline:none; }
+#ffStaffSearch:focus {border-color:#ff8b3e;box-shadow:0 0 0 2px rgba(255,119,32,.21);}
+#ffStaffSearchCount {margin:0;color:#e1d9d3;font-size:12px;}
+#ffStaffDirectoryTeams {display:grid;gap:14px;}
+.ffTeamZone {min-width:0;overflow:hidden;padding:0!important;border:1px solid #a74b24!important;background:linear-gradient(145deg,#12100f,#08090b)!important;border-radius:17px!important;}
+.ffTeamZoneHeader {display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #814021;padding:16px 17px;background:linear-gradient(100deg,rgba(255,113,25,.18),rgba(255,113,25,0));}
+.ffTeamZoneHeader h3 {margin:0;color:#ff8a36;font-size:16px;line-height:1.25;letter-spacing:.04em;text-transform:uppercase;}
+.ffTeamZoneHeader span {white-space:nowrap;color:#fff;font-size:11px;font-weight:700;}
+.ffTeamZonePeople {display:grid;min-width:0;}
+.ffTeamPerson {min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:17px;align-items:center;}
+.ffTeamPerson + .ffTeamPerson {border-top:1px solid rgba(255,130,52,.21);}
+.ffTeamIdentity {display:flex;align-items:center;min-width:0;gap:12px;}
+.ffTeamAvatar {width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;background:rgba(255,125,47,.1);color:#fba264;border:1px solid #ac5829;border-radius:50%;font-weight:800;font-size:18px;}
+.ffTeamInfo {min-width:0;overflow-wrap:anywhere;color:white;}
+.ffTeamInfo strong {font-size:16px;line-height:1.35;display:block;color:#fff;}
+.ffTeamDetails {margin-top:5px;font-size:13px;line-height:1.4;color:#f8f1e9;}
+.ffStaffPublicId {color:#ff9b5b;font-weight:800;}
+.ffTeamInfo small {display:block;margin-top:4px;color:#cfc7c2;font-size:12px;line-height:1.4;}
+.ffTeamInfo .ffTeamOwnLabel,.ffTeamInfo .ffTeamManagerLabel {color:#ff9b5b;font-weight:700;}
+.ffTeamActions {display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px;max-width:265px;}
+.ffTeamActions button {width:auto;min-height:38px;padding:9px 11px!important;font-size:12px!important;line-height:1.25;white-space:normal;border-radius:10px!important;}
+.ffStaffNoMatches {color:#fff;}
+.ffTeamPerson[hidden],.ffTeamZone[hidden],#ffStaffNoMatches[hidden]{display:none!important;}
+@media(max-width:650px) {
+ .ffTeamPerson {display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:15px;}
+ .ffTeamIdentity {align-items:flex-start;}
+ .ffTeamActions {width:100%;max-width:none;justify-content:flex-start;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+ .ffTeamActions button {width:100%;padding:10px 5px!important;min-width:0;overflow-wrap:anywhere;font-size:11px!important;}
+ .ffTeamActions button:only-child {grid-column:1/-1;max-width:220px;}
+ .ffTeamInfo strong {font-size:15px;}
+ .ffTeamDetails {font-size:12px;}
+}
