@@ -22,7 +22,7 @@ const zones=[{id:'PRIMARY',name:'KL'},{id:'CHERAS',name:'Cheras'},{id:'HEAD_OFFI
 const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 const groups=w.FFH_STAFF_DIRECTORY.buildGroups([...people],zones,true);
 assert.equal(groups[0].label,'HEAD OFFICE');
-assert.deepEqual(groups[0].members.map(p=>p.staff_id),['M21954','PERVES_HIRA','WAHID_ADMIN']);
+assert.equal(groups[0].members.map(p=>p.staff_id).join(','),'M21954,PERVES_HIRA,WAHID_ADMIN');
 assert.equal(groups[1].label,'KL ZONE');
 assert.equal(groups[1].members.some(p=>p.staff_id==='M21954'),false);
 assert.equal(groups.find(x=>x.id==='CHERAS').members[0].staff_id,'M22075');
