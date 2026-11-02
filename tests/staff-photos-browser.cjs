@@ -64,7 +64,24 @@ for(const id of ['M21954','M22075']){
  await page.locator('.ffItemPicker .ffPickerOption').first().waitFor({timeout:5000});
  await page.locator('.ffItemPicker .ffPickerAvatar').first().waitFor({timeout:8000});
  assert.ok(await page.locator('.ffItemPicker .ffPickerAvatar').count()>=1,'chat contact picker includes portrait');
- console.log('PASS Chromium circular pinch-ready crop, drag and zoom, saved cropped + original photo, manager dashboard and chat: '+id);
+ await page.evaluate(()=>{
+  const select=document.createElement('select');select.id='ffAssignQaSelect';select.multiple=true;
+  select.innerHTML='<option value="M22075">Test Colleague</option><option value="M21954">MEHEDI ALIM AYON</option>';
+  document.querySelector('main.wrap').append(select);
+  window.FFH_STYLE_MULTI_SELECT(select,{title:'Assign staff'});
+ });
+ await page.locator('#ffAssignQaSelect + .ffSelectTrigger').click();
+ await page.locator('.ffMultiPicker .ffPickerAvatar').first().waitFor({timeout:8000});
+ const assignLayout=await page.locator('.ffMultiPicker .ffMultiOption').first().evaluate(row=>{
+  const photo=row.querySelector('.ffPickerAvatar').getBoundingClientRect();
+  const name=row.querySelector('span:not(.ffPickerAvatar)').getBoundingClientRect();
+  return {photoX:photo.x,nameX:name.x,photoWidth:photo.width,height:row.getBoundingClientRect().height};
+ });
+ assert.ok(assignLayout.photoX<assignLayout.nameX,'round photo displayed before the SR name');
+ assert.ok(assignLayout.photoWidth>=36,'assign photo large enough to recognize');
+ assert.ok(assignLayout.height<=84,'assign option is compact rather than a tall card');
+
+ console.log('PASS Chromium circular pinch-ready crop, drag and zoom, saved cropped + original photo, manager dashboard, chat and compact assign picker: '+id);
  await ctx.close();
 }
 }finally{await browser.close()}
