@@ -18,6 +18,55 @@ Deno.serve(async(req:Request)=>{
  const id=String(p.staff_id||'').trim().toUpperCase();if(!/^[A-Z][A-Z0-9_-]{2,29}$/.test(id))throw Error('Use a valid staff ID');
  const {data:existing,error:ee}=await ownerDb.from('ffh_profiles').select('auth_user_id,staff_id,company_staff_id,target_pending,login_alias,full_name,can_sell,can_manage').eq('staff_id',id).maybeSingle();if(ee)throw ee;
  if(!rootOwner&&(id==='M21954'||id===actor.staff_id||id==='PERVES_HIRA'))return out({error:'Only Ayon can change owner or administrator own account'},403);
+ if(action==='delete_preview'){
+  if(!rootOwner)return out({error:'Only Ayon can preview staff account deletion'},403);
+  if(!existing)throw Error('Staff account not found');
+  const {data,error}=await ownerDb.rpc('ffh_owner_staff_delete_preview',{target:id});
+  if(error)throw Error(error.message);
+  return out(data);
+ }
+ if(action==='delete_staff'){
+  if(!rootOwner)return out({error:'Only Ayon may permanently delete a staff account'},403);
+  if(!existing||id==='M21954')throw Error('Select a non-owner staff account');
+  const confirmation=String(p.confirm_staff_id||'').trim().toUpperCase();
+  if(confirmation!==String(existing.company_staff_id||id).trim().toUpperCase())throw Error('Type the exact login Staff ID to confirm deletion');
+  // Atomic database removal with owner-only row archive. A database error rolls
+  // back the entire deletion; no Auth/Storage cleanup runs in that case.
+  const {data:deleted,error:dbError}=await ownerDb.rpc('ffh_owner_staff_delete',{target:id,confirm_staff:confirmation});
+  if(dbError)throw Error('Staff records were not deleted: '+dbError.message);
+  if(!deleted?.database_deleted)throw Error('Database deletion was not confirmed');
+  const assets=Array.isArray(deleted.storage_assets)?deleted.storage_assets:[];
+  const groups=new Map<string,string[]>();
+  for(const item of assets){
+   if(typeof item.bucket!=='string'||typeof item.name!=='string')continue;
+   if(!groups.has(item.bucket))groups.set(item.bucket,[]);
+   groups.get(item.bucket)!.push(item.name);
+  }
+  const cleanupErrors:string[]=[];
+  for(const [bucket,paths] of groups){
+   for(let n=0;n<paths.length;n+=100){
+    const {error}=await sb.storage.from(bucket).remove(paths.slice(n,n+100));
+    if(error)cleanupErrors.push('Storage '+bucket+': '+error.message);
+   }
+  }
+  const storageDeleted=cleanupErrors.length===0;
+  let authDeleted=!deleted.auth_user_id;
+  if(deleted.auth_user_id){
+   const {error:removeError}=await sb.auth.admin.deleteUser(deleted.auth_user_id);
+   if(removeError){
+    cleanupErrors.push('Auth: '+removeError.message);
+    const {error:banError}=await sb.auth.admin.updateUserById(deleted.auth_user_id,{ban_duration:'876000h'});
+    if(banError)cleanupErrors.push('Auth suspension: '+banError.message);
+   }else authDeleted=true;
+  }
+  const {error:statusError}=await ownerDb.rpc('ffh_owner_staff_delete_cleanup',{
+   event_id:deleted.deletion_id,files_ok:storageDeleted,auth_ok:authDeleted
+  });
+  if(statusError)cleanupErrors.push('History status: '+statusError.message);
+  return out({saved:true,database_deleted:true,archive_id:deleted.deletion_id,
+   record_count:deleted.record_count,storage_deleted:storageDeleted,auth_deleted:authDeleted,
+   cleanup_warnings:cleanupErrors});
+ }
  if(action==='password'){if(!rootOwner)return out({error:'Only Ayon changes passwords'},403);if(!existing?.auth_user_id)throw Error('Account not found');await setAccountPassword(sb,existing.auth_user_id,p.password);const {error}=await ownerDb.from('ffh_profiles').update({must_change_password:false}).eq('staff_id',id);if(error)throw error;return out({saved:true,password_changed:true});}
 
  if(action==='replace_sr'){
