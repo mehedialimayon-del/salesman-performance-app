@@ -33,10 +33,10 @@ for(const id of ['M21954','M22075']){
  await page.locator('#dots').click();await page.locator('#ffSetProfilePicture').click();
  await page.locator('#ffProfilePhotoDialog').waitFor();
  assert.equal(await page.locator('#ffProfilePhotoFile').getAttribute('accept'),'.jpg,.jpeg,.png,.webp');
- await page.locator('#ffProfilePhotoFile').setInputFiles({name:'portrait.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y5AAsoAAAAASUVORK5CYII=','base64')});
+ const png=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=96;c.height=120;const x=c.getContext('2d');x.fillStyle='#ff7a18';x.fillRect(0,0,96,120);return c.toDataURL('image/png').split(',')[1];});await page.locator('#ffProfilePhotoFile').setInputFiles({name:'portrait.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});
  await page.locator('#ffProfilePhotoPreview').waitFor({state:'visible'});
  await page.locator('#ffProfilePhotoSave').click();
- await page.waitForFunction(()=>!!window.__qaPhotoSave,null,{timeout:12000});
+ try{await page.waitForFunction(()=>!!window.__qaPhotoSave,null,{timeout:12000});}catch(ex){const detail=await page.evaluate(()=>({status:document.querySelector('#ffProfilePhotoStatus')?.textContent,uploads:window.__qaPhotoUploads,currentId:window.__qaCurrentId,auth:!!window.FFH_SUPABASE?.auth}));throw Error('Profile save did not finish: '+JSON.stringify(detail));}
  assert.equal(await page.evaluate(()=>window.__qaPhotoUploads.length),1,'one own-path upload');
  assert.equal(await page.evaluate(()=>window.__qaPhotoUploads[0].path.startsWith('profiles/'+window.__qaCurrentId.toLowerCase()+'/')),true,'own account only');
  await page.locator('#ffProfilePhotoDialog').waitFor({state:'detached',timeout:12000});
