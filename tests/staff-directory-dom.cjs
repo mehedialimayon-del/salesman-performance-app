@@ -72,7 +72,7 @@ const ctx={
  assert.ok(form,'owner can open password-change form');
  form.elements.password.value='ExampleSecure2026';
  form.elements.confirm_password.value='ExampleSecure2026';
- form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
+ form.dispatchEvent(new w.SubmitEvent('submit',{bubbles:true,cancelable:true,submitter:form.querySelector('[type="submit"]')}));
  await new Promise(resolve=>setTimeout(resolve,10));
  assert.equal(passwords.length,1,'password change should invoke backend once');
  assert.deepEqual(passwords[0],{action:'password',staff_id:'M21954',password:'ExampleSecure2026'});
