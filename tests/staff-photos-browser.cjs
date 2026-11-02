@@ -1,11 +1,12 @@
 const fs=require('node:fs'),assert=require('node:assert/strict'),{chromium}=require('playwright');
 const mock=fs.readFileSync('tests/duty-ui.cjs','utf8').split('const mock=')[1].split('\n(async()=>')[0].replace(/;\s*$/,'');
-const augment=()=>{const original=window.supabase.createClient;window.supabase.createClient=(...args)=>{const sb=original(...args),rpc=sb.rpc;sb.rpc=(action,payload)=>action==='ffh_staff_photo_directory'?Promise.resolve({data:[{staff_id:'M21954',full_name:'MEHEDI ALIM AYON',photo_url:location.origin+'/salesman-performance-app/ayon-ai.png'},{staff_id:'M22075',full_name:'Test Colleague',photo_url:location.origin+'/salesman-performance-app/ayon-ai.png'}],error:null}):rpc(action,payload);return sb;};};
+const augment=()=>{const original=window.supabase.createClient;window.supabase.createClient=(...args)=>{const sb=original(...args),rpc=sb.rpc;sb.rpc=(action,payload)=>action==='ffh_staff_photo_directory'?Promise.resolve({data:[{staff_id:'M21954',full_name:'MEHEDI ALIM AYON',photo_url:'https://qa.fieldforce.test/photos/owner.png'},{staff_id:'M22075',full_name:'Test Colleague',photo_url:'https://qa.fieldforce.test/photos/colleague.png'}],error:null}):rpc(action,payload);return sb;};};
 (async()=>{const browser=await chromium.launch({headless:true,...(process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHROMIUM,args:['--no-sandbox','--disable-dev-shm-usage']}: {})});
 try{
 for(const id of ['M21954','M22075']){
  const ctx=await browser.newContext({viewport:{width:412,height:844},geolocation:{latitude:3.139,longitude:101.687},permissions:['geolocation']});
  const page=await ctx.newPage();
+ await page.route('https://qa.fieldforce.test/photos/**',route=>route.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y5AAsoAAAAASUVORK5CYII=','base64')}));
  await page.route('https://cdn.jsdelivr.net/npm/@supabase/**',route=>route.fulfill({contentType:'text/javascript',body:'('+mock+')('+JSON.stringify(id)+',true);('+augment.toString()+')();'}));
  await page.route('https://cdn.onesignal.com/**',route=>route.fulfill({contentType:'text/javascript',body:''}));
  await page.goto(process.env.FFH_TEST_URL||'http://127.0.0.1:8765');
