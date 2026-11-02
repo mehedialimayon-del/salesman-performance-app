@@ -11,25 +11,31 @@
     return (/\b(team|zone|office)\b/i.test(label)?label:label+' TEAM').toLocaleUpperCase();
   };
   function buildGroups(profiles, zones, owner) {
+    // Head Office is a DISPLAY GROUP; keep each employee's actual zone,
+    // manager, access grants, and operational data unchanged.
+    const leadershipOrder=['M21954','PERVES_HIRA','WAHID_ADMIN'];
+    const headOffice = [];
     const byZone = new Map();
-    for(const p of profiles || []) {
+    for(const p of profiles||[]){
+      if(leadershipOrder.includes(p.staff_id)){
+        headOffice.push(p);
+        continue;
+      }
       const id=String(p.zone_id||'UNASSIGNED');
       if(!byZone.has(id))byZone.set(id,[]);
       byZone.get(id).push(p);
     }
+    headOffice.sort((a,b)=>leadershipOrder.indexOf(a.staff_id)-leadershipOrder.indexOf(b.staff_id));
     const zoneLookup = new Map((zones||[]).map(z=>[String(z.id),z]));
-    const groups = [...byZone].map(([id,members])=>{
+    const groups=[...byZone].map(([id,members])=>{
       const label=zoneLabel(zoneLookup.get(id),id);
-      members.sort((a,b)=>{
-        const order=p=>owner&&p.staff_id==='M21954'?0:p.can_manage?1:2;
-        return order(a)-order(b)||String(a.full_name||'').localeCompare(String(b.full_name||''),'en');
-      });
+      members.sort((a,b)=>Number(!!b.can_manage)-Number(!!a.can_manage)
+        ||String(a.full_name||'').localeCompare(String(b.full_name||''),'en'));
       return {id,label,members};
     });
-    groups.sort((a,b)=>{
-      const rank=g=>g.id==='PRIMARY'?0:g.id==='HEAD_OFFICE'?2:1;
-      return rank(a)-rank(b)||a.label.localeCompare(b.label,'en');
-    });
+    groups.sort((a,b)=>a.id==='PRIMARY'?-1:b.id==='PRIMARY'?1:a.id==='HEAD_OFFICE'?1:b.id==='HEAD_OFFICE'?-1:a.label.localeCompare(b.label,'en'));
+    // Always show the leadership box first, followed by KL and other teams.
+    if(headOffice.length)groups.unshift({id:'HEAD_OFFICE_LEADERSHIP',label:'HEAD OFFICE',members:headOffice});
     return groups;
   }
   function render({profiles=[],zones=[],owner=false,admin=false,viewerId='',escape:fallback=fallbackEscape}={}){
