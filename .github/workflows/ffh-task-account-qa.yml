@@ -29,7 +29,7 @@ jobs:
           const html=fs.readFileSync('index.html','utf8');
           const accounts=fs.readFileSync('accounts.js','utf8');
           const picker=fs.readFileSync('task-assignee-access.js','utf8');
-          for(const term of ['task-assignee-access.js','accounts.js?v=zone-team-search-password-20261103-1']){
+          for(const term of ['task-assignee-access.js','accounts.js?v=leadership-20261103-2']){
             if(!html.includes(term))throw Error('Missing live index script '+term);
           }
           for(const term of ['ffDeleteStaff','ffOwnerDeleteStaffForm','ffDeletedStaffHistory','confirm_staff_id']){
