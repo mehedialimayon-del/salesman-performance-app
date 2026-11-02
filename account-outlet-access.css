@@ -1,0 +1,50 @@
+/* Compact and responsive Staff Edit, Outlet Access and permissions controls. */
+#ffAccountForm, #ffAccountForm *{box-sizing:border-box;}
+#ffAccountForm{width:100%;min-width:0;max-width:100%;overflow-wrap:anywhere;}
+#ffAccountForm>label,#ffAccountForm>fieldset,#ffAccountForm>section,#ffAccountForm>p{min-width:0;max-width:100%;}
+#ffAccountForm fieldset {min-width:0;width:100%;max-width:100%;padding:12px!important;overflow:hidden;}
+#ffAccountForm fieldset p,#ffAccountForm>p,#ffAccountForm .ffAccountOutletPanel p{
+  white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal;max-width:100%;line-height:1.55;
+}
+#ffAccountForm input:not([type=checkbox]):not([type=radio]),#ffAccountForm select,#ffAccountForm textarea,
+#ffAccountForm button{max-width:100%!important;min-width:0!important;}
+#ffAccountForm label{max-width:100%;white-space:normal!important;overflow-wrap:anywhere!important;}
+#ffAccountForm .ffPermissionTable{max-width:100%;width:100%;min-width:0;overflow-x:auto;overscroll-behavior-inline:contain;}
+#ffAccountForm .ffPermissionRow{width:100%!important;min-width:0!important;grid-template-columns:minmax(0,1fr) repeat(3,44px)!important;gap:3px!important;}
+#ffAccountForm .ffPermissionRow>span{white-space:normal!important;overflow-wrap:anywhere!important;min-width:0;line-height:1.35;font-size:12px;}
+#ffAccountForm .ffPermissionRow>b{white-space:normal;font-size:12px;text-align:center;}
+#ffAccountForm .ffPermissionRow>b:first-child{text-align:left;}
+#ffAccountForm .ffPermissionRow label{display:flex!important;align-items:center;justify-content:center;margin:0;padding:4px 0;}
+#ffAccountForm .ffPermissionRow input[type=checkbox]{-webkit-appearance:checkbox!important;appearance:auto!important;display:block!important;opacity:1!important;visibility:visible!important;width:21px!important;height:21px!important;min-width:21px!important;max-width:21px!important;accent-color:#ff7e21!important;margin:0!important;padding:0!important;}
+#ffAccountForm label:has(input[type=checkbox]):not(.ffPermissionRow label){display:flex!important;align-items:center!important;justify-content:flex-start!important;flex-wrap:wrap;gap:9px;line-height:1.5;}
+#ffAccountForm label>input[type=checkbox]{flex:0 0 21px!important;margin:0!important;}
+#ffAccountForm #ffOwnRouteTarget{display:block!important;}
+#ffAccountForm #ffOwnRouteTarget input{display:block;width:100%;margin-top:6px;}
+.ffAccountOutletAccess{min-width:0;width:100%;margin:12px 0;}
+.ffAccountOutletAccess>#ffEditOutletAccessOpen{width:100%;text-align:center;white-space:normal;}
+.ffAccountOutletPanel{min-width:0;border:1px solid #a64b25;background:linear-gradient(140deg,#17110e,#08090b);border-radius:14px;padding:13px;margin-top:10px;overflow-wrap:anywhere;}
+.ffAccountOutletPanel[hidden],#ffOutletAccessImport[hidden]{display:none!important;}
+.ffAccountOutletPanel h3{margin:0 0 12px;color:#ff8d3c;font-size:16px;letter-spacing:.02em;}
+.ffOutletTotals{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;border:1px solid #995025;border-radius:10px;padding:12px;margin:10px 0;color:#fff;}
+.ffOutletTotals strong{color:#ff943b;}
+.ffOutletTotals span{font-size:12px;}
+.ffOutletList{display:grid;gap:0;max-height:50vh;overflow:auto;border:1px solid #553526;border-radius:10px;}
+.ffOutletListRow{display:flex;align-items:flex-start;min-width:0;gap:12px;padding:11px;border-bottom:1px solid #48301f;color:#fff;}
+.ffOutletListRow:last-child{border-bottom:0;}
+.ffOutletSerial{flex:0 0 25px;color:#ff8a32;text-align:right;font-variant-numeric:tabular-nums;}
+.ffOutletListRow>div{min-width:0;overflow-wrap:anywhere;}
+.ffOutletListRow strong{font-size:13px;display:block;line-height:1.4;}
+.ffOutletListRow small{font-size:11px;display:block;color:#d9cfc7;margin-top:4px;line-height:1.4;}
+#ffOutletAccessImport{display:grid;gap:10px;margin-top:14px;}
+#ffOutletExcelFile{width:100%;padding:12px;border-radius:9px;background:#0b0b0d;color:#fff;border:1px solid #9a4922;}
+.ffOutletExcelPreview{max-height:200px;overflow:auto;padding:4px 8px;color:#fff;font-size:12px;}
+.ffOutletExcelPreview p{margin:6px 0!important;font-size:12px;}
+#ffOutletAccessStatus{font-size:12px;}
+.ffTeamAvatar.ffStaffCircle{width:46px!important;height:46px!important;min-width:46px!important;flex:0 0 46px!important;border-radius:50%!important;overflow:hidden!important;}
+.ffTeamAvatar.ffStaffCircle>img.ffStaffPhoto{width:100%!important;height:100%!important;border-radius:50%;object-fit:cover!important;cursor:zoom-in;}
+@media(max-width:460px){
+ #ffAccountForm fieldset{padding:9px!important;}
+ #ffAccountForm .ffPermissionRow{grid-template-columns:minmax(0,1fr) repeat(3,35px)!important;gap:2px!important;}
+ #ffAccountForm .ffPermissionRow>span{font-size:11px!important;}
+ #ffAccountForm .ffPermissionRow input[type=checkbox]{width:19px!important;height:19px!important;min-width:19px!important;max-width:19px!important;}
+}
