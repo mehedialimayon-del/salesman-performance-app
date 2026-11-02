@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080a0e">
+<meta name="description" content="A&N Overseas Study Updates & Insights and real Student Success Stories.">
+<title>Student Resource &amp; Success Hub | A&amp;N Overseas</title>
+<style>
+:root{color-scheme:dark;--orange:#ff921a;--gold:#ffc36d;--muted:#c4bdba;--border:#704321}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:#fff;background:#080a0e}body{min-height:100dvh}
+a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:10;background:rgba(7,8,12,.97);border-bottom:1px solid #714621;backdrop-filter:blur(12px)}
+.topinner{display:flex;align-items:center;gap:15px;min-height:78px;max-width:1460px;margin:auto;padding:7px 22px}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}.brand img{height:55px;width:69px;object-fit:contain}.brand-name{font-family:Georgia,serif;color:#ffac46;font-size:clamp(19px,2.3vw,27px);font-weight:800}.brand small{display:block;letter-spacing:1.9px;font-size:9px;color:#e5d5bc}.nav{display:flex;gap:17px;margin-left:auto;align-items:center;font-size:13px;font-weight:700}.nav a:hover,.nav .active{color:var(--orange)}
+.refresh{background:#17151b;color:var(--gold);border:1px solid var(--border);border-radius:12px;min-height:41px;padding:6px 13px;font-weight:800}
+.ticker{overflow:hidden;white-space:nowrap;background:#15100d;border-bottom:1px solid #563619;padding:9px 20px;font-size:12px;color:#f8bd76}.ticker b{color:#0a0b0d;background:var(--orange);padding:9px 12px;margin-right:14px}
+.main{max-width:1460px;margin:auto;padding:20px 20px 30px}.eyebrow{color:var(--gold);font-weight:850;letter-spacing:1.6px;font-size:10px;text-transform:uppercase}.intro{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}.intro h1{margin:5px 0 7px;font-size:clamp(25px,3.4vw,42px);line-height:1.12}.intro h1 span{color:var(--orange)}.intro p{color:var(--muted);margin:0;font-size:13px;line-height:1.5}.tag{border:1px solid var(--border);border-radius:50px;padding:9px 13px;font-size:11px;color:var(--gold);background:#25170d}
+.panels{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:15px;height:calc(100dvh - 238px);min-height:400px}
+.panel{display:flex;flex-direction:column;min-height:0;overflow:hidden;border:1px solid var(--border);border-radius:19px;background:linear-gradient(140deg,#1c1716,#11141c 62%,#0d0f15)}
+.panelhead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:17px 17px 14px;border-bottom:1px solid #54351c;background:linear-gradient(110deg,#302011,#151419)}.panelhead h2{margin:3px 0 4px;font-size:clamp(18px,2vw,23px)}.panelhead h2 span{color:var(--orange)}.panelhead p{margin:0;font-size:11px;color:var(--muted)}.panelhead .sign{display:grid;place-items:center;background:linear-gradient(110deg,#ffcd68,#fb8207);color:#100d09;border-radius:11px;width:40px;height:40px;font-size:21px}.count{font-size:11px;font-weight:800;color:var(--gold);padding:11px 16px 0}
+.feed{padding:13px;overflow-y:auto;overscroll-behavior:contain;scrollbar-color:#af762c #13151b;min-height:0;flex:1}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+.card{min-width:0;overflow:hidden;background:#181920;border:1px solid #493321;border-radius:14px}
+.media{border:0;background:#0b1016;padding:0;width:100%;aspect-ratio:16/10;display:block;overflow:hidden;position:relative}.media img,.media video{width:100%;height:100%;object-fit:cover;display:block}.media video{object-fit:contain}.media button{border:0}.media .zoom{position:absolute;right:8px;bottom:8px;padding:4px 8px;border-radius:6px;background:#0c0c0dd9;color:white;font-size:10px}
+.cardbody{padding:11px}.category{color:#ffb35e;font-size:10px;font-weight:800;margin-bottom:6px;letter-spacing:.5px}.card h3{font-size:14px;line-height:1.4;margin:0 0 8px;overflow-wrap:anywhere}.desc{font-size:12px;color:#dbd2c9;line-height:1.5;white-space:pre-line;overflow-wrap:anywhere;max-height:4.6em;overflow:hidden}.card.expanded .desc{max-height:none}.more{color:#ffb15a;border:0;background:transparent;padding:8px 0 0;font-size:11px;text-decoration:underline}.meta{color:#aaa4a0;font-size:10px;margin-top:9px}
+.empty{margin:15px auto;border:1px dashed #754522;padding:35px 17px;text-align:center;border-radius:15px;color:#d2c6bb;max-width:460px}.empty strong{display:block;color:#fff;font-size:20px;margin:0 0 13px}.empty p{line-height:1.6;font-size:13px}.empty button{border:1px solid #9a5b25;background:#241608;color:#ffbe69;padding:10px;border-radius:9px}
+dialog{border:1px solid #a66b2d;border-radius:15px;max-width:96vw;max-height:96dvh;background:#090a0c;color:white;padding:13px 13px 7px;box-shadow:0 20px 80px #000}dialog::backdrop{background:#000d}dialog img{display:block;max-width:calc(96vw - 30px);max-height:82dvh;width:auto;height:auto;object-fit:contain}dialog button{display:block;margin-left:auto;background:#291a0d;border:1px solid #966029;border-radius:8px;padding:6px 12px;color:#fff;margin-bottom:8px}dialog p{font-size:12px;margin:8px 0}
+@media(max-width:950px){.nav{gap:10px}.nav a:nth-child(2){display:none}.panels{height:auto;display:flex;flex-direction:column}.panel{height:min(670px,75dvh);min-height:360px}.main{padding:17px 12px 28px}}
+@media(max-width:570px){.topinner{padding:6px 11px;min-height:72px;gap:9px}.brand img{width:47px;height:51px}.brand-name{font-size:18px}.brand small{font-size:7px;letter-spacing:.6px}.nav{font-size:11px;margin-left:auto}.nav a:not(.active){display:none}.refresh{padding:6px 10px}.intro{display:block}.tag{display:inline-block;margin-top:13px}.grid{grid-template-columns:1fr}.media{aspect-ratio:16/10}.panelhead{padding:12px}.panel{height:min(680px,80dvh)}}
+</style>
+</head>
+<body>
+<header class="top"><div class="topinner">
+<a class="brand" href="./index.html#/home"><img src="./assets/brand-logo.jpg" alt="A&amp;N logo"><div><div class="brand-name">A&amp;N Overseas</div><small>EDUCATION &amp; CONSULTANCY</small></div></a>
+<nav class="nav" aria-label="Navigation"><a href="./index.html#/home">Home</a><a href="./index.html#/universities">Universities</a><a class="active" aria-current="page" href="./student-hub.html">Student Hub</a></nav>
+<button id="refresh" class="refresh" type="button" aria-label="Refresh published content">↻</button>
+</div></header>
+<div class="ticker"><b>📣 LATEST UPDATES</b><span>Study guidance • University updates • Verified student journeys • A&amp;N Overseas</span></div>
+<main class="main">
+<div class="intro"><div><div class="eyebrow">A&amp;N Overseas · Learning &amp; Trust Centre</div><h1>STUDENT RESOURCE <span>&amp; SUCCESS HUB</span></h1><p>Helpful study resources and published student success stories, in two separate sections.</p></div><div class="tag">Study Updates &amp; Insights · Success Stories</div></div>
+<div class="panels">
+<section class="panel" aria-labelledby="updates-title"><div class="panelhead"><div><div class="eyebrow">LEARN · PLAN · APPLY</div><h2 id="updates-title">STUDY <span>UPDATES &amp; INSIGHTS</span></h2><p>Guides, admission news, posters, tips and videos</p></div><span class="sign">✎</span></div><div class="count" id="updates-count">Loading published posts…</div><div class="feed" id="updates-feed" aria-live="polite"></div></section>
+<section class="panel" aria-labelledby="stories-title"><div class="panelhead"><div><div class="eyebrow">REAL JOURNEYS · REAL EXPERIENCES</div><h2 id="stories-title">STUDENT <span>SUCCESS STORIES</span></h2><p>Photos and videos published with student permission</p></div><span class="sign">★</span></div><div class="count" id="stories-count">Loading published stories…</div><div class="feed" id="stories-feed" aria-live="polite"></div></section>
+</div></main>
+<dialog id="photo-dialog" aria-label="Full original photo"><button type="button" id="photo-close">× Close</button><img id="full-photo" alt="Full original photo"><p id="full-caption"></p></dialog>
+<script>
+(function(){
+'use strict';
+const ROOT='https://svpgjrxeqnluipsgjywk.supabase.co';
+const KEY='sb_publishable_eR5TZxv2aWndxdwzU0RIUA_mXWcBcO3';
+let busy=false,previous='',photoHistory=false;
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safe=x=>{try{const u=new URL(x);return u.protocol==='https:'?u.href:'';}catch{return'';}};
+const node=id=>document.getElementById(id);
+function card(s,isStory){
+ const name=esc(s.title||(isStory?'Student Success':'Study Update'));
+ const description=esc(s.description||'');
+ const media=safe(s.media_url);
+ const vid=s.type==='video',hasMedia=(s.type==='video'||s.type==='image')&&!!media;
+ let visual='';
+ if(hasMedia)visual=vid?'<div class="media"><video controls playsinline preload="metadata" src="'+esc(media)+'" aria-label="'+name+'"></video></div>':'<button class="media" type="button" data-full="'+esc(media)+'" data-title="'+name+'"><img src="'+esc(media)+'" loading="lazy" alt="'+name+'"><span class="zoom">⤢ Full Photo</span></button>';
+ else visual='<div class="media" style="display:grid;place-items:center;color:#ffd194;font-size:24px">✦</div>';
+ let date='';if(s.created_at){const d=new Date(s.created_at);if(!isNaN(d.getTime()))date=d.toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'});}
+ return '<article class="card">'+visual+'<div class="cardbody"><div class="category">'+esc(isStory?'STUDENT JOURNEY':s.category||'STUDY GUIDE')+(s.featured?' · ★ FEATURED':'')+'</div><h3>'+name+'</h3>'+(description?'<div class="desc">'+description+'</div><button type="button" class="more" data-more>Read more</button>':'')+'<div class="meta">A&amp;N Overseas'+(date?' · '+esc(date):'')+'</div></div></article>';
+}
+function empty(name,detail,err=false){return '<div class="empty"><strong>'+esc(name)+'</strong><p>'+esc(detail)+'</p>'+(err?'<button type="button" data-retry>↻ Refresh &amp; Retry</button>':'')+'</div>';}
+function draw(data){
+ const updates=(Array.isArray(data.study_insights)?data.study_insights:[]).filter(s=>s&&s.approved===true&&String(s.title||'').trim());
+ const stories=(Array.isArray(data.success_stories)?data.success_stories:[]).filter(s=>s&&s.approved===true&&['image','video'].includes(s.type)&&safe(s.media_url));
+ updates.sort((a,b)=>Number(!!b.featured)-Number(!!a.featured)||new Date(b.created_at||0)-new Date(a.created_at||0));
+ stories.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+ node('updates-count').textContent=updates.length+' published update'+(updates.length===1?'':'s');
+ node('stories-count').textContent=stories.length+' published stor'+(stories.length===1?'y':'ies');
+ node('updates-feed').innerHTML=updates.length?'<div class="grid">'+updates.map(x=>card(x,false)).join('')+'</div>':empty('No published updates yet','Study posts will appear here once published by the administrator.');
+ node('stories-feed').innerHTML=stories.length?'<div class="grid">'+stories.map(x=>card(x,true)).join('')+'</div>':empty('No published success stories yet','Verified photos and videos will appear here after permission and publication.');
+}
+async function load(){
+ if(busy)return;busy=true;node('refresh').disabled=true;
+ try{
+  const r=await fetch(ROOT+'/rest/v1/an_site_content?select=key,value&key=in.(study_insights,success_stories)',{headers:{apikey:KEY},cache:'no-store'});
+  if(!r.ok)throw Error('HTTP '+r.status);
+  const rows=await r.json(),data={};rows.forEach(r=>data[r.key]=r.value);
+  const next=JSON.stringify(data);if(next!==previous){previous=next;draw(data);}
+ }catch(err){
+  if(!previous){node('updates-count').textContent='Unable to load';node('stories-count').textContent='Unable to load';node('updates-feed').innerHTML=empty('Connection error','Could not read published posts. Check your connection and retry.',true);node('stories-feed').innerHTML=empty('Connection error','Could not read published stories. Check your connection and retry.',true);}
+ }finally{busy=false;node('refresh').disabled=false;}
+}
+document.addEventListener('click',e=>{
+ const full=e.target.closest('[data-full]');
+ if(full){const src=safe(full.dataset.full);if(!src)return;node('full-photo').src=src;node('full-caption').textContent=full.dataset.title||'';node('photo-dialog').showModal();history.pushState({anHubPhoto:true},'',location.href);photoHistory=true;return;}
+ if(e.target.closest('[data-more]')){const b=e.target.closest('[data-more]');const box=b.closest('.card');const open=box.classList.toggle('expanded');b.textContent=open?'Read less':'Read more';return;}
+ if(e.target.closest('[data-retry]'))void load();
+});
+function closePhoto(){if(node('photo-dialog').open)node('photo-dialog').close();photoHistory=false;}
+node('photo-close').addEventListener('click',()=>{if(photoHistory)history.back();else closePhoto();});
+window.addEventListener('popstate',()=>{if(photoHistory)closePhoto();});
+node('photo-dialog').addEventListener('cancel',e=>{if(photoHistory){e.preventDefault();history.back();}});
+node('refresh').addEventListener('click',()=>void load());
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)void load();});
+void load();setInterval(()=>{if(!document.hidden)void load();},15000);
+})();
+</script>
+</body></html>
