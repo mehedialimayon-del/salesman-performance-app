@@ -2,7 +2,7 @@
 (()=>{'use strict';
  const app=document.getElementById('app');if(!app)return;
  const sb=()=>window.FFH_SUPABASE,avatars=new Map(),broken=new Set();
- let viewer='',scheduled=false,fetching=null,channel=null,lastRead=0;
+ let viewer='',scheduled=false,fetching=null,channel=null,photoBroadcast=null,lastRead=0;
  const pickId=()=>{try{return String(JSON.parse(localStorage.getItem('ffh_session')||'null')?.id||'').trim().toUpperCase();}catch{return '';}};
  const safeUrl=value=>{try{const u=new URL(String(value||''));return u.protocol==='https:'?u.href:'';}catch{return '';}};
  const person=id=>avatars.get(String(id||'').toUpperCase());
@@ -118,7 +118,7 @@
   }catch(err){console.warn('Staff profile photos are temporarily unavailable:',err.message||err);}finally{fetching=null;}})();
   return fetching;
  }
- function sessionTick(){const id=pickId();if(id!==viewer){viewer=id;avatars.clear();lastRead=0;if(channel){sb()?.removeChannel?.(channel);channel=null;}}if(id){refresh();connectRealtime();}}
+ function sessionTick(){const id=pickId();if(id!==viewer){viewer=id;avatars.clear();lastRead=0;if(channel){sb()?.removeChannel?.(channel);channel=null;}if(photoBroadcast){sb()?.removeChannel?.(photoBroadcast);photoBroadcast=null;}}if(id){refresh();connectRealtime();}}
  const st=document.createElement('style');
  st.textContent=`
  .ffIdentityHero .editableAvatar,.profile .editableAvatar{border-radius:50%!important;object-fit:cover!important;cursor:zoom-in!important}
@@ -160,11 +160,16 @@
   if(channel||!sb()?.channel||!pickId())return;
   try{channel=sb().channel('ffh-shared-staff-photo-'+pickId())
    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'ffh_profiles'},()=>refresh(true))
-   .subscribe();}catch(err){console.warn('Profile photo realtime fallback:',err);}
+   .subscribe();
+   photoBroadcast=sb().channel('ffh-team-photo-announcements')
+    .on('broadcast',{event:'profile-photo-updated'},()=>refresh(true)).subscribe();
+  }catch(err){console.warn('Profile photo realtime fallback:',err);}
  };
  window.addEventListener('ffh-staff-updated',()=>refresh(true));
  queue();sessionTick();setInterval(()=>{if(document.hidden)return;sessionTick();refresh();},8000);
- window.FFH_STAFF_PHOTOS={refresh,render:queue,find:id=>person(id),updateOwn:(id,url)=>{
+ window.FFH_STAFF_PHOTOS={refresh,render:queue,find:id=>person(id),announce:(staffId)=>{
+  try{photoBroadcast?.send?.({type:'broadcast',event:'profile-photo-updated',payload:{staff_id:String(staffId||'')}})?.catch?.(console.warn);}catch(err){console.warn('Profile photo broadcast unavailable:',err);}
+ },updateOwn:(id,url)=>{
   if(!id||!safeUrl(url))return;
   const key=String(id).toUpperCase(),old=person(key)||{staff_id:key,full_name:key};
   avatars.set(key,{...old,photo_url:url});broken.delete(url);
