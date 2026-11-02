@@ -103,7 +103,7 @@ async function saveManagement(){
 function storiesPanel(){
  const row=(s,i)=>'<article class="studio-media-row" data-story-id="'+E(s.id||'index:'+i)+'"><div class="studio-preview">'+
  (s.type==='video'?'<video src="'+E(s.media_url)+'" playsinline muted preload="metadata"></video>':'<img alt="" src="'+E(s.media_url)+'" loading="lazy">')+
- '</div><div><b>'+E(s.title||'Untitled')+'</b><p>'+E(s.description||'')+'</p><small>'+dstr(s.created_at)+' · '+(s.approved?'Published':'Draft')+'</small></div><div class="actions">'+action(s.approved?'Unpublish':'Publish','toggle-story',s.id||'index:'+i)+' '+action('Edit','edit-story',s.id||'index:'+i)+' '+action('Replace Media','replace-story',s.id||'index:'+i)+(s.type==='image'?' '+action('Zoom / Position','adjust-story',s.id||'index:'+i):'')+' '+action('Remove','remove-story',s.id||'index:'+i,'danger')+'</div><input hidden type="file" name="media" data-media-replace="story" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"></article>';
+ '</div><div><b>'+E(s.title||'Untitled')+'</b><p>'+E(s.description||'')+'</p><small>'+dstr(s.created_at)+' · '+(s.approved?'Published':'Draft')+'</small></div><div class="actions">'+action(s.approved?'Unpublish':'Publish',s.approved?'unpublish-story':'publish-story',s.id||'index:'+i)+' '+action('Edit','edit-story',s.id||'index:'+i)+' '+action('Replace Media','replace-story',s.id||'index:'+i)+(s.type==='image'?' '+action('Zoom / Position','adjust-story',s.id||'index:'+i):'')+' '+action('Remove','remove-story',s.id||'index:'+i,'danger')+'</div><input hidden type="file" name="media" data-media-replace="story" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"></article>';
  wrap('Success <em>Stories</em>','Publish YouTube-style photo and video cards with captions, playable directly on the public site.',
  panel('<h2>Upload a Success Story</h2><form id="studio-story-form">'+fld('title','Video / Photo Title','')
  +area('description','Description / Student Achievement','')
@@ -130,9 +130,9 @@ async function addStory(f){
  storiesPanel();progress('Published and verified ✓. Your Success Story is saved in the live database. Open the website to check the card.');
 }
 async function mutateStory(cmd,id){
- const i=id.startsWith('index:')?Number(id.slice(6)):stories.findIndex(x=>String(x.id)===id);if(!Number.isInteger(i)||i<0||i>=stories.length)throw Error('Story not found');
- const list=stories.map(x=>({...x}));
- if(cmd==='toggle-story'){list[i].approved=!list[i].approved;}
+ const fresh=await api().getContent('success_stories',[]),list=Array.isArray(fresh)?fresh.map(x=>({...x})):[];
+ const i=id.startsWith('index:')?Number(id.slice(6)):list.findIndex(x=>String(x.id)===id);if(!Number.isInteger(i)||i<0||i>=list.length)throw Error('Story not found');
+ if(cmd==='publish-story'||cmd==='unpublish-story'){list[i].approved=cmd==='publish-story';}
  else if(cmd==='remove-story'){if(!confirm('Remove this story from the website?'))return;list.splice(i,1);}
  else if(cmd==='edit-story'){
   const title=prompt('Edit Story Title',list[i].title||'');if(title===null)return;
@@ -140,7 +140,13 @@ async function mutateStory(cmd,id){
   if(!title.trim())throw Error('Story title cannot be empty');
   list[i].title=title.trim();list[i].description=desc.trim();
  }
- await publish('success_stories',list);await showStories();
+ await publish('success_stories',list);
+ if(cmd==='publish-story'||cmd==='unpublish-story'){
+  const verified=await api().getContent('success_stories',[]);
+  const changed=verified.find(x=>x.id===list[i]?.id);
+  if(!changed||changed.approved!==(cmd==='publish-story'))throw Error('Story status did not save correctly. Please refresh and retry.');
+ }
+ await showStories();
 }
 
 const updateCategories=['Study Tips','University Updates','Application Guide','Visa Guidance','Student Life','FAQ','Announcement','Offers'];
@@ -150,13 +156,13 @@ function updatePanel(){
   const identifier=E(u.id||'index:'+i),title=E(u.title||'Untitled');
   const media=u.type==='video'&&safeUrl(u.media_url)?'<video src="'+E(u.media_url)+'" controls playsinline preload="metadata"></video>':u.type==='image'&&safeUrl(u.media_url)?'<img src="'+E(u.media_url)+'" alt="" loading="lazy">':'<div class="studio-update-text-preview">✦</div>';
   return '<article class="studio-media-row" data-update-id="'+identifier+'"><div class="studio-preview">'+media+'</div><div><b>'+title+'</b><p>'+E(u.description||'')+'</p><small>'+E(u.category||'Study Tips')+' · '+dstr(u.created_at)+' · '+(u.approved?'Published':'Draft')+(u.featured?' · Featured':'')+'</small></div><div class="actions">'+
-   action(u.approved?'Unpublish':'Publish','toggle-update',u.id||'index:'+i)+
+   action(u.approved?'Unpublish':'Publish',u.approved?'unpublish-update':'publish-update',u.id||'index:'+i)+
    action(u.featured?'Unpin':'Feature','feature-update',u.id||'index:'+i)+
    action('Edit Text','edit-update',u.id||'index:'+i)+
    action('Replace Media','replace-update',u.id||'index:'+i)+
    action('Remove','remove-update',u.id||'index:'+i,'danger')+'</div><input hidden type="file" name="media" data-media-replace="update" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"></article>';
  }).join('');
- wrap('Study <em>Updates & Insights</em>','Your own Facebook-inspired resource library. New posts appear in the left panel of the public Success Stories page.', 
+ wrap('Study <em>Updates & Insights</em>','Your published study posts appear in the Study Updates panel inside the Student Resource & Success Hub.', 
  panel('<h2>Publish a New Resource</h2><form id="studio-update-form">'+
   fld('title','Post Title / Headline','')+
   area('description','Post Description / Full Caption','')+
@@ -191,10 +197,11 @@ async function addUpdate(f){
  updatePanel();progress('Published and verified ✓. This Study Update is saved in the live database. Open the website to check the card.');
 }
 async function mutateUpdate(command,id){
- const i=id.startsWith('index:')?Number(id.slice(6)):updates.findIndex(x=>String(x.id)===id);
- if(i<0||i>=updates.length||!Number.isInteger(i))throw Error('Update not found');
- const list=updates.map(x=>({...x}));const item=list[i];
- if(command==='toggle-update')item.approved=!item.approved;
+ const fresh=await api().getContent('study_insights',[]),list=Array.isArray(fresh)?fresh.map(x=>({...x})):[];
+ const i=id.startsWith('index:')?Number(id.slice(6)):list.findIndex(x=>String(x.id)===id);
+ if(i<0||i>=list.length||!Number.isInteger(i))throw Error('Update not found');
+ const item=list[i];
+ if(command==='publish-update'||command==='unpublish-update')item.approved=command==='publish-update';
  if(command==='feature-update')item.featured=!item.featured;
  if(command==='remove-update'){
   if(!confirm('Remove this update from the public site?'))return;
@@ -207,6 +214,11 @@ async function mutateUpdate(command,id){
   item.title=title.trim();item.description=desc.trim();
  }
  await publish('study_insights',list);
+ if(command==='publish-update'||command==='unpublish-update'){
+  const verified=await api().getContent('study_insights',[]);
+  const changed=verified.find(x=>x.id===item.id);
+  if(!changed||changed.approved!==(command==='publish-update'))throw Error('Update status did not save correctly. Please refresh and retry.');
+ }
  await showUpdates();
 }
 
@@ -342,8 +354,8 @@ document.addEventListener('click',async e=>{
     const adjusted=await window.ANPhotoEditor.editUrl(story.media_url,'success');
     if(adjusted){const url=await upload(adjusted,'success-adjust');const list=stories.map(x=>({...x}));list[i].media_url=url;await publish('success_stories',list);await showStories();}
    }
-  else if(['toggle-story','remove-story','edit-story'].includes(command))await mutateStory(command,id);
-  else if(['toggle-update','feature-update','remove-update','edit-update'].includes(command))await mutateUpdate(command,id);
+  else if(['publish-story','unpublish-story','remove-story','edit-story'].includes(command))await mutateStory(command,id);
+  else if(['publish-update','unpublish-update','feature-update','remove-update','edit-update'].includes(command))await mutateUpdate(command,id);
   else if(['replace-update','replace-story'].includes(command)){
     const input=button.closest('.studio-media-row')?.querySelector('input[data-media-replace]');
     if(!input)throw Error('Media replacement input missing');
