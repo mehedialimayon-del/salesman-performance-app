@@ -56,3 +56,10 @@
  #ffAccountForm .ffPermissionRow{grid-template-columns:minmax(118px,1fr) repeat(3,39px)!important;gap:3px!important;font-size:12px!important;}
  #ffAccountForm .ffPermissionRow input[type="checkbox"]{width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;}
 }
+
+/* Visible hierarchy back control; the app's native navigation remains in charge on root. */
+.ffAccountNavHeader{display:flex!important;align-items:center;gap:12px!important;min-width:0;}
+.ffAccountNavHeader h1{flex:1;min-width:0;text-align:left!important;margin:0!important;}
+.ffAccountPageBack{flex:0 0 auto;width:auto!important;min-width:76px!important;padding:8px 11px!important;min-height:38px!important;border-radius:9px!important;border:1px solid #de762e!important;background:#101010!important;color:#fff!important;font-size:12px!important;font-weight:800!important;}
+.ffAccountPageBack:focus-visible{outline:2px solid #fff!important;}
+@media(max-width:460px){.ffAccountNavHeader{gap:7px!important}.ffAccountPageBack{min-width:65px!important;font-size:11px!important;padding:7px 8px!important}.ffAccountNavHeader h1{font-size:19px!important;line-height:1.25!important}}
