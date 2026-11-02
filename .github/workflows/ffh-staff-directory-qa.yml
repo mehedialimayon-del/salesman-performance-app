@@ -4,10 +4,14 @@ on:
     branches: [main]
     paths:
       - 'accounts.js'
+      - 'account-outlet-access.js'
+      - 'account-outlet-access.css'
+      - 'staff-photos.js'
       - 'staff-directory.js'
       - 'staff-directory.css'
       - 'index.html'
       - 'tests/staff-directory-dom.cjs'
+      - 'tests/account-outlet-access-dom.cjs'
       - 'tests/staff-directory-live.cjs'
       - '.github/workflows/ffh-staff-directory-qa.yml'
   workflow_dispatch:
@@ -26,6 +30,9 @@ jobs:
       - name: Validate JavaScript syntax
         run: |
           node --check accounts.js
+          node --check account-outlet-access.js
+          node --check staff-photos.js
+          node --check tests/account-outlet-access-dom.cjs
           node --check staff-directory.js
           node --check tests/staff-directory-dom.cjs
       - name: Inspect app navigation contract
@@ -38,7 +45,9 @@ jobs:
           }
           NODE
       - name: Test owner management, team grouping, and search
-        run: node tests/staff-directory-dom.cjs
+        run: |
+          node tests/staff-directory-dom.cjs
+          node tests/account-outlet-access-dom.cjs
       - name: Install browser smoke-test dependency
         run: npm install --no-save playwright@1.58.2
       - name: Verify live published site in mobile Chromium
@@ -50,7 +59,7 @@ jobs:
           node - <<'NODE'
           const fs=require('fs');
           const html=fs.readFileSync('index.html','utf8');
-          for(const n of ['staff-directory.js?v=leadership-20261103-3','staff-directory.css?v=leadership-20261103-2','accounts.js?v=leadership-20261103-2']){
+          for(const n of ['staff-directory.js?v=20261103-all-zone-avatars-1','account-outlet-access.js?v=20261103-owner-excel-1','account-outlet-access.css?v=20261103-responsive-1','accounts.js?v=20261103-outlets-edit-1','staff-photos.js?v=20261103-all-zone-avatars-1']){
             if(!html.includes(n))throw Error('Missing asset in index: '+n);
           }
           console.log('PASS: all new live assets referenced');
