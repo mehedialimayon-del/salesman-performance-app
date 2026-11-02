@@ -200,6 +200,7 @@
  '.ffProfilePhotoPreview{position:relative;width:min(62vw,250px);height:auto;aspect-ratio:1;margin:12px auto;background:#080706;border:3px solid #ff7a18;border-radius:50%;overflow:hidden;touch-action:none;user-select:none;box-shadow:0 0 0 4px #302115,0 0 23px #ff7a1830}',
  '.ffProfilePhotoPreview img{position:absolute;left:50%;top:50%;max-width:none!important;max-height:none!important;object-fit:contain;touch-action:none;user-select:none;pointer-events:none;transform-origin:center}',
  '.ffProfilePhotoPreview span{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:16px}',
+ '.ffProfilePhotoPreview [hidden]{display:none!important}',
  '.ffCropControls{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0}',
  '.ffCropControls[hidden],#ffCropHint[hidden]{display:none!important}',
  '.ffCropControls button{width:36px;min-height:36px;background:#25190f;border:1px solid #ff7a18;color:#fff;border-radius:10px;font-size:17px}',
