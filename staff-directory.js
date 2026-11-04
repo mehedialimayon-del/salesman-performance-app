@@ -11,31 +11,28 @@
     return (/\b(team|zone|office)\b/i.test(label)?label:label+' TEAM').toLocaleUpperCase();
   };
   function buildGroups(profiles, zones, owner) {
-    // Head Office is a DISPLAY GROUP; keep each employee's actual zone,
-    // manager, access grants, and operational data unchanged.
+    // Group every employee by team, with no separate Head Office display box.
+    // Leadership is shown first in KL without modifying its saved zone/access.
     const leadershipOrder=['M21954','PERVES_HIRA','WAHID_ADMIN'];
-    const headOffice = [];
-    const byZone = new Map();
+    const byZone=new Map();
     for(const p of profiles||[]){
-      if(leadershipOrder.includes(p.staff_id)){
-        headOffice.push(p);
-        continue;
-      }
-      const id=String(p.zone_id||'UNASSIGNED');
+      const assigned=String(p.zone_id||'UNASSIGNED');
+      const id=assigned==='HEAD_OFFICE'?'PRIMARY':assigned;
       if(!byZone.has(id))byZone.set(id,[]);
       byZone.get(id).push(p);
     }
-    headOffice.sort((a,b)=>leadershipOrder.indexOf(a.staff_id)-leadershipOrder.indexOf(b.staff_id));
-    const zoneLookup = new Map((zones||[]).map(z=>[String(z.id),z]));
+    const zoneLookup=new Map((zones||[]).map(z=>[String(z.id),z]));
     const groups=[...byZone].map(([id,members])=>{
       const label=zoneLabel(zoneLookup.get(id),id);
-      members.sort((a,b)=>Number(!!b.can_manage)-Number(!!a.can_manage)
-        ||String(a.full_name||'').localeCompare(String(b.full_name||''),'en'));
+      members.sort((a,b)=>{
+        const ai=leadershipOrder.indexOf(a.staff_id),bi=leadershipOrder.indexOf(b.staff_id);
+        if(ai!==-1||bi!==-1)return (ai===-1?99:ai)-(bi===-1?99:bi);
+        return Number(!!b.can_manage)-Number(!!a.can_manage)
+          ||String(a.full_name||'').localeCompare(String(b.full_name||''),'en');
+      });
       return {id,label,members};
     });
-    groups.sort((a,b)=>a.id==='PRIMARY'?-1:b.id==='PRIMARY'?1:a.id==='HEAD_OFFICE'?1:b.id==='HEAD_OFFICE'?-1:a.label.localeCompare(b.label,'en'));
-    // Always show the leadership box first, followed by KL and other teams.
-    if(headOffice.length)groups.unshift({id:'HEAD_OFFICE_LEADERSHIP',label:'HEAD OFFICE',members:headOffice});
+    groups.sort((a,b)=>a.id==='PRIMARY'?-1:b.id==='PRIMARY'?1:a.label.localeCompare(b.label,'en'));
     return groups;
   }
   function render({profiles=[],zones=[],owner=false,admin=false,viewerId='',escape:fallback=fallbackEscape}={}){
