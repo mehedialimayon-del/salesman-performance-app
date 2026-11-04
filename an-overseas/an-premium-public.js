@@ -17,10 +17,10 @@ function storyCard(s,i){
  const d=s.created_at?new Date(s.created_at):null;
  const date=d&&!isNaN(d.getTime())?d.toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'}):'';
  return '<article class="an-youtube-card">'+visual+'<div class="an-youtube-info"><div class="an-story-avatar">A<span>&</span>N</div><div class="an-story-copy"><h3>'+title+'</h3>'
- +(desc?'<p>'+desc+'</p><button type="button" class="an-community-more" data-an-expand aria-expanded="false">Read more</button>':'')+'<small>A&N Overseas'+(date?' · '+esc(date):'')+'</small></div></div></article>';
+ +(desc?'<p>'+desc+'</p><button type="button" class="an-community-more" data-an-read-detail="story" data-an-detail-index="'+i+'" aria-label="Read full story: '+title+'">Read more ↗</button>':'')+'<small>A&N Overseas'+(date?' · '+esc(date):'')+'</small></div></div></article>';
 }
 
-function insightCard(s){
+function insightCard(s,i){
  const title=esc(s.title||'Study Resource'),desc=esc(s.description||'');
  const media=url(s.media_url),type=s.type||'text';
  const category=esc(s.category||'Student Guidance');
@@ -33,7 +33,7 @@ function insightCard(s){
  const date=d&&!isNaN(d.getTime())?d.toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'}):'';
  return '<article class="an-community-card">'+visual+
  '<div class="an-community-copy"><div class="an-community-category">'+(s.featured?'★ FEATURED · ':'')+category+'</div><h3>'+title+'</h3>'+
- (desc?'<p class="an-community-desc">'+desc+'</p><button type="button" class="an-community-more" data-an-expand aria-expanded="false">Read more</button>':'')+
+ (desc?'<p class="an-community-desc">'+desc+'</p><button type="button" class="an-community-more" data-an-read-detail="study" data-an-detail-index="'+i+'" aria-label="Read full update: '+title+'">Read more ↗</button>':'')+
  '<small class="an-community-meta">A&N Overseas'+(date?' · '+esc(date):'')+'</small></div></article>';
 }
 function showInsights(){
@@ -44,7 +44,7 @@ function showInsights(){
  const top=live.find(s=>s.featured);
  const feature=document.querySelector('#an-community-featured');
  if(feature)feature.innerHTML='<b>'+(top?'FEATURED':'STUDY HUB')+'</b><span>'+esc(top?top.title:'University news, application tips and practical student resources')+'</span>';
- mount.innerHTML=live.length?'<div class="an-community-grid">'+live.map(insightCard).join('')+'</div>'
+ mount.innerHTML=live.length?'<div class="an-community-grid">'+live.map((s,i)=>insightCard(s,i)).join('')+'</div>'
  :'<div class="an-premium-empty"><span>✦</span><h2>Study Updates & Insights</h2><p>University guides, FAQs, posters and videos will appear here after the administrator publishes them.</p></div>';
 }
 
@@ -160,13 +160,64 @@ document.addEventListener('touchend',e=>{
  teamIndex=(teamIndex+(delta<0?1:-1)+activeMembers().length)%activeMembers().length;showTeam();
 },{passive:true});
 
+// Fullscreen reader for Study Updates and Student Success Stories.
+// The compact two-column cards remain unchanged; Read More opens media first,
+// then the complete caption. Tapping an image still opens the original photo.
+const liveStudies=()=>insights.filter(s=>s&&s.approved===true&&String(s.title||'').trim())
+ .sort((a,b)=>Number(!!b.featured)-Number(!!a.featured)||(new Date(b.created_at||0)-new Date(a.created_at||0)));
+const liveStories=()=>stories.filter(s=>s&&s.approved===true&&(s.type==='video'||s.type==='image')&&url(s.media_url))
+ .sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+let anReaderPopPending=false;
+function closeAnReaderFromHistory(){
+ const dlg=document.getElementById('an-detail-dialog');
+ if(dlg?.open){dlg.querySelectorAll('video').forEach(v=>v.pause());dlg.close();}
+ anReaderPopPending=false;
+}
+function openAnReader(kind,index){
+ if(current()!=='success'||!Number.isSafeInteger(index)||index<0)return;
+ const item=(kind==='story'?liveStories():kind==='study'?liveStudies():[])[index];if(!item)return;
+ const title=esc(item.title||(kind==='story'?'Student Success Story':'Study Update'));
+ const full=esc(item.description||'');
+ const media=url(item.media_url);
+ const video=item.type==='video'&&media;
+ const picture=item.type==='image'&&media;
+ const category=esc(kind==='study'?item.category||'Student Guidance':'Student Success Story');
+ const d=item.created_at?new Date(item.created_at):null;
+ const date=d&&!isNaN(d.getTime())?d.toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'}):'';
+ const visual=video
+  ?'<div class="an-reader-media"><video controls playsinline preload="metadata" src="'+esc(media)+'" aria-label="'+title+'"></video></div>'
+  :picture
+   ?'<button type="button" class="an-reader-media an-reader-photo-button" data-an-preview="'+esc(media)+'" data-an-title="'+title+'" aria-label="View full original photo: '+title+'"><img src="'+esc(media)+'" alt="'+title+'"><span>⤢ View full photo</span></button>'
+   :'<div class="an-reader-media an-reader-text-media" aria-hidden="true">✦</div>';
+ let dlg=document.getElementById('an-detail-dialog');
+ if(!dlg){dlg=document.createElement('dialog');dlg.id='an-detail-dialog';dlg.className='an-detail-dialog';dlg.setAttribute('aria-label','Full article and media');document.body.appendChild(dlg);}
+ if(dlg.open)closeAnReaderFromHistory();
+ dlg.innerHTML='<div class="an-reader-layout">'
+  +'<header class="an-reader-top"><span>A&amp;N OVERSEAS <b>· FULL STORY</b></span><button type="button" data-an-close-detail aria-label="Close full story">✕ Close</button></header>'
+  +'<div class="an-reader-scroll">'+visual
+  +'<article class="an-reader-copy"><div class="an-reader-category">'+category+'</div><h1>'+title+'</h1>'
+  +'<div class="an-reader-meta">A&amp;N Overseas'+(date?' · '+esc(date):'')+'</div>'
+  +(full?'<div class="an-reader-description">'+full+'</div>':'')
+  +'</article></div></div>';
+ if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','');
+ history.pushState({anDetailPreview:true},'',location.href);
+ anReaderPopPending=true;
+}
 document.addEventListener('click',e=>{
- const b=e.target.closest('[data-an-expand]');
- if(!b)return;
- const card=b.closest('.an-community-card,.an-youtube-card');if(!card)return;
- const expand=card.classList.toggle('an-community-expanded');
- b.textContent=expand?'Read less':'Read more';
- b.setAttribute('aria-expanded',String(expand));
+ const b=e.target.closest('[data-an-read-detail]');if(!b)return;
+ const index=Number(b.dataset.anDetailIndex);
+ openAnReader(b.dataset.anReadDetail,index);
+});
+document.addEventListener('click',e=>{
+ if(!e.target.closest('[data-an-close-detail]'))return;
+ if(anReaderPopPending)history.back();else closeAnReaderFromHistory();
+});
+window.addEventListener('popstate',e=>{
+ if(anReaderPopPending&&!e.state?.anDetailPreview)closeAnReaderFromHistory();
+});
+document.addEventListener('cancel',e=>{
+ if(e.target?.id!=='an-detail-dialog')return;
+ if(anReaderPopPending){e.preventDefault();history.back();}
 });
 // Full-resolution, uncropped photo viewer. Android Back closes the image before changing routes.
 let anPhotoPopPending=false;
