@@ -1,0 +1,16 @@
+/* University photo and official-site identity layer */
+.an-guide-card .uni-cover-wrap{position:relative;overflow:hidden}
+.an-guide-card .an-guide-identity.an-identity-branded{padding:13px 12px 12px;background:radial-gradient(circle at 83% 13%,#a35c226b,transparent 51%),linear-gradient(145deg,#101b29,#1c1a19 65%,#291806)}
+.an-identity-head{position:absolute;top:10px;left:12px;right:8px;display:flex;align-items:center;gap:9px;max-width:calc(100% - 22px);z-index:0}
+.an-identity-head span{font-size:10px;letter-spacing:.3px;color:#f9cf9e;font-weight:650}
+.an-identity-logo{width:44px;height:44px;display:block;object-fit:contain;border-radius:10px;padding:5px;background:#f8f9f4;border:1px solid #eebc7a;box-shadow:0 4px 15px #0008}
+.an-guide-card .an-university-mark{position:absolute;z-index:3;top:9px;right:9px;width:37px;height:37px;object-fit:contain;background:#fff;border:1px solid #ffe0ae;border-radius:8px;padding:4px;box-shadow:0 3px 13px #000a}
+.an-guide-card .an-guide-photo.an-commons-photo{z-index:1;display:block}
+.an-guide-card .an-commons-credit{max-width:calc(100% - 12px);width:max-content;right:auto;font-size:7px}
+.an-guide-card .an-guide-identity strong{padding-right:3px}
+@media(max-width:520px){
+ .an-identity-logo{width:32px;height:32px;padding:4px}
+ .an-identity-head{top:8px;left:9px;gap:7px}
+ .an-identity-head span{font-size:8px}
+ .an-guide-card .an-university-mark{width:28px;height:28px;top:7px;right:7px}
+}
