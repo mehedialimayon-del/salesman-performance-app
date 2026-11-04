@@ -73,3 +73,9 @@
 .an-guide-fee-table th,.an-guide-fee-table td{border:1px solid #6f5030;padding:8px;text-align:left}
 .an-guide-fee-table th{background:#302114;color:#ffe0a1}
 @media(max-width:900px){.an-guide-degree-grid{grid-template-columns:1fr}.an-guide-degree-box .an-guide-step{font-size:12px}.an-guide-degree-box .an-guide-check li{font-size:11px}}
+
+/* Private Malaysian university seals: ticket upper left, published scholarship upper right.
+   QS rank moves to lower left where a ticket offer is shown. */
+.an-guide-card:has(.an-guide-ticket) .an-guide-ticket{top:7px;left:7px;right:auto;bottom:auto;max-width:56%}
+.an-guide-card:has(.an-guide-ticket) .an-guide-rank{top:auto;bottom:7px;left:7px}
+.an-guide-card:has(.an-guide-ticket) .an-guide-credit{display:none}
