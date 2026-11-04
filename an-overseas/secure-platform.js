@@ -163,12 +163,9 @@ function changePasswordPage(){
  +'<p class="live-mini">Your new password is saved securely by the authentication provider, not on this website or in your Gmail account.</p>'
  +'<div class="live-controls"><a href="'+back+'">← '+label+'</a></div></div></div>';
 }
-const oldSuccess=successPage;
-successPage=function(){
- return title('Success Stories','Verified student experiences, university journeys and graduation moments.')
- +'<div class="wrap content page-scroll"><div id="an-story-grid" class="story-grid">'+storyMarkup()+'</div>'
- +'<div class="contact-action-card"><div><h3>Begin Your Own Journey</h3><p>Contact our team for university admission guidance and application support.</p></div><a class="btn" href="#/contact">Contact Our Team →</a></div></div>';
-};
+/* The Student Resource & Success Hub is rendered by the existing
+   successPage() in index.html. Do not overwrite it with the legacy
+   single-column Student Experiences layout. */
 function storyMarkup(){
  if(!AN.loadedStory)return '<div class="story-empty">Loading published student journeys...</div>';
  const ss=AN.stories.filter(x=>x&&x.title&&/^https:\/\//i.test(x.media_url||'')&&x.approved===true);
