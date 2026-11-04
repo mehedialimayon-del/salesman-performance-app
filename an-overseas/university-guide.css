@@ -55,3 +55,21 @@
 .an-guide-ticket-note{border-left:3px solid #ffa52d;background:#3d210f;padding:10px;font-size:12px}
 @media(max-width:760px){.an-guide-fee-grid,.an-guide-support-grid{grid-template-columns:1fr}.an-guide-support{padding:13px}.an-guide-gallery{grid-template-columns:1fr}}
 @media(max-width:480px){.an-guide-card .uni-cover-wrap{height:138px}.an-guide-identity{padding:9px}.an-guide-identity strong{font-size:11px}.an-guide-identity small{font-size:8px}.an-guide-rank{font-size:9px;padding:4px 6px}.an-guide-card .inside{min-height:170px}.an-guide-card .university-fullname{font-size:10px}.an-guide-card .inside h3{font-size:15px}.an-guide-support-head img{width:58px;height:55px}.an-guide-btn{font-size:11px}.an-guide-level-links{grid-template-columns:1fr}}
+
+.an-guide-scholarship-enquiry{position:absolute;z-index:4;top:8px;right:8px;background:#201507eb;color:#ffce83;border:1px solid #db8c31;padding:5px 7px;border-radius:7px;font-size:9px;font-weight:800}
+.an-guide-degree-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}
+.an-guide-degrees>p{font-size:12px;line-height:1.55}
+.an-guide-degree-box{min-width:0;border:1px solid #855a31;border-radius:11px;background:#111a23;color:#fff;overflow:hidden}
+.an-guide-degree-box>summary{list-style:none;cursor:pointer;padding:11px 13px;background:linear-gradient(105deg,#3b2510,#18212d);color:#ffc47b;font-size:13px;font-weight:850;display:flex;justify-content:space-between;gap:10px}
+.an-guide-degree-box>summary::-webkit-details-marker{display:none}
+.an-guide-degree-box .an-guide-level{padding:9px}
+.an-guide-degree-box .an-guide-level h2{font-size:15px;line-height:1.25}
+.an-guide-degree-box .an-guide-step{font-size:10px;padding:6px;gap:5px}
+.an-guide-degree-box .an-guide-step b{height:20px;width:20px;flex:0 0 20px}
+.an-guide-degree-box .an-guide-check{padding:8px;margin:8px 0}
+.an-guide-degree-box .an-guide-check h3{font-size:12px}
+.an-guide-degree-box .an-guide-check li,.an-guide-degree-box .an-guide-check p,.an-guide-degree-box .an-guide-level>p{font-size:10px}
+.an-guide-fee-table{border-collapse:collapse;width:100%;font-size:11px}
+.an-guide-fee-table th,.an-guide-fee-table td{border:1px solid #6f5030;padding:8px;text-align:left}
+.an-guide-fee-table th{background:#302114;color:#ffe0a1}
+@media(max-width:900px){.an-guide-degree-grid{grid-template-columns:1fr}.an-guide-degree-box .an-guide-step{font-size:12px}.an-guide-degree-box .an-guide-check li{font-size:11px}}
