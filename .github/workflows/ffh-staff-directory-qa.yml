@@ -59,7 +59,7 @@ jobs:
           node - <<'NODE'
           const fs=require('fs');
           const html=fs.readFileSync('index.html','utf8');
-          for(const n of ['staff-directory.js?v=20261103-all-zone-avatars-1','account-outlet-access.js?v=20261103-owner-excel-1','account-outlet-access.css?v=20261103-responsive-1','accounts.js?v=20261103-outlets-edit-1','staff-photos.js?v=20261103-all-zone-avatars-1']){
+          for(const n of ['staff-directory.js?v=20261104-photos-leadership-4','account-outlet-access.js?v=20261104-excel-import-4','account-outlet-access.css?v=20261104-mobile-responsive-4','accounts.js?v=20261104-account-edit-4','staff-photos.js?v=20261104-avatars-sync-4']){
             if(!html.includes(n))throw Error('Missing asset in index: '+n);
           }
           console.log('PASS: all new live assets referenced');
