@@ -2,6 +2,7 @@
    Costs are illustrative published programme examples, NOT overall university fees. */
 (function(){
 'use strict';
+var visibleLimit=48,lastQuerySignature='';
 var pref={kind:'All Types',level:'All Levels',subject:'All Subjects',budget:'Any Budget',order:'QS Ranking (verified first)',requirement:''};
 var levels={
  upm:['Bachelor','Master','PhD'],um:['Bachelor','Master','PhD'],
@@ -32,7 +33,7 @@ universitiesPage=function(){
  +controls+'<div class="filter-actions"><small>Fee ranges use verified programme examples, not fixed university-wide prices.</small><button type="button" class="catalogue-clear" id="reset-university-filters">Reset filters</button></div>'
  +'</div></details><label class="an-scholarship-only"><input id="scholarship-filter" type="checkbox" '+(scholarshipOnly?'checked':'')+'> 🎓 Scholarships only</label></div><div id="catalogue-count" class="catalogue-count" aria-live="polite"></div><div id="results" class="grid"></div>'
  +'<div class="other-university">Your preferred university is not listed? <a href="#/contact">Ask A&N Overseas about another university ↗</a></div>'
- +'<p class="catalogue-footnote">Fees, eligibility and study levels depend on the exact programme. Published fee examples may have different durations and exclusions; always confirm with the official university offer.</p></div>';
+ +'<p class="catalogue-footnote">This is a university discovery directory, not a register of accredited institutions or A&amp;N partners. Additional listings may come from the Hipo public university domains dataset. Confirm official recognition, current courses, fees, entry rules and image licensing at the institution and national regulator.</p><p class="catalogue-footnote">Fees, eligibility and study levels depend on the exact programme. Published fee examples may have different durations and exclusions; always confirm with the official university offer.</p></div>';
 };
 function feeEstimate(u){
  var p=UNIVERSITY_PROFILES[u.id],fees=p&&p.fees||[],nums=[];
@@ -59,6 +60,8 @@ function passesBudget(n){
 renderResults=function(){
  var el=document.querySelector('#results');if(!el)return;
  var term=searchTerm.toLowerCase().trim(),requirement=pref.requirement.toLowerCase().trim();
+ var signature=[filterCountry,term,requirement,pref.kind,pref.level,pref.subject,pref.budget,pref.order,scholarshipOnly].join('|');
+ if(signature!==lastQuerySignature){visibleLimit=48;lastQuerySignature=signature;}
  var arr=U.filter(function(u){
   var p=UNIVERSITY_PROFILES[u.id]||{};
   var all=[u.name,u.short,u.country,u.city].concat(u.programs||[],p.programs||[]).join(' ').toLowerCase();
@@ -78,7 +81,7 @@ renderResults=function(){
  });
  var count=document.querySelector('#catalogue-count');
  if(count)count.innerHTML='<strong>'+arr.length+'</strong> universities · '+esc(filterCountry)+(pref.budget!=='Any Budget'?' · published fee examples':'');
- el.innerHTML=arr.length?arr.map(card).join(''):'<div class="empty">No universities matched. Try resetting filters or another search.</div>';
+ el.innerHTML=arr.length?arr.slice(0,visibleLimit).map(card).join('')+(arr.length>visibleLimit?'<div class="catalogue-load-more" style="grid-column:1/-1;text-align:center;padding:22px"><button class="btn outline" id="load-more-universities" type="button">Show next '+Math.min(48,arr.length-visibleLimit)+' of '+arr.length+' universities ↓</button></div>':''):'<div class="empty">No universities matched. Try resetting filters or another search.</div>';
 };
 document.addEventListener('change',function(e){
  var map={'type-filter':'kind','level-filter':'level','subject-filter':'subject','budget-filter':'budget','order-filter':'order'};
@@ -88,6 +91,7 @@ document.addEventListener('input',function(e){
  if(e.target.id==='requirements-filter'){pref.requirement=e.target.value;renderResults();}
 });
 document.addEventListener('click',function(e){
+ if(e.target.closest('#load-more-universities')){visibleLimit+=48;renderResults();return;}
  if(e.target.id==='reset-university-filters'){
   pref={kind:'All Types',level:'All Levels',subject:'All Subjects',budget:'Any Budget',order:'Featured',requirement:''};
   filterCountry='Malaysia';searchTerm='';scholarshipOnly=false;render();return;
