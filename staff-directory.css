@@ -115,3 +115,13 @@
  #ffAccountForm fieldset {padding:8px!important;}
  #ffAccountForm fieldset legend {font-size:13px!important;}
 }
+
+/* Zone picker manager identities and profile photo on small screens */
+.ffZoneManagerPicker .ffPickerRows{display:grid;gap:8px}
+.ffZoneManagerPicker .ffPickerOption.ffZoneManagerRow{display:flex!important;align-items:center!important;min-height:74px;gap:12px;width:100%;text-align:left;white-space:normal;max-width:100%;box-sizing:border-box;overflow:hidden}
+.ffZoneManagerPicker .ffZoneManagerAvatar{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;border:1px solid #f18e45;border-radius:50%;overflow:hidden;background:#28170e;color:#ffb584;cursor:zoom-in}
+.ffZoneManagerPicker .ffZoneManagerAvatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.ffZoneManagerPicker .ffPickerText{display:grid;gap:4px;min-width:0;flex:1;overflow-wrap:anywhere}
+.ffZoneManagerPicker .ffZoneManagerIdentity{color:#ffb786;font-size:12px;line-height:1.35;white-space:normal;overflow-wrap:anywhere}
+.ffZoneManagerPicker .globalSearchBox{max-width:calc(100vw - 28px);overflow-x:hidden}
+@media(max-width:420px){.ffZoneManagerPicker .ffZoneManagerAvatar{flex-basis:42px;width:42px;height:42px}.ffZoneManagerPicker .ffPickerText strong{font-size:14px}.ffZoneManagerPicker .ffZoneManagerIdentity{font-size:11px}}
