@@ -1,0 +1,57 @@
+/* A&N Overseas university cards and detailed degree guide: scoped; homepage unchanged */
+#results .an-guide-card{min-width:0;overflow:hidden}
+.an-guide-card .uni-cover-wrap{height:165px;isolation:isolate;background:#111923}
+.an-guide-identity{position:absolute;inset:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;padding:14px;background:radial-gradient(circle at 85% 7%,#a65c1770,transparent 43%),linear-gradient(145deg,#14202b,#0e1019 56%,#281604);color:#fff}
+.an-guide-identity .an-guide-symbol{font-size:25px;position:absolute;top:12px;left:13px;filter:drop-shadow(0 2px 5px #0007)}
+.an-guide-identity .an-guide-country{font-size:10px;color:#ffd399;margin-bottom:5px;font-weight:800}
+.an-guide-identity strong{font-size:clamp(12px,1.2vw,15px);line-height:1.2;max-width:100%;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+.an-guide-identity small{font-size:9px;color:#c7c9ce;margin-top:4px}
+.an-guide-card .campus-cover.an-guide-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.an-guide-credit{position:absolute;bottom:3px;left:6px;right:6px;font-size:8px;line-height:1.2;color:white;background:#090909a6;border-radius:3px;padding:3px 5px;z-index:2;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
+.an-guide-rank{position:absolute;z-index:4;top:8px;left:8px;color:#14100c;background:#ffc668;border-radius:8px;padding:6px 8px;font-size:10px;font-weight:900;box-shadow:0 3px 12px #0007}
+.an-guide-ticket{position:absolute;z-index:4;bottom:7px;right:7px;max-width:57%;font-size:9px;line-height:1.2;color:#fff7e6;background:#b64b16ed;padding:5px 6px;border-radius:7px;font-weight:850}
+.an-guide-card .an-uni-discount{z-index:6;top:8px;right:8px}
+.an-guide-links{display:grid;gap:6px;margin-top:10px}
+.an-guide-links .card-open{margin:0}
+.an-guide-official{border:1px solid #5d5044;color:#ffd29c;background:#211d1a;border-radius:9px;min-height:34px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;text-decoration:none}
+.an-guide-official:hover{background:#42200c;color:#fff}
+.an-guide-card .inside{display:flex;flex-direction:column;min-height:180px}
+.an-guide-card .university-location{margin:9px 0 0}
+.an-guide-card .an-guide-links{margin-top:auto;padding-top:12px}
+#university-panel.white{background:linear-gradient(145deg,#191c25,#10141a);color:#f9f8f5;border:1px solid #755029;box-shadow:0 10px 30px #0005}
+#university-panel.white h2,#university-panel.white h3{color:#ffad4d}
+#university-panel.white p,#university-panel.white li{color:#e3dcd4}
+#university-panel .an-guide-note{background:#241c13;border-left:3px solid #ed9836;padding:11px 13px;border-radius:5px;line-height:1.6;font-size:12px;margin:12px 0}
+.an-guide-step{display:flex;align-items:flex-start;gap:10px;margin:7px 0;padding:9px;border:1px solid #573f2d;background:#171d25;border-radius:9px;font-size:12px;line-height:1.5;color:#ebe0d0}
+.an-guide-step b{width:24px;height:24px;flex:0 0 24px;display:grid;place-items:center;background:#ff941a;color:#100e0a;border-radius:8px}
+.an-guide-check{margin:12px 0;padding:14px;background:#101722;border:1px solid #62452e;border-radius:12px}
+.an-guide-check h3{font-size:15px;margin:0 0 10px}
+.an-guide-check ul{padding-left:20px;font-size:12px;line-height:1.8;margin:5px 0}
+.an-guide-check p,.an-guide-level p{font-size:12px;line-height:1.7}
+.an-guide-actions{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0}
+.an-guide-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:9px;border:1px solid #f2a14a;background:linear-gradient(110deg,#ffad37,#ff8414);color:#120f09!important;min-height:41px;padding:10px 12px;font-size:12px;font-weight:850;text-decoration:none!important;white-space:normal;text-align:center}
+.an-guide-btn.alt{background:#2b1d11;color:#ffd291!important;border-color:#775332}
+.an-guide-btn:hover{filter:brightness(1.12)}
+.an-guide-level-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.an-guide-level-links button{border:1px solid #a16832;border-radius:8px;color:#ffcc8c;background:#24160c;padding:10px 6px;font-size:11px;font-weight:800}
+.an-guide-key{display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:#272015;padding:12px;border:1px solid #93612e;border-radius:11px;margin:13px 0}
+.an-guide-key strong{font-size:13px}
+.an-guide-fee-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.an-guide-fee-grid>div{background:#161d26;border:1px solid #51402f;border-radius:9px;padding:12px}
+.an-guide-fee-grid b{color:#ffc47e;font-size:13px}
+.an-guide-fee-grid p{font-size:11px;line-height:1.6}
+.an-guide-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.an-guide-gallery figure{background:#1a2029;border:1px solid #674b31;margin:0;border-radius:10px;overflow:hidden}
+.an-guide-gallery img{width:100%;height:170px;object-fit:contain}
+.an-guide-gallery figcaption{padding:8px;font-size:10px;line-height:1.4;overflow-wrap:anywhere;color:#eee}
+.an-guide-support{margin:19px 0;border:1px solid #aa6c2a;background:linear-gradient(125deg,#241a14,#101923 70%);border-radius:18px;padding:20px;color:#f9f6ef}
+.an-guide-support-head{display:flex;align-items:center;gap:15px}.an-guide-support-head img{width:75px;height:70px;object-fit:contain}
+.an-guide-support-head small{font-size:10px;letter-spacing:1px;color:#f5bb7f}
+.an-guide-support h2{margin:5px 0;font-size:clamp(19px,2vw,24px);color:#ffae4b}
+.an-guide-support-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.an-guide-support-grid>div{border:1px solid #775333;background:#161c23;border-radius:11px;padding:12px}
+.an-guide-support-grid b{color:#ffc37b;font-size:13px}
+.an-guide-support-grid p{font-size:12px;line-height:1.65;color:#e6dcd1}
+.an-guide-ticket-note{border-left:3px solid #ffa52d;background:#3d210f;padding:10px;font-size:12px}
+@media(max-width:760px){.an-guide-fee-grid,.an-guide-support-grid{grid-template-columns:1fr}.an-guide-support{padding:13px}.an-guide-gallery{grid-template-columns:1fr}}
+@media(max-width:480px){.an-guide-card .uni-cover-wrap{height:138px}.an-guide-identity{padding:9px}.an-guide-identity strong{font-size:11px}.an-guide-identity small{font-size:8px}.an-guide-rank{font-size:9px;padding:4px 6px}.an-guide-card .inside{min-height:170px}.an-guide-card .university-fullname{font-size:10px}.an-guide-card .inside h3{font-size:15px}.an-guide-support-head img{width:58px;height:55px}.an-guide-btn{font-size:11px}.an-guide-level-links{grid-template-columns:1fr}}
