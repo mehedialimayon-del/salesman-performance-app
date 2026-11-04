@@ -2,7 +2,7 @@
    Costs are illustrative published programme examples, NOT overall university fees. */
 (function(){
 'use strict';
-var pref={kind:'All Types',level:'All Levels',subject:'All Subjects',budget:'Any Budget',order:'Featured',requirement:''};
+var pref={kind:'All Types',level:'All Levels',subject:'All Subjects',budget:'Any Budget',order:'QS Ranking (verified first)',requirement:''};
 var levels={
  upm:['Bachelor','Master','PhD'],um:['Bachelor','Master','PhD'],
  ukm:['Bachelor','Master','PhD'],utm:['Bachelor','Master','PhD'],
@@ -23,7 +23,7 @@ universitiesPage=function(){
  +field('STUDY LEVEL','level-filter',selectBox('level-filter',['All Levels','Foundation','Diploma','Bachelor','Master','PhD'],pref.level))
  +field('SUBJECT / FIELD','subject-filter',selectBox('subject-filter',subjects,pref.subject))
  +field('TUITION BUDGET (RM)','budget-filter',selectBox('budget-filter',['Any Budget','Up to RM 20,000','Up to RM 40,000','Up to RM 60,000','Up to RM 90,000','RM 90,000+'],pref.budget))
- +field('SORT BY','order-filter',selectBox('order-filter',['Featured','University A–Z','Fee low to high','Fee high to low'],pref.order))
+ +field('SORT BY','order-filter',selectBox('order-filter',['QS Ranking (verified first)','Featured','University A–Z','Fee low to high','Fee high to low'],pref.order))
  +field('ADMISSION REQUIREMENTS','requirements-filter','<input id="requirements-filter" type="search" value="'+esc(pref.requirement)+'" placeholder="IELTS, CGPA, English, etc.">')
  +'</div>';
  return title('Explore Universities','Discover universities, courses, entry requirements, tuition and student accommodation.')
@@ -69,6 +69,7 @@ renderResults=function(){
    &&hasLevel(u,pref.level)&&subject&&passesBudget(feeEstimate(u))
    &&(!requirement||entries.indexOf(requirement)>=0)&&all.indexOf(term)>=0;
  });
+ if(pref.order==='QS Ranking (verified first)'||pref.order==='Featured')arr.sort(window.ANUniGuide?.compare||function(a,b){return a.name.localeCompare(b.name);});
  if(pref.order==='University A–Z')arr.sort(function(a,b){return a.name.localeCompare(b.name);});
  if(pref.order==='Fee low to high'||pref.order==='Fee high to low')arr.sort(function(a,b){
   var x=feeEstimate(a),y=feeEstimate(b);
