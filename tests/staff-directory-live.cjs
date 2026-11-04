@@ -17,7 +17,7 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
     await page.waitForFunction(()=>!!(window.FFH_STAFF_DIRECTORY&&window.FFH_CREATE_ACCOUNTS&&
       document.querySelector('link[href*="account-outlet-access.css?v=20261104-mobile-responsive-4"]')&&
       document.querySelector('script[src*="accounts.js?v=20261104-account-edit-4"]')&&
-      document.querySelector('script[src*="staff-directory.js?v=20261104-photos-leadership-4"]')&&
+      document.querySelector('script[src*="staff-directory.js?v=20261104-head-office-separate-5"]')&&
       document.querySelector('script[src*="account-outlet-access.js?v=20261104-excel-import-4"]')),
     null,{timeout:7000});
     ready=true;break;
