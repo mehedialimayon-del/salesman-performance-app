@@ -128,7 +128,14 @@ fetch('site-content.json?v=20261029-2154',{cache:'no-cache'}).then(function(r){i
  siteCopy=cfg;
  (cfg.additionalUniversities||[]).forEach(function(u){
   if(!u||!u.id||!u.name||U.some(function(o){return o.id===u.id;}))return;
-  U.push({id:String(u.id),name:String(u.name),short:String(u.short||u.name),country:String(u.country||'Malaysia'),city:String(u.city||''),kind:u.kind==='Private'?'Private':'Public',programs:Array.isArray(u.programs)?u.programs:[],site:/^https:\/\//i.test(u.site||'')?u.site:'https://www.mqa.gov.my',photo:''});
+  var clean=function(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/gi,'').toLowerCase();};
+  var dest=String(u.country||'Malaysia');
+  var previous=U.find(function(o){return o.country===dest&&clean(o.name)===clean(u.name);});
+  if(previous){
+   if(/^an-(global|h-dir)-/.test(previous.id))U.splice(U.indexOf(previous),1);
+   else return;
+  }
+  U.push({id:String(u.id),name:String(u.name),short:String(u.short||u.name),country:dest,city:String(u.city||''),kind:u.kind==='Private'?'Private':u.kind==='Public'?'Public':'University',programs:Array.isArray(u.programs)?u.programs:[],site:/^https:\/\//i.test(u.site||'')?u.site:'https://www.mqa.gov.my',photo:''});
  });
  Object.keys(cfg.universityOverrides||{}).forEach(function(id){
   var u=U.find(function(o){return o.id===id;}),v=cfg.universityOverrides[id];
