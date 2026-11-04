@@ -108,3 +108,82 @@ body.an-community-mode #app{flex:1 1 0;min-height:0;overflow:hidden;display:flex
  body.an-community-mode #app .an-community-desc{font-size:10px;line-height:1.4}
  body.an-community-mode #app .an-community-panel .an-premium-empty{padding:12px 9px}
 }
+
+/* A&N fullscreen media-first article reader; only affects the Hub Read More dialog. */
+dialog.an-detail-dialog{
+ position:fixed!important;inset:0!important;margin:0!important;padding:0!important;
+ width:100vw!important;max-width:100vw!important;height:100vh!important;height:100dvh!important;
+ max-height:100dvh!important;border:0!important;border-radius:0!important;
+ color:#f9f8f6!important;background:#090b10!important;overflow:hidden!important;
+ box-sizing:border-box!important;z-index:2147483000;
+}
+dialog.an-detail-dialog::backdrop{background:#000e}
+dialog.an-detail-dialog .an-reader-layout{
+ height:100%;min-height:0;display:flex;flex-direction:column;overflow:hidden
+}
+dialog.an-detail-dialog .an-reader-top{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;
+ flex:0 0 auto;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 11px;
+ border-bottom:1px solid #704621;background:#121217;
+ color:#ffc474;font-size:12px;letter-spacing:1px;font-weight:800
+}
+dialog.an-detail-dialog .an-reader-top b{color:#fff;font-weight:700;letter-spacing:.45px}
+dialog.an-detail-dialog .an-reader-top button{
+ flex:0 0 auto;border:1px solid #9c632b;border-radius:10px;background:#2c1c10;color:#fff;
+ padding:9px 13px;font-weight:750;font-size:13px;cursor:pointer
+}
+dialog.an-detail-dialog .an-reader-scroll{
+ flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;
+ overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;
+ padding:18px 14px calc(28px + env(safe-area-inset-bottom,0px));
+ scrollbar-color:#a76422 #11131b;
+}
+dialog.an-detail-dialog .an-reader-media{
+ width:100%;max-width:860px;max-height:none;margin:0 auto 16px;
+ padding:0;display:flex;align-items:center;justify-content:center;flex-direction:column;
+ border:1px solid #564021;border-radius:13px;overflow:hidden;background:#050608;color:#fff;
+ position:relative;
+}
+dialog.an-detail-dialog .an-reader-media img{
+ display:block;width:auto;height:auto;max-width:100%;max-height:68dvh;
+ object-fit:contain;object-position:center;margin:0 auto;
+}
+dialog.an-detail-dialog .an-reader-media video{
+ display:block;width:100%;max-height:68dvh;object-fit:contain;background:#050608
+}
+dialog.an-detail-dialog .an-reader-photo-button{cursor:zoom-in}
+dialog.an-detail-dialog .an-reader-photo-button span{
+ position:absolute;right:11px;bottom:10px;background:#07080bdb;
+ color:#fff;border-radius:7px;padding:6px 9px;font-size:11px;font-weight:750
+}
+dialog.an-detail-dialog .an-reader-text-media{
+ min-height:135px;font-size:40px;color:#ffb456;background:linear-gradient(125deg,#4d2a11,#151923)
+}
+dialog.an-detail-dialog .an-reader-copy{
+ margin:0 auto;max-width:860px;width:100%;background:#13151c;
+ border:1px solid #513c25;border-radius:13px;padding:22px 23px 30px;
+}
+dialog.an-detail-dialog .an-reader-category{
+ color:#ffb150;font-size:12px;letter-spacing:1px;font-weight:850;text-transform:uppercase
+}
+dialog.an-detail-dialog .an-reader-copy h1{
+ font-size:clamp(20px,3vw,30px);line-height:1.33;color:#fff;overflow-wrap:anywhere;
+ margin:10px 0 11px
+}
+dialog.an-detail-dialog .an-reader-meta{
+ font-size:11px;color:#b5a89a;border-bottom:1px solid #473828;padding-bottom:14px;margin-bottom:14px
+}
+dialog.an-detail-dialog .an-reader-description{
+ color:#f1eae3;font-size:clamp(14px,1.4vw,16px);line-height:1.85;
+ white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal
+}
+@media(max-width:600px){
+ dialog.an-detail-dialog .an-reader-top{padding:calc(8px + env(safe-area-inset-top,0px)) 12px 9px;font-size:10px}
+ dialog.an-detail-dialog .an-reader-top button{font-size:12px;padding:9px 11px}
+ dialog.an-detail-dialog .an-reader-scroll{padding:10px 9px calc(20px + env(safe-area-inset-bottom,0px))}
+ dialog.an-detail-dialog .an-reader-media{margin-bottom:10px;border-radius:10px}
+ dialog.an-detail-dialog .an-reader-media img,dialog.an-detail-dialog .an-reader-media video{max-height:60dvh}
+ dialog.an-detail-dialog .an-reader-copy{padding:17px 14px 30px;border-radius:10px}
+ dialog.an-detail-dialog .an-reader-copy h1{font-size:20px;line-height:1.38;margin:8px 0}
+ dialog.an-detail-dialog .an-reader-description{font-size:14px;line-height:1.75}
+}
