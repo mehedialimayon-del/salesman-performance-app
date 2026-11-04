@@ -89,6 +89,41 @@ jobs:
               result.viewport=size.join('x');result.errors=errors;console.log('LIVE PHONE',JSON.stringify(result));details.push(result);
               await page.screenshot({path:'qa-student-hub/hub-'+size.join('x')+'.png',fullPage:true});
               if(result.oldPage||!result.hasHub||!result.insightsVisible||!result.successVisible||result.panelCount!==2||errors.length)failed=true;
+              // Exercise the actual published post: compact card -> full-screen reader -> full-size photo -> back.
+              try{
+                await page.waitForSelector('#an-insights-gallery [data-an-read-detail="study"]',{timeout:14000});
+                const inline=await page.locator('#an-insights-gallery .an-community-desc').first().evaluate(e=>({full:e.textContent.length,box:e.getBoundingClientRect().height,overflow:getComputedStyle(e).overflow}));
+                await page.locator('#an-insights-gallery [data-an-read-detail="study"]').first().click();
+                await page.waitForSelector('dialog.an-detail-dialog[open]',{timeout:6000});
+                const reading=await page.evaluate(()=>{
+                  const dlg=document.querySelector('dialog.an-detail-dialog'),photo=dlg?.querySelector('.an-reader-media img'),copy=dlg?.querySelector('.an-reader-description');
+                  const media=dlg?.querySelector('.an-reader-media');
+                  const scroll=dlg?.querySelector('.an-reader-scroll');
+                  const r=dlg?.getBoundingClientRect();
+                  return {open:dlg?.open||false,fullHeight:Math.round(r?.height||0),viewportHeight:innerHeight,
+                   mediaBeforeDescription:!!(media&&copy&&(media.compareDocumentPosition(copy)&Node.DOCUMENT_POSITION_FOLLOWING)),
+                   descriptionChars:copy?.textContent.length||0,hasImage:!!photo,
+                   scrollMode:scroll?getComputedStyle(scroll).overflowY:'missing',
+                   hasBack:!!dlg.querySelector('[data-an-close-detail]')};
+                });
+                await page.screenshot({path:'qa-student-hub/reader-'+size.join('x')+'.png'});
+                if(!reading.open||reading.fullHeight<reading.viewportHeight-15||!reading.mediaBeforeDescription||reading.descriptionChars<inline.full||reading.scrollMode!=='auto'||!reading.hasBack)failed=true;
+                let fullPhoto=false,photoBack=false,readerBack=false;
+                if(reading.hasImage){
+                  await page.locator('dialog.an-detail-dialog .an-reader-photo-button').click();
+                  await page.waitForSelector('dialog.an-preview-dialog[open]',{timeout:6000});
+                  fullPhoto=await page.locator('dialog.an-preview-dialog img').count()===1;
+                  await page.locator('dialog.an-preview-dialog [data-an-close]').click();
+                  await page.waitForFunction(()=>!document.querySelector('dialog.an-preview-dialog')?.open,null,{timeout:6000});
+                  photoBack=await page.locator('dialog.an-detail-dialog[open]').count()===1;
+                }
+                await page.locator('dialog.an-detail-dialog [data-an-close-detail]').click();
+                await page.waitForFunction(()=>!document.querySelector('dialog.an-detail-dialog')?.open,null,{timeout:6000});
+                readerBack=await page.locator('#an-community').count()===1;
+                if(reading.hasImage&&(!fullPhoto||!photoBack))failed=true;
+                if(!readerBack)failed=true;
+                console.log('LIVE READER',JSON.stringify({viewport:size.join('x'),inline,reading,fullPhoto,photoBack,readerBack}));
+              }catch(e){console.error('LIVE READER FAILED',size.join('x'),e.stack||e.message);failed=true;}
               await page.close();
             }
             fs.writeFileSync('qa-student-hub/results.json',JSON.stringify(details,null,2));
