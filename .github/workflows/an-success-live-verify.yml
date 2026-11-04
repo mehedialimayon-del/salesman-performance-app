@@ -53,7 +53,7 @@ jobs:
             for(const size of [[360,800],[412,900]]){
               const page=await browser.newPage({viewport:{width:size[0],height:size[1]},deviceScaleFactor:1});
               const errors=[];page.on('pageerror',e=>errors.push(e.message));
-              const uri='https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/index.html?liveqa='+encodeURIComponent(process.env.GITHUB_SHA)+'#/success';
+              const uri='https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/index.html?liveqa='+encodeURIComponent(process.env.GITHUB_SHA)+'&hub_refresh=20261103-fresh-1#/success';
               await page.goto(uri,{waitUntil:'domcontentloaded',timeout:30000});
               await page.waitForTimeout(3500);
               const result=await page.evaluate(()=>{
@@ -74,7 +74,10 @@ jobs:
                   viewportHeight:window.innerHeight,
                   galleryScroll:css?.overflowY||'missing',
                   panelCount:document.querySelectorAll('.an-community-panel').length,
-                  hasHomeNavigation:!!document.querySelector('header.top .brand[href="#/home"]')
+                  hasHomeNavigation:!!document.querySelector('header.top .brand[href="#/home"]'),
+                  successFunction:typeof successPage==='function'?successPage.toString().slice(0,320):'missing',
+                  appHtml:document.querySelector('#app')?.innerHTML.slice(0,360),
+                  scripts:[...document.scripts].map(x=>x.src||'inline')
                 };
               });
               result.viewport=size.join('x');result.errors=errors;console.log('LIVE PHONE',JSON.stringify(result));details.push(result);
