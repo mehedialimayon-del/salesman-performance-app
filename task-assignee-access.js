@@ -30,7 +30,7 @@
    caption.style.cssText='color:#ff7b23;font-weight:800;letter-spacing:.04em';
    const scope=document.createElement('select');scope.type='button';
    scope.setAttribute('aria-label','Filter task recipient zone');scope.style.cssText='background:#090b0e;color:white;border:1px solid #fa762b;border-radius:9px;padding:9px;max-width:250px';
-   scope.innerHTML='<option value="all">All permitted · management + team</option><option value="zone">My zone · team</option>';
+   scope.innerHTML='<option value="all">All active staff · company-wide</option><option value="zone">My zone + leadership</option>';
    toolbar.append(caption,scope);
    const note=document.createElement('small');note.style.color='#eee';note.textContent='Loading permitted staff…';
    ui.append(toolbar,note);
@@ -44,23 +44,21 @@
      function render(){
        const selected=select.value||previous;
        const scoped=scope.value==='zone'?people.filter(p=>p.same_zone===true||p.is_upward===true):people;
-       const groups=[['MANAGEMENT',scoped.filter(p=>p.can_manage===true)],['SR · PERMITTED ZONE',scoped.filter(p=>p.can_manage!==true)]];
+       const groups=[['MANAGERS / HEAD OF SALES / SALES ADMIN',scoped.filter(p=>p.can_manage===true)],['SALES REPRESENTATIVES · ALL ZONES',scoped.filter(p=>p.can_manage!==true)]];
        select.replaceChildren();
        select.add(new Option('Select a person…',''));
        for(const [title,records] of groups)if(records.length){
          const group=document.createElement('optgroup');group.label=title;
-         records.forEach(p=>group.append(new Option(p.name+' · '+(p.login_id||p.staff_id)+' · '+p.zone_id,p.staff_id)));
+         records.forEach(p=>group.append(new Option(p.name+' · '+(p.login_id||p.staff_id)+' · '+p.zone_id+' · '+String(p.designation|| (p.can_manage?'MANAGER':'SR')).replaceAll('_',' '),p.staff_id)));
          select.append(group);
        }
        if(people.some(p=>p.staff_id===selected)&&scoped.some(p=>p.staff_id===selected))select.value=selected;
        else select.value='';
        select.required=true;select.disabled=false;
-       note.textContent=scoped.length+' permitted staff · Managers can assign across management; SR assignment stays zone-scoped.';
+       note.textContent=scoped.length+' active staff · Assignments never grant dashboard, location, or private chat access.';
        window.FFH_STYLE_SELECT?.(select,{title:'Assign task to'});
      }
-     if(!managerGroup.some(p=>p.same_zone===false)&&!srGroup.some(p=>p.same_zone===false)){
-       scope.remove();caption.textContent='MY ZONE / REPORTING MANAGEMENT';
-     }
+     // Keep the All active staff filter available for every logged-in role.
      scope.addEventListener('change',render);
      render();
    }catch(error){
