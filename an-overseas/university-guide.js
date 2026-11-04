@@ -61,7 +61,7 @@ const countryRoute={
  'United States':{name:'EducationUSA · apply to university',url:'https://educationusa.state.gov/your-5-steps-us-study/complete-your-application',note:'U.S. university admission is institution-specific; follow each university’s undergraduate or graduate instructions.'}
 };
 const photos={
- 'eu-at-university-of-vienna':{url:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Universit%C3%A4t_Wien_Hauptgeb%C3%A4ude_%28Ian_Ehm%29_16.jpg/1280px-Universit%C3%A4t_Wien_Hauptgeb%C3%A4ude_%28Ian_Ehm%29_16.jpg',credit:'Wikimedia Commons · University of Vienna'},
+ 'eu-at-university-of-vienna':{url:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Universit%C3%A4t_Wien_Hauptgeb%C3%A4ude_%28Ian_Ehm%29_16.jpg/1280px-Universit%C3%A4t_Wien_Hauptgeb%C3%A4ude_%28Ian_Ehm%29_16.jpg',credit:'© Ian Ehm · CC BY 4.0 · Wikimedia Commons',source:'https://commons.wikimedia.org/wiki/File:Universit%C3%A4t_Wien_Hauptgeb%C3%A4ude_(Ian_Ehm)_16.jpg'},
 };
 const flag={Malaysia:'🇲🇾','United Kingdom':'🇬🇧',Germany:'🇩🇪',Austria:'🇦🇹',Belgium:'🇧🇪','Czech Republic':'🇨🇿',Denmark:'🇩🇰',Finland:'🇫🇮',France:'🇫🇷',Greece:'🇬🇷',Hungary:'🇭🇺',Ireland:'🇮🇪',Italy:'🇮🇹',Luxembourg:'🇱🇺',Netherlands:'🇳🇱',Norway:'🇳🇴',Poland:'🇵🇱',Portugal:'🇵🇹',Spain:'🇪🇸',Sweden:'🇸🇪',Switzerland:'🇨🇭',Canada:'🇨🇦',Australia:'🇦🇺',China:'🇨🇳',Japan:'🇯🇵','South Korea':'🇰🇷','United States':'🇺🇸','United Arab Emirates':'🇦🇪',Turkey:'🇹🇷',Singapore:'🇸🇬',Thailand:'🇹🇭','New Zealand':'🇳🇿'};
 const getRank=u=>Number.isInteger(Number(u.qs2027))?Number(u.qs2027):idRank[u.id]||ranks.get(norm(u.name))||null;
@@ -77,7 +77,7 @@ const fallback=u=>'<div class="an-guide-identity"><div class="an-guide-symbol">�
 const imageMarkup=(u,p)=>{
  const photo=localPhoto(u,p);
  if(!photo)return fallback(u);
- return fallback(u)+'<img class="campus-cover an-guide-photo" src="'+e(photo.url)+'" alt="'+e(u.name)+' — university campus" loading="lazy" decoding="async" data-guide-image><span class="an-guide-credit">'+e(photo.credit)+'</span>';
+ return fallback(u)+'<img class="campus-cover an-guide-photo" src="'+e(photo.url)+'" alt="'+e(u.name)+' — university campus" loading="lazy" decoding="async" data-guide-image>'+(photo.source?'<a class="an-guide-credit" href="'+e(photo.source)+'" target="_blank" rel="noopener noreferrer">'+e(photo.credit)+' ↗</a>':'<span class="an-guide-credit">'+e(photo.credit)+'</span>');
 };
 const card=(u,p)=>{
  const rank=getRank(u),kind=u.kind||'University',official=validUrl(u.site);
