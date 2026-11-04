@@ -11,14 +11,14 @@ const browserConfig=process.env.FFH_CHROMIUM?{executablePath:process.env.FFH_CHR
   page.on('pageerror',e=>console.log('Site script warning:',e.message.slice(0,240)));
   let ready=false;
   for(let n=0;n<12;n++){
-   const response=await page.goto(site+'?qa_version=outlets-avatar-mobile1&attempt='+n,{waitUntil:'domcontentloaded',timeout:50000});
+   const response=await page.goto(site+'?qa_version=outlets-avatar-mobile4&attempt='+n,{waitUntil:'domcontentloaded',timeout:50000});
    console.log('Live HTTP status:',response?.status(),'URL:',page.url());
    try{
     await page.waitForFunction(()=>!!(window.FFH_STAFF_DIRECTORY&&window.FFH_CREATE_ACCOUNTS&&
-      document.querySelector('link[href*="account-outlet-access.css?v=20261103-responsive-1"]')&&
-      document.querySelector('script[src*="accounts.js?v=20261103-outlets-edit-1"]')&&
-      document.querySelector('script[src*="staff-directory.js?v=20261103-all-zone-avatars-1"]')&&
-      document.querySelector('script[src*="account-outlet-access.js?v=20261103-owner-excel-1"]')),
+      document.querySelector('link[href*="account-outlet-access.css?v=20261104-mobile-responsive-4"]')&&
+      document.querySelector('script[src*="accounts.js?v=20261104-account-edit-4"]')&&
+      document.querySelector('script[src*="staff-directory.js?v=20261104-photos-leadership-4"]')&&
+      document.querySelector('script[src*="account-outlet-access.js?v=20261104-excel-import-4"]')),
     null,{timeout:7000});
     ready=true;break;
    }catch(e){
