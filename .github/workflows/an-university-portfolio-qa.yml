@@ -46,21 +46,28 @@ jobs:
               await page.screenshot({path:'an-university-qa/austria-'+w+'.png'});
               await page.goto('http://127.0.0.1:8765/index.html#/university/eu-at-university-of-vienna',{waitUntil:'domcontentloaded'});
               await page.waitForTimeout(700);
-              const tabs=page.locator('.tabs [data-tab]');
-              const initial=await page.evaluate(()=>({bachelor:!!document.querySelector('.tabs [data-tab="Bachelor"]'),master:!!document.querySelector('.tabs [data-tab="Master"]'),phd:!!document.querySelector('.tabs [data-tab="PhD"]'),support:!!document.getElementById('an-university-support'),linkCount:document.querySelectorAll('.an-guide-actions a').length}));
-              await tabs.filter({hasText:'Bachelor'}).click();
-              const bachelor=await page.locator('#university-panel').innerText();
-              await tabs.filter({hasText:'Master'}).click();
-              const masters=await page.locator('#university-panel').innerText();
-              await tabs.filter({hasText:'PhD'}).click();
-              const phd=await page.locator('#university-panel').innerText();
+              const initial=await page.evaluate(()=>({
+                portfolio:!!document.querySelector('.university-profile'),
+                bachelor:!!document.querySelector('.an-guide-degree-box:nth-child(1)'),
+                master:!!document.querySelector('.an-guide-degree-box:nth-child(2)'),
+                phd:!!document.querySelector('.an-guide-degree-box:nth-child(3)'),
+                support:!!document.getElementById('an-guide-support')||!!document.getElementById('an-university-support'),
+                degreeSection:!!document.getElementById('profile-degree'),
+                linkCount:document.querySelectorAll('.an-guide-actions a').length
+              }));
+              const boxes=page.locator('.an-guide-degree-box');
+              const bachelor=await boxes.nth(0).innerText();
+              await boxes.nth(1).locator('summary').click();
+              const masters=await boxes.nth(1).innerText();
+              await boxes.nth(2).locator('summary').click();
+              const phd=await boxes.nth(2).innerText();
               await page.screenshot({path:'an-university-qa/doctorate-'+w+'.png'});
               await page.goto('http://127.0.0.1:8765/index.html#/universities?country=Malaysia',{waitUntil:'domcontentloaded'});
               await page.waitForTimeout(1000);
               const malaysia=await page.evaluate(()=>({count:document.querySelectorAll('#results .an-guide-card').length,first:document.querySelector('#results .an-guide-card h3')?.textContent}));
               const row={viewport:w+'x'+h,home,austria,initial,malaysia,levelTests:{bachelor:bachelor.includes('Application steps'),master:masters.includes('Application steps'),phd:phd.includes('no fixed worldwide minimum number')},errors};
               console.log('PORTFOLIO CHECK',JSON.stringify(row));evidence.push(row);
-              if(!home.guideExists||!home.hero||austria.count<45||austria.images<45||austria.officialLinks<45||!initial.bachelor||!initial.master||!initial.phd||!initial.support||malaysia.count<50||Object.values(row.levelTests).some(x=>!x))fail=true;
+              if(!home.guideExists||!home.hero||austria.count<45||austria.images<45||austria.officialLinks<45||!initial.bachelor||!initial.master||!initial.phd||!initial.support||!initial.degreeSection||!initial.portfolio||malaysia.count<50||Object.values(row.levelTests).some(x=>!x))fail=true;
               await page.close();
             }
             fs.writeFileSync('an-university-qa/results.json',JSON.stringify(evidence,null,2));
