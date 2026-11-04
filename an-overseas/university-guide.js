@@ -162,8 +162,20 @@ const mount=u=>{
  const el=document.createElement('div');el.innerHTML=support(u);page.appendChild(el.firstElementChild);
 };
 document.addEventListener('error',event=>{
- const img=event.target;if(!(img instanceof HTMLImageElement)||!img.matches('[data-guide-image]'))return;
- img.hidden=true;img.style.display='none';const credit=img.parentElement?.querySelector('.an-guide-credit');if(credit)credit.style.display='none';
+ const img=event.target;if(!(img instanceof HTMLImageElement))return;
+ if(img.matches('[data-guide-image]')){
+  img.hidden=true;img.style.display='none';
+  const credit=img.parentElement?.querySelector('.an-guide-credit');
+  if(credit)credit.style.display='none';
+  return;
+ }
+ if(!img.closest('.university-profile'))return;
+ if(img.closest('.campus-gallery')){img.closest('figure')?.remove();return;}
+ if(img.classList.contains('university-logo')){
+  const txt=img.getAttribute('alt')||'University';
+  const initial=document.createElement('span');initial.className='university-monogram';initial.textContent=txt.replace(/ university logo$/i,'');
+  img.replaceWith(initial);
+ }
 },true);
 const extended=(u,p)=>'<section class="profile-section an-guide-degrees" id="profile-degree"><h2><span>Degree-wise</span> Application Guide</h2><p>Expand a level for its application preparation, recognised-document checklist and official route.</p><div class="an-guide-degree-grid">'+['Bachelor','Master','PhD'].map((level,i)=>'<details class="an-guide-degree-box"'+(i===0?' open':'')+'><summary>'+e(level)+' <span>⌄</span></summary>'+degree(u,level)+'</details>').join('')+'</div></section>'+support(u);
 window.ANUniGuide={card,compare,getRank,panel,mount,route,photos,extended};
