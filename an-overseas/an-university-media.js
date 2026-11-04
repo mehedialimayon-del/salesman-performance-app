@@ -103,7 +103,7 @@
  const start=()=>{
   hydrate();
   const app=document.querySelector('#app');
-  if(app)new MutationObserver(()=>hydrate()).observe(app,{childList:true,subtree:false});
+  if(app)new MutationObserver(()=>hydrate()).observe(app,{childList:true,subtree:true});
   document.addEventListener('hashchange',()=>requestAnimationFrame(hydrate));
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
