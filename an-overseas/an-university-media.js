@@ -56,12 +56,13 @@
    remembered.set(name,req);
    return req;
  }
+ window.ANUniMedia={websiteIcon,commonsImage};
  function showImage(cover,rec){
    if(!cover?.isConnected||!rec)return;
    if(cover.querySelector('.an-guide-photo'))return;
    const image=document.createElement('img');
    image.className='campus-cover an-guide-photo an-commons-photo';
-   image.alt=cover.dataset.universityTitle+' — Wikimedia Commons article image';
+   image.alt=cover.dataset.universityTitle+' — Wikimedia Commons university illustration';
    image.loading='lazy';image.decoding='async';
    image.addEventListener('error',()=>image.remove(),{once:true});
    image.addEventListener('load',()=>{
@@ -90,6 +91,24 @@
      if(cover.querySelector('.an-guide-photo'))return;
      if(observer)observer.observe(cover);else inspect(cover);
    });
+   const campus=document.querySelector('.university-profile #profile-campus');
+   if(campus&&!campus.dataset.anMediaObserved&&!campus.querySelector('.campus-gallery figure')){
+     campus.dataset.anMediaObserved='1';
+     const matched=String(location.hash||'').match(/^#\/university\/([^?/]+)/);
+     const id=matched?decodeURIComponent(matched[1]):'';
+     const u=typeof U!=='undefined'?U.find(item=>item.id===id):null;
+     if(u)commonsImage(u.name).then(rec=>{
+       if(!rec||!campus.isConnected||campus.querySelector('.campus-gallery figure'))return;
+       const gallery=document.createElement('div');gallery.className='campus-gallery';
+       const figure=document.createElement('figure');
+       const anchor=document.createElement('a');anchor.href=rec.source;anchor.target='_blank';anchor.rel='noopener noreferrer';
+       const picture=document.createElement('img');picture.src=rec.url;picture.alt=u.name+' — Wikimedia Commons university illustration';picture.loading='lazy';
+       const cap=document.createElement('figcaption');cap.textContent='Wikimedia Commons · '+(rec.credit?rec.credit+' · ':'')+rec.licence;
+       picture.addEventListener('error',()=>gallery.remove(),{once:true});
+       anchor.appendChild(picture);figure.appendChild(anchor);figure.appendChild(cap);gallery.appendChild(figure);
+       const credit=campus.querySelector('.photo-credit');if(credit)campus.insertBefore(gallery,credit);else campus.appendChild(gallery);
+     });
+   }
  }
  document.addEventListener('error',event=>{
    const target=event.target;
