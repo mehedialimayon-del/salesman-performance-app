@@ -28,6 +28,12 @@ jobs:
             echo "::error::Published HTML is an older single-panel Success Stories source."
             exit 1
           fi
+          curl -fLsS --retry 3 --max-time 35 "https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/secure-platform.js?verify=${GITHUB_SHA}" -o /tmp/secure-platform.js
+          echo "LEGACY_OVERRIDE_COUNT: $(grep -o 'successPage=function' /tmp/secure-platform.js | wc -l)"
+          if grep -q 'successPage=function' /tmp/secure-platform.js; then
+            echo "::error::The old secure-platform override remains in the published JavaScript."
+            exit 1
+          fi
           if ! grep -q 'an-community-columns' /tmp/an-index.html; then
             echo "::error::Published HTML missing the two-panel Student Hub."
             exit 1
