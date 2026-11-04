@@ -28,7 +28,7 @@
    const toolbar=document.createElement('div');toolbar.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap';
    const caption=document.createElement('span');caption.textContent='TASK RECIPIENTS';
    caption.style.cssText='color:#ff7b23;font-weight:800;letter-spacing:.04em';
-   const scope=document.createElement('select');scope.type='button';
+   const scope=document.createElement('select');
    scope.setAttribute('aria-label','Filter task recipient zone');scope.style.cssText='background:#090b0e;color:white;border:1px solid #fa762b;border-radius:9px;padding:9px;max-width:250px';
    scope.innerHTML='<option value="all">All active staff · company-wide</option><option value="zone">My zone + leadership</option>';
    toolbar.append(caption,scope);
