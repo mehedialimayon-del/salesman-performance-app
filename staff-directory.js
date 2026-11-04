@@ -11,28 +11,26 @@
     return (/\b(team|zone|office)\b/i.test(label)?label:label+' TEAM').toLocaleUpperCase();
   };
   function buildGroups(profiles, zones, owner) {
-    // Group every employee by team, with no separate Head Office display box.
-    // Leadership is shown first in KL without modifying its saved zone/access.
-    const leadershipOrder=['M21954','PERVES_HIRA','WAHID_ADMIN'];
-    const byZone=new Map();
+    // Owner's requested view: Head Office first, leadership displayed ONCE.
+    // Display grouping never changes real zone, reporting manager or permissions.
+    const leadershipIds=['M21954','PERVES_HIRA','WAHID_ADMIN'];
+    const leadership=[],byZone=new Map();
     for(const p of profiles||[]){
-      const assigned=String(p.zone_id||'UNASSIGNED');
-      const id=assigned==='HEAD_OFFICE'?'PRIMARY':assigned;
+      if(leadershipIds.includes(p.staff_id)){leadership.push(p);continue;}
+      const id=String(p.zone_id||'UNASSIGNED');
       if(!byZone.has(id))byZone.set(id,[]);
       byZone.get(id).push(p);
     }
+    leadership.sort((a,b)=>leadershipIds.indexOf(a.staff_id)-leadershipIds.indexOf(b.staff_id));
     const zoneLookup=new Map((zones||[]).map(z=>[String(z.id),z]));
     const groups=[...byZone].map(([id,members])=>{
       const label=zoneLabel(zoneLookup.get(id),id);
-      members.sort((a,b)=>{
-        const ai=leadershipOrder.indexOf(a.staff_id),bi=leadershipOrder.indexOf(b.staff_id);
-        if(ai!==-1||bi!==-1)return (ai===-1?99:ai)-(bi===-1?99:bi);
-        return Number(!!b.can_manage)-Number(!!a.can_manage)
-          ||String(a.full_name||'').localeCompare(String(b.full_name||''),'en');
-      });
+      members.sort((a,b)=>Number(!!b.can_manage)-Number(!!a.can_manage)
+        ||String(a.full_name||'').localeCompare(String(b.full_name||''),'en'));
       return {id,label,members};
     });
     groups.sort((a,b)=>a.id==='PRIMARY'?-1:b.id==='PRIMARY'?1:a.label.localeCompare(b.label,'en'));
+    if(leadership.length)groups.unshift({id:'HEAD_OFFICE_LEADERSHIP',label:'HEAD OFFICE',members:leadership});
     return groups;
   }
   function render({profiles=[],zones=[],owner=false,admin=false,viewerId='',escape:fallback=fallbackEscape}={}){
