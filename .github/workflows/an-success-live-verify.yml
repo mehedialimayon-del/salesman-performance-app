@@ -1,0 +1,97 @@
+name: A&N Student Hub live browser verification
+on:
+  push:
+    paths:
+      - ".github/workflows/an-success-live-verify.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Inspect actual published GitHub Pages HTML
+        shell: bash
+        run: |
+          set -eu
+          URL="https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/index.html?liveqa=${GITHUB_SHA}"
+          echo "URL: $URL"
+          curl -fLsS --retry 3 --max-time 40 -D /tmp/an-headers "$URL" -o /tmp/an-index.html
+          grep -iE '^(HTTP/|last-modified:|cache-control:|etag:|age:|x-github-request-id:)' /tmp/an-headers || true
+          echo "LIVE HTML BYTES: $(wc -c </tmp/an-index.html)"
+          echo "LIVE HTML SHA256: $(sha256sum /tmp/an-index.html)"
+          echo "STUDENT_EXPERIENCES: $(grep -o 'Student Experiences' /tmp/an-index.html | wc -l)"
+          echo "TWO_PANEL_ID: $(grep -o 'an-community-columns' /tmp/an-index.html | wc -l)"
+          echo "FRESH_ROUTE: $(grep -o 'hub_refresh' /tmp/an-index.html | wc -l)"
+          if grep -q 'Student Experiences' /tmp/an-index.html; then
+            echo "::error::Published HTML is an older single-panel Success Stories source."
+            exit 1
+          fi
+          if ! grep -q 'an-community-columns' /tmp/an-index.html; then
+            echo "::error::Published HTML missing the two-panel Student Hub."
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install mobile browser
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Visit public Student Hub on phone-sized browser
+        shell: bash
+        run: |
+          mkdir -p qa-student-hub
+          node <<'JS'
+          const {chromium}=require('playwright');
+          const fs=require('fs');
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+            let failed=false;const details=[];
+            for(const size of [[360,800],[412,900]]){
+              const page=await browser.newPage({viewport:{width:size[0],height:size[1]},deviceScaleFactor:1});
+              const errors=[];page.on('pageerror',e=>errors.push(e.message));
+              const uri='https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/index.html?liveqa='+encodeURIComponent(process.env.GITHUB_SHA)+'#/success';
+              await page.goto(uri,{waitUntil:'domcontentloaded',timeout:30000});
+              await page.waitForTimeout(3500);
+              const result=await page.evaluate(()=>{
+                const g=id=>document.getElementById(id);
+                const a=g('an-insights-gallery'),b=g('an-success-gallery');
+                const box=g('an-community');
+                const card=a?.querySelector('.an-community-card');
+                const css=a?getComputedStyle(a):null;
+                return {
+                  title:document.title,
+                  location:location.href,
+                  hasHub:!!box,
+                  insightsVisible:!!a,
+                  successVisible:!!b,
+                  oldPage:document.body.textContent.includes('Student Experiences'),
+                  studyCardCount:a?.querySelectorAll('.an-community-card').length||0,
+                  pageHeight:document.documentElement.scrollHeight,
+                  viewportHeight:window.innerHeight,
+                  galleryScroll:css?.overflowY||'missing',
+                  panelCount:document.querySelectorAll('.an-community-panel').length,
+                  hasHomeNavigation:!!document.querySelector('header.top .brand[href="#/home"]')
+                };
+              });
+              result.viewport=size.join('x');result.errors=errors;console.log('LIVE PHONE',JSON.stringify(result));details.push(result);
+              await page.screenshot({path:'qa-student-hub/hub-'+size.join('x')+'.png',fullPage:true});
+              if(result.oldPage||!result.hasHub||!result.insightsVisible||!result.successVisible||result.panelCount!==2||errors.length)failed=true;
+              await page.close();
+            }
+            fs.writeFileSync('qa-student-hub/results.json',JSON.stringify(details,null,2));
+            await browser.close();
+            if(failed)process.exitCode=1;
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          JS
+      - name: Keep screenshots and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: an-student-hub-live-check
+          path: qa-student-hub/
+          if-no-files-found: ignore
+          retention-days: 7
