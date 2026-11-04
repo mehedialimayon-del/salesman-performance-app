@@ -66,7 +66,7 @@ async function loadPublicDirectory(){
     });
     const added=addUnique(U,items);loaded=true;
     window.ANWorldDirectoryStatus={source:'Hipo open directory',added,records:rows.length};
-    if(typeof window.ANExpandUniversityProfiles==='function')window.ANExpandUniversityProfiles();
+    // Do not allocate full detail profiles for every imported directory row on mobile.
     if(location.hash.startsWith('#/universities')&&typeof renderResults==='function')renderResults();
    }catch(err){window.ANWorldDirectoryStatus={source:'Curated local list',added:0,note:'Supplement unavailable'};}
  })();return loading;
