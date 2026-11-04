@@ -1,0 +1,77 @@
+name: A&N University Portfolio QA
+on:
+  push:
+    paths:
+      - ".github/workflows/an-university-portfolio-qa.yml"
+      - "an-overseas/university-guide.js"
+      - "an-overseas/university-guide.css"
+      - "an-overseas/index.html"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  university-portal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install Chrome browser
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Test original home and ranked country portfolios
+        shell: bash
+        run: |
+          mkdir -p an-university-qa
+          python3 -m http.server 8765 --directory an-overseas >/tmp/an-university-http.log 2>&1 &
+          node <<'JS'
+          const {chromium}=require('playwright');
+          const fs=require('fs');
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+            const evidence=[];let fail=false;
+            for(const [w,h] of [[360,780],[1366,768]]){
+              const page=await browser.newPage({viewport:{width:w,height:h},deviceScaleFactor:1});
+              await page.route(/https:\/\/svpgjrxeqnluipsgjywk\.supabase\.co\/rest\/v1\/.*/,route=>route.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'[]'}));
+              const errors=[];page.on('pageerror',x=>errors.push(x.message));
+              await page.goto('http://127.0.0.1:8765/index.html#/home',{waitUntil:'domcontentloaded'});
+              await page.waitForTimeout(500);
+              const home=await page.evaluate(()=>({hero:document.querySelector('.hero')?.innerText.slice(0,100),url:location.hash,guideExists:!!window.ANUniGuide}));
+              await page.goto('http://127.0.0.1:8765/index.html#/universities?country=Austria',{waitUntil:'domcontentloaded'});
+              await page.waitForTimeout(1100);
+              const austria=await page.evaluate(()=>({count:document.querySelectorAll('#results .an-guide-card').length,first:document.querySelector('#results .an-guide-card h3')?.textContent,firstRank:document.querySelector('#results .an-guide-rank')?.textContent,officialLinks:document.querySelectorAll('#results .an-guide-official').length,images:document.querySelectorAll('#results .an-guide-identity').length}));
+              await page.screenshot({path:'an-university-qa/austria-'+w+'.png'});
+              await page.goto('http://127.0.0.1:8765/index.html#/university/eu-at-university-of-vienna',{waitUntil:'domcontentloaded'});
+              await page.waitForTimeout(700);
+              const tabs=page.locator('.tabs [data-tab]');
+              const initial=await page.evaluate(()=>({bachelor:!!document.querySelector('.tabs [data-tab="Bachelor"]'),master:!!document.querySelector('.tabs [data-tab="Master"]'),phd:!!document.querySelector('.tabs [data-tab="PhD"]'),support:!!document.getElementById('an-university-support'),linkCount:document.querySelectorAll('.an-guide-actions a').length}));
+              await tabs.filter({hasText:'Bachelor'}).click();
+              const bachelor=await page.locator('#university-panel').innerText();
+              await tabs.filter({hasText:'Master'}).click();
+              const masters=await page.locator('#university-panel').innerText();
+              await tabs.filter({hasText:'PhD'}).click();
+              const phd=await page.locator('#university-panel').innerText();
+              await page.screenshot({path:'an-university-qa/doctorate-'+w+'.png'});
+              await page.goto('http://127.0.0.1:8765/index.html#/universities?country=Malaysia',{waitUntil:'domcontentloaded'});
+              await page.waitForTimeout(1000);
+              const malaysia=await page.evaluate(()=>({count:document.querySelectorAll('#results .an-guide-card').length,first:document.querySelector('#results .an-guide-card h3')?.textContent}));
+              const row={viewport:w+'x'+h,home,austria,initial,malaysia,levelTests:{bachelor:bachelor.includes('Application steps'),master:masters.includes('Application steps'),phd:phd.includes('no fixed worldwide minimum number')},errors};
+              console.log('PORTFOLIO CHECK',JSON.stringify(row));evidence.push(row);
+              if(!home.guideExists||!home.hero||austria.count<45||austria.images<45||austria.officialLinks<45||!initial.bachelor||!initial.master||!initial.phd||!initial.support||malaysia.count<50||Object.values(row.levelTests).some(x=>!x))fail=true;
+              await page.close();
+            }
+            fs.writeFileSync('an-university-qa/results.json',JSON.stringify(evidence,null,2));
+            await browser.close();if(fail)process.exitCode=1;
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          JS
+      - name: Archive QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: an-university-portfolio-check
+          path: an-university-qa/
+          if-no-files-found: ignore
+          retention-days: 7
