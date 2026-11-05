@@ -13,7 +13,7 @@
    return match?'https://www.google.com/s2/favicons?domain='+encodeURIComponent(match[1])+'&sz=256':'';
  }
  function brandFallback(u,p){
-   const logo=(u.logoImage||p?.logo||websiteIcon(u)||'');
+   const logo=(u.logoImage||p?.logo||'');
    const named=String(u.name||'');const acronym=named.match(/\(([A-Z]{2,5})\)/);
    const short=acronym?acronym[1]:String(u.short||u.name||'U').replace(/[^A-Z]/g,'').slice(0,3)||'U';
    return '<div class="an-guide-identity an-identity-logo-only"><div class="an-logo-stage">'+
@@ -79,6 +79,25 @@
    remembered.set(name,req);
    return req;
  }
+ const sealCache=new Map();
+ async function wikidataSeal(name){
+  if(sealCache.has(name))return sealCache.get(name);
+  const request=(async()=>{
+   try{
+    const p=await fetch('https://en.wikipedia.org/w/api.php?origin=*&action=query&format=json&formatversion=2&prop=pageprops&titles='+encodeURIComponent(name),{mode:'cors'});
+    if(!p.ok)return '';
+    const page=(await p.json())?.query?.pages?.[0];
+    if(!page||page.missing||normalize(page.title)!==normalize(name))return '';
+    const id=page.pageprops?.wikibase_item;if(!/^Q\d+$/.test(id||''))return '';
+    const r=await fetch('https://www.wikidata.org/w/api.php?origin=*&action=wbgetentities&format=json&ids='+id+'&props=claims',{mode:'cors'});
+    if(!r.ok)return '';
+    const logo=(await r.json())?.entities?.[id]?.claims?.P154?.[0]?.mainsnak?.datavalue?.value;
+    if(typeof logo!=='string'||!/\.(png|jpg|jpeg|svg|webp)$/i.test(logo))return '';
+    return 'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(logo)+'?width=512';
+   }catch{return '';}
+  })();
+  sealCache.set(name,request);return request;
+ }
  window.ANUniMedia={websiteIcon,commonsImage};
  function showImage(cover,rec){
    if(!cover?.isConnected||!rec||!rec.photoCandidate)return;
@@ -102,7 +121,17 @@
    watching.add(cover);
    const name=cover.dataset.universityTitle;
    if(!name)return;
-   showImage(cover,await commonsImage(name));
+   const candidate=await commonsImage(name);
+   if(candidate?.photoCandidate){showImage(cover,candidate);return;}
+   const brand=cover.querySelector('.an-identity-logo-only .an-logo-stage');
+   if(!brand||brand.querySelector('.an-center-logo'))return;
+   const seal=await wikidataSeal(name);
+   if(seal&&cover.isConnected&&!cover.querySelector('.an-guide-photo')){
+     const mark=document.createElement('img');
+     mark.className='an-center-logo';mark.alt=name+' university emblem (Wikimedia Commons)';
+     mark.loading='lazy';mark.decoding='async';mark.src=seal;
+     brand.prepend(mark);
+   }
  }
  const observer='IntersectionObserver'in window?new IntersectionObserver(entries=>{
    entries.forEach(entry=>{if(entry.isIntersecting){observer.unobserve(entry.target);inspect(entry.target);}});
