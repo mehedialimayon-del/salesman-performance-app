@@ -1,6 +1,8 @@
 name: FieldForce Hub - Android APK
 
 on:
+  pull_request:
+    branches: [main]
   workflow_dispatch:
     inputs:
       build_type:
