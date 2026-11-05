@@ -154,6 +154,55 @@ const policy={
  scholarshipUrl:'https://hea.ie/policy/internationalisation/goi-ies/',
  living:[1100,1900],livingType:'Illustrative monthly planning budget; Dublin varies substantially'
  },
+ 'Finland':{
+ work:'Students with a Finnish residence permit for studies may work an average of 30 hours/week over the year; credited degree internships and thesis work are treated differently.',
+ workUrl:'https://migri.fi/working-and-internships-during-studies',
+ spouse:'Spouse/children can apply on family ties if residence and maintenance requirements are met. Family rights depend on their own granted permit.',
+ spouseUrl:'https://migri.fi/en/studying-in-finland',
+ visaUrl:'https://migri.fi/en/studying-in-finland',
+ pr:'After graduation, a separate job-seeking or work-based residence permit may be available. Permanent residence has its own eligibility and is not automatic.',
+ prUrl:'https://migri.fi/en/',
+ scholarshipUrl:'https://www.studyinfinland.fi/scholarships',
+ living:[850,1400],livingType:'Illustrative monthly study budget, city/dorm rates vary'
+ },
+ 'Norway':{
+ work:'A standard Norwegian study permit normally permits work up to 20 hours/week during studies and full-time in official holidays. Self-employment is not generally allowed under this permit.',
+ workUrl:'https://www.udi.no/en/answer-pages/answers-study-permits/',
+ spouse:'A family immigration application may be possible for some students subject to income, relationship and permit criteria.',
+ spouseUrl:'https://www.udi.no/en/want-to-apply/family-immigration/',
+ visaUrl:'https://www.udi.no/en/want-to-apply/studies/',
+ scholarshipUrl:'https://studyinnorway.no/',
+ living:[12000,19000],livingType:'Illustrative monthly student planning budget'
+ },
+ 'Denmark':{
+ work:'Students in a state-approved higher education programme generally have permission for 90 work hours per month and full time during June, July and August. Certain non-state-approved courses do not confer work rights.',
+ workUrl:'https://www.nyidanmark.dk/en-GB/Words-and-concepts/SIRI/Work-permits-for-students-in-higher-educational-programmes/',
+ spouse:'Accompanying family may qualify for residence subject to programme approval, adequate funds and family requirements; check their own work conditions.',
+ spouseUrl:'https://nyidanmark.dk/en-GB/You-want-to-apply/Accompanying-family',
+ visaUrl:'https://nyidanmark.dk/en-GB/You-want-to-apply/Study/Higher-education',
+ scholarshipUrl:'https://studyindenmark.dk/study-options/tuition-fees-scholarships',
+ living:[7500,12500],livingType:'Illustrative monthly student budget'
+ },
+ 'Austria':{
+ work:'Non-EU students holding a residence permit Student may normally be employed up to 20 hours/week with an employer-obtained work permit.',
+ workUrl:'https://oead.at/en/to-austria/entry-and-residence/translate-to-english-faq-zu-einreise-und-aufenthalt-fuer-drittstaatsangehoerige-studierende',
+ spouse:'Partner and children residence applications may be possible under specific family and maintenance requirements; check Austria immigration authority.',
+ spouseUrl:'https://oead.at/en/to-austria/entry-and-residence',
+ visaUrl:'https://oead.at/en/to-austria/entry-and-residence',
+ scholarshipUrl:'https://grants.at/en/',
+ living:[950,1500],livingType:'Illustrative city-dependent student spending estimate'
+ },
+ 'Poland':{
+ work:'A non-EU full-time student with a Polish study visa or qualifying residence permit may work without obtaining a separate work permit; legal stay and study status conditions still apply.',
+ workUrl:'https://www.gov.pl/web/udsc-en/work-student',
+ spouse:'Family reunification is not automatic for a student. Check residence eligibility and a family member’s legal employment conditions.',
+ spouseUrl:'https://www.gov.pl/web/udsc-en',
+ pr:'Graduation can allow an eligible job-search residence route, but neither full-time study nor work-permit exemption guarantees permanent residence.',
+ prUrl:'https://study.gov.pl/work-and-internships',
+ visaUrl:'https://www.gov.pl/web/diplomacy/visas',
+ scholarshipUrl:'https://nawa.gov.pl/en/',
+ living:[2200,4200],livingType:'Illustrative monthly Polish student living scenario'
+ },
  'South Korea':{
  work:'Part-time employment for D-2/D-4 students requires immigration permission and may depend on Korean language skill, degree level and institution. Do NOT assume fixed universal hours.',
  workUrl:'https://www.studyinkorea.go.kr/ko/work/aboutForeignerEmploymentSystem.do?tab=part-time',
