@@ -14,3 +14,54 @@
  .an-identity-head span{font-size:8px}
  .an-guide-card .an-university-mark{width:28px;height:28px;top:7px;right:7px}
 }
+
+
+/* 2026-11-05 restoration: preserve existing photos, central logo only as fallback. */
+.an-guide-card .an-identity-logo-only{
+  align-items:center;justify-content:center;padding:12px;
+  background:radial-gradient(circle at 50% 35%,#70431d55,transparent 66%),linear-gradient(145deg,#131c29,#25180c);
+}
+.an-guide-card .an-logo-stage{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;
+}
+.an-guide-card .an-center-logo{
+  width:min(46%,94px);height:min(78%,98px);min-width:58px;object-fit:contain;
+  background:#fff;border:1px solid #dfaa67;border-radius:16px;padding:8px;
+  box-shadow:0 10px 26px #0009;position:relative;z-index:1;
+}
+.an-guide-card .an-center-monogram{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-size:32px;font-weight:900;color:#ffd093;letter-spacing:1px;
+}
+.an-guide-card .an-identity-logo-only .an-guide-symbol,
+.an-guide-card .an-identity-logo-only .an-identity-head{display:none!important}
+/* The two promotions are circular, independent icons, never overlapping text labels. */
+.an-guide-card .an-guide-ticket,
+.an-guide-card .an-guide-scholarship-enquiry,
+.an-guide-card .an-uni-discount{
+  position:absolute!important;top:auto!important;bottom:7px!important;left:auto!important;
+  width:32px!important;height:32px!important;max-width:none!important;min-width:0!important;
+  padding:0!important;border-radius:50%!important;display:flex!important;
+  align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;
+  font-size:0!important;line-height:1!important;z-index:6!important;
+  box-shadow:0 3px 10px #000c!important;
+}
+.an-guide-card .an-guide-ticket{right:7px!important;background:#80260f!important;border:1px solid #ffb46c!important}
+.an-guide-card .an-guide-scholarship-enquiry,
+.an-guide-card .an-uni-discount{right:45px!important;background:#302309!important;border:1px solid #f7c35f!important}
+.an-guide-card:not(:has(.an-guide-ticket)) .an-guide-scholarship-enquiry,
+.an-guide-card:not(:has(.an-guide-ticket)) .an-uni-discount{right:7px!important}
+.an-guide-card .an-guide-ticket::before{content:"✈";font-size:20px;color:#fff4e0}
+.an-guide-card .an-guide-scholarship-enquiry::before,
+.an-guide-card .an-uni-discount::before{content:"🎓";font-size:18px}
+.an-guide-card:has(.an-guide-scholarship-enquiry) .an-guide-credit,
+.an-guide-card:has(.an-uni-discount) .an-guide-credit{display:none}
+@media(max-width:520px){
+ .an-guide-card .an-center-logo{width:76px;height:76px;min-width:0;padding:6px;border-radius:14px}
+ .an-guide-card .an-guide-ticket,
+ .an-guide-card .an-guide-scholarship-enquiry,
+ .an-guide-card .an-uni-discount{width:29px!important;height:29px!important}
+ .an-guide-card .an-guide-scholarship-enquiry,.an-guide-card .an-uni-discount{right:40px!important}
+ .an-guide-card .an-guide-ticket::before{font-size:18px}
+ .an-guide-card .an-guide-scholarship-enquiry::before,.an-guide-card .an-uni-discount::before{font-size:16px}
+}
