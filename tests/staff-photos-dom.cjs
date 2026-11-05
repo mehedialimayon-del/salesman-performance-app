@@ -31,7 +31,7 @@ assert.equal(query('[data-ff-staff-avatar="M21954"] img').src,'https://example.t
 assert.equal(query('[data-ff-staff-avatar="M22075"] img').src,'https://example.test/emon-new.jpg','colleague photo change syncs in zone box');
 query('#ffScopeStaff').value='ALL';w.FFH_STAFF_PHOTOS.render();await delay(30);assert.equal(query('.ffDashStaffIdentity'),null,'combined scope does not show an arbitrary staff photo');
 const zone=w.document.createElement('select');zone.id='ffDashboardZone';zone.innerHTML='<option value="ALL">All</option><option value="PRIMARY">Primary</option>';zone.value='PRIMARY';query('.ffScopeFilter').append(zone);
-w.U=[{id:'M21954',zone:'PRIMARY',can_manage:true,active:true}];
+w.FFH_ZONE_MANAGER=zone=>zone==='PRIMARY'?{id:'M21954',zone:'PRIMARY',can_manage:true,active:true}:null;
 w.FFH_STAFF_PHOTOS.render();await delay(30);
 assert.equal(query('.dashHero .ffDashProgressFace .ffDashStaffAvatar img').src,'https://example.test/owner-new.jpg','combined zone shows its real manager inside the progress ring');
 const modal=w.document.createElement('div');modal.className='ffItemPicker ffZoneManagerPicker';
