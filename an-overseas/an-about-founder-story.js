@@ -56,6 +56,17 @@
     const vision = intro && intro.querySelector('.an-vision-inline');
     const button = vision && vision.querySelector('.an-about-readmore');
     if (!intro || !vision || !button) return;
+    if (!intro.querySelector('.an2-about-box')) {
+      const eyebrow = intro.querySelector(':scope > .an-about-eyebrow');
+      const heading = intro.querySelector(':scope > #an-about-title');
+      const paragraph = intro.querySelector(':scope > #an-about-intro');
+      if (eyebrow && heading && paragraph) {
+        const aboutBox = document.createElement('section');
+        aboutBox.className = 'an2-about-box';
+        intro.insertBefore(aboutBox, eyebrow);
+        aboutBox.append(eyebrow, heading, paragraph);
+      }
+    }
     let row = intro.querySelector('.an2-readmore-separate');
     if (!row) {
       row = document.createElement('div');
