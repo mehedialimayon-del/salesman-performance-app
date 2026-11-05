@@ -1,0 +1,120 @@
+/* FieldForce Hub — mobile-only corrections requested 05 Nov.
+   All rules are scoped: retain brand colours, data, navigation and other pages. */
+
+/* Proposal artwork IS the card. All artworks use identical geometry without a
+   second box or letterbox. Original artwork/image URL remains untouched. */
+#app .ffProposalPage .ffProposalStack{gap:11px!important}
+#app .ffProposalPage .ffProposalStrip{width:100%!important;max-width:100%!important;
+  padding:0!important;margin:0!important;border:0!important;box-shadow:none!important;
+  background:transparent!important;overflow:visible!important}
+#app .ffProposalPage .ffProposalStack .ffProposalVisual{
+  position:relative!important;display:block!important;width:100%!important;aspect-ratio:3/1!important;
+  padding:0!important;margin:0!important;height:auto!important;min-height:0!important;
+  background:transparent!important;border:0!important;border-radius:13px!important;overflow:hidden!important
+}
+#app .ffProposalPage .ffProposalVisual::before,#app .ffProposalPage .ffProposalVisual::after{display:none!important}
+#app .ffProposalPage .ffProposalStack .ffProposalVisual>img,
+#app .ffProposalPage .ffProposalStack .ffProposalVisual>img.ffFramedArt{
+  position:absolute!important;inset:0!important;top:0!important;left:0!important;
+  width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;
+  margin:0!important;padding:0!important;object-fit:fill!important;transform:none!important;
+  border:0!important;border-radius:13px!important;display:block!important;background:transparent!important
+}
+#app .ffProposalPage .ffProposalActions{margin:5px 0 0!important}
+
+/* Task composer: all inputs stay inside the dialog, even with long usernames. */
+.ffTaskModalBackdrop{box-sizing:border-box!important;padding:12px!important;max-width:100vw!important;overflow-x:clip!important}
+.ffTaskModalBackdrop>.ffTaskModal{box-sizing:border-box!important;flex:0 1 auto!important;
+  width:min(540px,calc(100vw - 24px))!important;min-width:0!important;max-width:100%!important;
+  max-height:calc(100dvh - 36px - var(--ffh-safe-top,0px) - var(--ffh-safe-bottom,0px))!important;
+  margin:0 auto!important;overflow:hidden!important}
+.ffTaskModal .ffTaskModalBody{box-sizing:border-box!important;min-width:0!important;
+  max-width:100%!important;overflow-x:hidden!important;overflow-y:auto!important;padding:10px 12px!important}
+.ffTaskModal .ffTaskModalBody *{box-sizing:border-box!important;min-width:0!important;max-width:100%!important}
+.ffTaskModal .ffTaskModalBody form,
+.ffTaskModal .ffTaskModalBody .form,
+.ffTaskModal .ffTaskModalBody fieldset{width:100%!important;min-width:0!important;max-width:100%!important;
+  margin-left:0!important;margin-right:0!important;overflow-wrap:anywhere!important}
+.ffTaskModal .ffTaskModalBody input,
+.ffTaskModal .ffTaskModalBody textarea,
+.ffTaskModal .ffTaskModalBody select,
+.ffTaskModal .ffTaskModalBody .ffSelectTrigger{display:block;width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.ffTaskModal .ffTaskModalBody .ffSelectTrigger{text-align:left!important;white-space:nowrap}
+.ffTaskModal .ffTaskModalBody .row{flex-wrap:wrap!important}
+@media(max-width:390px){.ffTaskModalBackdrop{padding:8px!important}.ffTaskModalBackdrop>.ffTaskModal{width:calc(100vw - 16px)!important}}
+
+/* Zero Sales: occupy remaining space above the fixed seven-icon navigation.
+   The measured height is supplied by november-screen-corrections.js */
+#app .app>main.wrap:has(.ffZeroBoard){height:var(--ff-zero-main-height,calc(100dvh - 220px))!important;
+ min-height:0!important;max-height:var(--ff-zero-main-height,calc(100dvh - 220px))!important;
+ display:flex!important;flex-direction:column!important;overflow:hidden!important;
+ padding-top:7px!important;padding-bottom:7px!important;box-sizing:border-box!important}
+#app .app>main.wrap .ffZeroBoard{flex:1 1 auto!important;min-height:0!important;height:100%!important;
+ max-height:100%!important;display:flex!important;flex-direction:column!important}
+#app .app>main.wrap .ffZeroBoard>.ffOutletList{flex:1 1 auto!important;min-height:0!important;
+ max-height:100%!important;overflow:hidden!important}
+#app .app>main.wrap .ffZeroBoard .ffOutletRows{flex:1 1 auto!important;
+ min-height:0!important;height:auto!important;max-height:none!important;overflow-y:auto!important;
+ overscroll-behavior-y:contain!important;padding-bottom:8px!important}
+
+/* Compact contact cards: the original photo and actions remain clickable. */
+#app .ffContactDetail .ffContactCard{width:100%;min-width:0;border-radius:15px}
+#app .ffContactCard .ffContactTop{padding:8px 34px!important;min-height:0!important}
+#app .ffContactCard .ffContactDesignation{font-size:13px!important;line-height:1.2!important}
+#app .ffContactCard .ffContactIdentity.ffCompactContact{
+ display:grid!important;grid-template-columns:106px minmax(0,1fr)!important;
+ align-items:start!important;gap:7px 11px!important;
+ padding:10px 12px!important;min-width:0!important;text-align:left!important
+}
+#app .ffCompactContact>.ffContactPhotoButton,#app .ffCompactContact>.ffContactInitial{
+ grid-row:1/3!important;grid-column:1!important;width:106px!important;height:116px!important;
+ max-width:106px!important;max-height:116px!important;border-radius:13px!important;
+ margin:0!important;padding:0!important
+}
+#app .ffCompactContact .ffContactPhoto{height:100%!important;width:100%!important;object-fit:cover!important}
+#app .ffCompactContact>.ffContactNamePanel{grid-column:2!important;grid-row:1!important;min-width:0!important}
+#app .ffCompactContact .ffContactNamePanel h3{font-size:14px!important;line-height:1.2!important;margin:2px 0 5px!important}
+#app .ffCompactContact .ffContactDepartment{font-size:11px!important;min-height:0!important;padding:5px!important}
+#app .ffCompactContact>.ffContactTags{grid-column:2!important;grid-row:2!important;margin:0!important;
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important}
+#app .ffCompactContact>.ffContactTags>span{min-width:0!important;padding:5px!important;margin:0!important;border-radius:8px!important}
+#app .ffCompactContact>.ffContactTags small{font-size:8px!important}
+#app .ffCompactContact>.ffContactTags b{font-size:11px!important}
+#app .ffCompactContact>.ffContactZoneLine{grid-column:1/-1!important;grid-row:3!important;
+ margin:0!important;min-width:0!important}
+#app .ffContactZoneLine>span{display:flex!important;align-items:center;justify-content:space-between;
+ gap:8px;border:1px solid #3d7296;border-radius:9px;padding:7px 10px;
+ background:#0b2030;color:#fff}
+#app .ffContactZoneLine small{color:#c2deee;font-size:9px;font-weight:750}
+#app .ffContactZoneLine b{font-size:12px;color:#fff;overflow-wrap:anywhere}
+#app .ffCompactContact>.ffContactLinks{grid-column:1/-1!important;grid-row:4!important;
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ margin:0!important;padding:0!important;gap:6px!important}
+#app .ffCompactContact>.ffContactLinks a{min-width:0!important;padding:7px!important;
+ min-height:38px!important;font-size:11px!important;border-radius:9px!important}
+#app .ffCompactContact .ffContactLinks svg{width:19px!important;height:19px!important}
+#app .ffCompactContact .ffContactLinks small{font-size:9px!important}
+#app .ffCompactContact>.ffContactExtra{grid-column:1/-1!important;font-size:10px;color:#e7bd98}
+#app .ffContactExtra summary{cursor:pointer;padding:3px 0}
+#app .ffContactExtra span{display:block;margin:5px 0;overflow-wrap:anywhere}
+#app .ffContactCard .ffContactAbout{font-size:11px!important;padding:0 12px!important;margin:0 0 5px!important}
+@media(max-width:350px){
+ #app .ffContactCard .ffContactIdentity.ffCompactContact{grid-template-columns:91px minmax(0,1fr)!important;gap:6px!important}
+ #app .ffCompactContact>.ffContactPhotoButton,#app .ffCompactContact>.ffContactInitial{width:91px!important;height:107px!important}
+}
+
+/* Access editor stays wide within the phone, with explicit base permissions. */
+#app #ffAccountForm .ffPermissionTable{width:100%!important;max-width:100%!important;
+ overflow-x:auto!important;border-radius:12px}
+#app #ffAccountForm .ffPermissionRow{box-sizing:border-box!important;
+ width:100%!important;min-width:0!important;grid-template-columns:minmax(100px,1fr) repeat(3,40px)!important}
+#app #ffAccountForm .ffRoleIncluded{margin:8px 0!important;padding:10px!important;
+ background:#19130f;border:1px solid #a65b2b;border-radius:11px}
+#app #ffAccountForm .ffRoleIncluded h3{font-size:13px;color:#ff933b;margin:0 0 8px}
+#app #ffAccountForm .ffRoleBaseGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+#app #ffAccountForm .ffRoleBaseGrid label{display:flex;align-items:center;gap:6px;
+ font-size:10px;color:#fff;margin:0;padding:5px;border:1px solid #65391d;border-radius:8px}
+#app #ffAccountForm .ffRoleBaseGrid input{appearance:auto!important;-webkit-appearance:checkbox!important;
+ width:16px!important;min-width:16px!important;height:16px!important;margin:0!important;
+ accent-color:#ff7b18!important}
+#app #ffAccountForm .ffRoleHint{font-size:11px;color:#dcc7b5;margin:7px 0 0}
