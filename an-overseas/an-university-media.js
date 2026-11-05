@@ -20,6 +20,27 @@
        (logo?'<img class="an-center-logo" src="'+esc(logo)+'" alt="'+esc(u.name)+' logo or official website icon" loading="lazy">':'')+
        '<span class="an-center-monogram">'+esc(short)+'</span></div></div>';
  }
+ // Stable numbers per country are based on the complete loaded catalogue, not current filters.
+ let serialCache={size:-1,items:new Map()};
+ function serial(u){
+   if(typeof U==='undefined'||!Array.isArray(U))return '';
+   if(serialCache.size!==U.length){
+     const groups=new Map(),items=new Map();
+     U.forEach(entry=>{
+       const country=entry.country||'Other';
+       if(!groups.has(country))groups.set(country,[]);
+       groups.get(country).push(entry);
+     });
+     groups.forEach(list=>{
+       list.sort((a,b)=>window.ANUniGuide?.compare?.(a,b)||a.name.localeCompare(b.name));
+       list.forEach((entry,i)=>items.set(entry.id,{n:i+1,total:list.length}));
+     });
+     serialCache={size:U.length,items};
+   }
+   const number=serialCache.items.get(u.id);if(!number)return '';
+   const zero=v=>String(v).padStart(3,'0');
+   return '<span class="an-catalogue-index" title="'+esc(u.country)+' university '+number.n+' of '+number.total+'">'+zero(number.n)+' <small>/ '+zero(number.total)+'</small></span>';
+ }
  guide.card=function(u,p){
    let result=nativeCard(u,p);
    const hasPhoto=result.includes('class="campus-cover an-guide-photo"');
@@ -29,7 +50,7 @@
      if(start>=0&&stop>=0)result=result.slice(0,start)+brandFallback(u,p)+result.slice(stop+14);
      result=result.replace(/<img class="uni-card-logo"[^>]*>/,'');
    }
-   return result.replace('<div class="uni-cover-wrap">','<div class="uni-cover-wrap" data-university-title="'+esc(u.name)+'" data-university-id="'+esc(u.id)+'">');
+   return result.replace('<div class="uni-cover-wrap">','<div class="uni-cover-wrap" data-university-title="'+esc(u.name)+'" data-university-id="'+esc(u.id)+'">'+serial(u));
  };
  async function commonsImage(name){
    if(remembered.has(name))return remembered.get(name);
