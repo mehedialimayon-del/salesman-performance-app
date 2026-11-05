@@ -67,6 +67,9 @@ async function loadPublicDirectory(){
      // French regional "Académie de …" education authorities are not universities.
      // Hipo lists some as universities: exclude instead of presenting repeated state seals as school logos.
      if(country==='France'&&/^Acad[eé]mie de\s/i.test(name))return;
+     // Asian University / Asian University of Science and Technology are aliases of one institution
+     // formally closed in August 2017. Do not offer new admissions to defunct institutions.
+     if(country==='Thailand'&&/^Asian University(?: of Science and Technology)?$/i.test(name))return;
      items.push({id:'an-h-dir-'+norm(country)+'-'+norm(new URL(site).hostname),name,short:name,country,city:row['state-province']||country,kind:'University',programs:[],site,photo:'',source:'Hipo directory (unverified recognition)'});
     });
     const added=addUnique(U,items);loaded=true;
