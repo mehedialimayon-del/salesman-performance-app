@@ -165,7 +165,7 @@ function repaintCopy(){
  }
 }
 window.addEventListener('hashchange',function(){queueMicrotask(repaintCopy);});
-fetch('site-content.json?v=20261029-2154',{cache:'no-cache'}).then(function(r){if(!r.ok)throw Error('Content not available');return r.json();}).then(function(cfg){
+fetch('site-content.json?v=20261106-malaysia-mqa-117-v1',{cache:'no-cache'}).then(function(r){if(!r.ok)throw Error('Content not available');return r.json();}).then(function(cfg){
  siteCopy=cfg;
  (cfg.additionalUniversities||[]).forEach(function(u){
   if(!u||!u.id||!u.name||U.some(function(o){return o.id===u.id;}))return;
