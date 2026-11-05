@@ -29,6 +29,10 @@
    // The existing image/overlay history manager owns gallery navigation.
    const photo=document.querySelector('.ffPhotoViewer [data-action="close"]');
    if(photo){photo.click();return true;}
+   const task=document.querySelector('.ffTaskModalBackdrop [data-task-close]');
+   if(task){task.click();return true;}
+   // Allow a picker or editor's own history handler to close its overlay.
+   if(document.querySelector('.ffItemPicker,.ffProfilePhotoDialog')){history.back();return true;}
    promptExit();return true;
  };
  // Add a history guard for the older 1.19 Android wrapper, which sends
