@@ -45,3 +45,40 @@
 }
 
 .university-catalogue .an-catalogue-apply{display:flex;align-items:center;justify-content:center;min-height:34px;margin:0 13px 12px;padding:8px;border-radius:9px;background:linear-gradient(90deg,#3b200c,#1c1009);border:1px solid #9c602c;color:#ffba73;text-decoration:none;font-weight:850;font-size:11px}.university-catalogue .an-catalogue-apply:hover{background:#ff8e0d;color:#090909}.an-favorite-page .an-catalogue-apply{margin:0 13px 12px}
+
+/* Institution-specific media: small authentic icon or individual identity, never enlarged shared government seals. */
+.university-catalogue .an-guide-card .an-identity-logo-only .an-logo-stage,
+.an-favorite-page .an-guide-card .an-identity-logo-only .an-logo-stage{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ gap:4px;min-height:100%;padding:12px 10px 22px;position:relative;
+}
+.an-guide-card .an-identity-logo-only .an-identity-name{
+ display:block;position:absolute;bottom:5px;left:8px;right:8px;
+ color:#ffdb9d;font-size:10px;line-height:1.35;text-align:center;
+ font-weight:750;max-height:30px;overflow:hidden;
+ text-shadow:0 2px 8px #000;
+}
+.an-guide-card .an-identity-logo-only .an-center-logo.an-website-favicon{
+ width:64px!important;height:64px!important;min-width:0!important;max-width:64px!important;
+ padding:11px!important;border-radius:13px!important;object-fit:contain!important;
+ image-rendering:auto;z-index:2;
+}
+.an-guide-card .an-identity-logo-only .an-center-monogram{font-size:clamp(18px,2.6vw,30px);max-width:100%;overflow:hidden}
+.an-guide-card .an-identity-logo-only .an-center-logo+.an-center-monogram{opacity:0}
+.an-guide-card .an-identity-logo-only .an-center-logo[style*="display: none"]+.an-center-monogram{opacity:1}
+.university-catalogue .badge.an-type-public,.an-favorite-page .badge.an-type-public{
+ color:#f9d3a5!important;border-color:#d58e3c!important;background:#53310f!important;
+}
+.university-catalogue .badge.an-type-private,.an-favorite-page .badge.an-type-private{
+ color:#f2d6ff!important;border-color:#ae73cf!important;background:#3c244d!important;
+}
+.university-catalogue .badge.an-type-unknown,.an-favorite-page .badge.an-type-unknown{
+ color:#e5e5e5!important;border-color:#595a60!important;background:#26272c!important;
+}
+.university-catalogue .badge[class*="an-type-"]{display:inline-flex;max-width:100%;white-space:normal;font-weight:850}
+@media(max-width:520px){
+ .an-guide-card .an-identity-logo-only .an-center-logo.an-website-favicon{
+ width:49px!important;height:49px!important;max-width:49px!important;padding:8px!important;
+ }
+ .an-guide-card .an-identity-logo-only .an-identity-name{font-size:9px}
+}
