@@ -156,3 +156,16 @@
     max-height:76%!important;
   }
 }
+
+/* Historical universities must not advertise current admissions. */
+.an-guide-card .an-closed-status{
+  display:block;padding:7px 9px;margin:0 0 9px;
+  border:1px solid #b67650;border-radius:7px;
+  color:#f8c3a8;background:#4b231b;
+  font-size:10px;font-weight:900;line-height:1.45;letter-spacing:.35px;
+}
+.an-guide-card .an-no-applications{
+  margin:0 14px 14px;padding:10px 12px;border:1px solid #96513b;
+  color:#ecc0ae;background:#301d19;border-radius:10px;
+  font-size:11px;line-height:1.4;text-align:center;font-weight:800;
+}
