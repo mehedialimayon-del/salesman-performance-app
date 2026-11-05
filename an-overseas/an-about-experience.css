@@ -25,6 +25,9 @@ body.an-about-locked #app>.an-about-fixed{display:flex!important;flex-direction:
 #app .an-about-v2 .an-about-proof-card span{font-size:9px!important;font-weight:750;color:#e9e7e4!important;letter-spacing:.15px}
 #app .an-about-v2 .an-about-locations{margin-top:10px;gap:5px!important}
 #app .an-about-v2 .an-about-locations span{font-size:10px!important;background:#17191e!important;padding:5px 7px!important}
+#app .an-about-v2 .an-about-vision-panel{display:flex;flex-direction:column;justify-content:center}
+#app .an-about-v2 .an-about-vision-panel .an-about-eyebrow,#app .an-about-v2 .an-about-vision-panel h2{text-align:center}
+#app .an-about-v2 .an-about-vision-panel .an-about-readmore{align-self:center}
 #app .an-about-v2 .an-vision-glow{position:absolute;right:-85px;top:-85px;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,#ff811a27,transparent 65%);pointer-events:none}
 #app .an-about-v2 .an-about-readmore{display:inline-flex;gap:12px;align-items:center;justify-content:center;margin-top:14px;padding:12px 20px!important;border-radius:11px!important;font-size:12px!important;color:#111!important;background:linear-gradient(110deg,#ffbe58,#ff7b13)!important;border:0!important;font-weight:900!important;letter-spacing:.4px;white-space:normal!important}
 #app .an-about-v2 .an-about-readmore:hover{filter:brightness(1.12)}
