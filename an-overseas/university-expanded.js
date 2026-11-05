@@ -11,7 +11,7 @@ const localCampusSources={"usm":"https://commons.wikimedia.org/wiki/File:Main_ga
 function refreshLocalCampusImages(){try{if(typeof U==='undefined')return;U.forEach(u=>{const ref=localCampusSources[u.id],p=UNIVERSITY_PROFILES[u.id];if(!ref||!p)return;p.images=[{url:'assets/universities/verified-'+u.id+'.jpg',label:u.name+' campus photo',source:ref}];});}catch(e){console.warn('Campus photo hydration',e)}}
 function enrich(u){
  if(!u||!u.id||UNIVERSITY_PROFILES[u.id])return;
- const site=(typeof u.site==='string'&&/^https:\/\//.test(u.site))?u.site:'https://www.mqa.gov.my/';
+ const site=(typeof u.site==='string'&&/^https:\/\//.test(u.site))?u.site:''; // A registry page must never masquerade as the official university website.
  const fact=detailed[u.id], fields=Array.isArray(u.programs)&&u.programs.length?u.programs.slice(0,30):['See the full official programme directory'];
  const location=u.city||u.country||'the selected campus';
  const photo=visuals[u.id],isMalaysia=u.country==='Malaysia';
