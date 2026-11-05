@@ -55,6 +55,16 @@
       if(manager)p=person(manager.staff_id||manager.id);
     }catch(_){}
   }
+  // Explicit identity on dashboard; reused existing directory only.
+  const zoneForLabel=document.querySelector('#ffDashboardZone')?.value;
+  const labelText=p?.full_name||(zoneForLabel&&zoneForLabel!=='ALL'?(zoneForLabel==='PRIMARY'?'KL ZONE':zoneForLabel):'Combined Team');
+  let ownerLabel=hero.querySelector('.ffDashOwnerLabel');
+  if(!ownerLabel){
+    ownerLabel=document.createElement('div');ownerLabel.className='ffDashOwnerLabel';
+    const summary=hero.querySelector('small');
+    if(summary)summary.before(ownerLabel);else hero.firstElementChild?.append(ownerLabel);
+  }
+  if(ownerLabel&&ownerLabel.textContent!==labelText)ownerLabel.textContent=labelText;
   const old=hero.querySelector('.ffDashStaffIdentity');
   if(!p){old?.remove();document.querySelector('.ffScopeFilter .ffScopeAvatar')?.remove();return;}
   if(old?.dataset.staffId===p.staff_id){patchAvatar(old.querySelector('.ffDashStaffAvatar'),p.staff_id,'ffDashStaffAvatar ffStaffCircle');return;}
@@ -158,6 +168,12 @@
  .ffDashStaffIdentity{display:flex;align-items:center;gap:7px;max-width:42%;min-width:0;padding:2px 4px}
  .ffDashStaffIdentity .ffDashStaffName{font-size:10px;color:#fff;line-height:1.3;overflow:hidden;text-overflow:ellipsis;max-width:85px}
  .ffDashStaffAvatar{width:38px;height:38px;min-width:38px}
+ .dashHero{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;min-width:0}
+ .dashHero>div:first-child{min-width:0!important;flex:1!important;overflow:hidden}
+ .dashHero>div:first-child>b{display:block;overflow-wrap:anywhere;line-height:1.2}
+ .dashHero .ffDashOwnerLabel{color:#ff9d59;font-size:12px;font-weight:850;min-width:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:3px 0 2px}
+ .dashHero>div:first-child>small{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
  /* Restore portrait-centred dashboard progress; leave the existing theme intact. */
  .dashHero .dashAch.ffDashProgress{position:relative;flex:0 0 74px;width:74px;height:74px;min-width:74px;border-radius:50%;background:conic-gradient(#ff7b18 var(--ff-dash-progress,0%),#493322 0);display:grid;place-items:center;box-shadow:0 0 15px #ff74172b;color:#ff9a3b!important}
  .dashHero .ffDashProgressFace{position:absolute;inset:6px;border-radius:50%;background:#130e0c;display:grid;place-items:center;overflow:hidden}
