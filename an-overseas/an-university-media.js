@@ -15,6 +15,52 @@
   '4th military medical university':'Air Force Medical University',
   'fourth military medical university':'Air Force Medical University'
  })[String(name||'').trim().toLowerCase()]||String(name||'');
+ // Hand-matched photographs/logo URLs from each institution's published pages
+ // or labelled historical archival imagery. Photos are references, not partner claims.
+ const verifiedCovers={
+  allianzeuniversitycollegeofmedicalsciencesaucms:{
+   photo:'https://img.afterschool.my/storage/uploads/images/getadvice/30481/598d8c25c4321.jpg',
+   source:'https://afterschool.my/articles/aucms-students-barred-from-serving-their-practical-years-in-government-hospitals',
+   credit:'Historical AUCMS campus photo · Afterschool.my',
+   closedDate:'30 November 2017'
+  },
+  amcuniversitycollege:{
+   site:'https://amc.edu.my/',
+   photo:'https://amc.edu.my/wp-content/uploads/2026/08/ChIJF1KTaL1pOzIRIkad4g7py6Q.jpg',
+   logo:'https://amc.edu.my/wp-content/uploads/2024/08/AMC-UC-Logo-Horizontal-01.png',
+   source:'https://amc.edu.my/',
+   credit:'AMC University College · official website'
+  },
+  asiametropolitanuniversity:{
+   site:'https://amu.edu.my/',
+   photo:'https://amu.edu.my/wp-content/uploads/2026/08/IMG_0607-scaled.jpg',
+   logo:'https://amu.edu.my/wp-content/uploads/2025/01/AMU-Logo-Orange.png',
+   source:'https://amu.edu.my/campus-life/our-campus/',
+   credit:'Asia Metropolitan University · official campus photography'
+  },
+  asiametropolitanuniversitycyberjayacampus:{
+   site:'https://amu.edu.my/',
+   photo:'https://amu.edu.my/wp-content/uploads/2022/10/AMU-Cyberjaya-Campus-Library_Resize-scaled-1.jpg',
+   logo:'https://amu.edu.my/wp-content/uploads/2025/01/AMU-Logo-Orange.png',
+   source:'https://amu.edu.my/campus-life/our-campus/',
+   credit:'Asia Metropolitan University · official Cyberjaya campus image'
+  },
+  alfauniversitycollegeauc:{
+   site:'https://alfa.edu.my/',
+   photo:'https://alfa.edu.my/wp-content/uploads/Grand-Alfa-University-Campus-Entrance-1.png',
+   logo:'https://alfa.edu.my/wp-content/uploads/ALFA-LOGO-BLACK@2x-8-scaled.png',
+   source:'https://alfa.edu.my/',
+   credit:'ALFA University College · official campus image'
+  }
+ };
+ function enrichKnownUniversity(u){
+   const match=verifiedCovers[normalize(u.name)];
+   if(!match)return;
+   if(match.site&&!u.site)u.site=match.site;
+   if(match.photo){u.cardPhoto=match.photo;u.cardSource=match.source;u.cardCredit=match.credit;}
+   if(match.logo&&!u.logoImage)u.logoImage=match.logo;
+   if(match.closedDate)u.closedDate=match.closedDate;
+ }
  const remembered=new Map(), watching=new WeakSet();
  const hostOf=x=>{const m=String(x||'').match(/^https?:\/\/([^/?#:]+)/i);return m?m[1].toLowerCase().replace(/^www\./,''):'';};
  let hostCountSize=-1,hostCount=new Map();
@@ -62,6 +108,7 @@
    return '<span class="an-catalogue-index" title="'+esc(u.country)+' university '+number.n+' of '+number.total+'">'+zero(number.n)+' <small>/ '+zero(number.total)+'</small></span>';
  }
  guide.card=function(u,p){
+   enrichKnownUniversity(u);
    let result=nativeCard(u,p);
    const hasPhoto=result.includes('class="campus-cover an-guide-photo"');
    if(!hasPhoto){
