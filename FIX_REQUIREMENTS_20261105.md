@@ -22,9 +22,16 @@
 - Composer and Send must remain usable; make space for input controls rather than moving the floating button.
 
 ## Navigation and exit
-- Android Back/gesture: first close a photo or modal, then navigate to the previous internal page.
-- On Home, display a clear Cancel / Exit confirmation; dismissing it keeps the app open.
-- No accidental exit when pressing the background, or when using Android Back on a normal page.
+- Android Back/gesture: when no photo viewer is active, show an explicit No / Yes Exit confirmation even from a module page, leaving that page unchanged while waiting.
+- NO keeps the current screen in place; YES invokes the app exit command. Pressing the Android Home button remains a normal OS action.
+- Do not minimize, silently exit, or return to another module merely from Android Back; the only automatic close is a photo viewer's own Back action.
+- Maintain the history-based back guard for legacy native wrappers that still call history.back() directly.
+
+## Team / zone filter
+- Remove the duplicate "Team Filter > Filter" accordion arrangement; show the existing zone and SR selectors directly and together.
+- Label them SELECT ZONE and SELECT SR; keep combined SR totals within the selector.
+- Present internal zone code PRIMARY as KL ZONE in the UI without changing database keys or historical records.
+- Apply this to every module that shares the existing ffScopeFilter component and to Zone picker labels.
 
 ## APK acceptance
 - Signed production APK using the existing release certificate; matching package ID and increased versionCode.
