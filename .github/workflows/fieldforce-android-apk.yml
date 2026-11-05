@@ -153,6 +153,59 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+
+  android-smoke:
+    name: Install and launch APK in Android emulator
+    runs-on: ubuntu-latest
+    needs: android-apk
+    timeout-minutes: 25
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: FieldForce-Hub-Android-${{ github.run_number }}
+          path: dist
+      - name: Enable hardware acceleration
+        run: |
+          if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm; fi
+      - name: Verify fresh APK installation, launch, and crash-free startup
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: |
+            set -euo pipefail
+            apk="$(find dist -type f -name '*.apk' ! -name '*unsigned*' -print -quit)"
+            test -n "$apk" || { echo 'No installable APK in artifact'; exit 1; }
+            echo "Installing $apk"
+            adb install -r "$apk"
+            adb shell pm path com.fieldforcehub.mobile | grep 'package:'
+            adb shell am start -W -n com.fieldforcehub.mobile/.MainActivity
+            sleep 12
+            adb shell pidof com.fieldforcehub.mobile
+            adb shell dumpsys activity activities | grep -F 'com.fieldforcehub.mobile'
+            adb logcat -d -s AndroidRuntime:E > /tmp/ffh-android-runtime.log || true
+            if grep -q 'FATAL EXCEPTION' /tmp/ffh-android-runtime.log; then
+              cat /tmp/ffh-android-runtime.log
+              echo 'Android runtime crash detected'
+              exit 1
+            fi
+            adb shell screencap -p /sdcard/ffh-smoke.png
+            adb pull /sdcard/ffh-smoke.png /tmp/ffh-android-smoke.png
+            echo 'PASS: APK installs, main screen launches, process alive, no AndroidRuntime crash'
+      - name: Keep Android emulator startup screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: FieldForce-Android-Emulator-Screenshot-${{ github.run_number }}
+          path: /tmp/ffh-android-smoke.png
+          if-no-files-found: ignore
+          retention-days: 7
+
+
   web-regression:
     name: Web regression and mobile browser checks
     runs-on: ubuntu-latest
