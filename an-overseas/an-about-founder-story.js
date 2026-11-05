@@ -48,8 +48,16 @@
       '<footer class="an2-closing"><img src="assets/brand-logo.jpg" alt="A&N Overseas logo"><div><span>YOUR DREAM. OUR COMMITMENT.</span><h2>Wherever your opportunity is waiting,<br><em>we hope to help you reach it.</em></h2><p>We are grateful for every family that places its trust in A&N Overseas. May your educational journey lead you to knowledge, opportunity and a meaningful future. With sincerity and dedication, we remain committed to standing beside our students, Insha’Allah.</p><div class="an2-cta"><a href="#/apply">BEGIN YOUR JOURNEY ↗</a><a href="#/contact">SPEAK TO OUR TEAM</a><a href="#/about">← ABOUT US</a></div><small>Published university information is a discovery resource. Fees, recognition, eligibility, intake and approvals must be confirmed with the institution or relevant authority. The directory is not a representation of institutional partnerships.</small></div></footer>'+
     '</main>';
   }
+  // Public route renderer: loaded before the SPA router so direct links work on first paint.
+  window.ANAboutFounderStory = renderStory;
   // Route function is defined in index.html. Replacing it preserves the existing hash router.
   if (typeof aboutDetailsPage === 'function') aboutDetailsPage = renderStory;
+  function ensureFounderPage() {
+    const route=location.hash.split('?')[0];
+    const app=document.querySelector('#app');
+    if(route!=='#/aboutdetails'||!app||app.querySelector('.an2-story'))return;
+    app.innerHTML=renderStory();
+  }
   function relocateReadMore() {
     if (!location.hash.startsWith('#/about') || location.hash.startsWith('#/aboutdetails')) return;
     const intro = document.querySelector('#an-about-fixed .an-about-intro-panel');
@@ -78,10 +86,17 @@
     button.setAttribute('aria-label','Read our full story, mission and vision');
   }
   function setup() {
+    ensureFounderPage();
     relocateReadMore();
     const app=document.getElementById('app');
-    if (app) new MutationObserver(relocateReadMore).observe(app,{childList:true,subtree:true});
-    window.addEventListener('hashchange',()=>requestAnimationFrame(relocateReadMore));
+    if (app) new MutationObserver(() => {
+      if(location.hash.split('?')[0]==='#/aboutdetails')ensureFounderPage();
+      else relocateReadMore();
+    }).observe(app,{childList:true,subtree:true});
+    window.addEventListener('hashchange',()=>requestAnimationFrame(()=>{
+      ensureFounderPage();
+      relocateReadMore();
+    }));
   }
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup,{once:true}); else setup();
 })();
