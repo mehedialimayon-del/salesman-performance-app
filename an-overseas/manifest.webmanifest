@@ -10,7 +10,7 @@
   "theme_color": "#ff8a08",
   "icons": [
     {
-      "src": "./assets/an-overseas-app-icon.svg",
+      "src": "./assets/an-overseas-app-icon.svg?v=20261106-authentic-brand1",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
