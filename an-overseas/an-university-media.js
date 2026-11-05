@@ -10,10 +10,10 @@
  const remembered=new Map(), watching=new WeakSet();
  function websiteIcon(u){
    const match=String(u.site||'').match(/^https?:\/\/([^/?#]+)/i);
-   return match?'https://www.google.com/s2/favicons?domain='+encodeURIComponent(match[1])+'&sz=256':'';
+   return match&&!/^(www\.)?mqa\.gov\.my$/i.test(match[1])?'https://www.google.com/s2/favicons?domain='+encodeURIComponent(match[1])+'&sz=256':'';
  }
  function brandFallback(u,p){
-   const logo=(u.logoImage||p?.logo||'');
+   const logo=(u.logoImage||p?.logo||websiteIcon(u));
    const named=String(u.name||'');const acronym=named.match(/\(([A-Z]{2,5})\)/);
    const short=acronym?acronym[1]:String(u.short||u.name||'U').replace(/[^A-Z]/g,'').slice(0,3)||'U';
    return '<div class="an-guide-identity an-identity-logo-only"><div class="an-logo-stage">'+
@@ -50,7 +50,7 @@
      if(start>=0&&stop>=0)result=result.slice(0,start)+brandFallback(u,p)+result.slice(stop+14);
      result=result.replace(/<img class="uni-card-logo"[^>]*>/,'');
    }
-   return result.replace('<div class="uni-cover-wrap">','<div class="uni-cover-wrap" data-university-title="'+esc(u.name)+'" data-university-id="'+esc(u.id)+'">'+serial(u));
+   return result.replace('<div class="uni-cover-wrap">','<div class="uni-cover-wrap" data-university-title="'+esc(u.name)+'" data-university-id="'+esc(u.id)+'">');
  };
  async function commonsImage(name){
    if(remembered.has(name))return remembered.get(name);
@@ -124,13 +124,13 @@
    const candidate=await commonsImage(name);
    if(candidate?.photoCandidate){showImage(cover,candidate);return;}
    const brand=cover.querySelector('.an-identity-logo-only .an-logo-stage');
-   if(!brand||brand.querySelector('.an-center-logo'))return;
+   if(!brand)return;
    const seal=await wikidataSeal(name);
    if(seal&&cover.isConnected&&!cover.querySelector('.an-guide-photo')){
      const mark=document.createElement('img');
      mark.className='an-center-logo';mark.alt=name+' university emblem (Wikimedia Commons)';
      mark.loading='lazy';mark.decoding='async';mark.src=seal;
-     brand.prepend(mark);
+     mark.addEventListener('load',()=>{brand.querySelectorAll('.an-center-logo').forEach(old=>{if(old!==mark)old.remove();});},{once:true});brand.prepend(mark);
    }
  }
  const observer='IntersectionObserver'in window?new IntersectionObserver(entries=>{
