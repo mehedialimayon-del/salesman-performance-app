@@ -27,6 +27,6 @@ const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require
  const ai=fs.readFileSync('ai-anchored-popup.js','utf8');new Function(ai);
  const dash=fs.readFileSync('staff-photos.js','utf8');new Function(dash);
  assert.match(dash,/ffDashOwnerLabel/,'selected person name is visible on dashboard');
- dom.window.close();
+ await new Promise(r=>setTimeout(r,80));
  console.log('PASS Munnaf manager identity, person/zone picker, one-step scope filters, KL zone label, proposal/task/zero/contacts CSS and dashboard/AI JS syntax');
 })().catch(e=>{console.error(e);process.exit(1)});
