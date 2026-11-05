@@ -89,5 +89,6 @@ body:has(.ffCampaignPage) #orb{width:32px!important;height:32px!important;bottom
 /* Hide AI orb while private chat uses microphone/attachment composer. */
 body:has(.ffMessenger) #orb{display:none!important}
 
-/* With the AI assistant dialog open, move its floating toggle away from the Send button. */
-body:has(#aiPopup.aiFloatingOverlay) #orb.aiOrb{top:calc(10px + env(safe-area-inset-top))!important;bottom:auto!important;right:10px!important;width:44px!important;height:44px!important}
+/* AI toggle stays at its original (or user-dragged) position on open and close.
+   Reserve composer space for Send instead of moving the AI toggle. */
+body:has(#aiPopup.aiFloatingOverlay) .aiPopupComposer{padding-right:62px!important;box-sizing:border-box!important}
