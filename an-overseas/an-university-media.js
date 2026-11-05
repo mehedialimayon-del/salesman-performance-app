@@ -8,7 +8,7 @@
  const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
  const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/gi,'').toLowerCase();
  const remembered=new Map(), watching=new WeakSet();
- const hostOf=x=>{try{return new URL(x).hostname.toLowerCase().replace(/^www\./,'');}catch{return '';}};
+ const hostOf=x=>{const m=String(x||'').match(/^https?:\/\/([^/?#:]+)/i);return m?m[1].toLowerCase().replace(/^www\./,''):'';};
  let hostCountSize=-1,hostCount=new Map();
  function websiteIcon(u){
    const host=hostOf(u.site);if(!host)return '';
@@ -142,7 +142,7 @@
    const seal=await wikidataSeal(name);
    if(seal&&cover.isConnected&&!cover.querySelector('.an-guide-photo')){
      const mark=document.createElement('img');
-     mark.className='an-center-logo';mark.alt=name+' university emblem (Wikimedia Commons)';
+     mark.className='an-center-logo an-verified-media';mark.alt=name+' university logo or image (Wikimedia Commons / Wikidata)';
      mark.loading='lazy';mark.decoding='async';mark.src=seal;
      mark.addEventListener('load',()=>{brand.querySelectorAll('.an-center-logo').forEach(old=>{if(old!==mark)old.remove();});},{once:true});brand.prepend(mark);
    }
