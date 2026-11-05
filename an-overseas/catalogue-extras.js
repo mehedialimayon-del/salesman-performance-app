@@ -2,7 +2,7 @@
    Costs are illustrative published programme examples, NOT overall university fees. */
 (function(){
 'use strict';
-var visibleLimit=80,lastQuerySignature='';
+var visibleLimit=80,lastQuerySignature='',lastRenderedSignature='',lastRenderedCount=0,loadMoreObserver=null;
 var priority=['Malaysia','China','Japan','South Korea','Singapore','Thailand','United Arab Emirates','Turkey','United Kingdom','Germany','France','Italy','Ireland','Netherlands','Sweden','Finland','Austria','Belgium','Switzerland','Norway','Denmark','Spain','Portugal','Poland','Czech Republic','Hungary','Greece','Luxembourg','Canada','United States','Australia','New Zealand'];
 const countryIndex=name=>{const n=priority.indexOf(name);return n<0?1000:n;};
 countries.sort((a,b)=>countryIndex(a[0])-countryIndex(b[0])||a[0].localeCompare(b[0]));
@@ -128,7 +128,29 @@ renderResults=function(){
  if(count)count.innerHTML='<strong>'+found.length.toLocaleString('en-US')+'</strong> matching universities of <strong>'+U.length.toLocaleString('en-US')+'</strong> worldwide · '+esc(filterCountry)+(feeFilter?' · fee ranges in '+esc(pref.currency):'');
  const grand=document.getElementById('an-global-count');if(grand)grand.textContent=U.length.toLocaleString('en-US')+' universities · '+countries.length+' study destinations';
  if(needsCurrency){el.innerHTML='<div class="empty">Select a tuition currency before comparing minimum or maximum amounts.</div>';return;}
- el.innerHTML=found.length?found.slice(0,visibleLimit).map(anNumberedCard).join('')+(found.length>visibleLimit?'<div class="catalogue-load-more" style="grid-column:1/-1;text-align:center;padding:20px"><button class="btn outline" id="load-more-universities" type="button">Show next '+Math.min(80,found.length-visibleLimit)+' of '+found.length+' universities ↓</button></div>':''):'<div class="empty">No matches with verified information. Try another destination, amount or reset filters.</div>';
+ if(loadMoreObserver)loadMoreObserver.disconnect();
+ const currentCount=el.querySelectorAll('.an-guide-card').length;
+ const appendOnly=found.length>0&&lastRenderedSignature===signature&&lastRenderedCount>0&&currentCount===lastRenderedCount&&visibleLimit>lastRenderedCount;
+ const start=appendOnly?lastRenderedCount:0;
+ const cards=found.slice(start,visibleLimit).map(anNumberedCard).join('');
+ const more=found.length>visibleLimit?'<div class="catalogue-load-more" style="grid-column:1/-1;text-align:center;padding:20px"><button class="btn outline" id="load-more-universities" type="button">Show next '+Math.min(80,found.length-visibleLimit)+' of '+found.length+' universities ↓</button></div>':'';
+ if(appendOnly){
+   el.querySelector('.catalogue-load-more')?.remove();
+   el.insertAdjacentHTML('beforeend',cards+more);
+ }else{
+   el.innerHTML=found.length?cards+more:'<div class="empty">No matches. Try another destination or reset filters.</div>';
+ }
+ lastRenderedSignature=signature;lastRenderedCount=Math.min(found.length,visibleLimit);
+ const moreButton=el.querySelector('#load-more-universities');
+ if(moreButton&&'IntersectionObserver' in window){
+   loadMoreObserver=new IntersectionObserver(entries=>{
+     if(!entries.some(x=>x.isIntersecting))return;
+     loadMoreObserver.disconnect();
+     visibleLimit=Math.min(found.length,visibleLimit+80);
+     renderResults();
+   },{rootMargin:'0px 0px 500px 0px',threshold:0});
+   loadMoreObserver.observe(moreButton);
+ }
  window.ANUniversityFavorites?.refresh?.();
 };
 document.addEventListener('change',e=>{
