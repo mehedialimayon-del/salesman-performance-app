@@ -29,6 +29,8 @@ const midMYR={
  DKK:(0.6415+0.5821)/2,NOK:(0.464+0.4045)/2,CHF:(5.075+4.880)/2
 };
 const bdtCross={};Object.keys(midMYR).forEach(key=>bdtCross[key]=midMYR[key]*100/3.333);
+// 05 Nov 2026 indicative mid-market BDT rates for currencies absent from the Malaysian bank table (Currency World / published historical observations).
+Object.assign(bdtCross,{KRW:0.09265,TRY:2.487,PLN:31.953,CZK:5.756,HUF:0.386573});
 const fxSource='https://www.allianceonline.com.my/personal/rate_charges/foreign_exchange_rate_kiosk_view.do';
 const common={
  work:'Work conditions depend on your visa category, institution and approved employment. Do not assume a part-time job is automatically permitted.',
@@ -206,5 +208,5 @@ const bdt= (amount,code)=>{
  return '(≈ ৳'+(Math.round(amount*rate/100)*100).toLocaleString('en-US')+')';
 };
 const withBdt=(amount,code)=>cash(amount,code)+' '+bdt(amount,code);
-window.ANStudyCountry={get,currencies,policy,bdtCross,fxSource,cash,bdt,withBdt,sourceNote};
+window.ANStudyCountry={get,currencies,policy,bdtCross,fxSource,secondaryFxSource:'https://currency.world/exchange_rates/BDT',cash,bdt,withBdt,sourceNote};
 })();
