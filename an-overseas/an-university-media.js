@@ -53,8 +53,27 @@
    credit:'ALFA University College · official campus image'
   }
  };
+ const verifiedSites={
+  alsultanabdullahahmadshahquranicuniversityofpahang:'https://uniqsaas.edu.my/',
+  genovasiuniversitycollege:'https://www.genovasi.edu.my/',
+  kpjhealthcareuniversity:'https://kpju.edu.my/',
+  internationaluniversitycollegeoftechnologytwintech:'https://newtwintech.edu.my/',
+  lintonuniversitycollege:'https://www.linton.edu.my/web/',
+  netherlandsmaritimeuniversitycollegenmuc:'https://nmuc.edu.my/',
+  northborneouniversitycollegenbuc:'https://nbuc.edu.my/',
+  universitycollegeofaviationmalaysiaunicam:'https://aviation.edu.my/',
+  universitycollegetatiuctati:'https://www.uctati.edu.my/',
+  universitycollegesabahfoundationucsf:'https://www.ucsf.edu.my/',
+  spectruminternationaluniversitycollege:'https://siuc.edu.my/',
+  universitycollegeofagrosciencemalaysia:'https://ucam.edu.my/',
+  universitycollegebestari:'https://www.ucbestari.edu.my/',
+  veritasuniversitycollege:'https://www.veritas.edu.my/'
+ };
  function enrichKnownUniversity(u){
-   const match=verifiedCovers[normalize(u.name)];
+   const key=normalize(u.name);
+   const site=verifiedSites[key];
+   if(site&&!u.site)u.site=site;
+   const match=verifiedCovers[key];
    if(!match)return;
    if(match.site&&!u.site)u.site=match.site;
    if(match.photo){u.cardPhoto=match.photo;u.cardSource=match.source;u.cardCredit=match.credit;}
