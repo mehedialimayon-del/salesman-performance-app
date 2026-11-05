@@ -44,6 +44,12 @@
      if(b&&['KL','PRIMARY','KUALA LUMPUR'].includes(b.textContent.trim().toUpperCase()))b.textContent='KUALA LUMPUR';
      card.insertBefore(full,card.querySelector('.ffContactLinks')||card.querySelector('.ffContactAbout')||card.querySelector('.ffContactTools')||null);
    }
+   const longer=[...tags.querySelectorAll(':scope > span')];
+   if(longer.length){
+      const details=document.createElement('details');details.className='ffContactExtraDetails';
+      const label=document.createElement('summary');label.textContent='Team / route details';details.append(label,...longer);
+      card.insertBefore(details,card.querySelector('.ffContactLinks')||card.querySelector('.ffContactTools')||null);
+   }
    if(!tags.children.length)tags.remove();
  }
  function keepContactCompact(){
@@ -63,17 +69,42 @@
       row.querySelector('span')?.append(note);
    }
    if(!sr&&note)note.remove();
+   const table=form.querySelector('.ffPermissionTable');
+   if(table){
+      let included=form.querySelector('.ffBuiltInSrSummary');
+      if(sr&&!included){
+         included=document.createElement('section');included.className='ffBuiltInSrSummary';
+         included.innerHTML='<b>✓ Included with SR Role</b><div class="ffSrRoleGrid"></div><small>These are base SR operations, not additional Edit / Upload / Delete grants. To remove the SR role, change the account position and route after confirming the impact.</small>';
+         for(const activity of ['Own Daily Sales','Own Attendance','Assigned Task Proof','Own Private Chat']){
+           const label=document.createElement('label'),check=document.createElement('input');
+           check.type='checkbox';check.checked=true;check.disabled=true;
+           label.append(check,document.createTextNode(activity));included.querySelector('.ffSrRoleGrid').append(label);
+         }
+         table.before(included);
+      }
+      if(!sr&&included)included.remove();
+   }
  }
  function update(){
    scheduled=false;
    dashboardIdentity();
    keepContactCompact();
    hintSrBaseline();
+   // Reach the fixed bottom navigation; never stop Zero Sales halfway down.
+   const main=app.querySelector('main.wrap:has(>.ffZeroBoard)');
+   if(main){
+     const nav=app.querySelector('nav.bottomSeven')||app.querySelector('nav');
+     const mt=main.getBoundingClientRect().top,nt=nav?.getBoundingClientRect().top;
+     const px=Math.max(330,Math.round((nt&&nt>mt?nt:window.innerHeight-74)-mt-5))+'px';
+     if(main.style.getPropertyValue('--ff-zero-main-height')!==px)main.style.setProperty('--ff-zero-main-height',px);
+   }
    const task=app.querySelector('.ffTaskModalBackdrop');
    if(task)task.style.maxWidth='100vw';
  }
  function queue(){if(scheduled)return;scheduled=true;requestAnimationFrame(update);}
  new MutationObserver(queue).observe(app,{childList:true,subtree:true});
+ window.addEventListener('resize',queue,{passive:true});
+ window.visualViewport?.addEventListener('resize',queue,{passive:true});
  app.addEventListener('change',e=>{if(e.target?.name==='can_sell'||e.target?.name==='designation')queue()},true);
  function aiOrigin(){
    const orb=app.querySelector('#orb'),popup=document.querySelector('#aiPopup.aiFloatingOverlay');
