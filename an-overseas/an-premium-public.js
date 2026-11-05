@@ -108,7 +108,7 @@ function showTeam(){
  const designationHtml='<div class="an-manager-position"><span class="an-manager-label">DESIGNATION</span><strong>'+esc(role)+'</strong></div>';
  const supportHtml=help?'<div class="an-manager-support"><span class="an-manager-label">STUDENT SUPPORT</span><p>'+esc(help)+'</p></div>':'';
  const buttonsHtml=portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'DISCOVER THE FOUNDER':'VIEW PORTFOLIO')+' ↗</a>':'';
- panel.innerHTML='<div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
+ panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role)+'</div><div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
   +'<div class="an-manager-information">'+nameHtml+designationHtml+supportHtml
   +'<div class="an-manager-contacts">'+emailHtml+whatsappHtml+'</div>'
   +'<div class="an-manager-actions">'+buttonsHtml+'</div></div></div>';
