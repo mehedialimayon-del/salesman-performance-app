@@ -116,7 +116,7 @@ function research(u,p,c){
  '<p>Potential activities: lab volunteering where eligible, academic writing groups, undergraduate research schemes, conference presentations, graduate research posts and funded PhD projects.</p>'+
  sources([link(p?.pgSource||u.site,'Graduate and research website'),link(p?.historySource||u.site,'Institutional facts'),link(u.site,'International admissions office')]));
 }
-function calc(u,c){
+function calc(u,c,p){
  const currency=c.currency;
  const low=c.living?.[0]||0,high=c.living?.[1]||0;
  const starter=low&&high?'<p><b>Starter accommodation + 1 month living, excluding all academic/travel/visa charges:</b> '+E(policy().withBdt(Math.round(low*1.5),currency))+' – '+E(policy().withBdt(Math.round(high*2),currency))+'</p>':'';
@@ -149,7 +149,7 @@ function render(u,p){
  section('📚','Education: Bachelor · Master · PhD',
  '<div class="an-study-degree-grid">'+['Bachelor','Master','PhD'].map((level,i)=>degree(u,p,level,i)).join('')+'</div>'+
  '<p class="an-study-note">A list of study fields is NOT an official confirmed programme title. Degree availability, fees, CGPA, language tests and deadlines vary by university and intake.</p>')+
- aid(u,c)+employment(u,c,p)+spouse(c)+stay(c)+funding(c,u,p)+settlement(c)+research(u,p,c)+calc(u,c)+
+ aid(u,c)+employment(u,c,p)+spouse(c)+stay(c)+funding(c,u,p)+settlement(c)+research(u,p,c)+calc(u,c,p)+
  '<div class="an-study-footer"><p>'+E(source.sourceNote)+'</p><a href="#/contact">Request A&N personalised university costing →</a></div>'+
  '</section>';
 }
