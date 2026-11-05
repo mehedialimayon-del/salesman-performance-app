@@ -125,3 +125,9 @@
 .ffZoneManagerPicker .ffZoneManagerIdentity{color:#ffb786;font-size:12px;line-height:1.35;white-space:normal;overflow-wrap:anywhere}
 .ffZoneManagerPicker .globalSearchBox{max-width:calc(100vw - 28px);overflow-x:hidden}
 @media(max-width:420px){.ffZoneManagerPicker .ffZoneManagerAvatar{flex-basis:42px;width:42px;height:42px}.ffZoneManagerPicker .ffPickerText strong{font-size:14px}.ffZoneManagerPicker .ffZoneManagerIdentity{font-size:11px}}
+
+/* Keep search/header visible and zone cards fully below the search field. */
+.ffZoneManagerPicker .globalSearchBox{display:flex!important;flex-direction:column!important;max-height:min(78dvh,740px)!important;overflow:hidden!important}
+.ffZoneManagerPicker .globalSearchBox>.row,.ffZoneManagerPicker .ffPickerSearch{flex:0 0 auto!important}
+.ffZoneManagerPicker .ffPickerSearch{position:relative;z-index:1;margin:0 0 10px!important}
+.ffZoneManagerPicker .ffPickerRows{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;grid-auto-rows:max-content;padding-top:1px}
