@@ -143,6 +143,21 @@
      if(cover.querySelector('.an-guide-photo'))return;
      if(observer)observer.observe(cover);else inspect(cover);
    });
+   const headerMonogram=document.querySelector('.university-profile .an-portfolio-emblem-pending');
+   if(headerMonogram&&!headerMonogram.dataset.sealCheck){
+     headerMonogram.dataset.sealCheck='1';
+     const id=headerMonogram.dataset.universityId;
+     const u=typeof U!=='undefined'?U.find(item=>item.id===id):null;
+     if(u)wikidataSeal(u.name).then(seal=>{
+       if(!seal||!headerMonogram.isConnected)return;
+       const image=document.createElement('img');
+       image.className='university-logo';image.alt=u.name+' university emblem — Wikimedia Commons / Wikidata';
+       image.loading='lazy';image.decoding='async';
+       image.addEventListener('load',()=>{if(headerMonogram.isConnected)headerMonogram.replaceWith(image);},{once:true});
+       image.addEventListener('error',()=>image.remove(),{once:true});
+       image.src=seal;
+     });
+   }
    const campus=document.querySelector('.university-profile #profile-campus');
    if(campus&&!campus.dataset.anMediaObserved&&!campus.querySelector('.campus-gallery figure')){
      campus.dataset.anMediaObserved='1';
