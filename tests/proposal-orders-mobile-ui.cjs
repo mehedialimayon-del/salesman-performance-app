@@ -37,6 +37,9 @@ await page.evaluate(id=>{
 },id);
 for(const width of [320,390,412]){
  await page.setViewportSize({width,height:844});
+ await page.locator('#ffhEntryPermissions').waitFor({state:'visible',timeout:1500}).catch(()=>{});
+ if(await page.locator('#ffhEntryAllow').isVisible())await page.locator('#ffhEntryAllow').click();
+ await page.locator('#ffhEntryPermissions').waitFor({state:'detached',timeout:5000});
  await page.locator('[data-page=proposals]').click();
  await page.locator('.ffProposalPage').waitFor();
  await page.waitForFunction(()=>document.querySelectorAll('.ffPoCreateBtn,.ffPropView[data-ff-po-button]').length>0);
