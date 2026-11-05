@@ -48,6 +48,7 @@ permissions:
 jobs:
   android-apk:
     name: Build installable Android APK
+    needs: web-regression
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -166,11 +167,19 @@ jobs:
         env:
           NODE_PATH: /tmp/ffh-qa/node_modules
         run: |
-          set -euo pipefail
+          set -uo pipefail
+          failures=0
           for file in tests/*.cjs; do
             case "$file" in *-ui.cjs|*premium-mobile.cjs|*ticker-details-browser.cjs) continue ;; esac
-            node "$file"
+            echo "::group::Regression $file"
+            if ! node "$file"; then
+              echo "::error file=$file::Regression failed"
+              failures=$((failures+1))
+            fi
+            echo "::endgroup::"
           done
+          echo "Total failed regression scripts: $failures"
+          test "$failures" -eq 0
       - name: Run actual Chromium mobile scenarios
         env:
           NODE_PATH: /tmp/ffh-qa/node_modules
