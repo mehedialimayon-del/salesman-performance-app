@@ -1,0 +1,95 @@
+/* About Us v3 — single-screen desktop, accessible scrolling on small viewports.
+   Scope every rule to the About route to protect the rest of the website. */
+html:has(body.an-about-locked){height:100%!important;overflow:hidden!important}
+body.an-about-locked{display:flex!important;flex-direction:column!important;height:100vh!important;height:100dvh!important;min-height:0!important;max-height:100dvh!important;overflow:hidden!important;background:#090a0e!important}
+body.an-about-locked .top{position:relative!important;top:auto!important;flex:0 0 auto!important}
+body.an-about-locked .an-updates-bar{position:relative!important;flex:0 0 auto!important}
+body.an-about-locked #app{display:flex!important;flex:1 1 0!important;flex-direction:column!important;min-height:0!important;height:auto!important;overflow:hidden!important}
+body.an-about-locked .footer{display:none!important}
+body.an-about-locked #app>.an-about-v3{box-sizing:border-box;display:flex!important;flex:1 1 0!important;flex-direction:column!important;width:100%!important;max-width:1430px!important;height:100%!important;min-height:0!important;gap:14px!important;overflow:hidden!important;padding:16px 23px 18px!important}
+#app .an-about-v3 .an-about-summary{flex:1 1 0!important;min-height:0!important;max-height:none!important;overflow:hidden!important;display:block!important;height:auto!important;background:none!important;border:0!important;box-shadow:none!important;padding:0!important}
+#app .an-about-v3 .an-about-summary:before{display:none!important}
+#app .an-about-v3 .an-about-duo{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:stretch!important;gap:15px!important;height:100%!important;min-height:0!important}
+#app .an-about-v3 .an-about-half{display:flex!important;flex-direction:column!important;position:relative!important;min-height:0!important;max-height:none!important;min-width:0!important;height:100%!important;overflow:hidden!important;padding:clamp(17px,2.1vh,25px) clamp(17px,2.1vw,30px)!important;background:linear-gradient(137deg,#202128,#101218 65%,#0b0c10)!important;border:1px solid #9b5d25!important;border-radius:19px!important;box-shadow:0 14px 40px #0005!important}
+#app .an-about-v3 .an-about-half:before{content:"";display:block!important;position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ff7514,#ffc25e,transparent);pointer-events:none}
+#app .an-about-v3 .an-about-intro-panel{justify-content:flex-start!important}
+#app .an-about-v3 .an-about-eyebrow{font-size:clamp(9px,1vw,11px)!important;font-weight:850!important;letter-spacing:1.2px!important}
+#app .an-about-v3 .an-about-summary h1{font-size:clamp(22px,2.3vw,32px)!important;line-height:1.13!important;margin:8px 0 12px!important;letter-spacing:-.5px!important}
+#app .an-about-v3 .an-about-summary p{color:#e9e9ed!important;font-size:clamp(12px,1.06vw,14px)!important;line-height:1.49!important;margin:6px 0 12px!important;max-height:none!important;overflow:visible!important;display:block!important;-webkit-line-clamp:unset!important}
+#app .an-about-v3 .an-vision-inline{display:flex;flex-direction:column;align-items:flex-start;gap:0;margin-top:clamp(9px,2.7vh,25px);padding-top:clamp(12px,2.2vh,20px);border-top:1px solid #895622}
+#app .an-about-v3 .an-vision-inline h2{color:#fff!important;font-size:clamp(22px,2.5vw,32px)!important;letter-spacing:-.6px!important;margin:0 0 9px!important;line-height:1.12!important;text-align:left!important}
+#app .an-about-v3 .an-vision-inline h2 span{color:#ff912c!important}
+#app .an-about-v3 .an-vision-inline .an-about-readmore{align-self:flex-start!important;margin-top:clamp(7px,1.7vh,18px)!important;min-height:34px!important;padding:9px 16px!important;border-radius:9px!important}
+#app .an-about-v3 .an-about-management{justify-content:flex-start!important;gap:0!important;padding:clamp(16px,2vh,24px) clamp(14px,1.8vw,25px)!important;overflow:hidden!important}
+#app .an-about-v3 .an-manager-heading{flex:0 0 auto!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:11px!important;margin-bottom:10px!important}
+#app .an-about-v3 .an-manager-heading h2{font-size:clamp(20px,2.3vw,30px)!important;line-height:1.1!important;white-space:normal!important;text-align:right!important;margin:0!important}
+#app .an-about-v3 .an-manager-card{flex:1 1 0!important;display:flex!important;flex-direction:column!important;min-height:0!important;height:auto!important;max-height:none!important;overflow:hidden!important;padding:0!important;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important}
+#app .an-about-v3 .an-manager-role-banner{flex:0 0 auto!important;min-height:33px!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:clamp(13px,1.38vw,17px)!important;line-height:1.12!important;padding:5px 10px!important;margin:2px 0 11px!important;border:1px solid #835325!important;border-radius:9px!important;background:linear-gradient(90deg,#2b1c11,#13161c,#2b1c11)!important}
+#app .an-about-v3 .an-manager-main{display:grid!important;grid-template-columns:minmax(0,42%) minmax(0,1fr)!important;gap:clamp(12px,1.8vw,22px)!important;align-items:stretch!important;flex:1 1 0!important;height:100%!important;max-height:none!important;min-height:0!important;overflow:hidden!important}
+#app .an-about-v3 .an-manager-photo-box{display:flex!important;align-items:stretch!important;justify-content:center!important;width:100%!important;max-width:none!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+#app .an-about-v3 .an-manager-photo-button{display:block!important;width:100%!important;height:100%!important;min-height:0!important;padding:0!important;background:none!important;border:0!important}
+#app .an-about-v3 .an-manager-photo{display:block!important;width:100%!important;height:100%!important;max-height:100%!important;max-width:none!important;aspect-ratio:auto!important;object-fit:cover!important;object-position:center 23%!important;border:1px solid #b87d3a!important;border-radius:13px!important}
+#app .an-about-v3 .an-manager-information{display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:stretch!important;min-width:0!important;min-height:0!important;max-height:100%!important;height:100%!important;gap:clamp(6px,1.2vh,13px)!important;padding:2px 1px!important;overflow-y:auto!important;overflow-x:hidden!important;scrollbar-width:thin;scrollbar-color:#8f5a27 #171920}
+#app .an-about-v3 .an-manager-name-box{padding:0!important}
+#app .an-about-v3 .an-manager-name-box h3{font-size:clamp(17px,2.2vw,30px)!important;letter-spacing:-.4px!important;line-height:1.09!important;margin:4px 0 0!important;overflow-wrap:anywhere!important}
+#app .an-about-v3 .an-manager-label{font-size:clamp(9px,.85vw,10px)!important;letter-spacing:1px!important}
+#app .an-about-v3 .an-manager-position{padding-left:10px!important;border-left:2px solid #ff922c!important}
+#app .an-about-v3 .an-manager-position strong{display:block!important;font-size:clamp(13px,1.48vw,19px)!important;line-height:1.21!important;margin-top:4px!important}
+#app .an-about-v3 .an-manager-support p{font-size:clamp(11px,.99vw,13px)!important;line-height:1.35!important;margin:4px 0 0!important;overflow:visible!important;white-space:normal!important;display:block!important;-webkit-line-clamp:unset!important}
+#app .an-about-v3 .an-manager-contacts{display:flex!important;gap:7px!important;flex-wrap:wrap!important}
+#app .an-about-v3 .an-manager-contact{display:flex!important;flex:1 1 138px!important;min-width:0!important;gap:7px!important;align-items:center!important;padding:7px 9px!important;border-radius:8px!important}
+#app .an-about-v3 .an-manager-contact svg{width:20px!important;height:20px!important}
+#app .an-about-v3 .an-manager-contact small{font-size:9px!important}
+#app .an-about-v3 .an-manager-contact b{font-size:clamp(9px,.83vw,11px)!important;overflow-wrap:anywhere!important}
+#app .an-about-v3 .an-manager-actions .an-manager-action{min-height:30px!important;padding:8px 13px!important;font-size:10px!important}
+#app .an-about-v3 .an-manager-controls{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;margin:9px 0 0!important;padding:8px 0 0!important;min-height:38px!important;border-top:1px solid #573e2b!important}
+#app .an-about-v3 .an-manager-controls button{width:40px!important;height:31px!important;font-size:23px!important}
+#app .an-about-v3 .an-manager-counter{font-size:12px!important}
+#app .an-about-v3 .an-manager-empty{min-height:0!important;padding:25px 10px!important}
+#app .an-about-v3 .an-about-highlights{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:12px!important;flex:0 0 clamp(100px,14.8vh,130px)!important;min-height:0!important;height:auto!important;overflow:visible!important}
+#app .an-about-v3 .an-fact-tile{position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;min-width:0;min-height:0;overflow:hidden;border-radius:14px;border:1px solid #85562d;padding:15px 13px;background-color:#1a1c24;background-size:cover;background-position:center;box-shadow:0 7px 25px #0007}
+#app .an-about-v3 .an-fact-tile:before{position:absolute;z-index:-1;inset:0;content:"";background:linear-gradient(0deg,#07090df8 0%,#0a0d16a5 61%,#05080d4a 100%)}
+#app .an-about-v3 .an-fact-tile:after{position:absolute;content:"";height:3px;inset:0 0 auto;background:linear-gradient(90deg,#ff831b,#f8c069,transparent)}
+#app .an-about-v3 .an-fact-tile strong{font-size:clamp(16px,1.7vw,23px);line-height:1.06;font-weight:950;color:#ffb148;letter-spacing:-.4px;overflow-wrap:anywhere;text-shadow:0 2px 8px #000}
+#app .an-about-v3 .an-fact-tile span{font-size:clamp(9px,.85vw,11px);font-weight:850;line-height:1.2;color:#fff;letter-spacing:.35px;margin-top:5px;text-shadow:0 2px 8px #000}
+#app .an-about-v3 .an-fact-established{background-image:url("https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=550&q=76&auto=format&fit=crop")}
+#app .an-about-v3 .an-fact-students{background-image:url("https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=550&q=76&auto=format&fit=crop")}
+#app .an-about-v3 .an-fact-focus{background-image:url("https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=550&q=76&auto=format&fit=crop")}
+#app .an-about-v3 .an-fact-kl{background-image:url("assets/malaysia-skyline-clean.jpg")}
+#app .an-about-v3 .an-fact-rangpur{background-image:url("https://flagcdn.com/w640/bd.png");background-position:center 46%}
+
+/* Small laptop / zoom: readable layout takes precedence over clipped content. */
+@media (max-width:980px), (max-height:690px){
+ html:has(body.an-about-locked){height:auto!important;overflow:auto!important}
+ body.an-about-locked{height:auto!important;min-height:100dvh!important;max-height:none!important;overflow:auto!important;display:block!important}
+ body.an-about-locked .top{position:sticky!important;top:0!important}
+ body.an-about-locked #app{display:block!important;min-height:0!important;height:auto!important;overflow:visible!important}
+ body.an-about-locked #app>.an-about-v3{height:auto!important;display:flex!important;min-height:0!important;max-width:1230px!important;overflow:visible!important;padding:15px!important;gap:13px!important}
+ #app .an-about-v3 .an-about-summary{height:auto!important;min-height:0!important;overflow:visible!important;flex:none!important}
+ #app .an-about-v3 .an-about-duo{height:auto!important;min-height:0!important}
+ #app .an-about-v3 .an-about-half{height:auto!important;min-height:0!important;overflow:visible!important}
+ #app .an-about-v3 .an-about-intro-panel{gap:2px}
+ #app .an-about-v3 .an-manager-card{height:auto!important;overflow:visible!important;flex:none!important}
+ #app .an-about-v3 .an-manager-main{height:auto!important;min-height:280px!important;overflow:visible!important}
+ #app .an-about-v3 .an-manager-photo-box{height:280px!important;max-height:300px!important}
+ #app .an-about-v3 .an-manager-information{height:auto!important;max-height:none!important;overflow:visible!important}
+ #app .an-about-v3 .an-about-highlights{flex:none!important;height:auto!important;grid-template-columns:repeat(5,minmax(0,1fr))!important}
+ #app .an-about-v3 .an-fact-tile{min-height:117px!important}
+}
+@media (max-width:700px){
+ #app .an-about-v3 .an-about-duo{grid-template-columns:1fr!important;gap:13px!important}
+ #app .an-about-v3 .an-manager-main{grid-template-columns:minmax(0,40%) minmax(0,1fr)!important;min-height:0!important;gap:12px!important}
+ #app .an-about-v3 .an-manager-photo-box{height:270px!important;max-height:none!important}
+ #app .an-about-v3 .an-manager-heading h2{font-size:23px!important}
+ #app .an-about-v3 .an-about-highlights{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+ #app .an-about-v3 .an-fact-tile{min-height:125px!important}
+ #app .an-about-v3 .an-fact-tile:last-child{grid-column:1/-1}
+}
+@media (max-width:420px){
+ #app .an-about-v3 .an-manager-main{grid-template-columns:1fr!important}
+ #app .an-about-v3 .an-manager-photo-box{height:320px!important;max-width:330px!important;margin:auto}
+ #app .an-about-v3 .an-manager-photo{object-position:center 25%!important}
+ #app .an-about-v3 .an-manager-contacts{flex-direction:column!important}
+ #app .an-about-v3 .an-manager-contact{flex:0 0 auto!important}
+}
+@media (prefers-reduced-motion:reduce){#app .an-about-v3 *{scroll-behavior:auto!important}}
