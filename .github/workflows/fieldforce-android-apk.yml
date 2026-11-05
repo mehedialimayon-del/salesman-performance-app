@@ -170,7 +170,7 @@ jobs:
           set -uo pipefail
           failures=0
           for file in tests/*.cjs; do
-            case "$file" in *-ui.cjs|*premium-mobile.cjs|*ticker-details-browser.cjs) continue ;; esac
+            case "$file" in *-ui.cjs|*premium-mobile.cjs|*-browser.cjs|*-live.cjs) continue ;; esac
             echo "::group::Regression $file"
             if ! node "$file"; then
               echo "::error file=$file::Regression failed"
@@ -207,6 +207,8 @@ jobs:
           node tests/assistant-speech-ui.cjs || ffh_browser_status=1
           node tests/entry-conversations-ui.cjs || ffh_browser_status=1
           node tests/proposal-orders-mobile-ui.cjs || ffh_browser_status=1
+          node tests/staff-photos-browser.cjs || ffh_browser_status=1
+          node tests/staff-directory-live.cjs || ffh_browser_status=1
           exit "$ffh_browser_status"
 
       - name: Preserve controlled report layout screenshots
