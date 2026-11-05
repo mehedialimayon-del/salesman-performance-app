@@ -64,6 +64,9 @@ async function loadPublicDirectory(){
      const link=(row.web_pages||[]).find(s=>/^https?:\/\//i.test(s));if(!link)return;
      let site;try{const u=new URL(link);u.protocol='https:';site=u.origin+'/';}catch{return;}
      const name=String(row.name).trim();if(name.length<5||name.length>130)return;
+     // French regional "Académie de …" education authorities are not universities.
+     // Hipo lists some as universities: exclude instead of presenting repeated state seals as school logos.
+     if(country==='France'&&/^Acad[eé]mie de\s/i.test(name))return;
      items.push({id:'an-h-dir-'+norm(country)+'-'+norm(new URL(site).hostname),name,short:name,country,city:row['state-province']||country,kind:'University',programs:[],site,photo:'',source:'Hipo directory (unverified recognition)'});
     });
     const added=addUnique(U,items);loaded=true;
