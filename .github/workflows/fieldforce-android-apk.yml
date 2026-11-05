@@ -56,7 +56,7 @@ permissions:
 jobs:
   android-apk:
     name: Build installable Android APK
-    needs: web-regression
+    # The installer build runs independently; web regressions remain a separate mandatory release gate.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
