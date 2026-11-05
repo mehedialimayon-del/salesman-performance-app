@@ -239,3 +239,59 @@ body:not(.an-about-locked) #app .an2-story{--gold:#ffd19b;--orange:#ff962a;--cre
     line-height:1.5!important;
   }
 }
+
+
+/* Floating study destination flags and typographic closing quote */
+#app .an2-founder-quote .an2-end-quote{
+  display:inline-block;color:#ffb35b;font-family:Georgia,serif;font-size:1.95em;
+  line-height:.3;vertical-align:-.23em;font-weight:700;margin-left:4px;font-style:normal;
+}
+#app .an2-founder-quote .an2-quote-footer{grid-template-columns:minmax(0,1fr) 152px!important;}
+#app .an2-founder-quote .an2-quote-sign{
+  align-self:stretch!important;display:flex!important;flex-direction:column!important;
+  justify-content:flex-end!important;gap:6px!important;
+}
+#app .an2-flags-journey{
+  display:flex;flex-direction:column;justify-content:center;gap:9px;
+  flex:1;min-height:127px;position:relative;overflow:hidden;
+}
+#app .an2-flags-overline{
+  display:flex;align-items:center;gap:9px;color:#e5a869!important;
+  font-size:9px!important;letter-spacing:1.3px!important;font-weight:900;
+}
+#app .an2-plane-mark{display:inline-block;color:#ffad63;animation:an2-plane-float 4s ease-in-out infinite;}
+#app .an2-floating-flags{display:flex;align-items:center;flex-wrap:wrap;gap:7px;max-width:360px}
+#app .an2-floating-flags .an2-flag{
+  --flag-index:0;display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:30px;background:linear-gradient(125deg,#4f3113,#19191f);
+  border-radius:8px;border:1px solid #ab7641aa;font-size:23px;line-height:1;
+  filter:drop-shadow(0 5px 7px #0008);
+  transform-origin:0% 50%;
+  animation:an2-flutter 4.3s ease-in-out infinite;
+}
+#app .an2-floating-flags .an2-flag:nth-child(2){animation-delay:.44s}
+#app .an2-floating-flags .an2-flag:nth-child(3){animation-delay:.9s}
+#app .an2-floating-flags .an2-flag:nth-child(4){animation-delay:1.32s}
+#app .an2-floating-flags .an2-flag:nth-child(5){animation-delay:1.76s}
+#app .an2-floating-flags .an2-flag:nth-child(6){animation-delay:2.2s}
+#app .an2-floating-flags .an2-flag-origin{border-color:#e8b678;box-shadow:0 0 10px #da85462e}
+#app .an2-flags-journey small{font-size:9px;color:#c29d80;font-weight:500;letter-spacing:.3px;line-height:1.35}
+@keyframes an2-flutter{
+  0%,100%{transform:translateY(0) rotateZ(-3deg) skewY(0)}
+  25%{transform:translateY(-5px) rotateZ(1deg) skewY(-3deg)}
+  50%{transform:translateY(1px) rotateZ(3deg) skewY(2deg)}
+  75%{transform:translateY(-3px) rotateZ(-1deg) skewY(-2deg)}
+}
+@keyframes an2-plane-float{0%,100%{transform:translate(0,0) rotate(-10deg)}50%{transform:translate(9px,-4px) rotate(0deg)}}
+@media(max-width:650px){
+  #app .an2-founder-quote .an2-quote-footer{grid-template-columns:minmax(0,1fr) 123px!important;min-height:190px!important;}
+  #app .an2-flags-journey{min-height:130px!important;gap:8px!important}
+  #app .an2-flags-overline{font-size:8px!important;letter-spacing:.3px!important}
+  #app .an2-floating-flags{gap:5px!important}
+  #app .an2-floating-flags .an2-flag{width:31px;height:27px;font-size:20px;border-radius:6px}
+  #app .an2-flags-journey small{font-size:8px}
+  #app .an2-founder-quote .an2-quote-sign{padding:8px 0 13px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #app .an2-floating-flags .an2-flag,#app .an2-plane-mark{animation:none!important}
+}
