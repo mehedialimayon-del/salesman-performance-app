@@ -122,10 +122,12 @@ function applyAbout(){
  if(counter)counter.textContent=(managerIndex+1)+' / '+members.length;
 }
 function applyDetails(){
- let root=document.querySelector('#app');if(!root||root.querySelector('#an-about-details'))return;
- const s=off();
- root.innerHTML='<section class="page-head"><div class="wrap"><div class="bread">HOME › ABOUT US</div><h1><span style="color:#ff9c2c">About</span> A&N Overseas</h1><p>Explore our work and educational support in detail.</p></div></section>'
- +'<div class="wrap content page-scroll" id="an-about-details"><div class="live-panel"><h2>Our Education & Consultancy</h2><p>'+E(s.about||'We support students from university discovery through admissions, documentation and arrival planning.')+'</p><h3>How We Work</h3><p>'+E(s.work||'We provide practical, step-by-step education guidance based on each student’s circumstances.')+'</p><p>University admissions and visa approvals are determined by universities and relevant authorities.</p><a class="btn outline" href="#/about">← Back to About</a></div></div>';
+  // Legacy enhancement must never replace the new founder story.
+  const root=document.querySelector('#app');
+  if(!root||root.querySelector('.an2-story'))return;
+  if(typeof window.ANAboutFounderStory==='function'){
+    root.innerHTML=window.ANAboutFounderStory();
+  }
 }
 function services(){
  const cards=document.querySelectorAll('#app>.wrap.content>.grid>.card');if(!cards.length)return;
