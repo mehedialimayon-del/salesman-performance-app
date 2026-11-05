@@ -75,7 +75,7 @@ const compare=(a,b)=>(getRank(a)??999999)-(getRank(b)??999999)||a.name.localeCom
 const route=u=>countryRoute[u.country]||null;
 const localPhoto=(u,p)=>{
  const custom=photos[u.id];if(custom)return custom;
- const override=validUrl(u.cardPhoto);if(override)return{url:override,credit:'University-specific image — verify attribution before reuse'};
+ const override=validUrl(u.cardPhoto);if(override)return{url:override,credit:u.cardCredit||'University-specific image — verify source',source:validUrl(u.cardSource)||''};
  const image=p?.images?.find(x=>x?.url&&(/^(assets\/|https:\/\/)/.test(x.url))&&/campus|university|main|aerial|verified/i.test(x.label||''));
  return image?{url:image.url,credit:image.source||'Institutional campus image'}:null;
 };
