@@ -55,6 +55,8 @@ async function loadPublicDirectory(){
     if(!response.ok)throw Error('supplement unavailable');
     const rows=await response.json();if(!Array.isArray(rows))throw Error('invalid dataset');
     const allow=new Set(typeof countries==='undefined'?[]:countries.map(x=>x[0]));
+    // Malaysia retains the original owner-curated catalogue; do not flood it with unaudited college-directory records.
+    allow.delete('Malaysia');
     const items=[];
     rows.forEach(row=>{
      if(!row||!row.name||!row.country)return;
