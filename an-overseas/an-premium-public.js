@@ -61,6 +61,7 @@ function showCountries(){
  if(!mount||!Array.isArray(countries)||!countries.length)return;
  mount.innerHTML=countries.filter(c=>Array.isArray(c)&&c[0]).map(c=>{
   const photo=img(c[2]),name=String(c[0]);
+  if(window.ANCountryCards?.render)return window.ANCountryCards.render({name,flag:c[1],img:c[2]});
   return '<a class="country an-country-card" href="#/universities?country='+encodeURIComponent(name)+'"'
    +(photo?' style="background-image:url(&quot;'+esc(photo)+'&quot;)"':'')+'><span class="flag">'+esc(c[1]||'🌍')+'</span>'
    +'<strong>'+esc(name)+'</strong><small>Explore universities <span>↗</span></small></a>';
