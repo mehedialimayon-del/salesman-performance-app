@@ -74,3 +74,27 @@
 #ffAccountForm .ffPermissionRow input[type=checkbox]{width:22px!important;height:22px!important;accent-color:#ff7417!important}
 #ffAccountForm .ffBuiltInAccessNote{font-size:10px;color:#ffd29d;margin:6px 0 0}
 @media(max-width:380px){#ffAccountForm .ffPermissionRow{grid-template-columns:minmax(122px,1fr) repeat(3,38px)!important}}
+
+/* Final measured Zero Sales height: scroll the list down to the bottom nav. */
+#app .app>main.wrap:has(>.ffZeroBoard){height:var(--ff-zero-main-height,calc(100dvh - 220px))!important;
+ min-height:0!important;max-height:var(--ff-zero-main-height,calc(100dvh - 220px))!important;
+ box-sizing:border-box!important;overflow:hidden!important;padding-bottom:7px!important}
+#app .app>main.wrap>.ffZeroBoard{height:100%!important;flex:1 1 auto!important;min-height:0!important}
+#app .app>main.wrap>.ffZeroBoard .ffOutletRows{flex:1 1 auto!important;max-height:none!important;overflow-y:auto!important}
+
+/* Extra staff details are expandable so they never make the contact cards giant. */
+#app .ffCompactContactCard .ffContactExtraDetails{padding:4px 11px;color:#e2c6ad;font-size:10px}
+#app .ffCompactContactCard .ffContactExtraDetails summary{cursor:pointer;color:#ffb978;font-weight:750}
+#app .ffCompactContactCard .ffContactExtraDetails>span{display:block;margin:6px 0;overflow-wrap:anywhere}
+
+/* Distinguish required SR role operations from additional editor grants. */
+#app #ffAccountForm .ffBuiltInSrSummary{margin:9px 0!important;border:1px solid #a75d2b;
+ border-radius:11px;background:#1b130e;padding:10px!important}
+#app #ffAccountForm .ffBuiltInSrSummary>b{display:block;color:#ff9848;font-size:13px;margin-bottom:7px}
+#app #ffAccountForm .ffSrRoleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+#app #ffAccountForm .ffSrRoleGrid>label{display:flex;gap:6px;align-items:center;min-width:0;
+ padding:5px;border:1px solid #68411e;border-radius:7px;color:#fff;font-size:10px}
+#app #ffAccountForm .ffSrRoleGrid input[type=checkbox]{display:block!important;width:16px!important;
+ height:16px!important;min-width:16px!important;appearance:auto!important;-webkit-appearance:checkbox!important;
+ accent-color:#ff822b!important;margin:0!important}
+#app #ffAccountForm .ffBuiltInSrSummary>small{display:block;margin-top:8px;color:#d4bca6;font-size:10px;line-height:1.4}
