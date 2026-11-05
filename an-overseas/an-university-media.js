@@ -109,10 +109,27 @@
     const base='https://en.wikipedia.org/w/api.php?origin=*&action=query&redirects=1&format=json&formatversion=2&prop=pageprops&titles='+encodeURIComponent(name);
     const result=await fetch(base,{mode:'cors'});if(!result.ok)return null;
     const doc=await result.json(),page=doc?.query?.pages?.[0];
-    if(!page||page.missing)return null;
-    const redirects=(doc?.query?.redirects||[]).some(x=>normalize(x.from)===normalize(name)&&normalize(x.to)===normalize(page.title));
-    if(!redirects&&normalize(page.title)!==normalize(name))return null;
-    const id=page.pageprops?.wikibase_item;if(!/^Q\d+$/.test(id||''))return null;
+    let id='';
+    if(page&&!page.missing){
+      const redirects=(doc?.query?.redirects||[]).some(x=>normalize(x.from)===normalize(name)&&normalize(x.to)===normalize(page.title));
+      if(redirects||normalize(page.title)===normalize(name))id=page.pageprops?.wikibase_item||'';
+    }
+    // A large global catalogue includes names that are absent from English Wikipedia
+    // yet have their own Wikidata items. Find an exact university label instead.
+    if(!/^Q\d+$/.test(id)){
+      const endpoint='https://www.wikidata.org/w/api.php?origin=*&action=wbsearchentities&format=json&language=en&type=item&limit=8&search='+encodeURIComponent(name);
+      const lookup=await fetch(endpoint,{mode:'cors'});
+      if(lookup.ok){
+        const candidates=(await lookup.json())?.search||[];
+        const exact=candidates.find(row=>{
+          const label=normalize(row.label||''),requested=normalize(name);
+          const description=String(row.description||'').toLowerCase();
+          return label===requested && (!description||/university|college|medical|education|academy|institute/.test(description));
+        });
+        if(exact?.id)id=exact.id;
+      }
+    }
+    if(!/^Q\d+$/.test(id||''))return null;
     const wr=await fetch('https://www.wikidata.org/w/api.php?origin=*&action=wbgetentities&format=json&ids='+id+'&props=claims',{mode:'cors'});
     if(!wr.ok)return null;
     const claims=(await wr.json())?.entities?.[id]?.claims||{};
