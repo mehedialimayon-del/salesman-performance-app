@@ -43,3 +43,5 @@
 .an-guide-card .an-identity-logo-only .an-center-logo{max-width:90px;max-height:90px;padding:9px}
 .an-favorite-page #an-saved-grid{gap:10px}
 }
+
+.university-catalogue .an-catalogue-apply{display:flex;align-items:center;justify-content:center;min-height:34px;margin:0 13px 12px;padding:8px;border-radius:9px;background:linear-gradient(90deg,#3b200c,#1c1009);border:1px solid #9c602c;color:#ffba73;text-decoration:none;font-weight:850;font-size:11px}.university-catalogue .an-catalogue-apply:hover{background:#ff8e0d;color:#090909}.an-favorite-page .an-catalogue-apply{margin:0 13px 12px}
