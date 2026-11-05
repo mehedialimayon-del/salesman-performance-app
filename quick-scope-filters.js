@@ -2,6 +2,17 @@
 (()=>{
  'use strict';
  const ROOT=document.getElementById('app');if(!ROOT)return;
+ const style=document.createElement('style');
+ style.textContent=`
+ #app .ffQuickScope{display:block!important;margin:8px 0!important;padding:3px!important;border:1px solid #9b682e66;border-radius:12px;background:#1b1714}
+ #app .ffQuickScope>summary[hidden]{display:none!important}
+ #app .ffQuickScope .ffScopeFilterBody{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:8px!important}
+ #app .ffQuickScope .ffScopeFilterBody>label{display:block!important;min-width:0;font-size:11px!important;font-weight:800;color:#ffac62!important;letter-spacing:.03em}
+ #app .ffQuickScope .ffScopeFilterBody .ffSelectTrigger{width:100%!important;min-width:0;margin-top:7px!important;min-height:43px!important;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+ #app .ffQuickScope .ffScopeFilterBody select:not([hidden]){width:100%;max-width:100%;min-height:43px}
+ @media(max-width:365px){#app .ffQuickScope .ffScopeFilterBody{gap:5px;padding:6px!important}#app .ffQuickScope .ffScopeFilterBody>label{font-size:10px!important}}
+ `;
+ document.head.append(style);
  let queued=false;
  const zoneName=value=>String(value||'').trim().toUpperCase()==='PRIMARY'?'KL ZONE':String(value||'');
  function caption(label,value){
