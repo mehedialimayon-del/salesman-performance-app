@@ -131,7 +131,35 @@
   })();
   sealCache.set(name,request);return request;
  }
- window.ANUniMedia={websiteIcon,commonsImage,wikidataMedia};
+ const campusSearchCache=new Map();
+ async function commonsCampusSearch(name){
+  if(campusSearchCache.has(name))return campusSearchCache.get(name);
+  const job=(async()=>{
+   try{
+    // Only exact institutional names in Commons filenames are acceptable: never use a city/stock photo.
+    const search='"'+String(name).replace(/["\\]/g,'')+'" campus';
+    const url='https://commons.wikimedia.org/w/api.php?origin=*&action=query&format=json&formatversion=2&generator=search&gsrnamespace=6&gsrlimit=8&gsrsearch='+encodeURIComponent(search)+'&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata&iiurlwidth=1100';
+    const response=await fetch(url,{mode:'cors'});if(!response.ok)return null;
+    const pages=(await response.json())?.query?.pages||[];
+    const key=normalize(name);
+    const candidates=pages.filter(p=>{
+     const filename=String(p.title||'').replace(/^File:/i,'');
+     return normalize(filename).includes(key)&&!/(logo|seal|coat.?of.?arms|crest|emblem|flag|symbol|admission|brochure|poster|portrait|passport|signature|map)/i.test(filename);
+    }).sort((a,b)=>(a.index??999)-(b.index??999));
+    for(const page of candidates){
+     const info=page.imageinfo?.[0],license=String(info?.extmetadata?.LicenseShortName?.value||'');
+     const w=Number(info?.width),h=Number(info?.height),image=info?.thumburl||info?.url;
+     if(!/CC BY|CC0|public domain|PD-|CC-BY/i.test(license)||w<650||h<330||w/h<1||w/h>3.7)continue;
+     if(!/^https:\/\/upload\.wikimedia\.org\//.test(image||''))continue;
+     const credit=String(info?.extmetadata?.Artist?.value||'').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').slice(0,85);
+     return {kind:'photo',url:image,source:info.descriptionurl||'https://commons.wikimedia.org',credit,licence:license,photoCandidate:true};
+    }
+    return null;
+   }catch{return null;}
+  })();
+  campusSearchCache.set(name,job);return job;
+ }
+ window.ANUniMedia={websiteIcon,commonsImage,wikidataMedia,commonsCampusSearch};
  function showImage(cover,rec){
    if(!cover?.isConnected||!rec||!rec.photoCandidate)return;
    if(cover.querySelector('.an-guide-photo'))return;
@@ -169,6 +197,8 @@
      mark.addEventListener('error',()=>mark.remove(),{once:true});
      brand.prepend(mark);mark.src=media.url;
    }
+   const found=await commonsCampusSearch(name);
+   if(found?.photoCandidate&&cover.isConnected)showImage(cover,found);
  }
  const observer='IntersectionObserver'in window?new IntersectionObserver(entries=>{
    entries.forEach(entry=>{if(entry.isIntersecting){observer.unobserve(entry.target);inspect(entry.target);}});
