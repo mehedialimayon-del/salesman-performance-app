@@ -22,7 +22,7 @@
   function currentDirectory() {
     const list = typeof U !== 'undefined' && Array.isArray(U) ? U : [];
     const countries = new Set(list.map(x => x.country).filter(Boolean));
-    return {universities: list.length || 6017, countries: countries.size || 31};
+    return {universities: Math.max(6017, list.length), countries: Math.max(31, countries.size)};
   }
   function renderStory(){
     const directory = currentDirectory();
