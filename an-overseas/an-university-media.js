@@ -8,17 +8,29 @@
  const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
  const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/gi,'').toLowerCase();
  const remembered=new Map(), watching=new WeakSet();
+ const hostOf=x=>{try{return new URL(x).hostname.toLowerCase().replace(/^www\./,'');}catch{return '';}};
+ let hostCountSize=-1,hostCount=new Map();
  function websiteIcon(u){
-   const match=String(u.site||'').match(/^https?:\/\/([^/?#]+)/i);
-   return match&&!/^(www\.)?mqa\.gov\.my$/i.test(match[1])?'https://www.google.com/s2/favicons?domain='+encodeURIComponent(match[1])+'&sz=256':'';
+   const host=hostOf(u.site);if(!host)return '';
+   // Government, shared education authorities and general directory favicons aren't university logos.
+   if(/(^|\.)(?:gouv\.fr|gov\.my|gov\.uk|gov\.au|mqa\.gov\.my)$/.test(host)
+     ||/^ac-[^.]+\.fr$/.test(host)||/^education\.gouv\.fr$/.test(host)
+     ||/^(?:facebook\.com|wikipedia\.org|studyportals\.com)$/.test(host))return '';
+   if(typeof U!=='undefined'&&Array.isArray(U)&&hostCountSize!==U.length){
+      hostCount=new Map();for(const row of U){const h=hostOf(row.site);if(h)hostCount.set(h,(hostCount.get(h)||0)+1);}
+      hostCountSize=U.length;
+   }
+   // Shared institution domains can carry the same icon for separate catalogue entries.
+   if((hostCount.get(host)||0)>1)return '';
+   return 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(host)+'&sz=128';
  }
  function brandFallback(u,p){
    const logo=(u.logoImage||p?.logo||websiteIcon(u));
    const named=String(u.name||'');const acronym=named.match(/\(([A-Z]{2,5})\)/);
    const short=acronym?acronym[1]:String(u.short||u.name||'U').replace(/[^A-Z]/g,'').slice(0,3)||'U';
    return '<div class="an-guide-identity an-identity-logo-only"><div class="an-logo-stage">'+
-       (logo?'<img class="an-center-logo" src="'+esc(logo)+'" alt="'+esc(u.name)+' logo or official website icon" loading="lazy">':'')+
-       '<span class="an-center-monogram">'+esc(short)+'</span></div></div>';
+       (logo?'<img class="an-center-logo '+(logo.includes('google.com/s2/favicons')?'an-website-favicon':'an-verified-media')+'" src="'+esc(logo)+'" alt="'+esc(u.name)+' university website icon or logo" loading="lazy" decoding="async" onerror="this.remove()">':'')+
+       '<span class="an-center-monogram">'+esc(short)+'</span><span class="an-identity-name">'+esc(u.name)+'</span></div></div>';
  }
  // Stable numbers per country are based on the complete loaded catalogue, not current filters.
  let serialCache={size:-1,items:new Map()};
@@ -64,7 +76,7 @@
      const filename=String(page.pageimage||'');
      const photoCandidate=!/logo|seal|coat.?of.?arms|crest|emblem|icon|flag|symbol|signature|portrait/i.test(filename);
      const title='File:'+page.pageimage;
-     const path='https://commons.wikimedia.org/w/api.php?origin=*&action=query&format=json&formatversion=2&prop=imageinfo&iiprop=url%7Cextmetadata&iiurlwidth=960&titles='+encodeURIComponent(title);
+     const path='https://commons.wikimedia.org/w/api.php?origin=*&action=query&format=json&formatversion=2&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata&iiurlwidth=960&titles='+encodeURIComponent(title);
      const res=await fetch(path,{mode:'cors'});if(!res.ok)return null;
      const info=(await res.json())?.query?.pages?.[0]?.imageinfo?.[0];if(!info)return null;
      const meta=info.extmetadata||{};
@@ -91,8 +103,10 @@
     const id=page.pageprops?.wikibase_item;if(!/^Q\d+$/.test(id||''))return '';
     const r=await fetch('https://www.wikidata.org/w/api.php?origin=*&action=wbgetentities&format=json&ids='+id+'&props=claims',{mode:'cors'});
     if(!r.ok)return '';
-    const logo=(await r.json())?.entities?.[id]?.claims?.P154?.[0]?.mainsnak?.datavalue?.value;
+    const claims=(await r.json())?.entities?.[id]?.claims||{};
+    const logo=claims.P154?.[0]?.mainsnak?.datavalue?.value||claims.P18?.[0]?.mainsnak?.datavalue?.value;
     if(typeof logo!=='string'||!/\.(png|jpg|jpeg|svg|webp)$/i.test(logo))return '';
+    // Wikimedia Commons thumbnails provide institutional media, never unrelated generic country logos.
     return 'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(logo)+'?width=512';
    }catch{return '';}
   })();
