@@ -46,3 +46,8 @@
 /* All filter choices remain in normal page flow and their labels are legible. */
 #app .ffQuickScope .ffScopeFilterBody>label{overflow:hidden!important}
 @media(max-width:360px){#app .ffContactDetail .ffContactIdentity{grid-template-columns:94px minmax(0,1fr)!important;gap:6px!important}#app .ffContactDetail .ffContactPhotoButton{width:94px!important;height:136px!important}}
+
+#ffAccountForm .ffRoleDefaultBadge{display:block;margin:4px 0 0;padding:3px 5px;border-radius:6px;background:#102417;color:#8ef1ac;font-size:10px!important;font-weight:750;line-height:1.25}
+#ffAccountForm .ffPermissionTable{max-width:100%;overflow-x:auto;scrollbar-width:thin}
+#ffAccountForm .ffPermissionRow{box-sizing:border-box;min-width:0!important;width:100%!important;grid-template-columns:minmax(130px,1fr) repeat(3,minmax(37px,48px))!important;gap:4px!important}
+#ffAccountForm .ffPermissionRow>span{overflow-wrap:anywhere}
