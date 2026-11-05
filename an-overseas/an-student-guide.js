@@ -34,7 +34,7 @@ function sources(links){
  return '<div class="an-study-sources">'+links.filter(Boolean).join('')+'</div>';
 }
 function aid(u,c){
- return section('🧭','Bangladesh applicant checklist',
+ return section('🧭','Student Applicant Checklist',
  '<ol class="an-study-steps"><li>Verify institution recognition, course availability, degree level and English/language criteria directly.</li>'+
  '<li>Choose the correct intake, programme/campus and check nationality-specific entry conditions.</li>'+
  '<li>Prepare passport, certificates, transcripts, SOP, references, finances, and translations as requested.</li>'+
