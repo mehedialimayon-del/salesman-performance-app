@@ -7,7 +7,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require
  const orig=await lib.PDFDocument.create(),pg=orig.addPage([595.28,841.89]);
  pg.drawText('Company Claim Form', {x:45,y:780,size:13});
  const claimPdf=new Uint8Array(await orig.save());
- const invoice=await lib.PDFDocument.create();invoice.addPage().drawText('Fuel receipt');const pdfReceipt=new Uint8Array(await invoice.save());
+ const invoice=await lib.PDFDocument.create();invoice.addPage([595.28,841.89]).drawText('Fuel receipt');const pdfReceipt=new Uint8Array(await invoice.save());
  const png=new Uint8Array(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGP8//8/AwMDEwMDAwMDAwAkBgMB/DXemwAAAABJRU5ErkJggg==','base64'));
  const text=(str,x,y)=>({str,width:str.length*5,transform:[1,0,0,1,x,y]});
  w.pdfjsLib={getDocument(){return{promise:Promise.resolve({numPages:1,getPage:async()=>({getTextContent:async()=>({items:[text('FUEL EXPENSES',50,640),text('BUYER ENTERTAINMENT',50,600),text('GRAND TOTAL',50,200),text('AMOUNT',450,695),text('DATE',50,745)]})}),destroy:async()=>{}})}}};
