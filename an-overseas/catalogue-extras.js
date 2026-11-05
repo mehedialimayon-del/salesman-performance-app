@@ -57,6 +57,31 @@ function passesBudget(n){
  if(pref.budget==='RM 90,000+')return n>=90000;
  var m=pref.budget.match(/[\d,]+/);return !m||n<=Number(m[0].replace(/,/g,''));
 }
+/* Country sequence is calculated from the full destination list (not the search results).
+   e.g. Malaysia 001 / 050; filtered results keep their original index. */
+var anSerialCache={size:-1,byId:new Map()};
+function anCountrySerial(u){
+ if(anSerialCache.size!==U.length){
+  var countriesMap=new Map(),indexMap=new Map();
+  U.forEach(function(item){
+    var country=String(item.country||'Other');
+    if(!countriesMap.has(country))countriesMap.set(country,[]);
+    countriesMap.get(country).push(item);
+  });
+  countriesMap.forEach(function(items){
+    items.sort(window.ANUniGuide?.compare||function(a,b){return a.name.localeCompare(b.name);});
+    var total=items.length;
+    items.forEach(function(item,index){indexMap.set(item.id,{number:index+1,total:total});});
+  });
+  anSerialCache={size:U.length,byId:indexMap};
+ }
+ return anSerialCache.byId.get(u.id)||{number:0,total:0};
+}
+function anNumberedCard(u){
+ var seq=anCountrySerial(u),zero=n=>String(n).padStart(3,'0');
+ var badge='<span class="an-catalogue-index" title="'+esc(u.country)+' university '+seq.number+' of '+seq.total+'">'+zero(seq.number)+' <small>/ '+zero(seq.total)+'</small></span>';
+ return card(u).replace(/(<div class="uni-cover-wrap"[^>]*>)/,function(full){return full+badge;});
+}
 renderResults=function(){
  var el=document.querySelector('#results');if(!el)return;
  var term=searchTerm.toLowerCase().trim(),requirement=pref.requirement.toLowerCase().trim();
@@ -81,7 +106,7 @@ renderResults=function(){
  });
  var count=document.querySelector('#catalogue-count');
  if(count)count.innerHTML='<strong>'+arr.length+'</strong> universities · '+esc(filterCountry)+(pref.budget!=='Any Budget'?' · published fee examples':'');
- el.innerHTML=arr.length?arr.slice(0,visibleLimit).map(card).join('')+(arr.length>visibleLimit?'<div class="catalogue-load-more" style="grid-column:1/-1;text-align:center;padding:22px"><button class="btn outline" id="load-more-universities" type="button">Show next '+Math.min(48,arr.length-visibleLimit)+' of '+arr.length+' universities ↓</button></div>':''):'<div class="empty">No universities matched. Try resetting filters or another search.</div>';
+ el.innerHTML=arr.length?arr.slice(0,visibleLimit).map(anNumberedCard).join('')+(arr.length>visibleLimit?'<div class="catalogue-load-more" style="grid-column:1/-1;text-align:center;padding:22px"><button class="btn outline" id="load-more-universities" type="button">Show next '+Math.min(48,arr.length-visibleLimit)+' of '+arr.length+' universities ↓</button></div>':''):'<div class="empty">No universities matched. Try resetting filters or another search.</div>';
 };
 document.addEventListener('change',function(e){
  var map={'type-filter':'kind','level-filter':'level','subject-filter':'subject','budget-filter':'budget','order-filter':'order'};
