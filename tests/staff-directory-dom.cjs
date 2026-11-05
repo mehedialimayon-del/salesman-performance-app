@@ -80,7 +80,9 @@ const ctx={
  const salesPerm=document.querySelector('.ffPermissionRow[data-module="sales"]');
  assert.equal(salesPerm.querySelector('[data-verb="edit"]').checked,true,'saved Edit permission remains visibly checked');
  assert.equal(salesPerm.querySelector('[data-verb="delete"]').checked,true,'saved Delete permission remains visibly checked');
- assert.equal(salesPerm.querySelector('[data-verb="upload"]').checked,false,'unchecked Upload is preserved');
+ assert.equal(salesPerm.querySelector('[data-verb="upload"]').checked,true,'built-in SR own-sales Upload shows its effective tick');
+ assert.equal(salesPerm.querySelector('[data-verb="upload"]').disabled,true,'built-in role action is not a separately editable cross-staff grant');
+ assert.equal(salesPerm.querySelector('[data-verb="upload"]').dataset.ffBuiltIn,'1','role-derived access is distinguished from delegated permissions');
  assert.ok(document.querySelector('#back'),'subpage provides visible Back button');
  w.dispatchEvent(new w.PopStateEvent('popstate',{state:{ffhPage:'control:users'}}));
  await new Promise(resolve=>setTimeout(resolve,25));
