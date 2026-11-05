@@ -67,7 +67,13 @@
   spectruminternationaluniversitycollege:'https://siuc.edu.my/',
   universitycollegeofagrosciencemalaysia:'https://ucam.edu.my/',
   universitycollegebestari:'https://www.ucbestari.edu.my/',
-  veritasuniversitycollege:'https://www.veritas.edu.my/'
+  globalnxtuniversity:'https://globalnxt.edu.my/',
+  manipaluniversitycollegemalaysiamucm:'https://manipal.edu.my/',
+  kolejuniversitifairview:'https://ucf.edu.my/',
+  kolejuniversitiijn:'https://www.ijn.edu.my/',
+  kolejuniversitivision:'https://vision.edu.my/',
+  malaysiancooperativeentrepreneurshipuniversity:'https://www.ukkm.edu.my/',
+    veritasuniversitycollege:'https://www.veritas.edu.my/'
  };
  function enrichKnownUniversity(u){
    const key=normalize(u.name);
