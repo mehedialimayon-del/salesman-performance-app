@@ -1,10 +1,10 @@
 {
-  "id": "./index.html",
+  "id": "/salesman-performance-app/an-overseas/",
   "name": "A&N Overseas Education & Consultancy",
   "short_name": "A&N Overseas",
   "description": "A&N Overseas student university catalogue, study planning and application guidance",
-  "start_url": "./index.html#/home",
-  "scope": "./",
+  "start_url": "/salesman-performance-app/an-overseas/index.html#/home",
+  "scope": "/salesman-performance-app/an-overseas/",
   "display": "standalone",
   "background_color": "#08090d",
   "theme_color": "#ff8a08",
@@ -17,9 +17,21 @@
     },
     {
       "src": "./assets/brand-logo.jpg",
-      "sizes": "512x512",
       "type": "image/jpeg",
+      "sizes": "any",
       "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Universities",
+      "short_name": "Universities",
+      "url": "./index.html#/universities"
+    },
+    {
+      "name": "Saved Universities",
+      "short_name": "Saved",
+      "url": "./index.html#/favorites"
     }
   ]
 }
