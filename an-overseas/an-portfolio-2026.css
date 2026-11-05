@@ -192,3 +192,10 @@ body.an-portfolio-v2 .an-portfolio-icon{flex:none}
  body.an-portfolio-v2 .an-portfolio-jumps-toggle{font-size:9px!important}
  body.an-portfolio-v2 .an-portfolio-topnav details[open] nav{left:0!important;right:auto!important;width:min(300px,84vw)!important}
 }
+
+/* Final A&N support card follows the same right-edge numbering convention. */
+body.an-portfolio-v2 #profile-support .an-guide-support-head{display:flex;align-items:center;gap:12px;min-width:0}
+body.an-portfolio-v2 #profile-support .an-guide-support-head>div{min-width:0;flex:1}
+body.an-portfolio-v2 #profile-support .an-guide-support-head h2{display:flex;align-items:center;gap:8px;width:100%;font-size:clamp(17px,2vw,23px)}
+body.an-portfolio-v2 #profile-support .an-guide-support-head h2 .an-portfolio-serial{margin-left:auto!important;color:#bd711e}
+body.an-portfolio-v2 #profile-support .an-guide-support-head h2 .an-portfolio-icon{flex:none}
