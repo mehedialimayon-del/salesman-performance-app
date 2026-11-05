@@ -2,7 +2,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
 const {JSDOM}=require('jsdom');
 const source=fs.readFileSync(require('node:path').join(__dirname,'../accounts.js'),'utf8');
 async function setup(owner){
- const dom=new JSDOM('<main></main>',{runScripts:'outside-only'}),w=dom.window,calls=[],alerts=[];
+ const dom=new JSDOM('<main></main>',{runScripts:'outside-only',url:'https://fieldforce.test/staff'}),w=dom.window,calls=[],alerts=[];
  const row={operation:'UPDATE',table_name:'ffh_sales',actor_name:'<script>bad</script>',actor:'S100',actor_zone:'KL',occurred_at:'2026-10-18',row_key:{id:'S1'},before_data:{qty:1},after_data:{qty:2}};
  let failRestore=false,confirm=true;
  w.alert=s=>alerts.push(s);w.confirm=()=>confirm;
