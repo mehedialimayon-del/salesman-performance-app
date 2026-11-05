@@ -3,13 +3,41 @@
 'use strict';
 const STORAGE='an-overseas-saved-universities-v1';let temp=[];
 const safe=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let cloudClient=null,cloudUser=null;
+async function syncStudentAccount(){
+ const client=window.ANStudentSession?.supabase||window.ANStudentPortal?.supabase;
+ if(!client?.auth?.getUser||!client.from)return;
+ try{
+  const auth=await client.auth.getUser(),user=auth?.data?.user;
+  if(!user?.id)return;
+  const query=await client.from('an_student_favorite_universities').select('university_id').eq('user_id',user.id);
+  if(query.error)return;
+  cloudClient=client;cloudUser=user;
+  const existing=new Set((query.data||[]).map(x=>x.university_id)),before=read();
+  const merged=[...new Set([...existing,...before])];
+  save(merged);refresh();if(location.hash.split('?')[0]==='#/favorites')renderSaved();
+  const unsynced=before.filter(x=>!existing.has(x));
+  if(unsynced.length){
+   const rows=unsynced.map(id=>({user_id:user.id,university_id:id}));
+   await client.from('an_student_favorite_universities').insert(rows);
+  }
+ }catch(_){/* Browsing favourites remain locally available while offline. */}
+}
+async function syncChange(id,added){
+ if(!cloudClient||!cloudUser)return;
+ try{
+  const table=cloudClient.from('an_student_favorite_universities');
+  if(added)await table.insert({user_id:cloudUser.id,university_id:id});
+  else await table.delete().eq('user_id',cloudUser.id).eq('university_id',id);
+ }catch(_){/* Retain local preference and retry after account reconnects. */}
+}
 function read(){try{const list=JSON.parse(localStorage.getItem(STORAGE)||'[]');return Array.isArray(list)?list.filter(x=>typeof x==='string').slice(0,3000):temp;}catch{return temp;}}
 function save(list){temp=list;try{localStorage.setItem(STORAGE,JSON.stringify(list));}catch{}}
 function toggle(id){
  if(!id)return;
  const list=read(),position=list.indexOf(id);
  if(position<0)list.push(id);else list.splice(position,1);
- save(list);refresh();
+ save(list);refresh();syncChange(id,position<0);
  if(location.hash.split('?')[0]==='#/favorites')renderSaved();
 }
 function button(id){const checked=read().includes(id);return '<button type="button" class="an-favorite-heart'+(checked?' saved':'')+'" data-favorite-university="'+safe(id)+'" aria-pressed="'+checked+'" aria-label="'+(checked?'Remove from':'Save to')+' favourites" title="'+(checked?'Remove from favourites':'Save university')+'">'+(checked?'♥':'♡')+'</button>';}
@@ -29,7 +57,7 @@ function profile(u){
  refresh();
 }
 function page(){
- return '<section class="page-head"><div class="wrap"><div class="bread"><a href="#/universities">Universities</a> › Favourites</div><h1><span>Saved</span> Universities</h1><p>Your short-listed universities, with their same full profiles and Apply Through A&N links.</p></div></section><div class="wrap content university-catalogue an-favorite-page"><p class="an-favourite-notice">Saved on this browser. Until the student login system is active, favourites do not yet sync between phones or student accounts.</p><div class="an-favorite-head"><strong id="an-fav-count">0 saved universities</strong><a href="#/universities">+ Explore all universities ↗</a></div><div class="grid" id="an-saved-grid"></div></div>';
+ return '<section class="page-head"><div class="wrap"><div class="bread"><a href="#/universities">Universities</a> › Favourites</div><h1><span>Saved</span> Universities</h1><p>Your short-listed universities, with their same full profiles and Apply Through A&N links.</p></div></section><div class="wrap content university-catalogue an-favorite-page"><p class="an-favourite-notice">Saved on this browser. When an authenticated student session is connected, saved universities can sync to that account; otherwise they remain on this browser.</p><div class="an-favorite-head"><strong id="an-fav-count">0 saved universities</strong><a href="#/universities">+ Explore all universities ↗</a></div><div class="grid" id="an-saved-grid"></div></div>';
 }
 function renderSaved(){
  const list=read();const count=document.getElementById('an-fav-count');if(count)count.textContent=list.length+' saved universities';
@@ -41,5 +69,7 @@ function renderSaved(){
 }
 document.addEventListener('click',e=>{const el=e.target.closest('[data-favorite-university]');if(!el)return;e.preventDefault();e.stopPropagation();toggle(el.dataset.favoriteUniversity);},true);
 window.addEventListener('storage',e=>{if(e.key===STORAGE){refresh();renderSaved();}});
-window.ANUniversityFavorites={page,renderSaved,profile,refresh,button,toggle,read};
+window.ANUniversityFavorites={page,renderSaved,profile,refresh,button,toggle,read,syncStudentAccount};
+window.addEventListener('an-student-session-ready',syncStudentAccount);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',syncStudentAccount,{once:true});else syncStudentAccount();
 })();
