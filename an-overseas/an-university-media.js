@@ -11,25 +11,23 @@
  function websiteIcon(u){
    try {let domain=new URL(u.site).hostname;return 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(domain)+'&sz=256';}catch{return '';}
  }
- function brandFallback(u){
-   const site=websiteIcon(u),country=u.country||'University';
-   return '<div class="an-guide-identity an-identity-branded">'+
-       '<div class="an-identity-head">'+
-       (site?'<img class="an-identity-logo" src="'+esc(site)+'" alt="'+esc(u.name)+' official website icon" loading="lazy" decoding="async">':'')+
-       '<span>University identity</span></div>'+
-       '<span class="an-guide-country">'+esc(country)+'</span>'+
-       '<strong>'+esc(u.name)+'</strong>'+
-       '<small>University portfolio · official website linked</small></div>';
+ function brandFallback(u,p){
+   const logo=(u.logoImage||p?.logo||websiteIcon(u)||'');
+   const short=String(u.short||u.name||'U').replace(/[^A-Z]/g,'').slice(0,3)||'U';
+   return '<div class="an-guide-identity an-identity-logo-only"><div class="an-logo-stage">'+
+       (logo?'<img class="an-center-logo" src="'+esc(logo)+'" alt="'+esc(u.name)+' logo or official website icon" loading="lazy">':'')+
+       '<span class="an-center-monogram">'+esc(short)+'</span></div></div>';
  }
  guide.card=function(u,p){
-   let result=nativeCard(u,p),start=result.indexOf('<div class="an-guide-identity">');
-   if(start!==-1){
+   let result=nativeCard(u,p);
+   const hasPhoto=result.includes('class="campus-cover an-guide-photo"');
+   if(!hasPhoto){
+     const start=result.indexOf('<div class="an-guide-identity">');
      const stop=result.indexOf('</small></div>',start);
-     if(stop!==-1)result=result.slice(0,start)+brandFallback(u)+result.slice(stop+'</small></div>'.length);
+     if(start>=0&&stop>=0)result=result.slice(0,start)+brandFallback(u,p)+result.slice(stop+14);
+     result=result.replace(/<img class="uni-card-logo"[^>]*>/,'');
    }
-   const mark=websiteIcon(u);
-   const marker=mark?'<img class="an-university-mark" src="'+esc(mark)+'" alt="'+esc(u.name)+' website icon" loading="lazy" decoding="async">':'';
-   return result.replace('<div class="uni-cover-wrap">','<div class="uni-cover-wrap" data-university-title="'+esc(u.name)+'" data-university-id="'+esc(u.id)+'">'+marker);
+   return result.replace('<div class="uni-cover-wrap">','<div class="uni-cover-wrap" data-university-title="'+esc(u.name)+'" data-university-id="'+esc(u.id)+'">');
  };
  async function commonsImage(name){
    if(remembered.has(name))return remembered.get(name);
