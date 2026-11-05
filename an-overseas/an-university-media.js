@@ -139,8 +139,9 @@
    image.className='campus-cover an-guide-photo an-commons-photo an-fullbleed-photo';
    image.alt=cover.dataset.universityTitle+' — Wikimedia Commons university illustration';
    image.loading='lazy';image.decoding='async';
-   image.addEventListener('error',()=>image.remove(),{once:true});
+   image.addEventListener('error',()=>{cover?.classList.remove('an-has-campus-photo');image.remove();},{once:true});
    image.addEventListener('load',()=>{
+     if(cover.isConnected)cover.classList.add('an-has-campus-photo');
      const label=document.createElement('a');
      label.className='an-guide-credit an-commons-credit';
      label.href=rec.source;label.target='_blank';label.rel='noopener noreferrer';
