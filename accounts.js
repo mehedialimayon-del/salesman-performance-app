@@ -58,6 +58,26 @@ window.FFH_CREATE_ACCOUNTS=ctx=>async function(){
   <label><input name="active" type="checkbox" ${p.active!==false?'checked':''}> Active login</label>
   <button class="primary">SAVE ACCOUNT & ACCESS</button><button type="button" class="secondary" id="ffCancelAccount">BACK TO STAFF</button><p id="ffAccountResult" role="status"></p></form></div>`);
   const f=q('#ffAccountForm');
+  // Baseline SR rights are role-derived, not a new delegated permission grant.
+  // Show the effective right as a readonly tick without granting cross-staff edits.
+  const ffSrUpload=f.querySelector('.ffPermissionRow[data-module="sales"] [data-verb="upload"]');
+  const ffExplicitSalesUpload=grants.some(g=>g.module==='sales'&&g.can_upload===true);
+  const ffSyncBuiltIn=()=>{
+   if(!ffSrUpload||ffExplicitSalesUpload)return;
+   const required=f.elements.can_sell.checked||f.elements.designation.value==='SR';
+   ffSrUpload.dataset.ffBuiltIn=required?'1':'0';
+   ffSrUpload.checked=required;
+   ffSrUpload.disabled=required;
+   ffSrUpload.title=required?'Included in SR role: own Daily Sales submission. To revoke, change SR role/access in the supported staff settings.':'Additional Daily Sales upload delegation';
+   const row=ffSrUpload.closest('.ffPermissionRow');
+   let note=row?.querySelector('.ffBuiltInAccessNote');
+   if(required&&!note){note=document.createElement('small');note.className='ffBuiltInAccessNote';note.textContent='✓ Built-in SR permission · own Daily Sales. Separate Edit/Delete grants are optional.';row.querySelector('span')?.append(note);}
+   if(!required)note?.remove();
+  };
+  f.elements.can_sell.addEventListener('change',ffSyncBuiltIn);
+  f.elements.designation.addEventListener('change',ffSyncBuiltIn);
+  ffSyncBuiltIn();
+
   if(owner&&existing&&window.FFH_ACCOUNT_OUTLETS){
    window.FFH_ACCOUNT_OUTLETS.wire({form:f,staff:p,client:sb,onRefresh:()=>ctx.ffhLoadCloud?.()});
   }
@@ -68,7 +88,7 @@ window.FFH_CREATE_ACCOUNTS=ctx=>async function(){
    b.role=b.designation==='SR'?'SR':'MANAGER';b.business_title=b.designation;b.can_sell=b.designation==='SR'||f.elements.can_sell.checked;if(!b.can_sell)b.monthly_target=0;b.active=f.elements.active.checked;b.owner_access=owner&&!head?f.elements.administrator.checked:false;b.action=existing?'update':'create';
    // Account creation uses Auth Admin; access changes use the owner's authenticated DB transaction.
    const result=await api(b);const id=result.staff_id||b.staff_id;
-   try{await rpc('save_access',{staff_id:id,designation:b.designation,manager_id:b.manager_id,team_name:b.team_name,route_name:b.route_name,zones:q('#ffAllZones').checked?['*']:qa('.ffAccessZone:checked').map(x=>x.value),...(owner?{administrator:!head&&f.elements.administrator.checked}:{}),grants:[...qa('.ffPermissionRow[data-module]').map(row=>({module:row.dataset.module,...Object.fromEntries(['edit','upload','delete'].map(v=>['can_'+v,row.querySelector('[data-verb='+v+']').checked]))})),...(owner?[{module:'kb',can_edit:!head&&f.elements.ai_access.checked,can_upload:!head&&f.elements.ai_access.checked,can_delete:!head&&f.elements.ai_access.checked}]:[])]});}
+   try{await rpc('save_access',{staff_id:id,designation:b.designation,manager_id:b.manager_id,team_name:b.team_name,route_name:b.route_name,zones:q('#ffAllZones').checked?['*']:qa('.ffAccessZone:checked').map(x=>x.value),...(owner?{administrator:!head&&f.elements.administrator.checked}:{}),grants:[...qa('.ffPermissionRow[data-module]').map(row=>({module:row.dataset.module,...Object.fromEntries(['edit','upload','delete'].map(v=>['can_'+v,(row.querySelector('[data-verb='+v+']').dataset.ffBuiltIn==='1'?false:row.querySelector('[data-verb='+v+']').checked)]))})),...(owner?[{module:'kb',can_edit:!head&&f.elements.ai_access.checked,can_upload:!head&&f.elements.ai_access.checked,can_delete:!head&&f.elements.ai_access.checked}]:[])]});}
    catch(err){throw Error('Account profile saved; access settings were not saved. Open Edit and retry: '+err.message);}
    if(f.elements.password){f.elements.password.value='';f.elements.confirm_password.value='';}q('#ffAccountResult').textContent='Account and permissions saved. Password changes are owner-only.';await load();await ctx.ffhLoadCloud();
   });};
