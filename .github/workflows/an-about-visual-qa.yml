@@ -71,10 +71,10 @@ jobs:
                   nameFirst:!!$('.an-manager-name-box h3'),
                   designationSecond:!!$('.an-manager-position strong'),
                   supportThird:!!$('.an-manager-support p'),
-                  arrows:document.querySelectorAll('[data-an-manager]').length,
-                  errors
+                  arrows:document.querySelectorAll('[data-an-manager]').length
                 };
               });
+              info.errors=errors.slice();
               await page.locator('[data-an-manager="1"]').click();
               info.nextMember=await page.locator('.an-manager-name-box h3').innerText();
               info.nextWhatsAppLink=await page.locator('a.an-manager-contact[href^="https://wa.me/"]').count();
