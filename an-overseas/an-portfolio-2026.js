@@ -99,7 +99,19 @@ function apply(u,p){
  const guideHead=planner?.querySelector(':scope > .an-study-header');
  const foot=planner?.querySelector(':scope > .an-study-footer');
  const back=main.querySelector(':scope > .profile-bottom-link');
- const rest=original.filter(n=>n!==planner&&n!==support&&n!==back&&!/^profile-/.test(n.id||''));
+ // The CMS's semester PDF and scholarship card belong in their existing numbered sections, never after A&N support.
+ const extras=original.find(n=>n.classList?.contains('an-university-extras'));
+ if(extras){
+  const pdf=extras.querySelector('.an-uni-feature:not(.an-uni-offer)');
+  const availablePdf=pdf?.querySelector('.an-uni-pdf-buttons');
+  if(availablePdf){
+   [...mapped.semester.querySelectorAll('p')].filter(n=>/pdf has not been added yet|No verified official semester-fee pdf/i.test(n.textContent)).forEach(n=>n.remove());
+   mapped.semester.append(pdf);
+  }
+  const scholarship=extras.querySelector('.an-uni-offer');
+  if(scholarship)mapped.scholarships.append(scholarship);
+ }
+ const rest=original.filter(n=>n!==planner&&n!==support&&n!==back&&!n.classList?.contains('an-university-extras')&&!/^profile-/.test(n.id||''));
  const f=document.createDocumentFragment();
  if(guideHead){guideHead.classList.add('an-portfolio-mini-intro');f.append(guideHead);}
  const jumps=document.createElement('div');jumps.className='an-portfolio-jumps';
@@ -110,9 +122,10 @@ function apply(u,p){
  rest.forEach(n=>mapped.support.append(n));
  if(foot)mapped.support.append(foot);if(back)mapped.support.append(back);
  main.replaceChildren(f);
- const banner=wrap.querySelector('.profile-banner .wrap'),nav=wrap.querySelector('.profile-navigation');
- if(banner&&nav){
-  banner.append(nav);nav.classList.add('an-portfolio-topnav');
+ // Put "On this page" in the free left column of the short planning bar, never over the QS ranking.
+ const guideBar=main.querySelector('.an-portfolio-mini-intro'),nav=wrap.querySelector('.profile-navigation');
+ if(guideBar&&nav){
+  guideBar.prepend(nav);nav.classList.add('an-portfolio-topnav');
   const list=nav.querySelector('nav');
   if(list)list.innerHTML=ORDER.map(([key,title],i)=>'<button data-profile-jump="'+key+'"><span>'+String(i+1).padStart(2,'0')+'</span>'+esc(title)+'</button>').join('');
   nav.querySelector('details')?.removeAttribute('open');
