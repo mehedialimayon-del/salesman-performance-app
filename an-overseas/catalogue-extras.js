@@ -33,7 +33,7 @@ universitiesPage=function(){
  +'<details class="catalogue-filter"><summary aria-label="Filter universities" title="Filter universities">☷ <span class="filter-word">Filters</span></summary><div class="catalogue-filter-panel">'+controls+'</div></details>'
  +'<label class="an-scholarship-only"><input id="scholarship-filter" type="checkbox" '+(scholarshipOnly?'checked':'')+'> 🎓 Scholarships only</label></div>'
  +'<div id="catalogue-count" class="catalogue-count" aria-live="polite"></div><div id="results" class="grid"></div>'
- +'<p class="catalogue-footnote">The directory includes sourced and unverified catalogue entries, not all accredited institutions or A&N partners. Check the official university website, exact programme, recognition, application fee and any scholarship offer before applying. Published example fees are not comparable across different durations or currencies. QS 2027 ranks are shown only for institutions with verified ranking data; institutions without a confirmed QS rank follow ranked universities within their country.</p></div>';
+ +'<p class="catalogue-footnote">Malaysia entries include institutions from the MQA register; its accreditation applies to specific programmes and may change. Institution listing does not establish eligibility for international enrolment. This directory also contains other sourced and unverified entries and is not an A&N partner list. Check the official university website, exact programme, recognition, application fee and any scholarship offer before applying. Published example fees are not comparable across different durations or currencies. QS 2027 ranks are shown only for institutions with verified ranking data; institutions without a confirmed QS rank follow ranked universities within their country.</p></div>';
 };
 function amountOf(u,code){
  const rows=UNIVERSITY_PROFILES[u.id]?.fees||[],matches=[];
@@ -176,7 +176,7 @@ fetch('site-content.json?v=20261029-2154',{cache:'no-cache'}).then(function(r){i
    if(/^an-(global|h-dir)-/.test(previous.id))U.splice(U.indexOf(previous),1);
    else return;
   }
-  U.push({id:String(u.id),name:String(u.name),short:String(u.short||u.name),country:dest,city:String(u.city||''),kind:u.kind==='Private'?'Private':u.kind==='Public'?'Public':'University',programs:Array.isArray(u.programs)?u.programs:[],site:/^https:\/\//i.test(u.site||'')?u.site:'https://www.mqa.gov.my',photo:''});
+  U.push({id:String(u.id),name:String(u.name),short:String(u.short||u.name),country:dest,city:String(u.city||''),kind:u.kind==='Private'?'Private':u.kind==='Public'?'Public':'University',institutionType:String(u.institutionType||'University'),programs:Array.isArray(u.programs)?u.programs:[],site:/^https:\/\//i.test(u.site||'')?u.site:'',registrySource:/^https:\/\//i.test(u.registrySource||'')?u.registrySource:'',cardPhoto:/^https:\/\//i.test(u.cardPhoto||'')?u.cardPhoto:'',cardPhotoSource:/^https:\/\//i.test(u.cardPhotoSource||'')?u.cardPhotoSource:'',photo:''});
  });
  Object.keys(cfg.universityOverrides||{}).forEach(function(id){
   var u=U.find(function(o){return o.id===id;}),v=cfg.universityOverrides[id];
