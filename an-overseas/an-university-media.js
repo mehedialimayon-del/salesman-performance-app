@@ -9,7 +9,8 @@
  const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/gi,'').toLowerCase();
  const remembered=new Map(), watching=new WeakSet();
  function websiteIcon(u){
-   try {let domain=new URL(u.site).hostname;return 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(domain)+'&sz=256';}catch{return '';}
+   const match=String(u.site||'').match(/^https?:\/\/([^/?#]+)/i);
+   return match?'https://www.google.com/s2/favicons?domain='+encodeURIComponent(match[1])+'&sz=256':'';
  }
  function brandFallback(u,p){
    const logo=(u.logoImage||p?.logo||websiteIcon(u)||'');
