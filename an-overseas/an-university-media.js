@@ -14,7 +14,8 @@
  }
  function brandFallback(u,p){
    const logo=(u.logoImage||p?.logo||websiteIcon(u)||'');
-   const short=String(u.short||u.name||'U').replace(/[^A-Z]/g,'').slice(0,3)||'U';
+   const named=String(u.name||'');const acronym=named.match(/\(([A-Z]{2,5})\)/);
+   const short=acronym?acronym[1]:String(u.short||u.name||'U').replace(/[^A-Z]/g,'').slice(0,3)||'U';
    return '<div class="an-guide-identity an-identity-logo-only"><div class="an-logo-stage">'+
        (logo?'<img class="an-center-logo" src="'+esc(logo)+'" alt="'+esc(u.name)+' logo or official website icon" loading="lazy">':'')+
        '<span class="an-center-monogram">'+esc(short)+'</span></div></div>';
