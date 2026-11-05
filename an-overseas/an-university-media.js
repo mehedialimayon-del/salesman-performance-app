@@ -166,7 +166,7 @@
      const image=info.thumburl||info.url;
      if(!/^https:\/\//.test(image)||!/^(https:\/\/upload\.wikimedia\.org\/)/.test(image))return null;
      const credit=String(meta.Artist?.value||'').replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim().slice(0,85);
-     return {url:image,source:info.descriptionurl||'https://commons.wikimedia.org',licence,credit,photoCandidate:photoCandidate&&Number(info.width)>=550&&Number(info.height)>=300&&Number(info.width)/Number(info.height)>=0.98};
+     return {url:image,source:info.descriptionurl||'https://commons.wikimedia.org',licence,credit,kind:/logo|seal|coat.?of.?arms|crest|emblem|icon|symbol/i.test(filename)?'logo':'other',photoCandidate:photoCandidate&&Number(info.width)>=550&&Number(info.height)>=300&&Number(info.width)/Number(info.height)>=0.98};
     }catch{return null;}
    })();
    remembered.set(name,req);
@@ -287,6 +287,15 @@
    if(candidate?.photoCandidate){showImage(cover,candidate);return;}
    const brand=cover.querySelector('.an-identity-logo-only .an-logo-stage');
    if(!brand)return;
+   if(candidate?.kind==='logo'&&cover.isConnected){
+     const logo=document.createElement('img');
+     logo.className='an-center-logo an-verified-media';
+     logo.alt=name+' — licensed Wikimedia university identity';
+     logo.loading='lazy';logo.decoding='async';
+     logo.addEventListener('load',()=>{brand.querySelectorAll('.an-center-logo').forEach(old=>{if(old!==logo)old.remove();});},{once:true});
+     logo.addEventListener('error',()=>logo.remove(),{once:true});
+     brand.prepend(logo);logo.src=candidate.url;
+   }
    const media=await wikidataMedia(name);
    if(media?.kind==='photo'){showImage(cover,media);return;}
    if(media?.kind==='logo'&&cover.isConnected&&!cover.querySelector('.an-guide-photo')){
