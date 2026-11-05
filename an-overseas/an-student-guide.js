@@ -57,7 +57,12 @@ function degree(u,p,level,index){
   if(!Array.isArray(row))return false;
   const text=row.join(' ');return levelPattern[level].test(text)&&/[\d,]+\s*/.test(row[1]||'')&&/(?:RM|GBP|AUD|CAD|USD|EUR|MYR)\s*[\d,]+/i.test(row[1]||'');
  }).slice(0,3);
- let tuition=feeRows.length?'<ul>'+feeRows.map(r=>'<li>'+E(r[0])+': <strong>'+E(r[1])+'</strong> <small>'+E(r[2]||'')+'</small></li>').join('')+'</ul>':'<p>Programme-specific international tuition not verified here. Request the fee schedule and refundable/non-refundable initial payment invoice.</p>';
+ let tuition=feeRows.length?'<ul>'+feeRows.map(r=>{
+  const match=String(r[1]||'').match(/(RM|GBP|AUD|CAD|USD|EUR|MYR)\s*([\d,]+)/i);
+  const code=match?.[1]?.toUpperCase()==='RM'?'MYR':match?.[1]?.toUpperCase();
+  const amount=match?Number(match[2].replace(/,/g,'')):NaN;
+  return '<li>'+E(r[0])+': <strong>'+E(r[1])+'</strong> '+(Number.isFinite(amount)?'<small>'+E(policy().bdt(amount,code))+'</small>':'')+' <small>'+E(r[2]||'')+'</small></li>';
+ }).join('')+'</ul>':'<p>Programme-specific international tuition not verified here. Request the fee schedule and refundable/non-refundable initial payment invoice.</p>';
  return '<details class="an-study-degree"'+(index===0?' open':'')+'><summary><span>'+E(level)+'</span><span class="an-study-check">View subjects, fees & admission</span><b aria-hidden="true">⌄</b></summary>'+
  '<div class="an-study-degree-body"><h4>3 programme examples / subjects</h4>'+
  (verified.length?'<p class="an-study-tag">Listed from existing institution profile — confirm current intake</p>':'<p class="an-study-tag">No verified degree-specific course titles yet; fields below are only subjects to search</p>')+
@@ -73,7 +78,7 @@ function employment(u,c,p){
  const sec=fieldMap(u,p);
  return section('💼','Student jobs & graduate career sectors',
  '<p>'+E(c.work)+'</p>'+sources([link(c.workUrl,'Official work permission'),link(c.jobsUrl,'Official career guidance')])+
- '<div class="an-study-job-grid">'+sec.map(x=>'<article><h4>'+E(x.sector)+'</h4><p>'+E(x.jobs)+'</p></article>').join('')+'</div>'+
+ '<div class="an-study-mini-grid"><article><b>Bachelor</b><p>Graduate trainee, internship or supervised entry-level work where permitted.</p></article><article><b>Master</b><p>Analyst, technical specialist or research assistant if qualified.</p></article><article><b>PhD</b><p>Postdoctoral, academic research/teaching and R&D posts subject to funding and work authorisation.</p></article></div><div class="an-study-job-grid">'+sec.map(x=>'<article><h4>'+E(x.sector)+'</h4><p>'+E(x.jobs)+'</p></article>').join('')+'</div>'+
  '<p class="an-study-note">The sectors are linked to broad study fields, not confirmed vacancies. Language, licensing, employer sponsorship and immigration rules may restrict work. Part-time salary must never be assumed to cover tuition.</p>');
 }
 function spouse(c){
@@ -123,19 +128,21 @@ function calc(u,c,p){
  const names=[
   ['application','Application fee (verified quote)'],['tuition','First tuition / university deposit'],['visa','Visa / medical / insurance / EMGS if applicable'],
   ['flight','Dhaka → destination flight quotation'],['arrival','Airport → actual campus transfer quotation'],
-  ['housing','Housing deposit / advance quote'],['firstmonth','First month food / rent / utilities']
+  ['housing','Housing deposit / advance quote'],['firstmonth','First month food / rent / utilities'],
+  ['spouse','Additional partner/family cost (enter 0 if not travelling)']
  ];
  return section('🧮','First-arrival cost — transparent estimate & BDT conversion',
  '<p><b>Location:</b> '+E(u.city||u.country)+' · '+E(u.country)+' · <b>'+E(currency)+'</b> ('+E(c.currencyName)+').</p>'+
  starter+
  '<p class="an-study-note">The starter range above is only a rough housing-and-living planning scenario, NOT the total cost to enter the university. It assumes approximately 1.5–2 months of the monthly planning benchmark and does not represent a verified rent deposit.</p>'+
  '<div class="an-study-cost-grid">'+names.map(([key,label])=>'<label><span>'+E(label)+'</span><input class="an-cost-input" data-cost-key="'+E(key)+'" type="number" min="0" step="1" inputmode="decimal" placeholder="Enter actual '+E(currency)+' amount" aria-label="'+E(label)+'"></label>').join('')+'</div>'+
- '<div class="an-study-total" aria-live="polite"><strong>Complete estimated first-arrival cost</strong><output id="an-first-arrival-total">Enter all 7 quotation amounts to calculate a complete estimate.</output><small>Use 0 only where a documented fee genuinely does not apply. No automatic ticket, visa or deposit price is invented.</small></div>'+
+ '<div class="an-study-total" aria-live="polite"><strong>Complete estimated first-arrival cost</strong><output id="an-first-arrival-total">Enter all 8 quotation amounts to calculate a complete estimate.</output><small>Use 0 only where a documented fee genuinely does not apply. No automatic ticket, visa or deposit price is invented.</small></div>'+
  '<p>Use an offer invoice for tuition, the immigration fee page for visa, a travel agency/airline quote for a Dhaka departure, and university accommodation information for deposits. Add required show-money separately: proof of funds is not always an amount you spend.</p>'+
  sources([link(p?.feeSource||u.site,'University tuition / deposits'),link(c.visaUrl,'Official student visa fees'),
  link('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(u.name+' '+(u.city||u.country)),'Campus & airport route map'),
- link(policy().fxSource,'FX reference · 05 Nov 2026')])+
- '<p class="an-study-note">Currency conversion is an indicative cross-rate from the dated bank table; not a live exchange, fee or remittance rate. Actual airport, taxi/train/grab and air-ticket quotes are route, date and baggage dependent.</p>');
+ link(policy().fxSource,'MYR-based FX benchmark · 05 Nov 2026'),
+ link(policy().secondaryFxSource,'Additional BDT FX benchmark · 05 Nov 2026')])+
+ '<p class="an-study-note">Currency conversion uses indicative 05 Nov 2026 bank and mid-market references; not a live exchange, fee or remittance rate. Actual airport, taxi/train/grab and air-ticket quotes are route, date and baggage dependent.</p>');
 }
 function contents(){
  return ['Bachelor / Master / PhD','Admission steps','Student work & jobs','Spouse / dependants','Housing & living cost','Scholarships / funding','PR / post-study','Research / community','First-arrival calculator'];
@@ -144,7 +151,7 @@ function render(u,p){
  const source=policy();if(!source)return '';
  const c=source.get(u.country);
  return '<section id="an-student-planner" class="an-student-planner" aria-label="International student planning guide">'+
- '<div class="an-study-header"><div><small>A&N OVERSEAS · INTERNATIONAL STUDENT DECISION CENTRE</small><h2><span>Study, Work &</span> Settle Planning Guide</h2><p>'+E(u.name)+' · '+E(u.country)+' · '+E(u.city||'Campus location to verify')+'</p></div><span class="an-study-review">Sources checked 05 NOV 2026</span></div>'+
+ '<div class="an-study-header"><div><small>A&N OVERSEAS · INTERNATIONAL STUDENT DECISION CENTRE</small><h2><span>Study, Work &</span> Settle Planning Guide</h2><p>'+E(u.name)+' · '+E(u.country)+' · '+E(u.city||'Campus location to verify')+'</p></div><span class="an-study-review">Official policy & FX snapshots · 05 NOV 2026</span></div>'+
  '<div class="an-study-progress">'+contents().map((name,i)=>'<span><b>'+String(i+1).padStart(2,'0')+'</b>'+E(name)+'</span>').join('')+'</div>'+
  section('📚','Education: Bachelor · Master · PhD',
  '<div class="an-study-degree-grid">'+['Bachelor','Master','PhD'].map((level,i)=>degree(u,p,level,i)).join('')+'</div>'+
@@ -158,7 +165,7 @@ function refreshCost(){
  const fields=[...el.querySelectorAll('.an-cost-input')];
  const output=el.querySelector('#an-first-arrival-total');if(!output)return;
  if(fields.some(f=>f.value.trim()===''||Number(f.value)<0||!Number.isFinite(Number(f.value)))){
-  output.textContent='Enter all 7 quotation amounts to calculate a complete estimate.';return;
+  output.textContent='Enter all 8 quotation amounts to calculate a complete estimate.';return;
  }
  const id=(location.hash.split('?')[0].split('/')[2]||'');
  const u=typeof U!=='undefined'?U.find(o=>o.id===id):null;if(!u)return;
