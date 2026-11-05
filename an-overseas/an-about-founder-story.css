@@ -139,3 +139,103 @@ body:not(.an-about-locked) #app .an2-story{--gold:#ffd19b;--orange:#ff962a;--cre
  #app .an-about-v3 .an-about-intro-panel .an2-about-box,
  #app .an-about-v3 .an-about-intro-panel .an-vision-inline {padding:12px!important}
 }
+
+/* 2026-11-06: small transparent Nusrat portrait, bottom-right INSIDE the founder's quote. */
+#app .an2-founder-hero{
+  grid-template-columns:minmax(185px,.64fr) minmax(0,1.36fr)!important;
+  gap:16px!important;
+}
+#app .an2-founder-quote{
+  min-width:0!important;
+  overflow:hidden;
+}
+#app .an2-founder-quote .an2-quote-footer{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 152px!important;
+  gap:14px;
+  align-items:end!important;
+  border-top:1px solid rgba(174,120,71,.48);
+  margin-top:19px;
+  min-height:200px;
+}
+#app .an2-founder-quote .an2-quote-sign{
+  margin:0!important;
+  padding:15px 0 18px!important;
+  border:0!important;
+  align-self:end;
+  line-height:1.45;
+}
+#app .an2-founder-quote .an2-founder-person{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  position:relative!important;
+  width:152px!important;
+  height:202px!important;
+  min-height:0!important;
+  max-width:100%!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  background:transparent!important;
+  overflow:visible!important;
+  isolation:auto!important;
+}
+#app .an2-founder-quote .an2-founder-person img{
+  display:block!important;
+  position:static!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  max-width:100%!important;
+  object-fit:contain!important;
+  object-position:center bottom!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  filter:none!important;
+  opacity:1!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+}
+#app .an2-founder-quote .an2-founder-person figcaption{
+  /* Asset itself contains the small name label. Keep a semantic figcaption only. */
+  position:absolute!important;
+  width:1px!important;height:1px!important;overflow:hidden!important;
+  padding:0!important;margin:-1px!important;border:0!important;
+  clip:rect(0 0 0 0)!important;
+  white-space:nowrap!important;
+}
+@media(max-width:1000px){
+  #app .an2-founder-hero{grid-template-columns:minmax(0,1fr)!important;gap:0!important}
+  #app .an2-founder-brand{padding:20px 22px 0!important}
+  #app .an2-founder-quote{margin:15px 16px 18px!important}
+}
+@media(max-width:650px){
+  #app .an2-founder-hero{grid-template-columns:minmax(0,1fr)!important}
+  #app .an2-founder-quote{margin:10px 13px 15px!important;padding:18px 17px 0!important}
+  #app .an2-founder-quote .an2-quote-footer{
+    grid-template-columns:minmax(0,1fr) 123px!important;
+    gap:5px!important;
+    min-height:181px!important;
+    margin-top:15px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person{
+    width:123px!important;
+    height:181px!important;
+    min-height:0!important;
+    margin:0!important;
+  }
+  #app .an2-founder-quote .an2-quote-sign{
+    font-size:11px!important;
+    letter-spacing:.5px!important;
+    padding:14px 0 22px!important;
+  }
+  #app .an2-founder-quote .an2-quote-sign span{
+    font-size:8px!important;
+    letter-spacing:.4px!important;
+    line-height:1.5!important;
+  }
+}
