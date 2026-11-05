@@ -7,6 +7,14 @@
  const nativeCard=guide.card;
  const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
  const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/gi,'').toLowerCase();
+ const canonicalUniversityName=name=>({
+  '2nd military medical university':'Naval Medical University',
+  'second military medical university':'Naval Medical University',
+  '3rd military medical university':'Army Medical University',
+  'third military medical university':'Army Medical University',
+  '4th military medical university':'Air Force Medical University',
+  'fourth military medical university':'Air Force Medical University'
+ })[String(name||'').trim().toLowerCase()]||String(name||'');
  const remembered=new Map(), watching=new WeakSet();
  const hostOf=x=>{const m=String(x||'').match(/^https?:\/\/([^/?#:]+)/i);return m?m[1].toLowerCase().replace(/^www\./,''):'';};
  let hostCountSize=-1,hostCount=new Map();
@@ -25,7 +33,7 @@
    return 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(host)+'&sz=128';
  }
  function brandFallback(u,p){
-   const logo=(u.logoImage||p?.logo||''); // Google favicon is often a generic globe; not a university photo.
+   const logo=(u.logoImage||p?.logo||websiteIcon(u)||''); // Google favicon is often a generic globe; not a university photo.
    const named=String(u.name||'');const acronym=named.match(/\(([A-Z]{2,5})\)/);
    const short=acronym?acronym[1]:String(u.short||u.name||'U').replace(/[^A-Z]/g,'').slice(0,3)||'U';
    return '<div class="an-guide-identity an-identity-logo-only"><div class="an-logo-stage">'+
@@ -65,6 +73,7 @@
    return result.replace('<div class="uni-cover-wrap">','<div class="uni-cover-wrap" data-university-title="'+esc(u.name)+'" data-university-id="'+esc(u.id)+'">');
  };
  async function commonsImage(name){
+   name=canonicalUniversityName(name);
    if(remembered.has(name))return remembered.get(name);
    const req=(async()=>{
     try{
@@ -93,6 +102,7 @@
  }
  const sealCache=new Map();
  async function wikidataMedia(name){
+  name=canonicalUniversityName(name);
   if(sealCache.has(name))return sealCache.get(name);
   const request=(async()=>{
    try{
@@ -133,6 +143,7 @@
  }
  const campusSearchCache=new Map();
  async function commonsCampusSearch(name){
+  name=canonicalUniversityName(name);
   if(campusSearchCache.has(name))return campusSearchCache.get(name);
   const job=(async()=>{
    try{
