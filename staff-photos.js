@@ -51,9 +51,8 @@
   if(!p&&(!selected||selected==='ALL')){
     const zone=document.querySelector('#ffDashboardZone')?.value;
     try{
-      const people=typeof U==='undefined'?[]:U;
-      const manager=zone&&zone!=='ALL'&&Array.isArray(people)?people.find(x=>String(x.zone||'').toUpperCase()===String(zone).toUpperCase()&&x.can_manage&&x.active!==false):null;
-      if(manager)p=person(manager.id);
+      const manager=zone&&zone!=='ALL'?window.FFH_ZONE_MANAGER?.(zone):null;
+      if(manager)p=person(manager.staff_id||manager.id);
     }catch(_){}
   }
   const old=hero.querySelector('.ffDashStaffIdentity');
