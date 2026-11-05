@@ -116,3 +116,26 @@ body:not(.an-about-locked) #app .an2-story{--gold:#ffd19b;--orange:#ff962a;--cre
  #app .an2-metrics span{font-size:9px}
  #app .an2-readmore-separate{gap:8px!important}
 }
+
+/* Two complete, individually framed About / Vision panels before Read More */
+#app .an-about-v3 .an-about-intro-panel .an2-about-box {
+ display:flex!important;flex-direction:column!important;gap:7px!important;
+ padding:clamp(12px,1.5vw,20px)!important;
+ border:1px solid #a5683a!important;border-radius:15px!important;
+ background:linear-gradient(125deg,#251b14,#10151b)!important;
+ width:100%!important;
+ box-shadow:inset 0 1px 0 #ffb46e11;
+}
+#app .an-about-v3 .an2-about-box .an-about-eyebrow{margin-bottom:4px!important}
+#app .an-about-v3 .an2-about-box #an-about-intro{margin:0!important}
+#app .an-about-v3 .an-about-intro-panel .an-vision-inline {
+ margin-top:10px!important;padding:clamp(12px,1.5vw,20px)!important;
+ border:1px solid #9f6437!important;border-radius:15px!important;
+ background:linear-gradient(125deg,#211609,#10151a)!important;
+ width:100%!important;
+}
+#app .an-about-v3 .an2-readmore-separate {margin-top:10px!important}
+@media(max-width:640px) {
+ #app .an-about-v3 .an-about-intro-panel .an2-about-box,
+ #app .an-about-v3 .an-about-intro-panel .an-vision-inline {padding:12px!important}
+}
