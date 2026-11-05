@@ -22,7 +22,9 @@ const ffhZoneManagers=async()=>{
 };
 window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect}){
  items=items.map(item=>window.FFH_STAFF_ITEM?.(item)||item);
- const isZonePicker=/\bzone\b/i.test(String(title)) && !/assig(n|nee)/i.test(String(title));
+ // A mixed "Choose person / zone" picker contains staff IDs, not just zones.
+ // Never interpret a staff ID as a zone or display "MANAGER NOT ASSIGNED" for it.
+ const isZonePicker=/\bzone\b/i.test(String(title)) && !/person|staff|representative|\bsr\b|assig(n|nee)/i.test(String(title));
  let managers=new Map();
  const ov=document.createElement('div');ov.className='globalSearchOverlay ffItemPicker'+(isZonePicker?' ffZoneManagerPicker':'');
  ov.innerHTML='<section class="globalSearchBox"><div class="row"><h2></h2><button type="button" class="secondary">CLOSE</button></div><input class="ffPickerSearch" placeholder="Search name, code or zone…"><div class="ffPickerRows"></div></section>';
@@ -41,16 +43,20 @@ window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect}){
    return [x.label,x.detail,x.value,manager?.manager_name,manager?.login_id,manager?.designation].join(' ').toLowerCase().includes(term);
   });
   for(const item of rows){
-   const manager=isZonePicker?managers.get(String(item.value).toUpperCase()):null;
+   const id=String(item.value).toUpperCase();
+   // "Choose person / zone" contains both people and zones. The person ID
+   // M22328 is NOT a zone; treating it as one incorrectly said "NOT ASSIGNED".
+   const zoneRow=isZonePicker&&(managers.has(id)||id==='PRIMARY');
+   const manager=zoneRow?managers.get(id):null;
    const button=document.createElement('button');
    button.type='button';
-   button.className='ffPickerOption'+(isZonePicker?' ffZoneManagerRow':'')+(String(item.value)===String(selected)?' selected':'');
+   button.className='ffPickerOption'+(zoneRow?' ffZoneManagerRow':'')+(String(item.value)===String(selected)?' selected':'');
    button.dataset.staffId=String(item.value);
    const body=document.createElement('span');body.className='ffPickerText';
-   const label=document.createElement('strong');label.textContent=item.label;body.append(label);
-   if(isZonePicker&&String(item.value).toUpperCase()!=='ALL'){
+   const label=document.createElement('strong');label.textContent=zoneRow&&id==='PRIMARY'?'KL ZONE':item.label;body.append(label);
+   if(zoneRow&&id!=='ALL'){
     const identity=document.createElement('small');identity.className='ffZoneManagerIdentity';
-    identity.textContent=manager?.staff_id?(manager.manager_name+' · '+(manager.login_id||manager.staff_id)+' · '+String(manager.designation||'MANAGER').replaceAll('_',' ')):'MANAGER NOT ASSIGNED';
+    identity.textContent=manager?.staff_id?(manager.manager_name+' · '+(manager.login_id||manager.staff_id)+' · '+String(manager.designation||'MANAGER').replaceAll('_',' ')):'Zone manager not configured';
     body.append(identity);
     const photo=document.createElement('span');
     photo.className='ffZoneManagerAvatar';

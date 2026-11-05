@@ -25,7 +25,16 @@ const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
   ],onSelect:v=>{selected=v;}});
   await pause(65);
   assert.equal(rpcCalls,1);
-  assert.equal([...w.document.querySelectorAll('.ffZoneManagerRow')].find(x=>x.dataset.staffId==='PRIMARY').querySelector('strong').textContent,'PRIMARY');
+  assert.equal([...w.document.querySelectorAll('.ffZoneManagerRow')].find(x=>x.dataset.staffId==='PRIMARY').querySelector('strong').textContent,'KL ZONE');
+  // A mixed staff/zone picker must not call an assigned SR an unassigned manager.
+  const staffPicker=w.FFH_PICK_ITEM({title:'Choose person / zone',items:[{value:'M22328',label:'Md Munnaf Ali · M22328',detail:'Manager: MEHEDI ALIM AYON · M21954'}],onSelect:()=>{}});
+  await pause(25);
+  const mixed=w.document.querySelector('.ffItemPicker:not(.ffZoneManagerPicker)');
+  assert.ok(mixed,'staff picker opened');
+  assert.equal(mixed.querySelectorAll('.ffZoneManagerAvatar').length,0,'staff entry does not gain zone manager picture');
+  assert.match(mixed.textContent,/Manager: MEHEDI ALIM AYON/,'assigned manager shown from staff metadata');
+  assert.doesNotMatch(mixed.textContent,/MANAGER NOT ASSIGNED/);
+  mixed.querySelector('.row button').click();
   const rows=[...w.document.querySelectorAll('.ffZoneManagerRow')];
   const cheras=rows.find(x=>x.dataset.staffId==='CHERAS');
   assert.ok(cheras);
