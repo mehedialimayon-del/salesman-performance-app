@@ -1,0 +1,118 @@
+/* A&N Overseas 2026 Founder Story — elegant black / orange / warm gold */
+#app .an2-readmore-separate {margin:9px auto 0;display:flex;align-items:center;justify-content:center;gap:15px;width:min(96%,620px);flex-wrap:wrap;border-top:1px solid rgba(241,161,77,.38);padding-top:10px;text-align:center}
+#app .an2-readmore-separate>span{font-size:10px;letter-spacing:2.2px;font-weight:800;color:#dfb47f}
+#app .an2-readmore-separate .an-about-readmore{margin:0!important;position:static!important;display:inline-flex!important;align-items:center;justify-content:center;gap:12px;border:1px solid #d48b44!important;border-radius:12px!important;padding:10px 20px!important;background:linear-gradient(115deg,#402009,#160f0a)!important;color:#fff0d7!important;text-decoration:none!important;font-size:12px!important;letter-spacing:1px!important;white-space:nowrap}
+body:not(.an-about-locked) #app .an2-story{--gold:#ffd19b;--orange:#ff962a;--cream:#fff4e7;--muted:#c4b9b2;--hair:rgba(222,151,80,.29);color:var(--cream);width:min(1290px,calc(100% - 32px));margin:0 auto;padding:24px 0 88px;display:block}
+#app .an2-story *{box-sizing:border-box}
+#app .an2-story em{font-style:normal;color:#ffab50}
+#app .an2-story h1,#app .an2-story h2,#app .an2-story h3,#app .an2-story p{margin-top:0}
+#app .an2-story p{line-height:1.84;color:#e3d7c9;font-size:15px}
+#app .an2-topline{display:flex;justify-content:space-between;align-items:center;gap:15px;color:#bca68f;font-size:10px;letter-spacing:2px;font-weight:800;padding:6px 0 20px}
+#app .an2-topline a{color:#f5c08a;text-decoration:none;border:1px solid #925e35;border-radius:999px;padding:9px 17px;white-space:nowrap}
+#app .an2-founder-hero{background:radial-gradient(circle at 75% 25%,rgba(207,102,17,.18),transparent 44%),linear-gradient(120deg,#121a24 0%,#0f1014 57%,#23160e 100%);border:1px solid #9e6030;border-radius:25px;display:grid;grid-template-columns:minmax(180px,.85fr) minmax(300px,1.55fr) minmax(180px,.75fr);gap:22px;align-items:stretch;overflow:hidden;min-height:450px;box-shadow:0 25px 60px #0008}
+#app .an2-founder-brand{padding:27px 0 25px 26px;display:flex;flex-direction:column;justify-content:space-between;gap:18px;position:relative;z-index:2}
+#app .an2-founder-brand img{width:min(100%,218px);aspect-ratio:1.25;object-fit:contain;border-radius:19px;box-shadow:0 7px 26px #0006}
+#app .an2-founder-brand span{font-size:10px;font-weight:800;line-height:1.7;letter-spacing:1.5px;color:#dca775}
+#app .an2-founder-brand strong{font-size:clamp(19px,2vw,28px);line-height:1.3;letter-spacing:-.5px}
+#app .an2-founder-quote{margin:25px 0;padding:24px 26px;border:1px solid #9e603077;border-radius:18px;background:linear-gradient(145deg,#342114aa,#0c1115bf);display:flex;flex-direction:column;justify-content:center;box-shadow:inset 0 0 55px #b96e1410;position:relative;z-index:2}
+#app .an2-quote-mark{font-family:Georgia,serif;color:#f6a850;font-size:82px;height:50px;line-height:1}
+#app .an2-founder-quote blockquote{margin:0;font-family:Georgia,Georgia,'Times New Roman',serif;font-style:italic;color:#fff2e1;font-size:clamp(14px,1.35vw,19px);line-height:1.69;font-weight:500}
+#app .an2-quote-sign{border-top:1px solid #ae78477c;margin-top:18px;padding-top:15px;color:#ffbf80;font-weight:900;letter-spacing:1px;font-size:12px}
+#app .an2-quote-sign span{display:block;color:#bdb0a1;letter-spacing:1.5px;font-size:10px;margin-top:5px}
+#app .an2-founder-person{margin:0;align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;position:relative;background:radial-gradient(circle at 50% 65%,#99502036,transparent 60%);overflow:hidden;min-width:0}
+#app .an2-founder-person img{position:absolute;left:-5%;right:0;bottom:56px;width:110%;height:90%;object-fit:contain;object-position:bottom center;filter:drop-shadow(0 14px 25px #0009);-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 12%,black 100%);mask-image:linear-gradient(to bottom,transparent 0%,black 12%,black 100%)}
+#app .an2-founder-person figcaption{position:relative;z-index:2;width:100%;min-height:72px;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:14px 10px;background:linear-gradient(0deg,#080d12 16%,#12100ee6);border-top:1px solid #a86f35;text-align:center}
+#app .an2-founder-person figcaption strong{font-size:12px;letter-spacing:.8px;color:#ffd19c}
+#app .an2-founder-person figcaption span{font-size:9px;color:#eee1d1;letter-spacing:1px}
+#app .an2-nav{display:flex;gap:11px;overflow-x:auto;scrollbar-width:thin;padding:18px 1px 13px;position:sticky;top:54px;z-index:8;background:#0b0e13df;backdrop-filter:blur(12px)}
+#app .an2-nav a{display:inline-flex;justify-content:center;align-items:center;flex:0 0 auto;color:#f4d5ae;padding:10px 16px;border-radius:999px;text-decoration:none;font-size:12px;white-space:nowrap;border:1px solid #714628;background:#20180f}
+#app .an2-nav a:hover{background:#523016}
+#app .an2-section-label{font-size:11px;color:#ffad5d;font-weight:900;letter-spacing:2px;display:flex;align-items:center;gap:13px;margin-bottom:24px}
+#app .an2-section-label i{height:1px;flex:1;background:linear-gradient(90deg,#ba6c34,transparent)}
+#app .an2-intro-section,#app .an2-story-chapter,#app .an2-all-services,#app .an2-future{padding:57px clamp(18px,4.2vw,66px);margin-top:17px;border:1px solid var(--hair);border-radius:23px;background:radial-gradient(circle at 95% 8%,#7f451111,transparent 38%),linear-gradient(155deg,#11171d,#11100f 100%);scroll-margin-top:130px}
+#app .an2-story h1,#app .an2-story h2{font-family:Georgia,serif;font-weight:650;letter-spacing:-1.2px;line-height:1.14;font-size:clamp(30px,3.1vw,47px);margin-bottom:23px}
+#app .an2-chapter-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(220px,.8fr);gap:clamp(20px,4vw,55px)}
+#app .an2-origin-aside{border:1px solid #bb743799;border-radius:17px;overflow:hidden;margin:2px 0;background:#2b1d14;align-self:stretch}
+#app .an2-origin-aside img{width:100%;height:55%;min-height:170px;object-fit:cover;display:block}
+#app .an2-origin-aside div{padding:18px}
+#app .an2-origin-aside span{display:block;font-size:10px;letter-spacing:1.5px;color:#ffc686;font-weight:800}
+#app .an2-origin-aside strong{display:block;margin:7px 0;font-size:23px;color:#fff}
+#app .an2-origin-aside p{margin:0;font-size:13px}
+#app .an2-prose-columns{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+#app .an2-promise-line{margin-top:22px;padding:25px;border-left:3px solid #fd9e43;background:linear-gradient(95deg,#4f2819,#231915 58%,transparent);border-radius:0 14px 14px 0;display:grid;gap:9px}
+#app .an2-promise-line span{font-size:10px;letter-spacing:1.8px;color:#ffbd77;font-weight:800}
+#app .an2-promise-line strong{font-family:Georgia,serif;font-size:clamp(18px,2vw,27px);font-weight:600}
+#app .an2-platform{margin-top:17px;border:1px solid #af6731;border-radius:23px;overflow:hidden;background:linear-gradient(130deg,#261810,#11171d 75%);display:grid;grid-template-columns:minmax(0,1.5fr) minmax(230px,.7fr);scroll-margin-top:130px}
+#app .an2-platform-copy{padding:55px clamp(20px,4.2vw,62px)}
+#app .an2-metrics{display:flex;flex-wrap:wrap;gap:24px;margin:26px 0}
+#app .an2-metrics div{display:grid;gap:5px;border-left:1px solid #aa6937;padding-left:16px}
+#app .an2-metrics strong{font-size:clamp(26px,3vw,43px);color:#ffb363}
+#app .an2-metrics span{font-size:10px;letter-spacing:1px;color:#d0bba9;font-weight:800}
+#app .an2-primary{display:inline-block;padding:13px 19px;border-radius:12px;background:#b35d1f;color:#fff!important;text-decoration:none;font-size:12px;font-weight:900;letter-spacing:.6px}
+#app .an2-platform-visual{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:25px;padding:30px;background:linear-gradient(10deg,#120c0cdb,#35201399),url('assets/hero-students.jpg') center/cover;min-height:320px}
+#app .an2-platform-visual>span{font-size:12px;letter-spacing:4px;color:#ffd3a1;font-weight:900}
+#app .an2-platform-visual strong{font-size:clamp(23px,2.4vw,38px);line-height:1.2}
+#app .an2-platform-visual div{display:flex;flex-wrap:wrap;gap:6px}
+#app .an2-platform-visual small{border:1px solid #fac39099;padding:7px 11px;border-radius:99px;background:#100d0cb8;font-size:9px;letter-spacing:1px}
+#app .an2-all-services .an2-lead{max-width:830px}
+#app .an2-service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-top:24px}
+#app .an2-service{padding:21px 17px;display:flex;gap:14px;border:1px solid #85512f;border-radius:15px;background:linear-gradient(150deg,#211d1a,#101419);min-height:205px}
+#app .an2-service-num{font-weight:900;color:#ffad5e;font-size:16px;line-height:1.3}
+#app .an2-service h3{font-size:16px;line-height:1.35;color:#ffca95;margin-bottom:11px}
+#app .an2-service p{font-size:12px;line-height:1.65;margin-bottom:13px;color:#c8beb4}
+#app .an2-service a{display:inline-block;margin-top:auto;color:#ffc48a;font-size:10px;letter-spacing:1px;font-weight:900;text-decoration:none}
+#app .an2-trust-grid,#app .an2-future-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+#app .an2-trust-grid article,#app .an2-future-grid article{border:1px solid #73492c;background:#1e1814;border-radius:15px;padding:22px}
+#app .an2-trust-grid b{display:block;color:#ff9d3e;font-size:27px;margin-bottom:13px}
+#app .an2-trust-grid h3{font-size:18px;margin-bottom:11px}
+#app .an2-trust-grid p,#app .an2-future-grid p{margin-bottom:0;font-size:13px}
+#app .an2-future-grid span{font-size:11px;font-weight:900;letter-spacing:1.4px;color:#ffbb77}
+#app .an2-future-note{margin:25px 0 0;padding-top:17px;border-top:1px solid #825436;font-style:italic}
+#app .an2-closing{margin-top:17px;background:radial-gradient(circle at 12% 25%,#66331544,transparent 38%),linear-gradient(130deg,#201910,#111720);border:1px solid #a06034;border-radius:23px;display:grid;grid-template-columns:210px 1fr;gap:26px;padding:42px;align-items:start}
+#app .an2-closing img{width:100%;border-radius:17px}
+#app .an2-closing div>span{font-size:11px;letter-spacing:2px;color:#ffb46c;font-weight:900}
+#app .an2-closing h2{margin-top:10px}
+#app .an2-closing .an2-cta{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0}
+#app .an2-cta a{border:1px solid #a96232;color:#ffe5c6;border-radius:10px;padding:12px 16px;text-decoration:none;font-size:12px;font-weight:800}
+#app .an2-cta a:first-child{background:#a65e29}
+#app .an2-closing small{font-size:10px;line-height:1.7;color:#aeb0b0}
+@media(max-width:1000px){
+ #app .an2-founder-hero{grid-template-columns:185px 1fr;gap:15px}
+ #app .an2-founder-person{display:none}
+ #app .an2-founder-brand{padding:20px 0 20px 20px}
+ #app .an2-founder-quote{margin:18px 18px 18px 0}
+ #app .an2-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:650px){
+ #app .an2-story{width:calc(100% - 20px)!important;padding-top:11px}
+ #app .an2-topline{font-size:8px;letter-spacing:1px}
+ #app .an2-founder-hero{grid-template-columns:1fr;gap:0;border-radius:19px}
+ #app .an2-founder-brand{padding:20px 20px 10px;display:grid;grid-template-columns:106px 1fr;gap:12px;align-items:center}
+ #app .an2-founder-brand img{width:104px;aspect-ratio:1;grid-row:1/3}
+ #app .an2-founder-brand span{font-size:8px}
+ #app .an2-founder-brand strong{font-size:18px}
+ #app .an2-founder-quote{margin:10px 15px 15px;padding:18px}
+ #app .an2-founder-quote blockquote{font-size:14px;line-height:1.7}
+ #app .an2-quote-mark{font-size:63px;height:39px}
+ #app .an2-founder-person{display:flex;min-height:180px;height:200px}
+ #app .an2-founder-person img{height:230px;width:200px;left:auto;right:4%;bottom:43px;object-fit:contain}
+ #app .an2-founder-person figcaption{width:100%;min-height:44px;padding:8px 15px;align-items:flex-start;text-align:left}
+ #app .an2-founder-person figcaption strong{font-size:11px}
+ #app .an2-founder-person figcaption span{font-size:8px}
+ #app .an2-nav{top:48px;margin:0 -2px;padding:12px 0}
+ #app .an2-intro-section,#app .an2-story-chapter,#app .an2-all-services,#app .an2-future{padding:25px 17px;border-radius:18px}
+ #app .an2-story h1,#app .an2-story h2{font-size:29px}
+ #app .an2-chapter-layout,#app .an2-prose-columns,#app .an2-platform,#app .an2-trust-grid,#app .an2-future-grid,#app .an2-closing{grid-template-columns:1fr}
+ #app .an2-platform-copy{padding:27px 18px}
+ #app .an2-service-grid{grid-template-columns:1fr}
+ #app .an2-service{min-height:0}
+ #app .an2-platform-visual{min-height:225px}
+ #app .an2-origin-aside img{height:190px}
+ #app .an2-origin-aside{max-width:100%}
+ #app .an2-closing{padding:25px;gap:18px}
+ #app .an2-closing>img{width:110px}
+ #app .an2-metrics{gap:13px}
+ #app .an2-metrics div{padding-left:9px}
+ #app .an2-metrics span{font-size:9px}
+ #app .an2-readmore-separate{gap:8px!important}
+}
