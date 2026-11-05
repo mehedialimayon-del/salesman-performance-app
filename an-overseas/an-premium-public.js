@@ -98,22 +98,20 @@ function showTeam(){
  const isFounder=m.id==='nusrat-nasrin'||String(m.name).trim().toLowerCase()==='nusrat nasrin';
  const imageHtml=photo?'<button class="an-manager-photo-button" type="button" data-an-preview="'+esc(photo)+'" data-an-title="'+esc(m.name)+'" aria-label="View full photo of '+esc(m.name)+'"><img class="an-manager-photo" src="'+esc(photo)+'" alt="'+esc(m.name)+'" loading="lazy"></button>'
   :'<div class="an-manager-photo an-manager-photo-empty"><span>A</span>&amp;<span>N</span></div>';
- const nameHtml=managerField('NAME',m.name,'an-manager-name-box');
- const supportHtml=managerField('STUDENT SUPPORT',help,'an-manager-bio-box');
- const emailHtml=validEmail?'<a class="an-manager-field an-manager-email-box" href="mailto:'+esc(email)+'" aria-label="Email '+esc(m.name)+'"><span class="an-manager-field-label">EMAIL ↗</span><span class="an-manager-field-value">'+esc(email)+'</span></a>':'';
- const phoneHtml=phone.length>=8?'<a class="an-manager-field an-manager-phone-box" href="tel:'+esc(phone)+'" aria-label="Call '+esc(m.name)+'"><span class="an-manager-field-label">PHONE ↗</span><span class="an-manager-field-value">'+esc(m.phone)+'</span></a>':'';
- const storyHtml=portfolio
-  ?'<div class="an-manager-trust"><span class="an-manager-trust-label">'+(isFounder?'BEHIND THE BRAND · A REAL JOURNEY':'THE PERSON BEHIND THE ROLE')+'</span><span class="an-manager-trust-copy">'+(isFounder?'Education · Achievements · Professional story':'Background · Experience · Personal journey')+'</span></div>'
-  :'';
- const buttonsHtml=
-   (portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'DISCOVER THE FOUNDER':'VIEW THEIR PORTFOLIO')+' ↗</a>':'')
-  +(isFounder?'<a class="an-manager-action an-manager-action-secondary" href="./admin-app/" target="_blank" rel="noopener noreferrer">ADMIN ↗</a>':'');
- panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role)+'</div>'
-  +'<div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
-  +'<div class="an-manager-information">'
-  +nameHtml+supportHtml+emailHtml+phoneHtml+storyHtml
-  +'<div class="an-manager-actions">'+buttonsHtml+'</div>'
-  +'</div></div>';
+ const mailIcon='<svg class="an-mail" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4.1-8 5-8-5V6l8 5 8-5v2.1Z"/></svg>';
+ const waIcon='<svg class="an-wa" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.52 3.48A11.82 11.82 0 0 0 12.07 0C5.49 0 .13 5.34.12 11.91a11.8 11.8 0 0 0 1.6 5.96L0 24l6.29-1.65a11.95 11.95 0 0 0 5.77 1.47h.01c6.57 0 11.94-5.35 11.94-11.93a11.8 11.8 0 0 0-3.49-8.41ZM12.07 21.8a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.73.98 1-3.64-.24-.38a9.83 9.83 0 0 1-1.52-5.26c0-5.47 4.46-9.92 9.94-9.92a9.88 9.88 0 0 1 7.03 2.91 9.87 9.87 0 0 1 2.9 7.02c0 5.47-4.46 9.92-9.98 9.92Zm5.45-7.44c-.3-.15-1.76-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.14-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.66-1.6-.9-2.18-.23-.56-.47-.48-.66-.49h-.56c-.2 0-.52.08-.79.37s-1.03 1.01-1.03 2.46 1.06 2.86 1.21 3.06c.15.2 2.09 3.18 5.06 4.45.71.31 1.26.49 1.7.63.71.22 1.35.19 1.85.12.56-.08 1.76-.72 2.01-1.42.25-.7.25-1.3.17-1.42-.07-.13-.27-.2-.57-.35Z"/></svg>';
+ const emailHtml=validEmail?'<a class="an-manager-contact" href="mailto:'+esc(email)+'" aria-label="Email '+esc(m.name)+'">'+mailIcon+'<span><small>EMAIL</small><b>'+esc(email)+'</b></span></a>':'';
+ const waNumber=phone.replace(/[^0-9]/g,'');
+ const whatsappHtml=waNumber.length>=8?'<a class="an-manager-contact" href="https://wa.me/'+waNumber+'" target="_blank" rel="noopener noreferrer" aria-label="Chat with '+esc(m.name)+' on WhatsApp">'+waIcon+'<span><small>WHATSAPP</small><b>Start a conversation ↗</b></span></a>':
+ '<span class="an-manager-contact an-contact-unavailable" title="WhatsApp number has not been published">'+waIcon+'<span><small>WHATSAPP</small><b>Contact number not published</b></span></span>';
+ const nameHtml='<div class="an-manager-name-box"><span class="an-manager-label">NAME</span><h3>'+esc(m.name)+'</h3></div>';
+ const designationHtml='<div class="an-manager-position"><span class="an-manager-label">DESIGNATION</span><strong>'+esc(role)+'</strong></div>';
+ const supportHtml=help?'<div class="an-manager-support"><span class="an-manager-label">STUDENT SUPPORT</span><p>'+esc(help)+'</p></div>':'';
+ const buttonsHtml=portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'DISCOVER THE FOUNDER':'VIEW PORTFOLIO')+' ↗</a>':'';
+ panel.innerHTML='<div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
+  +'<div class="an-manager-information">'+nameHtml+designationHtml+supportHtml
+  +'<div class="an-manager-contacts">'+emailHtml+whatsappHtml+'</div>'
+  +'<div class="an-manager-actions">'+buttonsHtml+'</div></div></div>';
  counter.textContent=(teamIndex+1)+' / '+members.length;
 }
 function apply(){
