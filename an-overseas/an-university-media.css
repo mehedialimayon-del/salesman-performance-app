@@ -65,3 +65,56 @@
  .an-guide-card .an-guide-ticket::before{font-size:18px}
  .an-guide-card .an-guide-scholarship-enquiry::before,.an-guide-card .an-uni-discount::before{font-size:16px}
 }
+
+/* 2026-11-06 authentic campus images are FULL-BLEED. No small thumbnail container. */
+.an-guide-card .uni-cover-wrap{isolation:isolate;position:relative;overflow:hidden}
+.an-guide-card .uni-cover-wrap .an-fullbleed-photo,
+.an-guide-card .uni-cover-wrap > img.campus-cover.an-guide-photo,
+.an-guide-card .uni-cover-wrap > img.an-guide-photo.an-commons-photo {
+  display:block!important;position:absolute!important;inset:0!important;
+  width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;
+  min-width:100%!important;min-height:100%!important;
+  object-fit:cover!important;object-position:center center!important;
+  padding:0!important;margin:0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;z-index:2!important;
+}
+.an-guide-card .uni-cover-wrap.an-has-campus-photo .an-identity-logo-only{
+  visibility:hidden!important;pointer-events:none!important;
+}
+.an-guide-card .uni-cover-wrap.an-has-campus-photo::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:linear-gradient(180deg,transparent 30%,#05070d6e 100%);
+}
+.an-guide-card .uni-cover-wrap .an-guide-credit{z-index:5!important}
+.an-guide-card .uni-cover-wrap .an-guide-rank,
+.an-guide-card .uni-cover-wrap .an-guide-scholarship-enquiry,
+.an-guide-card .uni-cover-wrap .an-guide-ticket,
+.an-guide-card .uni-cover-wrap .an-uni-discount{z-index:8!important}
+/* Institution identity fallback when a genuine photograph or logo could not be verified. */
+.an-guide-card .an-identity-logo-only{
+  inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  background:radial-gradient(circle at 55% 22%,#a25b263d,transparent 64%),linear-gradient(155deg,#132238,#24180f)!important;
+  text-align:center!important;
+}
+.an-guide-card .an-identity-logo-only .an-logo-stage{
+  width:100%!important;height:100%!important;padding:10px 12px 25px!important;
+  display:flex!important;justify-content:center!important;align-items:center!important;
+}
+.an-guide-card .an-identity-logo-only .an-identity-name{
+  bottom:9px!important;z-index:3!important;font-size:clamp(10px,1.1vw,14px)!important;
+  max-height:36px!important;text-shadow:0 3px 9px #000b!important;
+}
+.an-guide-card .an-identity-logo-only .an-center-monogram{
+  left:50%!important;top:46%!important;max-width:calc(100% - 20px)!important;
+  font-size:clamp(24px,3vw,46px)!important;letter-spacing:1px!important;line-height:1.1!important;
+  white-space:normal!important;text-wrap:balance!important;overflow-wrap:anywhere!important;
+}
+.an-guide-card .an-identity-logo-only .an-center-logo.an-verified-media{
+  max-width:60%!important;max-height:72%!important;width:auto!important;height:auto!important;
+  padding:9px!important;object-fit:contain!important;
+}
+@media(max-width:520px){
+  .an-guide-card .uni-cover-wrap{height:150px!important}
+  .an-guide-card .an-identity-logo-only .an-center-monogram{font-size:clamp(18px,5vw,30px)!important}
+  .an-guide-card .an-identity-logo-only .an-identity-name{font-size:10px!important}
+}
