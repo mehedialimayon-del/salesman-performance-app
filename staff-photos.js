@@ -55,6 +55,16 @@
       if(manager)p=person(manager.staff_id||manager.id);
     }catch(_){}
   }
+  const head=document.querySelector('#app main.wrap .head');
+  if(head){
+    let tag=head.querySelector('.ffDashSelectedLabel');
+    if(!tag){tag=document.createElement('span');tag.className='ffDashSelectedLabel';head.append(tag);}
+    const zone=document.querySelector('#ffDashboardZone')?.value||'ALL';
+    const staff=document.querySelector('#ffScopeStaff');
+    const name=p?.full_name||(selected&&selected!=='ALL'?(staff?.selectedOptions?.[0]?.textContent||selected):null);
+    tag.textContent=name||('Combined team'+(zone&&zone!=='ALL'?' · '+(zone==='PRIMARY'?'KL ZONE':zone):''));
+    tag.title=tag.textContent;
+  }
   const old=hero.querySelector('.ffDashStaffIdentity');
   if(!p){old?.remove();document.querySelector('.ffScopeFilter .ffScopeAvatar')?.remove();return;}
   if(old?.dataset.staffId===p.staff_id){patchAvatar(old.querySelector('.ffDashStaffAvatar'),p.staff_id,'ffDashStaffAvatar ffStaffCircle');return;}
@@ -158,6 +168,12 @@
  .ffDashStaffIdentity{display:flex;align-items:center;gap:7px;max-width:42%;min-width:0;padding:2px 4px}
  .ffDashStaffIdentity .ffDashStaffName{font-size:10px;color:#fff;line-height:1.3;overflow:hidden;text-overflow:ellipsis;max-width:85px}
  .ffDashStaffAvatar{width:38px;height:38px;min-width:38px}
+ .dashHero{min-width:0!important;gap:8px!important}
+ .dashHero>div:first-child{min-width:0;flex:1}
+ .dashHero>div:first-child small{display:block;max-width:100%;overflow-wrap:anywhere}
+ #app main.wrap .head:has(+.ffDashboardTabs){display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;flex-wrap:wrap}
+ #app main.wrap .ffDashSelectedLabel{max-width:min(55%,270px);padding:4px 8px;border:1px solid #ac5e2d;border-radius:9px;color:#fff;font-size:11px;font-weight:750;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#1b110b}
+ 
  /* Restore portrait-centred dashboard progress; leave the existing theme intact. */
  .dashHero .dashAch.ffDashProgress{position:relative;flex:0 0 74px;width:74px;height:74px;min-width:74px;border-radius:50%;background:conic-gradient(#ff7b18 var(--ff-dash-progress,0%),#493322 0);display:grid;place-items:center;box-shadow:0 0 15px #ff74172b;color:#ff9a3b!important}
  .dashHero .ffDashProgressFace{position:absolute;inset:6px;border-radius:50%;background:#130e0c;display:grid;place-items:center;overflow:hidden}
