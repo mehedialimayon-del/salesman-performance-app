@@ -145,8 +145,14 @@
      aiAnimating=false;
    },195);
  },true);
- new MutationObserver(()=>{
-   if(document.querySelector('#aiPopup.aiFloatingOverlay:not([data-ff-ai-animated])'))requestAnimationFrame(aiOrigin);
- }).observe(document.body,{childList:true,subtree:false});
+ // Keep an owned document reference: old JSDOM test windows can tear down
+ // their global document before queued MutationObserver callbacks are delivered.
+ const ownedDoc=document;
+ const aiObserver=new MutationObserver(()=>{
+   if(!ownedDoc.documentElement?.isConnected||!app.isConnected)return;
+   if(ownedDoc.querySelector('#aiPopup.aiFloatingOverlay:not([data-ff-ai-animated])'))requestAnimationFrame(aiOrigin);
+ });
+ aiObserver.observe(ownedDoc.body,{childList:true,subtree:false});
+ window.addEventListener('pagehide',()=>aiObserver.disconnect(),{once:true});
  queue();
 })();
