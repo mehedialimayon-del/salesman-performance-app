@@ -203,7 +203,7 @@ const get=country=>{
 const cash=(amount,code)=>Number.isFinite(Number(amount))?Number(amount).toLocaleString('en-US',{maximumFractionDigits:0})+' '+code:'Not verified';
 const bdt= (amount,code)=>{
  const rate=bdtCross[code];if(!rate||!Number.isFinite(Number(amount)))return '(৳ conversion needs a verified rate)';
- return '(≈ ৳'+Math.round(amount*rate/100)*100 .toLocaleString('en-US')+')';
+ return '(≈ ৳'+(Math.round(amount*rate/100)*100).toLocaleString('en-US')+')';
 };
 const withBdt=(amount,code)=>cash(amount,code)+' '+bdt(amount,code);
 window.ANStudyCountry={get,currencies,policy,bdtCross,fxSource,cash,bdt,withBdt,sourceNote};
