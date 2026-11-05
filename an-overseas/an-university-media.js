@@ -115,6 +115,16 @@
      const tag=target.nextElementSibling;if(tag)tag.textContent='University';
    }else if(target instanceof HTMLImageElement&&target.classList.contains('an-center-logo')){
      target.style.display='none';
+   }else if(target instanceof HTMLImageElement&&target.classList.contains('an-guide-photo')){
+     const cover=target.closest('.an-guide-card .uni-cover-wrap');
+     const university=typeof U!=='undefined'?U.find(u=>u.id===cover?.dataset.universityId):null;
+     if(cover&&university&&!cover.querySelector('.an-identity-logo-only')){
+       const profile=typeof UNIVERSITY_PROFILES!=='undefined'?UNIVERSITY_PROFILES[university.id]:null;
+       const oldIdentity=cover.querySelector('.an-guide-identity');
+       if(oldIdentity)oldIdentity.outerHTML=brandFallback(university,profile);
+       cover.querySelector('.uni-card-logo')?.remove();
+       cover.querySelector('.an-guide-credit')?.remove();
+     }
    }else if(target instanceof HTMLImageElement&&target.classList.contains('an-university-mark')){
      target.style.display='none';
    }
