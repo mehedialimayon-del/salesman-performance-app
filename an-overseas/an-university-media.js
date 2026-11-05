@@ -61,6 +61,8 @@
      const pages=(await resp.json())?.query?.pages||[];
      const page=pages[0];
      if(!page||page.missing||normalize(page.title)!==normalize(name)||!page.pageimage)return null;
+     const filename=String(page.pageimage||'');
+     const photoCandidate=!/logo|seal|coat.?of.?arms|crest|emblem|icon|flag|symbol|signature|portrait/i.test(filename);
      const title='File:'+page.pageimage;
      const path='https://commons.wikimedia.org/w/api.php?origin=*&action=query&format=json&formatversion=2&prop=imageinfo&iiprop=url%7Cextmetadata&iiurlwidth=960&titles='+encodeURIComponent(title);
      const res=await fetch(path,{mode:'cors'});if(!res.ok)return null;
@@ -71,7 +73,7 @@
      const image=info.thumburl||info.url;
      if(!/^https:\/\//.test(image)||!/^(https:\/\/upload\.wikimedia\.org\/)/.test(image))return null;
      const credit=String(meta.Artist?.value||'').replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim().slice(0,85);
-     return {url:image,source:info.descriptionurl||'https://commons.wikimedia.org',licence,credit};
+     return {url:image,source:info.descriptionurl||'https://commons.wikimedia.org',licence,credit,photoCandidate:photoCandidate&&Number(info.width)>=550&&Number(info.height)>=300&&Number(info.width)/Number(info.height)>=0.98};
     }catch{return null;}
    })();
    remembered.set(name,req);
@@ -79,7 +81,7 @@
  }
  window.ANUniMedia={websiteIcon,commonsImage};
  function showImage(cover,rec){
-   if(!cover?.isConnected||!rec)return;
+   if(!cover?.isConnected||!rec||!rec.photoCandidate)return;
    if(cover.querySelector('.an-guide-photo'))return;
    const image=document.createElement('img');
    image.className='campus-cover an-guide-photo an-commons-photo';
@@ -109,7 +111,7 @@
    document.querySelectorAll('.an-guide-card .uni-cover-wrap[data-university-title]').forEach(cover=>{
      if(cover.dataset.mediaObserved)return;
      cover.dataset.mediaObserved='1';
-     if(cover.querySelector('.an-guide-photo')||cover.querySelector('.an-identity-logo-only'))return;
+     if(cover.querySelector('.an-guide-photo'))return;
      if(observer)observer.observe(cover);else inspect(cover);
    });
    const campus=document.querySelector('.university-profile #profile-campus');
