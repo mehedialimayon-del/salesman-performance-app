@@ -4,12 +4,12 @@
 (()=>{
  'use strict';
  const root=document.getElementById('app');if(!root)return;
- const loggedIn=()=>!!localStorage.getItem('ffh_session');
  let overlay=null;
  function promptExit(){
-   if(overlay?.isConnected)return;
+   if(overlay?.isConnected||document.querySelector('.ffExitOverlay'))return;
    overlay=document.createElement('div');
    overlay.className='globalSearchOverlay ffExitOverlay ffProtectedExit';
+   overlay.style.zIndex='60000';
    overlay.setAttribute('role','dialog');
    overlay.setAttribute('aria-modal','true');
    overlay.setAttribute('aria-label','Confirm exit');
@@ -33,12 +33,10 @@
  };
  // Add a history guard for the older 1.19 Android wrapper, which sends
  // history.back() directly instead of the new native callback.
- if(loggedIn()){
-   const state={...(history.state||{}),ffhBackGuard:true};
-   history.pushState(state,'',location.href);
- }
+ const state={...(history.state||{}),ffhBackGuard:true};
+ history.pushState(state,'',location.href);
  window.addEventListener('popstate',event=>{
-   if(window.__FFH_ALLOW_EXIT__||!loggedIn())return;
+   if(window.__FFH_ALLOW_EXIT__)return;
    // An overlay's own capture-phase listener handles a photo/modal first.
    const page=localStorage.getItem('ffh_last_page')||history.state?.ffhPage||'home';
    history.pushState({...history.state,ffhPage:page,ffhBackGuard:true},'',location.href);
