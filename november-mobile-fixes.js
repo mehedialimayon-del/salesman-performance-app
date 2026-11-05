@@ -105,7 +105,15 @@
  new MutationObserver(queue).observe(app,{childList:true,subtree:true});
  window.addEventListener('resize',queue,{passive:true});
  window.visualViewport?.addEventListener('resize',queue,{passive:true});
- app.addEventListener('change',e=>{if(e.target?.name==='can_sell'||e.target?.name==='designation')queue()},true);
+ app.addEventListener('change',e=>{
+   if(e.target?.name==='can_sell'&&e.target.closest?.('#ffAccountForm')?.elements?.designation?.value==='SR'&&!e.target.checked){
+     // Existing account save semantics always enforce can_sell for SR position.
+     // Tell the owner instead of implying this toggle removes the basic SR role.
+     e.target.checked=true;
+     window.alert('SR role includes daily sales. To remove that role, change Position and review the assigned route first. Additional permissions below can still be revoked.');
+   }
+   if(e.target?.name==='can_sell'||e.target?.name==='designation')queue();
+ },true);
  function aiOrigin(){
    const orb=app.querySelector('#orb'),popup=document.querySelector('#aiPopup.aiFloatingOverlay');
    if(!orb||!popup||!popup.isConnected||popup.dataset.ffAiAnimated)return;
