@@ -1,0 +1,61 @@
+/* A&N overseas education: international student decision centre · 2026-11-05 */
+.an-student-planner{color:#f9f4ec;display:grid;gap:15px;margin:5px 0 28px;min-width:0}
+.an-study-header{padding:19px 20px;border:1px solid #ac6c30;border-radius:18px;background:linear-gradient(125deg,#38210e,#0f1620 75%);display:flex;justify-content:space-between;align-items:flex-start;gap:13px;flex-wrap:wrap}
+.an-study-header small{font-size:10px;letter-spacing:.8px;color:#ffd098;font-weight:850}
+.an-study-header h2{font-size:clamp(23px,3.5vw,34px);line-height:1.15;margin:8px 0;color:#fff;letter-spacing:-.5px}
+.an-study-header h2 span{color:#ff971b}
+.an-study-header p{font-size:12px;color:#dfd1c0;margin:5px 0}
+.an-study-review{font-size:9px;border:1px solid #ab682c;background:#2c180a;color:#eac8a0;border-radius:30px;padding:8px 11px;white-space:nowrap}
+.an-study-progress{display:flex;gap:7px;flex-wrap:wrap}
+.an-study-progress>span{font-size:10px;display:flex;align-items:center;gap:6px;background:#1a1b1b;border:1px solid #65452a;border-radius:20px;padding:6px 9px;color:#f0d2a9}
+.an-study-progress b{font-size:9px;color:#ff9d22}
+.an-study-section{background:linear-gradient(150deg,#11161d,#0c0f13);border:1px solid #744a29;border-radius:16px;padding:19px 20px;box-shadow:0 7px 21px #0005;min-width:0}
+.an-study-section>header{display:flex;align-items:center;gap:10px;margin-bottom:14px;border-bottom:1px solid #6e472c;padding-bottom:12px}
+.an-study-section-icon{background:#30200f;color:#ffcb77;border:1px solid #9f662f;width:35px;height:35px;border-radius:10px;display:grid;place-items:center;font-size:19px;flex:none}
+.an-study-section h3{font-size:clamp(17px,2.3vw,21px);margin:0;color:#ffd095;letter-spacing:-.25px}
+.an-study-section h4{margin:12px 0 6px;color:#ffc07c;font-size:13px}
+.an-study-section p,.an-study-section li{color:#d5d1ce;font-size:12px;line-height:1.75}
+.an-study-section p strong{color:#ffe3b4}
+.an-study-degree-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.an-study-degree{background:#101923;border:1px solid #87542b;border-radius:11px;min-width:0}
+.an-study-degree>summary{cursor:pointer;list-style:none;padding:13px 11px;display:flex;align-items:center;justify-content:space-between;gap:5px;flex-wrap:wrap;color:#ffb04b;font-weight:900}
+.an-study-degree>summary::-webkit-details-marker{display:none}
+.an-study-degree>summary>span:first-child{font-size:16px}
+.an-study-degree>summary .an-study-check{font-size:9px;color:#dfb989;font-weight:650}
+.an-study-degree>summary b{color:#fff4d6}
+.an-study-degree[open]>summary{border-bottom:1px solid #674225}
+.an-study-degree-body{padding:8px 13px 14px}
+.an-study-degree-body ul{margin:7px 0 11px;padding-left:19px}
+.an-study-degree-body li{margin:4px 0;overflow-wrap:anywhere}
+.an-study-tag{background:#2e2013;color:#f4d6ab!important;border-radius:7px;padding:8px;font-size:10px!important}
+.an-study-note{background:#261e16;color:#d4bda0!important;border-left:3px solid #d88a29;padding:11px;border-radius:7px;margin:12px 0 0!important;font-size:11px!important}
+.an-study-sources{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
+.an-study-sources a{display:inline-flex;align-items:center;min-height:33px;border-radius:9px;border:1px solid #ab6a31;color:#ffbb65;font-size:11px;text-decoration:none;padding:7px 10px;background:#24170f;font-weight:750;overflow-wrap:anywhere}
+.an-study-sources a:hover{color:#fff;background:#572c0f}
+.an-study-steps{margin:5px 0 12px;padding-left:22px}
+.an-study-steps li{padding:4px 2px}
+.an-study-job-grid,.an-study-mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:11px 0}
+.an-study-job-grid article,.an-study-mini-grid article{background:#1a1c22;border:1px solid #5b402b;border-radius:11px;padding:12px;min-width:0}
+.an-study-mini-grid b{color:#ffc57c;font-size:12px}
+.an-study-mini-grid p,.an-study-job-grid p{font-size:11px!important;line-height:1.65!important}
+.an-study-job-grid h4{font-size:12px!important;margin:0 0 8px!important}
+.an-study-big-range{padding:15px;background:linear-gradient(115deg,#302314,#181c24);border:1px solid #986331;border-radius:13px;display:grid;gap:6px}
+.an-study-big-range strong{font-size:clamp(16px,2.3vw,21px);line-height:1.6;color:#ffc06d;overflow-wrap:anywhere}
+.an-study-big-range small{font-size:10px;color:#c3bbb2}
+.an-study-cost-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:13px 0}
+.an-study-cost-grid label{display:grid;gap:7px;font-size:10px;color:#ffcf91;font-weight:700;min-width:0}
+.an-study-cost-grid input{width:100%;min-width:0;min-height:44px;padding:10px;background:#0d1420;color:#fff;border:1px solid #94633b;border-radius:9px;font-size:12px}
+.an-study-cost-grid input:focus{border-color:#ffaf48;outline:2px solid #ff900033}
+.an-study-cost-grid input::placeholder{color:#8e9097}
+.an-study-total{display:grid;gap:8px;margin:15px 0;padding:16px;border:1px solid #c07c34;border-radius:12px;background:#2a1a0d}
+.an-study-total strong{color:#ffd08c;font-size:14px}
+.an-study-total output{color:#fff;font-size:16px;font-weight:800;line-height:1.4}
+.an-study-total small{color:#cebba1;font-size:11px}
+.an-study-footer{border:1px solid #8c572b;background:#20160d;padding:12px;border-radius:11px}
+.an-study-footer p{font-size:10px;color:#d5c4a9;line-height:1.7;margin:0 0 8px}
+.an-study-footer a{color:#ffb85e;font-size:12px;font-weight:850}
+.an-catalogue-index{position:absolute;top:8px;left:8px;z-index:8;display:inline-flex;gap:4px;align-items:center;background:#080d13eb;color:#fff;border:1px solid #f3a74f;border-radius:9px;padding:5px 8px;font-size:11px;font-weight:900;font-variant-numeric:tabular-nums;box-shadow:0 4px 12px #0008}
+.an-catalogue-index small{font-size:9px;font-weight:650;color:#ffbf6a}
+.an-guide-card:has(.an-catalogue-index) .an-guide-rank{top:auto;bottom:8px;left:8px}
+@media(max-width:850px){.an-study-degree-grid{grid-template-columns:1fr}.an-study-mini-grid,.an-study-job-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.an-study-section{padding:14px 12px}.an-study-header{padding:15px 13px}.an-study-mini-grid,.an-study-job-grid{grid-template-columns:1fr}.an-study-cost-grid{grid-template-columns:1fr}.an-study-progress>span{font-size:9px}.an-study-section h3{font-size:17px}.an-catalogue-index{font-size:9px;padding:4px 6px;top:6px;left:6px}.an-catalogue-index small{font-size:8px}}
