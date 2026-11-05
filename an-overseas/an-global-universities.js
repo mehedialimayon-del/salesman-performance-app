@@ -71,11 +71,12 @@ async function loadPublicDirectory(){
     // Do not allocate full detail profiles for every imported directory row on mobile.
     if(location.hash.startsWith('#/universities')&&typeof renderResults==='function')renderResults();
     if(location.hash.startsWith('#/countries')&&typeof render==='function')render();
+    if(location.hash.startsWith('#/favorites'))window.ANUniversityFavorites?.renderSaved?.();
    }catch(err){window.ANWorldDirectoryStatus={source:'Curated local list',added:0,note:'Supplement unavailable'};}
  })();return loading;
 }
 function maybeLoad(){
- if(!/^#\/(universities|countries)\b/.test(location.hash))return;
+ if(!/^#\/(universities|countries|favorites)\b/.test(location.hash))return;
  enrich();
  loadPublicDirectory();
 }
