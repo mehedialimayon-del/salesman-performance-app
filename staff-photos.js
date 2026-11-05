@@ -33,16 +33,37 @@
  }
  function dashboard(){
   const hero=document.querySelector('.dashHero');if(!hero)return;
+  const progress=hero.querySelector('.dashAch');
+  if(progress&&!progress.classList.contains('ffDashProgress')){
+    const label=progress.textContent.trim(),value=Math.max(0,Math.min(100,Number.parseFloat(label)||0));
+    progress.classList.add('ffDashProgress');
+    progress.style.setProperty('--ff-dash-progress',value+'%');
+    const face=document.createElement('span');face.className='ffDashProgressFace';
+    const percentage=document.createElement('span');percentage.className='ffDashProgressLabel';percentage.textContent=label;
+    progress.replaceChildren(face,percentage);
+  }
   const selected=document.querySelector('#ffScopeStaff')?.value||'';
   const text=hero.querySelector('small')?.textContent||'';
   let p=(selected&&selected!=='ALL'?person(selected):null);
   if(!p&&!selected&&!/combined|all\s+team/i.test(text))p=[...avatars.values()].find(x=>x.full_name&&text.includes(x.full_name));
+  // A selected zone with combined SR data still shows that zone's manager portrait.
+  // Only reuse real, active manager records already loaded by the application.
+  if(!p&&(!selected||selected==='ALL')){
+    const zone=document.querySelector('#ffDashboardZone')?.value;
+    try{
+      const people=typeof U==='undefined'?[]:U;
+      const manager=zone&&zone!=='ALL'&&Array.isArray(people)?people.find(x=>String(x.zone||'').toUpperCase()===String(zone).toUpperCase()&&x.can_manage&&x.active!==false):null;
+      if(manager)p=person(manager.id);
+    }catch(_){}
+  }
   const old=hero.querySelector('.ffDashStaffIdentity');
   if(!p){old?.remove();document.querySelector('.ffScopeFilter .ffScopeAvatar')?.remove();return;}
   if(old?.dataset.staffId===p.staff_id){patchAvatar(old.querySelector('.ffDashStaffAvatar'),p.staff_id,'ffDashStaffAvatar ffStaffCircle');return;}
   old?.remove();const block=document.createElement('div');block.className='ffDashStaffIdentity';block.dataset.staffId=p.staff_id;
   const circle=makeAvatar(p.staff_id,'ffDashStaffAvatar ffStaffCircle');const label=document.createElement('span');label.className='ffDashStaffName';label.textContent=p.full_name;
-  block.append(circle,label);hero.insertBefore(block,hero.lastElementChild);
+  block.append(circle,label);
+  const face=progress?.querySelector('.ffDashProgressFace');
+  if(face)face.append(block);else hero.insertBefore(block,hero.lastElementChild);
   const scope=document.querySelector('.ffScopeFilter summary');if(scope){let slot=scope.querySelector('.ffScopeAvatar');if(!slot){slot=document.createElement('span');slot.className='ffScopeAvatar ffStaffCircle';scope.prepend(slot);}patchAvatar(slot,p.staff_id,'ffScopeAvatar ffStaffCircle');}
  }
  function accountCards(){
@@ -82,6 +103,9 @@
 
  function pickers(){
   for(const row of document.querySelectorAll('.ffItemPicker .ffPickerOption')){
+   // Zone rows already render their manager portrait; injecting a generic
+   // staff avatar here produced two identical circles for every zone.
+   if(row.classList.contains('ffZoneManagerRow'))continue;
    const text=row.querySelector('strong,.ffPickerText')?.textContent||row.querySelector('span:not(.ffPickerAvatar)')?.textContent||'';
    const p=person(row.dataset.staffId)||byName(text)||[...avatars.values()].find(x=>text.includes(x.staff_id));
    if(!p)continue;
@@ -135,6 +159,14 @@
  .ffDashStaffIdentity{display:flex;align-items:center;gap:7px;max-width:42%;min-width:0;padding:2px 4px}
  .ffDashStaffIdentity .ffDashStaffName{font-size:10px;color:#fff;line-height:1.3;overflow:hidden;text-overflow:ellipsis;max-width:85px}
  .ffDashStaffAvatar{width:38px;height:38px;min-width:38px}
+ /* Restore portrait-centred dashboard progress; leave the existing theme intact. */
+ .dashHero .dashAch.ffDashProgress{position:relative;flex:0 0 74px;width:74px;height:74px;min-width:74px;border-radius:50%;background:conic-gradient(#ff7b18 var(--ff-dash-progress,0%),#493322 0);display:grid;place-items:center;box-shadow:0 0 15px #ff74172b;color:#ff9a3b!important}
+ .dashHero .ffDashProgressFace{position:absolute;inset:6px;border-radius:50%;background:#130e0c;display:grid;place-items:center;overflow:hidden}
+ .dashHero .ffDashProgressFace .ffDashStaffIdentity{width:100%;height:100%;max-width:none;min-width:0;padding:0;display:grid;place-items:center}
+ .dashHero .ffDashProgressFace .ffDashStaffAvatar{width:100%;height:100%;min-width:0;border:0;border-radius:50%}
+ .dashHero .ffDashProgressFace .ffDashStaffName{display:none}
+ .dashHero .ffDashProgressLabel{position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);z-index:2;min-width:35px;text-align:center;padding:1px 5px;border:1px solid #ff7b18;border-radius:10px;background:#130e0c;color:#fff!important;font-size:12px!important;font-weight:900;line-height:1.4;white-space:nowrap}
+ 
  .ffScopeAvatar{width:24px;height:24px;min-width:24px;margin-right:5px}
  .ffConversationAvatar.ffStaffCircle{width:42px;height:42px;min-width:42px}
  .ffChatTitleAvatar{width:29px;height:29px;min-width:29px;margin-right:8px}
