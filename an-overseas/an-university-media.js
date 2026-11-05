@@ -86,7 +86,7 @@
    document.querySelectorAll('.an-guide-card .uni-cover-wrap[data-university-title]').forEach(cover=>{
      if(cover.dataset.mediaObserved)return;
      cover.dataset.mediaObserved='1';
-     if(cover.querySelector('.an-guide-photo'))return;
+     if(cover.querySelector('.an-guide-photo')||cover.querySelector('.an-identity-logo-only'))return;
      if(observer)observer.observe(cover);else inspect(cover);
    });
    const campus=document.querySelector('.university-profile #profile-campus');
@@ -113,6 +113,8 @@
    if(target instanceof HTMLImageElement&&target.classList.contains('an-identity-logo')){
      target.style.display='none';
      const tag=target.nextElementSibling;if(tag)tag.textContent='University';
+   }else if(target instanceof HTMLImageElement&&target.classList.contains('an-center-logo')){
+     target.style.display='none';
    }else if(target instanceof HTMLImageElement&&target.classList.contains('an-university-mark')){
      target.style.display='none';
    }
