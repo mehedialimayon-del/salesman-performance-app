@@ -185,7 +185,7 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: |
-            set -euo pipefail
+            set -eu
             apk="$(find dist -type f -name '*.apk' ! -name '*unsigned*' -print -quit)"
             test -n "$apk" || { echo 'No installable APK in artifact'; exit 1; }
             echo "Installing $apk"
