@@ -57,7 +57,8 @@ function firstArrival(u,p){
 function label(node,key,i){
  const [,title,icon]=ORDER[i],number=String(i+1).padStart(2,'0');
  node.id='profile-'+key;node.classList.add('an-portfolio-order');node.dataset.portfolioNumber=number;
- const h=node.querySelector(':scope > h2')||node.querySelector(':scope > header > h3');
+ node.querySelector(':scope > header > .an-study-section-icon')?.remove();
+ const h=node.querySelector(':scope > h2')||node.querySelector(':scope > header > h3')||node.querySelector('.an-guide-support-head h2');
  if(h){
    h.textContent=title;
    const ic=document.createElement('span');ic.className='an-portfolio-icon';ic.setAttribute('aria-hidden','true');ic.textContent=icon;
