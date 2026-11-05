@@ -86,6 +86,11 @@ function anNumberedCard(u){
   html=html.replace('University · '+esc(u.country),'Type not verified · '+esc(u.country));
  }
  html=html.replace(/<span class="an-catalogue-index"[^>]*>[\s\S]*?<\/small><\/span>/,'');
+ if(u.closedDate){
+   html=html.replace('<span class="badge">','<span class="badge an-type-closed">');
+   html=html.replace('<div class="inside">','<div class="inside"><div class="an-closed-status">HISTORICAL RECORD · CLOSED '+esc(u.closedDate)+'</div>');
+   return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite).replace('</article>','<p class="an-no-applications">Institution closed — applications unavailable</p></article>');
+ }
  return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite).replace('</article>','<a class="an-catalogue-apply" href="#/apply/'+encodeURIComponent(u.id)+'" aria-label="Start an A&amp;N application for '+esc(u.name)+'">Apply through A&amp;N ↗</a></article>');
 }
 renderResults=function(){
