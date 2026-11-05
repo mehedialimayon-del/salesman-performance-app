@@ -22,7 +22,9 @@ const ffhZoneManagers=async()=>{
 };
 window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect}){
  items=items.map(item=>window.FFH_STAFF_ITEM?.(item)||item);
- const isZonePicker=/\bzone\b/i.test(String(title)) && !/assig(n|nee)/i.test(String(title));
+ // A mixed "Choose person / zone" picker contains staff IDs, not just zones.
+ // Never interpret a staff ID as a zone or display "MANAGER NOT ASSIGNED" for it.
+ const isZonePicker=/\bzone\b/i.test(String(title)) && !/person|staff|representative|\bsr\b|assig(n|nee)/i.test(String(title));
  let managers=new Map();
  const ov=document.createElement('div');ov.className='globalSearchOverlay ffItemPicker'+(isZonePicker?' ffZoneManagerPicker':'');
  ov.innerHTML='<section class="globalSearchBox"><div class="row"><h2></h2><button type="button" class="secondary">CLOSE</button></div><input class="ffPickerSearch" placeholder="Search name, code or zone…"><div class="ffPickerRows"></div></section>';
