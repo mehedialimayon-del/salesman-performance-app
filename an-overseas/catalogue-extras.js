@@ -77,7 +77,7 @@ renderResults=function(){
  const term=searchTerm.toLowerCase().trim(),req=pref.requirement.toLowerCase().trim();
  const signature=[filterCountry,term,req,pref.kind,pref.level,pref.subject,pref.currency,pref.minFee,pref.maxFee,pref.order,scholarshipOnly,U.length].join('|');
  if(signature!==lastQuerySignature){visibleLimit=80;lastQuerySignature=signature;}
- const feeFilter=pref.minFee!==''||pref.maxFee!=='',needsCurrency=feeFilter&&pref.currency==='Any currency';
+ const feeFilter=pref.minFee!==''||pref.maxFee!=='',needsCurrency=(feeFilter||pref.order.startsWith('Published fee:'))&&pref.currency==='Any currency';
  let found=needsCurrency?[]:U.filter(u=>{
   const p=UNIVERSITY_PROFILES[u.id]||{},str=[u.name,u.short,u.country,u.city,...(u.programs||[]),...(p.programs||[])].join(' ').toLowerCase();
   if(!str.includes(term)||filterCountry!=='All Countries'&&filterCountry!==u.country)return false;
