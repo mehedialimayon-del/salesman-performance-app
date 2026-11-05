@@ -104,6 +104,7 @@ function apply(u,p){
  const jumps=document.createElement('div');jumps.className='an-portfolio-jumps';
  jumps.innerHTML=ORDER.map(([key,title],i)=>'<button data-profile-jump="'+key+'" title="'+esc(title)+'"><b>'+String(i+1).padStart(2,'0')+'</b>'+esc(title)+'</button>').join('');
  f.append(jumps);
+ const expand=document.createElement('button');expand.type='button';expand.className='an-portfolio-jumps-toggle';expand.textContent='Show all 20 sections ↓';expand.addEventListener('click',()=>{const on=jumps.classList.toggle('expanded');expand.textContent=on?'Show fewer sections ↑':'Show all 20 sections ↓';});f.append(expand);
  ORDER.forEach(([key],i)=>{const n=mapped[key]||fallback(key,u);label(n,key,i);f.append(n);});
  rest.forEach(n=>mapped.support.append(n));
  if(foot)mapped.support.append(foot);if(back)mapped.support.append(back);
