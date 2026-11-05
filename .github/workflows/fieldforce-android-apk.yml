@@ -231,6 +231,7 @@ jobs:
           set -euo pipefail
           python3 -m http.server 8765 >/tmp/ffh-server.log 2>&1 &
           ffh_browser_status=0
+          node tests/november-mobile-browser.cjs || ffh_browser_status=1
           node tests/brand-layout-ui.cjs || ffh_browser_status=1
           node tests/ticker-details-browser.cjs || ffh_browser_status=1
           node tests/campaign-screen-ui.cjs || ffh_browser_status=1
