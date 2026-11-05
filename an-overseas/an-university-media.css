@@ -118,3 +118,41 @@
   .an-guide-card .an-identity-logo-only .an-center-monogram{font-size:clamp(18px,5vw,30px)!important}
   .an-guide-card .an-identity-logo-only .an-identity-name{font-size:10px!important}
 }
+
+/* v7 — show real institutional logos prominently across the FULL media area.
+   Letter monograms are only a last-resort textual identity, not a fake logo. */
+.an-guide-card .an-identity-logo-only .an-logo-stage .an-center-logo,
+.an-guide-card .an-identity-logo-only .an-logo-stage .an-center-logo.an-verified-media,
+.an-guide-card .an-identity-logo-only .an-logo-stage .an-center-logo.an-website-favicon {
+  width:min(65%,150px)!important;
+  height:min(76%,155px)!important;
+  min-width:65px!important;
+  max-width:65%!important;
+  max-height:76%!important;
+  object-fit:contain!important;
+  padding:10px!important;
+  border:1px solid #dfab69!important;
+  background:#fffaf1!important;
+  border-radius:15px!important;
+  z-index:4!important;
+  box-shadow:0 11px 28px rgba(0,0,0,.45)!important;
+}
+.an-guide-card .an-logo-stage:has(img.an-center-logo:not([style*="display: none"])) .an-center-monogram {
+  display:none!important;
+}
+.an-guide-card .uni-cover-wrap .an-guide-photo,
+.an-guide-card .uni-cover-wrap .an-fullbleed-photo {
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+}
+@media(max-width:520px) {
+  .an-guide-card .an-identity-logo-only .an-logo-stage .an-center-logo,
+  .an-guide-card .an-identity-logo-only .an-logo-stage .an-center-logo.an-website-favicon {
+    width:104px!important;
+    height:104px!important;
+    min-width:0!important;
+    max-width:68%!important;
+    max-height:76%!important;
+  }
+}
