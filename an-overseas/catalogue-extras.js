@@ -70,7 +70,7 @@ function anNumberedCard(u){
  const favorite='<button class="an-favorite-heart" data-favorite-university="'+esc(u.id)+'" type="button" aria-label="Save '+esc(u.name)+' to favorites" aria-pressed="false" title="Save university">♡</button>';
  let html=card(u);
  html=html.replace(/<span class="an-catalogue-index"[^>]*>[\s\S]*?<\/small><\/span>/,'');
- return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite);
+ return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite).replace('</article>','<a class="an-catalogue-apply" href="#/apply/'+encodeURIComponent(u.id)+'" aria-label="Start an A&amp;N application for '+esc(u.name)+'">Apply through A&amp;N ↗</a></article>');
 }
 renderResults=function(){
  const el=document.getElementById('results');if(!el)return;
