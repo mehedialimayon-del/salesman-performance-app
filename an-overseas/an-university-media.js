@@ -55,7 +55,7 @@
  };
  const verifiedCoversById={
   "utm":{photo:"https://www.utm.my/wp-content/uploads/2026/09/aerial-view-scaled.jpg",source:"https://www.utm.my/",credit:'Campus image · official institution website'},
-  "usm":{photo:"https://www.usm.my/images/hero/s1.png",source:"https://www.usm.my/",credit:'Campus image · official institution website'},
+  "usm":{photo:"https://upload.wikimedia.org/wikipedia/commons/a/a9/Main_gate_at_the_Universiti_Sains_Malaysia.jpg",source:"https://commons.wikimedia.org/wiki/File:Main_gate_at_the_Universiti_Sains_Malaysia.jpg",credit:'USM main gate · Dnydegger / CC BY-SA 3.0'},
   "utem":{photo:"https://www.utem.edu.my/images/slider/cache/ec38f738b76a1041bda5df75169acc3b/slider-aerial-utem.png",source:"https://www.utem.edu.my/",credit:'Campus image · official institution website'},
   "unisza":{photo:"https://www.unisza.edu.my/wp-content/uploads/elementor/thumbs/medical-Campus-2-pj4k486f1t84jt3gxghi9133m193ksq5mp045efbpk.jpg",source:"https://www.unisza.edu.my/",credit:'Campus image · official institution website'},
   "sunway":{photo:"https://sunwayuniversity.edu.my/sites/default/files/styles/content_banner/public/contentbanner/2023-12/sunway-campus-drone01.jpg.webp?h=f5bb8812&itok=7c4Y_P7W",source:"https://sunwayuniversity.edu.my/",credit:'Campus image · official institution website'},
