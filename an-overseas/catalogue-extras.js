@@ -2,129 +2,127 @@
    Costs are illustrative published programme examples, NOT overall university fees. */
 (function(){
 'use strict';
-var visibleLimit=48,lastQuerySignature='';
-var pref={kind:'All Types',level:'All Levels',subject:'All Subjects',budget:'Any Budget',order:'QS Ranking (verified first)',requirement:''};
-var levels={
- upm:['Bachelor','Master','PhD'],um:['Bachelor','Master','PhD'],
- ukm:['Bachelor','Master','PhD'],utm:['Bachelor','Master','PhD'],
- uum:['Bachelor','Master','PhD'],unikl:['Foundation','Diploma','Bachelor','Master','PhD'],
- klust:['Foundation','Diploma','Bachelor','Master','PhD'],
- uniten:['Foundation','Diploma','Bachelor','Master','PhD']
-};
-function optionItems(items,value){return items.map(function(s){return '<option value="'+esc(s)+'"'+(value===s?' selected':'')+'>'+esc(s)+'</option>';}).join('');}
-function field(name,id,contents){return '<label><span>'+name+'</span>'+contents.replace('PLACEHOLDER_ID',id)+'</label>';}
-function selectBox(id,items,current){return '<select id="'+id+'">'+optionItems(items,current)+'</select>';}
+var visibleLimit=80,lastQuerySignature='';
+var priority=['Malaysia','China','Japan','South Korea','Singapore','Thailand','United Arab Emirates','Turkey','United Kingdom','Germany','France','Italy','Ireland','Netherlands','Sweden','Finland','Austria','Belgium','Switzerland','Norway','Denmark','Spain','Portugal','Poland','Czech Republic','Hungary','Greece','Luxembourg','Canada','United States','Australia','New Zealand'];
+const countryIndex=name=>{const n=priority.indexOf(name);return n<0?1000:n;};
+countries.sort((a,b)=>countryIndex(a[0])-countryIndex(b[0])||a[0].localeCompare(b[0]));
+var pref={kind:'All Types',level:'All Levels',subject:'All Subjects',currency:'Any currency',minFee:'',maxFee:'',order:'Country directory order',requirement:''};
+var levels={upm:['Bachelor','Master','PhD'],um:['Bachelor','Master','PhD'],ukm:['Bachelor','Master','PhD'],utm:['Bachelor','Master','PhD'],uum:['Bachelor','Master','PhD'],unikl:['Foundation','Diploma','Bachelor','Master','PhD'],klust:['Foundation','Diploma','Bachelor','Master','PhD'],uniten:['Foundation','Diploma','Bachelor','Master','PhD']};
 var subjects=['All Subjects','Agriculture','Aquaculture','Architecture','Business','Communication','Computer Science','Economics','Education','Engineering','Finance','Health','Management','Science','Social Sciences','Technology'];
+const moneyUnits=['Any currency','MYR','EUR','GBP','USD','CAD','AUD','JPY','CNY','KRW','SGD','NZD','SEK','NOK','DKK','CHF','TRY','THB','AED','PLN','CZK','HUF'];
+const optionItems=(arr,value)=>arr.map(x=>'<option value="'+esc(x)+'"'+(x===value?' selected':'')+'>'+esc(x)+'</option>').join('');
+const labelled=(name,field)=>'<label><span>'+name+'</span>'+field+'</label>';
+const choice=(id,opts,now)=>'<select id="'+id+'">'+optionItems(opts,now)+'</select>';
 universitiesPage=function(){
- var query=new URLSearchParams((location.hash.split('?')[1]||''));
- filterCountry=query.get('country')||'Malaysia';
- var controls='<div class="filter-fields">'
- +field('COUNTRY','country-filter',selectBox('country-filter',['All Countries'].concat(countries.map(function(c){return c[0];})),filterCountry))
- +field('PUBLIC / PRIVATE','type-filter',selectBox('type-filter',['All Types','Public','Private'],pref.kind))
- +field('STUDY LEVEL','level-filter',selectBox('level-filter',['All Levels','Foundation','Diploma','Bachelor','Master','PhD'],pref.level))
- +field('SUBJECT / FIELD','subject-filter',selectBox('subject-filter',subjects,pref.subject))
- +field('TUITION BUDGET (RM)','budget-filter',selectBox('budget-filter',['Any Budget','Up to RM 20,000','Up to RM 40,000','Up to RM 60,000','Up to RM 90,000','RM 90,000+'],pref.budget))
- +field('SORT BY','order-filter',selectBox('order-filter',['QS Ranking (verified first)','Featured','University A–Z','Fee low to high','Fee high to low'],pref.order))
- +field('ADMISSION REQUIREMENTS','requirements-filter','<input id="requirements-filter" type="search" value="'+esc(pref.requirement)+'" placeholder="IELTS, CGPA, English, etc.">')
- +'</div>';
- return title('Explore Universities','Discover universities, courses, entry requirements, tuition and student accommodation.')
- +'<div class="wrap content university-catalogue"><div class="catalogue-tools"><label class="catalogue-search"><span>⌕</span><input id="university-search" type="search" value="'+esc(searchTerm)+'" placeholder="Search universities or programmes" aria-label="Search universities and programmes"></label>'
- +'<details class="catalogue-filter"><summary aria-label="Filter universities" title="Filter universities">☷ <span class="filter-word">Filters</span></summary><div class="catalogue-filter-panel">'
- +controls+'<div class="filter-actions"><small>Fee ranges use verified programme examples, not fixed university-wide prices.</small><button type="button" class="catalogue-clear" id="reset-university-filters">Reset filters</button></div>'
- +'</div></details><label class="an-scholarship-only"><input id="scholarship-filter" type="checkbox" '+(scholarshipOnly?'checked':'')+'> 🎓 Scholarships only</label></div><div id="catalogue-count" class="catalogue-count" aria-live="polite"></div><div id="results" class="grid"></div>'
- +'<div class="other-university">Your preferred university is not listed? <a href="#/contact">Ask A&N Overseas about another university ↗</a></div>'
- +'<p class="catalogue-footnote">This is a university discovery directory, not a register of accredited institutions or A&amp;N partners. Additional listings may come from the Hipo public university domains dataset. Confirm official recognition, current courses, fees, entry rules and image licensing at the institution and national regulator.</p><p class="catalogue-footnote">Fees, eligibility and study levels depend on the exact programme. Published fee examples may have different durations and exclusions; always confirm with the official university offer.</p></div>';
+ const query=new URLSearchParams((location.hash.split('?')[1]||''));
+ filterCountry=query.get('country')||'All Countries';
+ const controls='<div class="filter-fields">'
+ +labelled('COUNTRY',choice('country-filter',['All Countries',...countries.map(c=>c[0])],filterCountry))
+ +labelled('PUBLIC / PRIVATE',choice('type-filter',['All Types','Public','Private'],pref.kind))
+ +labelled('STUDY LEVEL',choice('level-filter',['All Levels','Foundation','Diploma','Bachelor','Master','PhD'],pref.level))
+ +labelled('SUBJECT / FIELD',choice('subject-filter',subjects,pref.subject))
+ +labelled('TUITION CURRENCY',choice('currency-filter',moneyUnits,pref.currency))
+ +labelled('MINIMUM PUBLISHED TUITION','<input id="min-fee-filter" type="number" min="0" inputmode="decimal" placeholder="Min" value="'+esc(pref.minFee)+'">')
+ +labelled('MAXIMUM PUBLISHED TUITION','<input id="max-fee-filter" type="number" min="0" inputmode="decimal" placeholder="Max" value="'+esc(pref.maxFee)+'">')
+ +labelled('SORT BY',choice('order-filter',['Country directory order','QS Ranking (verified first)','University A–Z','Published fee: low to high','Published fee: high to low'],pref.order))
+ +labelled('ADMISSION REQUIREMENTS','<input id="requirements-filter" type="search" value="'+esc(pref.requirement)+'" placeholder="IELTS, CGPA, English">')
+ +'</div><div class="filter-actions"><small>Only programme-specific fee examples with matching currency can be compared. Unquoted fees are not shown as zero.</small><button type="button" class="catalogue-clear" id="reset-university-filters">Reset filters</button></div>';
+ return title('Explore Universities','Browse the full multi-country directory, compare published programme fees and save universities for later.')
+ +'<div class="wrap content university-catalogue"><div class="an-university-directory-bar"><strong id="an-global-count">'+U.length.toLocaleString('en-US')+' universities in our world directory</strong><a href="#/favorites" class="an-directory-fav">♡ Saved universities <b data-favorite-count>0</b></a></div>'
+ +'<div class="catalogue-tools"><label class="catalogue-search"><span>⌕</span><input id="university-search" type="search" value="'+esc(searchTerm)+'" placeholder="Search university or course" aria-label="Search universities"></label>'
+ +'<details class="catalogue-filter"><summary aria-label="Filter universities" title="Filter universities">☷ <span class="filter-word">Filters</span></summary><div class="catalogue-filter-panel">'+controls+'</div></details>'
+ +'<label class="an-scholarship-only"><input id="scholarship-filter" type="checkbox" '+(scholarshipOnly?'checked':'')+'> 🎓 Scholarships only</label></div>'
+ +'<div id="catalogue-count" class="catalogue-count" aria-live="polite"></div><div id="results" class="grid"></div>'
+ +'<p class="catalogue-footnote">The directory includes sourced and unverified catalogue entries, not all accredited institutions or A&N partners. Check the official university website, exact programme, recognition, application fee and any scholarship offer before applying. Published example fees are not comparable across different durations or currencies.</p></div>';
 };
-function feeEstimate(u){
- var p=UNIVERSITY_PROFILES[u.id],fees=p&&p.fees||[],nums=[];
- fees.forEach(function(row){
-  if(/initial payment|deposit|not total tuition|per month/i.test((row[2]||'')+' '+(row[0]||'')))return;
-  var amount=String(row[1]||'').match(/RM\s*([\d,]+)/i);
-  if(amount){var n=Number(amount[1].replace(/,/g,''));if(n>0)nums.push(n);}
+function amountOf(u,code){
+ const rows=UNIVERSITY_PROFILES[u.id]?.fees||[],matches=[];
+ rows.forEach(row=>{
+  if(!Array.isArray(row))return;
+  const match=String(row[1]||'').match(/(RM|MYR|EUR|GBP|USD|CAD|AUD|JPY|CNY|KRW|SGD|NZD|SEK|NOK|DKK|CHF|TRY|THB|AED|PLN|CZK|HUF)\s*([\d,]+(?:\.\d+)?)/i);
+  if(!match)return;
+  let unit=match[1].toUpperCase();if(unit==='RM')unit='MYR';
+  const val=Number(match[2].replace(/,/g,''));
+  if(!Number.isFinite(val)||val<=0||code!=='Any currency'&&code!==unit)return;
+  if(/initial payment|deposit|per month/i.test(String(row[0]||'')+' '+String(row[2]||'')))return;
+  matches.push({value:val,currency:unit});
  });
- return nums.length?Math.min.apply(null,nums):null;
+ return matches.length?matches.sort((a,b)=>a.value-b.value)[0]:null;
 }
 function hasLevel(u,level){
  if(level==='All Levels')return true;
- if(levels[u.id])return levels[u.id].indexOf(level)>=0;
- var p=UNIVERSITY_PROFILES[u.id]||{},s=(u.programs||[]).concat(p.programs||[]).concat((p.fees||[]).map(function(f){return f[0];})).join(' ').toLowerCase();
- var words={Foundation:/foundation/i,Diploma:/diploma/i,Bachelor:/bachelor|undergraduate|bsc|bba/i,Master:/master|postgraduate|msc/i,PhD:/phd|doctor/i};
- return words[level].test(s);
+ if(levels[u.id])return levels[u.id].includes(level);
+ const p=UNIVERSITY_PROFILES[u.id]||{},text=[...(u.programs||[]),...(p.programs||[]),...(p.fees||[]).map(x=>x[0])].join(' ').toLowerCase();
+ const tests={Foundation:/foundation/,Diploma:/diploma/,Bachelor:/bachelor|undergraduate|bsc|bba/,Master:/master|postgraduate|msc/,PhD:/phd|doctor/};
+ return tests[level].test(text);
 }
-function passesBudget(n){
- if(pref.budget==='Any Budget')return true;
- if(n===null)return false;
- if(pref.budget==='RM 90,000+')return n>=90000;
- var m=pref.budget.match(/[\d,]+/);return !m||n<=Number(m[0].replace(/,/g,''));
-}
-/* Country sequence is calculated from the full destination list (not the search results).
-   e.g. Malaysia 001 / 050; filtered results keep their original index. */
-var anSerialCache={size:-1,byId:new Map()};
-function anCountrySerial(u){
- if(anSerialCache.size!==U.length){
-  var countriesMap=new Map(),indexMap=new Map();
-  U.forEach(function(item){
-    var country=String(item.country||'Other');
-    if(!countriesMap.has(country))countriesMap.set(country,[]);
-    countriesMap.get(country).push(item);
-  });
-  countriesMap.forEach(function(items){
-    items.sort(window.ANUniGuide?.compare||function(a,b){return a.name.localeCompare(b.name);});
-    var total=items.length;
-    items.forEach(function(item,index){indexMap.set(item.id,{number:index+1,total:total});});
-  });
-  anSerialCache={size:U.length,byId:indexMap};
- }
- return anSerialCache.byId.get(u.id)||{number:0,total:0};
+const serialState={size:-1,items:new Map()};
+function globalSerial(){
+ if(serialState.size===U.length)return serialState.items;
+ const entries=U.slice().sort((a,b)=>countryIndex(a.country)-countryIndex(b.country)||String(a.name).localeCompare(String(b.name)));
+ const map=new Map();
+ entries.forEach((u,i)=>map.set(u.id,{number:i+1,total:entries.length}));
+ serialState.items=map;serialState.size=U.length;return map;
 }
 function anNumberedCard(u){
- var seq=anCountrySerial(u),zero=n=>String(n).padStart(3,'0');
- var badge='<span class="an-catalogue-index" title="'+esc(u.country)+' university '+seq.number+' of '+seq.total+'">'+zero(seq.number)+' <small>/ '+zero(seq.total)+'</small></span>';
- return card(u).replace(/(<div class="uni-cover-wrap"[^>]*>)/,function(full){return full+badge;});
+ const seq=globalSerial().get(u.id)||{number:0,total:U.length},zero=n=>String(n).padStart(3,'0');
+ const badge='<span class="an-catalogue-index" aria-label="Global university '+seq.number+' of '+seq.total+'">'+zero(seq.number)+' <small>/ '+zero(seq.total)+'</small></span>';
+ const favorite='<button class="an-favorite-heart" data-favorite-university="'+esc(u.id)+'" type="button" aria-label="Save '+esc(u.name)+' to favorites" aria-pressed="false" title="Save university">♡</button>';
+ let html=card(u);
+ html=html.replace(/<span class="an-catalogue-index"[^>]*>[\s\S]*?<\/small><\/span>/,'');
+ return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite);
 }
 renderResults=function(){
- var el=document.querySelector('#results');if(!el)return;
- var term=searchTerm.toLowerCase().trim(),requirement=pref.requirement.toLowerCase().trim();
- var signature=[filterCountry,term,requirement,pref.kind,pref.level,pref.subject,pref.budget,pref.order,scholarshipOnly].join('|');
- if(signature!==lastQuerySignature){visibleLimit=48;lastQuerySignature=signature;}
- var arr=U.filter(function(u){
-  var p=UNIVERSITY_PROFILES[u.id]||{};
-  var all=[u.name,u.short,u.country,u.city].concat(u.programs||[],p.programs||[]).join(' ').toLowerCase();
-  var entries=[p.entry,p.intake].join(' ').toLowerCase();
-  var subject=pref.subject==='All Subjects'||all.indexOf(pref.subject.toLowerCase())>=0||(pref.subject==='Science'&&/science|biology|chemistry/.test(all));
-  return (filterCountry==='All Countries'||u.country===filterCountry)&&(!scholarshipOnly||!!window.ANUniversityTools?.scholarship(u.id))
-   &&(pref.kind==='All Types'||u.kind===pref.kind)
-   &&hasLevel(u,pref.level)&&subject&&passesBudget(feeEstimate(u))
-   &&(!requirement||entries.indexOf(requirement)>=0)&&all.indexOf(term)>=0;
+ const el=document.getElementById('results');if(!el)return;
+ const term=searchTerm.toLowerCase().trim(),req=pref.requirement.toLowerCase().trim();
+ const signature=[filterCountry,term,req,pref.kind,pref.level,pref.subject,pref.currency,pref.minFee,pref.maxFee,pref.order,scholarshipOnly,U.length].join('|');
+ if(signature!==lastQuerySignature){visibleLimit=80;lastQuerySignature=signature;}
+ const feeFilter=pref.minFee!==''||pref.maxFee!=='',needsCurrency=feeFilter&&pref.currency==='Any currency';
+ let found=needsCurrency?[]:U.filter(u=>{
+  const p=UNIVERSITY_PROFILES[u.id]||{},str=[u.name,u.short,u.country,u.city,...(u.programs||[]),...(p.programs||[])].join(' ').toLowerCase();
+  if(!str.includes(term)||filterCountry!=='All Countries'&&filterCountry!==u.country)return false;
+  if(scholarshipOnly&&!window.ANUniversityTools?.scholarship(u.id))return false;
+  if(pref.kind!=='All Types'&&pref.kind!==u.kind)return false;
+  if(!hasLevel(u,pref.level)||pref.subject!=='All Subjects'&&!str.includes(pref.subject.toLowerCase()))return false;
+  if(req&&![p.entry,p.intake].join(' ').toLowerCase().includes(req))return false;
+  if(feeFilter){
+   const amount=amountOf(u,pref.currency)?.value;
+   if(!Number.isFinite(amount)||pref.minFee!==''&&amount<Number(pref.minFee)||pref.maxFee!==''&&amount>Number(pref.maxFee))return false;
+  }
+  return true;
  });
- if(pref.order==='QS Ranking (verified first)'||pref.order==='Featured')arr.sort(window.ANUniGuide?.compare||function(a,b){return a.name.localeCompare(b.name);});
- if(pref.order==='University A–Z')arr.sort(function(a,b){return a.name.localeCompare(b.name);});
- if(pref.order==='Fee low to high'||pref.order==='Fee high to low')arr.sort(function(a,b){
-  var x=feeEstimate(a),y=feeEstimate(b);
-  if(x===null)return 1;if(y===null)return -1;
-  return pref.order==='Fee low to high'?x-y:y-x;
- });
- var count=document.querySelector('#catalogue-count');
- if(count)count.innerHTML='<strong>'+arr.length+'</strong> universities · '+esc(filterCountry)+(pref.budget!=='Any Budget'?' · published fee examples':'');
- el.innerHTML=arr.length?arr.slice(0,visibleLimit).map(anNumberedCard).join('')+(arr.length>visibleLimit?'<div class="catalogue-load-more" style="grid-column:1/-1;text-align:center;padding:22px"><button class="btn outline" id="load-more-universities" type="button">Show next '+Math.min(48,arr.length-visibleLimit)+' of '+arr.length+' universities ↓</button></div>':''):'<div class="empty">No universities matched. Try resetting filters or another search.</div>';
-};
-document.addEventListener('change',function(e){
- var map={'type-filter':'kind','level-filter':'level','subject-filter':'subject','budget-filter':'budget','order-filter':'order'};
- if(map[e.target.id]){pref[map[e.target.id]]=e.target.value;renderResults();}if(e.target.id==='scholarship-filter'){scholarshipOnly=e.target.checked;renderResults();}
-});
-document.addEventListener('input',function(e){
- if(e.target.id==='requirements-filter'){pref.requirement=e.target.value;renderResults();}
-});
-document.addEventListener('click',function(e){
- if(e.target.closest('#load-more-universities')){visibleLimit+=48;renderResults();return;}
- if(e.target.id==='reset-university-filters'){
-  pref={kind:'All Types',level:'All Levels',subject:'All Subjects',budget:'Any Budget',order:'Featured',requirement:''};
-  filterCountry='Malaysia';searchTerm='';scholarshipOnly=false;render();return;
+ if(pref.order==='Country directory order')found.sort((a,b)=>globalSerial().get(a.id).number-globalSerial().get(b.id).number);
+ else if(pref.order==='QS Ranking (verified first)')found.sort(window.ANUniGuide?.compare||((a,b)=>a.name.localeCompare(b.name)));
+ else if(pref.order==='University A–Z')found.sort((a,b)=>a.name.localeCompare(b.name));
+ else if(pref.order.startsWith('Published fee:')){
+  found.sort((a,b)=>{
+   const x=amountOf(a,pref.currency)?.value??null,y=amountOf(b,pref.currency)?.value??null;
+   if(x===null)return 1;if(y===null)return -1;
+   return pref.order.includes('low')?x-y:y-x;
+  });
  }
- var back=e.target.closest('.university-profile a[href="#/universities"]');
- if(back){var id=(location.hash.split('?')[0].split('/')[2]||''),u=U.find(function(x){return x.id===id;});if(u)back.href='#/universities?country='+encodeURIComponent(u.country);}
+ const count=document.getElementById('catalogue-count');
+ if(count)count.innerHTML='<strong>'+found.length.toLocaleString('en-US')+'</strong> matching universities of <strong>'+U.length.toLocaleString('en-US')+'</strong> worldwide · '+esc(filterCountry)+(feeFilter?' · fee ranges in '+esc(pref.currency):'');
+ const grand=document.getElementById('an-global-count');if(grand)grand.textContent=U.length.toLocaleString('en-US')+' universities · '+countries.length+' study destinations';
+ if(needsCurrency){el.innerHTML='<div class="empty">Select a tuition currency before comparing minimum or maximum amounts.</div>';return;}
+ el.innerHTML=found.length?found.slice(0,visibleLimit).map(anNumberedCard).join('')+(found.length>visibleLimit?'<div class="catalogue-load-more" style="grid-column:1/-1;text-align:center;padding:20px"><button class="btn outline" id="load-more-universities" type="button">Show next '+Math.min(80,found.length-visibleLimit)+' of '+found.length+' universities ↓</button></div>':''):'<div class="empty">No matches with verified information. Try another destination, amount or reset filters.</div>';
+ window.ANUniversityFavorites?.refresh?.();
+};
+document.addEventListener('change',e=>{
+ const mapping={'type-filter':'kind','level-filter':'level','subject-filter':'subject','currency-filter':'currency','order-filter':'order'};
+ if(mapping[e.target.id]){pref[mapping[e.target.id]]=e.target.value;renderResults();}
+ if(e.target.id==='country-filter'){filterCountry=e.target.value;renderResults();}
+ if(e.target.id==='scholarship-filter'){scholarshipOnly=e.target.checked;renderResults();}
+});
+document.addEventListener('input',e=>{
+ const mapping={'min-fee-filter':'minFee','max-fee-filter':'maxFee','requirements-filter':'requirement'};
+ if(mapping[e.target.id]){pref[mapping[e.target.id]]=e.target.value;renderResults();}
+});
+document.addEventListener('click',e=>{
+ if(e.target.closest('#load-more-universities')){visibleLimit+=80;renderResults();}
+ if(e.target.id==='reset-university-filters'){pref={kind:'All Types',level:'All Levels',subject:'All Subjects',currency:'Any currency',minFee:'',maxFee:'',order:'Country directory order',requirement:''};filterCountry='All Countries';searchTerm='';scholarshipOnly=false;render();}
 },true);
-
+window.ANCatalogueExtras={priority,countryIndex,globalSerial,anNumberedCard};
 /* Owner-managed PUBLIC information, published by updating site-content.json in GitHub. */
 var siteCopy=null;
 function repaintCopy(){
