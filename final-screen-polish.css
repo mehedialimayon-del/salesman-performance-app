@@ -85,3 +85,6 @@ body:has(.ffCampaignPage) #orb{width:32px!important;height:32px!important;bottom
 #app .app>main.wrap .ffContactIdentity h3 .ffNameOrange{color:#ff7417!important}
 #app .app>main.wrap .ffContactIdentity h3 .ffNameWhite{color:#fff!important}
 #app .app>main.wrap #ffMonthlyComparison .ffDailyRange{position:sticky;top:64px;z-index:8;background:#17100c;padding:5px 0}
+
+/* Hide AI orb while private chat uses microphone/attachment composer. */
+body:has(.ffMessenger) #orb{display:none!important}
