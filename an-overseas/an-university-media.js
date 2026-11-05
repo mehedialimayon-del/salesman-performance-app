@@ -53,6 +53,23 @@
    credit:'ALFA University College · official campus image'
   }
  };
+ const verifiedCoversById={
+  "utm":{photo:"https://www.utm.my/wp-content/uploads/2026/09/aerial-view-scaled.jpg",source:"https://www.utm.my/",credit:'Campus image · official institution website'},
+  "usm":{photo:"https://www.usm.my/images/hero/s1.png",source:"https://www.usm.my/",credit:'Campus image · official institution website'},
+  "utem":{photo:"https://www.utem.edu.my/images/slider/cache/ec38f738b76a1041bda5df75169acc3b/slider-aerial-utem.png",source:"https://www.utem.edu.my/",credit:'Campus image · official institution website'},
+  "unisza":{photo:"https://www.unisza.edu.my/wp-content/uploads/elementor/thumbs/medical-Campus-2-pj4k486f1t84jt3gxghi9133m193ksq5mp045efbpk.jpg",source:"https://www.unisza.edu.my/",credit:'Campus image · official institution website'},
+  "sunway":{photo:"https://sunwayuniversity.edu.my/sites/default/files/styles/content_banner/public/contentbanner/2023-12/sunway-campus-drone01.jpg.webp?h=f5bb8812&itok=7c4Y_P7W",source:"https://sunwayuniversity.edu.my/",credit:'Campus image · official institution website'},
+  "apu":{photo:"https://publicwebsite-media.apu.edu.my/assets/2024-01/banner_apu_iconic_campus.jpg?VersionId=z9PBh2OaiyBqWHu9c7dRBK1xVDwIzVuF",source:"https://www.apu.edu.my/",credit:'Campus image · official institution website'},
+  "heriotwatt-my":{photo:"https://www.hw.ac.uk/image-library/hci-malaysia-campus-water.xc1fb97cc.jpg?w=1280&h=474&fit=crop&q=75&f=webp",source:"https://www.hw.ac.uk/malaysia.htm",credit:'Campus image · official institution website'},
+  "xiamen-my":{photo:"https://www.xmu.edu.my/sites/default/files/styles/720p/public/2025-04/A3%20Building%202.jpeg?itok=ZBAbuHpu",source:"https://www.xmu.edu.my/",credit:'Campus image · official institution website'},
+  "inti":{photo:"https://newinti.edu.my/wp-content/uploads/2018/01/IU_campus_small.jpg",source:"https://newinti.edu.my/",credit:'Campus image · official institution website'},
+  "oum":{photo:"https://www.oum.edu.my/wp-content/uploads/2026/09/menara-oum-1536x512-1.png",source:"https://www.oum.edu.my/",credit:'Campus image · official institution website'},
+  "southampton-my":{photo:"https://www.southampton.ac.uk/img/malaysia/Students%20on%20campus.jpg",source:"https://www.southampton.ac.uk/",credit:'Campus image · official institution website'},
+  "curtin-my":{photo:"https://s43414.pcdn.co/wp-content/uploads/2023/04/Campus-Sunset-Square-copy.jpg",source:"https://curtin.edu.my/",credit:'Campus image · official institution website'},
+  "umk":{photo:"https://www.umk.edu.my/images/gambartest.webp",source:"https://www.umk.edu.my/",credit:'Campus image · official institution website'},
+  "my-u-malaysiancooperativeentrepreneurshipuniversity":{photo:"https://www.ukkm.edu.my/wp-content/uploads/2025/09/Campus-Life1.jpg",source:"https://www.ukkm.edu.my/",credit:'Campus image · official institution website'},
+  "my-college-lsbf":{photo:"https://lsbf.edu.my/wp-content/uploads/2026/10/campuses.webp",source:"https://lsbf.edu.my/",credit:'Campus image · official institution website'}
+ };
  const verifiedSites={
   alsultanabdullahahmadshahquranicuniversityofpahang:'https://uniqsaas.edu.my/',
   genovasiuniversitycollege:'https://www.genovasi.edu.my/',
@@ -79,7 +96,7 @@
    const key=normalize(u.name);
    const site=verifiedSites[key];
    if(site&&!u.site)u.site=site;
-   const match=verifiedCovers[key];
+   const match=verifiedCoversById[u.id]||verifiedCovers[key];
    if(!match)return;
    if(match.site&&!u.site)u.site=match.site;
    if(match.photo){u.cardPhoto=match.photo;u.cardSource=match.source;u.cardCredit=match.credit;}
