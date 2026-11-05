@@ -1,0 +1,45 @@
+/* A&N global directory: real official-website icons, favourite actions and multi-currency filters. */
+.university-catalogue .an-university-directory-bar,.university-catalogue .an-favorite-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 13px}
+.university-catalogue .an-university-directory-bar strong,.university-catalogue .an-favorite-head strong{color:#f7bc75;font-weight:850;font-size:14px}
+.university-catalogue .an-directory-fav,.university-catalogue .an-favorite-head a{display:inline-flex;align-items:center;gap:6px;border:1px solid #9b612b;border-radius:12px;padding:8px 12px;font-size:12px;color:#ffbf71;background:#251708;font-weight:800}
+.university-catalogue .an-directory-fav b{color:#fff}
+.university-catalogue .catalogue-filter-panel{width:min(820px,calc(100vw - 36px));right:0;top:55px;padding:15px;max-height:min(78vh,700px);overflow:auto}
+.university-catalogue .filter-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.university-catalogue .filter-fields label{display:grid;gap:6px;color:#ffbe79;font-size:10px;line-height:1.3;font-weight:800;min-width:0}
+.university-catalogue .filter-fields select,.university-catalogue .filter-fields input{display:block;width:100%;height:40px;min-height:40px;border:1px solid #7f5936;background:#12151c;color:#fff;border-radius:9px;font-size:12px;padding:8px}
+.university-catalogue .filter-actions{display:flex;align-items:center;justify-content:space-between;gap:13px;margin-top:15px}
+.university-catalogue .filter-actions small{color:#d5c0a6;font-size:10px;line-height:1.5}
+.university-catalogue .catalogue-clear{background:#ff960e;border:0;color:#111;border-radius:9px;padding:10px 15px;font-size:12px;font-weight:850}
+.university-catalogue #results .uni-card,.an-favorite-page .uni-card{min-width:0;position:relative}
+.university-catalogue .uni-cover-wrap{position:relative}
+.university-catalogue .an-catalogue-index{z-index:12}
+.an-favorite-heart{position:absolute;right:10px;top:9px;z-index:14;border:1px solid #ffd08b;background:#0c0e13e8;color:#fff;font-size:25px;font-weight:900;border-radius:10px;width:39px;height:37px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 13px #0009}
+.an-favorite-heart.saved{color:#ff8842;background:#28110b;border-color:#ff8b24}
+.an-favorite-heart:hover,.an-favorite-heart:focus-visible{background:#81390a;color:#fff}
+.an-profile-fav{position:relative;display:inline-flex;align-self:center;margin-left:auto;flex:none}
+.an-profile-fav .an-favorite-heart{position:relative;top:auto;right:auto;width:43px;height:43px}
+.an-favourite-notice{font-size:12px;color:#d6c5b0;padding:12px;border:1px solid #715532;border-radius:12px;background:#24170d}
+.an-favorite-page #an-saved-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.an-favorite-page .empty{grid-column:1/-1}
+.an-guide-card .an-identity-logo-only .an-logo-stage{position:relative;display:flex;align-items:center;justify-content:center}
+.an-guide-card .an-identity-logo-only .an-center-logo{display:block;position:relative;z-index:2;max-width:115px;max-height:115px;object-fit:contain;background:#fff;padding:12px;border-radius:17px;border:1px solid #e9b76a}
+.an-guide-card .an-identity-logo-only .an-center-monogram{position:absolute;z-index:1}
+.an-continent-heading{grid-column:1/-1;font-weight:850;color:#ffbc72;margin:10px 0 0;font-size:14px;letter-spacing:1px;border-bottom:1px solid #673d1d;padding:10px 0}
+@media(max-width:850px){
+.university-catalogue .filter-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+.an-favorite-page #an-saved-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+.university-catalogue .an-university-directory-bar{align-items:flex-start}
+.university-catalogue .an-university-directory-bar strong{font-size:12px}
+.university-catalogue .an-directory-fav{font-size:10px;padding:6px 8px}
+.university-catalogue .catalogue-filter-panel{right:-10px;width:calc(100vw - 28px);max-height:72vh;padding:12px}
+.university-catalogue .filter-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.university-catalogue .filter-fields label{font-size:9px}
+.university-catalogue .filter-fields select,.university-catalogue .filter-fields input{font-size:11px}
+.university-catalogue .filter-actions{flex-wrap:wrap}
+.an-favorite-heart{width:32px;height:30px;right:6px;top:6px;font-size:21px;border-radius:8px}
+.an-profile-fav .an-favorite-heart{width:36px;height:36px}
+.an-guide-card .an-identity-logo-only .an-center-logo{max-width:90px;max-height:90px;padding:9px}
+.an-favorite-page #an-saved-grid{gap:10px}
+}
