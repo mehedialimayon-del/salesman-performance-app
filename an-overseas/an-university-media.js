@@ -383,7 +383,7 @@
      logo.className='an-center-logo an-verified-media';
      logo.alt=name+' — licensed Wikimedia university identity';
      logo.loading='lazy';logo.decoding='async';
-     logo.addEventListener('load',()=>{brand.querySelectorAll('.an-center-logo').forEach(old=>{if(old!==logo)old.remove();});},{once:true});
+     logo.addEventListener('load',()=>{brand.querySelectorAll('.an-center-logo').forEach(old=>{if(old!==logo)old.remove();});brand.classList.add('an-site-icon-loaded');},{once:true});
      logo.addEventListener('error',()=>logo.remove(),{once:true});
      brand.prepend(logo);logo.src=candidate.url;
    }
@@ -393,7 +393,7 @@
      const mark=document.createElement('img');
      mark.className='an-center-logo an-verified-media';mark.alt=name+' genuine university logo (Wikimedia Commons)';
      mark.loading='lazy';mark.decoding='async';
-     mark.addEventListener('load',()=>{brand.querySelectorAll('.an-center-logo').forEach(old=>{if(old!==mark)old.remove();});},{once:true});
+     mark.addEventListener('load',()=>{brand.querySelectorAll('.an-center-logo').forEach(old=>{if(old!==mark)old.remove();});brand.classList.add('an-site-icon-loaded');},{once:true});
      mark.addEventListener('error',()=>mark.remove(),{once:true});
      brand.prepend(mark);mark.src=media.url;
    }
