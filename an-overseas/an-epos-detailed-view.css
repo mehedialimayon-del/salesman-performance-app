@@ -1,0 +1,50 @@
+/* DAAD EPOS full research profiles – 2026-11-06 */
+.an-epos-guide{margin:24px auto 48px;color:#f6f8fc}
+.an-epos-title,.an-epos-course-catalogue,.an-epos-sourcebar{background:linear-gradient(132deg,#161f2a,#17120e);border:1px solid #a16b3f;border-radius:19px;padding:22px;margin-bottom:18px}
+.an-epos-title small{letter-spacing:.08em;font-weight:900;color:#ffc084;font-size:11px}
+.an-epos-title h2{color:#fff;font-size:clamp(19px,3vw,30px);margin:8px 0}
+.an-epos-title p,.an-epos-course-catalogue p,.an-epos-sourcebar p{font-size:13px;line-height:1.75;color:#d7dce4;margin:6px 0}
+.an-epos-stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
+.an-epos-stats span{color:#ffe6bc;background:#4c2b15;border:1px solid #ca955e;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:900}
+.an-epos-pointgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin-bottom:20px}
+.an-epos-point-panel{background:linear-gradient(155deg,#171f2a,#101419);border:1px solid #604e39;border-radius:17px;padding:18px;box-shadow:inset 3px 0 #ce8a4d}
+.an-epos-point-panel:nth-child(3),.an-epos-point-panel:nth-child(4){border-color:#37799e;box-shadow:inset 3px 0 #58b8f5}
+.an-epos-point-panel:nth-child(2),.an-epos-point-panel:nth-child(8){border-color:#3b8f84;box-shadow:inset 3px 0 #51c3b3}
+.an-epos-point-panel h3{font-size:15px;margin:0 0 12px;color:#ffcb96;line-height:1.35}
+.an-epos-point-panel:nth-child(3) h3,.an-epos-point-panel:nth-child(4) h3{color:#8bdaff}
+.an-epos-point-panel:nth-child(2) h3,.an-epos-point-panel:nth-child(8) h3{color:#8cf4de}
+.an-epos-pointlist{list-style:none;display:grid;gap:10px;padding:0;margin:0}
+.an-epos-pointlist li{background:#080e1590;border:1px solid #384653;border-radius:11px;padding:11px 12px;position:relative;line-height:1.55}
+.an-epos-pointlist li b{display:block;color:#ffd295;font-size:12px;margin-bottom:4px}
+.an-epos-pointlist li span{display:block;color:#e5e9f1;font-size:12px}
+.an-epos-point-panel:nth-child(3) .an-epos-pointlist li b{color:#92d3ff}
+.an-epos-course-catalogue h2{font-size:clamp(19px,2.4vw,27px);color:#ffd49c;margin:0 0 6px}
+.an-epos-course-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}
+.an-epos-course{background:linear-gradient(145deg,#1c2734,#12141b);border:1px solid #a16b43;border-radius:15px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.an-epos-course>header{display:flex;justify-content:space-between;align-items:center;gap:6px;color:#ffe5c3;font-size:10px;font-weight:900}
+.an-epos-course header span{padding:5px 8px;border:1px solid #996338;border-radius:7px;background:#0f141c}
+.an-epos-course h3{color:#fff;font-size:14px;line-height:1.38;margin:3px 0}
+.an-epos-course>p{font-size:11px!important;line-height:1.6!important;color:#dbe1e9!important;margin:0!important;white-space:normal}
+.an-epos-course .an-epos-host{color:#ffd09d!important;font-weight:850}
+.an-epos-course>p b{color:#86d8ff}
+.an-epos-due{margin-top:auto;padding:10px;border:1px solid #73512c;border-radius:9px;background:#16120e}
+.an-epos-due b{display:block;color:#ffdda8;font-size:11px;line-height:1.4}
+.an-epos-countdown{display:block;margin-top:6px;color:#8becc4;font-size:11px;font-weight:900;line-height:1.4}
+.an-epos-countdown.an-expired{color:#ffa396}
+.an-epos-course-links{display:flex;flex-wrap:wrap;gap:8px}
+.an-epos-course-links a,.an-epos-sourcebar a{display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:#3d240f;border:1px solid #dd9855;color:#ffd9aa!important;font-size:11px;font-weight:900;padding:9px 10px;line-height:1.3}
+.an-epos-course-links a:first-child{background:linear-gradient(110deg,#a95316,#78310c);color:#fff!important}
+.an-epos-sourcebar h2{font-size:18px;color:#ffca8c}
+.an-epos-sourcebar>div{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
+body.an-scholarship-detail-view .an-epos-guide,
+body.an-scholarship-detail-view .an-epos-course-grid{height:auto!important;max-height:none!important;overflow:visible!important}
+@media(max-width:1100px){.an-epos-course-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+ .an-epos-pointgrid{grid-template-columns:1fr;gap:10px}
+ .an-epos-course-grid{grid-template-columns:1fr}
+ .an-epos-title,.an-epos-course-catalogue,.an-epos-sourcebar{padding:14px;border-radius:13px}
+ .an-epos-point-panel{padding:14px}
+ .an-epos-point-panel h3{font-size:14px}
+ .an-epos-pointlist li{padding:10px}
+}
+@media(prefers-reduced-motion:reduce){.an-epos-guide *{scroll-behavior:auto!important}}
