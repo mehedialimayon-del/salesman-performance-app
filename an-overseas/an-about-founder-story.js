@@ -118,11 +118,16 @@
     app.innerHTML=renderStory();
   }
   function relocateReadMore() {
-    if (!location.hash.startsWith('#/about') || location.hash.startsWith('#/aboutdetails')) return;
+    // Keep the full-story link directly AFTER the Vision text.
+    // Earlier versions moved it into a separate panel that was cut off
+    // when the desktop About view was made a single-screen layout.
+    if (location.hash.split('?')[0] !== '#/about') return;
     const intro = document.querySelector('#an-about-fixed .an-about-intro-panel');
-    const vision = intro && intro.querySelector('.an-vision-inline');
-    const button = vision && vision.querySelector('.an-about-readmore');
-    if (!intro || !vision || !button) return;
+    const vision = intro?.querySelector('.an-vision-inline');
+    if (!intro || !vision) return;
+    const button = vision.querySelector('.an-about-readmore') ||
+      intro.querySelector('.an2-readmore-separate .an-about-readmore');
+    if (!button) return;
     if (!intro.querySelector('.an2-about-box')) {
       const eyebrow = intro.querySelector(':scope > .an-about-eyebrow');
       const heading = intro.querySelector(':scope > #an-about-title');
@@ -134,15 +139,12 @@
         aboutBox.append(eyebrow, heading, paragraph);
       }
     }
-    let row = intro.querySelector('.an2-readmore-separate');
-    if (!row) {
-      row = document.createElement('div');
-      row.className = 'an2-readmore-separate';
-      row.innerHTML = '<span>THE STORY BEHIND A&amp;N</span>';
-      vision.insertAdjacentElement('afterend', row);
-    }
-    row.appendChild(button);
-    button.setAttribute('aria-label','Read our full story, mission and vision');
+    // Idempotent: avoid repeated DOM moves in the MutationObserver.
+    if (button.parentElement !== vision) vision.appendChild(button);
+    button.href = '#/aboutdetails';
+    button.setAttribute('aria-label', 'Read our complete story, purpose and vision');
+    button.textContent = 'READ MORE ↗';
+    intro.querySelector('.an2-readmore-separate')?.remove();
   }
   // Gracefully fall back to the original emoji when a flag image cannot load.
   document.addEventListener('error', event => {
