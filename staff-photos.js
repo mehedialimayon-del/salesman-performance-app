@@ -35,7 +35,8 @@
   const hero=document.querySelector('.dashHero');if(!hero)return;
   const selected=document.querySelector('#ffScopeStaff')?.value||'';
   const text=hero.querySelector('small')?.textContent||'';
-  let p=(selected&&selected!=='ALL'?person(selected):null);
+  let p=(selected&&selected!=='ALL'?person(selected.replace(/^TEAM:/,'')):null);
+  if(!p&&selected==='ALL')p=person(document.querySelector('#ffScopeStaff option[value="ALL"]')?.dataset.managerId);
   if(!p&&!selected&&!/combined|all\s+team/i.test(text))p=[...avatars.values()].find(x=>x.full_name&&text.includes(x.full_name));
   const old=hero.querySelector('.ffDashStaffIdentity');
   if(!p){old?.remove();document.querySelector('.ffScopeFilter .ffScopeAvatar')?.remove();return;}
