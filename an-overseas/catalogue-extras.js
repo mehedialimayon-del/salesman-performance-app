@@ -122,7 +122,39 @@ function restoreState(){
  const check=document.getElementById('scholarship-filter');if(check)check.checked=scholarshipOnly;
  return true;
 }
-window.ANCatalogueState={snapshot:snapshotState,restore:restoreState};
+function applyCountryFilters(q){
+ if(!q||![...q.keys()].some(k=>k.startsWith('hero_')))return false;
+ const country=q.get('hero_country')||'All Countries';
+ filterCountry=country;
+ searchTerm=q.get('hero_university')||'';
+ scholarshipOnly=q.get('hero_scholarship')==='1';
+ const level=q.get('hero_level')||'';
+ pref.level=['Bachelor','Master','PhD'].includes(level)?level:'All Levels';
+ pref.minFee=q.get('hero_min')||'';
+ pref.maxFee=q.get('hero_max')||'';
+ pref.currency=(pref.minFee!==''||pref.maxFee!=='')?(q.get('hero_currency')||'MYR'):'Any currency';
+ const inputs={'university-search':searchTerm,'country-filter':filterCountry,'level-filter':pref.level,
+  'currency-filter':pref.currency,'min-fee-filter':pref.minFee,'max-fee-filter':pref.maxFee};
+ for(const [id,val] of Object.entries(inputs)){const el=document.getElementById(id);if(el)el.value=val;}
+ const cb=document.getElementById('scholarship-filter');if(cb)cb.checked=scholarshipOnly;
+ return true;
+}
+window.ANCatalogueState={snapshot:snapshotState,restore:restoreState,applyCountryFilters};
+document.addEventListener('submit',function(event){
+ if(event.target?.id!=='an-country-hero-form')return;
+ event.preventDefault();
+ const get=id=>document.getElementById(id)?.value.trim()||'';
+ const q=new URLSearchParams();
+ q.set('hero_country',get('an-country-filter-country')||'All Countries');
+ if(get('an-country-university-name'))q.set('hero_university',get('an-country-university-name'));
+ if(get('an-country-filter-level'))q.set('hero_level',get('an-country-filter-level'));
+ if(get('an-country-fee-min'))q.set('hero_min',get('an-country-fee-min'));
+ if(get('an-country-fee-max'))q.set('hero_max',get('an-country-fee-max'));
+ q.set('hero_currency',get('an-country-fee-currency')||'MYR');
+ if(document.getElementById('an-country-scholarship-only')?.checked)q.set('hero_scholarship','1');
+ location.hash='#/universities?'+q.toString();
+});
+
 renderResults=function(){
  const el=document.getElementById('results');if(!el)return;
  const term=searchTerm.toLowerCase().trim(),req=pref.requirement.toLowerCase().trim();
