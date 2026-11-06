@@ -178,13 +178,26 @@
    if((hostCount.get(host)||0)>1)return '';
    return 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(host)+'&sz=128';
  }
+ function institutionalIconCandidates(u){
+   // Website-hosted identity only: never replace an existing verified campus photo or logo.
+   // For Asia, use the institution's own domain and finally a sufficiently large icon
+   // published for that exact host. Do not use unrelated generic stock photography.
+   if(!asiaCountries.has(u.country))return [];
+   const host=hostOf(u.site);
+   if(!host || !/^[a-z0-9.-]+$/.test(host) || !host.includes('.') ||
+      /^(facebook|instagram|wikipedia|studyportals)\./i.test(host))return [];
+   return ['https://'+host+'/apple-touch-icon.png','https://'+host+'/favicon.ico',
+     'https://www.google.com/s2/favicons?domain='+encodeURIComponent(host)+'&sz=256'];
+ }
  function brandFallback(u,p){
-   const logo=(u.logoImage||p?.logo||websiteIcon(u)||''); // Google favicon is often a generic globe; not a university photo.
+   const logo=(u.logoImage||p?.logo||websiteIcon(u)||''); // Existing verified identity always wins.
+   const iconCandidates=logo?[]:institutionalIconCandidates(u);
    const named=String(u.name||'');const acronym=named.match(/\(([A-Z]{2,5})\)/);
    const short=acronym?acronym[1]:String(u.short||u.name||'U').replace(/[^A-Z]/g,'').slice(0,3)||'U';
    const pending=asiaCountries.has(u.country)&&!logo;
    return '<div class="an-guide-identity an-identity-logo-only'+(pending?' an-asia-media-pending':'')+'"><div class="an-logo-stage">'+
        (logo?'<img class="an-center-logo '+(logo.includes('google.com/s2/favicons')?'an-website-favicon':'an-verified-media')+'" src="'+esc(logo)+'" alt="'+esc(u.name)+' university website logo" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">':'')+
+       (iconCandidates.length?'<img class="an-center-logo an-institution-site-icon" src="'+esc(iconCandidates[0])+'" data-an-institution-icons="'+esc(JSON.stringify(iconCandidates))+'" alt="'+esc(u.name)+' icon from its linked institutional website" loading="lazy" decoding="async" referrerpolicy="no-referrer">':'')+
        (pending?'<div class="an-identity-awaiting"><span class="an-identity-awaiting-name">'+esc(u.name)+'</span><small>Campus photo or logo not yet verified</small></div>':
        '<span class="an-center-monogram">'+esc(short)+'</span><span class="an-identity-name">'+esc(u.name)+'</span>')+'</div></div>';
  }
@@ -390,7 +403,32 @@
  const observer='IntersectionObserver'in window?new IntersectionObserver(entries=>{
    entries.forEach(entry=>{if(entry.isIntersecting){observer.unobserve(entry.target);inspect(entry.target);}});
  },{rootMargin:'380px'}):null;
+ function bindInstitutionalSiteIcons(){
+   document.querySelectorAll('.an-institution-site-icon[data-an-institution-icons]').forEach(img=>{
+     if(img.dataset.iconListenerBound)return;
+     img.dataset.iconListenerBound='1';
+     let candidates=[];
+     try{candidates=JSON.parse(img.dataset.anInstitutionIcons);}catch{}
+     let at=0;
+     const show=()=>{
+       if(!img.isConnected)return;
+       // Google returns a generic 16px globe for many unknown domains. Suppress it.
+       if(at===candidates.length-1 && img.naturalWidth<=16){next();return;}
+       img.closest('.an-logo-stage')?.classList.add('an-site-icon-loaded');
+     };
+     const next=()=>{
+       img.closest('.an-logo-stage')?.classList.remove('an-site-icon-loaded');
+       at++;
+       if(at>=candidates.length){img.remove();return;}
+       img.src=candidates[at];
+     };
+     img.addEventListener('load',show);
+     img.addEventListener('error',next);
+     if(img.complete){if(img.naturalWidth)show();else next();}
+   });
+ }
  function hydrate(){
+   bindInstitutionalSiteIcons();
    document.querySelectorAll('.an-guide-card .uni-cover-wrap[data-university-title]').forEach(cover=>{
      if(cover.dataset.mediaObserved)return;
      cover.dataset.mediaObserved='1';
