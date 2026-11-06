@@ -64,12 +64,24 @@
       groups[bucket].push({ name, flag:String(row[1] || '🌐') });
     });
     const ordered = [{name:'Bangladesh',flag:'🇧🇩',home:true}].concat(...groups);
-    return ordered.map((item,i) =>
-      '<span class="an2-flag-unit'+(item.home?' an2-flag-unit--home':'')+'" title="'+esc(item.name)+'">'+
-      '<span class="an2-static-star" aria-hidden="true">✦</span>'+
-      '<span class="an2-flag'+(item.home?' an2-flag-origin':'')+'" role="img" aria-label="'+esc(item.name)+' flag" style="--flag-index:'+i+'">'+item.flag+'</span>'+
-      '</span>'
-    ).join('');
+    return ordered.map((item,i) => {
+      // Native flag emoji are shown as two-letter country codes on Windows Chrome.
+      // Convert their Unicode regional indicators to real, platform-independent flag pictures.
+      const regional = Array.from(item.flag).map(ch => ch.codePointAt(0))
+        .filter(cp => cp >= 0x1F1E6 && cp <= 0x1F1FF);
+      const iso = regional.length === 2
+        ? String.fromCharCode(regional[0] - 0x1F1E6 + 97, regional[1] - 0x1F1E6 + 97)
+        : '';
+      const image = iso
+        ? '<img class="an2-flag-image" src="https://flagcdn.com/w80/'+iso+'.png" alt="" loading="eager" decoding="async">'
+        : '';
+      return '<span class="an2-flag-unit'+(item.home?' an2-flag-unit--home':'')+'" title="'+esc(item.name)+'">'+
+        '<span class="an2-static-star" aria-hidden="true">✦</span>'+
+        '<span class="an2-flag'+(item.home?' an2-flag-origin':'')+'" role="img" aria-label="'+esc(item.name)+' flag" style="--flag-index:'+i+'">'+
+          '<span class="an2-flag-emoji" aria-hidden="true">'+esc(item.flag)+'</span>'+image+
+        '</span>'+
+      '</span>';
+    }).join('');
   }
   function renderStory(){
     const directory = currentDirectory();
@@ -132,6 +144,13 @@
     row.appendChild(button);
     button.setAttribute('aria-label','Read our full story, mission and vision');
   }
+  // Gracefully fall back to the original emoji when a flag image cannot load.
+  document.addEventListener('error', event => {
+    const node = event.target;
+    if (node && node.classList && node.classList.contains('an2-flag-image')) {
+      node.classList.add('an2-flag-image-error');
+    }
+  }, true);
   function setup() {
     ensureFounderPage();
     relocateReadMore();
