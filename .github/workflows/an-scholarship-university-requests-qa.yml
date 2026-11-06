@@ -99,9 +99,9 @@ jobs:
             out.hungary=await page.evaluate(()=>({help:!!document.querySelector('#an-scholarship-help #contact-form'),docs:!!document.querySelector('#an-scholarship-document-guide')}));
             out.errors=errors;all.push(out);
             const valid=out.about.story&&out.about.photoHeight>=220&&
-             // All flags are smaller so the full-height founder portrait has room.
-             out.about.flagWidth>0&&out.about.flagWidth<=32&&
-             out.about.otherFlagWidth>0&&out.about.otherFlagWidth<=28&&
+             // Updated founder design: Bangladesh flag is larger, others retain readable sizes.
+             out.about.flagWidth>=44&&out.about.flagWidth<=64&&
+             out.about.otherFlagWidth>=18&&out.about.otherFlagWidth<=38&&
              /rgb\(244, 38, 74\)/.test(out.about.heartFill)&&
              out.about.heartAnimation==='none'&&out.catalogue.minHeight>=200&&
              out.catalogue.controlRows.every(y=>Math.abs(y-out.catalogue.controlRows[0])<=6)&&
