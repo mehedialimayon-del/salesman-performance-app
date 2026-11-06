@@ -1,0 +1,169 @@
+/* FieldForce Hub · Restore original black + bright orange glow without changing data/permissions. */
+:root{--ff-restore-orange:#ff7517;--ff-restore-bright:#ffa047;--ff-restore-white:#fff}
+html body.ffGlowOn #app .app.ffBlackGlow :is(.wrap button.secondary,.wrap button.primary,.wrap a.primary,.topBtns .iconBtn,.ffSelectTrigger){
+ background:linear-gradient(150deg,#17100c 0%,#050505 75%)!important;
+ border:1px solid #e87527!important;
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+ box-shadow:inset 0 1px 0 #ffb36c30,0 0 9px #f56b193d!important;
+ text-shadow:none!important
+}
+html body.ffGlowOn #app .app.ffBlackGlow :is(.wrap button.secondary,.wrap button.primary,.wrap a.primary,.topBtns .iconBtn,.ffSelectTrigger):is(:focus-visible,:hover){
+ border-color:#ffb46a!important;box-shadow:0 0 0 1px #ffb05a60,0 0 14px #ff74177a!important
+}
+html body.ffGlowOn #app .app.ffBlackGlow :is(button.danger,button.success,button:disabled){filter:none}
+html body.ffGlowOn #app .app.ffBlackGlow :is(.bottom button,.top .iconBtn){color:#ff811e!important;-webkit-text-fill-color:#ff811e!important}
+html body.ffGlowOn #app .app.ffBlackGlow :is(.scope button.active,.tabs button.on){
+ background:linear-gradient(128deg,#ff831f,#b94509)!important;border-color:#ffc17a!important;color:#fff!important;box-shadow:0 0 12px #ff771777!important
+}
+/* One directly tappable, equal-width pair, modeled after Live Communication. */
+#app .ffScopeFilter.ffDirectScope,#app .ffTaskScope .ffDirectScope{
+ margin:1px 0 7px!important;padding:5px 7px!important;
+ border:1px solid #ed742b!important;border-radius:12px!important;
+ background:linear-gradient(110deg,#1e100a,#080808)!important;
+ box-shadow:0 0 11px #fb6b192c!important;min-height:0!important;
+}
+#app .ffDirectScope .ffDirectScopeFields,#app .ffTaskScope .ffDirectScopeFields{
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:7px!important;padding:0!important;margin:0!important
+}
+#app .ffDirectScope label{font-size:9px!important;letter-spacing:.02em!important;line-height:1.2!important;color:#ff9e4e!important}
+#app .ffScopeFilter .ffSelectTrigger,#app .ffTaskScope .ffSelectTrigger{
+ height:35px!important;min-height:35px!important;max-height:35px!important;
+ padding:5px 9px!important;display:flex!important;align-items:center!important;
+ font-size:11px!important;line-height:1.15!important;border-radius:9px!important;
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+ white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+ box-shadow:0 0 9px #ff741730!important
+}
+#app .ffScopeFilter .ffSelectStaffLabel{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#app .ffDirectScope select:not([hidden]){height:35px!important;min-height:35px!important;margin-top:3px!important;font-size:11px!important;border-radius:9px!important;background:#080808!important}
+#app .ffDirectScope select[hidden]{display:none!important}
+#app .ffTaskScope>summary,#app details.ffScopeFilter>summary{display:none!important}
+#app .ffReportDirectScope,#app .ffDailyQuickScope{background:linear-gradient(120deg,#1f1009,#060606)!important;border-color:#f17a2e!important;gap:7px!important;padding:7px!important}
+#app .ffReportDirectScope :is(select,.ffSelectTrigger),#app .ffDailyQuickScope :is(select,.ffSelectTrigger){height:35px!important;min-height:35px!important;font-size:10px!important;background:#090909!important;color:#fff!important;border-color:#f38737!important}
+/* Task history uses all remaining room; ONLY the history scrolls when drawers are closed. */
+#app .app>main.wrap.ffTaskPage{
+ height:calc(100dvh - var(--ff-frame-top,204px) - var(--ff-frame-bottom,76px) - 6px)!important;
+ max-height:calc(100dvh - var(--ff-frame-top,204px) - var(--ff-frame-bottom,76px) - 6px)!important;
+ padding:6px 12px 9px!important;gap:7px!important;overflow:hidden!important;
+ display:flex!important;flex-direction:column!important
+}
+#app .ffTaskPage>.head{flex:none!important;margin:0!important}
+#app .ffTaskPage>.ffTaskScope{flex:none!important;margin:0!important}
+#app .ffTaskPage>.ffTaskList{flex:1 1 0!important;min-height:140px!important;max-height:none!important;overflow:hidden!important;padding:10px 12px!important}
+#app .ffTaskPage>.ffTaskList>.ffHistoryScroll{flex:1 1 0!important;min-height:0!important;overflow:auto!important;overscroll-behavior:contain}
+#app .ffTaskPage>.ffTaskComposer,#app .ffTaskPage>.ffPrivateNoteDrawer{
+ flex:none!important;margin:0!important;padding:0!important;min-height:0!important;
+ box-shadow:0 0 12px #ff74172e!important;border-radius:12px!important
+}
+#app .ffTaskPage>.ffTaskComposer>summary,#app .ffTaskPage>.ffPrivateNoteDrawer>summary{
+ min-height:47px!important;height:47px!important;padding:7px 11px!important;gap:5px!important;
+ flex-wrap:nowrap!important;overflow:hidden!important;
+ font-size:13px!important;border-radius:12px!important
+}
+#app .ffTaskPage>.ffTaskComposer>summary span,#app .ffTaskPage>.ffPrivateNoteDrawer>summary span{font-size:13px!important}
+#app .ffTaskPage>.ffTaskComposer>summary small,#app .ffTaskPage>.ffPrivateNoteDrawer>summary small{font-size:9px!important;white-space:nowrap!important}
+#app .ffTaskPage>.ffTaskComposer:not([open]){background:linear-gradient(105deg,#a83c07,#f77812)!important;border:1px solid #ff9b4b!important}
+#app .ffTaskPage>.ffPrivateNoteDrawer:not([open]){background:linear-gradient(105deg,#20170f,#3a2516)!important;border:1px solid #bb6728!important}
+#app .ffTaskPage:has(>.ffTaskComposer[open]),#app .ffTaskPage:has(>.ffPrivateNoteDrawer[open]){height:auto!important;max-height:none!important;overflow:auto!important}
+#app .ffTaskPage:has(>details[open]:not(.ffTaskScope))>.ffTaskList{flex:0 0 190px!important}
+/* Dashboard toolbar order: tabs, two equal selectors, FROM/TO; content below scrolls. */
+#app .app>main.wrap.ffDashboardFrame{
+ height:calc(100dvh - var(--ff-frame-top,204px) - var(--ff-frame-bottom,76px) - 5px)!important;
+ max-height:calc(100dvh - var(--ff-frame-top,204px) - var(--ff-frame-bottom,76px) - 5px)!important;
+ overflow-y:auto!important;overscroll-behavior:contain!important;
+ display:flex!important;flex-direction:column!important;gap:6px!important;
+ padding:6px 12px 12px!important
+}
+#app .ffDashboardFrame>*{order:5}
+#app .ffDashboardFrame>.head{order:0;flex:none}
+#app .ffDashboardFrame>.ffDashboardTabs{order:1;position:sticky;top:0;z-index:9;background:#080808;padding:3px 0!important}
+#app .ffDashboardFrame>.ffScopeFilter{order:2;position:sticky;top:42px;z-index:9;background:#080808}
+#app .ffDashboardFrame>.dashRange{order:3;position:sticky;top:108px;z-index:9;background:#080808;padding:4px 0!important}
+#app .ffDashboardFrame>.dashHero{order:4;margin:3px 0!important;flex:none!important}
+#app .ffDashboardFrame>.ffDashboardPanels{flex:none!important;min-height:0!important;height:auto!important;overflow:visible!important}
+#app .ffDashboardPanels>[data-dashboard-panel]:not([hidden]){height:auto!important;min-height:0!important;overflow:visible!important}
+#app .ffDashboardFrame>.refKpis{flex:none!important}
+#app .ffDashboardFrame>.ffDashboardTabs button{
+ border-radius:10px!important;font-size:10px!important;font-weight:850!important;
+ min-height:39px!important;box-shadow:0 0 10px #ff74172a!important;
+ white-space:normal!important
+}
+#app .ffDashboardFrame>.ffDashboardTabs button:nth-child(1){background:linear-gradient(130deg,#b43d0e,#f8751f)!important;border:1px solid #ffb16b!important;color:#fff!important}
+#app .ffDashboardFrame>.ffDashboardTabs button:nth-child(2){background:linear-gradient(130deg,#0b5967,#0d8791)!important;border:1px solid #50c9d3!important;color:#fff!important}
+#app .ffDashboardFrame>.ffDashboardTabs button:nth-child(3){background:linear-gradient(130deg,#552979,#8942a6)!important;border:1px solid #c589e8!important;color:#fff!important}
+#app .ffDashboardFrame>.ffDashboardTabs button.on{outline:2px solid #fff!important;outline-offset:1px!important;box-shadow:0 0 12px #ff873670!important}
+#app .ffDashboardFrame .dashRange :is(input,.ffSelectTrigger){min-height:33px!important;height:33px!important;background:#080808!important;color:#fff!important;border:1px solid #e37a3a!important;border-radius:10px!important}
+#app .ffDashboardFrame .dashHero .ffDashStaffIdentity,#app .ffDashboardFrame .dashHero .ffDashManagerCompact{display:none!important}
+#app .ffDashboardFrame .dashHero .ffDashSelectedIdentity{
+ display:flex!important;align-items:center!important;gap:6px!important;
+ flex:0 1 47%!important;max-width:47%!important;min-width:0!important;order:2
+}
+#app .ffDashSelectedIdentity .ffDashSelectedAvatar{
+ display:grid;place-items:center;flex:0 0 43px;width:43px;height:43px;
+ border:2px solid #ff8c2a;border-radius:50%;overflow:hidden;
+ background:#28130b;color:#ffa054;font-weight:850
+}
+#app .ffDashSelectedAvatar img{display:block;width:100%;height:100%;object-fit:cover}
+#app .ffDashSelectedIdentity .ffDashSelectedName{color:white!important;font-size:11px!important;font-weight:800!important;overflow-wrap:anywhere;line-height:1.2;min-width:0}
+#app .ffDashboardFrame .dashHero .dashAch{order:3!important;flex:none!important}
+@media(max-width:380px){#app .ffDashSelectedIdentity .ffDashSelectedAvatar{width:35px;height:35px;flex-basis:35px}#app .ffDashSelectedIdentity .ffDashSelectedName{font-size:9px!important}}
+/* Compact contact cards: portrait/zone left, name/counts/channels right. */
+#app .ffContactCard .ffContactIdentity.ffContactIdentityCompact{
+ display:grid!important;grid-template-columns:minmax(104px,38%) minmax(0,1fr)!important;
+ gap:8px!important;align-items:start!important;padding:9px 11px!important;text-align:left!important
+}
+#app .ffContactIdentityCompact .ffContactVisual{min-width:0}
+#app .ffContactIdentityCompact .ffContactPhotoButton,#app .ffContactIdentityCompact .ffContactPhoto,
+#app .ffContactIdentityCompact .ffContactInitial{
+ display:block!important;width:100%!important;max-width:100%!important;height:auto!important;
+ aspect-ratio:1/1!important;object-fit:contain!important;object-position:center!important;
+ margin:0!important;border-radius:13px!important;min-height:0!important;
+ border:2px solid #ffa35b!important;background:#060606!important;overflow:hidden!important
+}
+#app .ffContactIdentityCompact .ffContactInitial{display:grid!important;place-items:center!important}
+#app .ffContactIdentityCompact .ffContactZone{
+ margin-top:6px;padding:6px 8px;border:1px solid #3d6b90;
+ background:linear-gradient(120deg,#051a2b,#0b2537);border-radius:9px;
+ font-size:10px;font-weight:850;color:#fff;line-height:1.25;overflow-wrap:anywhere
+}
+#app .ffContactZone small{display:block;font-size:8px;color:#fda054!important}
+#app .ffContactIdentityCompact .ffContactRight{display:flex;flex-direction:column;gap:6px;min-width:0}
+#app .ffContactIdentityCompact .ffContactNamePanel h3{font-size:clamp(14px,3.5vw,18px)!important;margin:0!important;line-height:1.22!important;text-align:center}
+#app .ffContactIdentityCompact .ffContactDepartment{margin:0!important;padding:5px!important;font-size:10px!important}
+#app .ffContactIdentityCompact .ffContactCounts{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+#app .ffContactCounts>span{min-width:0;text-align:center;padding:5px 3px;border-radius:8px;background:linear-gradient(140deg,#351906,#1b0e07);border:1px solid #b05a25}
+#app .ffContactCounts small{display:block!important;font-size:8px!important;color:#ff9a45!important;line-height:1.2}
+#app .ffContactCounts b{display:block!important;font-size:15px!important;color:#fff!important;line-height:1.2;margin-top:3px}
+#app .ffContactIdentityCompact .ffContactLinks{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:5px!important;margin:0!important;padding:0!important
+}
+#app .ffContactIdentityCompact .ffContactLinks a{min-width:0!important;min-height:36px!important;padding:5px 4px!important;border-radius:9px!important;gap:4px!important}
+#app .ffContactIdentityCompact .ffContactLinks :is(span,small){min-width:0!important;font-size:9px!important;overflow-wrap:anywhere!important}
+#app .ffContactIdentityCompact .ffContactLinks svg{width:17px!important;flex:0 0 17px!important}
+#app .ffContactCard .ffContactAdditional{padding:2px 12px 8px;color:#d5c0ad;font-size:10px;line-height:1.3}
+#app .ffContactCard .ffContactAbout{margin:3px 0 5px}
+@media(max-width:360px){
+ #app .ffContactCard .ffContactIdentityCompact{grid-template-columns:minmax(85px,35%) minmax(0,1fr)!important;padding:8px!important}
+ #app .ffContactIdentityCompact .ffContactLinks{grid-template-columns:1fr!important}
+}
+
+/* Equal-sized zone choices with one avatar and two readable identity rows. */
+.ffZoneManagerPicker .ffPickerRows{display:grid!important;gap:7px!important}
+.ffZoneManagerPicker .ffPickerOption.ffZoneManagerRow{
+ display:flex!important;align-items:center!important;width:100%!important;
+ height:78px!important;min-height:78px!important;max-height:78px!important;
+ padding:7px 11px!important;overflow:hidden!important;box-sizing:border-box!important;
+ border-color:#d86c2c!important;background:linear-gradient(115deg,#231309,#090909)!important;
+ box-shadow:0 0 9px #ff741721!important
+}
+.ffZoneManagerPicker .ffZoneManagerAvatar{width:47px!important;height:47px!important;flex:0 0 47px!important}
+.ffZoneManagerPicker .ffPickerText{flex:1;min-width:0;overflow:hidden}
+.ffZoneManagerPicker .ffPickerText strong{font-size:13px!important;line-height:1.2!important;color:#fff!important}
+.ffZoneManagerPicker .ffZoneManagerIdentity{
+ display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ overflow:hidden!important;font-size:10px!important;line-height:1.28!important;
+ color:#ffb587!important;overflow-wrap:anywhere!important
+}
+@media(max-width:340px){.ffZoneManagerPicker .ffZoneManagerAvatar{width:40px!important;height:40px!important;flex-basis:40px!important}.ffZoneManagerPicker .ffPickerText strong{font-size:12px!important}}

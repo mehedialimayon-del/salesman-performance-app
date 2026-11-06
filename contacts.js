@@ -36,11 +36,26 @@ root.FFH_CREATE_CONTACTS=ctx=>{
 
  function postTitle(text){const words=String(text||'').trim().split(/\s+/).filter(Boolean);if(!words.length)return '';let first,rest;if(words.length>1){const mid=Math.ceil(words.length/2);first=words.slice(0,mid).join(' ');rest=words.slice(mid).join(' ');}else{const chars=Array.from(words[0]),mid=Math.ceil(chars.length/2);first=chars.slice(0,mid).join('');rest=chars.slice(mid).join('');}return `<span class="ffContactAccent">${esc(first)}</span>${rest?`<span class="ffContactRest">${words.length>1?' ':''}${esc(rest)}</span>`:''}`;}
  function contactCard(p){
-  const photo=safePhoto(p.photo_url),digits=String(p.whatsapp||'').replace(/\D/g,'');const email=String(p.email||'').replace(/[?#\r\n]/g,''),mailHref=root.FieldForceNative&&!root.FieldForceNative.openContact?'https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(email):'mailto:'+email;
-  const posts=[p.designation,p.designation2].filter(v=>String(v||'').trim());
-  const tags=[['Zone',p.zone],['Salesmen',p.salesmen_count],['Routes',p.routes_count],['Sales team',p.salesmen_names],['Route names',p.route_names]].filter(([,v])=>v!==null&&v!==undefined&&v!=='');
-  return `<article class="ffContactCard" data-contact-id="${esc(p.id)}"><div class="ffContactTop"><span class="ffContactSerial">${p.serial}</span>${posts.length?`<h2 class="ffContactDesignation">${posts.map(t=>`<span class="ffContactDesignationLine">${postTitle(t)}</span>`).join('')}</h2>`:''}</div><div class="ffContactIdentity">${photo?`<button class="ffContactPhotoButton" data-photo="${esc(p.id)}" aria-label="Zoom photo of ${esc(p.name)}"><img class="ffContactPhoto" src="${esc(photo)}" alt="${esc(p.name)}" loading="lazy"></button>`:`<div class="ffContactInitial" aria-hidden="true">${esc(Array.from(p.name)[0]||'?')}</div>`}<div class="ffContactNamePanel"><h3>${postTitle(p.name)}</h3>${p.department?`<div class="ffContactDepartment">${esc(p.department)}</div>`:''}</div>${tags.length?`<div class="ffContactTags">${tags.map(([label,value])=>`<span class="${label==='Department'?'ffDepartmentTag':''}">${label==='Department'?'':`<small>${esc(label)}</small>`}<b>${esc(value)}</b></span>`).join('')}</div>`:''}</div>${p.about?`<p class="ffContactAbout">${esc(p.about)}</p>`:''}<div class="ffContactLinks">${digits?`<a class="ffContactWA" href="https://wa.me/${digits}" aria-label="WhatsApp ${esc(p.name)}">${waIcon}<span>WhatsApp<small>+${digits}</small></span></a>`:''}${p.email?`<a class="ffContactMail" href="${esc(mailHref)}" aria-label="Email ${esc(p.name)}">${mailIcon}<span>Email<small>${esc(p.email)}</small></span></a>`:''}</div>${owner()||canDelete()?`<div class="ffContactTools">${owner()?`<button class="secondary" data-edit="${esc(p.id)}">EDIT</button>`:''}${canDelete()?`<button class="secondary" data-delete="${esc(p.id)}">DELETE</button>`:''}</div>`:''}</article>`;
- }
+ const photo=safePhoto(p.photo_url),digits=String(p.whatsapp||'').replace(/\D/g,'');
+ const email=String(p.email||'').replace(/[?#\r\n]/g,'');
+ const mailHref=root.FieldForceNative&&!root.FieldForceNative.openContact?'https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(email):'mailto:'+email;
+ const posts=[p.designation,p.designation2].filter(v=>String(v||'').trim());
+ const pic=photo?`<button class="ffContactPhotoButton" data-photo="${esc(p.id)}" aria-label="Zoom photo of ${esc(p.name)}"><img class="ffContactPhoto" src="${esc(photo)}" alt="${esc(p.name)}" loading="lazy"></button>`:`<div class="ffContactInitial" aria-hidden="true">${esc(Array.from(p.name)[0]||'?')}</div>`;
+ const count=(label,value)=>`<span><small>${label}</small><b>${value===null||value===undefined||value===''?'—':esc(value)}</b></span>`;
+ const links=`<div class="ffContactLinks">${digits?`<a class="ffContactWA" href="https://wa.me/${digits}" aria-label="WhatsApp ${esc(p.name)}">${waIcon}<span>WhatsApp<small>+${digits}</small></span></a>`:''}${p.email?`<a class="ffContactMail" href="${esc(mailHref)}" aria-label="Email ${esc(p.name)}">${mailIcon}<span>Email<small>${esc(p.email)}</small></span></a>`:''}</div>`;
+ const extra=[p.salesmen_names?`<div><b>TEAM</b> ${esc(p.salesmen_names)}</div>`:'',p.route_names?`<div><b>ROUTES</b> ${esc(p.route_names)}</div>`:''].filter(Boolean).join('');
+ return `<article class="ffContactCard" data-contact-id="${esc(p.id)}">
+  <div class="ffContactTop"><span class="ffContactSerial">${p.serial}</span>${posts.length?`<h2 class="ffContactDesignation">${posts.map(t=>`<span class="ffContactDesignationLine">${postTitle(t)}</span>`).join('')}</h2>`:''}</div>
+  <div class="ffContactIdentity ffContactIdentityCompact">
+   <div class="ffContactVisual">${pic}${p.zone?`<div class="ffContactZone"><small>ZONE</small>${esc(String(p.zone).toUpperCase()==='PRIMARY'?'KL ZONE':p.zone)}</div>`:''}</div>
+   <div class="ffContactRight"><div class="ffContactNamePanel"><h3>${postTitle(p.name)}</h3>${p.department?`<div class="ffContactDepartment">${esc(p.department)}</div>`:''}</div>
+   <div class="ffContactCounts">${count('NUMBER OF SR',p.salesmen_count)}${count('ROUTES',p.routes_count)}</div>${links}</div>
+  </div>${extra?`<div class="ffContactAdditional">${extra}</div>`:''}
+  ${p.about?`<p class="ffContactAbout">${esc(p.about)}</p>`:''}
+  ${owner()||canDelete()?`<div class="ffContactTools">${owner()?`<button class="secondary" data-edit="${esc(p.id)}">EDIT</button>`:''}${canDelete()?`<button class="secondary" data-delete="${esc(p.id)}">DELETE</button>`:''}</div>`:''}
+ </article>`;
+}
+
  function render(message=''){
   if(!active())return;
   const all=visible(),list=all.filter(p=>searchTerm?matches(p,searchTerm):category==='all'||categoryOf(p)===category),trash=rows.filter(x=>x.deleted_at).sort((a,b)=>b.deleted_at.localeCompare(a.deleted_at));

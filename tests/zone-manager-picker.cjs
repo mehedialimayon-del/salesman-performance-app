@@ -25,7 +25,7 @@ const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
   ],onSelect:v=>{selected=v;}});
   await pause(65);
   assert.equal(rpcCalls,1);
-  assert.equal([...w.document.querySelectorAll('.ffZoneManagerRow')].find(x=>x.dataset.staffId==='PRIMARY').querySelector('strong').textContent,'PRIMARY');
+  assert.equal([...w.document.querySelectorAll('.ffZoneManagerRow')].find(x=>x.dataset.staffId==='PRIMARY').querySelector('strong').textContent,'KL ZONE');
   const rows=[...w.document.querySelectorAll('.ffZoneManagerRow')];
   const cheras=rows.find(x=>x.dataset.staffId==='CHERAS');
   assert.ok(cheras);
