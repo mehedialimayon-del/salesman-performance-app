@@ -1,0 +1,327 @@
+/* A&N Overseas 2026-11-06: final responsive fixes, deliberately last stylesheet. */
+:root{--an-orange:#ff992d;--an-white:#fff;--an-black:#0a0b0f;}
+#app h1 span,#app h2 span,#app h3 span{color:var(--an-orange);}
+#app .an-manager-name-box .an-manager-profession{color:#ff9d38!important;font-weight:900;}
+#app .an-manager-name-box .an-manager-person-name{color:#fff!important;font-weight:900;}
+#app .an-about-v3 .an-manager-white-name{color:#fff!important;}
+#app .an-manager-name-box h3{overflow-wrap:anywhere;}
+/* Header: retain a fixed page frame, trim wasted vertical space. */
+@media(min-width:801px){
+ body .top{height:65px!important;min-height:65px!important;max-height:65px!important;position:sticky!important;top:0!important;z-index:100!important;}
+ body .top .wrap{height:65px!important;min-height:65px!important;max-height:65px!important;padding-top:3px!important;padding-bottom:3px!important;}
+ body .top .brand-copy strong{font-size:clamp(14px,1.4vw,19px)!important}
+ body .top .links{justify-content:flex-end!important}
+ body .top .links a{padding-top:4px!important;padding-bottom:4px!important}
+ body .top .an-desktop-login,body .top .btn.tiny{height:26px!important;min-height:26px!important;max-height:26px!important;font-size:10px!important}
+ .an-updates-bar{height:28px!important;min-height:28px!important}
+}
+@media(max-width:800px){
+ body .top{height:58px!important;min-height:58px!important;max-height:58px!important;position:sticky!important;top:0!important;z-index:100!important}
+ body .top .wrap{height:58px!important;max-height:58px!important;display:flex!important;flex-wrap:nowrap!important;gap:4px!important;padding:3px 7px!important}
+ body .top .brand{order:0;min-width:0!important;max-width:none!important;flex:1 1 auto!important;overflow:hidden!important;gap:3px!important;margin:0!important}
+ body .top .logo-motion,body .top .logo-crop{width:43px!important;height:39px!important;flex:0 0 43px!important}
+ body .top .logo-crop img{width:127px!important;height:36px!important}
+ body .top .brand-copy{min-width:0!important;flex:1 1 auto!important;overflow:hidden!important}
+ body .top .brand-copy strong{font-size:clamp(12px,3.35vw,17px)!important;line-height:1.15!important;white-space:nowrap!important;min-height:0!important}
+ body .top .brand-copy small{font-size:5.5px!important;white-space:nowrap!important;letter-spacing:.1px!important}
+ body .top .an-favorite-header{order:1;display:grid!important;place-items:center!important;position:relative!important;flex:0 0 31px!important;width:31px!important;min-width:31px!important;height:34px!important;margin:0!important;padding:0!important;border-radius:9px!important}
+ body .top .an-favorite-header svg{display:block!important;width:20px!important;height:20px!important;fill:#ff9944!important;stroke:#ffe1bc!important}
+ body .top .an-favorite-header .an-favorite-count{top:-6px!important;right:-4px!important}
+ body .top .site-refresh{order:2;display:grid!important;place-items:center!important;flex:0 0 31px!important;width:31px!important;height:34px!important;margin:0!important;padding:0!important;font-size:22px!important}
+ body .top .an-global-search-trigger{order:3;position:static!important;display:grid!important;place-items:center!important;flex:0 0 31px!important;width:31px!important;min-width:31px!important;height:34px!important;border:1px solid #ad723e!important;border-radius:9px!important;background:#21170f!important;color:#ffbc76!important;margin:0!important;padding:0!important;cursor:pointer!important}
+ body .top .an-global-search-trigger svg{width:18px;height:18px;stroke:currentColor;fill:none}
+ body .top .hamb,body .top #hamb{order:4;display:grid!important;place-items:center!important;flex:0 0 31px!important;width:31px!important;min-width:31px!important;height:34px!important;padding:0!important;margin:0!important;font-size:22px!important}
+ body .top .btn.tiny,body .top .an-desktop-login{display:none!important}
+ body .top .links .an-mobile-global-search{display:none!important}
+ .an-updates-bar{height:28px!important;min-height:28px!important;max-height:28px!important;}
+ .an-updates-label{padding:5px 8px!important}
+}
+/* Keep Read More separate from the panel-fullscreen control. */
+#app .an-community-panel-head{position:relative;}
+#app .an-community-panel-head .an-hub-maximize{
+ border:1px solid #f3af63;cursor:pointer;display:grid;place-items:center;flex:0 0 33px;
+ width:33px;height:33px;margin-left:auto;margin-right:4px;border-radius:10px;
+ background:#2d1a0c;color:#ffd49e;font-size:20px;line-height:1;font-weight:800;
+}
+#app .an-community-panel-head .an-hub-maximize svg{width:19px;height:19px;stroke:currentColor}
+body.an-hub-max-open{overflow:hidden!important}
+body.an-hub-max-open::after{content:"";position:fixed;inset:0;z-index:1999;background:#000e;}
+body.an-hub-max-open #app .an-community-panel.an-hub-fullview{
+ position:fixed!important;inset:calc(env(safe-area-inset-top,0px) + 6px) 6px calc(env(safe-area-inset-bottom,0px) + 6px)!important;
+ width:auto!important;height:auto!important;max-height:calc(100dvh - 12px)!important;
+ max-width:none!important;z-index:2000!important;display:flex!important;flex-direction:column!important;
+ overflow:hidden!important;background:#080b10!important;border:1px solid #ffb36a!important;border-radius:15px!important;
+ box-shadow:0 20px 70px #000c!important;
+}
+body.an-hub-max-open #app .an-community-panel.an-hub-fullview .an-community-scroll{
+ flex:1 1 0!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;touch-action:pan-y!important;
+}
+body.an-hub-max-open #app .an-community-panel.an-hub-fullview .an-community-grid,
+body.an-hub-max-open #app .an-community-panel.an-hub-fullview .an-youtube-grid{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:13px!important;
+}
+@media(max-width:800px){
+ #app .an-community-panel-head .an-hub-maximize{width:29px;height:29px;flex-basis:29px;margin-left:auto;margin-right:2px}
+ body.an-hub-max-open #app .an-community-panel.an-hub-fullview .an-community-grid,
+ body.an-hub-max-open #app .an-community-panel.an-hub-fullview .an-youtube-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+ body.an-hub-max-open #app .an-community-panel.an-hub-fullview .an-community-media,
+ body.an-hub-max-open #app .an-community-panel.an-hub-fullview .an-youtube-media{height:auto!important;aspect-ratio:4/5!important}
+ body.an-hub-max-open #app .an-community-panel.an-hub-fullview .an-community-media img,
+ body.an-hub-max-open #app .an-community-panel.an-hub-fullview .an-youtube-media img{object-fit:contain!important}
+}
+body.an-community-mode #app .an-community-card,
+body.an-community-mode #app .an-youtube-card{border-color:#70461e!important;background:#111319!important;color:#fff!important;}
+body.an-community-mode #app .an-community-category,
+body.an-community-mode #app .an-community-more{color:#ffa84b!important}
+body.an-community-mode #app .an-community-copy h3,
+body.an-community-mode #app .an-story-copy h3{color:#fff!important}
+body.an-community-mode #app .an-community-desc,
+body.an-community-mode #app .an-story-copy p{color:#e7e5e1!important}
+/* Scholarships: search first, four fixed feature cards, then VERTICAL list. */
+body.an-scholarships-mode{
+ height:100vh!important;height:100dvh!important;min-height:0!important;
+ display:flex!important;flex-direction:column!important;overflow:hidden!important;
+}
+body.an-scholarships-mode .top,body.an-scholarships-mode .an-updates-bar{flex:0 0 auto!important}
+body.an-scholarships-mode #app{
+ flex:1 1 0!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;
+}
+body.an-scholarships-mode #app>.an-scholarship-head{flex:0 0 auto!important;padding:6px 0!important}
+body.an-scholarships-mode #app>.an-scholarship-directory{
+ flex:1 1 0!important;min-height:0!important;overflow:hidden!important;
+ display:flex!important;flex-direction:column!important;
+ padding:6px 12px 5px!important;max-width:1570px!important;width:100%!important;
+}
+body.an-scholarships-mode .footer{display:none!important}
+body.an-scholarships-mode .an-scholarship-filters{order:0;flex:0 0 auto;margin:2px 0 6px!important;gap:6px!important}
+body.an-scholarships-mode .an-scholarship-filters label{font-size:9px!important;gap:2px!important}
+body.an-scholarships-mode .an-scholarship-filters input,
+body.an-scholarships-mode .an-scholarship-filters select{
+ min-height:33px!important;padding:5px 9px!important;font-size:11px!important;border-radius:8px!important
+}
+body.an-scholarships-mode .an-feature-grid{order:1;flex:0 0 auto;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}
+body.an-scholarships-mode .an-feature-scholarship{min-height:90px!important;max-height:112px!important;border-radius:10px!important;padding:9px!important}
+body.an-scholarships-mode .an-scholarship-about{order:2;flex:0 0 auto;margin:5px 0 0!important}
+body.an-scholarships-mode .an-scholarship-about>summary{padding:5px 9px!important}
+body.an-scholarships-mode .an-scholarship-meta{order:3;flex:0 0 auto;margin:5px 0!important;font-size:10px!important}
+body.an-scholarships-mode .an-scholarship-scroll-region{
+ order:4;flex:1 1 0;min-height:0;overflow-x:hidden!important;overflow-y:auto!important;
+ overscroll-behavior:contain!important;touch-action:pan-y!important;padding:0 2px 15px;
+ scrollbar-color:#a46b33 #141519;
+}
+body.an-scholarships-mode .an-scholarship-info{order:5;max-height:24px;overflow:auto;font-size:9px!important;line-height:1.3!important;margin:1px 0!important;}
+body.an-scholarships-mode .an-scholarship-rail-nav{display:none!important}
+body.an-scholarships-mode .an-scholarship-directory .an-scholarship-rail{
+ display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ grid-auto-flow:row!important;grid-auto-columns:auto!important;grid-template-rows:none!important;
+ overflow-x:hidden!important;overflow-y:visible!important;scroll-snap-type:none!important;
+ gap:10px!important;width:100%!important;padding:2px!important;
+}
+body.an-scholarships-mode .an-scholarship-directory .an-scholarship-rail>.an-scholarship-card{
+ width:auto!important;min-width:0!important;height:auto!important;scroll-snap-align:none!important;
+}
+body.an-scholarships-mode .an-scholarship-rail-section{margin:6px 0 14px!important}
+body.an-scholarships-mode .an-scholarship-rail-header{margin:4px 0!important;padding:0 0 5px!important}
+body.an-scholarships-mode .an-scholarship-rail-header h2{font-size:clamp(16px,1.6vw,21px)!important;margin:3px 0!important}
+body.an-scholarships-mode .an-scholarship-rail-header p{font-size:10px!important}
+body.an-scholarships-mode .an-scholarship-card h3{min-height:0!important;margin:5px 0 6px!important;font-size:clamp(12px,1.1vw,15px)!important;}
+body.an-scholarships-mode .an-scholarship-body{padding:10px!important}
+body.an-scholarships-mode .an-scholarship-cover{min-height:94px!important}
+@media(max-width:800px){
+ body.an-scholarships-mode .an-scholarship-directory .an-scholarship-rail{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+ body.an-scholarships-mode .an-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+ body.an-scholarships-mode .an-feature-scholarship{min-height:79px!important;max-height:88px!important;padding:7px!important}
+ body.an-scholarships-mode .an-scholarship-filters{grid-template-columns:1fr 1fr 1fr!important;gap:5px!important}
+ body.an-scholarships-mode .an-scholarship-filters label:first-child{grid-column:auto!important}
+ body.an-scholarships-mode .an-scholarship-filters label{font-size:8px!important;min-width:0!important}
+ body.an-scholarships-mode .an-scholarship-filters input,
+ body.an-scholarships-mode .an-scholarship-filters select{min-height:30px!important;font-size:10px!important;padding:4px!important;max-width:100%!important}
+ body.an-scholarships-mode .an-scholarship-meta{font-size:9px!important}
+ body.an-scholarships-mode .an-scholarship-meta>span{display:none!important}
+}
+/* Country hero more compact; titles, CTA and filter stay fixed, countries scroll underneath. */
+body.an-countries-mode{height:100dvh!important;display:flex!important;flex-direction:column!important;min-height:0!important;overflow:hidden!important}
+body.an-countries-mode #app{flex:1 1 0!important;display:flex!important;flex-direction:column!important;min-height:0!important;overflow:hidden!important}
+body.an-countries-mode .top,body.an-countries-mode .an-updates-bar{flex:0 0 auto!important}
+body.an-countries-mode #app>.an-country-hero{flex:0 0 auto!important;padding:5px 0 6px!important}
+body.an-countries-mode #app>.an-country-hero .an-country-hero-layout{gap:9px!important}
+body.an-countries-mode .an-country-hero h1{font-size:clamp(18px,2vw,26px)!important;margin:2px 0!important}
+body.an-countries-mode .an-country-hero p{font-size:10px!important;margin:0!important}
+body.an-countries-mode .an-country-scholarship-cta{min-height:42px!important;max-height:45px!important;padding:5px 10px!important;border-radius:9px!important;gap:6px!important}
+body.an-countries-mode .an-country-cta-ico{font-size:17px!important}
+body.an-countries-mode .an-country-cta-copy{gap:0!important}
+body.an-countries-mode .an-country-cta-copy strong{font-size:11px!important;line-height:1.15!important}
+body.an-countries-mode .an-country-cta-copy small{display:none!important}
+body.an-countries-mode .an-country-advanced>summary{min-height:42px!important;height:42px!important;border-radius:9px!important}
+body.an-countries-mode #app>.an-country-page{flex:1 1 0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;padding-top:5px!important}
+body.an-countries-mode #app>.an-country-page .country-tiles{margin-top:0!important}
+body.an-countries-mode .footer{display:none!important}
+@media(max-width:800px){
+ body.an-countries-mode #app>.an-country-hero .an-country-hero-layout{grid-template-columns:minmax(0,1fr)!important;gap:5px!important}
+ body.an-countries-mode .an-country-hero .an-country-hero-intro p{display:none!important}
+ body.an-countries-mode .an-country-scholarship-cta{min-height:37px!important;max-height:39px!important}
+ body.an-countries-mode .an-country-advanced>summary{min-height:38px!important;height:38px!important}
+ body.an-countries-mode .an-country-hero-tools{grid-template-columns:minmax(0,1fr) 38px!important;gap:6px!important}
+ body.an-countries-mode #app>.an-country-page .country-tiles{gap:8px!important}
+}
+/* University search and filter stay in place; the university CARD list alone scrolls. */
+body.an-universities-mode{height:100dvh!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;min-height:0!important}
+body.an-universities-mode #app{display:flex!important;flex-direction:column!important;flex:1 1 0!important;min-height:0!important;overflow:hidden!important}
+body.an-universities-mode #app>.page-head{flex:0 0 auto!important;padding:4px 0 5px!important}
+body.an-universities-mode #app>.page-head p{display:none!important}
+body.an-universities-mode #app>.university-catalogue{
+ display:flex!important;flex-direction:column!important;flex:1 1 0!important;
+ width:100%!important;max-width:1560px!important;min-height:0!important;
+ overflow:hidden!important;padding:5px 12px!important;
+}
+body.an-universities-mode .catalogue-tools{display:flex!important;align-items:center!important;gap:7px!important;flex:0 0 auto!important;margin:0 0 3px!important;min-height:37px!important}
+body.an-universities-mode .catalogue-tools .catalogue-search{flex:1!important;min-width:0!important}
+body.an-universities-mode .catalogue-tools #university-search{font-size:11px!important;min-height:35px!important;height:35px!important;padding:6px 8px!important}
+body.an-universities-mode .catalogue-tools .catalogue-filter summary{width:37px!important;min-height:35px!important;height:35px!important;padding:5px!important}
+body.an-universities-mode .catalogue-tools .an-scholarship-only{display:inline-flex!important;align-items:center!important;padding:5px 7px!important;font-size:10px!important;min-height:35px!important;height:35px!important;white-space:nowrap!important}
+body.an-universities-mode #catalogue-count{flex:0 0 auto!important;font-size:10px!important;margin:2px 0 5px!important;line-height:1.3!important}
+body.an-universities-mode .university-catalogue #results{
+ flex:1 1 0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+ overscroll-behavior:contain!important;touch-action:pan-y!important;align-content:start!important;
+ padding:2px 3px 12px!important;margin:0!important;scrollbar-width:thin;
+}
+body.an-universities-mode .university-catalogue .catalogue-footnote{flex:0 0 auto!important;max-height:17px!important;overflow:auto!important;font-size:9px!important;line-height:1.3!important;margin:3px 0 0!important}
+body.an-universities-mode .footer{display:none!important}
+@media(max-width:800px){
+ body.an-universities-mode .catalogue-tools{gap:5px!important}
+ body.an-universities-mode .catalogue-tools .an-scholarship-only{font-size:0!important;min-width:33px!important;padding:5px!important}
+ body.an-universities-mode .catalogue-tools .an-scholarship-only::before{content:"🎓";font-size:17px}
+ body.an-universities-mode .university-catalogue #results{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+ body.an-universities-mode #app>.page-head .bread{font-size:8px!important}
+ body.an-universities-mode #app>.page-head h1{font-size:19px!important}
+}
+/* Contact: compact office tiles, direct email, CMS social icons, permanently accessible enquiry. */
+body.an-contact-mode{height:100dvh!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+body.an-contact-mode #app{display:flex!important;flex-direction:column!important;flex:1 1 0!important;min-height:0!important;overflow:hidden!important}
+body.an-contact-mode .an-contact-head{flex:0 0 auto!important;padding:5px 0!important}
+body.an-contact-mode .an-contact-head h1{font-size:clamp(18px,2.1vw,25px)!important;margin:2px 0!important}
+body.an-contact-mode .an-contact-head p{font-size:10px!important;margin:0!important}
+body.an-contact-mode #app>.an-contact-content{
+ flex:1 1 0!important;min-height:0!important;max-width:1400px!important;width:100%!important;
+ display:flex!important;flex-direction:column!important;padding:7px 12px 10px!important;overflow:hidden!important
+}
+body.an-contact-mode .an-contact-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:11px;min-height:0;flex:1 1 0}
+body.an-contact-mode .an-contact-offices,body.an-contact-mode .an-contact-enquiry{
+ padding:13px;border-radius:14px;border:1px solid #87552e;
+ background:linear-gradient(140deg,#171518,#090b10);min-width:0;min-height:0;
+}
+body.an-contact-mode .an-contact-main h2{font-size:clamp(17px,1.8vw,23px)!important;margin:0 0 9px!important;color:#fff!important}
+body.an-contact-mode .an-contact-main h2 span{color:#ff9a33!important}
+.an-contact-office-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.an-contact-office{border:1px solid #704520;border-radius:10px;background:#1b1512;padding:12px;min-width:0}
+.an-contact-office b{display:block;color:#fff;font-size:14px;line-height:1.35}
+.an-contact-office b span{color:#ffa24e}
+.an-contact-office p{margin:5px 0 0!important;color:#eee2d6;font-size:11px;line-height:1.45}
+.an-contact-social{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:12px 0}
+.an-contact-social a{
+ min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+ height:54px;cursor:pointer;border-radius:10px;background:#26190e;color:#ffb15f!important;
+ border:1px solid #956335;font-size:20px;font-weight:900;text-decoration:none;
+}
+.an-contact-social a small{font-size:8px;color:#eee3d9}
+.an-contact-social a.an-social-unset{opacity:.45;cursor:not-allowed;filter:grayscale(.8)}
+.an-contact-email{display:inline-flex;gap:8px;align-items:center;max-width:100%;overflow-wrap:anywhere;color:#ffc28a!important;font-size:12px;padding:8px;border:1px solid #80512b;border-radius:9px;background:#150f0b}
+body.an-contact-mode .an-contact-enquiry{display:flex;flex-direction:column;overflow:hidden}
+body.an-contact-mode .an-contact-enquiry form{display:flex;flex-direction:column;min-height:0;flex:1 1 0}
+body.an-contact-mode .an-contact-fields{flex:1 1 0;min-height:0;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:9px;align-content:start}
+body.an-contact-mode .an-contact-fields label{display:flex;flex-direction:column;gap:4px;min-width:0;font-size:11px;font-weight:750;color:#fdbb76}
+body.an-contact-mode .an-contact-fields label:last-child{grid-column:1/-1}
+body.an-contact-mode .an-contact-fields input,body.an-contact-mode .an-contact-fields textarea{
+ box-sizing:border-box;width:100%;min-height:34px!important;background:#11161e;color:#fff!important;
+ border:1px solid #815132;border-radius:8px;font:inherit;font-size:12px;padding:7px 9px
+}
+body.an-contact-mode .an-contact-fields textarea{resize:vertical;min-height:70px}
+body.an-contact-mode .an-contact-enquiry .btn{align-self:flex-start;flex:0 0 auto;padding:9px 16px!important;min-height:36px!important;margin-top:9px;font-size:12px}
+body.an-contact-mode .footer{display:none!important}
+@media(max-width:800px){
+ body.an-contact-mode .an-contact-head p{display:none!important}
+ body.an-contact-mode .an-contact-main{display:flex;flex-direction:column;gap:7px}
+ body.an-contact-mode .an-contact-offices{flex:0 0 auto;padding:8px!important}
+ body.an-contact-mode .an-contact-main h2{font-size:16px!important;margin:0 0 6px!important}
+ body.an-contact-mode .an-contact-office-grid{gap:6px}
+ body.an-contact-mode .an-contact-office{padding:7px}
+ body.an-contact-mode .an-contact-office b{font-size:11px}
+ body.an-contact-mode .an-contact-office p{font-size:9px!important;line-height:1.3!important}
+ body.an-contact-mode .an-contact-social{gap:4px;margin:7px 0}
+ body.an-contact-mode .an-contact-social a{height:38px;font-size:15px;gap:0;border-radius:7px}
+ body.an-contact-mode .an-contact-social a small{font-size:7px}
+ body.an-contact-mode .an-contact-email{font-size:10px;padding:5px!important}
+ body.an-contact-mode .an-contact-enquiry{flex:1 1 0;min-height:0;padding:8px!important}
+ body.an-contact-mode .an-contact-fields{grid-template-columns:1fr 1fr;gap:6px}
+ body.an-contact-mode .an-contact-fields input{min-height:29px!important;height:29px!important}
+ body.an-contact-mode .an-contact-fields textarea{min-height:65px!important}
+ body.an-contact-mode .an-contact-enquiry .btn{min-height:30px!important;padding:6px 12px!important;margin-top:6px}
+}
+/* Our Services: 4 x 3 with readable text and complete cover; no collapsed text overlays. */
+@media(min-width:801px){
+ body.an-services-mode #app .an-journey-services{overflow-y:auto!important;overflow-x:hidden!important;}
+ body.an-services-mode #app .an-journey-services>.grid{
+  flex:1 0 auto!important;grid-template-rows:repeat(3,minmax(155px,1fr))!important;min-height:0!important;align-content:stretch!important;
+ }
+ body.an-services-mode #app .an-service-card{display:flex!important;flex-direction:column!important;height:100%!important;min-height:155px!important;}
+ body.an-services-mode #app .an-service-card .an-service-picture{
+  flex:0 0 clamp(55px,9dvh,86px)!important;height:clamp(55px,9dvh,86px)!important;overflow:hidden!important;
+ }
+ body.an-services-mode #app .an-service-card .an-service-picture img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;}
+ body.an-services-mode #app .an-service-card .inside{flex:1 1 0!important;min-height:0!important;padding:4px 8px!important;display:flex!important;flex-direction:column!important;overflow:visible!important;}
+ body.an-services-mode #app .an-service-card .iconbox{width:20px!important;height:20px!important;flex:0 0 20px!important;font-size:12px!important;margin:0!important}
+ body.an-services-mode #app .an-service-card h3{font-size:clamp(11px,.88vw,14px)!important;margin:2px 0!important;line-height:1.16!important;color:#fff!important;min-height:0!important;overflow:visible!important;display:block!important;}
+ body.an-services-mode #app .an-service-card h3 span{color:#ff9a2d!important}
+ body.an-services-mode #app .an-service-card p{font-size:clamp(9px,.7vw,11px)!important;line-height:1.25!important;margin:2px 0!important;overflow:hidden!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;}
+ body.an-services-mode #app .an-service-card .an-service-go{flex:0 0 auto!important;margin-top:auto!important;min-height:24px!important;padding:5px!important;line-height:1.1!important;font-size:10px!important;}
+}
+body.an-service-detail-mode #app .an-journey{max-width:1250px!important}
+body.an-service-detail-mode #app .an-journey-lead,
+body.an-service-detail-mode #app .an-journey-block{padding:12px 15px!important;margin:7px 0!important;border-radius:11px!important}
+body.an-service-detail-mode #app .an-journey h2{font-size:clamp(17px,2vw,23px)!important;margin:4px 0 7px!important}
+body.an-service-detail-mode #app .an-journey p{font-size:12px!important;line-height:1.42!important;margin:5px 0!important}
+body.an-service-detail-mode #app .an-flow-grid{gap:8px!important;margin:9px 0!important}
+body.an-service-detail-mode #app .an-flow-step{padding:10px!important;min-height:0!important}
+body.an-service-detail-mode #app .an-flow-step b{font-size:21px!important}
+body.an-service-detail-mode #app .an-flow-step p{font-size:11px!important;line-height:1.3!important}
+body.an-service-detail-mode #app .an-journey-actions{margin-top:8px!important}
+/* About details is a scrollable document under a stationary navigation bar. */
+body.an-about-details-mode{height:100dvh!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;min-height:0!important}
+body.an-about-details-mode #app{flex:1 1 0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;scroll-behavior:smooth!important}
+body.an-about-details-mode .footer{display:none!important}
+body.an-about-details-mode #app .an2-nav{position:sticky!important;top:0!important;z-index:55!important}
+#app .an2-founder-quote blockquote{color:#f4f3f2!important;font-style:normal!important;}
+#app .an2-founder-quote blockquote::first-line{color:#ffaf58!important}
+#app .an2-founder-quote .an2-founder-msg-orange{color:#ff9e37!important}
+#app .an2-founder-quote .an2-founder-msg-white{color:#fff!important}
+#app .an2-founder-quote .an2-floating-flags .an2-flag{animation-duration:2.5s!important}
+@media(min-width:801px){
+ #app .an2-founder-quote{overflow:hidden!important;position:relative!important;padding-right:clamp(185px,20vw,260px)!important}
+ #app .an2-founder-quote .an2-quote-footer{display:block!important;grid-template-columns:none!important}
+ #app .an2-founder-quote .an2-founder-person{
+  position:absolute!important;top:0!important;right:0!important;bottom:0!important;left:auto!important;
+  width:clamp(185px,21vw,265px)!important;height:100%!important;max-height:none!important;
+  display:block!important;margin:0!important;overflow:hidden!important;
+ }
+ #app .an2-founder-quote .an2-founder-person img{
+  position:absolute!important;top:0!important;bottom:0!important;right:-10px!important;left:auto!important;
+  height:100%!important;width:100%!important;max-width:none!important;max-height:none!important;
+  object-fit:contain!important;object-position:right top!important;filter:none!important;transform:none!important;
+ }
+}
+@media(max-width:800px){
+ #app .an2-founder-quote{position:relative!important;overflow:hidden!important;padding-bottom:10px!important}
+ #app .an2-founder-quote .an2-quote-footer{position:relative!important;min-height:220px!important;grid-template-columns:minmax(0,1fr) minmax(130px,43%)!important}
+ #app .an2-founder-quote .an2-founder-person{height:220px!important;width:100%!important;align-self:stretch!important}
+ #app .an2-founder-quote .an2-founder-person img{
+  top:0!important;bottom:auto!important;right:-10px!important;left:auto!important;
+  height:100%!important;width:120%!important;max-width:none!important;max-height:none!important;
+  object-fit:contain!important;object-position:top right!important;transform:none!important;
+ }
+}
+/* Retain access to content by scrolling inside full-detail pages. */
+body.an-scholarship-detail-view .top{position:sticky!important;top:0!important}
+@media(min-width:801px){
+ body.an-scholarship-detail-view #app .an-scholarship-section{padding:13px!important;margin:9px 0!important}
+ body.an-scholarship-detail-view #app .an-scholarship-section-grid{gap:8px!important}
+}
