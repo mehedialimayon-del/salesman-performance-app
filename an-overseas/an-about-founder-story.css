@@ -579,3 +579,19 @@ body:not(.an-about-locked) #app .an2-story{--gold:#ffd19b;--orange:#ff962a;--cre
   #app .an2-founder-quote .an2-founder-person{width:158px!important;height:281px!important}
   #app .an2-founder-quote .an2-founder-person img{width:115%!important}
 }
+
+
+/* Keep the raised head below the quotation's final lines on tablets and desktops. */
+@media(min-width:651px){
+  #app .an2-founder-quote .an2-founder-person img{
+    width:min(93%,210px)!important;
+    right:0!important;
+    bottom:29px!important;
+    height:auto!important;
+  }
+  #app .an2-founder-quote .an2-founder-person figcaption{
+    left:auto!important;
+    right:0!important;
+    width:min(93%,210px)!important;
+  }
+}
