@@ -54,6 +54,12 @@
   }
  };
  const verifiedCoversById={
+  "my-u-kpjhealthcareuniversity":{logo:"https://kpju.edu.my/wp-content/uploads/2025/05/logo.svg",source:"https://kpju.edu.my/",credit:"KPJ Healthcare University · official logo"},
+  "my-u-perdanauniversity":{logo:"https://perdanauniversity.edu.my/wp-content/uploads/2021/01/PU_Official_Main_Logo_2026-01.png",source:"https://perdanauniversity.edu.my/",credit:"Perdana University · official logo"},
+  "my-u-universitigeomatikamalaysia":{logo:"https://i0.wp.com/www.geomatika.edu.my/wp-content/uploads/2022/10/Logo-UGM-2022-TRANSPARENT-01.png?fit=2222%2C803&ssl=1",source:"https://www.geomatika.edu.my/",credit:"Universiti Geomatika Malaysia · official logo"},
+  "my-uc-netherlandsmaritimeuniversitycollegenmuc":{logo:"https://nmuc.edu.my/storage/2026/08/NMUC-LOGO-01-1-768x1209-1.png",source:"https://nmuc.edu.my/",credit:"NMUC · official institutional image"},
+  "my-uc-spectruminternationaluniversitycollege":{logo:"https://siuc.edu.my/wp-content/uploads/2023/09/SIUC-LOGO.png",source:"https://siuc.edu.my/",credit:"Spectrum International University College · official logo"},
+
   "my-uc-hanchianguniversitycollegeofcommunication":{
    photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Han_Chiang_University_College.jpg/960px-Han_Chiang_University_College.jpg',
    source:'https://commons.wikimedia.org/wiki/File:Han_Chiang_University_College.jpg',
