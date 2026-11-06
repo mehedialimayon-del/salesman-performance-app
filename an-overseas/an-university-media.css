@@ -203,3 +203,24 @@
  #app .an-guide-card .an-identity-awaiting-name{font-size:11px;line-height:1.2}
  #app .an-guide-card .an-identity-awaiting small{font-size:8px}
 }
+
+
+/* Institution-site identity fallback 2026-11-06 */
+.an-guide-card .an-logo-stage.an-site-icon-loaded .an-identity-awaiting{display:none!important}
+.an-guide-card .an-logo-stage .an-institution-site-icon{
+  display:block;
+  width:clamp(65px,58%,114px)!important;
+  height:clamp(65px,78%,114px)!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  padding:12px!important;
+  background:#fff!important;
+  border:1px solid rgba(232,176,100,.8)!important;
+  border-radius:15px!important;
+  position:relative!important;
+  box-shadow:0 10px 26px rgba(0,0,0,.38)!important;
+}
+.an-guide-card .an-logo-stage:not(.an-site-icon-loaded) .an-institution-site-icon{opacity:0}
+@media(max-width:520px){
+ .an-guide-card .an-logo-stage .an-institution-site-icon{width:75px!important;height:75px!important;padding:9px!important}
+}
