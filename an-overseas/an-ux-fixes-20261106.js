@@ -74,10 +74,23 @@ function contacts(){
   }
  }
 }
+function ensureRoute(){
+ const hash=location.hash.startsWith('#/')?location.hash.slice(2):location.hash.slice(1);
+ const page=hash.split('?')[0].split('/')[0]||'home';
+ for(const [cls,route] of [['an-contact-mode','contact'],['an-about-details-mode','aboutdetails'],['an-countries-mode','countries'],['an-universities-mode','universities'],['an-scholarships-mode','scholarships']]){
+  document.body.classList.toggle(cls,page===route);
+ }
+ if(page==='contact'&&!document.querySelector('#app .an-contact-content')&&typeof window.contactPage==='function'){
+  const html=window.contactPage();
+  if(typeof html==='string'&&html.includes('an-contact-content')){
+   const app=document.getElementById('app');if(app)app.innerHTML=html;
+  }
+ }
+}
 function init(){
  const app=document.getElementById('app');
  if(!app)return;
- const update=()=>{if(openPanel&&!document.contains(openPanel))close();hub();contacts();};
+ const update=()=>{ensureRoute();if(openPanel&&!document.contains(openPanel))close();hub();contacts();};
  let pending=false;
  const observer=new MutationObserver(()=>{
   if(pending)return;pending=true;
