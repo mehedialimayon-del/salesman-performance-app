@@ -23,8 +23,9 @@ const ffhZoneManagers=async()=>{
 window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect}){
  items=items.map(item=>window.FFH_STAFF_ITEM?.(item)||item);
  const isZonePicker=/\bzone\b/i.test(String(title)) && !/assig(n|nee)/i.test(String(title));
+ const isScopeStaffPicker=/select\s*sr|sales representative/i.test(String(title));
  let managers=new Map();
- const ov=document.createElement('div');ov.className='globalSearchOverlay ffItemPicker'+(isZonePicker?' ffZoneManagerPicker':'');
+ const ov=document.createElement('div');ov.className='globalSearchOverlay ffItemPicker'+(isZonePicker?' ffZoneManagerPicker':'')+(isScopeStaffPicker?' ffScopeStaffPicker':'');
  ov.innerHTML='<section class="globalSearchBox"><div class="row"><h2></h2><button type="button" class="secondary">CLOSE</button></div><input class="ffPickerSearch" placeholder="Search name, code or zone…"><div class="ffPickerRows"></div></section>';
  ov.querySelector('h2').textContent=title;
  document.body.append(ov);
@@ -48,6 +49,25 @@ window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect}){
    button.dataset.staffId=String(item.value);
    const body=document.createElement('span');body.className='ffPickerText';
    const label=document.createElement('strong');label.textContent=item.label;body.append(label);
+   if(isScopeStaffPicker){
+    const staff=window.FFH_STAFF_PROFILE?.(String(item.value).replace(/^TEAM:/,''));
+    if(staff){
+     label.className='ffScopeStaffName';label.textContent=String(staff.name||staff.full_name||item.label||'');
+     const managerId=String(staff.manager_id||'');
+     const owner=managerId?window.FFH_STAFF_PROFILE?.(managerId):null;
+     const displayId=p=>String(p?.companyStaffId||p?.company_staff_id||p?.id||p?.staff_id||'');
+     const managerName=String(owner?.name||owner?.full_name||staff.managerLabel||'Manager not assigned');
+     const detail=document.createElement('small');detail.className='ffScopeStaffManager';
+     detail.textContent=String(item.value).startsWith('TEAM:')||staff.can_manage
+       ?'MANAGER · '+displayId(staff)+' · TEAM TOTAL'
+       :'MANAGER · '+(displayId(owner)||managerId||'ID pending')+' · '+managerName;
+     const fine=document.createElement('small');fine.className='ffScopeStaffFine';
+     const route=String(staff.route||staff.route_name||'Not assigned');
+     const zone=String(staff.zone||staff.zone_id||'Not assigned');
+     fine.textContent=(staff.can_manage?'ZONE · '+zone:'ROUTE · '+route+'  |  ZONE · '+zone);
+     body.append(detail,fine);
+    }
+   }
    if(isZonePicker&&String(item.value).toUpperCase()!=='ALL'){
     const identity=document.createElement('small');identity.className='ffZoneManagerIdentity';
     identity.textContent=manager?.staff_id?(manager.manager_name+' · '+(manager.login_id||manager.staff_id)+' · '+String(manager.designation||'MANAGER').replaceAll('_',' ')):'MANAGER NOT ASSIGNED';
