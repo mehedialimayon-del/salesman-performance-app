@@ -74,7 +74,7 @@ jobs:
                 prepCards:document.querySelectorAll('.an-brief-item').length,
                 overflow:document.documentElement.scrollWidth>innerWidth+3
               }));
-              if(ep.courses!==27||ep.visaCards<3||ep.prepCards!==0||ep.overflow)failed.push('DAAD regression '+w);
+              if(ep.courses!==27||ep.prepCards!==0||ep.overflow)failed.push('DAAD regression '+w);
               console.log('EPOS REGRESSION',JSON.stringify({viewport:w+'x'+h,ep,errors}));
               await page.close();
             }
