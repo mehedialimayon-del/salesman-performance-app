@@ -60,6 +60,17 @@
   function render(){
     var cards=document.querySelectorAll('#skuList .ffPremiumSku');
     cards.forEach(function(card){
+      // Force the requested orange labels and pure-white numbers directly on each
+      // catalogue field. Older app.js styles inject later with !important and can
+      // override a head stylesheet. Inline-important wins without changing theme.
+      card.querySelectorAll('.ffSkuFour .ffSkuChip small, .ffSkuIdentity span').forEach(function(label){
+        label.style.setProperty('color','#ff7a17','important');
+        label.style.setProperty('font-weight','900','important');
+      });
+      card.querySelectorAll('.ffSkuFour .ffSkuChip strong, .ffSkuIdentity strong').forEach(function(value){
+        value.style.setProperty('color','#ffffff','important');
+        value.style.setProperty('font-weight','950','important');
+      });
       var area=card.querySelector('.ffSkuOfferStack');
       if(!area){
         area=document.createElement('div');area.className='ffSkuOfferStack';
