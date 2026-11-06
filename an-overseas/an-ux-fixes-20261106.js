@@ -46,6 +46,12 @@ function contacts(){
  for(const key of ['malaysiaOffice','bangladeshOffice']){
   const el=host.querySelector('[data-an-office="'+key+'"]');
   if(el&&s[key])el.textContent=esc(s[key]);
+  const map=host.querySelector('[data-an-map-office="'+key+'"]');
+  const area=String(el?.textContent||'').trim();
+  if(map&&area){
+   map.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(area);
+   map.title='Search this office area on Google Maps (not a verified office pin)';
+  }
  }
  const email=String(s.email||'educationanoverseas@gmail.com').trim();
  const gmail=String(s.gmail||email).trim();
