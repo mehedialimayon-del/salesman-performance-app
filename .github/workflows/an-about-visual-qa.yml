@@ -62,7 +62,7 @@ jobs:
                   horizontalOverflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
                   verticalScroll:document.documentElement.scrollHeight-document.documentElement.clientHeight,
                   columns:cols,
-                  proofCards:document.querySelectorAll('.an-about-proof-card').length,
+                  proofCards:document.querySelectorAll('.an-fact-tile').length,
                   imageWidth:photo?Math.round(photo.getBoundingClientRect().width):0,
                   infoOverflow:i?Math.max(0,i.scrollHeight-i.clientHeight):999,
                   managerCardOverflow:card?Math.max(0,card.scrollHeight-card.clientHeight):999,
@@ -81,8 +81,8 @@ jobs:
               await page.screenshot({path:'qa-artifacts/about-'+w+'x'+h+'.png',fullPage:true});
               await page.locator('.an-about-readmore[href="#/aboutdetails"]').click();
               await page.waitForURL('**/#/aboutdetails');
-              info.detailsSteps=await page.locator('.an-story-step').count();
-              info.detailsLogo=await page.locator('.an-story-hero .an-story-logo').count();
+              info.detailsSteps=await page.locator('.an2-service').count();
+              info.detailsLogo=await page.locator('.an2-founder-brand img').count();
               await page.locator('[data-an-about-jump="an2-services"]').click();
               info.jumpRetainsRoute=(new URL(page.url())).hash==='#/aboutdetails';
               info.detailsHorizontalOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
@@ -97,7 +97,7 @@ jobs:
               x.horizontalOverflow>3||
               x.detailsHorizontalOverflow>3||
               x.columns!==(parseInt(x.viewport)>=801?2:1)||
-              x.proofCards!==3||
+              x.proofCards!==5||
               x.imageWidth<200||
               x.infoOverflow>5||
               x.managerCardOverflow>5||
