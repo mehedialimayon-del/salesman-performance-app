@@ -104,7 +104,7 @@
  }
  let scanning=false;
  function scan(){
-   if(scanning)return;scanning=true;
+   if(scanning||!document?.querySelectorAll)return;scanning=true;
    try{
      document.querySelectorAll('form').forEach(form=>{
        if(!watched.has(form)&&taskForm(form)&&form.querySelector('select[name="to"],select[name="assigned_to"]'))wire(form);
