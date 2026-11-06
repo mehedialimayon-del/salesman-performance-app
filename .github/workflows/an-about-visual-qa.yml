@@ -83,6 +83,22 @@ jobs:
               await page.waitForURL('**/#/aboutdetails');
               info.detailsSteps=await page.locator('.an2-service').count();
               info.detailsLogo=await page.locator('.an2-founder-brand img').count();
+              await page.waitForTimeout(750);
+              info.founderDiagnostics=await page.evaluate(()=>{
+                const sel=s=>document.querySelector(s);
+                const img=sel('.an2-founder-person img');
+                const fig=sel('.an2-founder-person');
+                const sign=sel('.an2-quote-sign');
+                const footer=sel('.an2-quote-footer');
+                const flag=sel('.an2-floating-flags .an2-flag');
+                const rect=e=>{const r=e?.getBoundingClientRect();return r?{x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.width),h:Math.round(r.height)}:null};
+                return {loaded:img?.complete&&img?.naturalWidth>0,naturalSize:[img?.naturalWidth,img?.naturalHeight],
+                  img:rect(img),fig:rect(fig),sign:rect(sign),footer:rect(footer),
+                  imageDisplay:img&&getComputedStyle(img).display,imageVisibility:img&&getComputedStyle(img).visibility,
+                  imageOpacity:img&&getComputedStyle(img).opacity,signWidth:sign?.clientWidth,
+                  flagWidth:rect(flag)?.w,headerFontSize:getComputedStyle(sel('.an2-founder-quote blockquote')).fontSize,
+                  screenWidth:innerWidth};
+              });
               await page.locator('[data-an-about-jump="an2-services"]').click();
               info.jumpRetainsRoute=(new URL(page.url())).hash==='#/aboutdetails';
               info.detailsHorizontalOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
