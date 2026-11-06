@@ -1,0 +1,69 @@
+name: FFH Orange Theme and Compact Scope QA
+on:
+  push:
+    branches:
+      - fix/restore-orange-compact-filters-20261107
+  pull_request:
+    branches: [main]
+    paths:
+      - 'ffh-orange-compact-20261107.css'
+      - 'ffh-selected-identity-20261107.js'
+      - 'ffh-direct-filters.js'
+      - 'searchable-picker.js'
+      - 'contacts.js'
+      - 'index.html'
+      - 'tests/orange-compact-20261107.cjs'
+      - 'tests/orange-compact-browser-20261107.cjs'
+      - 'tests/contacts-dom.cjs'
+      - 'tests/visual-followup.cjs'
+      - 'tests/visual-followup-browser.cjs'
+      - 'tests/zone-manager-picker.cjs'
+      - '.github/workflows/ffh-orange-compact-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-and-dom:
+    name: Theme, scope, contacts and dashboard tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Check updated JavaScript syntax
+        run: |
+          node --check contacts.js
+          node --check searchable-picker.js
+          node --check ffh-direct-filters.js
+          node --check ffh-selected-identity-20261107.js
+          node --check tests/orange-compact-20261107.cjs
+      - name: Check preserved functionality and requested UI metadata
+        run: |
+          node tests/orange-compact-20261107.cjs
+          node tests/direct-filters.cjs
+          node tests/visual-followup.cjs
+          node tests/zone-manager-picker.cjs
+          node tests/staff-picker.cjs
+          node tests/contacts-dom.cjs
+  mobile-layout:
+    name: Narrow mobile layout
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm install --no-save playwright@1.58.2
+      - name: Run Chromium 320–412px regression
+        env:
+          FFH_CHROMIUM: /usr/bin/google-chrome
+        run: |
+          node tests/direct-filters-browser.cjs
+          node tests/visual-followup-browser.cjs
+          node tests/orange-compact-browser-20261107.cjs
+
