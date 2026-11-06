@@ -1,0 +1,103 @@
+name: A&N Contact Mobile/Desktop Layout and Enquiry QA
+on:
+  push:
+    paths:
+      - an-overseas/index.html
+      - an-overseas/an-contact-fixed-20261107.css
+      - .github/workflows/an-contact-live-responsive-qa-20261107.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contact-live-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Verify published fixed-screen Contact page in Chromium
+        shell: bash
+        run: |
+          node <<'JS'
+          const {chromium}=require('playwright');
+          const assert=require('node:assert/strict');
+          const base='https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/index.html';
+          (async()=>{
+            let ready=false;
+            for(let i=0;i<24;i++){
+              try{
+                const res=await fetch(base+'?qa-stamp='+Date.now(),{cache:'no-store'});
+                const html=await res.text();
+                if(res.ok&&html.includes('an-contact-fixed-20261107.css?v=20261107-responsive-v1')){ready=true;break;}
+              }catch(e){console.log('Published site check:',e.message)}
+              await new Promise(r=>setTimeout(r,5000));
+            }
+            assert(ready,'Published HTML must reference new contact stylesheet');
+            const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
+            try {
+              for(const [name,width,height] of [['phone-small',320,640],['phone-standard',375,812],['desktop',1366,768]]){
+                const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1});
+                await page.goto(base+'?qa-contact='+Date.now()+'#/contact',{waitUntil:'domcontentloaded',timeout:30000});
+                await page.locator('#contact-form').waitFor({timeout:15000});
+                await page.waitForTimeout(900);
+                const g=await page.evaluate(()=>{
+                  const rect=s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return {top:r.top,left:r.left,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};
+                  return {
+                    v:{width:innerWidth,height:innerHeight,docWidth:document.documentElement.scrollWidth,docHeight:document.documentElement.scrollHeight},
+                    loaded:[...document.styleSheets].some(s=>s.href?.includes('an-contact-fixed-20261107.css')),
+                    office1:rect('.an-contact-office--kl'),office2:rect('.an-contact-office--rangpur'),
+                    officeBox:rect('.an-contact-offices'),contacts:rect('.an-contact-channels-title'),social:rect('.an-contact-social'),
+                    formBox:rect('.an-contact-enquiry'),submit:rect('#contact-form button[type=submit]'),
+                    input:rect('#contact-form [name=name]'),message:rect('#contact-form textarea'),
+                    photo:getComputedStyle(document.querySelector('.an-contact-office-photo')).display,
+                    mapLinks:document.querySelectorAll('.an-contact-map[href]').length,
+                    contactLinks:document.querySelectorAll('.an-contact-social a').length
+                  };
+                });
+                console.log(name,JSON.stringify(g));
+                assert(g.loaded,name+': new stylesheet is loaded');
+                assert(g.v.docWidth<=g.v.width+2,name+': no horizontal overflow');
+                assert(g.v.docHeight<=g.v.height+3,name+': fixed viewport root');
+                assert(g.mapLinks===2&&g.contactLinks===7,name+': two map links and seven contact methods');
+                assert(g.officeBox&&g.formBox&&g.submit&&g.message,name+': existing form and office DOM');
+                assert(g.submit.top>=0&&g.submit.bottom<=height+2,name+': enquiry submit remains on screen');
+                if(width<=800){
+                  assert(Math.abs(g.office1.top-g.office2.top)<5,name+': office buttons side by side');
+                  assert(g.office2.right<=width+2,name+': office buttons within phone');
+                  assert(g.photo==='none',name+': large mobile office photos removed');
+                  assert(g.contacts.top>g.office2.top&&g.contacts.bottom<g.formBox.top,name+': contact links between office buttons and form');
+                  assert(g.formBox.top>g.social.top&&g.input.top<g.submit.top,name+': form below contact links');
+                  assert(g.message.top>=0&&g.message.bottom<=height+2,name+': message field remains visible');
+                }else{
+                  assert(g.formBox.left>g.officeBox.right,name+': enquiry positioned right of offices');
+                  assert(Math.abs(g.formBox.top-g.officeBox.top)<4,name+': office and enquiry panels top aligned');
+                  assert(g.photo!=='none',name+': city landmark photos kept on laptop');
+                }
+                await page.screenshot({path:name+'-contact.png',fullPage:false});
+                if(name==='phone-standard'){
+                  await page.route('**/rest/v1/an_enquiries',route=>route.fulfill({status:201,contentType:'application/json',body:'{}'}));
+                  await page.locator('#contact-form [name=name]').fill('QA Layout Only');
+                  await page.locator('#contact-form [name=email]').fill('test@example.invalid');
+                  await page.locator('#contact-form textarea').fill('Test intercepted without storing any real enquiry.');
+                  await page.locator('#contact-form button[type=submit]').click();
+                  await page.locator('#an-contact-feedback').getByText(/submitted successfully/i).waitFor({timeout:9000});
+                  console.log('PASS intercepted enquiry submit status: no real form data sent');
+                }
+                await page.close();
+              }
+            }finally{await browser.close()}
+            console.log('PASS ALL A&N CONTACT LAYOUT AND FORM CHECKS');
+          })().catch(e=>{console.error(e.stack||e);process.exitCode=1});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: an-contact-responsive-screenshots
+          path: '*-contact.png'
+          if-no-files-found: ignore
+          retention-days: 7
