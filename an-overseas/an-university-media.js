@@ -54,6 +54,23 @@
   }
  };
  const verifiedCoversById={
+  "my-uc-hanchianguniversitycollegeofcommunication":{
+   photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Han_Chiang_University_College.jpg/960px-Han_Chiang_University_College.jpg',
+   source:'https://commons.wikimedia.org/wiki/File:Han_Chiang_University_College.jpg',
+   credit:'Han Chiang University College · CW Tan (PenangLion), CC BY-SA 4.0'
+  },
+  "my-uc-genovasiuniversitycollege":{
+   photo:'https://static.wixstatic.com/media/84b015_1f27bc7d94bd4cb1ae29bb178e0ff993~mv2.png/v1/fill/w_1000%2Ch_673%2Cal_c%2Cq_90/84b015_1f27bc7d94bd4cb1ae29bb178e0ff993~mv2.png',
+   source:'https://www.genovasi.edu.my/zh/post/genovasi-inks-partnership-with-china-s-sany-group-to-boost-vocational-education',
+   credit:'Genovasi University College campus · institutional website'
+  },
+  "my-u-globalnxtuniversity":{
+   forceLogoOnly:true,
+   logo:'https://upload.wikimedia.org/wikipedia/commons/b/be/GlobalNxt-University-logo.png',
+   source:'https://commons.wikimedia.org/wiki/File:GlobalNxt-University-logo.png',
+   credit:'GlobalNxt University identity · CC0 1.0'
+  },
+
   "utm":{photo:"https://www.utm.my/wp-content/uploads/2026/09/aerial-view-scaled.jpg",source:"https://www.utm.my/",credit:'Campus image · official institution website'},
   "usm":{photo:"https://upload.wikimedia.org/wikipedia/commons/a/a9/Main_gate_at_the_Universiti_Sains_Malaysia.jpg",source:"https://commons.wikimedia.org/wiki/File:Main_gate_at_the_Universiti_Sains_Malaysia.jpg",credit:'USM main gate · Dnydegger / CC BY-SA 3.0'},
   "utem":{photo:"https://www.utem.edu.my/images/slider/cache/ec38f738b76a1041bda5df75169acc3b/slider-aerial-utem.png",source:"https://www.utem.edu.my/",credit:'Campus image · official institution website'},
@@ -115,6 +132,7 @@
    const match=verifiedCoversById[u.id]||verifiedCovers[key];
    if(!match)return;
    if(match.site&&!u.site)u.site=match.site;
+   if(match.forceLogoOnly)u.cardPhoto='';
    if(match.photo&&!failedMediaUrls.has(match.photo)){
      u.cardPhoto=match.photo;u.cardSource=match.source;u.cardCredit=match.credit;
    }
