@@ -99,11 +99,11 @@ jobs:
             out.hungary=await page.evaluate(()=>({help:!!document.querySelector('#an-scholarship-help #contact-form'),docs:!!document.querySelector('#an-scholarship-document-guide')}));
             out.errors=errors;all.push(out);
             const valid=out.about.story&&out.about.photoHeight>=220&&
-             // Bangladesh home flag is intentionally larger than other destination flags.
-             out.about.flagWidth>=40&&out.about.flagWidth<=70&&
-             out.about.otherFlagWidth>0&&out.about.otherFlagWidth<=36&&
+             // All flags are smaller so the full-height founder portrait has room.
+             out.about.flagWidth>0&&out.about.flagWidth<=32&&
+             out.about.otherFlagWidth>0&&out.about.otherFlagWidth<=28&&
              /rgb\(244, 38, 74\)/.test(out.about.heartFill)&&
-             out.about.heartAnimation.includes('an-heart-hop')&&out.catalogue.minHeight>=200&&
+             out.about.heartAnimation==='none'&&out.catalogue.minHeight>=200&&
              out.catalogue.controlRows.every(y=>Math.abs(y-out.catalogue.controlRows[0])<=6)&&
              out.categoryOpen&&out.categorySelected&&out.china.cards>=1&&out.china.minHeight>=200&&
              out.scholarships.features===4&&out.scholarships.nested&&out.scholarships.filtersOutside&&
