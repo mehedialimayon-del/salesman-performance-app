@@ -222,6 +222,23 @@ function countryGuideHtml(p){
  if(!x)return '';
  return '<section class="an-scholarship-section an-scholarship-section-full"><h2><span>✈</span> · Country-specific visa, spouse, work & settlement</h2><p>'+esc(x.text)+'</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(x.url))+'" target="_blank" rel="noopener noreferrer">Official immigration / student guidance ↗</a></div></section>';
 }
+function genericDeadline(p){
+ if(!p.deadlineISO||!/^\d{4}-\d{2}-\d{2}$/.test(p.deadlineISO))return '';
+ return '<section class="an-scholarship-datecard"><span>📅 Published scholarship deadline</span><h3>'+esc(p.deadlineKind||'Application deadline')+'</h3><strong>'+esc(p.deadlineISO)+'</strong><b data-scholarship-date="'+esc(p.deadlineISO)+'">Checking date…</b><p>Closing time not published; calendar-day counter is based on the device clock, not a live provider feed.</p></section>';
+}
+let genericDeadlineTimer;
+function mountGenericDeadlines(){
+ if(genericDeadlineTimer)clearInterval(genericDeadlineTimer);
+ const tick=()=>{
+  for(const el of document.querySelectorAll('[data-scholarship-date]')){
+   const [y,m,d]=el.dataset.scholarshipDate.split('-').map(Number),now=new Date();
+   const days=Math.round((Date.UTC(y,m-1,d)-Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
+   el.textContent=days<0?'Listed intake deadline has passed':days===0?'Closing calendar date is TODAY':days+' calendar days remaining';
+   el.classList.toggle('an-expired',days<0);
+  }
+ };
+ if(document.querySelector('[data-scholarship-date]')){tick();genericDeadlineTimer=setInterval(tick,60000);}
+}
 function detailPage(id){
  const p=items.find(x=>x.id===id);
  if(!p)return '<div class="wrap content"><h1>Funding pathway not found</h1><a class="btn" href="#/scholarships">← Back to scholarship directory</a></div>';
@@ -247,13 +264,13 @@ function detailPage(id){
  ['Student work permissions',p.work],
  ['Post-study stay, PR & return duties',p.post]
  ];
- return '<main class="wrap an-scholarship-detail"><div class="an-breadcrumb"><a href="#/home">Home</a> › <a href="#/scholarships">Scholarships</a> › '+esc(p.name)+'</div><div class="an-scholarship-lead"><div class="an-scholarship-intro"><span class="an-type">'+flagCountry(p.country)+' '+esc(p.country)+' · '+esc(p.level)+'</span><h1>'+esc(p.name)+'</h1><p>'+esc(p.coverage)+'</p><p>Last source review: '+esc(p.updated)+' · Bangladesh-oriented application guidance</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Apply at official provider ↗</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Scholarship official details ↗</a></div></div><aside class="an-scholarship-amount-panel"><small>Funding in original currency</small><strong>'+esc(amountText(p))+'</strong><small>Indicative Bangladesh taka conversion</small><em>'+esc(conv)+'</em><p style="line-height:1.6;font-size:11px;color:#dcc7b9;margin-top:15px">Currency figures are not an offer and do not include unfunded tuition, travel, visa or living-cost differences. <a href="'+BANK+'" target="_blank" rel="noopener noreferrer" style="color:#ffd097">FX reference ↗</a></p></aside></div><div class="an-scholarship-section-grid">'+sections.map((item,i)=>section(i+1,item[0],item[1])).join('')+'</div>'+countryGuideHtml(p)+'<section class="an-scholarship-universities"><h2>Universities & eligible programmes</h2><p style="font-size:12px;color:#c7c9cd;line-height:1.65">'+esc(p.hostNote)+'</p>'+hostCards(p)+'</section><section class="an-scholarship-section an-scholarship-section-full"><h2><span>13</span> · Official sources, application & reliability</h2><p>Scholarship operator: '+esc(p.name)+'\nApplication window and amounts are subject to the current annual call. Some awards require separate university admission, nomination or an embassy route. A&N can guide preparation but cannot submit an official award decision or guarantee scholarship, visa, family residence or PR.</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Open official application ↗</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Read official award & document list ↗</a><a href="#/scholarships">← All scholarship cards</a></div></section></main>';
+ return '<main class="wrap an-scholarship-detail"><div class="an-breadcrumb"><a href="#/home">Home</a> › <a href="#/scholarships">Scholarships</a> › '+esc(p.name)+'</div><div class="an-scholarship-lead"><div class="an-scholarship-intro"><span class="an-type">'+flagCountry(p.country)+' '+esc(p.country)+' · '+esc(p.level)+'</span><h1>'+esc(p.name)+'</h1><p>'+esc(p.coverage)+'</p><p>Last source review: '+esc(p.updated)+' · Bangladesh-oriented application guidance</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Apply at official provider ↗</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Scholarship official details ↗</a></div></div><aside class="an-scholarship-amount-panel"><small>Funding in original currency</small><strong>'+esc(amountText(p))+'</strong><small>Indicative Bangladesh taka conversion</small><em>'+esc(conv)+'</em><p style="line-height:1.6;font-size:11px;color:#dcc7b9;margin-top:15px">Currency figures are not an offer and do not include unfunded tuition, travel, visa or living-cost differences. <a href="'+BANK+'" target="_blank" rel="noopener noreferrer" style="color:#ffd097">FX reference ↗</a></p></aside></div>'+genericDeadline(p)+'<div class="an-scholarship-section-grid">'+sections.map((item,i)=>section(i+1,item[0],item[1])).join('')+'</div>'+countryGuideHtml(p)+'<section class="an-scholarship-universities"><h2>Universities & eligible programmes</h2><p style="font-size:12px;color:#c7c9cd;line-height:1.65">'+esc(p.hostNote)+'</p>'+hostCards(p)+'</section><section class="an-scholarship-section an-scholarship-section-full"><h2><span>13</span> · Official sources, application & reliability</h2><p>Scholarship operator: '+esc(p.name)+'\nApplication window and amounts are subject to the current annual call. Some awards require separate university admission, nomination or an embassy route. A&N can guide preparation but cannot submit an official award decision or guarantee scholarship, visa, family residence or PR.</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Open official application ↗</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Read official award & document list ↗</a><a href="#/scholarships">← All scholarship cards</a></div></section></main>';
 }
 function onRender(page,second){
  if(page==='scholarships'){refreshList();}
  if(page==='scholarship'){
   const p=items.find(x=>x.id===second);if(p)document.title=p.name+' | A&N Scholarships';
-  window.ANEPOSGuide?.mount?.();
+  window.ANEPOSGuide?.mount?.();mountGenericDeadlines();
  }
  if(page==='university'){
   const u=getUniList().find(x=>x.id===second);
