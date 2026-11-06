@@ -192,6 +192,13 @@ function detailPage(id){
  const p=items.find(x=>x.id===id);
  if(!p)return '<div class="wrap content"><h1>Funding pathway not found</h1><a class="btn" href="#/scholarships">← Back to scholarship directory</a></div>';
  const conv=p.discountPercent!=null?('Tuition discount '+p.discountPercent+'%, not a cash payment'):bdt(p)==null?(p.awardDisplay?'Tuition-waiver value depends on course fees':'Award amount depends on institution / offer'):('≈ ৳'+bdt(p).toLocaleString('en-US')+' / '+(p.period==='once'?'award':p.period));
+ const isEpos=p.id==='daad-epos-masters'||p.id==='daad-epos-phd';
+ if(isEpos&&window.ANEPOSGuide&&window.ANEPOSDeep){
+  const guide=window.ANEPOSGuide.render(p,bdt(p),name=>resolveUniversity(name));
+  return '<main class="wrap an-scholarship-detail"><nav class="an-breadcrumb"><a href="#/home">Home</a> › <a href="#/scholarships">Scholarships</a> › '+esc(p.name)+'</nav>'+
+   '<section class="an-scholarship-lead"><div class="an-scholarship-intro"><span class="an-type">🇩🇪 GERMANY · '+esc(p.level)+'</span><h1>'+esc(p.name)+'</h1><p>Government-funded DAAD EPOS scholarship for named development-related courses, with separate university application, exact academic prerequisites and verified programme-specific deadlines.</p><div class="an-scholarship-cta"><a href="#an-epos-extended">Read Full A–Z Guide ↓</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Official DAAD award ↗</a></div></div><aside class="an-scholarship-amount-panel"><small>DAAD Monthly Award</small><strong>'+esc(amountText(p))+'</strong><small>Approximate BDT equivalent</small><em>'+esc(conv)+'</em><p style="color:#e5d4bc;font-size:12px">Only a planning currency conversion. Tuition, insurance, rent and travel are separately itemised below.</p></aside></section>'+
+   guide+'<div class="an-scholarship-cta"><a href="#/scholarships">← Back to all scholarships</a></div></main>';
+ }
  const sections=[
  ['Scholarship & financial coverage',p.coverage],
  ['Academic eligibility — Bangladeshi applicants',p.eligibility],
@@ -212,6 +219,7 @@ function onRender(page,second){
  if(page==='scholarships'){refreshList();}
  if(page==='scholarship'){
   const p=items.find(x=>x.id===second);if(p)document.title=p.name+' | A&N Scholarships';
+  window.ANEPOSGuide?.mount?.();
  }
  if(page==='university'){
   const u=getUniList().find(x=>x.id===second);
