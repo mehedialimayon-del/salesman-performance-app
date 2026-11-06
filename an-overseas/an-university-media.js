@@ -150,6 +150,19 @@
      u.logoImage=institutionalIcon.logo;
      u.logoSource=institutionalIcon.source||u.site;
    }
+   const extraCommons=window.ANAsiaCommonsAdditional?.[u.id];
+   if(extraCommons){
+     if(extraCommons.photo&&!u.cardPhoto&&!failedMediaUrls.has(extraCommons.photo)){
+       u.cardPhoto=extraCommons.photo;
+       u.cardSource=extraCommons.source;
+       u.cardCredit=extraCommons.credit;
+     }
+     if(extraCommons.logo&&!u.logoImage&&!failedMediaUrls.has(extraCommons.logo)){
+       u.logoImage=extraCommons.logo;
+       u.logoSource=extraCommons.source;
+       u.logoCredit=extraCommons.credit;
+     }
+   }
    const match=verifiedCoversById[u.id]||verifiedCovers[key];
    if(!match)return;
    if(match.site&&!u.site)u.site=match.site;
@@ -199,7 +212,8 @@
        (logo?'<img class="an-center-logo '+(logo.includes('google.com/s2/favicons')?'an-website-favicon':'an-verified-media')+'" src="'+esc(logo)+'" alt="'+esc(u.name)+' university website logo" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">':'')+
        (iconCandidates.length?'<img class="an-center-logo an-institution-site-icon" src="'+esc(iconCandidates[0])+'" data-an-institution-icons="'+esc(JSON.stringify(iconCandidates))+'" alt="'+esc(u.name)+' icon from its linked institutional website" loading="lazy" decoding="async" referrerpolicy="no-referrer">':'')+
        (pending?'<div class="an-identity-awaiting"><span class="an-identity-awaiting-name">'+esc(u.name)+'</span><small>Campus photo or logo not yet verified</small></div>':
-       '<span class="an-center-monogram">'+esc(short)+'</span><span class="an-identity-name">'+esc(u.name)+'</span>')+'</div></div>';
+       '<span class="an-center-monogram">'+esc(short)+'</span><span class="an-identity-name">'+esc(u.name)+'</span>')+
+       (u.logoSource&&u.logoSource.includes('commons.wikimedia.org')?'<a class="an-logo-credit" href="'+esc(u.logoSource)+'" target="_blank" rel="noopener noreferrer" title="Wikimedia Commons author and image licence">Commons · source/licence ↗</a>':'')+'</div></div>';
  }
  // Stable numbers per country are based on the complete loaded catalogue, not current filters.
  let serialCache={size:-1,items:new Map()};
