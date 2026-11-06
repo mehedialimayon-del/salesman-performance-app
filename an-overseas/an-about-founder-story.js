@@ -24,6 +24,28 @@
     const countries = new Set(list.map(x => x.country).filter(Boolean));
     return {universities: Math.max(6017, list.length), countries: Math.max(31, countries.size)};
   }
+  // Use the exact published Countries page list, not a hand-maintained flag list.
+  // Bangladesh is the origin, then Asian destinations, European destinations, and others.
+  function journeyFlags() {
+    const destinationRows = typeof countries !== 'undefined' && Array.isArray(countries) ? countries : [];
+    const asia = new Set(['Malaysia','China','Japan','South Korea','Singapore','Thailand','United Arab Emirates','Turkey']);
+    const elsewhere = new Set(['Canada','United States','Australia','New Zealand']);
+    const groups = [[],[],[]], seen = new Set(['Bangladesh']);
+    destinationRows.forEach(row => {
+      const name = String(row && row[0] || '');
+      if (!name || seen.has(name)) return;
+      seen.add(name);
+      const bucket = asia.has(name) ? 0 : elsewhere.has(name) ? 2 : 1;
+      groups[bucket].push({ name, flag:String(row[1] || '🌐') });
+    });
+    const ordered = [{name:'Bangladesh',flag:'🇧🇩',home:true}].concat(...groups);
+    return ordered.map((item,i) =>
+      '<span class="an2-flag-unit'+(item.home?' an2-flag-unit--home':'')+'" title="'+esc(item.name)+'">'+
+      '<span class="an2-static-star" aria-hidden="true">✦</span>'+
+      '<span class="an2-flag'+(item.home?' an2-flag-origin':'')+'" role="img" aria-label="'+esc(item.name)+' flag" style="--flag-index:'+i+'">'+item.flag+'</span>'+
+      '</span>'
+    ).join('');
+  }
   function renderStory(){
     const directory = currentDirectory();
     const uniCount = directory.universities.toLocaleString('en-US');
@@ -32,7 +54,7 @@
       '<div class="an2-topline"><a href="#/about" class="an2-back">← ABOUT US</a><span>THE PEOPLE · THE PURPOSE · THE PROMISE</span></div>'+
       '<header class="an2-founder-hero">'+
         '<div class="an2-founder-brand"><img src="assets/brand-logo.jpg" alt="A&N Overseas Education & Consultancy brand logo"><span>ESTABLISHED 2024 · MALAYSIA & BANGLADESH</span><strong>ROOTED IN EXPERIENCE.<br><em>BUILT FOR YOUR FUTURE.</em></strong></div>'+
-        '<div class="an2-founder-quote"><span class="an2-quote-mark" aria-hidden="true">“</span><blockquote>International education should never be a privilege reserved for the few. It should be a bridge between potential and possibility—where trustworthy guidance, the right opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you. <span class="an2-end-quote" aria-label="End of quote">”</span></blockquote><div class="an2-quote-footer"><div class="an2-quote-sign"><div class="an2-flags-journey" aria-label="Bangladesh and Malaysia, with featured global study destinations"><span class="an2-flags-overline">FROM HOME TO THE WORLD <span class="an2-plane-mark" aria-hidden="true">✈</span></span><div class="an2-floating-flags"><span class="an2-flag an2-flag-origin" title="Bangladesh">🇧🇩</span><span class="an2-flag an2-flag-origin" title="Malaysia">🇲🇾</span><span class="an2-flag" title="United Kingdom">🇬🇧</span><span class="an2-flag" title="Canada">🇨🇦</span><span class="an2-flag" title="Australia">🇦🇺</span><span class="an2-flag" title="China">🇨🇳</span></div><small>Bangladesh · Malaysia · Global possibilities</small></div>NUSRAT NASRIN <span>FOUNDER’S MESSAGE · A&N OVERSEAS</span></div><figure class="an2-founder-person"><img src="https://d2ol7oe51mr4n9.cloudfront.net/user_3J7eLpAsZ71YVjJWQaNzcGsV3TY/fef76c99-f022-464a-8df9-74124ee51ee7.webp" alt="Nusrat Nasrin — Founder, A&N Overseas" loading="eager" decoding="async"><figcaption>Nusrat Nasrin · Founder</figcaption></figure></div></div>'+
+        '<div class="an2-founder-quote"><span class="an2-quote-mark" aria-hidden="true">“</span><blockquote>International education should never be a privilege reserved for the few. It should be a bridge between potential and possibility—where trustworthy guidance, the right opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you. <span class="an2-end-quote" aria-label="End of quote">”</span></blockquote><div class="an2-quote-footer"><div class="an2-quote-sign"><div class="an2-flags-journey" aria-label="Bangladesh and Malaysia, with featured global study destinations"><span class="an2-flags-overline">FROM HOME TO THE WORLD <span class="an2-plane-mark" aria-hidden="true">✈</span></span><div class="an2-floating-flags">'+journeyFlags()+'</div><small>Bangladesh · Malaysia · Global possibilities</small></div><span class="an2-founder-message-label">FOUNDER’S MESSAGE · A&N OVERSEAS</span></div><figure class="an2-founder-person"><img src="https://d2ol7oe51mr4n9.cloudfront.net/user_3J7eLpAsZ71YVjJWQaNzcGsV3TY/fef76c99-f022-464a-8df9-74124ee51ee7.webp" alt="Nusrat Nasrin — Founder, A&N Overseas" loading="eager" decoding="async"><figcaption><strong>NUSRAT NASRIN</strong><span>CEO and Founder</span></figcaption></figure></div></div>'+
       '</header>'+
       '<nav class="an2-nav" aria-label="Explore the A&N story">'+
         '<a href="#/aboutdetails" data-an-about-jump="an2-origins">Our Beginning</a><a href="#/aboutdetails" data-an-about-jump="an2-purpose">Why We Began</a><a href="#/aboutdetails" data-an-about-jump="an2-platform">Global Directory</a><a href="#/aboutdetails" data-an-about-jump="an2-services">What We Do</a><a href="#/aboutdetails" data-an-about-jump="an2-future">Our Vision</a>'+
