@@ -1,0 +1,78 @@
+name: A&N Erasmus 215 Catalogue and Countdown QA
+on:
+  push:
+    paths:
+      - "an-overseas/index.html"
+      - "an-overseas/an-erasmus-catalogue-extra-20261106.js"
+      - "an-overseas/an-erasmus-programme-explorer-20261106.js"
+      - "an-overseas/an-erasmus-programme-explorer-20261106.css"
+      - ".github/workflows/an-erasmus-explorer-qa.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Mobile and desktop real-browser checks
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --directory an-overseas >/tmp/an-erasmus-qa-http.log 2>&1 &
+          sleep 1
+          timeout 220s node <<'JS'
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+            let failures=[];
+            for(const [width,height] of [[375,812],[1366,768]]){
+              const page=await browser.newPage({viewport:{width,height}});
+              const errors=[];page.on('pageerror',e=>errors.push(e.message));
+              await page.goto('http://127.0.0.1:8765/index.html?qa=erasmus215#/scholarship/erasmus-mundus',{waitUntil:'domcontentloaded'});
+              await page.waitForSelector('#an-em-top-countdown',{timeout:15000});
+              await page.waitForSelector('.an-em-official-card',{timeout:15000});
+              const state=await page.evaluate(()=>{
+                const countdown=document.querySelector('#an-em-top-countdown'),
+                      lead=document.querySelector('.an-scholarship-lead'),
+                      official=document.querySelectorAll('.an-em-official-card'),
+                      programmes=document.querySelectorAll('.an-em-programme'),
+                      hosts=document.querySelectorAll('.an-em-university'),
+                      cards=document.querySelectorAll('.an-specific-guide article'),
+                      logo=document.querySelectorAll('.an-em-university img');
+                return {
+                  countdownAboveLead:countdown.compareDocumentPosition(lead)&Node.DOCUMENT_POSITION_FOLLOWING,
+                  countdownUnits:countdown.querySelectorAll('.an-em-timer-unit').length,
+                  official:official.length,programmes:programmes.length,hosts:hosts.length,
+                  originalsKept:cards.length,images:logo.length,
+                  visibleHead:!!document.querySelector('.an-em-head h2'),
+                  noBrokenFormat:document.querySelector('.an-em-counters')?.textContent.includes('215'),
+                  docWidth:document.documentElement.scrollWidth,viewport:innerWidth
+                };
+              });
+              const right=state.countdownAboveLead&&state.countdownUnits===2&&state.official===215&&state.programmes===3&&state.hosts>=20&&state.originalsKept>=4&&state.images>=20&&state.visibleHead&&state.noBrokenFormat&&!errors.length;
+              if(!right)failures.push(width+'px Erasmus page');
+              await page.locator('#an-em-search').fill('Geospatial Technologies');
+              const searched=await page.evaluate(()=>[...document.querySelectorAll('.an-em-official-card:not([hidden])')].map(x=>x.textContent.trim().slice(0,90)));
+              if(searched.length!==1||!searched[0].includes('GeoTech'))failures.push(width+'px catalogue search');
+              await page.goto('http://127.0.0.1:8765/index.html?qa=erasmus215#/scholarship/daad-epos-masters',{waitUntil:'domcontentloaded'});
+              await page.waitForTimeout(900);
+              const dae=await page.evaluate(()=>({
+                epos:document.querySelectorAll('.an-epos-course').length,
+                explorer:document.querySelectorAll('.an-em-programme').length
+              }));
+              if(dae.epos!==27||dae.explorer!==0)failures.push(width+'px EPOS regression');
+              console.log('ERASMUS QA',JSON.stringify({viewport:width+'x'+height,state,searched,dae,errors,pass:right}));
+              await page.close();
+            }
+            await browser.close();
+            if(failures.length){console.error('FAILED:',failures.join(', '));process.exitCode=1;}
+          })().catch(e=>{console.error(e.stack||e);process.exitCode=1;});
+          JS
