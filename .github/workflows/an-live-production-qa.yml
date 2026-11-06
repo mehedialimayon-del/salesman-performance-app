@@ -1,5 +1,7 @@
 name: A&N Production Website Mobile/Desktop QA
 on:
+  push:
+    paths: [".github/workflows/an-live-production-qa.yml"]
   workflow_run:
     workflows: ["pages build and deployment"]
     types: [completed]
@@ -8,7 +10,7 @@ permissions:
   contents: read
 jobs:
   public-site-browser:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
