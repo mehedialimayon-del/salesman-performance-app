@@ -109,7 +109,7 @@ function restoreState(){
  const params=new URLSearchParams(location.hash.split('?')[1]||'');
  filterCountry=params.has('country')?params.get('country'):String(saved.filterCountry||filterCountry);
  searchTerm=String(saved.searchTerm||'');scholarshipOnly=!!saved.scholarshipOnly;
- visibleLimit=Math.min(6017,Math.max(80,Number(saved.visibleLimit)||80));
+ visibleLimit=Math.min(Math.max(80,U.length),Math.max(80,Number(saved.visibleLimit)||80));
  lastQueryFilterSignature=filterStateSignature();
  const controls={'type-filter':pref.kind,'level-filter':pref.level,'subject-filter':pref.subject,
   'currency-filter':pref.currency,'min-fee-filter':pref.minFee,'max-fee-filter':pref.maxFee,
