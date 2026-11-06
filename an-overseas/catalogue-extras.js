@@ -31,7 +31,7 @@ universitiesPage=function(){
  +'<div class="wrap content university-catalogue"><div class="an-university-directory-bar"><strong id="an-global-count">'+U.length.toLocaleString('en-US')+' universities in our world directory</strong><a href="#/favorites" class="an-directory-fav">♡ Saved universities <b data-favorite-count>0</b></a></div>'
  +'<div class="catalogue-tools"><label class="catalogue-search"><span>⌕</span><input id="university-search" type="search" value="'+esc(searchTerm)+'" placeholder="Search university or course" aria-label="Search universities"></label>'
  +'<details class="catalogue-filter"><summary aria-label="Filter universities" title="Filter universities">☷ <span class="filter-word">Filters</span></summary><div class="catalogue-filter-panel">'+controls+'</div></details>'
- +'<label class="an-scholarship-only"><input id="scholarship-filter" type="checkbox" '+(scholarshipOnly?'checked':'')+'> 🎓 Scholarships only</label></div>'
+ +'<div class="an-scholarship-category-wrap"><button type="button" id="an-scholarship-category-toggle" class="an-scholarship-only an-scholarship-page-shortcut" aria-expanded="false" aria-controls="an-scholarship-category-panel" title="Filter by scholarship type" aria-label="Choose scholarship type">🎓</button><div class="an-scholarship-category-panel" id="an-scholarship-category-panel" hidden><h3>Scholarship Types</h3><p>Only confirmed named host universities are shown. Country eligibility is not an automatic university scholarship.</p><button type="button" data-scholarship-category="" aria-pressed="true">All universities</button><button type="button" data-scholarship-category="international" aria-pressed="false">International &amp; Research</button><button type="button" data-scholarship-category="merit" aria-pressed="false">Academic / Merit</button><button type="button" data-scholarship-category="full" aria-pressed="false">Fully Funded</button><button type="button" data-scholarship-category="tuition" aria-pressed="false">Tuition Discounts / Waivers</button><a href="#/scholarships">Explore all scholarship pathways ↗</a></div></div><a class="an-catalogue-favourites" href="#/favorites" aria-label="Open Saved Universities" title="Saved universities">♥<span data-favorite-count>0</span></a></div>'
  +'<div id="catalogue-count" class="catalogue-count" aria-live="polite"></div><div id="results" class="grid"></div>'
  +'<p class="catalogue-footnote">Malaysia entries include institutions from the MQA register; its accreditation applies to specific programmes and may change. Institution listing does not establish eligibility for international enrolment. This directory also contains other sourced and unverified entries and is not an A&N partner list. Check the official university website, exact programme, recognition, application fee and any scholarship offer before applying. Published example fees are not comparable across different durations or currencies. QS 2027 ranks are shown only for institutions with verified ranking data; institutions without a confirmed QS rank follow ranked universities within their country.</p></div>';
 };
@@ -96,10 +96,10 @@ function anNumberedCard(u){
 
 function filterStateSignature(){
  return [filterCountry,searchTerm.toLowerCase().trim(),String(pref.requirement||'').toLowerCase().trim(),
-  pref.kind,pref.level,pref.subject,pref.currency,pref.minFee,pref.maxFee,pref.order,scholarshipOnly].join('|');
+  pref.kind,pref.level,pref.subject,pref.currency,pref.minFee,pref.maxFee,pref.order,scholarshipOnly,scholarshipCategory].join('|');
 }
 function snapshotState(){
- return {visibleLimit,pref:{...pref},filterCountry,searchTerm,scholarshipOnly};
+ return {visibleLimit,pref:{...pref},filterCountry,searchTerm,scholarshipOnly,scholarshipCategory};
 }
 function restoreState(){
  const saved=window.ANNavState?.get?.(location.hash||'#/home')?.catalogue;
@@ -108,7 +108,7 @@ function restoreState(){
  keys.forEach(k=>{if(Object.prototype.hasOwnProperty.call(saved.pref||{},k))pref[k]=saved.pref[k];});
  const params=new URLSearchParams(location.hash.split('?')[1]||'');
  filterCountry=params.has('country')?params.get('country'):String(saved.filterCountry||filterCountry);
- searchTerm=String(saved.searchTerm||'');scholarshipOnly=!!saved.scholarshipOnly;
+ searchTerm=String(saved.searchTerm||'');scholarshipOnly=!!saved.scholarshipOnly;scholarshipCategory=String(saved.scholarshipCategory||'');
  visibleLimit=Math.min(Math.max(80,U.length),Math.max(80,Number(saved.visibleLimit)||80));
  lastQueryFilterSignature=filterStateSignature();
  const controls={'type-filter':pref.kind,'level-filter':pref.level,'subject-filter':pref.subject,
@@ -166,7 +166,7 @@ renderResults=function(){
  let found=needsCurrency?[]:U.filter(u=>{
   const p=UNIVERSITY_PROFILES[u.id]||{},str=[u.name,u.short,u.country,u.city,...(u.programs||[]),...(p.programs||[])].join(' ').toLowerCase();
   if(!str.includes(term)||filterCountry!=='All Countries'&&filterCountry!==u.country)return false;
-  if(scholarshipOnly&&!window.ANUniversityTools?.scholarship(u.id))return false;
+  if(scholarshipCategory){if(!anScholarshipUniversityMatches(u,scholarshipCategory))return false;}else if(scholarshipOnly&&!window.ANUniversityTools?.scholarship(u.id))return false;
   if(pref.kind!=='All Types'&&pref.kind!==u.kind)return false;
   if(!hasLevel(u,pref.level)||pref.subject!=='All Subjects'&&!str.includes(pref.subject.toLowerCase()))return false;
   if(req&&![p.entry,p.intake].join(' ').toLowerCase().includes(req))return false;
@@ -189,7 +189,7 @@ renderResults=function(){
   });
  }
  const count=document.getElementById('catalogue-count');
- if(count)count.innerHTML='<strong>'+found.length.toLocaleString('en-US')+'</strong> matching universities of <strong>'+U.length.toLocaleString('en-US')+'</strong> worldwide · '+esc(filterCountry)+(feeFilter?' · fee ranges in '+esc(pref.currency):'');
+ if(count)count.innerHTML='<strong>'+found.length.toLocaleString('en-US')+'</strong> matching universities of <strong>'+U.length.toLocaleString('en-US')+'</strong> worldwide · '+esc(filterCountry)+(feeFilter?' · fee ranges in '+esc(pref.currency):'')+(scholarshipCategory?' · verified '+esc(scholarshipCategory)+' scholarship hosts':'');
  const grand=document.getElementById('an-global-count');if(grand)grand.textContent=U.length.toLocaleString('en-US')+' universities · '+countries.length+' study destinations';
  if(needsCurrency){el.innerHTML='<div class="empty">Select a tuition currency before comparing minimum or maximum amounts.</div>';return;}
  if(loadMoreObserver)loadMoreObserver.disconnect();
@@ -202,7 +202,7 @@ renderResults=function(){
    el.querySelector('.catalogue-load-more')?.remove();
    el.insertAdjacentHTML('beforeend',cards+more);
  }else{
-   el.innerHTML=found.length?cards+more:'<div class="empty">No matches. Try another destination or reset filters.</div>';
+   el.innerHTML=found.length?cards+more:'<div class="empty">'+(scholarshipCategory?'No verified university hosts match this scholarship type and your other filters. Only named eligible hosts appear; other awards require their official host finder.':'No matches. Try another destination or reset filters.')+' <a href="#/scholarships">Browse scholarship directory ↗</a></div>';
  }
  lastRenderedSignature=signature;lastRenderedCount=Math.min(found.length,visibleLimit);
  const moreButton=el.querySelector('#load-more-universities');
@@ -229,7 +229,7 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('click',e=>{
  if(e.target.closest('#load-more-universities')){visibleLimit+=80;renderResults();}
- if(e.target.id==='reset-university-filters'){pref={kind:'All Types',level:'All Levels',subject:'All Subjects',currency:'Any currency',minFee:'',maxFee:'',order:'Country → QS ranking',requirement:''};filterCountry='All Countries';searchTerm='';scholarshipOnly=false;render();}
+ if(e.target.id==='reset-university-filters'){pref={kind:'All Types',level:'All Levels',subject:'All Subjects',currency:'Any currency',minFee:'',maxFee:'',order:'Country → QS ranking',requirement:''};filterCountry='All Countries';searchTerm='';scholarshipOnly=false;scholarshipCategory='';render();}
 },true);
 window.ANCatalogueExtras={priority,countryIndex,globalSerial,anNumberedCard,verifiedRank,rankingCompare};
 /* Owner-managed PUBLIC information, published by updating site-content.json in GitHub. */
