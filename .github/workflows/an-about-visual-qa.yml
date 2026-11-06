@@ -83,7 +83,7 @@ jobs:
               await page.waitForURL('**/#/aboutdetails');
               info.detailsSteps=await page.locator('.an-story-step').count();
               info.detailsLogo=await page.locator('.an-story-hero .an-story-logo').count();
-              await page.locator('[data-an-about-jump="visa"]').click();
+              await page.locator('[data-an-about-jump="an2-services"]').click();
               info.jumpRetainsRoute=(new URL(page.url())).hash==='#/aboutdetails';
               info.detailsHorizontalOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
               await page.screenshot({path:'qa-artifacts/details-'+w+'x'+h+'.png',fullPage:true});
