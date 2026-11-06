@@ -671,3 +671,87 @@ body:not(.an-about-locked) #app .an2-story{--gold:#ffd19b;--orange:#ff962a;--cre
   #app .an2-founder-quote .an2-founder-person{width:150px!important;height:270px!important}
   #app .an2-founder-quote .an2-founder-person img{width:151px!important;right:-12px!important;bottom:-3px!important}
 }
+
+
+/* 2026-11-06: original portrait fine alignment (no exposure changes) */
+#app .an2-founder-quote{overflow:visible!important}
+#app .an2-founder-quote .an2-quote-footer{
+  grid-template-columns:minmax(0,1fr) clamp(175px,30%,205px)!important;
+  gap:2px!important;
+  margin-right:-16px!important;
+  min-height:288px!important;
+  align-items:end!important;
+}
+#app .an2-founder-quote .an2-founder-person{
+  position:relative!important;
+  width:100%!important;
+  height:288px!important;
+  display:block!important;
+  justify-self:end!important;
+  align-self:end!important;
+  overflow:visible!important;
+  background:transparent!important;
+  margin:0!important;
+  padding:0!important;
+}
+#app .an2-founder-quote .an2-founder-person img{
+  position:absolute!important;
+  left:auto!important;
+  right:-8px!important;
+  top:auto!important;
+  bottom:0!important;
+  width:258px!important;
+  height:auto!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:contain!important;
+  object-position:right bottom!important;
+  opacity:1!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  transform:none!important;
+  z-index:1!important;
+}
+#app .an2-founder-quote .an2-founder-person figcaption{display:none!important}
+@media(max-width:650px){
+  #app .an2-founder-quote .an2-quote-footer{
+    grid-template-columns:minmax(0,1fr) 170px!important;
+    gap:2px!important;
+    margin-right:-15px!important;
+    min-height:288px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person{
+    width:170px!important;
+    height:288px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person img{
+    width:265px!important;
+    height:auto!important;
+    right:-8px!important;
+    bottom:0!important;
+    filter:none!important;
+  }
+}
+@media(max-width:380px){
+  #app .an2-founder-quote .an2-quote-footer{
+    grid-template-columns:minmax(0,1fr) 152px!important;
+    min-height:270px!important;
+    margin-right:-15px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person{width:152px!important;height:270px!important}
+  #app .an2-founder-quote .an2-founder-person img{width:241px!important;right:-8px!important}
+}
+@media(min-width:1001px){
+  #app .an2-founder-quote .an2-quote-footer{
+    grid-template-columns:minmax(0,1fr) 245px!important;
+    min-height:310px!important;
+    margin-right:-15px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person{width:245px!important;height:310px!important}
+  #app .an2-founder-quote .an2-founder-person img{width:252px!important;right:-8px!important;bottom:0!important}
+}
