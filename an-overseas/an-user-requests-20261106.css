@@ -270,3 +270,23 @@ body.an-favorites-mode #app .an-university-moi-badge,
   object-fit:contain!important;object-position:right bottom!important;
  }
 }
+
+/* Final Android QA overrides: older high-specificity responsive selectors
+   kept the header heart orange and first Bangladesh home flag oversized. */
+body .top .an-favorite-header svg,
+body .top .an-favorite-header svg path{
+ fill:#f4264a!important;
+ stroke:#f4264a!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home .an2-flag{
+ width:30px!important;height:21px!important;min-width:0!important;max-width:30px!important;
+ font-size:18px!important;animation:none!important;transform:none!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag-unit:not(.an2-flag-unit--home) .an2-flag{
+ width:24px!important;height:17px!important;min-width:0!important;max-width:24px!important;
+ font-size:15px!important;animation:none!important;transform:none!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home{
+ grid-column:span 1!important;max-width:40px!important;min-height:26px!important;
+ height:26px!important;
+}
