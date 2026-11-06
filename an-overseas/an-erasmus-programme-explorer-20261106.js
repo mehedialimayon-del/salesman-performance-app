@@ -161,7 +161,7 @@ function decorate(){
  existing.innerHTML=explorer();
  // Avoid duplicated countdown buried deep inside the i-MESC explanatory card.
  for(const article of root.querySelectorAll('.an-specific-guide article')){
-  if((article.querySelector('h3')?.textContent||'').includes('Application timeline'))article.remove();
+  if((article.querySelector('h3')?.textContent||'').includes('Application timeline'))article.innerHTML='<h3>Application dates · verify official portal</h3><p>The live opening and closing countdown now appears prominently at the top of this scholarship page, rather than being buried inside this detail card.</p><p><a href="https://i-mesc.eu/application/admission-criteria" target="_blank" rel="noopener noreferrer">Official application dates ↗</a></p>';
  }
 }
 let queued=false;
