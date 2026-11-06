@@ -1,0 +1,102 @@
+name: A&N Responsive Hub and Directory QA
+on:
+  push:
+    paths:
+      - ".github/workflows/an-responsive-regression-qa.yml"
+      - "an-overseas/an-ux-fixes-20261106.css"
+      - "an-overseas/an-ux-fixes-20261106.js"
+      - "an-overseas/an-scholarships.js"
+      - "an-overseas/an-premium-public.js"
+      - "an-overseas/index.html"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  visual-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium browser driver
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Check mobile and laptop public routes
+        shell: bash
+        run: |
+          mkdir -p an-responsive-qa
+          python3 -m http.server 8765 --directory an-overseas >/tmp/an-responsive-http.log 2>&1 &
+          sleep 2
+          timeout 130s node <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+            const evidence=[];let failed=false;
+            for(const [w,h] of [[360,780],[1366,768]]){
+              const page=await browser.newPage({viewport:{width:w,height:h},deviceScaleFactor:1});
+              const errors=[];page.on('pageerror',e=>errors.push(e.message));
+              await page.route(/https:\/\/svpgjrxeqnluipsgjywk\.supabase\.co\/rest\/v1\/an_site_content.*/,async route=>{
+                const url=route.request().url();
+                const fixture=url.includes('study_insights')?[
+                  {key:'study_insights',value:[{id:'test1',approved:true,title:'Malaysia higher education planning',description:'University information and student updates',type:'text',category:'Student Guidance',created_at:'2026-11-06T00:00:00Z'}]},
+                  {key:'success_stories',value:[{id:'test2',approved:true,title:'Student success story',description:'Published student journey',type:'image',media_url:'https://images.unsplash.com/photo-1523050854058-8df90110c9f1',created_at:'2026-11-06T00:00:00Z'}]},
+                  {key:'management',value:[{id:'test3',name:'AGRICULTURIST NUSRAT NASRIN',position:'CEO & Head of Marketing',help:'Student support',email:'educationanoverseas@gmail.com'}]},
+                  {key:'countries',value:[]}
+                ]:[
+                  {key:'settings',value:{email:'educationanoverseas@gmail.com',facebook:'https://www.facebook.com/',malaysiaOffice:'Kuala Lumpur, Malaysia',bangladeshOffice:'Dhap, Rangpur 5401, Bangladesh'}},
+                  {key:'latest_updates',value:[]},{key:'management',value:[]},{key:'university_overrides',value:[]}
+                ];
+                await route.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify(fixture)});
+              });
+              const visit=async route=>{
+                await page.goto('http://127.0.0.1:8765/index.html?hub_refresh=20261103-fresh-1#/'+route,{waitUntil:'domcontentloaded'});
+                await page.waitForTimeout(1000);
+              };
+              const row={viewport:w+'x'+h};
+              await visit('success');
+              row.hub=await page.evaluate(()=>({panels:document.querySelectorAll('.an-community-panel').length,fullscreen:document.querySelectorAll('.an-hub-maximize').length,studies:document.querySelectorAll('.an-community-card').length,stories:document.querySelectorAll('.an-youtube-card').length}));
+              await page.locator('.an-hub-maximize').first().click();
+              row.hub.expanded=await page.evaluate(()=>!!document.querySelector('.an-community-panel.an-hub-fullview'));
+              await page.locator('.an-hub-maximize').first().click();
+              row.hub.closed=await page.evaluate(()=>!document.querySelector('.an-community-panel.an-hub-fullview'));
+              await page.screenshot({path:'an-responsive-qa/hub-'+w+'.png'});
+              await visit('scholarships');
+              row.scholarships=await page.evaluate(()=>{
+                const rail=document.querySelector('#an-global-rail');
+                const css=rail?getComputedStyle(rail):null;
+                return {featured:document.querySelectorAll('.an-feature-scholarship').length,cards:rail?.querySelectorAll('.an-scholarship-card').length,flow:css?.gridAutoFlow,columns:css?.gridTemplateColumns.split(' ').length,horizontal:rail?(rail.scrollWidth-rail.clientWidth):999,filtersFirst:document.querySelector('.an-scholarship-directory')?.firstElementChild?.classList.contains('an-scholarship-filters')};
+              });
+              await page.screenshot({path:'an-responsive-qa/scholarships-'+w+'.png'});
+              await visit('countries');
+              row.countries=await page.evaluate(()=>({cards:document.querySelectorAll('.country-tiles .country').length,ctaHeight:Math.round(document.querySelector('.an-country-scholarship-cta')?.getBoundingClientRect().height||0),scrollable:!!document.querySelector('.an-country-page')}));
+              await visit('universities?country=Malaysia');
+              row.universities=await page.evaluate(()=>({cards:document.querySelectorAll('#results .an-guide-card').length,scrollable:getComputedStyle(document.querySelector('#results')).overflowY,tools:!!document.querySelector('.catalogue-tools')}));
+              await visit('services');
+              row.services=await page.evaluate(()=>({cards:document.querySelectorAll('.an-service-card').length,gridCols:getComputedStyle(document.querySelector('.an-journey-services .grid')).gridTemplateColumns.split(' ').length}));
+              await visit('contact');
+              row.contact=await page.evaluate(()=>({officeCards:document.querySelectorAll('.an-contact-office').length,channels:document.querySelectorAll('[data-an-social]').length,mailto:document.querySelector('.an-contact-email')?.getAttribute('href'),enquiry:!!document.querySelector('#contact-form')}));
+              await page.screenshot({path:'an-responsive-qa/contact-'+w+'.png'});
+              await visit('aboutdetails');
+              row.aboutdetails=await page.evaluate(()=>({hasStory:!!document.querySelector('.an2-founder-quote'),scrollable:getComputedStyle(document.querySelector('#app')).overflowY,person:!!document.querySelector('.an2-founder-person img')}));
+              row.header=await page.evaluate(()=>({searchVisible:!!document.querySelector('.an-global-search-trigger')&&getComputedStyle(document.querySelector('.an-global-search-trigger')).display!=='none',favorite:!!document.querySelector('.an-favorite-header')}));
+              row.errors=errors; evidence.push(row);
+              const checks=[row.hub.panels===2,row.hub.fullscreen===2,row.hub.studies>=1,row.hub.stories>=1,row.hub.expanded,row.hub.closed,row.scholarships.featured===4,row.scholarships.cards>=1,row.scholarships.horizontal<=10,row.scholarships.filtersFirst,row.countries.cards>=10,row.countries.ctaHeight<66,row.universities.cards>=50,row.services.cards===12,row.contact.officeCards===2,row.contact.channels===7,row.contact.enquiry,row.contact.mailto?.startsWith('mailto:'),row.aboutdetails.hasStory,row.aboutdetails.person,row.header.searchVisible,row.header.favorite,errors.length===0];
+              if(checks.some(x=>!x)){failed=true;console.log('FAILED CHECKS',row.viewport,checks.map((x,i)=>x?null:i).filter(x=>x!==null));}
+              console.log('RESPONSIVE QA',JSON.stringify(row));
+              await page.close();
+            }
+            fs.writeFileSync('an-responsive-qa/results.json',JSON.stringify(evidence,null,2));
+            await browser.close();
+            if(failed)process.exitCode=1;
+          })().catch(err=>{console.error(err);process.exitCode=1;});
+          JS
+      - name: Publish QA screenshots and metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: an-responsive-qa-20261106
+          path: an-responsive-qa/
+          retention-days: 7
