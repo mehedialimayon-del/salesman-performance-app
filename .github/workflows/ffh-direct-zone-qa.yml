@@ -6,6 +6,8 @@ on:
       - 'ffh-direct-filters.js'
       - 'ffh-direct-filters.css'
       - 'reports-ui.js'
+      - 'daily-performance.js'
+      - 'tests/daily-performance-dom.cjs'
       - 'staff-photos.js'
       - 'index.html'
       - 'tests/direct-filters.cjs'
@@ -30,6 +32,7 @@ jobs:
         run: |
           node --check ffh-direct-filters.js
           node --check reports-ui.js
+          node --check daily-performance.js
           node --check staff-photos.js
           node --check tests/direct-filters.cjs
           node --check tests/direct-filters-browser.cjs
@@ -37,6 +40,7 @@ jobs:
         run: |
           node tests/direct-filters.cjs
           node tests/reports-filtered.cjs
+          node tests/daily-performance-dom.cjs
           node tests/company-roster.cjs
           node tests/staff-photos-dom.cjs
       - name: Install Chromium runner
