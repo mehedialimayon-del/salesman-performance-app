@@ -14,7 +14,7 @@ const visaG='https://dhaka.diplo.de/bd-en/service/2682868-2682868';
 const OFFICIAL='Use the current official programme call before submitting payment or documents.';
 const pills=(entries)=>'<div class="an-decision-grid">'+entries.map(f=>'<article class="an-decision-fact" data-tone="'+E(f[0])+'"><small>'+E(f[1])+'</small><strong>'+E(f[2])+'</strong><p>'+E(f[3])+'</p></article>').join('')+'</div>';
 function current(){
- const id=(location.hash||'').split(/[?#]/)[0].split('/')[2];
+ const id=(location.hash||'').split('?')[0].replace(/^#\/scholarship\//,'').split('/')[0];
  return (window.ANScholarships?.items||[]).find(x=>x.id===id);
 }
 function brief(txt,n=84){let t=String(txt||'').trim();return t.length>n?t.slice(0,n).replace(/\s+\S*$/,'')+'…':t;}
