@@ -48,27 +48,29 @@ jobs:
               });
               await go('scholarship/erasmus-mundus');
               const er=await p.evaluate(()=>({
-                board:!!document.querySelector('#an-scholarship-decision-board'),
-                factCount:document.querySelectorAll('.an-decision-fact').length,
-                moi:document.querySelector('#an-scholarship-decision-board')?.textContent.includes('Accepted conditionally'),
-                score:document.querySelector('#an-scholarship-decision-board')?.textContent.includes('6.5 minimum'),
-                walkthrough:document.querySelectorAll('.an-application-walkthrough ol>li').length,
-                links:document.querySelectorAll('.an-application-walkthrough a').length,
-                stepText:document.querySelector('.an-application-walkthrough')?.textContent.includes('Save AND submit')
+                unified:!!document.querySelector('#an-scholarship-complete-guide'),
+                fees:document.querySelector('.an-programme-costs')?.textContent.includes('€4,000/year'),
+                verified:document.querySelectorAll('.an-specific-guide article').length>=4,
+                noDuplicate:!document.querySelector('#an-scholarship-decision-board')&&!document.querySelector('#an-scholarship-document-guide')&&!document.querySelector('#an-scholarship-verified-walk')
               }));
               await go('scholarship/daad-epos-masters');
               const ep=await p.evaluate(()=>({
-                board:!!document.querySelector('#an-scholarship-decision-board'),
-                visa:document.querySelector('#an-scholarship-decision-board')?.textContent.includes('€75'),
-                epos:document.querySelectorAll('.an-epos-course').length,
-                stepDetails:document.querySelectorAll('.an-epos-course details.an-course-apply-steps').length,
-                scoreBadges:document.querySelectorAll('.an-epos-course .an-course-quickfacts').length,
-                guide:document.querySelectorAll('.an-application-walkthrough ol>li').length,
-                emphasized:document.querySelectorAll('.an-info-hot').length
+                unified:!!document.querySelector('#an-scholarship-complete-guide'),
+                courses:document.querySelectorAll('.an-epos-course').length,
+                feeCards:document.querySelectorAll('.an-epos-course .an-programme-fee-breakdown').length,
+                namedFees:[...document.querySelectorAll('.an-epos-course .an-programme-fee-breakdown')].filter(el=>!el.textContent.includes('No independently verified exact fee')).length,
+                details:document.querySelectorAll('.an-epos-course details.an-course-apply-steps').length,
+                noGeneric:!document.querySelector('#an-scholarship-document-guide')&&!document.querySelector('#an-scholarship-decision-board')
               }));
               await go('scholarship/hungary-masters');
-              const other=await p.evaluate(()=>({board:!!document.querySelector('#an-scholarship-decision-board'),facts:document.querySelectorAll('.an-decision-fact').length,steps:document.querySelectorAll('.an-application-walkthrough li').length}));
-              const ok=about.portrait>=250&&about.flagWidth>=44&&about.flagWidth<=64&&about.flagAnimation.includes('anTinyFlagWave')&&er.board&&er.factCount===8&&er.moi&&er.score&&er.walkthrough>=8&&er.links>=3&&er.stepText&&ep.board&&ep.visa&&ep.epos>=27&&ep.stepDetails>=27&&ep.scoreBadges>=27&&ep.guide>=7&&other.board&&other.facts===8&&other.steps>=7&&!errors.length;
+              const other=await p.evaluate(()=>({
+                unified:!!document.querySelector('#an-scholarship-complete-guide'),
+                fee:!!document.querySelector('.an-programme-costs'),
+                basic:document.querySelectorAll('.an-scholarship-section-grid>.an-scholarship-section').length,
+                documents:!!document.querySelector('#an-scholarship-document-guide'),
+                noDuplicate:!document.querySelector('#an-scholarship-decision-board')&&!document.querySelector('#an-scholarship-verified-walk')
+              }));
+              const ok=about.portrait>=250&&about.flagWidth>=44&&about.flagWidth<=64&&about.flagAnimation.includes('anTinyFlagWave')&&er.unified&&er.fees&&er.verified&&er.noDuplicate&&ep.unified&&ep.courses===27&&ep.feeCards===27&&ep.details===27&&ep.noGeneric&&other.unified&&other.fee&&other.basic===6&&other.documents&&other.noDuplicate&&!errors.length;
               const result={viewport:w+'x'+h,about,erasmus:er,epos:ep,generic:other,errors,passed:ok};
               console.log('ITEMIZED QA '+JSON.stringify(result));
               if(!ok){fail=true;console.error('ITEMIZED QA FAILED '+w);}
