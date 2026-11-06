@@ -195,6 +195,11 @@ document.addEventListener('change',e=>{
  if(e.target.id==='an-scholarship-country'){filters.country=e.target.value;refreshList();}
  if(e.target.id==='an-scholarship-level'){filters.level=e.target.value;refreshList();}
 });
+/* Broken/blocked remote photos simply fall back to the premium gradient. */
+document.addEventListener('error',e=>{
+ const el=e.target;
+ if(el?.matches?.('.an-scholarship-cover-photo,.an-feature-photo,.an-scholarship-flag'))el.style.display='none';
+},true);
 document.addEventListener('click',e=>{
  const link=e.target.closest('[data-scholarships-only]');
  if(link){e.preventDefault();location.hash='#/scholarships';}
