@@ -8,6 +8,26 @@ const FEES={
   fee:'€0 tuition per semester',extra:'Approximately €460 semester contribution (not tuition); recheck current semester invoice.',
   source:'https://www2.daad.de/deutschland/studienangebote/international-programmes/en/detail/4204/'
  },
+ 'epos-course-2':{
+  fee:'Published standard tuition: €6,000 for full programme',extra:'Four instalments of €1,500 plus Leipzig semester contribution. Confirm DAAD-funded payment/waiver arrangement.',
+  source:'https://www.wifa.uni-leipzig.de/en/sept-competence-center/masters-program/financial-matters'
+ },
+ 'epos-course-5':{
+  fee:'Standard tuition: none for the regular degree',extra:'TU Dresden semester fee applies; second-degree/long-study charges may apply individually.',
+  source:'https://tu-dresden.de/studium/vor-dem-studium/studienangebot/sins/sins_studiengang?autoid=71&set_language=en'
+ },
+ 'epos-course-11':{
+  fee:'Published standard programme tuition: €13,800 / 3 semesters',extra:'€5,000 + €5,000 + €3,800; semester fee about €350 each, German course up to €300 per semester. Confirm EPOS payment conditions.',
+  source:'https://www.tu.berlin/en/planen-bauen-umwelt/urbanmanagement/application-admission-and-tuition-fees'
+ },
+ 'epos-course-25':{
+  fee:'Published standard full-time tuition: €14,100 / 1 year',extra:'Heidelberg states special arrangements apply to DAAD scholarship holders; verify award-specific payment in writing.',
+  source:'https://www.klinikum.uni-heidelberg.de/heidelberger-institut-fuer-global-health/education/master-of-science-in-international-health'
+ },
+ 'epos-course-26':{
+  fee:'Published standard programme tuition: €9,700 total',extra:'€4,850 per semester, two semesters; confirm separately what any DAAD EPOS award pays.',
+  source:'https://www.uni-bonn.de/en/studying/degree-programs/degree-programs-a-z/global-health-wm'
+ },
  'epos-course-14':{
   fee:'€0 tuition for awarded DAAD EPOS scholars',extra:'A 2-year tuition waiver; other semester and personal costs require separate checking.',
   source:'https://www.uni-hohenheim.de/agecon-stipendien'
