@@ -463,3 +463,173 @@
     animation:an2-flag-wave 5.4s ease-in-out infinite!important;
   }
 }
+
+/* 2026-11-06 / precise founder portrait + priority Bangladesh flag correction.
+   Only the About Details founder card is affected; existing pages and copy stay intact.
+   Portrait is anchored to the bottom while scaled UP to the quote-footer's top edge. */
+#app .an2-founder-quote .an2-quote-footer {
+  position:relative!important;
+  overflow:visible!important;
+}
+#app .an2-founder-quote .an2-quote-sign {
+  position:relative!important;
+  z-index:2!important;
+}
+#app .an2-founder-quote .an2-founder-person {
+  z-index:1!important;
+  overflow:visible!important;
+}
+#app .an2-founder-quote .an2-founder-person img {
+  position:absolute!important;
+  display:block!important;
+  top:auto!important;
+  left:auto!important;
+  bottom:0!important;
+  max-width:none!important;
+  max-height:none!important;
+  height:auto!important;
+  object-fit:contain!important;
+  object-position:right bottom!important;
+  opacity:1!important;
+  transform:none!important;
+  filter:none!important;
+}
+#app .an2-founder-quote .an2-floating-flags {
+  display:grid!important;
+  grid-auto-flow:row!important;
+  align-items:center!important;
+  align-content:start!important;
+  justify-items:center!important;
+  overflow:visible!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag-unit {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  position:relative!important;
+  box-sizing:border-box!important;
+  min-width:0!important;
+  overflow:visible!important;
+  padding:1px 2px!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag {
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:none!important;
+  transform-origin:50% 50%!important;
+  overflow:visible!important;
+  line-height:1!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag-image {
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  border-radius:2px!important;
+  box-shadow:0 1px 5px #0008!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag-emoji {
+  display:none!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag:has(.an2-flag-image-error) .an2-flag-emoji,
+#app .an2-founder-quote .an2-floating-flags .an2-flag:not(:has(.an2-flag-image)) .an2-flag-emoji {
+  display:inline!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag-image.an2-flag-image-error {
+  display:none!important;
+}
+@media(min-width:801px) {
+  #app .an2-founder-quote .an2-quote-footer {
+    grid-template-columns:minmax(0,1fr) clamp(220px,26%,300px)!important;
+    min-height:285px!important;
+    gap:7px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags {
+    grid-template-columns:repeat(8,minmax(0,1fr))!important;
+    gap:8px 7px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit {
+    height:25px!important;
+    min-height:25px!important;
+    grid-column:auto!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home {
+    grid-column:span 2!important;
+    height:42px!important;
+    min-height:42px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag {
+    width:32px!important;
+    height:21px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home .an2-flag {
+    width:62px!important;
+    height:40px!important;
+    max-width:100%!important;
+  }
+  #app .an2-founder-quote .an2-founder-person {
+    width:clamp(220px,26vw,300px)!important;
+    height:285px!important;
+    align-self:end!important;
+    justify-self:end!important;
+  }
+  #app .an2-founder-quote .an2-founder-person img {
+    width:clamp(375px,32vw,485px)!important;
+    right:-26px!important;
+    bottom:-2px!important;
+  }
+}
+@media(max-width:800px) {
+  #app .an2-founder-quote .an2-quote-footer {
+    grid-template-columns:minmax(0,1fr) clamp(145px,43%,186px)!important;
+    min-height:290px!important;
+    margin-right:-17px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags {
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:5px 3px!important;
+    align-content:start!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit {
+    height:24px!important;
+    min-height:24px!important;
+    grid-column:auto!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home {
+    grid-column:span 2!important;
+    height:38px!important;
+    min-height:38px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag {
+    width:26px!important;
+    height:18px!important;
+    font-size:21px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home .an2-flag {
+    width:50px!important;
+    height:34px!important;
+    font-size:40px!important;
+    max-width:100%!important;
+  }
+  #app .an2-founder-quote .an2-founder-person {
+    position:relative!important;
+    width:clamp(145px,43vw,186px)!important;
+    height:290px!important;
+    justify-self:end!important;
+    align-self:end!important;
+  }
+  #app .an2-founder-quote .an2-founder-person img {
+    width:clamp(350px,104vw,430px)!important;
+    right:-32px!important;
+    bottom:-2px!important;
+  }
+}
+@media(max-width:380px) {
+  #app .an2-founder-quote .an2-floating-flags {gap:5px 2px!important}
+  #app .an2-founder-quote .an2-floating-flags .an2-flag {width:24px!important;height:17px!important}
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home .an2-flag {width:47px!important;height:31px!important}
+}
+@media(prefers-reduced-motion:reduce) {
+  #app .an2-founder-quote .an2-floating-flags .an2-flag {animation:none!important}
+}
