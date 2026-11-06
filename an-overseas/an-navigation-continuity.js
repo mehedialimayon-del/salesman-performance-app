@@ -10,7 +10,7 @@ const scrollRoot=()=>document.scrollingElement||document.documentElement;
 const scrollableSelectors=[
  '#app','.page-scroll','.an-about-fixed','.an-about-summary','.an-about-duo',
  '.an-about-intro-panel','.an-about-details-scroll','.an-community-scroll',
- '.an2-nav','.an-success-gallery','.an-manager-card','.an-university-profile'
+ '.an2-nav','.an-success-gallery','.an-scholarship-directory','.an-manager-card','.an-university-profile'
 ];
 let activeRoute=root(), pending=null, scheduledSave=0, lastGesture=0, restoreToken=0;
 let initial=true, restoreInProgress=false, lastRenderedRoute=null;
