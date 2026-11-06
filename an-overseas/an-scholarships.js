@@ -91,7 +91,16 @@ const knownHosts=[
  ['King Abdullah University of Science and Technology','Saudi Arabia','Thuwal','https://www.kaust.edu.sa/'],
  ['Qatar University','Qatar','Doha','https://www.qu.edu.qa/'],
  ['Universiti Brunei Darussalam','Brunei','Bandar Seri Begawan','https://ubd.edu.bn/'],
- ['Universiti Teknologi Brunei','Brunei','Bandar Seri Begawan','https://www.utb.edu.bn/']
+ ['Universiti Teknologi Brunei','Brunei','Bandar Seri Begawan','https://www.utb.edu.bn/'],
+ ['Sentral Digital College Kuala Lumpur','Malaysia','Kuala Lumpur','https://sdckl.edu.my/'],
+ ['Nilai University','Malaysia','Nilai, Negeri Sembilan','https://www.nilai.edu.my/'],
+ ['Sunway University','Malaysia','Bandar Sunway, Selangor','https://sunway.edu.my/'],
+ ['Curtin University Malaysia','Malaysia','Miri, Sarawak','https://curtin.edu.my/'],
+ ['Monash University Malaysia','Malaysia','Bandar Sunway, Selangor','https://www.monash.edu.my/'],
+ ['University of Padua','Italy','Padua','https://www.unipd.it/en/'],
+ ["Ca' Foscari University of Venice",'Italy','Venice','https://www.unive.it/pag/13526/'],
+ ['Vilnius University','Lithuania','Vilnius','https://www.vu.lt/en/'],
+ ['VILNIUS TECH','Lithuania','Vilnius','https://vilniustech.lt/en/']
 ];
 function addKnownUniversities(list){
  if(!Array.isArray(list))return 0;
