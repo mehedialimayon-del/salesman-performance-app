@@ -32,7 +32,7 @@ function dailyQuickScope(){
  const zone=filter.zone||'';
  const managerRows=allPeople().filter(p=>p.can_manage&&(!zone||p.zone===zone)).sort((a,b)=>String(a.zone||'').localeCompare(String(b.zone||''))||String(a.name||'').localeCompare(String(b.name||'')));
  const sellers=new Set(allIds());
- const srRows=allPeople().filter(p=>sellers.has(p.id)&&!p.can_manage&&(!zone||p.zone===zone)).sort((a,b)=>String(a.zone||'').localeCompare(String(b.zone||''))||String(a.name||'').localeCompare(String(b.name||''))));
+ const srRows=allPeople().filter(p=>sellers.has(p.id)&&!p.can_manage&&(!zone||p.zone===zone)).sort((a,b)=>String(a.zone||'').localeCompare(String(b.zone||''))||String(a.name||'').localeCompare(String(b.name||'')));
  return '<div class="ffDailyQuickScope ffReportDirectScope" aria-label="Daily sales zone and staff selection">'
  +'<label>SELECT ZONE<select id="ffDailyQuickZone" aria-label="Select daily zone"><option value="" '+(!zone?'selected':'')+'>ALL PERMITTED ZONES</option>'
  +zoneOptions().map(z=>'<option value="'+E(z)+'" '+(z===zone?'selected':'')+'>'+E(z)+'</option>').join('')+'</select></label>'
