@@ -192,16 +192,8 @@ function apply(){
  if(!(location.hash||'').startsWith('#/scholarship/'))return;
  const main=document.querySelector('#app .an-scholarship-detail'),p=current();
  if(!main||!p)return;
- const lead=main.querySelector('.an-scholarship-lead');
- if(lead&&!main.querySelector('#an-scholarship-decision-board')){
-  const frame=document.createElement('div');frame.innerHTML=board(p);
-  lead.insertAdjacentElement('afterend',frame.firstElementChild);
- }
- const dashboard=main.querySelector('#an-scholarship-decision-board');
- if(dashboard&&!main.querySelector('#an-scholarship-verified-walk')){
-  const frame=document.createElement('div');frame.innerHTML=walk(p);
-  dashboard.insertAdjacentElement('afterend',frame.firstElementChild);
- }
+ // The consolidated guide owns the definitive eligibility/document/fee/steps sections.
+ // Do NOT inject a second summary board or second universal application guide.
  if(p.id==='daad-epos-masters')decorateCourseCards();
  splitLongParagraphs();
  emphasize();
