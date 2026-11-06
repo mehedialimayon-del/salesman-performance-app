@@ -214,7 +214,7 @@ function detailPage(id){
  const p=items.find(x=>x.id===id);
  if(!p)return '<div class="wrap content"><h1>Funding pathway not found</h1><a class="btn" href="#/scholarships">← Back to scholarship directory</a></div>';
  const conv=p.discountPercent!=null?('Tuition discount '+p.discountPercent+'%, not a cash payment'):bdt(p)==null?(p.awardDisplay?'Tuition-waiver value depends on course fees':'Award amount depends on institution / offer'):('≈ ৳'+bdt(p).toLocaleString('en-US')+' / '+(p.period==='once'?'award':p.period));
- const isEpos=p.id==='daad-epos-masters'||p.id==='daad-epos-phd';
+ const isEpos=p.id==='daad-epos-masters';
  if(isEpos&&window.ANEPOSGuide&&window.ANEPOSDeep){
   const guide=window.ANEPOSGuide.render(p,bdt(p),name=>resolveUniversity(name));
   return '<main class="wrap an-scholarship-detail"><nav class="an-breadcrumb"><a href="#/home">Home</a> › <a href="#/scholarships">Scholarships</a> › '+esc(p.name)+'</nav>'+
