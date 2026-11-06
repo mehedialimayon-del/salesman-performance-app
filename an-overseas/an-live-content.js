@@ -78,12 +78,12 @@ document.addEventListener('submit',async e=>{
  e.preventDefault();e.stopImmediatePropagation();
  const name=form.querySelector('[name=name]')?.value.trim(),email=form.querySelector('[name=email]')?.value.trim(),phone=form.querySelector('[name=phone]')?.value.trim(),message=form.querySelector('[name=message]')?.value.trim();
  if(!name||!email||!message)return;
- const button=form.querySelector('[type=submit]');button.disabled=true;
+ const button=form.querySelector('[type=submit]');const status=form.querySelector('#an-contact-feedback');if(status)status.textContent='Sending your enquiry securely…';button.disabled=true;
  try{
   const res=await fetch(ROOT+'/rest/v1/an_enquiries',{method:'POST',headers:{...headers,'Prefer':'return=minimal'},body:JSON.stringify({full_name:name,email,phone:phone||'',country:'',institution:'',programme:'',message,status:'new'})});
   if(!res.ok)throw Error('Message could not be sent. Please contact us directly.');
-  form.reset();window.toast?.('Message sent. Our team will contact you soon.');
- }catch(err){window.toast?.(err.message||'Could not send enquiry');}
+  form.reset();if(status)status.textContent='Your enquiry was submitted successfully. Our team will follow up.';window.toast?.('Message sent. Our team will contact you soon.');
+ }catch(err){if(status)status.textContent=err.message||'Could not send enquiry. Please use the email contact above.';window.toast?.(err.message||'Could not send enquiry');}
  finally{button.disabled=false;}
 },true);
 window.addEventListener('hashchange',()=>setTimeout(applyPage,20));
