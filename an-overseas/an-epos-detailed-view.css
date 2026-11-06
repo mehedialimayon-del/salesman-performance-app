@@ -56,3 +56,14 @@ body.an-scholarship-detail-view .an-scholarship-item-list li:before{content:"◆
 body.an-scholarship-detail-view .an-scholarship-section-3 .an-scholarship-item-list li:before{color:#70ccff}
 body.an-scholarship-detail-view .an-scholarship-section-2 .an-scholarship-item-list li:before{color:#83dfca}
 body.an-scholarship-detail-view .an-scholarship-section{min-width:0}
+
+/* Internal page jump must not change hash-based SPA route. */
+body.an-scholarship-detail-view .an-scholarship-cta button[data-epos-jump]{border-radius:12px;padding:10px 15px;border:1px solid #cb8b50;background:linear-gradient(120deg,#ab4a11,#49200a);font-weight:850;font-size:12px;color:#fff2e2;cursor:pointer}
+#an-epos-extended{scroll-margin-top:90px}
+.an-scholarship-datecard{margin:17px 0;padding:18px 20px;background:linear-gradient(125deg,#282015,#101a23);border:1px solid #c18a4a;border-radius:15px;display:grid;gap:7px}
+.an-scholarship-datecard>span{font-size:11px;color:#ffb56f;font-weight:850;text-transform:uppercase}
+.an-scholarship-datecard h3{margin:0;font-size:15px;color:#f4e2cb}
+.an-scholarship-datecard strong{font-size:22px;color:#fff}
+.an-scholarship-datecard>b{color:#88ebc7}
+.an-scholarship-datecard>b.an-expired{color:#ffa79e}
+.an-scholarship-datecard p{font-size:11px;color:#c3cbd4;line-height:1.5;margin:0}
