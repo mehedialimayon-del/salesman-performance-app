@@ -22,7 +22,7 @@
   function currentDirectory() {
     const list = typeof U !== 'undefined' && Array.isArray(U) ? U : [];
     const countries = new Set(list.map(x => x.country).filter(Boolean));
-    return {universities: Math.max(6017, list.length), countries: Math.max(31, countries.size)};
+    return {universities: list.length, countries: Math.max(31, countries.size)};
   }
   // Use the exact published Countries page list, not a hand-maintained flag list.
   // Bangladesh is the origin, then Asian destinations, European destinations, and others.
