@@ -118,15 +118,13 @@
     app.innerHTML=renderStory();
   }
   function relocateReadMore() {
-    // Keep the full-story link directly AFTER the Vision text.
-    // Earlier versions moved it into a separate panel that was cut off
-    // when the desktop About view was made a single-screen layout.
+    // READ MORE belongs to the overall A&N story, BELOW the two separate
+    // About and Our Vision sections, not inside the Vision content panel.
     if (location.hash.split('?')[0] !== '#/about') return;
     const intro = document.querySelector('#an-about-fixed .an-about-intro-panel');
     const vision = intro?.querySelector('.an-vision-inline');
     if (!intro || !vision) return;
-    const button = vision.querySelector('.an-about-readmore') ||
-      intro.querySelector('.an2-readmore-separate .an-about-readmore');
+    const button = intro.querySelector('.an-about-readmore');
     if (!button) return;
     if (!intro.querySelector('.an2-about-box')) {
       const eyebrow = intro.querySelector(':scope > .an-about-eyebrow');
@@ -139,12 +137,16 @@
         aboutBox.append(eyebrow, heading, paragraph);
       }
     }
-    // Idempotent: avoid repeated DOM moves in the MutationObserver.
-    if (button.parentElement !== vision) vision.appendChild(button);
+    let row = intro.querySelector(':scope > .an2-readmore-separate');
+    if (!row) {
+      row = document.createElement('div');
+      row.className = 'an2-readmore-separate';
+      intro.appendChild(row);
+    }
+    if (button.parentElement !== row) row.appendChild(button);
     button.href = '#/aboutdetails';
-    button.setAttribute('aria-label', 'Read our complete story, purpose and vision');
+    button.setAttribute('aria-label', 'Read more about A&N Overseas overall story and consultancy');
     if (button.textContent.trim() !== 'READ MORE ↗') button.textContent = 'READ MORE ↗';
-    intro.querySelector('.an2-readmore-separate')?.remove();
   }
   // Gracefully fall back to the original emoji when a flag image cannot load.
   document.addEventListener('error', event => {
