@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 const items=window.ANScholarshipData||[];
-const FX={USD:124.34,EUR:139.61,GBP:167.50,AUD:87.10,JPY:0.7847,CNY:18.63,SEK:12.77,HUF:0.36,TRY:2.90,KRW:0.088,MYR:30.0,RON:27.5,AZN:73,TWD:3.84};
+const FX={USD:124.34,EUR:139.61,GBP:167.50,AUD:87.10,JPY:0.7847,CNY:18.63,SEK:12.77,HUF:0.36,TRY:2.90,KRW:0.088,MYR:30.0,RON:27.5,AZN:73,TWD:3.84,AED:33.85,HKD:15.96,QAR:34.14,BND:97.2};
 const BANK='https://www.bb.org.bd/en/index.php/econdata/exchangerate';
 const DIRECT_FX=['USD','EUR','GBP','AUD','JPY','CNY','SEK'];
 const easy=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g,'');
@@ -12,7 +12,7 @@ const money=(n,code)=>Number(n).toLocaleString('en-US',{maximumFractionDigits:0}
 const bdt=p=>p.amount==null||!FX[p.currency]?null:Math.round((p.amount*FX[p.currency])/10)*10;
 const approx=p=>bdt(p)==null?'Funding varies / official call':('≈ ৳'+bdt(p).toLocaleString('en-US')+' / '+(p.period==='once'?'award':p.period));
 const amountText=p=>p.amount==null?'Official award varies':money(p.amount,p.currency)+' / '+(p.period==='once'?'award':p.period);
-const flagCountry=c=>({'Germany':'🇩🇪','United Kingdom':'🇬🇧','Hungary':'🇭🇺','Türkiye':'🇹🇷','Japan':'🇯🇵','China':'🇨🇳','South Korea':'🇰🇷','Australia':'🇦🇺','France':'🇫🇷','Netherlands':'🇳🇱','Romania':'🇷🇴','Azerbaijan':'🇦🇿','Malaysia':'🇲🇾','Taiwan':'🇹🇼','Finland':'🇫🇮','Sweden':'🇸🇪'})[c]||'🌐';
+const flagCountry=c=>({'Germany':'🇩🇪','United Kingdom':'🇬🇧','Hungary':'🇭🇺','Türkiye':'🇹🇷','Japan':'🇯🇵','China':'🇨🇳','South Korea':'🇰🇷','Australia':'🇦🇺','France':'🇫🇷','Netherlands':'🇳🇱','Romania':'🇷🇴','Azerbaijan':'🇦🇿','Malaysia':'🇲🇾','Taiwan':'🇹🇼','Finland':'🇫🇮','Sweden':'🇸🇪','United Arab Emirates':'🇦🇪','Saudi Arabia':'🇸🇦','Qatar':'🇶🇦','Hong Kong':'🇭🇰','Brunei':'🇧🇳'})[c]||'🌐';
 const asList=text=>esc(text).replace(/(?:^|\n)(\d+\.) /g,'$&');
 const getUniList=()=>typeof U!=='undefined'&&Array.isArray(U)?U:[];
 function resolveUniversity(name){
@@ -51,7 +51,12 @@ const knownHosts=[
  ['London School of Economics and Political Science','United Kingdom','London','https://www.lse.ac.uk/'],
  ['Yale University','United States','New Haven','https://www.yale.edu/'],
  ['Stanford University','United States','Stanford','https://www.stanford.edu/'],
- ['National Cheng Kung University','Taiwan','Tainan','https://www.ncku.edu.tw/']
+ ['National Cheng Kung University','Taiwan','Tainan','https://www.ncku.edu.tw/'],
+ ['Mohamed bin Zayed University of Artificial Intelligence','United Arab Emirates','Abu Dhabi','https://mbzuai.ac.ae/'],
+ ['King Abdullah University of Science and Technology','Saudi Arabia','Thuwal','https://www.kaust.edu.sa/'],
+ ['Qatar University','Qatar','Doha','https://www.qu.edu.qa/'],
+ ['Universiti Brunei Darussalam','Brunei','Bandar Seri Begawan','https://ubd.edu.bn/'],
+ ['Universiti Teknologi Brunei','Brunei','Bandar Seri Begawan','https://www.utb.edu.bn/']
 ];
 function addKnownUniversities(list){
  if(!Array.isArray(list))return 0;
@@ -75,7 +80,7 @@ function card(p,i){
 function listPage(){
  const countries=['All destinations',...new Set(items.map(p=>p.country))].sort((a,b)=>a==='All destinations'?-1:b==='All destinations'?1:a.localeCompare(b));
  const degrees=['All degrees','Bachelor','Master','PhD','Research','Professional','Exchange','Training'];
- return '<section class="an-scholarship-head"><div class="wrap"><span class="an-eyebrow">A&N Overseas · Academic Funding Library</span><h1>Explore <span>Global Scholarships</span></h1><p>Dedicated funding pathways for Bangladeshi applicants. Every funding level is a separate card where the award structure differs. Amounts, deadlines and university choices must be confirmed against each official call.</p><div class="an-scholarship-facts"><span>🎓 '+items.length+' funding pathways</span><span>🌍 '+(countries.length-1)+' destinations / groups</span><span>🇧🇩 BDT planning conversion · 05 Nov 2026</span></div></div></section><main class="wrap content an-scholarship-directory"><div class="an-scholarship-filters"><label>SEARCH FUNDING / COUNTRY<input id="an-scholarship-search" type="search" autocomplete="off" placeholder="e.g. DAAD, PhD, Erasmus, Japan…" value="'+esc(filters.search)+'"></label><label>DESTINATION<select id="an-scholarship-country">'+countries.map(c=>'<option'+(filters.country===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></label><label>DEGREE LEVEL<select id="an-scholarship-level">'+degrees.map(x=>'<option'+(filters.level===x?' selected':'')+'>'+esc(x)+'</option>').join('')+'</select></label></div><div class="an-scholarship-meta"><strong id="an-scholarship-count"></strong><span>Verified source links in each profile</span></div><div id="an-scholarship-results" class="an-scholarship-grid"></div><p class="an-scholarship-info">Exchange-rate note: <a href="'+BANK+'" target="_blank" rel="noopener noreferrer">Bangladesh Bank, 05 November 2026</a> provides base USD and major currency BDT rates; HUF, TRY, KRW, MYR, RON, AZN and TWD use approximate planning estimates. Amount in BDT is a translation of the published award amount, not an extra payment. Exchange rates change, amounts can be revised, and programme funding is not a living-cost guarantee. A source link is not proof that the current application cycle is open.</p></main>';
+ return '<section class="an-scholarship-head"><div class="wrap"><span class="an-eyebrow">A&N Overseas · Academic Funding Library</span><h1>Explore <span>Global Scholarships</span></h1><p>Dedicated funding pathways for Bangladeshi applicants. Every funding level is a separate card where the award structure differs. Amounts, deadlines and university choices must be confirmed against each official call.</p><div class="an-scholarship-facts"><span>🎓 '+items.length+' funding pathways</span><span>🌍 '+(countries.length-1)+' destinations / groups</span><span>🇧🇩 BDT planning conversion · 05 Nov 2026</span></div></div></section><main class="wrap content an-scholarship-directory"><div class="an-scholarship-filters"><label>SEARCH FUNDING / COUNTRY<input id="an-scholarship-search" type="search" autocomplete="off" placeholder="e.g. DAAD, PhD, Erasmus, Japan…" value="'+esc(filters.search)+'"></label><label>DESTINATION<select id="an-scholarship-country">'+countries.map(c=>'<option'+(filters.country===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></label><label>DEGREE LEVEL<select id="an-scholarship-level">'+degrees.map(x=>'<option'+(filters.level===x?' selected':'')+'>'+esc(x)+'</option>').join('')+'</select></label></div><div class="an-scholarship-meta"><strong id="an-scholarship-count"></strong><span>Verified source links in each profile</span></div><div id="an-scholarship-results" class="an-scholarship-grid"></div><p class="an-scholarship-info">Exchange-rate note: <a href="'+BANK+'" target="_blank" rel="noopener noreferrer">Bangladesh Bank, 05 November 2026</a> provides base USD and major currency BDT rates; HUF, TRY, KRW, MYR, RON, AZN, TWD, AED, HKD, QAR and BND use approximate planning estimates. Amount in BDT is a translation of the published award amount, not an extra payment. Exchange rates change, amounts can be revised, and programme funding is not a living-cost guarantee. A source link is not proof that the current application cycle is open.</p></main>';
 }
 function refreshList(){
  const target=document.getElementById('an-scholarship-results'),count=document.getElementById('an-scholarship-count');if(!target)return;
