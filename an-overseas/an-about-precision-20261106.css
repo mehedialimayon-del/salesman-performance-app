@@ -1,0 +1,351 @@
+/* A&N Overseas — surgical About corrections, Nov 2026.
+   Loaded LAST so legacy layout rules cannot supersede approved refinements. */
+
+/* A single-row, vertically centred desktop navigation with slim premium actions. */
+@media (min-width:801px) {
+  body .top {height:79px!important;min-height:79px!important;max-height:79px!important;box-sizing:border-box!important}
+  body .top .wrap {
+    display:grid!important;
+    grid-template-columns:minmax(185px,235px) minmax(0,1fr) 43px 108px!important;
+    grid-template-areas:"brand nav favorite actions"!important;
+    align-items:center!important;justify-content:stretch!important;
+    gap:clamp(3px,.7vw,10px)!important;
+    height:79px!important;min-height:79px!important;max-height:79px!important;
+    padding:6px clamp(8px,1.15vw,18px)!important;
+    width:100%!important;max-width:1600px!important;margin:0 auto!important;
+  }
+  body .top .brand {
+    grid-area:brand!important;min-width:0!important;max-width:235px!important;
+    align-self:center!important;justify-self:start!important;
+    overflow:hidden!important;
+  }
+  body .top .brand-copy{min-width:0!important}
+  body .top .brand-copy strong{font-size:clamp(14px,1.45vw,19px)!important}
+  body .top .brand-copy small{font-size:7px!important;letter-spacing:.55px!important}
+  body .top .logo-motion,body .top .logo-crop{width:53px!important;height:47px!important}
+  body .top .logo-crop img{width:155px!important;height:40px!important}
+  body .top .links {
+    grid-area:nav!important;
+    display:flex!important;flex-wrap:nowrap!important;
+    flex-direction:row!important;align-items:center!important;justify-content:center!important;
+    gap:clamp(2px,.35vw,6px)!important;
+    min-width:0!important;width:100%!important;
+    padding:0!important;margin:0!important;
+    overflow:visible!important;position:static!important;
+    background:transparent!important;border:0!important;box-shadow:none!important;
+  }
+  body .top .links a {
+    display:inline-flex!important;flex:0 1 auto!important;
+    min-width:0!important;min-height:27px!important;
+    padding:5px clamp(3px,.45vw,7px)!important;
+    border:1px solid #77533390!important;border-radius:999px!important;
+    font-size:clamp(8px,.72vw,10.5px)!important;
+    font-weight:700!important;line-height:1.08!important;
+    letter-spacing:-.13px!important;white-space:nowrap!important;
+    text-align:center!important;
+    background:linear-gradient(125deg,#252124,#151519)!important;
+    color:#fff3e7!important;
+  }
+  body .top .links a:hover,body .top .links a.current {
+    border-color:#e99d44!important;color:#ffc784!important;background:#3a2213!important;
+  }
+  body .top .links a[href="#/login"]{display:none!important}
+  body .top .links a.current:after,body .top .links a:hover:after{display:none!important}
+  body .top .an-favorite-header {
+    grid-area:favorite!important;justify-self:center!important;
+    align-self:center!important;width:38px!important;height:38px!important;
+    min-width:38px!important;padding:0!important;margin:0!important;
+  }
+  body .top .hamb,body .top #hamb{display:none!important}
+  body .top .btn.tiny,body .top .an-desktop-login {
+    grid-area:actions!important;display:inline-flex!important;
+    width:106px!important;min-width:0!important;height:30px!important;
+    min-height:30px!important;max-height:30px!important;
+    align-items:center!important;justify-content:center!important;
+    margin:0!important;padding:4px 7px!important;
+    justify-self:end!important;
+    box-sizing:border-box!important;white-space:nowrap!important;
+    font-size:10px!important;font-weight:850!important;line-height:1!important;
+    border-radius:8px!important;border:1px solid #f4a543!important;
+    box-shadow:0 2px 10px #ff8d1f23!important;
+  }
+  body .top .an-desktop-login {
+    align-self:start!important;color:#ffd7a2!important;
+    background:linear-gradient(115deg,#312015,#18151a)!important;
+  }
+  body .top .btn.tiny {
+    align-self:end!important;background:linear-gradient(115deg,#ffbc42,#fb810c)!important;
+    color:#150d09!important;
+  }
+  body.home-view .top{flex:0 0 79px!important}
+}
+/* At ordinary desktop widths, all eight public navigation choices stay on one line. */
+@media (min-width:801px) and (max-width:1100px) {
+  body .top .wrap {
+    grid-template-columns:minmax(155px,175px) minmax(0,1fr) 34px 88px!important;
+    gap:3px!important;padding-left:6px!important;padding-right:6px!important;
+  }
+  body .top .links{gap:2px!important}
+  body .top .links a{font-size:8px!important;padding:4px 3px!important;letter-spacing:-.3px!important}
+  body .top .brand-copy strong{font-size:14px!important}
+  body .top .brand-copy small{font-size:6px!important}
+  body .top .logo-motion,body .top .logo-crop{width:42px!important}
+  body .top .logo-crop img{width:130px!important}
+  body .top .btn.tiny,body .top .an-desktop-login{width:88px!important;font-size:9px!important}
+  body .top .an-favorite-header{width:33px!important;min-width:33px!important}
+}
+
+/* About Details: larger portraits, ordered roomy flags, same quote and sections. */
+@media (min-width:801px) {
+  #app .an2-founder-quote .an2-quote-footer {
+    display:grid!important;grid-template-columns:minmax(0,1fr) 225px!important;
+    min-height:245px!important;gap:10px!important;
+    align-items:end!important;margin:9px -14px 0 0!important;
+  }
+  #app .an2-founder-quote .an2-quote-sign {
+    justify-content:flex-end!important;align-self:stretch!important;
+    min-width:0!important;padding:5px 0 10px!important;
+  }
+  #app .an2-founder-quote .an2-flags-journey {
+    width:100%!important;min-height:0!important;
+    gap:5px!important;justify-content:flex-end!important;
+    overflow:visible!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags {
+    display:grid!important;grid-template-columns:repeat(8,minmax(0,1fr))!important;
+    grid-auto-flow:row!important;gap:5px 6px!important;
+    width:100%!important;max-width:100%!important;
+    align-items:center!important;justify-items:center!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit {
+    grid-column:auto!important;position:relative!important;
+    width:100%!important;min-height:23px!important;height:23px!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    padding:1px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home {
+    grid-column:auto!important;min-height:34px!important;height:34px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-static-star {
+    left:2px!important;top:50%!important;transform:translateY(-50%)!important;
+    font-size:6px!important;opacity:.75!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag {
+    width:30px!important;height:20px!important;max-width:100%!important;
+    line-height:1!important;transform-origin:center center!important;
+    animation:an2-flag-wave 4s ease-in-out infinite!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home .an2-flag {
+    width:47px!important;height:31px!important;max-width:100%!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-image {
+    display:block!important;width:100%!important;height:100%!important;
+    object-fit:cover!important;border-radius:2px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person {
+    width:225px!important;height:245px!important;max-height:none!important;
+    min-height:0!important;overflow:visible!important;
+    justify-self:end!important;align-self:end!important;
+    position:relative!important;
+  }
+  #app .an2-founder-quote .an2-founder-person img {
+    width:clamp(238px,20vw,285px)!important;
+    height:auto!important;max-height:none!important;max-width:none!important;
+    position:absolute!important;bottom:1px!important;right:-5px!important;
+    top:auto!important;left:auto!important;object-fit:contain!important;
+    filter:none!important;opacity:1!important;transform:none!important;
+  }
+  #app .an2-founder-quote .an2-founder-message-label {
+    line-height:1.35!important;font-weight:800!important;
+    letter-spacing:.45px!important;
+  }
+}
+/* Mobile: retain box footprint; increase portrait and flags without overlapping other controls. */
+@media (max-width:800px) {
+  #app .an2-founder-quote .an2-quote-footer {
+    grid-template-columns:minmax(0,1fr) clamp(155px,42%,182px)!important;
+    min-height:275px!important;margin-right:-17px!important;overflow:visible!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags {
+    display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    grid-auto-flow:row!important;gap:4px 2px!important;
+    align-content:start!important;justify-items:center!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit{
+    grid-column:auto!important;width:100%!important;
+    height:22px!important;min-height:22px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home{
+    grid-column:auto!important;height:38px!important;min-height:38px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-static-star{
+    left:0!important;font-size:6px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag {
+    font-size:22px!important;width:auto!important;height:auto!important;
+    max-width:100%!important;filter:drop-shadow(0 2px 3px #0007)!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home .an2-flag{
+    font-size:37px!important;width:auto!important;height:auto!important;
+  }
+  #app .an2-founder-quote .an2-founder-person {
+    width:182px!important;height:275px!important;
+    justify-self:end!important;align-self:end!important;overflow:visible!important;
+  }
+  #app .an2-founder-quote .an2-founder-person img {
+    width:clamp(224px,59vw,260px)!important;
+    height:auto!important;max-width:none!important;max-height:none!important;
+    position:absolute!important;bottom:6px!important;
+    right:-29px!important;top:auto!important;left:auto!important;
+    object-fit:contain!important;filter:none!important;opacity:1!important;
+    transform:none!important;
+  }
+}
+/* One orange part and one white part of the existing founder message. */
+#app .an2-founder-quote .an2-founder-message-label .an2-founder-msg-orange{color:#ff9a2f!important}
+#app .an2-founder-quote .an2-founder-message-label .an2-founder-msg-white{color:#fff!important}
+
+/* All management cards keep the existing content but add consistent theme treatments. */
+#app .an-about-v3 .an-manager-role-banner .an-role-orange,
+#app .an-about-v3 .an-manager-position .an-role-orange{color:#ff992e!important}
+#app .an-about-v3 .an-manager-role-banner .an-role-white,
+#app .an-about-v3 .an-manager-position .an-role-white,
+#app .an-about-v3 .an-manager-white-name{color:#fff!important}
+#app .an-about-v3 .an-manager-information{justify-content:flex-start!important}
+#app .an-about-v3 .an-manager-contacts{align-items:stretch!important}
+#app .an-about-v3 .an-manager-linkedin{background:#161c2a!important;border-color:#476787!important}
+#app .an-about-v3 .an-manager-linkedin .an-linkedin-mark{
+  flex:none;display:inline-grid;place-items:center;width:22px;height:22px;
+  border-radius:4px;background:#0a66c2;color:white;
+  font:bold 14px Arial,sans-serif;
+}
+#app .an-about-v3 .an-manager-actions{
+  display:flex!important;justify-content:center!important;align-items:center!important;
+  gap:8px!important;flex-wrap:wrap!important;
+  margin-top:auto!important;padding-top:7px!important;
+  align-self:stretch!important;
+}
+#app .an-about-v3 .an-manager-actions .an-journey-cta{
+  margin:0 auto!important;text-align:center!important;
+}
+#app .an-about-v3 .an-manager-actions .an-admin-entry{
+  background:linear-gradient(125deg,#291a12,#14181d)!important;
+  border:1px solid #a4733e!important;color:#ffc486!important;
+}
+/* Fixed one-screen About overview on laptops: five photo facts form its bottom edge. */
+@media (min-width:981px) {
+  html:has(body.an-about-locked){height:100%!important;overflow:hidden!important}
+  body.an-about-locked {
+    display:flex!important;flex-direction:column!important;
+    height:100dvh!important;min-height:0!important;max-height:100dvh!important;
+    overflow:hidden!important;
+  }
+  body.an-about-locked #app {
+    display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+    height:auto!important;min-height:0!important;max-height:none!important;
+    overflow:hidden!important;
+  }
+  body.an-about-locked .footer {display:none!important}
+  body.an-about-locked #app>.an-about-v3 {
+    flex:1 1 0!important;display:flex!important;flex-direction:column!important;
+    width:100%!important;max-width:1450px!important;
+    height:100%!important;min-height:0!important;
+    gap:7px!important;padding:5px 14px 8px!important;
+    overflow:hidden!important;
+  }
+  #app .an-about-v3 .an-about-summary {
+    display:block!important;flex:1 1 0!important;
+    height:auto!important;min-height:0!important;max-height:none!important;
+    overflow:hidden!important;
+  }
+  #app .an-about-v3 .an-about-duo {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:9px!important;height:100%!important;min-height:0!important;
+  }
+  #app .an-about-v3 .an-about-half {
+    display:flex!important;flex-direction:column!important;
+    height:100%!important;min-height:0!important;max-height:none!important;
+    padding:clamp(10px,1.6vh,17px) clamp(12px,1.5vw,20px)!important;
+    overflow:hidden!important;
+  }
+  #app .an-about-v3 .an-about-summary h1 {
+    font-size:clamp(18px,1.8vw,25px)!important;
+    margin:4px 0 7px!important;
+  }
+  #app .an-about-v3 .an-about-summary p {
+    font-size:clamp(11px,.9vw,13px)!important;
+    line-height:1.35!important;margin:4px 0 8px!important;
+  }
+  #app .an-about-v3 .an-vision-inline {
+    margin-top:6px!important;padding-top:7px!important;
+  }
+  #app .an-about-v3 .an-vision-inline h2{
+    font-size:clamp(19px,1.8vw,24px)!important;margin-bottom:5px!important;
+  }
+  #app .an-about-v3 .an-manager-heading{margin-bottom:4px!important}
+  #app .an-about-v3 .an-manager-card{
+    display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+    height:auto!important;min-height:0!important;overflow:hidden!important;
+  }
+  #app .an-about-v3 .an-manager-role-banner{
+    min-height:24px!important;margin:0 0 5px!important;
+    padding:3px 7px!important;font-size:clamp(12px,1.1vw,15px)!important;
+  }
+  #app .an-about-v3 .an-manager-main{
+    display:grid!important;grid-template-columns:minmax(0,41%) minmax(0,1fr)!important;
+    flex:1 1 0!important;height:100%!important;min-height:0!important;
+    gap:10px!important;align-items:stretch!important;overflow:hidden!important;
+  }
+  #app .an-about-v3 .an-manager-photo-box,
+  #app .an-about-v3 .an-manager-photo-button {
+    display:block!important;height:100%!important;min-height:0!important;
+    max-height:none!important;overflow:hidden!important;
+  }
+  #app .an-about-v3 .an-manager-photo{
+    height:100%!important;width:100%!important;max-height:100%!important;
+    object-fit:cover!important;object-position:center 18%!important;
+  }
+  #app .an-about-v3 .an-manager-information {
+    display:flex!important;flex:1 1 0!important;
+    flex-direction:column!important;height:100%!important;
+    max-height:100%!important;min-height:0!important;
+    overflow-y:auto!important;overflow-x:hidden!important;
+    padding:2px!important;gap:clamp(4px,.75vh,7px)!important;
+  }
+  #app .an-about-v3 .an-manager-name-box h3{
+    font-size:clamp(17px,1.7vw,23px)!important;
+  }
+  #app .an-about-v3 .an-manager-position strong{
+    font-size:clamp(12px,1.2vw,16px)!important;
+  }
+  #app .an-about-v3 .an-manager-support p {
+    font-size:clamp(10px,.83vw,12px)!important;line-height:1.3!important;
+  }
+  #app .an-about-v3 .an-manager-contact {
+    padding:5px 7px!important;min-height:30px!important;
+    flex:1 1 135px!important;
+  }
+  #app .an-about-v3 .an-manager-controls {
+    min-height:30px!important;margin-top:4px!important;padding-top:3px!important;
+  }
+  #app .an-about-v3 .an-about-highlights {
+    flex:0 0 clamp(98px,16vh,132px)!important;
+    height:auto!important;min-height:0!important;overflow:hidden!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+  #app .an-about-v3 .an-fact-tile{
+    min-height:0!important;height:100%!important;
+    padding:8px 9px!important;gap:3px!important;
+  }
+  #app .an-about-v3 .an-fact-topline{font-size:9px!important}
+  #app .an-about-v3 .an-fact-body{gap:2px!important}
+  #app .an-about-v3 .an-fact-body strong{font-size:clamp(14px,1.3vw,18px)!important}
+  #app .an-about-v3 .an-fact-category{font-size:9px!important}
+  #app .an-about-v3 .an-fact-note{font-size:9px!important;line-height:1.15!important;margin-top:1px!important}
+  #app .an-about-v3 .an-fact-credit{font-size:6px!important}
+}
+@media (prefers-reduced-motion:reduce){
+  #app .an2-founder-quote .an2-floating-flags .an2-flag{animation:none!important}
+}
