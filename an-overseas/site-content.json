@@ -1379,18 +1379,6 @@
       "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
     },
     {
-      "id": "my-uc-allianzeuniversitycollegeofmedicalsciencesaucms",
-      "name": "Allianze University College of Medical Sciences (AUCMS)",
-      "short": "Allianze University College of Medical Sciences (AUCMS)",
-      "country": "Malaysia",
-      "city": "Penang",
-      "kind": "Private",
-      "institutionType": "University College",
-      "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
-    },
-    {
       "id": "my-uc-amcuniversitycollege",
       "name": "AMC University College",
       "short": "AMC University College",
