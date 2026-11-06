@@ -39,6 +39,37 @@ function addUnique(target,items){
  return added;
 }
 let loading=null,loaded=false;
+let localSnapshotPromise=null;
+function loadLocalSnapshot(){
+ if(localSnapshotPromise)return localSnapshotPromise;
+ const packed=window.ANWorldDirectorySnapshotGzip;
+ if(!packed||typeof DecompressionStream!=='function')return Promise.resolve(false);
+ localSnapshotPromise=(async()=>{
+  try{
+   const bytes=Uint8Array.from(atob(packed),ch=>ch.charCodeAt(0));
+   const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+   const rows=await new Response(stream).json();
+   if(!Array.isArray(rows)||rows.length<1000||typeof U==='undefined'||!Array.isArray(U))return false;
+   const items=[];
+   rows.forEach(row=>{
+    if(!Array.isArray(row)||row.length!==4)return;
+    const [name,country,city,site]=row;
+    if(!name||!country||!site)return;
+    let hostname;try{hostname=new URL(site).hostname;}catch{return;}
+    items.push({id:'an-h-dir-'+norm(country)+'-'+norm(hostname),name,short:name,country,
+      city:city||country,kind:'University',programs:[],site,photo:'',
+      source:'Hipo public university domains list (recognition unverified)'});
+   });
+   const added=addUnique(U,items);
+   if(!loaded)window.ANWorldDirectoryStatus={source:'Hipo local snapshot',added,records:rows.length};
+   window.dispatchEvent(new CustomEvent('an-world-directory-updated',{detail:{count:U.length,source:'snapshot'}}));
+   if(location.hash.startsWith('#/universities')&&typeof renderResults==='function')renderResults();
+   if(location.hash.startsWith('#/countries')&&typeof render==='function')render();
+   return true;
+  }catch(error){window.ANWorldDirectorySnapshotError=String(error);return false;}
+ })();
+ return localSnapshotPromise;
+}
 function enrich(){
  if(typeof U==='undefined'||!Array.isArray(U))return;
  addUnique(U,seeds);
@@ -84,10 +115,11 @@ async function loadPublicDirectory(){
 function maybeLoad(){
  if(!/^#\/(universities|countries|favorites)\b/.test(location.hash))return;
  enrich();
+ loadLocalSnapshot();
  loadPublicDirectory();
 }
 window.ANWorldUniCatalogSeeds=seeds;
-window.ANWorldDirectory={addUnique,loadPublicDirectory,maybeLoad,enrich};
+window.ANWorldDirectory={addUnique,loadPublicDirectory,loadLocalSnapshot,maybeLoad,enrich};
 window.addEventListener('hashchange',maybeLoad);
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',maybeLoad,{once:true});
 else setTimeout(maybeLoad,0);
