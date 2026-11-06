@@ -8,10 +8,10 @@ const GALLERY_CACHE_KEY='an-approved-public-gallery-20261106-v1';
 function showCachedGallery(){
  try{
   const c=JSON.parse(localStorage.getItem(GALLERY_CACHE_KEY)||'null');
-  if(!c||!Number.isFinite(c.at)||Date.now()-c.at>24*60*60*1000)return;
+  if(!c||!Number.isFinite(c.at)||Date.now()-c.at>14*24*60*60*1000)return;
   stories=Array.isArray(c.stories)?c.stories.filter(x=>x&&x.approved===true):[];
   insights=Array.isArray(c.insights)?c.insights.filter(x=>x&&x.approved===true):[];
-  if(stories.length||insights.length){window.ANPublicSearchData={stories,insights};apply();}
+  if(stories.length||insights.length){snapshot=JSON.stringify({success_stories:stories,study_insights:insights});window.ANPublicSearchData={stories,insights};apply();}
  }catch(e){}
 }
 function saveCachedGallery(){
@@ -153,7 +153,7 @@ async function load(){
  if(working)return;working=true;
  try{
   const r=await fetch(ROOT+'/rest/v1/an_site_content?select=key,value&key=in.(success_stories,study_insights,countries,management)',{
-   headers:{apikey:KEY},cache:'no-store'
+   headers:{apikey:KEY},cache:'no-store',signal:AbortSignal.timeout(8500)
   });
   if(!r.ok)throw Error('Could not load public media');
   const rows=await r.json(),data={};rows.forEach(r=>data[r.key]=r.value);
@@ -165,7 +165,7 @@ async function load(){
   saveCachedGallery();
   apply();
  }catch(e){
-  if(!snapshot&&current()==='success'){
+  if(!snapshot&&!stories.length&&!insights.length&&current()==='success'){
    const msg='<div class="an-premium-empty" role="alert"><span>!</span><h2>Live content temporarily unavailable</h2><p>Could not load published posts. Check your connection and tap Refresh to try again.</p><button type="button" class="an-community-more" data-an-gallery-refresh>Refresh posts ↻</button></div>';
    ['an-insights-gallery','an-success-gallery'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=msg;});
   }else apply();
