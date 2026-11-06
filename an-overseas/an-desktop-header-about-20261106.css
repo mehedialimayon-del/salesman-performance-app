@@ -1,0 +1,218 @@
+/* A&N Overseas desktop refinements — 2026-11-06.
+   Mobile and tablet views at 800px or narrower retain their existing design. */
+@media (min-width:801px) {
+  /* Full desktop navigation: no hamburger/three-dot menu. Keep all public sections visible. */
+  .top { height:auto!important; min-height:0!important; }
+  .top .wrap {
+    display:grid!important;
+    grid-template-columns:minmax(240px,1fr) 52px 122px!important;
+    grid-template-areas:"brand favorite apply" "nav nav nav";
+    align-items:center!important;
+    column-gap:12px!important;
+    row-gap:1px!important;
+    height:auto!important;
+    min-height:0!important;
+    padding:8px clamp(14px,2vw,26px) 9px!important;
+  }
+  .top .brand { grid-area:brand; min-width:0!important; justify-self:start; }
+  .top .links {
+    grid-area:nav; display:flex!important; flex-direction:row!important;
+    justify-content:center!important; align-items:center!important;
+    flex-wrap:wrap!important; gap:5px 7px!important;
+    position:static!important; margin:0!important; padding:2px 0 0!important;
+    width:100%!important; min-width:0!important; max-height:none!important;
+    background:transparent!important; border:0!important;
+    box-shadow:none!important; overflow:visible!important;
+  }
+  .top .links a {
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:7px clamp(7px,1vw,13px)!important;
+    font-size:clamp(10px,.88vw,12px)!important;
+    line-height:1.15!important;white-space:nowrap!important;
+    border:1px solid #80532d72!important;border-radius:999px!important;
+    background:linear-gradient(135deg,#1b1b1d,#100e10)!important;
+    color:#f5e5d6!important;
+  }
+  .top .links a:hover,.top .links a.current {
+    border-color:#f5a54c!important;background:#35200f!important;color:#ffc57d!important;
+  }
+  .top .links a.current::after,.top .links a:hover::after {display:none!important}
+  .top .links a[href*="/admin"],.top .links a[href*="admin-panel"]{display:none!important}
+  .top .an-favorite-header {
+    grid-area:favorite;justify-self:center!important;align-self:center!important;
+    display:inline-flex!important;align-items:center;justify-content:center;
+    width:43px!important;min-width:43px!important;height:40px!important;
+    margin:0!important;order:0;position:relative;
+  }
+  .top .an-favorite-header svg {display:block;width:23px;height:23px}
+  .top .btn.tiny {
+    grid-area:apply;display:inline-flex!important;align-items:center!important;
+    justify-content:center!important;justify-self:stretch!important;
+    width:auto!important;min-width:0!important;white-space:nowrap!important;
+    padding:11px 9px!important;line-height:1!important;
+  }
+  .top .hamb,.top #hamb,.top .site-refresh {display:none!important}
+  body.home-view .top {flex:0 0 auto!important}
+
+  /* Restore normal browser scroll on the About summary screen. */
+  html:has(body.an-about-locked) {height:auto!important;overflow-x:hidden!important;overflow-y:auto!important}
+  body.an-about-locked {
+    position:static!important;display:block!important;
+    height:auto!important;min-height:100dvh!important;max-height:none!important;
+    overflow-x:hidden!important;overflow-y:auto!important;
+  }
+  body.an-about-locked #app {
+    display:block!important;flex:none!important;height:auto!important;max-height:none!important;
+    min-height:0!important;overflow:visible!important;
+  }
+  body.an-about-locked #app>.an-about-v3 {
+    display:flex!important;flex-direction:column!important;flex:none!important;
+    height:auto!important;max-height:none!important;min-height:0!important;
+    overflow:visible!important;
+  }
+  #app .an-about-v3 .an-about-summary,
+  #app .an-about-v3 .an-about-half,
+  #app .an-about-v3 .an-about-management,
+  #app .an-about-v3 .an-manager-card,
+  #app .an-about-v3 .an-manager-main,
+  #app .an-about-v3 .an-manager-information {
+    height:auto!important;min-height:0!important;max-height:none!important;
+    overflow:visible!important;flex:none!important;
+  }
+
+  /* About Details: one compact opening panel, then natural vertical scrolling through chapters. */
+  html:has(#an2-story),body:has(#an2-story) {
+    height:auto!important;max-height:none!important;
+    overflow-x:hidden!important;overflow-y:auto!important;
+  }
+  body:has(#an2-story) #app {
+    display:block!important;height:auto!important;max-height:none!important;overflow:visible!important;
+  }
+  body:not(.an-about-locked) #app .an2-story {
+    display:block!important;height:auto!important;max-height:none!important;
+    overflow:visible!important;width:min(1220px,calc(100% - 28px))!important;
+    padding-top:10px!important;padding-bottom:76px!important;
+  }
+  #app .an2-topline {padding:2px 2px 10px!important}
+  #app .an2-topline a {padding:6px 13px!important}
+  #app .an2-founder-hero {
+    grid-template-columns:minmax(175px,.56fr) minmax(0,1.44fr)!important;
+    gap:12px!important;min-height:0!important;height:auto!important;
+    border-radius:19px!important;
+  }
+  #app .an2-founder-brand {
+    padding:12px 0 13px 15px!important;gap:7px!important;
+  }
+  #app .an2-founder-brand img {
+    width:min(100%,175px)!important;max-height:92px!important;
+    aspect-ratio:auto!important;object-fit:contain!important;
+  }
+  #app .an2-founder-brand span {
+    font-size:9px!important;letter-spacing:.55px!important;
+  }
+  #app .an2-founder-brand strong {
+    font-size:clamp(14px,1.45vw,19px)!important;line-height:1.17!important;
+  }
+  #app .an2-founder-quote {
+    margin:9px 10px 9px 0!important;padding:11px 15px 0!important;
+    min-height:0!important;justify-content:flex-start!important;
+    border-radius:15px!important;
+  }
+  #app .an2-quote-mark {font-size:44px!important;height:25px!important;line-height:1!important}
+  #app .an2-founder-quote blockquote {
+    font-size:clamp(12px,1.12vw,14px)!important;
+    line-height:1.4!important;letter-spacing:0!important;
+  }
+  #app .an2-founder-quote .an2-quote-footer {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 152px!important;
+    gap:5px!important;align-items:end!important;
+    min-height:136px!important;margin:8px -10px 0 0!important;
+    overflow:visible!important;
+  }
+  #app .an2-founder-quote .an2-quote-sign {
+    min-height:0!important;padding:5px 0 6px!important;
+    justify-content:flex-end!important;gap:3px!important;
+  }
+  #app .an2-founder-quote .an2-flags-journey {
+    flex:0 1 auto!important;min-height:0!important;gap:4px!important;
+    justify-content:flex-end!important;overflow:visible!important;
+  }
+  #app .an2-founder-quote .an2-flags-overline {
+    font-size:8px!important;letter-spacing:.65px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags {
+    display:grid!important;grid-template-columns:repeat(9,minmax(0,1fr))!important;
+    gap:2px 4px!important;align-items:center!important;
+    justify-items:center!important;max-width:100%!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit {
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    min-height:17px!important;height:17px!important;width:100%!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home {
+    min-height:28px!important;height:28px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag {
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    width:25px!important;height:17px!important;overflow:visible!important;
+    transform-origin:left center!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home .an2-flag {
+    width:35px!important;height:23px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-emoji {display:none}
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-image {
+    display:block!important;width:100%!important;height:100%!important;
+    object-fit:cover;border-radius:2px;
+    box-shadow:0 1px 5px #0009;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-image.an2-flag-image-error {display:none!important}
+  #app .an2-founder-quote .an2-floating-flags .an2-flag:has(.an2-flag-image-error) .an2-flag-emoji,
+  #app .an2-founder-quote .an2-floating-flags .an2-flag:not(:has(img)) .an2-flag-emoji {display:inline!important}
+  #app .an2-founder-quote .an2-founder-person {
+    position:relative!important;display:block!important;
+    width:152px!important;height:136px!important;
+    min-height:0!important;max-height:none!important;
+    justify-self:end!important;align-self:end!important;
+    margin:0!important;padding:0!important;overflow:visible!important;
+  }
+  #app .an2-founder-quote .an2-founder-person img {
+    position:absolute!important;display:block!important;
+    width:145px!important;height:auto!important;
+    right:-2px!important;left:auto!important;top:auto!important;bottom:1px!important;
+    max-width:none!important;max-height:none!important;
+    object-fit:contain!important;filter:none!important;
+  }
+  #app .an2-nav {top:113px!important;scroll-margin-top:115px!important}
+  #app .an2-intro-section,#app .an2-story-chapter,
+  #app .an2-all-services,#app .an2-future,#app .an2-platform {
+    scroll-margin-top:154px!important;
+  }
+}
+@media (min-width:1450px) {
+  .top .wrap {
+    grid-template-columns:minmax(250px,285px) minmax(0,1fr) 52px 122px!important;
+    grid-template-areas:"brand nav favorite apply";
+    gap:7px!important;padding-top:11px!important;padding-bottom:11px!important;
+  }
+  .top .links {flex-wrap:nowrap!important;gap:2px!important}
+  .top .links a {padding:8px 5px!important;font-size:10px!important}
+  #app .an2-nav {top:78px!important}
+}
+@media (min-width:801px) and (max-height:720px) {
+  #app .an2-story {padding-top:6px!important}
+  #app .an2-founder-quote {padding-top:8px!important}
+  #app .an2-founder-quote .an2-quote-footer{min-height:120px!important}
+  #app .an2-founder-quote .an2-founder-person{height:120px!important}
+  #app .an2-founder-quote .an2-founder-person img{width:132px!important}
+  #app .an2-founder-brand img{max-height:78px!important}
+}
+@media (max-width:800px) {
+  /* On mobile, keep the existing native emoji flags and layout unchanged. */
+  #app .an2-founder-quote .an2-flag-image {display:none!important}
+  #app .an2-founder-quote .an2-flag-emoji {display:inline!important}
+}
+@media (prefers-reduced-motion:reduce) {
+  #app .an2-floating-flags .an2-flag {animation:none!important}
+}
