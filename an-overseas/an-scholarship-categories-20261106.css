@@ -12,8 +12,16 @@ html:has(body.an-scholarship-detail-view){
 body.an-scholarship-detail-view{
  position:static!important;display:block!important;
  height:auto!important;min-height:100dvh!important;max-height:none!important;
- overflow-x:hidden!important;overflow-y:auto!important;
+ overflow-x:clip!important;overflow-y:visible!important;
  overscroll-behavior-y:auto!important;touch-action:pan-y pinch-zoom!important;
+}
+/* Keep the site navigation visible while the document scrolls.
+ * The body must not become a second scrolling container: overflow-x:hidden
+ * would turn overflow-y:visible into auto and defeat position:sticky. */
+body.an-scholarship-detail-view > header.top{
+ position:sticky!important;
+ top:0!important;
+ z-index:1000!important;
 }
 body.an-scholarship-detail-view #app{
  display:block!important;position:static!important;flex:none!important;
