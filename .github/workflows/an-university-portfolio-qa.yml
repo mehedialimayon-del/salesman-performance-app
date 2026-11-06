@@ -51,7 +51,7 @@ jobs:
                 bachelor:!!document.querySelector('.an-guide-degree-box:nth-child(1)'),
                 master:!!document.querySelector('.an-guide-degree-box:nth-child(2)'),
                 phd:!!document.querySelector('.an-guide-degree-box:nth-child(3)'),
-                support:!!document.getElementById('an-guide-support')||!!document.getElementById('an-university-support'),
+                support:!!document.getElementById('an-guide-support')||!!document.getElementById('an-university-support')||!!document.getElementById('profile-support'),
                 degreeSection:!!document.getElementById('profile-degree'),
                 linkCount:document.querySelectorAll('.an-guide-actions a').length
               }));
