@@ -330,7 +330,201 @@ html body #app .an2-founder-quote .an2-floating-flags .an2-flag-unit:not(.an2-fl
  width:24px!important;height:17px!important;max-width:24px!important;
  animation:none!important;transform:none!important;font-size:15px!important;
 }
-</style><link rel="stylesheet" href="an-final-precision-20261106.css?v=20261106-desktop-services-fullbleed-v3"></head>
+</style><link rel="stylesheet" href="an-final-precision-20261106.css?v=20261106-desktop-services-fullbleed-v3"><style id="an-owner-founder-layout-20261106-v1">
+/* an-owner-founder-layout-20261106-v1
+   About Details only. Separate laptop vs mobile sizing; keep the existing
+   transparent Nusrat portrait (including its embedded NUSRAT NASRIN name). */
+html body #app .an2-founder-quote,
+html body #app .an2-founder-hero { overflow:visible!important; }
+html body #app .an2-founder-quote .an2-quote-footer{
+  position:relative!important;display:grid!important;
+  padding-right:0!important;padding-bottom:0!important;overflow:visible!important;
+}
+html body #app .an2-founder-quote .an2-quote-sign{
+  position:relative!important;z-index:2!important;min-width:0!important;
+}
+html body #app .an2-founder-quote .an2-flags-journey{
+  width:100%!important;max-width:none!important;min-height:0!important;
+  justify-content:flex-start!important;align-items:stretch!important;
+}
+html body #app .an2-founder-quote .an2-floating-flags {
+  display:grid!important;grid-auto-flow:row!important;
+  align-content:start!important;justify-items:center!important;
+  width:100%!important;max-width:100%!important;
+}
+html body #app .an2-founder-quote .an2-floating-flags .an2-flag-unit{
+  display:flex!important;width:100%!important;max-width:none!important;
+  grid-column:auto!important;align-items:center!important;justify-content:center!important;
+  min-width:0!important;
+}
+html body #app .an2-founder-quote .an2-floating-flags .an2-flag {
+  flex:none!important;max-width:100%!important;animation:none!important;
+  transform:none!important;
+}
+html body #app .an2-founder-quote .an2-founder-person{
+  display:block!important;position:relative!important;z-index:1!important;
+  top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;
+  align-self:end!important;justify-self:end!important;
+  max-width:none!important;max-height:none!important;min-height:0!important;
+  margin:0!important;padding:0!important;background:transparent!important;
+  overflow:visible!important;
+}
+html body #app .an2-founder-quote .an2-founder-person img{
+  display:block!important;position:absolute!important;
+  top:auto!important;left:auto!important;bottom:0!important;
+  width:auto;height:auto!important;min-width:0!important;
+  max-width:none!important;max-height:none!important;
+  object-fit:contain!important;object-position:right bottom!important;
+  opacity:1!important;visibility:visible!important;
+  filter:none!important;transform:none!important;
+  -webkit-mask-image:none!important;mask-image:none!important;
+}
+html body #app .an2-founder-quote .an2-founder-person figcaption{display:none!important}
+
+/* LAPTOP / DESKTOP — do not reuse the small mobile typography. */
+@media (min-width:801px){
+  html body .top .logo-motion,html body .top .logo-crop {
+    width:63px!important;height:53px!important;
+  }
+  html body .top .logo-crop img {width:189px!important;height:51px!important}
+  html body #app .an2-founder-hero{
+    grid-template-columns:minmax(205px,.54fr) minmax(0,1.46fr)!important;
+    gap:18px!important;min-height:650px!important;height:auto!important;
+  }
+  html body #app .an2-founder-brand {
+    padding:23px 0 23px 23px!important;
+  }
+  html body #app .an2-founder-brand img{
+    width:min(100%,238px)!important;max-height:154px!important;
+  }
+  html body #app .an2-founder-brand strong{
+    font-size:clamp(19px,1.7vw,24px)!important;
+    line-height:1.3!important;
+  }
+  html body #app .an2-founder-quote{
+    margin:15px 16px 15px 0!important;
+    padding:20px 23px 0!important;
+    min-height:0!important;justify-content:flex-start!important;
+  }
+  html body #app .an2-quote-mark {font-size:65px!important;height:37px!important}
+  html body #app .an2-founder-quote blockquote{
+    font-size:clamp(17px,1.46vw,21px)!important;
+    line-height:1.55!important;letter-spacing:0!important;
+    padding-right:clamp(18px,3vw,55px)!important;
+  }
+  html body #app .an2-founder-quote .an2-quote-footer{
+    grid-template-columns:minmax(0,1fr) clamp(250px,28%,315px)!important;
+    min-height:350px!important;
+    gap:10px!important;
+    margin:20px -13px 0 0!important;
+    align-items:end!important;
+  }
+  html body #app .an2-founder-quote .an2-quote-sign {
+    align-self:stretch!important;
+    padding:13px 0 8px!important;
+    justify-content:flex-start!important;
+  }
+  html body #app .an2-founder-quote .an2-floating-flags{
+    grid-template-columns:repeat(7,minmax(0,1fr))!important;
+    gap:8px 9px!important;
+  }
+  html body #app .an2-founder-quote .an2-floating-flags .an2-flag-unit{
+    min-height:30px!important;height:30px!important;
+  }
+  html body #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home{
+    grid-column:span 2!important;min-height:40px!important;height:40px!important;
+  }
+  html body #app .an2-founder-quote .an2-floating-flags .an2-flag{
+    width:38px!important;height:26px!important;font-size:27px!important;
+    max-width:100%!important;
+  }
+  html body #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home .an2-flag{
+    width:56px!important;height:36px!important;max-width:100%!important;
+    font-size:38px!important;
+  }
+  html body #app .an2-founder-quote .an2-founder-person{
+    width:clamp(250px,28vw,315px)!important;height:350px!important;
+  }
+  html body #app .an2-founder-quote .an2-founder-person img{
+    width:clamp(325px,29vw,405px)!important;right:-12px!important;
+  }
+  html body #app .an2-founder-quote .an2-founder-message-label {
+    font-size:11px!important;line-height:1.45!important;
+  }
+}
+/* PHONE / TABLET — bigger portrait, raised head, bottom name remains visible. */
+@media (max-width:800px){
+  html body #app .an2-founder-brand img{
+    width:clamp(115px,30vw,142px)!important;max-height:126px!important;
+    object-fit:contain!important;
+  }
+  html body #app .an2-founder-quote{
+    padding-bottom:0!important;
+  }
+  html body #app .an2-founder-quote .an2-quote-footer{
+    grid-template-columns:minmax(0,1fr) clamp(158px,44%,206px)!important;
+    min-height:395px!important;
+    gap:3px!important;
+    margin:17px -16px 0 0!important;
+    align-items:end!important;
+  }
+  html body #app .an2-founder-quote .an2-quote-sign{
+    align-self:stretch!important;
+    padding:12px 0 7px!important;
+    justify-content:flex-start!important;
+  }
+  html body #app .an2-founder-quote .an2-floating-flags {
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:6px 4px!important;
+  }
+  html body #app .an2-founder-quote .an2-floating-flags .an2-flag-unit{
+    min-height:26px!important;height:26px!important;
+  }
+  html body #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home{
+    grid-column:span 2!important;min-height:39px!important;height:39px!important;
+  }
+  html body #app .an2-founder-quote .an2-floating-flags .an2-flag{
+    width:31px!important;height:21px!important;font-size:22px!important;
+  }
+  html body #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home .an2-flag{
+    width:51px!important;height:34px!important;font-size:35px!important;
+  }
+  html body #app .an2-founder-quote .an2-founder-person {
+    width:clamp(158px,44vw,206px)!important;
+    height:395px!important;
+  }
+  html body #app .an2-founder-quote .an2-founder-person img {
+    width:clamp(408px,119vw,520px)!important;right:-72px!important;
+  }
+  html body #app .an2-founder-quote .an2-founder-message-label{
+    font-size:10px!important;line-height:1.45!important;
+  }
+}
+@media (min-width:651px) and (max-width:800px){
+  html body #app .an2-founder-quote .an2-quote-footer{min-height:420px!important}
+  html body #app .an2-founder-quote .an2-founder-person{height:420px!important}
+  html body #app .an2-founder-quote .an2-floating-flags{
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  }
+  html body #app .an2-founder-quote .an2-founder-person img {
+    width:clamp(420px,66vw,540px)!important;right:-43px!important;
+  }
+}
+@media (max-width:380px){
+  html body #app .an2-founder-quote .an2-quote-footer{
+    grid-template-columns:minmax(0,1fr) 153px!important;
+  }
+  html body #app .an2-founder-quote .an2-founder-person{
+    width:153px!important;
+  }
+  html body #app .an2-founder-quote .an2-founder-person img{
+    width:408px!important;right:-76px!important;
+  }
+  html body #app .an2-founder-quote .an2-floating-flags{
+    gap:5px 2px!important;
+  }
+}
+</style></head>
 <body><header class="top"><div class="wrap"><a class="brand" href="#/home" aria-label="A&N Overseas Home"><span class="logo-motion" aria-hidden="true"><span class="logo-crop"><img src="assets/brand-logo.jpg" alt=""></span></span><span class="brand-copy"><strong id="brand-typing" aria-hidden="true">A&N Overseas</strong><small>EDUCATION & CONSULTANCY</small></span></a><nav class="links" id="links" aria-label="Main menu"><a href="#/home">HOME</a><a href="#/about">ABOUT US</a><a href="#/services">OUR SERVICES</a><a href="./index.html?hub_refresh=20261103-fresh-1#/success">STUDY &amp; SUCCESS HUB</a><a href="#/countries">COUNTRIES</a><a href="#/universities">UNIVERSITIES</a><a href="#/scholarships">SCHOLARSHIPS</a><a href="#/login">STUDENT LOGIN</a><a href="#/contact">CONTACT</a></nav><a class="an-desktop-login" href="#/login" aria-label="Student login">LOGIN ↗</a><a class="btn tiny" href="#/apply">Apply Now ↗</a><a class="an-favorite-header" href="#/favorites" aria-label="Open saved universities" title="Saved universities"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"/></svg><span class="an-favorite-count" data-favorite-count>0</span></a><button type="button" id="site-refresh" class="site-refresh" aria-label="Refresh website" title="Refresh website">↻</button><button class="hamb" id="hamb" aria-label="Open menu" aria-expanded="false">☰</button></div></header><div id="app"></div><footer class="footer"><div class="wrap"><div class="footer-layout"><div><a class="brand" href="#/home"><img class="brand-logo" src="assets/brand-logo.jpg" alt="A&N Overseas Education & Consultancy"></a><p>Personalised education consultancy for students planning their study abroad journey, from choosing a programme to arrival support.</p></div><div><h4>Explore</h4><a href="#/countries">Destinations</a><a href="#/universities">Universities</a><a href="#/services">Services</a><a href="#/apply">Apply Now</a></div><div><h4>Student Portal</h4><a href="#/register">Register</a><a href="#/login">Login</a><a href="#/dashboard">Dashboard preview</a><a href="#/tracking">EMGS progress preview</a></div><div><h4>Our Offices</h4><p>📍 Kuala Lumpur, Malaysia<br>📍 Rangpur, Bangladesh</p><p>For the latest contact details, please use our contact page.</p></div></div><div class="copyright">© <span id="year"></span> A&N Overseas Education & Consultancy · Designed for your future</div></div></footer><div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script src="university-profiles.js?v=20261105-loader-v5"></script>
 <script src="europe-catalog.js?v=20261101-sourced-525"></script><script src="university-contacts.js?v=20261105-official-contacts-v1"></script><script src="university-guide.js?v=20261106-photo-credit-v8"></script><script src="an-asia-verified-media.js?v=20261106-malaysia-three-verified-v2"></script><script src="an-asia-commons-media.js?v=20261106-commons-57-v1"></script><script src="an-asia-supplementary-logos.js?v=20261106-official-421-v1"></script><script src="an-asia-institution-icons.js?v=20261106-identities-106-v1"></script><script src="an-asia-commons-additional.js?v=20261106-commons-13-v2"></script><script src="an-university-media.js?v=20261106-final-asia-v20"></script><script src="an-world-directory-packed.js?v=20261106-snapshot-v1"></script><script src="an-global-universities.js?v=20261106-snapshot-v4"></script><script src="an-student-country-data.js?v=20261105-work-family-v4"></script><script src="an-student-guide.js?v=20261105-guide-v3"></script>
