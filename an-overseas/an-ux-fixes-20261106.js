@@ -80,8 +80,8 @@ function ensureRoute(){
  for(const [cls,route] of [['an-contact-mode','contact'],['an-about-details-mode','aboutdetails'],['an-countries-mode','countries'],['an-universities-mode','universities'],['an-scholarships-mode','scholarships']]){
   document.body.classList.toggle(cls,page===route);
  }
- if(page==='contact'&&!document.querySelector('#app .an-contact-content')&&typeof window.contactPage==='function'){
-  const html=window.contactPage();
+ if(page==='contact'&&!document.querySelector('#app .an-contact-content')&&typeof window.ANCompactContactPage==='function'){
+  const html=window.ANCompactContactPage();
   if(typeof html==='string'&&html.includes('an-contact-content')){
    const app=document.getElementById('app');if(app)app.innerHTML=html;
   }
