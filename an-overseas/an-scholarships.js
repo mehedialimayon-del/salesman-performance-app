@@ -118,6 +118,20 @@ function featureCard(p){
  const acronym=p.name.split(/[ ·-]/).filter(Boolean).slice(0,3).map(v=>v[0]).join('').toUpperCase();
  return '<a class="an-feature-scholarship" href="#/scholarship/'+esc(p.id)+'" title="Open '+esc(p.name)+' funding details">'+coverPhoto(p,'an-feature-photo')+'<span class="an-feature-main"><span class="an-feature-tag">'+flagPhoto(p)+esc(p.country)+'</span><strong>'+esc(p.name)+'</strong><small>'+esc(p.level)+' · '+esc(p.amount==null?'Funding by official award':amountText(p))+'</small></span><span class="an-feature-arrow" aria-hidden="true">↗</span></a>';
 }
+const meritIds=new Set([
+ 'it-padua-excellence-ba','it-padua-excellence-ma','it-padua-fee-waiver',
+ 'it-cafoscari-honours-ba','it-cafoscari-honours-ma',
+ 'it-cafoscari-college-ba','it-cafoscari-college-ma',
+ 'lt-vu-masters-fee','lt-vu-political-ma','lt-vu-political-ba','lt-vu-feba-admission',
+ 'lt-vtech-ba-full','lt-vtech-ba-partial'
+]);
+const isMerit=p=>p.id.startsWith('my-')||meritIds.has(p.id);
+function scholarshipRail(id,heading,subtitle){
+ return '<section class="an-scholarship-rail-section" aria-label="'+esc(heading)+'">'+
+ '<div class="an-scholarship-rail-header"><div><span class="an-scholarship-rail-eyebrow">'+(id==='an-global-rail'?'01 / INTERNATIONAL FUNDING':'02 / ACADEMIC PERFORMANCE')+'</span><h2>'+esc(heading)+'</h2><p>'+esc(subtitle)+'</p></div>'+
+ '<div class="an-scholarship-rail-nav"><button type="button" data-scholarship-slide="'+id+'" data-dir="-1" aria-label="Previous scholarships">‹</button><button type="button" data-scholarship-slide="'+id+'" data-dir="1" aria-label="Next scholarships">›</button></div></div>'+
+ '<div class="an-scholarship-rail an-scholarship-grid" id="'+id+'" tabindex="0" role="region" aria-label="'+esc(heading)+' scholarship cards"></div></section>';
+}
 function listPage(){
  const countries=['All destinations',...new Set(items.map(p=>p.country))].sort((a,b)=>a==='All destinations'?-1:b==='All destinations'?1:a.localeCompare(b));
  const degrees=['All degrees','Bachelor','Master','PhD','Research','Professional','Exchange','Training'];
@@ -128,15 +142,25 @@ function listPage(){
  '<details class="an-scholarship-about"><summary>About academic funding, eligibility & latest calls <span>⌄</span></summary><p>Scholarships for Bangladeshi applicants, with separate funding levels and programme-specific eligibility. Amounts, deadlines and university choices are controlled by each official annual call. Funding amounts and exchange rates are approximate planning figures.</p><p>🌍 '+(countries.length-1)+' destination groups · 🇧🇩 BDT planning rates dated 05 Nov 2026.</p></details>'+
  '<div class="an-scholarship-filters"><label>SEARCH FUNDING / COUNTRY<input id="an-scholarship-search" type="search" autocomplete="off" placeholder="e.g. DAAD, PhD, Erasmus, Japan…" value="'+esc(filters.search)+'"></label><label>DESTINATION<select id="an-scholarship-country">'+countries.map(c=>'<option'+(filters.country===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></label><label>DEGREE LEVEL<select id="an-scholarship-level">'+degrees.map(x=>'<option'+(filters.level===x?' selected':'')+'>'+esc(x)+'</option>').join('')+'</select></label></div>'+
  '<div class="an-scholarship-meta"><strong id="an-scholarship-count"></strong><span>Official sources in each profile</span></div>'+
- '<div id="an-scholarship-results" class="an-scholarship-grid"></div>'+
+ scholarshipRail('an-global-rail','International & Research Funding','Government, university and research funding pathways for eligible Bangladeshi applicants.')+scholarshipRail('an-merit-rail','Intake, Semester & Merit Scholarships','University admission awards, CGPA progression, semester results and tuition-fee reductions.')+
  '<p class="an-scholarship-info">Exchange-rate note: <a href="'+BANK+'" target="_blank" rel="noopener noreferrer">Bangladesh Bank, 05 November 2026</a> provides base USD and major currency BDT rates; HUF, TRY, KRW, MYR, RON, AZN, TWD, AED, HKD, QAR and BND use approximate planning estimates. Amount in BDT is a translation of the published award amount, not an extra payment. Exchange rates change, amounts can be revised, and programme funding is not a living-cost guarantee. A source link is not proof that the current application cycle is open.</p></main>';
 }
 function refreshList(){
- const target=document.getElementById('an-scholarship-results'),count=document.getElementById('an-scholarship-count');if(!target)return;
- const q=easy(filters.search),filtered=items.filter(p=>(filters.country==='All destinations'||p.country===filters.country)&&(filters.level==='All degrees'||p.level.toLowerCase().includes(filters.level.toLowerCase()))&&(!q||easy([p.name,p.country,p.level,p.coverage,p.eligibility].join(' ')).includes(q)));
- target.innerHTML=filtered.length?filtered.map(p=>card(p,items.indexOf(p))).join(''):'<div class="an-scholarship-info">No matching scholarships. Try another country, degree or keyword.</div>';
- if(count)count.textContent='Showing '+filtered.length+' of '+items.length+' scholarship/funding cards';
+ const q=easy(filters.search);
+ const eligible=items.filter(p=>(filters.country==='All destinations'||p.country===filters.country)&&
+   (filters.level==='All degrees'||p.level.toLowerCase().includes(filters.level.toLowerCase()))&&
+   (!q||easy([p.name,p.country,p.level,p.coverage,p.eligibility].join(' ')).includes(q)));
+ const global=eligible.filter(p=>!isMerit(p)),merit=eligible.filter(isMerit);
+ for(const [id,group] of [['an-global-rail',global],['an-merit-rail',merit]]){
+  const el=document.getElementById(id);if(!el)continue;
+  el.innerHTML=group.length?group.map(p=>card(p,items.indexOf(p))).join(''):'<div class="an-scholarship-rail-empty">No matching scholarship in this category. Change the search or filters.</div>';
+  const section=el.closest('.an-scholarship-rail-section');
+  if(section)section.hidden=!group.length;
+ }
+ const counter=document.getElementById('an-scholarship-count');
+ if(counter)counter.textContent='Showing '+eligible.length+' of '+items.length+' funding pathways · '+global.length+' international / research · '+merit.length+' merit / intake / semester';
 }
+
 const section=(n,title,content)=>'<section class="an-scholarship-section"><h2><span>'+String(n).padStart(2,'0')+'</span> · '+esc(title)+'</h2><p>'+esc(content)+'</p></section>';
 function hostCards(p){
  const names=p.universities||[];
@@ -188,6 +212,12 @@ function onRender(page,second){
   if(container&&!container.querySelector('.an-scholarship-page-shortcut'))container.insertAdjacentHTML('afterbegin','<p><a class="an-scholarship-page-shortcut" href="#/scholarships">🎓 Scholarships · Explore academic funding ↗</a></p>');
  }
 }
+document.addEventListener('click',e=>{
+ const b=e.target.closest?.('[data-scholarship-slide]');
+ if(!b)return;
+ const rail=document.getElementById(b.dataset.scholarshipSlide);
+ if(rail)rail.scrollBy({left:(Number(b.dataset.dir)||1)*Math.max(280,rail.clientWidth*.8),behavior:'smooth'});
+});
 document.addEventListener('input',e=>{
  if(e.target.id==='an-scholarship-search'){filters.search=e.target.value;refreshList();}
 });
@@ -204,5 +234,5 @@ document.addEventListener('click',e=>{
  const link=e.target.closest('[data-scholarships-only]');
  if(link){e.preventDefault();location.hash='#/scholarships';}
 });
-window.ANScholarships={items,listPage,detailPage,addKnownUniversities,onRender,refreshList,approx,bdt};
+window.ANScholarships={items,listPage,detailPage,addKnownUniversities,onRender,refreshList,approx,bdt,isMerit};
 })();
