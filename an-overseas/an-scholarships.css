@@ -267,3 +267,9 @@
  .an-feature-scholarship{min-height:93px}
  .an-feature-main strong{font-size:10px}
 }
+
+/* Safe image stacking order: photos remain visible over the fallback background. */
+.an-feature-photo{z-index:0!important}
+.an-feature-scholarship:before{z-index:1!important}
+.an-feature-main,.an-feature-arrow{position:relative;z-index:2!important}
+.an-feature-arrow{position:absolute}
