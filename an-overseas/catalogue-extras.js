@@ -31,7 +31,7 @@ universitiesPage=function(){
  +'<div class="wrap content university-catalogue"><div class="an-university-directory-bar"><strong id="an-global-count">'+U.length.toLocaleString('en-US')+' universities in our world directory</strong><a href="#/favorites" class="an-directory-fav">♡ Saved universities <b data-favorite-count>0</b></a></div>'
  +'<div class="catalogue-tools"><label class="catalogue-search"><span>⌕</span><input id="university-search" type="search" value="'+esc(searchTerm)+'" placeholder="Search university or course" aria-label="Search universities"></label>'
  +'<details class="catalogue-filter"><summary aria-label="Filter universities" title="Filter universities">☷ <span class="filter-word">Filters</span></summary><div class="catalogue-filter-panel">'+controls+'</div></details>'
- +'<div class="an-scholarship-category-wrap"><button type="button" id="an-scholarship-category-toggle" class="an-scholarship-only an-scholarship-page-shortcut" aria-expanded="false" aria-controls="an-scholarship-category-panel" title="Filter by scholarship type" aria-label="Choose scholarship type">🎓</button><div class="an-scholarship-category-panel" id="an-scholarship-category-panel" hidden><h3>Scholarship Types</h3><p>Only confirmed named host universities are shown. Country eligibility is not an automatic university scholarship.</p><button type="button" data-scholarship-category="" aria-pressed="true">All universities</button><button type="button" data-scholarship-category="international" aria-pressed="false">International &amp; Research</button><button type="button" data-scholarship-category="merit" aria-pressed="false">Academic / Merit</button><button type="button" data-scholarship-category="full" aria-pressed="false">Fully Funded</button><button type="button" data-scholarship-category="tuition" aria-pressed="false">Tuition Discounts / Waivers</button><a href="#/scholarships">Explore all scholarship pathways ↗</a></div></div><a class="an-catalogue-favourites" href="#/favorites" aria-label="Open Saved Universities" title="Saved universities">♥<span data-favorite-count>0</span></a></div>'
+ +'<div class="an-scholarship-category-wrap"><button type="button" id="an-scholarship-category-toggle" class="an-scholarship-only an-scholarship-page-shortcut'+(scholarshipCategory?' an-category-active':'')+'" aria-expanded="false" aria-controls="an-scholarship-category-panel" title="Filter by scholarship type" aria-label="Choose scholarship type">🎓</button><div class="an-scholarship-category-panel" id="an-scholarship-category-panel" hidden><h3>Scholarship Types</h3><p>Only confirmed named host universities are shown. Country eligibility is not an automatic university scholarship.</p><button type="button" data-scholarship-category="" aria-pressed="'+(!scholarshipCategory)+'">All universities</button><button type="button" data-scholarship-category="international" aria-pressed="'+(scholarshipCategory==='international')+'">International &amp; Research</button><button type="button" data-scholarship-category="merit" aria-pressed="'+(scholarshipCategory==='merit')+'">Academic / Merit</button><button type="button" data-scholarship-category="full" aria-pressed="'+(scholarshipCategory==='full')+'">Fully Funded</button><button type="button" data-scholarship-category="tuition" aria-pressed="'+(scholarshipCategory==='tuition')+'">Tuition Discounts / Waivers</button><a href="#/scholarships">Explore all scholarship pathways ↗</a></div></div><a class="an-catalogue-favourites" href="#/favorites" aria-label="Open Saved Universities" title="Saved universities">♥<span data-favorite-count>0</span></a></div>'
  +'<div id="catalogue-count" class="catalogue-count" aria-live="polite"></div><div id="results" class="grid"></div>'
  +'<p class="catalogue-footnote">Malaysia entries include institutions from the MQA register; its accreditation applies to specific programmes and may change. Institution listing does not establish eligibility for international enrolment. This directory also contains other sourced and unverified entries and is not an A&N partner list. Check the official university website, exact programme, recognition, application fee and any scholarship offer before applying. Published example fees are not comparable across different durations or currencies. QS 2027 ranks are shown only for institutions with verified ranking data; institutions without a confirmed QS rank follow ranked universities within their country.</p></div>';
 };
@@ -230,6 +230,34 @@ document.addEventListener('input',e=>{
 document.addEventListener('click',e=>{
  if(e.target.closest('#load-more-universities')){visibleLimit+=80;renderResults();}
  if(e.target.id==='reset-university-filters'){pref={kind:'All Types',level:'All Levels',subject:'All Subjects',currency:'Any currency',minFee:'',maxFee:'',order:'Country → QS ranking',requirement:''};filterCountry='All Countries';searchTerm='';scholarshipOnly=false;scholarshipCategory='';render();}
+},true);
+/* Persist scholarship category UI across university page rebuilds.
+   Capture events to prevent stale page-level listeners from toggling twice. */
+document.addEventListener('click',function(event){
+ if(!document.body.classList.contains('an-universities-mode'))return;
+ const toggle=event.target.closest?.('#an-scholarship-category-toggle');
+ const option=event.target.closest?.('#an-scholarship-category-panel [data-scholarship-category]');
+ if(!toggle&&!option)return;
+ const btn=document.getElementById('an-scholarship-category-toggle');
+ const panel=document.getElementById('an-scholarship-category-panel');
+ if(!btn||!panel)return;
+ event.preventDefault();
+ event.stopImmediatePropagation();
+ if(toggle){
+   panel.hidden=!panel.hidden;
+   btn.setAttribute('aria-expanded',String(!panel.hidden));
+   return;
+ }
+ scholarshipCategory=option.getAttribute('data-scholarship-category')||'';
+ const chosen=option.textContent.trim();
+ panel.querySelectorAll('[data-scholarship-category]').forEach(b=>
+  b.setAttribute('aria-pressed',String(b===option)));
+ btn.classList.toggle('an-category-active',!!scholarshipCategory);
+ btn.setAttribute('aria-expanded','false');
+ btn.setAttribute('aria-label',scholarshipCategory?'Filter: '+chosen:'Choose scholarship type');
+ btn.title=scholarshipCategory?'Selected: '+chosen:'Choose scholarship type';
+ panel.hidden=true;
+ renderResults();
 },true);
 window.ANCatalogueExtras={priority,countryIndex,globalSerial,anNumberedCard,verifiedRank,rankingCompare};
 /* Owner-managed PUBLIC information, published by updating site-content.json in GitHub. */
