@@ -1,0 +1,74 @@
+name: FieldForce Direct Zone and SR QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ffh-direct-filters.js'
+      - 'ffh-direct-filters.css'
+      - 'reports-ui.js'
+      - 'staff-photos.js'
+      - 'index.html'
+      - 'tests/direct-filters.cjs'
+      - 'tests/direct-filters-browser.cjs'
+      - '.github/workflows/ffh-direct-zone-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scope-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Syntax checks
+        run: |
+          node --check ffh-direct-filters.js
+          node --check reports-ui.js
+          node --check staff-photos.js
+          node --check tests/direct-filters.cjs
+          node --check tests/direct-filters-browser.cjs
+      - name: Zone / Combined / Manager and report regression
+        run: |
+          node tests/direct-filters.cjs
+          node tests/reports-filtered.cjs
+          node tests/company-roster.cjs
+          node tests/staff-photos-dom.cjs
+      - name: Install Chromium runner
+        run: npm install --no-save playwright@1.58.2
+      - name: Mobile Chromium scope-width and selection test
+        env:
+          FFH_CHROMIUM: /usr/bin/google-chrome
+        run: node tests/direct-filters-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: direct-zone-mobile-qa
+          path: /tmp/ffh-direct-filter-*.png
+          if-no-files-found: ignore
+      - name: Verify GitHub Pages deployment when published
+        continue-on-error: true
+        run: |
+          node - <<'NODE'
+          const url='https://mehedialimayon-del.github.io/salesman-performance-app/';
+          (async()=>{
+            for(let attempt=0;attempt<12;attempt++){
+              try{
+                const r=await fetch(url+'?scope_qa='+Date.now(),{headers:{'cache-control':'no-cache'}});
+                const html=await r.text();
+                if(r.ok&&html.includes('ffh-direct-filters.js?v=20261106-direct-zone-1')){
+                  const asset=await fetch(new URL('ffh-direct-filters.js?v=20261106-direct-zone-1',url));
+                  if(asset.ok&&(await asset.text()).includes('ffDirectScopeFields')){
+                    console.log('PASS published live HTML and new direct filter asset HTTP 200');
+                    return;
+                  }
+                }
+              }catch(e){console.warn('Live check attempt:',e.message)}
+              await new Promise(resolve=>setTimeout(resolve,10000));
+            }
+            throw new Error('GitHub Pages had not published the latest direct selectors yet');
+          })().catch(e=>{console.error(e);process.exitCode=1;});
+          NODE
