@@ -174,3 +174,94 @@ html body .top .an-favorite-header::before {color:#f4264a!important;animation:no
  #app .an-application-walkthrough ol{grid-template-columns:1fr!important}
  #app .an-application-walkthrough li{font-size:12px!important}
 }
+
+/* Desktop-only: Services cards as full-bleed photo backgrounds (2026-11-06). */
+@media (min-width:801px) {
+  body.an-services-mode #app .an-journey-services .an-service-card {
+    position:relative!important;
+    isolation:isolate!important;
+    overflow:hidden!important;
+    background:#090d11!important;
+    border:1px solid #a96a32!important;
+  }
+  body.an-services-mode #app .an-journey-services .an-service-card .an-service-picture {
+    position:absolute!important;
+    inset:0!important;
+    top:0!important;
+    right:0!important;
+    bottom:0!important;
+    left:0!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:100%!important;
+    max-height:none!important;
+    flex:none!important;
+    z-index:0!important;
+    overflow:hidden!important;
+    background:#17110b!important;
+    pointer-events:none!important;
+  }
+  body.an-services-mode #app .an-journey-services .an-service-card .an-service-picture img {
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    max-height:none!important;
+    object-fit:cover!important;
+    object-position:center!important;
+    filter:brightness(.88) contrast(1.07)!important;
+    transform:none;
+    transition:transform .3s ease,filter .3s ease;
+  }
+  body.an-services-mode #app .an-journey-services .an-service-card .inside {
+    position:relative!important;
+    z-index:1!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    flex:1 1 auto!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:flex-end!important;
+    padding:9px 10px 8px!important;
+    background:linear-gradient(180deg,rgba(5,7,11,.04) 0%,rgba(4,7,10,.35) 20%,rgba(4,7,10,.81) 61%,rgba(4,6,9,.94) 100%)!important;
+    overflow:hidden!important;
+  }
+  body.an-services-mode #app .an-journey-services .an-service-card h3 {
+    color:#fff!important;
+    font-weight:850!important;
+    text-shadow:0 1px 4px #000,0 2px 8px #000!important;
+  }
+  body.an-services-mode #app .an-journey-services .an-service-card h3 span {
+    color:#ffb04b!important;
+  }
+  body.an-services-mode #app .an-journey-services .an-service-card p {
+    color:#fff!important;
+    text-shadow:0 1px 3px #000!important;
+    opacity:1!important;
+  }
+  body.an-services-mode #app .an-journey-services .an-service-card .an-service-go {
+    position:relative!important;
+    z-index:2!important;
+    width:100%!important;
+    box-sizing:border-box!important;
+    color:#ffd095!important;
+    background:rgba(15,9,6,.83)!important;
+    border:1px solid rgba(255,169,83,.84)!important;
+    font-weight:850!important;
+    text-shadow:0 1px 2px #000!important;
+  }
+  body.an-services-mode #app .an-journey-services .an-service-card:hover .an-service-picture img,
+  body.an-services-mode #app .an-journey-services .an-service-card:focus-within .an-service-picture img {
+    transform:scale(1.04)!important;
+  }
+  body.an-services-mode #app .an-journey-services .an-service-card .an-service-go:hover,
+  body.an-services-mode #app .an-journey-services .an-service-card .an-service-go:focus-visible {
+    color:#140b05!important;
+    background:#ffa42c!important;
+    text-shadow:none!important;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  body.an-services-mode #app .an-service-picture img {transition:none!important;}
+}
