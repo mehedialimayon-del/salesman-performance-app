@@ -160,15 +160,19 @@
     min-height:23px!important;flex:0 0 auto!important;border-radius:7px!important;
   }
 }
+/* Mobile: no new control over the existing logo, refresh or hamburger. */
+@media (min-width:801px){
+  body .top .links .an-mobile-global-search{display:none!important;}
+}
 @media (max-width:800px){
-  /* Existing mobile service and hub columns remain untouched. */
-  body .top .an-global-search-trigger{
-    position:absolute!important;right:50px!important;top:10px!important;
-    display:grid!important;place-items:center!important;width:31px!important;height:32px!important;
-    border:1px solid #956332!important;border-radius:9px!important;
-    background:#21170f!important;color:#ffc477!important;cursor:pointer!important;z-index:5!important;
+  body .top .an-global-search-trigger{display:none!important;}
+  body .top .links .an-mobile-global-search{
+    display:flex!important;align-items:center!important;justify-content:flex-start!important;
+    width:100%!important;min-height:39px!important;padding:10px 12px!important;
+    background:#302015!important;color:#ffd195!important;
+    border:1px solid #a46b31!important;border-radius:9px!important;
+    font:inherit!important;font-size:14px!important;font-weight:700!important;cursor:pointer!important;
   }
-  body .top .an-global-search-trigger svg{width:17px;height:17px;stroke:currentColor;fill:none}
 }
 dialog.an-site-search-dialog{
   position:fixed!important;inset:0!important;margin:auto!important;
