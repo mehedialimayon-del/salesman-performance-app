@@ -89,8 +89,10 @@ jobs:
             await visit('scholarship/erasmus-mundus');
             out.erasmus=await page.evaluate(()=>({moi:!!document.querySelector('.an-moi-badge:not(.no):not(.unknown)'),
              help:!!document.querySelector('#an-scholarship-help #contact-form'),
-             named:document.querySelectorAll('#an-scholarship-document-guide a[href*="i-mesc"],#an-scholarship-document-guide a[href*="euroculture"]').length,
-             checklist:document.querySelectorAll('.an-specific-guide article').length}));
+             named:document.querySelectorAll('.an-specific-guide a[href*="i-mesc"]').length,
+             checklist:document.querySelectorAll('.an-specific-guide article').length,
+             unified:!!document.querySelector('#an-scholarship-complete-guide'),
+             fee:document.querySelector('.an-programme-costs')?.textContent.includes('€8,000')}));
             await visit('scholarship/daad-epos-masters');
             out.epos=await page.evaluate(()=>({courses:document.querySelectorAll('.an-epos-course').length,
              noMoi:!!document.querySelector('.an-moi-badge.no'),help:!!document.querySelector('#an-scholarship-help #contact-form'),
