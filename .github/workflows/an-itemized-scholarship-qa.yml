@@ -1,0 +1,80 @@
+name: A&N Itemized Scholarships and Founder Layout QA
+on:
+  push:
+    paths:
+      - "an-overseas/index.html"
+      - "an-overseas/an-final-precision-20261106.css"
+      - "an-overseas/an-scholarship-verified-points-20261106.js"
+      - ".github/workflows/an-itemized-scholarship-qa.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Test actual rendered desktop and phone UI
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --directory an-overseas >/tmp/an-itemized-http.log 2>&1 &
+          sleep 1
+          timeout 200s node <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');
+          (async()=>{
+            const b=await chromium.launch({headless:true,args:['--no-sandbox']});
+            let fail=false;
+            for(const [w,h] of [[375,812],[1366,768]]){
+              const p=await b.newPage({viewport:{width:w,height:h}});
+              const errors=[];p.on('pageerror',e=>errors.push(e.message));
+              const go=async route=>{await p.goto('http://127.0.0.1:8765/index.html?qa=itemized#/'+route,{waitUntil:'domcontentloaded'});await p.waitForTimeout(1100);};
+              await go('aboutdetails');
+              const about=await p.evaluate(()=>{
+                const f=document.querySelector('.an2-founder-person');
+                const flag=document.querySelector('.an2-floating-flags .an2-flag');
+                const quote=document.querySelector('.an2-quote-footer');
+                return {portrait:Math.round(f?.getBoundingClientRect().height||0),
+                  portraitX:Math.round(f?.getBoundingClientRect().x||0),
+                  flagWidth:Math.round(flag?.getBoundingClientRect().width||0),
+                  flagAnimation:flag&&getComputedStyle(flag).animationName,
+                  boxHeight:Math.round(quote?.getBoundingClientRect().height||0)};
+              });
+              await go('scholarship/erasmus-mundus');
+              const er=await p.evaluate(()=>({
+                board:!!document.querySelector('#an-scholarship-decision-board'),
+                factCount:document.querySelectorAll('.an-decision-fact').length,
+                moi:document.querySelector('#an-scholarship-decision-board')?.textContent.includes('Accepted conditionally'),
+                score:document.querySelector('#an-scholarship-decision-board')?.textContent.includes('6.5 minimum'),
+                walkthrough:document.querySelectorAll('.an-application-walkthrough ol>li').length,
+                links:document.querySelectorAll('.an-application-walkthrough a').length,
+                stepText:document.querySelector('.an-application-walkthrough')?.textContent.includes('Save AND submit')
+              }));
+              await go('scholarship/daad-epos-masters');
+              const ep=await p.evaluate(()=>({
+                board:!!document.querySelector('#an-scholarship-decision-board'),
+                visa:document.querySelector('#an-scholarship-decision-board')?.textContent.includes('€75'),
+                epos:document.querySelectorAll('.an-epos-course').length,
+                stepDetails:document.querySelectorAll('.an-epos-course details.an-course-apply-steps').length,
+                scoreBadges:document.querySelectorAll('.an-epos-course .an-course-quickfacts').length,
+                guide:document.querySelectorAll('.an-application-walkthrough ol>li').length,
+                emphasized:document.querySelectorAll('.an-info-hot').length
+              }));
+              await go('scholarship/hungary-masters');
+              const other=await p.evaluate(()=>({board:!!document.querySelector('#an-scholarship-decision-board'),facts:document.querySelectorAll('.an-decision-fact').length,steps:document.querySelectorAll('.an-application-walkthrough li').length}));
+              const ok=about.portrait>=250&&about.flagWidth<=34&&about.flagWidth>0&&about.flagAnimation.includes('anTinyFlagWave')&&er.board&&er.factCount===8&&er.moi&&er.score&&er.walkthrough>=8&&er.links>=3&&er.stepText&&ep.board&&ep.visa&&ep.epos>=27&&ep.stepDetails>=27&&ep.scoreBadges>=27&&ep.guide>=7&&other.board&&other.facts===8&&other.steps>=7&&!errors.length;
+              const result={viewport:w+'x'+h,about,erasmus:er,epos:ep,generic:other,errors,passed:ok};
+              console.log('ITEMIZED QA '+JSON.stringify(result));
+              if(!ok){fail=true;console.error('ITEMIZED QA FAILED '+w);}
+              await p.close();
+            }
+            await b.close();
+            if(fail)process.exitCode=1;
+          })().catch(e=>{console.error(e.stack||e);process.exitCode=1});
+          JS
