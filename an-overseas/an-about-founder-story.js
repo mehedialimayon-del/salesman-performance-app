@@ -143,7 +143,7 @@
     if (button.parentElement !== vision) vision.appendChild(button);
     button.href = '#/aboutdetails';
     button.setAttribute('aria-label', 'Read our complete story, purpose and vision');
-    button.textContent = 'READ MORE ↗';
+    if (button.textContent.trim() !== 'READ MORE ↗') button.textContent = 'READ MORE ↗';
     intro.querySelector('.an2-readmore-separate')?.remove();
   }
   // Gracefully fall back to the original emoji when a flag image cannot load.
