@@ -1,0 +1,90 @@
+/* 07 Nov 2026 | A&N scholarship detail highlights, scoped and accessible */
+#app .an-scholarship-detail .an-visa-topic-grid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0 16px;
+}
+#app .an-scholarship-detail .an-visa-topic{min-width:0;position:relative;overflow:hidden;border:1px solid #b97e4c;background:linear-gradient(140deg,#221912,#101925 70%);border-radius:14px;padding:14px 14px 16px;box-shadow:inset 4px 0 #f2aa62}
+#app .an-scholarship-detail .an-visa-topic[data-topic="blue"]{border-color:#578eae;box-shadow:inset 4px 0 #78c7ed;background:linear-gradient(145deg,#102337,#101722)}
+#app .an-scholarship-detail .an-visa-topic[data-topic="mint"]{border-color:#3b876c;box-shadow:inset 4px 0 #73dfb1;background:linear-gradient(145deg,#102820,#101722)}
+#app .an-scholarship-detail .an-visa-topic[data-topic="violet"]{border-color:#8565ac;box-shadow:inset 4px 0 #c69bff;background:linear-gradient(145deg,#261b33,#101722)}
+#app .an-scholarship-detail .an-visa-topic-head{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+#app .an-scholarship-detail .an-visa-topic-count{flex:0 0 34px;display:grid;place-items:center;height:32px;background:#653b19;border-radius:9px;font-size:12px;font-weight:900;color:#ffcc88}
+#app .an-scholarship-detail .an-visa-topic[data-topic="blue"] .an-visa-topic-count{background:#1a4158;color:#9adfff}
+#app .an-scholarship-detail .an-visa-topic[data-topic="mint"] .an-visa-topic-count{background:#194639;color:#a5f1cb}
+#app .an-scholarship-detail .an-visa-topic[data-topic="violet"] .an-visa-topic-count{background:#4a3264;color:#e0bdff}
+#app .an-scholarship-detail .an-visa-topic h3{margin:0!important;color:#ffd19c!important;font-size:clamp(13px,1.5vw,16px)!important;line-height:1.35!important;letter-spacing:.025em}
+#app .an-scholarship-detail .an-visa-topic[data-topic="blue"] h3{color:#a2dfff!important}
+#app .an-scholarship-detail .an-visa-topic[data-topic="mint"] h3{color:#a4f1ca!important}
+#app .an-scholarship-detail .an-visa-topic[data-topic="violet"] h3{color:#e1c0ff!important}
+#app .an-scholarship-detail .an-visa-topic p{white-space:normal!important;color:#ebedf1!important;font-size:clamp(12px,1.2vw,14px)!important;line-height:1.75!important;margin:0!important;overflow-wrap:anywhere}
+#app .an-scholarship-detail .an-visa-advice{padding:13px 15px;margin:11px 0;background:#332514;border:1px solid #b5853b;border-radius:12px}
+#app .an-scholarship-detail .an-visa-advice b{color:#ffca79!important;font-size:12px}
+#app .an-scholarship-detail .an-visa-advice p{color:#f0e7d7!important;line-height:1.65;margin:5px 0!important;font-size:12px!important}
+#app .an-scholarship-detail .an-visa-documents{margin-top:13px;padding:15px;background:linear-gradient(145deg,#142436,#0e171c);border:1px solid #597a89;border-radius:15px}
+#app .an-scholarship-detail .an-visa-documents h3{margin:0 0 12px!important;color:#9fe1f6;font-size:16px}
+#app .an-scholarship-detail .an-visa-checkgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#app .an-scholarship-detail .an-visa-checkgrid article{min-width:0;background:#0c1721;border-radius:10px;padding:11px 12px;border-left:3px solid #ffa357}
+#app .an-scholarship-detail .an-visa-checkgrid article:nth-child(3n+2){border-left-color:#75c9ed}
+#app .an-scholarship-detail .an-visa-checkgrid article:nth-child(3n){border-left-color:#7de2b6}
+#app .an-scholarship-detail .an-visa-checkgrid article b{font-size:11px;color:#ffc78e}
+#app .an-scholarship-detail .an-visa-checkgrid article:nth-child(3n+2) b{color:#a8e1f7}
+#app .an-scholarship-detail .an-visa-checkgrid article:nth-child(3n) b{color:#aeefcf}
+#app .an-scholarship-detail .an-visa-checkgrid article p{color:#e1e7ed!important;white-space:normal!important;font-size:11px!important;line-height:1.6!important;margin:6px 0 0!important}
+#app .an-scholarship-detail .an-keymark{display:inline!important;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:4px;background:#5c3d194b;color:#ffc887!important;font-weight:900!important;padding:1px 4px!important;line-height:1.65;white-space:normal}
+#app .an-scholarship-detail .an-keymark[data-tone="money"]{background:#123f326f;color:#91efbf!important}
+#app .an-scholarship-detail .an-keymark[data-tone="duration"]{background:#19466175;color:#a4ddff!important}
+#app .an-scholarship-detail .an-keymark[data-tone="english"]{background:#4f284574;color:#f5b5e9!important}
+#app .an-scholarship-detail .an-keymark[data-tone="deadline"]{background:#55341b7a;color:#ffca90!important}
+#app .an-scholarship-detail .an-keymark[data-tone="documents"]{background:#4033618c;color:#d6bbff!important}
+#app .an-scholarship-detail .an-keymark[data-tone="policy"]{background:#59312678;color:#ffb5ad!important}
+#app .an-scholarship-detail .an-em-fact-ribbon{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:13px 0 16px}
+#app .an-scholarship-detail .an-em-fact-ribbon>span{display:flex;flex-direction:column;justify-content:center;min-height:61px;gap:6px;padding:10px;border:1px solid #9a6d43;border-radius:11px;background:#231a13;min-width:0;text-align:center}
+#app .an-scholarship-detail .an-em-fact-ribbon>span[data-tone="blue"]{border-color:#4c94b4;background:#132e3f}
+#app .an-scholarship-detail .an-em-fact-ribbon>span[data-tone="mint"]{border-color:#3e916f;background:#14372e}
+#app .an-scholarship-detail .an-em-fact-ribbon>span[data-tone="violet"]{border-color:#9b76b3;background:#31253b}
+#app .an-scholarship-detail .an-em-fact-ribbon>span[data-tone="gold"]{border-color:#b99442;background:#322915}
+#app .an-scholarship-detail .an-em-fact-ribbon small{font-size:9px;letter-spacing:.05em;line-height:1.3;color:#eecfb4}
+#app .an-scholarship-detail .an-em-fact-ribbon strong{font-size:clamp(12px,1.5vw,17px);line-height:1.3;color:#fff;overflow-wrap:anywhere}
+#app .an-scholarship-detail .an-premium-submission-steps ol{list-style:none!important;counter-reset:anSubmission;display:grid;grid-template-columns:1fr;gap:9px;padding:0!important;margin:12px 0!important}
+#app .an-scholarship-detail .an-premium-submission-steps ol>li{position:relative;list-style:none!important;counter-increment:anSubmission;min-height:54px;margin:0!important;padding:12px 13px 12px 56px!important;border:1px solid #68503b;background:#101925;border-radius:12px;color:#ebedf3!important;line-height:1.65!important;font-size:12px!important}
+#app .an-scholarship-detail .an-premium-submission-steps ol>li:nth-child(4n+2){border-color:#356782;background:#101e2b}
+#app .an-scholarship-detail .an-premium-submission-steps ol>li:nth-child(4n+3){border-color:#3e7e64;background:#10251e}
+#app .an-scholarship-detail .an-premium-submission-steps ol>li:nth-child(4n){border-color:#70558f;background:#20192b}
+#app .an-scholarship-detail .an-premium-submission-steps ol>li::before{content:counter(anSubmission,decimal-leading-zero)!important;position:absolute!important;left:11px!important;top:11px!important;display:grid!important;place-items:center!important;width:34px!important;height:34px!important;border-radius:9px!important;background:#5d391a!important;border:1px solid #bb813f!important;color:#ffd193!important;font-size:11px!important;font-weight:900!important;transform:none!important}
+#app .an-scholarship-detail .an-premium-submission-steps ol>li:nth-child(4n+2)::before{background:#1d4b65!important;border-color:#62aeda!important;color:#bae7ff!important}
+#app .an-scholarship-detail .an-premium-submission-steps ol>li:nth-child(4n+3)::before{background:#1a5340!important;border-color:#62b98b!important;color:#b8f4d5!important}
+#app .an-scholarship-detail .an-premium-submission-steps ol>li:nth-child(4n)::before{background:#4a3069!important;border-color:#ab7ddb!important;color:#e6c6ff!important}
+#app .an-scholarship-detail .an-premium-dates p{color:#e4edf1!important}
+#app .an-scholarship-detail .an-scholarship-student-brief{margin:24px 0;border:1px solid #cc955c;background:radial-gradient(circle at 100% 0%,#6145244c,transparent 46%),linear-gradient(145deg,#151e28,#0c1219);border-radius:19px;padding:clamp(14px,2vw,25px);box-shadow:inset 4px 0 #eea862,0 14px 26px #0005}
+#app .an-scholarship-detail .an-brief-head{padding:0 0 15px;border-bottom:1px solid #644e38;margin-bottom:14px}
+#app .an-scholarship-detail .an-brief-head>span{color:#8ce1ee;font-size:10px;letter-spacing:.15em;font-weight:900}
+#app .an-scholarship-detail .an-brief-head h2{font-size:clamp(20px,2.5vw,28px);line-height:1.35;margin:8px 0;color:#ffbb75}
+#app .an-scholarship-detail .an-brief-head h2 em{color:#fff;font-style:normal}
+#app .an-scholarship-detail .an-brief-head p{font-size:12px;color:#dce4ee;line-height:1.7;margin:0}
+#app .an-scholarship-detail .an-brief-head b{color:#ffbf83}
+#app .an-scholarship-detail .an-brief-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+#app .an-scholarship-detail .an-brief-item{min-width:0;overflow:hidden;padding:15px;border-radius:13px;border:1px solid #9b6f46;border-left:4px solid #f9ab5c;background:#1a1c24;overflow-wrap:anywhere}
+#app .an-scholarship-detail .an-brief-item[data-tone="blue"]{border-color:#397f9f;border-left-color:#84d8ff;background:#12212d}
+#app .an-scholarship-detail .an-brief-item[data-tone="mint"]{border-color:#3c8168;border-left-color:#77e4b7;background:#12271f}
+#app .an-scholarship-detail .an-brief-item[data-tone="violet"]{border-color:#755b93;border-left-color:#d4a9ff;background:#241c2e}
+#app .an-scholarship-detail .an-brief-item[data-tone="gold"]{border-color:#88763c;border-left-color:#ffe29a;background:#272216}
+#app .an-scholarship-detail .an-brief-item h4{color:#ffbf7b;font-size:13px;line-height:1.4;margin:0 0 9px}
+#app .an-scholarship-detail .an-brief-item[data-tone="blue"] h4{color:#9cddff}
+#app .an-scholarship-detail .an-brief-item[data-tone="mint"] h4{color:#a5f2cf}
+#app .an-scholarship-detail .an-brief-item[data-tone="violet"] h4{color:#e1c2ff}
+#app .an-scholarship-detail .an-brief-item[data-tone="gold"] h4{color:#ffe09a}
+#app .an-scholarship-detail .an-brief-item p{font-size:12px!important;line-height:1.7!important;color:#e8ebf0!important;white-space:normal!important;margin:0!important}
+#app .an-scholarship-detail .an-brief-item p b{background:#ffbd7540;color:#ffd399;border-radius:3px;padding:1px 3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+#app .an-scholarship-detail .an-brief-item[data-tone="blue"] b{background:#5bb1e33b;color:#b4e8ff}
+#app .an-scholarship-detail .an-brief-item[data-tone="mint"] b{background:#37bd8c34;color:#b5f8d8}
+#app .an-scholarship-detail .an-brief-item[data-tone="violet"] b{background:#ad7bda30;color:#e9cbff}
+#app .an-scholarship-detail .an-brief-item[data-tone="gold"] b{background:#baa04635;color:#ffe4a1}
+#app .an-scholarship-detail .an-brief-end{padding:10px 13px;border-radius:10px;background:#192a32;color:#c9e0e8!important;font-size:11px!important;line-height:1.7!important;margin:13px 0 0!important}
+@media(max-width:700px){
+ #app .an-scholarship-detail .an-visa-topic-grid,#app .an-scholarship-detail .an-visa-checkgrid,#app .an-scholarship-detail .an-brief-grid{grid-template-columns:1fr}
+ #app .an-scholarship-detail .an-visa-topic{padding:14px}
+ #app .an-scholarship-detail .an-em-fact-ribbon{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #app .an-scholarship-detail .an-em-fact-ribbon>span:last-child{grid-column:1/-1}
+ #app .an-scholarship-detail .an-em-fact-ribbon strong{font-size:15px}
+ #app .an-scholarship-detail .an-scholarship-student-brief{padding:13px}
+ #app .an-scholarship-detail .an-premium-submission-steps ol>li{font-size:12px!important}
+}
