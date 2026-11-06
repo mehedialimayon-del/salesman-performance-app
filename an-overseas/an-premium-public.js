@@ -5,6 +5,25 @@ const ROOT='https://svpgjrxeqnluipsgjywk.supabase.co';
 const KEY='sb_publishable_eR5TZxv2aWndxdwzU0RIUA_mXWcBcO3';
 let stories=[],insights=[],countries=null,team=[],teamIndex=0,snapshot='',working=false,refreshQueued=false;
 const GALLERY_CACHE_KEY='an-approved-public-gallery-20261106-v1';
+/* Fast first visit: bundled snapshot contains approved public posts only.
+   A live Supabase refresh still replaces it with the latest published data. */
+async function loadStaticGallery(){
+ if(stories.length||insights.length)return;
+ try{
+  const response=await fetch('an-public-gallery-snapshot.json?v=20261106-v1',{cache:'force-cache'});
+  if(!response.ok)return;
+  const data=await response.json();
+  if(snapshot||stories.length||insights.length)return; // never overwrite fresher data
+  const approved=x=>Array.isArray(x)?x.filter(p=>p&&p.approved===true):[];
+  const nextStories=approved(data.success_stories),nextInsights=approved(data.study_insights);
+  if(!nextStories.length&&!nextInsights.length)return;
+  stories=nextStories;insights=nextInsights;
+  window.ANPublicSearchData={stories,insights};
+  window.dispatchEvent(new Event('an-public-search-updated'));
+  apply();
+ }catch(e){/* Offline? Continue to normal live request. */}
+}
+
 function showCachedGallery(){
  try{
   const c=JSON.parse(localStorage.getItem(GALLERY_CACHE_KEY)||'null');
@@ -300,6 +319,6 @@ if(appRoot)new MutationObserver(()=>{
 }).observe(appRoot,{childList:true});
 window.addEventListener('hashchange',()=>setTimeout(()=>{apply();restoreAboutAfterRender();void load();},70));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void load();});
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{showCachedGallery();void load();});else{showCachedGallery();void load();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{showCachedGallery();void loadStaticGallery();void load();});else{showCachedGallery();void loadStaticGallery();void load();}
 setInterval(()=>{if(!document.hidden)void load();},60000);
 })();
