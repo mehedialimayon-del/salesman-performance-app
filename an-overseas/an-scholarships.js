@@ -196,7 +196,19 @@ function highlightScholarshipFacts(value){
  return esc(value).replace(/\b(IELTS|TOEFL|PTE|English|CGPA|GPA|B2|Tuition|Scholarship|Fully funded|Master|PhD|Bachelor|Recommendation|Visa|Passport|Deadline|Motivation|Research|University|Attendance)\b/gi,'<strong class="an-fact-highlight">$1</strong>')
  .replace(/(≥\s*\d+(?:\.\d+)?|\d+(?:\.\d+)?\s*%|€\s*[\d,]+|RM\s*[\d,]+|USD\s*[\d,]+)/g,'<mark class="an-fact-number">$1</mark>');
 }
-const section=(n,title,content)=>'<section class="an-scholarship-section an-scholarship-section-'+n+'"><h2><span>'+String(n).padStart(2,'0')+'</span> · '+esc(title)+'</h2><p>'+highlightScholarshipFacts(content)+'</p></section>';
+function detailLines(content){
+ const text=String(content||'').trim();
+ if(!text)return [];
+ let lines=text.match(/(?:^|\s)\d+\.\s/)?
+  text.split(/(?=\b\d+\.\s)/g):
+  text.split(/(?:\n+|;\s+(?=[A-Z0-9])|(?<=[.!?])\s+(?=[A-Z][a-z]))/g);
+ return lines.map(x=>x.replace(/^\d+\.\s*/,'').trim()).filter(Boolean);
+}
+const section=(n,title,content)=>{
+ const bits=detailLines(content);
+ const body=bits.length?'<ul class="an-scholarship-item-list">'+bits.map(t=>'<li>'+highlightScholarshipFacts(t)+'</li>').join('')+'</ul>':'<p>Programme-specific details were not supplied in the current notice.</p>';
+ return '<section class="an-scholarship-section an-scholarship-section-'+n+'"><h2><span>'+String(n).padStart(2,'0')+'</span> · '+esc(title)+'</h2>'+body+'</section>';
+};
 function hostCards(p){
  const names=p.universities||[];
  if(!names.length)return '<div class="an-scholarship-info">'+esc(p.hostNote)+' <a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Open official host list ↗</a></div>';
