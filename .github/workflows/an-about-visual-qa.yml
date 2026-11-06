@@ -95,10 +95,23 @@ jobs:
                 return {loaded:img?.complete&&img?.naturalWidth>0,naturalSize:[img?.naturalWidth,img?.naturalHeight],
                   img:rect(img),fig:rect(fig),sign:rect(sign),footer:rect(footer),
                   imageDisplay:img&&getComputedStyle(img).display,imageVisibility:img&&getComputedStyle(img).visibility,
-                  imageOpacity:img&&getComputedStyle(img).opacity,signWidth:sign?.clientWidth,
+                  imageOpacity:img&&getComputedStyle(img).opacity,
+                  figOpacity:fig&&getComputedStyle(fig).opacity,
+                  figVisibility:fig&&getComputedStyle(fig).visibility,
+                  figZ:fig&&getComputedStyle(fig).zIndex,
+                  imgZ:img&&getComputedStyle(img).zIndex,
+                  figClip:fig&&getComputedStyle(fig).clipPath,
+                  imgClip:img&&getComputedStyle(img).clipPath,
+                  imgMask:img&&getComputedStyle(img).maskImage,
+                  figOverflow:fig&&getComputedStyle(fig).overflow,
+                  footerOverflow:footer&&getComputedStyle(footer).overflow,
+                  signWidth:sign?.clientWidth,
                   flagWidth:rect(flag)?.w,headerFontSize:getComputedStyle(sel('.an2-founder-quote blockquote')).fontSize,
                   screenWidth:innerWidth};
               });
+              await page.evaluate(()=>window.scrollTo(0,0));
+              await page.waitForTimeout(350);
+              await page.screenshot({path:'qa-artifacts/founder-initial-'+w+'x'+h+'.png',fullPage:false});
               await page.locator('[data-an-about-jump="an2-services"]').click();
               info.jumpRetainsRoute=(new URL(page.url())).hash==='#/aboutdetails';
               info.detailsHorizontalOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
