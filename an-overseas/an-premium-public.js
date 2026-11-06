@@ -315,7 +315,15 @@ function restoreAboutAfterRender(){
 }
 const appRoot=document.getElementById('app');
 if(appRoot)new MutationObserver(()=>{
- if(current()==='about')requestAnimationFrame(restoreAboutAfterRender);
+ // A routed page may be rewritten by another module after published content
+ // arrives. Restore the CMS cards before the next frame, not a second later.
+ if(current()==='about')restoreAboutAfterRender();
+ if(current()==='success'&&(insights.length||stories.length)){
+  const mount=document.getElementById('an-insights-gallery');
+  const storiesMount=document.getElementById('an-success-gallery');
+  if(mount&&!mount.querySelector('.an-community-card')&&insights.some(x=>x&&x.approved===true))showInsights();
+  if(storiesMount&&!storiesMount.querySelector('.an-youtube-card')&&stories.some(x=>x&&x.approved===true))showStories();
+ }
 }).observe(appRoot,{childList:true});
 window.addEventListener('hashchange',()=>setTimeout(()=>{apply();restoreAboutAfterRender();void load();},70));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void load();});
