@@ -74,7 +74,7 @@
  function render(){
   if(!list)return;
   results=search(input.value);
-  list.replaceChildren();
+  list.replaceChildren(status);
   const q=input.value.trim();
   status.textContent=q?(results.length?'Search results — choose an item to open it':'No matching published content found. Try a different word.'):'Quick access · Search universities, scholarships, services and student posts';
   for(let i=0;i<results.length;i++){
