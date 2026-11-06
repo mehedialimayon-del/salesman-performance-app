@@ -145,6 +145,11 @@
      u.logoImage=verifiedLogo.logo;
      u.logoSource=verifiedLogo.source||u.site;
    }
+   const institutionalIcon=window.ANAsiaInstitutionalIcons?.[u.id];
+   if(institutionalIcon?.logo&&!u.logoImage&&!failedMediaUrls.has(institutionalIcon.logo)){
+     u.logoImage=institutionalIcon.logo;
+     u.logoSource=institutionalIcon.source||u.site;
+   }
    const match=verifiedCoversById[u.id]||verifiedCovers[key];
    if(!match)return;
    if(match.site&&!u.site)u.site=match.site;
