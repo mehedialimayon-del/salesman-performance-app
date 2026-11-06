@@ -95,22 +95,38 @@
   malaysiancooperativeentrepreneurshipuniversity:'https://www.ukkm.edu.my/',
     veritasuniversitycollege:'https://www.veritas.edu.my/'
  };
+ const asiaCountries=new Set(['Malaysia','China','Japan','South Korea','Singapore','Thailand','United Arab Emirates','Turkey']);
+ const failedMediaUrls=new Set();
  function enrichKnownUniversity(u){
    const key=normalize(u.name);
    const site=verifiedSites[key];
    if(site&&!u.site)u.site=site;
+   const asia=window.ANAsiaVerifiedMedia?.[u.id];
+   if(asia){
+     if(asia.photo&&!u.cardPhoto&&!failedMediaUrls.has(asia.photo)){
+       u.cardPhoto=asia.photo;
+       u.cardSource=asia.source||u.site;
+       u.cardCredit='Institutional photo · official website';
+     }
+     if(asia.logo&&!u.logoImage&&!failedMediaUrls.has(asia.logo)){
+       u.logoImage=asia.logo;
+     }
+   }
    const match=verifiedCoversById[u.id]||verifiedCovers[key];
    if(!match)return;
    if(match.site&&!u.site)u.site=match.site;
-   if(match.photo){u.cardPhoto=match.photo;u.cardSource=match.source;u.cardCredit=match.credit;}
-   if(match.logo&&!u.logoImage)u.logoImage=match.logo;
+   if(match.photo&&!failedMediaUrls.has(match.photo)){
+     u.cardPhoto=match.photo;u.cardSource=match.source;u.cardCredit=match.credit;
+   }
+   if(match.logo&&!u.logoImage&&!failedMediaUrls.has(match.logo))u.logoImage=match.logo;
    if(match.closedDate)u.closedDate=match.closedDate;
  }
  const remembered=new Map(), watching=new WeakSet();
  const hostOf=x=>{const m=String(x||'').match(/^https?:\/\/([^/?#:]+)/i);return m?m[1].toLowerCase().replace(/^www\./,''):'';};
  let hostCountSize=-1,hostCount=new Map();
  function websiteIcon(u){
-   const host=hostOf(u.site);if(!host)return '';
+   const host=hostOf(u.site);if(!host||asiaCountries.has(u.country))return '';
+   // Asia only uses confirmed institutional photos and genuine logos, not generic globe icons.
    // Government, shared education authorities and general directory favicons aren't university logos.
    if(/(^|\.)(?:gouv\.fr|gov\.my|gov\.uk|gov\.au|mqa\.gov\.my)$/.test(host)
      ||/^ac-[^.]+\.fr$/.test(host)||/^education\.gouv\.fr$/.test(host)
@@ -127,9 +143,11 @@
    const logo=(u.logoImage||p?.logo||websiteIcon(u)||''); // Google favicon is often a generic globe; not a university photo.
    const named=String(u.name||'');const acronym=named.match(/\(([A-Z]{2,5})\)/);
    const short=acronym?acronym[1]:String(u.short||u.name||'U').replace(/[^A-Z]/g,'').slice(0,3)||'U';
-   return '<div class="an-guide-identity an-identity-logo-only"><div class="an-logo-stage">'+
-       (logo?'<img class="an-center-logo '+(logo.includes('google.com/s2/favicons')?'an-website-favicon':'an-verified-media')+'" src="'+esc(logo)+'" alt="'+esc(u.name)+' university website icon or logo" loading="lazy" decoding="async" onerror="this.remove()">':'')+
-       '<span class="an-center-monogram">'+esc(short)+'</span><span class="an-identity-name">'+esc(u.name)+'</span></div></div>';
+   const pending=asiaCountries.has(u.country)&&!logo;
+   return '<div class="an-guide-identity an-identity-logo-only'+(pending?' an-asia-media-pending':'')+'"><div class="an-logo-stage">'+
+       (logo?'<img class="an-center-logo '+(logo.includes('google.com/s2/favicons')?'an-website-favicon':'an-verified-media')+'" src="'+esc(logo)+'" alt="'+esc(u.name)+' university website logo" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">':'')+
+       (pending?'<div class="an-identity-awaiting"><span class="an-identity-awaiting-name">'+esc(u.name)+'</span><small>Campus photo or logo not yet verified</small></div>':
+       '<span class="an-center-monogram">'+esc(short)+'</span><span class="an-identity-name">'+esc(u.name)+'</span>')+'</div></div>';
  }
  // Stable numbers per country are based on the complete loaded catalogue, not current filters.
  let serialCache={size:-1,items:new Map()};
@@ -155,6 +173,7 @@
  guide.card=function(u,p){
    enrichKnownUniversity(u);
    let result=nativeCard(u,p);
+   result=result.replace('class="campus-cover an-guide-photo"','class="campus-cover an-guide-photo" referrerpolicy="no-referrer"');
    const hasPhoto=result.includes('class="campus-cover an-guide-photo"');
    if(!hasPhoto){
      const start=result.indexOf('<div class="an-guide-identity">');
@@ -381,14 +400,18 @@
    }else if(target instanceof HTMLImageElement&&target.classList.contains('an-center-logo')){
      target.style.display='none';
    }else if(target instanceof HTMLImageElement&&target.classList.contains('an-guide-photo')){
+     failedMediaUrls.add(target.src);
      const cover=target.closest('.an-guide-card .uni-cover-wrap');
      const university=typeof U!=='undefined'?U.find(u=>u.id===cover?.dataset.universityId):null;
-     if(cover&&university&&!cover.querySelector('.an-identity-logo-only')){
+     target.remove();
+     if(cover&&university){
+       if(university.cardPhoto===target.src)university.cardPhoto='';
        const profile=typeof UNIVERSITY_PROFILES!=='undefined'?UNIVERSITY_PROFILES[university.id]:null;
        const oldIdentity=cover.querySelector('.an-guide-identity');
        if(oldIdentity)oldIdentity.outerHTML=brandFallback(university,profile);
        cover.querySelector('.uni-card-logo')?.remove();
        cover.querySelector('.an-guide-credit')?.remove();
+       requestAnimationFrame(()=>inspect(cover));
      }
    }else if(target instanceof HTMLImageElement&&target.classList.contains('an-university-mark')){
      target.style.display='none';
