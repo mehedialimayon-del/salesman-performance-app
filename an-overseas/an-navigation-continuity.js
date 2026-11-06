@@ -74,17 +74,11 @@ function restoreContainers(state){
  }
 }
 function positionTarget(state){
- if(state?.anchor?.id&&activeRoute.startsWith('#/universities')){
-  const cards=document.querySelectorAll('#results .an-guide-card');
-  for(const el of cards){
-   if(el.querySelector('.uni-cover-wrap')?.dataset.universityId===state.anchor.id){
-    const y=(scrollRoot().scrollTop||window.scrollY)+el.getBoundingClientRect().top-state.anchor.top;
-    return Math.max(0,y);
-   }
-  }
- }
+ // A saved pixel position is reliable when the same catalogue and filters are restored.
+ // Card anchors are a backup only if the original scroll distance exceeds page height.
  return Math.max(0,Number(state?.y)||0);
 }
+
 function restore(route,reason){
  const state=get(route);
  if(!state){if(reason==='navigation'){window.scrollTo(0,0);}return;}
@@ -93,14 +87,26 @@ function restore(route,reason){
  restoreInProgress=true;
  const begun=Date.now();
  function attempt(){
-  if(token!==restoreToken||route!==activeRoute){restoreInProgress=false;return;}
+  if(token!==restoreToken)return; // A newer restoration owns the lock.
+  if(route!==activeRoute){restoreInProgress=false;return;}
   if(lastGesture>begun){restoreInProgress=false;pending=null;save();return;}
   const target=positionTarget(state);
   const max=Math.max(0,scrollRoot().scrollHeight-innerHeight);
-  window.scrollTo({left:state.x||0,top:Math.min(target,max),behavior:'instant'});
+  let adjusted=Math.min(target,max);
+  // If the page remains shorter than the saved position, restore the remembered card.
+  if(max<target-120&&state?.anchor?.id&&activeRoute.startsWith('#/universities')){
+    const cards=document.querySelectorAll('#results .an-guide-card');
+    for(const el of cards){
+      if(el.querySelector('.uni-cover-wrap')?.dataset.universityId===state.anchor.id){
+        adjusted=Math.max(0,Math.min(max,(scrollRoot().scrollTop||scrollY)+el.getBoundingClientRect().top-state.anchor.top));
+        break;
+      }
+    }
+  }
+  window.scrollTo({left:state.x||0,top:adjusted,behavior:'instant'});
   restoreContainers(state);
   const complete=Math.abs((scrollRoot().scrollTop||window.scrollY)-target)<6;
-  if((complete&&Date.now()-begun>850)||Date.now()-begun>6000){
+  if((complete&&Date.now()-begun>1300)||Date.now()-begun>3800){
    restoreInProgress=false;pending=null;save();return;
   }
   setTimeout(attempt,complete?310:210);
