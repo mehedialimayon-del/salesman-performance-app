@@ -595,3 +595,79 @@ body:not(.an-about-locked) #app .an2-story{--gold:#ffd19b;--orange:#ff962a;--cre
     width:min(93%,210px)!important;
   }
 }
+
+
+/* Founder portrait final adjustment: original colours, smaller cutout, lower embedded name, right-edge extension. */
+/* The photo itself already contains the name label; do not overlay extra text. */
+#app .an2-founder-hero{overflow:visible!important}
+#app .an2-founder-quote{overflow:visible!important}
+#app .an2-founder-quote .an2-quote-footer{
+  grid-template-columns:minmax(0,1fr) 194px!important;
+  gap:6px!important;
+  min-height:280px!important;
+  margin-right:-12px!important;
+  overflow:visible!important;
+}
+#app .an2-founder-quote .an2-founder-person{
+  position:relative!important;
+  display:block!important;
+  justify-self:end!important;
+  align-self:end!important;
+  width:194px!important;
+  height:281px!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:visible!important;
+  background:transparent!important;
+}
+#app .an2-founder-quote .an2-founder-person img{
+  display:block!important;
+  position:absolute!important;
+  top:auto!important;
+  left:auto!important;
+  bottom:-3px!important;
+  right:-12px!important;
+  width:185px!important;
+  height:auto!important;
+  max-height:none!important;
+  max-width:none!important;
+  object-fit:contain!important;
+  object-position:right bottom!important;
+  opacity:1!important;
+  mix-blend-mode:normal!important;
+  filter:none!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  border:0!important;
+  border-radius:0!important;
+}
+#app .an2-founder-quote .an2-founder-person figcaption{display:none!important}
+@media(max-width:650px){
+  #app .an2-founder-quote .an2-quote-footer{
+    grid-template-columns:minmax(0,1fr) 165px!important;
+    min-height:281px!important;
+    gap:2px!important;
+    margin-right:-21px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person{
+    width:165px!important;
+    height:281px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person img{
+    width:166px!important;
+    right:-12px!important;
+    bottom:-3px!important;
+    top:auto!important;
+    height:auto!important;
+    filter:none!important;
+  }
+}
+@media(max-width:380px){
+  #app .an2-founder-quote .an2-quote-footer{
+    grid-template-columns:minmax(0,1fr) 150px!important;
+    min-height:270px!important;
+    margin-right:-20px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person{width:150px!important;height:270px!important}
+  #app .an2-founder-quote .an2-founder-person img{width:151px!important;right:-12px!important;bottom:-3px!important}
+}
