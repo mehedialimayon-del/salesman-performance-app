@@ -22,7 +22,7 @@
   function currentDirectory() {
     const list = typeof U !== 'undefined' && Array.isArray(U) ? U : [];
     const destinations = new Set(list.map(x => x.country).filter(Boolean));
-    const fullyLoaded = window.ANWorldDirectoryStatus?.source === 'Hipo open directory';
+    const fullyLoaded = ['Hipo open directory','Hipo local snapshot'].includes(window.ANWorldDirectoryStatus?.source);
     return {universities: fullyLoaded ? list.length : null, countries: destinations.size};
   }
   function refreshDirectoryMetric() {
@@ -30,7 +30,7 @@
     if (!number) return;
     const total = typeof U !== 'undefined' && Array.isArray(U) ? U.length : 0;
     const status = window.ANWorldDirectoryStatus;
-    if (status?.source === 'Hipo open directory') {
+    if (['Hipo open directory','Hipo local snapshot'].includes(status?.source)) {
       number.textContent = total.toLocaleString('en-US');
       number.title = 'Current complete searchable directory';
     } else if (status?.source === 'Curated local list') {
@@ -44,6 +44,8 @@
     // About Details must load the same catalogue used by the Universities page.
     // Never display the 809 local seed entries as the complete global total.
     if (typeof window.ANWorldDirectory?.loadPublicDirectory !== 'function') return;
+    Promise.resolve().then(() => window.ANWorldDirectory.loadLocalSnapshot?.())
+      .then(refreshDirectoryMetric, refreshDirectoryMetric);
     Promise.resolve().then(() => window.ANWorldDirectory.loadPublicDirectory())
       .then(refreshDirectoryMetric, refreshDirectoryMetric);
   }
