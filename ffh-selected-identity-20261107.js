@@ -17,7 +17,7 @@ function selectedIdentity(){
  const staff=root.querySelector('#ffScopeStaff')?.value||'ALL';
  let id='',selected=null;
  if(staff!=='ALL'){id=staff.startsWith('TEAM:')?staff.slice(5):staff;selected=profile(id);}
- else if(zone==='ALL'){id=ownId();selected=profile(id);}
+ else if(zone==='ALL'){id='M21954';selected=profile(id)||photo(id);}
  else {
   const row=managers().find(p=>norm(p.zone_id)===norm(zone));
   const local=typeof U!=='undefined'?U.find(p=>p.can_manage&&norm(p.zone)===norm(zone)):null;
