@@ -83,6 +83,8 @@
 
  function pickers(){
   for(const row of document.querySelectorAll('.ffItemPicker .ffPickerOption')){
+   // Zone picker already renders the manager portrait; never insert a second one.
+   if(row.classList.contains('ffZoneManagerRow')){row.querySelector(':scope > .ffPickerAvatar')?.remove();continue;}
    const text=row.querySelector('strong,.ffPickerText')?.textContent||row.querySelector('span:not(.ffPickerAvatar)')?.textContent||'';
    const p=person(row.dataset.staffId)||byName(text)||[...avatars.values()].find(x=>text.includes(x.staff_id));
    if(!p)continue;
