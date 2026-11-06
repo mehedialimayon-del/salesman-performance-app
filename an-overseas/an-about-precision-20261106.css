@@ -349,3 +349,6 @@
 @media (prefers-reduced-motion:reduce){
   #app .an2-founder-quote .an2-floating-flags .an2-flag{animation:none!important}
 }
+
+/* New desktop-only login shortcut must not alter the approved mobile header. */
+@media (max-width:800px){body .top .an-desktop-login{display:none!important}}
