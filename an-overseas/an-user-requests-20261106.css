@@ -1,11 +1,29 @@
-/* A&N November QA: scoped layout fixes; last stylesheet wins. */
-@keyframes an-heart-glow{0%,100%{filter:drop-shadow(0 0 2px #e10c40)}50%{filter:drop-shadow(0 0 8px #fb526c)}}
-.top .an-favorite-header svg{
- fill:#f4264a!important;stroke:#ff607c!important;stroke-width:1.3!important;
- animation:an-heart-glow 2.8s ease-in-out infinite!important;
- transform:none!important;
+/* A&N verified 2026-11-06: animated RED favourites heart at all screen sizes.
+   This rule follows an-ux-fixes.css and intentionally outranks its orange mobile SVG. */
+@keyframes an-heart-hop{
+ 0%,53%,100%{transform:translateY(0) scale(1);filter:drop-shadow(0 0 2px #e10c40)}
+ 10%{transform:translateY(-6px) scale(1.14);filter:drop-shadow(0 0 9px #ff526f)}
+ 18%{transform:translateY(0) scale(.96);filter:drop-shadow(0 0 4px #ec2952)}
+ 26%{transform:translateY(-3px) scale(1.07);filter:drop-shadow(0 0 8px #ff526f)}
+ 34%{transform:translateY(0) scale(1)}
 }
-.top .an-favorite-header{animation:none!important;transform:none!important}
+body .top .an-favorite-header svg{
+ fill:#f4264a!important;stroke:#ff607c!important;stroke-width:1.3!important;
+ animation:an-heart-hop 2.8s ease-in-out infinite!important;
+ transform-origin:50% 50%!important;
+}
+body .top .an-favorite-header{animation:none!important;transform:none!important}
+@media(min-width:801px){
+ body .top .an-favorite-header::before{
+  color:#f4264a!important;
+  animation:an-heart-hop 2.8s ease-in-out infinite!important;
+  transform-origin:center center!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body .top .an-favorite-header svg,
+ body .top .an-favorite-header::before{animation:none!important}
+}
 .top .an-favorite-count{background:#f8af58!important;color:#150d09!important}
 /* Four useful catalogue controls in one tight row. */
 body.an-universities-mode #app .catalogue-tools{
@@ -210,7 +228,7 @@ body.an-universities-mode #app .an-scholarship-category-wrap #an-scholarship-cat
  display:flex!important;width:43px!important;min-width:43px!important;
 }
 body.an-universities-mode #app .an-university-directory-bar .an-directory-fav{display:none!important}
-/* The header Favorites link is a red heart, never the previously mistaken bounce effect. */
+/* The header Favorites link remains red and animates internally, without moving the navigation box. */
 .top .an-favorite-header:hover{transform:none!important}
 body.an-universities-mode #app #results .an-university-moi-badge,
 body.an-favorites-mode #app .an-university-moi-badge,
