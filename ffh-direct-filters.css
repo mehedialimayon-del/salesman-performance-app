@@ -1,0 +1,70 @@
+/* Always-visible, one-tap native filters: no double summary/picker. */
+#app .ffScopeFilter.ffDirectScope {
+ display:block!important;flex:none!important;width:100%;min-width:0;max-width:100%;
+ margin:4px 0 9px!important;padding:5px!important;box-sizing:border-box;
+ border:1px solid #aa5c2e!important;border-radius:12px!important;
+ background:linear-gradient(125deg,#281911,#120f0d)!important;
+ overflow:hidden;
+}
+#app .ffDirectScope .ffDirectScopeFields {
+ display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+ gap:8px!important;padding:5px!important;margin:0!important;
+}
+#app .ffDirectScope label {display:block!important;min-width:0!important;
+ color:#ff983f!important;font-size:10px!important;font-weight:800!important;
+ letter-spacing:.04em!important;line-height:1.35!important;}
+#app .ffDirectScope select {
+ appearance:auto!important;-webkit-appearance:menulist!important;
+ box-sizing:border-box!important;display:block!important;position:static!important;
+ width:100%!important;max-width:100%!important;min-width:0!important;
+ height:43px!important;min-height:43px!important;
+ margin:5px 0 0!important;padding:5px 18px 5px 8px!important;
+ border:1px solid #f28a37!important;border-radius:9px!important;
+ background:#21160e!important;color:#fff!important;
+ font:700 12px/1.3 system-ui,sans-serif!important;
+ -webkit-text-fill-color:#fff!important;text-overflow:ellipsis!important;
+ white-space:nowrap!important;box-shadow:none!important;
+ touch-action:manipulation;
+}
+#app .ffDirectScope select:focus-visible{outline:2px solid #ffb768!important;outline-offset:1px}
+#app .ffDirectScope select optgroup{color:#ffad61;background:#201511;font-weight:800}
+#app .ffDirectScope select option{color:#fff;background:#21160e;font-weight:550}
+#app .ffTaskScope {display:block!important;border:0!important;padding:0!important;margin:0!important}
+#app .ffTaskScope[open] > summary {display:none!important}
+#app .ffTaskScope .ffDirectScope{margin:0 0 9px!important}
+/* Prevent any existing staff picker (including task assignment) from flowing
+   horizontally outside its overlay. Full manager / route details wrap in rows. */
+.globalSearchOverlay.ffItemPicker {
+ box-sizing:border-box!important;inset:0!important;
+ width:100vw!important;max-width:100vw!important;overflow-x:hidden!important;
+ padding:calc(68px + env(safe-area-inset-top,0px)) 12px 20px!important;
+}
+.ffItemPicker .globalSearchBox {
+ box-sizing:border-box!important;width:100%!important;
+ max-width:min(680px,calc(100vw - 24px))!important;min-width:0!important;
+ overflow-x:hidden!important;max-height:calc(100dvh - 108px)!important;
+}
+.ffItemPicker .ffPickerRows{box-sizing:border-box;min-width:0!important;width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+.ffItemPicker .ffPickerOption {
+ display:flex!important;align-items:center!important;box-sizing:border-box!important;
+ width:100%!important;min-width:0!important;max-width:100%!important;
+ white-space:normal!important;overflow:hidden!important;
+}
+.ffItemPicker .ffPickerText{box-sizing:border-box!important;min-width:0!important;max-width:100%!important;flex:1 1 0!important;overflow-wrap:anywhere!important}
+.ffItemPicker .ffPickerText :is(strong,small){
+ white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;
+ text-overflow:clip!important;max-width:100%!important;
+}
+.ffItemPicker .ffPickerOption .ffPickerAvatar,.ffItemPicker .ffZoneManagerAvatar{flex-shrink:0!important}
+#app .ffDashboardFrame .dashHero{display:flex!important;align-items:center!important;gap:6px!important;min-width:0!important;}
+#app .ffDashboardFrame .dashHero > div:first-child{flex:1 1 auto!important;min-width:0!important}
+#app .ffDashboardFrame .dashHero .ffDashStaffIdentity{display:flex!important;flex:0 1 43%!important;max-width:43%!important;min-width:0!important;justify-content:center}
+#app .ffDashboardFrame .dashHero .ffDashStaffAvatar{width:43px!important;height:43px!important;min-width:43px!important}
+#app .ffDashboardFrame .dashHero .ffDashStaffName{display:block!important;white-space:normal!important;overflow-wrap:anywhere!important;max-width:84px!important}
+#app .ffDashboardFrame .dashHero .dashAch{flex:0 0 auto!important;font-size:20px!important}
+@media(max-width:380px){
+ #app .ffDirectScope .ffDirectScopeFields{gap:5px!important;padding:3px!important}
+ #app .ffDirectScope select{font-size:11px!important;padding-left:5px!important}
+ #app .ffDashboardFrame .dashHero .ffDashStaffAvatar{width:36px!important;height:36px!important;min-width:36px!important}
+ #app .ffDashboardFrame .dashHero .ffDashStaffName{font-size:9px!important}
+}
