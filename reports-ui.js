@@ -39,7 +39,7 @@ function render(){
  q('#ffReportFilterPanel').ontoggle=e=>{filtersOpen=e.currentTarget.open;};
  q('#ffReportFilters').onsubmit=e=>{e.preventDefault();remember();try{model();filtersOpen=false;render();}catch(err){status(err.message);}};
  for(const key of ['zone','manager'])q('[data-report-filter="'+key+'"]').onchange=()=>{remember();filters.sr='';if(key==='zone')filters.manager='';filtersOpen=false;render();};
- q('[data-report-filter="sr"]').onchange=()=>{remember();filtersOpen=false;render();};
+ q('[data-report-filter="sr"]').onchange=()=>{if(!q('[data-report-filter="sr"]').value)q('[data-report-filter="manager"]').value='';remember();filtersOpen=false;render();};
  q('#ffReportReset').onclick=()=>{filters={...defaults(),zone:'',sr:''};render();};
  q('#ffReportReload').onclick=async e=>{e.target.disabled=true;status('Loading authenticated cloud records…');try{remember();if(await refresh())render();}catch(err){status('Refresh failed: '+err.message+' · Previous snapshot remains dated above.');if(e.target.isConnected)e.target.disabled=false;}};
  qa('.reportBtn').forEach(b=>b.onclick=()=>{remember();try{model();detail=R.names[+b.dataset.r];ctx.pushHistory();ctx.setPage('report:'+b.dataset.r);render();}catch(err){status(err.message);}});
