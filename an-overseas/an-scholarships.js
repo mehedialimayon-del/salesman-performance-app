@@ -13,6 +13,41 @@ const bdt=p=>p.amount==null||!FX[p.currency]?null:Math.round((p.amount*FX[p.curr
 const approx=p=>bdt(p)==null?'Funding varies / official call':('≈ ৳'+bdt(p).toLocaleString('en-US')+' / '+(p.period==='once'?'award':p.period));
 const amountText=p=>p.amount==null?'Official award varies':money(p.amount,p.currency)+' / '+(p.period==='once'?'award':p.period);
 const flagCountry=c=>({'Germany':'🇩🇪','United Kingdom':'🇬🇧','Hungary':'🇭🇺','Türkiye':'🇹🇷','Japan':'🇯🇵','China':'🇨🇳','South Korea':'🇰🇷','Australia':'🇦🇺','France':'🇫🇷','Netherlands':'🇳🇱','Romania':'🇷🇴','Azerbaijan':'🇦🇿','Malaysia':'🇲🇾','Taiwan':'🇹🇼','Finland':'🇫🇮','Sweden':'🇸🇪','United Arab Emirates':'🇦🇪','Saudi Arabia':'🇸🇦','Qatar':'🇶🇦','Hong Kong':'🇭🇰','Brunei':'🇧🇳'})[c]||'🌐';
+
+/* Country-specific destination photography already used by the A&N catalogue, with a gradient fallback.
+   These are illustrative destination visuals, not scholarship sponsor marks. */
+const PHOTO={
+ 'Europe (multiple countries)':'photo-1513635269975-59663e0ac1ad',
+ 'Germany':'photo-1467269204594-9661b134dd2b',
+ 'Hungary':'photo-1541343672885-9be56236302a',
+ 'Türkiye':'photo-1527838832700-5059252407fa',
+ 'Japan':'photo-1493976040374-85c8e12f0c0e',
+ 'South Korea':'photo-1517154421773-0529f29ea451',
+ 'China':'photo-1547981609-4b6bfe67ca0b',
+ 'Malaysia':'photo-1508062878650-88b52897f298',
+ 'United Kingdom':'photo-1513635269975-59663e0ac1ad',
+ 'Australia':'photo-1523482580672-f109ba8cb9be',
+ 'France':'photo-1502602898657-3e91760cbb34',
+ 'Netherlands':'photo-1512470876302-972faa2aa9a4',
+ 'Romania':'photo-1533105079780-92b9be482077',
+ 'Azerbaijan':'photo-1524231757912-21f4fe3a7200',
+ 'Taiwan':'photo-1534168923333-9ee7b67e763b',
+ 'Finland':'photo-1531366936337-7c912a4589a7',
+ 'Sweden':'photo-1509356843151-3e7d96241e11',
+ 'United Arab Emirates':'photo-1512453979798-5ea266f8880c',
+ 'Saudi Arabia':'photo-1578894381163-e72c17f2d45f',
+ 'Qatar':'photo-1562835155-9c5c5cfa02c7',
+ 'Hong Kong':'photo-1536599018102-9f803c140fc1',
+ 'Brunei':'photo-1549476464-37392f717541',
+ 'Asia-Pacific (multiple countries)':'photo-1547981609-4b6bfe67ca0b',
+ 'Global (multiple countries)':'photo-1485738422979-f5c462d49f74'
+};
+const FLAGS={
+ 'Germany':'de','Hungary':'hu','Türkiye':'tr','Japan':'jp','South Korea':'kr','China':'cn','Malaysia':'my','United Kingdom':'gb','Australia':'au','France':'fr','Netherlands':'nl','Romania':'ro','Azerbaijan':'az','Taiwan':'tw','Finland':'fi','Sweden':'se','United Arab Emirates':'ae','Saudi Arabia':'sa','Qatar':'qa','Hong Kong':'hk','Brunei':'bn'
+};
+const photoUrl=p=>PHOTO[p.country]?'https://images.unsplash.com/'+PHOTO[p.country]+'?w=740&q=76&auto=format&fit=crop':'';
+const coverPhoto=(p,cls)=>photoUrl(p)?'<img class="'+cls+'" src="'+esc(photoUrl(p))+'" loading="lazy" decoding="async" alt="" aria-hidden="true">':'';
+const flagPhoto=p=>FLAGS[p.country]?'<img class="an-scholarship-flag" src="https://flagcdn.com/w40/'+FLAGS[p.country]+'.png" alt="" aria-hidden="true" loading="lazy" decoding="async">':'';
 const asList=text=>esc(text).replace(/(?:^|\n)(\d+\.) /g,'$&');
 const getUniList=()=>typeof U!=='undefined'&&Array.isArray(U)?U:[];
 function resolveUniversity(name){
@@ -75,12 +110,26 @@ let filters={search:'',country:'All destinations',level:'All degrees'};
 function card(p,i){
  let desc=p.coverage.length>120?p.coverage.slice(0,117).replace(/\s+\S*$/,'')+'…':p.coverage;
  const initials=p.name.split(/[ \-·]/).filter(x=>/[A-Za-z]/.test(x)).slice(0,3).map(x=>x[0]).join('').toUpperCase();
- return '<article class="an-scholarship-card"><div class="an-scholarship-cover"><div class="an-scholarship-cover-top"><span class="an-scholarship-number">'+String(i+1).padStart(3,'0')+' / '+items.length+'</span><span class="an-scholarship-country">'+flagCountry(p.country)+' '+esc(p.country)+'</span></div><span class="an-scholarship-glyph" aria-hidden="true">'+esc(initials)+'</span></div><div class="an-scholarship-body"><small class="an-scholarship-level">'+esc(p.level)+'</small><h3>'+esc(p.name)+'</h3><div class="an-scholarship-money"><strong>'+esc(amountText(p))+'</strong><small>'+esc(approx(p))+'</small></div><p class="an-scholarship-desc">'+esc(desc)+'</p><div class="an-scholarship-actions"><a href="#/scholarship/'+esc(p.id)+'">View full funding & requirements ↗</a><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Official application ↗</a></div></div></article>';
+ return '<article class="an-scholarship-card"><div class="an-scholarship-cover">'+coverPhoto(p,'an-scholarship-cover-photo')+'<div class="an-scholarship-cover-top"><span class="an-scholarship-number">'+String(i+1).padStart(3,'0')+' / '+items.length+'</span><span class="an-scholarship-country">'+flagPhoto(p)+esc(p.country)+'</span></div><span class="an-scholarship-glyph" aria-hidden="true">'+esc(initials)+'</span></div><div class="an-scholarship-body"><small class="an-scholarship-level">'+esc(p.level)+'</small><h3>'+esc(p.name)+'</h3><div class="an-scholarship-money"><strong>'+esc(amountText(p))+'</strong><small>'+esc(approx(p))+'</small></div><p class="an-scholarship-desc">'+esc(desc)+'</p><div class="an-scholarship-actions"><a href="#/scholarship/'+esc(p.id)+'">View full funding & requirements ↗</a><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Official application ↗</a></div></div></article>';
+}
+
+function featureCard(p){
+ if(!p)return '';
+ const acronym=p.name.split(/[ ·-]/).filter(Boolean).slice(0,3).map(v=>v[0]).join('').toUpperCase();
+ return '<a class="an-feature-scholarship" href="#/scholarship/'+esc(p.id)+'" title="Open '+esc(p.name)+' funding details">'+coverPhoto(p,'an-feature-photo')+'<span class="an-feature-main"><span class="an-feature-tag">'+flagPhoto(p)+esc(p.country)+'</span><strong>'+esc(p.name)+'</strong><small>'+esc(p.level)+' · '+esc(p.amount==null?'Funding by official award':amountText(p))+'</small></span><span class="an-feature-arrow" aria-hidden="true">↗</span></a>';
 }
 function listPage(){
  const countries=['All destinations',...new Set(items.map(p=>p.country))].sort((a,b)=>a==='All destinations'?-1:b==='All destinations'?1:a.localeCompare(b));
  const degrees=['All degrees','Bachelor','Master','PhD','Research','Professional','Exchange','Training'];
- return '<section class="an-scholarship-head"><div class="wrap"><span class="an-eyebrow">A&N Overseas · Academic Funding Library</span><h1>Explore <span>Global Scholarships</span></h1><p>Dedicated funding pathways for Bangladeshi applicants. Every funding level is a separate card where the award structure differs. Amounts, deadlines and university choices must be confirmed against each official call.</p><div class="an-scholarship-facts"><span>🎓 '+items.length+' funding pathways</span><span>🌍 '+(countries.length-1)+' destinations / groups</span><span>🇧🇩 BDT planning conversion · 05 Nov 2026</span></div></div></section><main class="wrap content an-scholarship-directory"><div class="an-scholarship-filters"><label>SEARCH FUNDING / COUNTRY<input id="an-scholarship-search" type="search" autocomplete="off" placeholder="e.g. DAAD, PhD, Erasmus, Japan…" value="'+esc(filters.search)+'"></label><label>DESTINATION<select id="an-scholarship-country">'+countries.map(c=>'<option'+(filters.country===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></label><label>DEGREE LEVEL<select id="an-scholarship-level">'+degrees.map(x=>'<option'+(filters.level===x?' selected':'')+'>'+esc(x)+'</option>').join('')+'</select></label></div><div class="an-scholarship-meta"><strong id="an-scholarship-count"></strong><span>Verified source links in each profile</span></div><div id="an-scholarship-results" class="an-scholarship-grid"></div><p class="an-scholarship-info">Exchange-rate note: <a href="'+BANK+'" target="_blank" rel="noopener noreferrer">Bangladesh Bank, 05 November 2026</a> provides base USD and major currency BDT rates; HUF, TRY, KRW, MYR, RON, AZN, TWD, AED, HKD, QAR and BND use approximate planning estimates. Amount in BDT is a translation of the published award amount, not an extra payment. Exchange rates change, amounts can be revised, and programme funding is not a living-cost guarantee. A source link is not proof that the current application cycle is open.</p></main>';
+ const featured=['erasmus-mundus','daad-epos-masters','hungary-masters','turkiye-ma'].map(id=>items.find(p=>p.id===id)).filter(Boolean);
+ return '<section class="an-scholarship-head"><div class="wrap"><div class="an-scholarship-head-inner"><div><span class="an-eyebrow">A&N Overseas · Funding Library</span><h1>Explore <span>Global Scholarships</span></h1></div><span class="an-scholarship-total">🎓 '+items.length+' Scholarship Pathways</span></div></div></section>'+
+ '<main class="wrap content an-scholarship-directory">'+
+ '<div class="an-feature-grid" aria-label="Four featured scholarships">'+featured.map(featureCard).join('')+'</div>'+
+ '<details class="an-scholarship-about"><summary>About academic funding, eligibility & latest calls <span>⌄</span></summary><p>Scholarships for Bangladeshi applicants, with separate funding levels and programme-specific eligibility. Amounts, deadlines and university choices are controlled by each official annual call. Funding amounts and exchange rates are approximate planning figures.</p><p>🌍 '+(countries.length-1)+' destination groups · 🇧🇩 BDT planning rates dated 05 Nov 2026.</p></details>'+
+ '<div class="an-scholarship-filters"><label>SEARCH FUNDING / COUNTRY<input id="an-scholarship-search" type="search" autocomplete="off" placeholder="e.g. DAAD, PhD, Erasmus, Japan…" value="'+esc(filters.search)+'"></label><label>DESTINATION<select id="an-scholarship-country">'+countries.map(c=>'<option'+(filters.country===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></label><label>DEGREE LEVEL<select id="an-scholarship-level">'+degrees.map(x=>'<option'+(filters.level===x?' selected':'')+'>'+esc(x)+'</option>').join('')+'</select></label></div>'+
+ '<div class="an-scholarship-meta"><strong id="an-scholarship-count"></strong><span>Official sources in each profile</span></div>'+
+ '<div id="an-scholarship-results" class="an-scholarship-grid"></div>'+
+ '<p class="an-scholarship-info">Exchange-rate note: <a href="'+BANK+'" target="_blank" rel="noopener noreferrer">Bangladesh Bank, 05 November 2026</a> provides base USD and major currency BDT rates; HUF, TRY, KRW, MYR, RON, AZN, TWD, AED, HKD, QAR and BND use approximate planning estimates. Amount in BDT is a translation of the published award amount, not an extra payment. Exchange rates change, amounts can be revised, and programme funding is not a living-cost guarantee. A source link is not proof that the current application cycle is open.</p></main>';
 }
 function refreshList(){
  const target=document.getElementById('an-scholarship-results'),count=document.getElementById('an-scholarship-count');if(!target)return;
