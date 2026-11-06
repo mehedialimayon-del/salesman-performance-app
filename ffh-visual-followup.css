@@ -139,7 +139,13 @@
   width:100%!important;min-width:0!important;
 }
 #app .ffDashboardFrame .dashHero > div:first-child {flex:1 1 auto!important;min-width:0!important}
-#app .ffDashboardFrame .dashHero > .ffDashStaffIdentity {display:none!important}
+#app .ffDashboardFrame .dashHero > .ffDashStaffIdentity {
+  display:flex!important;order:2!important;flex:0 1 43%!important;max-width:43%!important;
+  min-width:0!important;
+}
+#app .ffDashboardFrame .dashHero:has(> .ffDashStaffIdentity) > .ffDashManagerCompact {
+  display:none!important;
+}
 #app .ffDashboardFrame .dashHero .ffDashManagerCompact {
   display:flex!important;align-items:center!important;justify-content:center!important;
   gap:6px!important;flex:0 1 43%!important;min-width:0!important;
