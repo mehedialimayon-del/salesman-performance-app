@@ -21,8 +21,31 @@
   }
   function currentDirectory() {
     const list = typeof U !== 'undefined' && Array.isArray(U) ? U : [];
-    const countries = new Set(list.map(x => x.country).filter(Boolean));
-    return {universities: list.length, countries: Math.max(31, countries.size)};
+    const destinations = new Set(list.map(x => x.country).filter(Boolean));
+    const fullyLoaded = window.ANWorldDirectoryStatus?.source === 'Hipo open directory';
+    return {universities: fullyLoaded ? list.length : null, countries: destinations.size};
+  }
+  function refreshDirectoryMetric() {
+    const number = document.getElementById('an2-directory-entry-count');
+    if (!number) return;
+    const total = typeof U !== 'undefined' && Array.isArray(U) ? U.length : 0;
+    const status = window.ANWorldDirectoryStatus;
+    if (status?.source === 'Hipo open directory') {
+      number.textContent = total.toLocaleString('en-US');
+      number.title = 'Current complete searchable directory';
+    } else if (status?.source === 'Curated local list') {
+      number.textContent = total.toLocaleString('en-US');
+      number.title = 'Currently available local directory; external university list could not load';
+    } else {
+      number.textContent = 'Loading…';
+    }
+  }
+  function loadDirectoryCount() {
+    // About Details must load the same catalogue used by the Universities page.
+    // Never display the 809 local seed entries as the complete global total.
+    if (typeof window.ANWorldDirectory?.loadPublicDirectory !== 'function') return;
+    Promise.resolve().then(() => window.ANWorldDirectory.loadPublicDirectory())
+      .then(refreshDirectoryMetric, refreshDirectoryMetric);
   }
   // Use the exact published Countries page list, not a hand-maintained flag list.
   // Bangladesh is the origin, then Asian destinations, European destinations, and others.
@@ -48,7 +71,8 @@
   }
   function renderStory(){
     const directory = currentDirectory();
-    const uniCount = directory.universities.toLocaleString('en-US');
+    const uniCount = directory.universities == null ? 'Loading…' : directory.universities.toLocaleString('en-US');
+    setTimeout(loadDirectoryCount, 0);
     const countryCount = directory.countries.toLocaleString('en-US');
     return '<main class="an2-story wrap" id="an2-story">'+
       '<div class="an2-topline"><a href="#/about" class="an2-back">← ABOUT US</a><span>THE PEOPLE · THE PURPOSE · THE PROMISE</span></div>'+
@@ -61,7 +85,7 @@
       '</nav>'+
       '<section class="an2-intro-section" id="an2-origins"><div class="an2-section-label">CHAPTER 01 <i></i> THE BEGINNING</div><div class="an2-chapter-layout"><div><h1>Two people. One journey.<br><em>A bigger purpose.</em></h1><p>In 2024, Nusrat Nasrin and her husband, Mehedi Alim Ayon, arrived in Malaysia to begin a new chapter of academic and personal growth. Like many international students, they faced unfamiliar systems, important choices, everyday responsibilities and the challenge of making a new country feel like home.</p><p>Through perseverance, study and first-hand experience, they learned to navigate Malaysia’s higher-education landscape. Mehedi pursued postgraduate studies in Communication at Kuala Lumpur University of Science and Technology, while Nusrat continued her own higher-education and research journey, including at Universiti Putra Malaysia (UPM). Their academic paths made them more aware of the questions families ask before sending a loved one abroad.</p><p>What began as an individual education journey gradually became a shared mission: to make the process clearer, more transparent and more human for the students who would come next.</p></div><aside class="an2-origin-aside"><img src="assets/malaysia-skyline-clean.jpg" alt="Kuala Lumpur skyline" loading="lazy"><div><span>OUR FIRST HOME ABROAD</span><strong>KUALA LUMPUR</strong><p>Physical guidance, real local experience and a commitment that continues after arrival.</p></div></aside></div></section>'+
       '<section class="an2-story-chapter" id="an2-purpose"><div class="an2-section-label">CHAPTER 02 <i></i> THE REASON WE STARTED</div><h2>When information is unclear,<br><em>ambition pays the price.</em></h2><div class="an2-prose-columns"><p>They saw how confusing study-abroad decisions could become: incomplete information, unrealistic promises, unclear charges and, in some cases, students being misled by intermediaries. Such experiences can damage a family’s trust and turn an exciting opportunity into unnecessary anxiety. Their answer was not to make louder promises. It was to offer clearer information and more accountable support.</p><p>They also discovered that, for some students, Malaysia could offer recognised programmes, international exposure and a comparatively manageable combination of tuition and living costs. It is not the cheapest or best choice for everyone—each case deserves a realistic comparison—but it can open a door for families who thought overseas education was beyond their means. This realisation inspired A&N Overseas Education & Consultancy in 2024.</p></div><div class="an2-promise-line"><span>OUR BELIEF</span><strong>A family’s budget should shape a sensible plan—not silence a student’s dream.</strong></div></section>'+
-      '<section class="an2-platform" id="an2-platform"><div class="an2-platform-copy"><div class="an2-section-label">CHAPTER 03 <i></i> A DIGITAL HOME FOR BIG DREAMS</div><h2>Thousands of universities.<br><em>One starting point.</em></h2><p>Students often know they want to study abroad before they know which university to choose, what a qualification means or how to apply. The A&N online directory brings institutions, programme discovery, portfolio pages and links to published or official sources together in one place.</p><p>Building a searchable platform of this scale took sustained research and development. The directory continues to grow and improve; its purpose is to help families discover options, compare routes and know where to verify important admissions details—not to suggest that every listed institution is an A&N partner.</p><div class="an2-metrics"><div><strong>'+uniCount+'</strong><span>DIRECTORY ENTRIES</span></div><div><strong>'+countryCount+'</strong><span>COUNTRIES LISTED</span></div><div><strong>2024</strong><span>JOURNEY BEGAN</span></div></div><a class="an2-primary" href="#/universities">EXPLORE THE UNIVERSITY DIRECTORY ↗</a></div><div class="an2-platform-visual"><span>DISCOVER</span><strong>ONE PLATFORM.<br>MORE POSSIBILITIES.</strong><div><small>COMPARE</small><small>VERIFY</small><small>PREPARE</small></div></div></section>'+
+      '<section class="an2-platform" id="an2-platform"><div class="an2-platform-copy"><div class="an2-section-label">CHAPTER 03 <i></i> A DIGITAL HOME FOR BIG DREAMS</div><h2>Thousands of universities.<br><em>One starting point.</em></h2><p>Students often know they want to study abroad before they know which university to choose, what a qualification means or how to apply. The A&N online directory brings institutions, programme discovery, portfolio pages and links to published or official sources together in one place.</p><p>Building a searchable platform of this scale took sustained research and development. The directory continues to grow and improve; its purpose is to help families discover options, compare routes and know where to verify important admissions details—not to suggest that every listed institution is an A&N partner.</p><div class="an2-metrics"><div><strong id="an2-directory-entry-count">'+uniCount+'</strong><span>DIRECTORY ENTRIES</span></div><div><strong>'+countryCount+'</strong><span>COUNTRIES LISTED</span></div><div><strong>2024</strong><span>JOURNEY BEGAN</span></div></div><a class="an2-primary" href="#/universities">EXPLORE THE UNIVERSITY DIRECTORY ↗</a></div><div class="an2-platform-visual"><span>DISCOVER</span><strong>ONE PLATFORM.<br>MORE POSSIBILITIES.</strong><div><small>COMPARE</small><small>VERIFY</small><small>PREPARE</small></div></div></section>'+
       '<section class="an2-story-chapter" id="an2-family"><div class="an2-section-label">CHAPTER 04 <i></i> TRUST STARTS CLOSE TO HOME</div><h2>They believed in this path<br><em>enough to share it with family.</em></h2><p>The confidence in Malaysia as a study destination was not only something they recommended to others. Mehedi also encouraged members of his own family—including his younger brother Wasi Ishraq, his cousin Jihad Hossain Jami and another relative, Sariyar Alam—to explore their own opportunities in Malaysia. Personal examples like these are part of why the team understands how seriously a family takes the decision to send a student abroad.</p><p>For A&N, support is not meant to end after an offer letter. Subject to the individual arrangement, it may include practical pre-departure planning, airport coordination, helping students find their bearings and staying available when questions arise. Every applicant deserves a clear explanation of what is included, what has a fee and which decisions belong to universities and government authorities.</p></section>'+
       '<section class="an2-all-services" id="an2-services"><div class="an2-section-label">CHAPTER 05 <i></i> END-TO-END GUIDANCE</div><h2>Not only an admission.<br><em>A better-supported journey.</em></h2><p class="an2-lead">From the first university search to adjusting to life abroad, A&N’s service areas are designed around the real questions students and families ask.</p><div class="an2-service-grid">'+steps()+'</div></section>'+
       '<section class="an2-story-chapter" id="an2-trust"><div class="an2-section-label">CHAPTER 06 <i></i> TRANSPARENCY & TRACKING</div><h2>Know the next step.<br><em>Know where you stand.</em></h2><div class="an2-trust-grid"><article><b>01</b><h3>Visible Identity</h3><p>We make our people, locations and service information easier to find, so students know whom they are dealing with.</p></article><article><b>02</b><h3>Trackable Milestones</h3><p>The platform explains important application milestones. Private case-specific tracking requires a securely connected service; official university and immigration records remain authoritative.</p></article><article><b>03</b><h3>Honest Outcomes</h3><p>Admission, scholarship and visa decisions belong to the issuing institution or authority. We do not promise approvals that are outside our control.</p></article></div></section>'+
