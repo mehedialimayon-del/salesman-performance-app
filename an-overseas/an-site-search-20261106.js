@@ -119,6 +119,9 @@
   button.title='Search website (Ctrl+K)';
   button.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" stroke-width="2.1" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="7.1"></circle><path d="m16 16 5 5"></path></svg>';
   nav.insertAdjacentElement('afterend',button);
+  const mobileButton=make('button','an-mobile-global-search','⌕ Search the website');
+  mobileButton.type='button';mobileButton.setAttribute('aria-label','Search the entire A&N Overseas website');
+  nav.prepend(mobileButton);
   dialog=make('dialog','an-site-search-dialog');
   dialog.setAttribute('aria-label','Search A&N Overseas');
   const content=make('div','an-site-search-content'),heading=make('div','an-site-search-heading'),headingText=make('div');
@@ -133,6 +136,7 @@
   content.append(heading,field,list);dialog.append(content);document.body.append(dialog);
   const open=()=>{if(!dialog.open)dialog.showModal();input.focus();input.select();render();};
   button.addEventListener('click',open);
+  mobileButton.addEventListener('click',open);
   close.addEventListener('click',()=>dialog.close());
   dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close();});
   dialog.addEventListener('close',()=>button.focus({preventScroll:true}));
