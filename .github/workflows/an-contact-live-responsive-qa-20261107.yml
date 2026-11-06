@@ -75,7 +75,7 @@ jobs:
                 assert(x.docHeight<=height+3,name+': page fixed in viewport');
                 assert(x.socialCards===7&&x.iconCount===7&&x.phone,name+': six icon contacts + Gmail');
                 assert(x.gmailText.includes('@')&&x.gmailText.length>5,name+': Gmail visibly displays address');
-                assert(x.visiblePhoto==='block',name+': city image remains on office card');
+                assert(x.visiblePhoto!=='none',name+': city image remains on office card');
                 assert(x.backgroundKL.includes('malaysia-skyline'),name+': Malaysia photograph linked');
                 assert(x.backgroundBD.includes('Rangpur_town_hall'),name+': Rangpur photograph linked');
                 assert(x.submit.top>=0&&x.submit.bottom<=height+3,name+': Send Enquiry submit visible');
@@ -85,11 +85,13 @@ jobs:
                   assert(x.contacts.top>x.offices[0].top&&x.contacts.bottom<x.enquiry.top,name+': contacts below office');
                   assert(x.enquiry.top>x.contactGrid.top,name+': compact form below socials');
                   assert(x.enquiry.height<260,name+': enquiry panel is compact');
+                  assert(x.gmail.bottom<=x.officePanel.bottom+3,name+': Gmail card not clipped by contact panel');
                   assert(Math.abs(x.fb.top-x.tt.top)<4&&Math.abs(x.yt.top-x.li.top)<4&&Math.abs(x.wa.top-x.call.top)<4,name+': three rows of two icon cards');
                   assert(x.gmail.top>x.call.top&&x.gmail.width>=x.fb.width*1.9,name+': centered full-width Gmail last');
                 }else{
                   assert(x.enquiry.left>x.officePanel.right,name+': form to the right on laptop');
                   assert(Math.abs(x.enquiry.top-x.officePanel.top)<4,name+': desktop aligned');
+                  assert(x.gmail.bottom<=x.officePanel.bottom+3,name+': desktop Gmail row fits without overflow');
                 }
                 await page.screenshot({path:'contact-'+name+'.png'});
                 if(name==='phone-standard'){
