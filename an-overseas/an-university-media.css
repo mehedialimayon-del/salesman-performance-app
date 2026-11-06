@@ -224,3 +224,14 @@
 @media(max-width:520px){
  .an-guide-card .an-logo-stage .an-institution-site-icon{width:75px!important;height:75px!important;padding:9px!important}
 }
+
+/* Commons logo attribution on university cards */
+#app .an-guide-card .an-logo-stage{position:relative}
+#app .an-guide-card .an-logo-credit{
+  position:absolute;bottom:5px;left:6px;right:6px;
+  display:block;max-width:calc(100% - 12px);
+  color:#ffcb94;font-size:8px!important;font-weight:700;
+  text-decoration:underline;text-align:center;text-overflow:ellipsis;
+  white-space:nowrap;overflow:hidden;padding:2px 3px;
+  background:#060a12db;border-radius:4px;z-index:9;
+}
