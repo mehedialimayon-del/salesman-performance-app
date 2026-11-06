@@ -470,3 +470,112 @@ body:not(.an-about-locked) #app .an2-story{--gold:#ffd19b;--orange:#ff962a;--cre
 @media(prefers-reduced-motion:reduce){
   #app .an2-founder-quote .an2-floating-flags .an2-flag{animation:none!important;will-change:auto!important}
 }
+
+
+/* AN portrait-only refinement / user feedback 2026-11-06.
+   The source portrait ALREADY includes a Nusrat Nasrin badge, so display CEO below it.
+   Leave all animated country flags and other About elements unchanged. */
+#app .an2-founder-quote .an2-quote-footer{
+  grid-template-columns:minmax(0,1fr) clamp(187px,34%,232px)!important;
+  gap:3px!important;
+  min-height:307px!important;
+  align-items:end!important;
+  margin-right:-26px!important;
+}
+#app .an2-founder-quote .an2-founder-person{
+  display:block!important;
+  position:relative!important;
+  justify-self:end!important;
+  align-self:end!important;
+  width:100%!important;
+  height:308px!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:visible!important;
+  background:none!important;
+}
+#app .an2-founder-quote .an2-founder-person img{
+  position:absolute!important;
+  top:auto!important;
+  bottom:29px!important;
+  left:auto!important;
+  right:0!important;
+  width:111%!important;
+  height:auto!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:contain!important;
+  object-position:right bottom!important;
+  display:block!important;
+  opacity:1!important;
+  visibility:visible!important;
+  mix-blend-mode:normal!important;
+  filter:brightness(1.2) contrast(1.07) saturate(1.08) drop-shadow(0 8px 12px rgba(0,0,0,.23))!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  border:0!important;
+  border-radius:0!important;
+  image-rendering:auto!important;
+  z-index:1!important;
+}
+#app .an2-founder-quote .an2-founder-person figcaption{
+  position:absolute!important;
+  left:0!important;right:0!important;bottom:0!important;
+  z-index:3!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  height:29px!important;min-height:29px!important;
+  padding:0 2px 5px!important;margin:0!important;
+  border:0!important;
+  background:none!important;
+  box-shadow:none!important;
+  overflow:visible!important;clip:auto!important;
+  white-space:normal!important;
+  text-align:center!important;
+}
+#app .an2-founder-quote .an2-founder-person figcaption strong{display:none!important}
+#app .an2-founder-quote .an2-founder-person figcaption span{
+  color:#ffc17f!important;
+  font-size:12px!important;
+  line-height:1.1!important;
+  font-weight:850!important;
+  letter-spacing:1.15px!important;
+  text-shadow:0 1px 3px rgba(0,0,0,.9)!important;
+  display:block!important;
+  margin:0!important;
+}
+@media(max-width:650px){
+  #app .an2-founder-quote .an2-quote-footer{
+    grid-template-columns:minmax(0,1fr) 174px!important;
+    gap:2px!important;
+    margin-right:-17px!important;
+    min-height:297px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person{
+    width:174px!important;
+    height:298px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person img{
+    width:111%!important;
+    right:0!important;
+    bottom:29px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person figcaption{
+    height:29px!important;
+    min-height:29px!important;
+    padding:0 1px 6px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person figcaption span{font-size:11px!important}
+}
+@media(max-width:380px){
+  #app .an2-founder-quote .an2-quote-footer{
+    grid-template-columns:minmax(0,1fr) 158px!important;
+    margin-right:-17px!important;
+    min-height:280px!important;
+  }
+  #app .an2-founder-quote .an2-founder-person{width:158px!important;height:281px!important}
+  #app .an2-founder-quote .an2-founder-person img{width:115%!important}
+}
