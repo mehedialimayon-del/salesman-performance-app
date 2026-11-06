@@ -81,6 +81,7 @@ const official=[
  ['Choreomundus','Dance and Movement as Practical Knowledge and Heritage','https://choreomundus.org/'],
  ['EMCL-25','European Masters in Clinical Linguistics','https://www.emcl.eu/']
 ];
+official.push(...(window.ANErasmusCatalogueExtra||[]));
 const uniqueHosts=Array.from(new Map(programmes.flatMap(p=>p.hosts.map(h=>[h.name.toLowerCase(),h]))).values());
 function initials(n){return n.split(/\W+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();}
 function hostImage(h){let host;try{host=new URL(h.url).hostname;}catch(e){host='';}
@@ -99,11 +100,11 @@ function programme(p,i){
 function explorer(){
  return '<header class="an-em-head"><span class="an-em-eyebrow">PROGRAMME-BY-PROGRAMME · OFFICIAL SOURCES</span><h2><span>Universities</span> & <em>Eligible Programmes</em></h2>'+
  '<p>Choose a <strong>joint master programme first</strong>; only its stated consortium universities are participating hosts. The 215-project EACEA catalogue includes programmes that may NOT have a current funded scholarship.</p>'+
- '<div class="an-em-counters"><span><b>'+programmes.length+'</b> verified partner networks</span><span><b>'+uniqueHosts.length+'</b> named university records</span><span><b>40</b> recent official catalogue entries</span></div></header>'+
+ '<div class="an-em-counters"><span><b>'+programmes.length+'</b> verified partner networks</span><span><b>'+uniqueHosts.length+'</b> named university records</span><span><b>'+official.length+'</b> official catalogue entries</span></div></header>'+
  '<div class="an-em-searchline"><label for="an-em-search">Search programme or university</label><input type="search" id="an-em-search" placeholder="e.g. battery, Erasmus, Sweden, EDISS" autocomplete="off"><span id="an-em-result-count" aria-live="polite"></span></div>'+
  '<div class="an-em-programme-stack">'+programmes.map(programme).join('')+'</div>'+
- '<section class="an-em-official"><div class="an-em-official-top"><div><span class="an-em-eyebrow">EU OFFICIAL CATALOGUE · NOT UNIVERSAL SCHOLARSHIP ELIGIBILITY</span><h3>Other published Erasmus Mundus joint masters</h3></div><strong>40 / 215</strong></div>'+
- '<p>The first 40 projects currently shown in the EACEA catalogue are listed on this page. Click an individual programme to verify its universities, intake, scholarship places, duration and fees. No unverified partner universities or tuition amounts are invented.</p>'+
+ '<section class="an-em-official"><div class="an-em-official-top"><div><span class="an-em-eyebrow">EU OFFICIAL CATALOGUE · NOT UNIVERSAL SCHOLARSHIP ELIGIBILITY</span><h3>Other published Erasmus Mundus joint masters</h3></div><strong>'+official.length+' / 215</strong></div>'+
+ '<p>All '+official.length+' projects currently shown in the EACEA catalogue are listed on this page. Click an individual programme to verify its universities, intake, scholarship places, duration and fees. No unverified partner universities or tuition amounts are invented.</p>'+
  '<div class="an-em-official-grid">'+official.map((p,i)=>'<article class="an-em-official-card"><span>'+String(i+1).padStart(2,'0')+' · '+E(p[0])+'</span><h4>'+E(p[1])+'</h4><p>Universities, eligibility, current scholarship places and fees: verify with this consortium.</p><a href="'+E(p[2])+'" target="_blank" rel="noopener noreferrer">Programme details ↗</a></article>').join('')+'</div>'+
  '<a class="an-em-masterlink" href="'+URL_EACEA+'" target="_blank" rel="noopener noreferrer">Browse the full 215-project European Commission catalogue ↗</a></section>';
 }
@@ -118,7 +119,7 @@ function attachDirectory(){
   const id='em-'+h.name.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,58);
   if(U.some(u=>u.id===id))continue;
   const linked=programmes.filter(p=>p.hosts.some(a=>a.name===h.name));
-  U.push({id,name:h.name,short:h.name,city:h.city,country:h.country,kind:'Public',programs:linked.map(p=>p.name),site:h.url,logoImage:'https://www.google.com/s2/favicons?domain='+encodeURIComponent(new URL(h.url).hostname)+'&sz=128',scholarshipProgrammes:linked.map(p=>p.id)});
+  U.push({id,name:h.name,short:h.name,city:h.city,country:h.country,kind:h.name==='Drexel University'?'Private':'Public',programs:linked.map(p=>p.name),site:h.url,logoImage:'https://www.google.com/s2/favicons?domain='+encodeURIComponent(new URL(h.url).hostname)+'&sz=128',scholarshipProgrammes:linked.map(p=>p.id)});
   current.add(exact);
  }
  try{window.ANScholarships?.addKnownUniversities?.(U);}catch(err){}
