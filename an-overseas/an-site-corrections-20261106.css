@@ -160,3 +160,120 @@ body.an-contact-mode #app .an-contact-feedback{
 @media(max-width:800px){
  body.an-contact-mode #app .an-contact-content{padding-top:12px!important}
 }
+
+/* CONTACT PAGE — premium two-column office and enquiry layout.
+   Landmark photographs are labelled as CITY views, never office-building photos. */
+body.an-contact-mode #app .an-contact-head{
+  background:radial-gradient(ellipse at 86% 10%,#ff8a171c,transparent 50%),#10131a;
+  padding:22px 0 17px!important;border-bottom:1px solid #754b28;
+}
+body.an-contact-mode #app .an-contact-head h1{
+  font-size:clamp(27px,3vw,40px)!important;margin:6px 0!important;color:#fff;
+}
+body.an-contact-mode #app .an-contact-head h1 span{color:#ffa33c!important}
+body.an-contact-mode #app .an-contact-head p{font-size:13px;color:#e1d9d0}
+body.an-contact-mode #app .an-contact-main{
+  display:grid!important;grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr)!important;
+  gap:20px!important;align-items:start!important;
+}
+body.an-contact-mode #app .an-contact-offices,
+body.an-contact-mode #app .an-contact-enquiry{
+  min-width:0;padding:22px;background:linear-gradient(145deg,#1b1e25,#0e1118 77%);
+  border:1px solid #85532a;border-radius:17px;box-shadow:0 14px 35px #0005;
+}
+body.an-contact-mode #app .an-contact-offices h2,
+body.an-contact-mode #app .an-contact-enquiry h2{
+  font-size:clamp(21px,2vw,29px);color:#fff;margin:0 0 18px;line-height:1.15;
+}
+body.an-contact-mode #app .an-contact-offices h2 span,
+body.an-contact-mode #app .an-contact-enquiry h2 span{color:#ffae51}
+body.an-contact-mode #app .an-contact-office-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;
+}
+body.an-contact-mode #app .an-contact-office{
+  min-width:0;overflow:hidden;border:1px solid #74502e;
+  border-radius:13px;background:#141820;padding:0 0 12px;
+}
+body.an-contact-mode #app .an-contact-office-photo{
+  height:126px;position:relative;background-color:#283044;background-position:center;
+  background-size:cover;display:flex;align-items:end;isolation:isolate;overflow:hidden;
+}
+body.an-contact-mode #app .an-contact-office-photo:before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(0deg,#070a11e6,transparent 76%);
+}
+body.an-contact-mode #app .an-contact-office--kl .an-contact-office-photo{
+  background-image:url("assets/malaysia-skyline-clean.jpg");
+}
+body.an-contact-mode #app .an-contact-office--rangpur .an-contact-office-photo{
+  background-image:url("https://commons.wikimedia.org/wiki/Special:FilePath/Rangpur_town_hall.jpg?width=900");
+}
+body.an-contact-mode #app .an-contact-office-photo span{
+  display:block;color:#fff;font-size:9px;letter-spacing:1px;font-weight:900;
+  padding:10px;text-shadow:0 1px 4px #000;
+}
+body.an-contact-mode #app .an-contact-office b{
+  display:block;margin:12px 11px 4px;font-size:14px;color:#fff;
+}
+body.an-contact-mode #app .an-contact-office b span{color:#ffb55a}
+body.an-contact-mode #app .an-contact-office p{
+  min-height:36px;margin:5px 11px 8px;color:#d2d6de;font-size:12px;line-height:1.45;
+  overflow-wrap:anywhere;
+}
+body.an-contact-mode #app .an-contact-map{
+  display:inline-flex;margin:0 11px;padding:7px 9px;border:1px solid #bc823e;
+  border-radius:8px;font-size:10px;font-weight:800;color:#ffe1ad!important;
+  background:#3b270f;text-decoration:none;line-height:1.3;
+}
+body.an-contact-mode #app .an-contact-map:hover{background:#78410e;color:#fff!important}
+body.an-contact-mode #app .an-contact-photo-credit{
+  display:block;margin:8px 11px 0;font-size:8px;line-height:1.45;color:#c0b1a6;
+}
+body.an-contact-mode #app .an-contact-photo-credit a{text-decoration:underline;color:#ffcc95}
+body.an-contact-mode #app .an-contact-social{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:17px 0 10px;
+}
+body.an-contact-mode #app .an-contact-social a{
+  display:inline-flex;align-items:center;gap:7px;justify-content:center;
+  border:1px solid #8f6335;background:#2a2018;
+  color:#f6e6d5;border-radius:9px;min-height:39px;min-width:45px;
+  padding:8px 11px;font-size:17px;font-weight:800;text-decoration:none;
+}
+body.an-contact-mode #app .an-contact-social a small{font-size:10px;color:#ffd3a5}
+body.an-contact-mode #app .an-contact-social a.an-social-unset{
+  opacity:.38;cursor:not-allowed;pointer-events:none;
+}
+body.an-contact-mode #app .an-contact-social a:not(.an-social-unset):hover{
+  border-color:#ffbb73;background:#4a2c15;
+}
+body.an-contact-mode #app .an-contact-email{
+  display:inline-flex;align-items:center;gap:7px;color:#ffca88!important;
+  font-weight:750;font-size:12px;overflow-wrap:anywhere;padding:8px 0;
+}
+body.an-contact-mode #app .an-contact-fields{display:grid;gap:13px}
+body.an-contact-mode #app .an-contact-fields label{
+  display:flex;flex-direction:column;gap:5px;color:#eac29a;
+  font-size:12px;font-weight:800;
+}
+body.an-contact-mode #app .an-contact-fields input,
+body.an-contact-mode #app .an-contact-fields textarea{
+  display:block;width:100%;box-sizing:border-box;min-height:43px;
+  padding:11px 12px;border:1px solid #7e6247;border-radius:10px;
+  color:#fff;background:#11161d;outline-offset:1px;
+  font-size:14px;font-weight:500;
+}
+body.an-contact-mode #app .an-contact-fields textarea{
+  min-height:118px;resize:vertical;
+}
+body.an-contact-mode #app .an-contact-fields input:focus,
+body.an-contact-mode #app .an-contact-fields textarea:focus{border-color:#ffaa53}
+body.an-contact-mode #app .an-contact-enquiry button[type=submit]{margin-top:15px;width:100%;min-height:45px}
+@media(max-width:800px){
+  body.an-contact-mode #app .an-contact-main{grid-template-columns:1fr!important;gap:14px!important}
+  body.an-contact-mode #app .an-contact-offices,
+  body.an-contact-mode #app .an-contact-enquiry{padding:17px!important}
+}
+@media(max-width:430px){
+  body.an-contact-mode #app .an-contact-office-grid{grid-template-columns:1fr}
+  body.an-contact-mode #app .an-contact-office-photo{height:128px}
+}
