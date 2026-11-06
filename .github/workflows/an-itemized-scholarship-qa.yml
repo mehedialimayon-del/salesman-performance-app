@@ -68,7 +68,7 @@ jobs:
               }));
               await go('scholarship/hungary-masters');
               const other=await p.evaluate(()=>({board:!!document.querySelector('#an-scholarship-decision-board'),facts:document.querySelectorAll('.an-decision-fact').length,steps:document.querySelectorAll('.an-application-walkthrough li').length}));
-              const ok=about.portrait>=250&&about.flagWidth<=34&&about.flagWidth>0&&about.flagAnimation.includes('anTinyFlagWave')&&er.board&&er.factCount===8&&er.moi&&er.score&&er.walkthrough>=8&&er.links>=3&&er.stepText&&ep.board&&ep.visa&&ep.epos>=27&&ep.stepDetails>=27&&ep.scoreBadges>=27&&ep.guide>=7&&other.board&&other.facts===8&&other.steps>=7&&!errors.length;
+              const ok=about.portrait>=250&&about.flagWidth>=44&&about.flagWidth<=64&&about.flagAnimation.includes('anTinyFlagWave')&&er.board&&er.factCount===8&&er.moi&&er.score&&er.walkthrough>=8&&er.links>=3&&er.stepText&&ep.board&&ep.visa&&ep.epos>=27&&ep.stepDetails>=27&&ep.scoreBadges>=27&&ep.guide>=7&&other.board&&other.facts===8&&other.steps>=7&&!errors.length;
               const result={viewport:w+'x'+h,about,erasmus:er,epos:ep,generic:other,errors,passed:ok};
               console.log('ITEMIZED QA '+JSON.stringify(result));
               if(!ok){fail=true;console.error('ITEMIZED QA FAILED '+w);}
