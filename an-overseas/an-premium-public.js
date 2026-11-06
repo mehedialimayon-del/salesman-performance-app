@@ -142,6 +142,8 @@ async function load(){
   const next=JSON.stringify(data);
   if(snapshot!==next){snapshot=next;stories=Array.isArray(data.success_stories)?data.success_stories:[];insights=Array.isArray(data.study_insights)?data.study_insights:[];
    countries=Array.isArray(data.countries)?data.countries:null;team=Array.isArray(data.management)?data.management:[];}
+  window.ANPublicSearchData={stories,insights};
+  window.dispatchEvent(new Event('an-public-search-updated'));
   apply();
  }catch(e){
   if(!snapshot&&current()==='success'){
