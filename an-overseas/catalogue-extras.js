@@ -2,7 +2,7 @@
    Costs are illustrative published programme examples, NOT overall university fees. */
 (function(){
 'use strict';
-var visibleLimit=80,lastQuerySignature='',lastRenderedSignature='',lastRenderedCount=0,loadMoreObserver=null;
+var visibleLimit=80,lastQuerySignature='',lastQueryFilterSignature='',lastRenderedSignature='',lastRenderedCount=0,loadMoreObserver=null;
 var priority=['Malaysia','China','Japan','South Korea','Singapore','Thailand','United Arab Emirates','Turkey','United Kingdom','Germany','France','Italy','Ireland','Netherlands','Sweden','Finland','Austria','Belgium','Switzerland','Norway','Denmark','Spain','Portugal','Poland','Czech Republic','Hungary','Greece','Luxembourg','Canada','United States','Australia','New Zealand'];
 const countryIndex=name=>{const n=priority.indexOf(name);return n<0?1000:n;};
 countries.sort((a,b)=>countryIndex(a[0])-countryIndex(b[0])||a[0].localeCompare(b[0]));
@@ -93,11 +93,43 @@ function anNumberedCard(u){
  }
  return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite).replace('</article>','<a class="an-catalogue-apply" href="#/apply/'+encodeURIComponent(u.id)+'" aria-label="Start an A&amp;N application for '+esc(u.name)+'">Apply through A&amp;N ↗</a></article>');
 }
+
+function filterStateSignature(){
+ return [filterCountry,searchTerm.toLowerCase().trim(),String(pref.requirement||'').toLowerCase().trim(),
+  pref.kind,pref.level,pref.subject,pref.currency,pref.minFee,pref.maxFee,pref.order,scholarshipOnly].join('|');
+}
+function snapshotState(){
+ return {visibleLimit,pref:{...pref},filterCountry,searchTerm,scholarshipOnly};
+}
+function restoreState(){
+ const saved=window.ANNavState?.get?.(location.hash||'#/home')?.catalogue;
+ if(!saved||typeof saved!=='object')return false;
+ const keys=Object.keys(pref);
+ keys.forEach(k=>{if(Object.prototype.hasOwnProperty.call(saved.pref||{},k))pref[k]=saved.pref[k];});
+ const params=new URLSearchParams(location.hash.split('?')[1]||'');
+ filterCountry=params.has('country')?params.get('country'):String(saved.filterCountry||filterCountry);
+ searchTerm=String(saved.searchTerm||'');scholarshipOnly=!!saved.scholarshipOnly;
+ visibleLimit=Math.min(6017,Math.max(80,Number(saved.visibleLimit)||80));
+ lastQueryFilterSignature=filterStateSignature();
+ const controls={'type-filter':pref.kind,'level-filter':pref.level,'subject-filter':pref.subject,
+  'currency-filter':pref.currency,'min-fee-filter':pref.minFee,'max-fee-filter':pref.maxFee,
+  'order-filter':pref.order,'requirements-filter':pref.requirement,'country-filter':filterCountry,
+  'university-search':searchTerm};
+ for(const [id,value] of Object.entries(controls)){
+   const el=document.getElementById(id);
+   if(el)el.value=value;
+ }
+ const check=document.getElementById('scholarship-filter');if(check)check.checked=scholarshipOnly;
+ return true;
+}
+window.ANCatalogueState={snapshot:snapshotState,restore:restoreState};
 renderResults=function(){
  const el=document.getElementById('results');if(!el)return;
  const term=searchTerm.toLowerCase().trim(),req=pref.requirement.toLowerCase().trim();
  const signature=[filterCountry,term,req,pref.kind,pref.level,pref.subject,pref.currency,pref.minFee,pref.maxFee,pref.order,scholarshipOnly,U.length].join('|');
- if(signature!==lastQuerySignature){visibleLimit=80;lastQuerySignature=signature;}
+ const filterSig=filterStateSignature();
+ if(filterSig!==lastQueryFilterSignature){visibleLimit=80;lastQueryFilterSignature=filterSig;}
+ lastQuerySignature=signature;
  const feeFilter=pref.minFee!==''||pref.maxFee!=='',needsCurrency=(feeFilter||pref.order.startsWith('Published fee:'))&&pref.currency==='Any currency';
  let found=needsCurrency?[]:U.filter(u=>{
   const p=UNIVERSITY_PROFILES[u.id]||{},str=[u.name,u.short,u.country,u.city,...(u.programs||[]),...(p.programs||[])].join(' ').toLowerCase();
