@@ -262,6 +262,6 @@ html body .top .an-favorite-header::before {color:#f4264a!important;animation:no
     text-shadow:none!important;
   }
 }
-@media (prefers-reduced-motion:reduce) {
+@media (min-width:801px) and (prefers-reduced-motion:reduce) {
   body.an-services-mode #app .an-service-picture img {transition:none!important;}
 }
