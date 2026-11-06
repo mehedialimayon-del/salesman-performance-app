@@ -140,6 +140,11 @@
        u.logoImage=commons.logo;
      }
    }
+   const verifiedLogo=window.ANAsiaSupplementaryLogos?.[u.id];
+   if(verifiedLogo?.logo&&!u.logoImage&&!failedMediaUrls.has(verifiedLogo.logo)){
+     u.logoImage=verifiedLogo.logo;
+     u.logoSource=verifiedLogo.source||u.site;
+   }
    const match=verifiedCoversById[u.id]||verifiedCovers[key];
    if(!match)return;
    if(match.site&&!u.site)u.site=match.site;
