@@ -5,6 +5,11 @@ on:
     paths:
       - 'ffh-direct-filters.js'
       - 'ffh-direct-filters.css'
+      - 'ffh-visual-followup.css'
+      - 'ffh-visual-followup.js'
+      - 'staff-identity.js'
+      - 'searchable-picker.js'
+      - 'tests/visual-followup.cjs'
       - 'reports-ui.js'
       - 'daily-performance.js'
       - 'tests/daily-performance-dom.cjs'
@@ -34,11 +39,16 @@ jobs:
           node --check reports-ui.js
           node --check daily-performance.js
           node --check staff-photos.js
+          node --check searchable-picker.js
+          node --check staff-identity.js
+          node --check ffh-visual-followup.js
+          node --check tests/visual-followup.cjs
           node --check tests/direct-filters.cjs
           node --check tests/direct-filters-browser.cjs
       - name: Zone / Combined / Manager and report regression
         run: |
           node tests/direct-filters.cjs
+          node tests/visual-followup.cjs
           node tests/reports-filtered.cjs
           node tests/daily-performance-dom.cjs
           node tests/company-roster.cjs
