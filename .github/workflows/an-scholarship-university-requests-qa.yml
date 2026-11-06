@@ -45,12 +45,16 @@ jobs:
             out.about=await page.evaluate(()=>{
              const photo=document.querySelector('.an2-founder-person');
              const img=photo?.querySelector('img');
-             const flag=document.querySelector('.an2-floating-flags .an2-flag');
+             const homeFlag=document.querySelector('.an2-floating-flags .an2-flag-unit--home .an2-flag');
+             const otherFlag=document.querySelector('.an2-floating-flags .an2-flag-unit:not(.an2-flag-unit--home) .an2-flag');
              const heart=document.querySelector('.top .an-favorite-header svg');
              return {photoHeight:Math.round(photo?.getBoundingClientRect().height||0),
               imageHeight:Math.round(img?.getBoundingClientRect().height||0),
-              flagWidth:Math.round(flag?.getBoundingClientRect().width||0),
-              heartFill:heart&&getComputedStyle(heart).fill,story:!!document.querySelector('.an2-story')};
+              flagWidth:Math.round(homeFlag?.getBoundingClientRect().width||0),
+              otherFlagWidth:Math.round(otherFlag?.getBoundingClientRect().width||0),
+              heartFill:heart&&getComputedStyle(heart).fill,
+              heartAnimation:heart&&getComputedStyle(heart).animationName,
+              story:!!document.querySelector('.an2-story')};
             });
             await visit('universities?country=Malaysia');
             await page.waitForSelector('#results .uni-card',{timeout:12000});
@@ -94,8 +98,12 @@ jobs:
             await visit('scholarship/hungary-masters');
             out.hungary=await page.evaluate(()=>({help:!!document.querySelector('#an-scholarship-help #contact-form'),docs:!!document.querySelector('#an-scholarship-document-guide')}));
             out.errors=errors;all.push(out);
-            const valid=out.about.story&&out.about.photoHeight>=220&&out.about.flagWidth<=32&&
-             /rgb\(244, 38, 74\)/.test(out.about.heartFill)&&out.catalogue.minHeight>=200&&
+            const valid=out.about.story&&out.about.photoHeight>=220&&
+             // Bangladesh home flag is intentionally larger than other destination flags.
+             out.about.flagWidth>=40&&out.about.flagWidth<=70&&
+             out.about.otherFlagWidth>0&&out.about.otherFlagWidth<=36&&
+             /rgb\(244, 38, 74\)/.test(out.about.heartFill)&&
+             out.about.heartAnimation.includes('an-heart-hop')&&out.catalogue.minHeight>=200&&
              out.catalogue.controlRows.every(y=>Math.abs(y-out.catalogue.controlRows[0])<=6)&&
              out.categoryOpen&&out.categorySelected&&out.china.cards>=1&&out.china.minHeight>=200&&
              out.scholarships.features===4&&out.scholarships.nested&&out.scholarships.filtersOutside&&
