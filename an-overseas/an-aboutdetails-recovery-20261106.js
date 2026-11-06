@@ -38,6 +38,18 @@
   if(!app)return;
   const observer=new MutationObserver(queue);
   observer.observe(app,{childList:true});
+  // The Read More click must draw the full article immediately.
+  // Waiting for hashchange left an empty black shell for one frame or longer.
+  document.addEventListener('click',event=>{
+   const link=event.target.closest?.('#an-about-fixed .an-about-readmore[href="#/aboutdetails"]');
+   if(!link)return;
+   event.preventDefault();
+   if(location.hash!=='#/aboutdetails')location.hash='#/aboutdetails';
+   try{
+    if(typeof window.render==='function')window.render();
+   }catch(err){console.error('About Details navigation failed',err);}
+   repair();
+  },true);
   window.addEventListener('hashchange',queue);
   window.addEventListener('pageshow',queue);
   queue();
