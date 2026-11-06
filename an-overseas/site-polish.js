@@ -102,7 +102,6 @@ function applyAbout(){
  const isNusrat=managerIndex===0&&String(m.name||'').trim().toLowerCase()==='nusrat nasrin';
  const portfolio=isNusrat?'https://mehedialimayon-del.github.io/Nusrat-Nasrin/?utm_source=chatgpt.com':m.portfolio;
  const profileButton=(typeof portfolio==='string'&&/^https:\/\//i.test(portfolio))?'<a class="an-management-link" href="'+E(portfolio)+'" target="_blank" rel="noopener noreferrer">View Portfolio ↗</a>':'';
- const adminButton=isNusrat?'<a class="an-management-link an-management-admin" href="#/admin"><span aria-hidden="true">🔐</span> Admin Panel</a>':'';
  const phone=String(m.phone||'').trim();
  const phoneHtml=phone?'<p class="an-management-contact">Phone: '+E(phone)+'</p>':'';
  const email=String(m.email||'').trim();
@@ -118,7 +117,7 @@ function applyAbout(){
   +(m.department&&m.department!==company?'<p>'+E(m.department)+'</p>':'')
   +(help?'<p class="an-management-help">'+E(help)+'</p>':'')
   +phoneHtml+emailHtml
-  +'<div class="an-management-links">'+profileButton+adminButton+'</div></div></div>';
+  +'<div class="an-management-links">'+profileButton+'</div></div></div>';
  if(counter)counter.textContent=(managerIndex+1)+' / '+members.length;
 }
 function applyDetails(){
