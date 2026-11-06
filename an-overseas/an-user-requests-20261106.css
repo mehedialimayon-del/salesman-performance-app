@@ -9,14 +9,14 @@
 }
 body .top .an-favorite-header svg{
  fill:#f4264a!important;stroke:#ff607c!important;stroke-width:1.3!important;
- animation:an-heart-hop 2.8s ease-in-out infinite!important;
+ animation:none!important;transform:none!important;
  transform-origin:50% 50%!important;
 }
 body .top .an-favorite-header{animation:none!important;transform:none!important}
 @media(min-width:801px){
  body .top .an-favorite-header::before{
   color:#f4264a!important;
-  animation:an-heart-hop 2.8s ease-in-out infinite!important;
+  animation:none!important;transform:none!important;
   transform-origin:center center!important;
  }
 }
