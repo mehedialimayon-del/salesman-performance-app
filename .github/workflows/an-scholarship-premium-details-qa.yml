@@ -1,0 +1,84 @@
+name: A&N Scholarship Premium Details Visual QA
+on:
+  push:
+    paths:
+      - "an-overseas/index.html"
+      - "an-overseas/an-scholarship-detail-highlights-20261107.js"
+      - "an-overseas/an-scholarship-detail-highlights-20261107.css"
+      - ".github/workflows/an-scholarship-premium-details-qa.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Set up Chromium
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Test highlighted visa topics, course facts, submission and preparation
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --directory an-overseas >/tmp/an-scholarship-premium-qa.log 2>&1 &
+          sleep 1
+          timeout 220s node <<'JS'
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+            let failed=[];
+            for(const [w,h] of [[375,812],[414,896],[1366,768]]){
+              const page=await browser.newPage({viewport:{width:w,height:h}});
+              const errors=[];page.on('pageerror',e=>errors.push(e.message));
+              const go=async route=>{
+                await page.goto('http://127.0.0.1:8765/index.html?qa=scholarship-premium#/'+route,{waitUntil:'domcontentloaded'});
+                await page.waitForTimeout(1050);
+              };
+              await go('scholarship/erasmus-mundus');
+              const e=await page.evaluate(()=>{
+                const visa=document.querySelector('.an-visa-topic-grid');
+                const topics=[...document.querySelectorAll('.an-visa-topic h3')].map(x=>x.textContent);
+                const guide=[...document.querySelectorAll('.an-specific-guide')].find(x=>x.textContent.includes('Verified Erasmus Mundus programme example'));
+                const course=[...guide.querySelectorAll('article')].find(x=>x.querySelector('h3')?.textContent.includes('Course & universities'));
+                const submission=[...guide.querySelectorAll('article')].find(x=>x.querySelector('h3')?.textContent==='Submission steps');
+                const milestones=[...guide.querySelectorAll('article')].find(x=>x.querySelector('h3')?.textContent.includes('Application & selection'));
+                const brief=document.querySelector('#an-scholarship-student-brief');
+                const all=document.querySelector('.an-scholarship-detail');
+                return {topics:topics.length,topicNames:topics,visaColored:visa&&getComputedStyle(visa.firstElementChild).borderLeftColor,
+                  noOriginalCountryParagraph:!Array.from(document.querySelectorAll('.an-scholarship-section-full>p')).some(x=>x.textContent.includes('ERASMUS MUNDUS:')),
+                  ribbon:course?.querySelectorAll('.an-em-fact-ribbon>span').length||0,
+                  keymarks:course?.querySelectorAll('mark.an-keymark').length||0,
+                  submission:submission?.querySelectorAll('ol>li').length||0,
+                  submissionStyled:!!submission?.classList.contains('an-premium-submission-steps'),
+                  milestoneCount:milestones?.querySelectorAll('ol>li').length||0,
+                  noEmptyPlaceholder:!all?.textContent.includes('The live opening and closing countdown now appears prominently'),
+                  studentPrep:brief?.querySelectorAll('.an-brief-item').length||0,
+                  prepContent:brief?.textContent.includes('€20,000')&&brief?.textContent.includes('150 points')&&brief?.textContent.includes('€0'),
+                  programmeCards:document.querySelectorAll('.an-em-programme').length,
+                  countdown:!!document.querySelector('#an-em-top-countdown'),
+                  overflow:document.documentElement.scrollWidth>innerWidth+3
+                };
+              });
+              const check=e.topics>=4&&e.topicNames.includes('WORK')&&e.topicNames.includes('FAMILY')&&e.topicNames.some(x=>x.includes('AFTER STUDY'))&&e.noOriginalCountryParagraph&&e.ribbon===5&&e.keymarks>5&&e.submission===5&&e.submissionStyled&&e.milestoneCount===5&&e.noEmptyPlaceholder&&e.studentPrep===10&&e.prepContent&&e.programmeCards===3&&e.countdown&&!e.overflow&&!errors.length;
+              console.log('PREMIUM QA',JSON.stringify({viewport:w+'x'+h,check,e,errors}));
+              if(!check)failed.push('i-MESC '+w);
+              await go('scholarship/daad-epos-masters');
+              const ep=await page.evaluate(()=>({
+                courses:document.querySelectorAll('.an-epos-course').length,
+                visaCards:document.querySelectorAll('.an-visa-topic').length,
+                prepCards:document.querySelectorAll('.an-brief-item').length,
+                overflow:document.documentElement.scrollWidth>innerWidth+3
+              }));
+              if(ep.courses!==27||ep.visaCards<3||ep.prepCards!==0||ep.overflow)failed.push('DAAD regression '+w);
+              console.log('EPOS REGRESSION',JSON.stringify({viewport:w+'x'+h,ep,errors}));
+              await page.close();
+            }
+            await browser.close();
+            if(failed.length){console.error('FAILED',failed.join(', '));process.exitCode=1;}
+          })().catch(e=>{console.error(e.stack||e);process.exitCode=1});
+          JS
