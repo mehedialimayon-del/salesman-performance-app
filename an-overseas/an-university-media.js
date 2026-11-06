@@ -18,12 +18,6 @@
  // Hand-matched photographs/logo URLs from each institution's published pages
  // or labelled historical archival imagery. Photos are references, not partner claims.
  const verifiedCovers={
-  allianzeuniversitycollegeofmedicalsciencesaucms:{
-   photo:'https://img.afterschool.my/storage/uploads/images/getadvice/30481/598d8c25c4321.jpg',
-   source:'https://afterschool.my/articles/aucms-students-barred-from-serving-their-practical-years-in-government-hospitals',
-   credit:'Historical AUCMS campus photo · Afterschool.my',
-   closedDate:'30 November 2017'
-  },
   amcuniversitycollege:{
    site:'https://amc.edu.my/',
    photo:'https://amc.edu.my/wp-content/uploads/2026/08/ChIJF1KTaL1pOzIRIkad4g7py6Q.jpg',
