@@ -203,3 +203,42 @@ body.an-scholarships-mode #app .an-scholarship-content-scroll .an-scholarship-in
  #app .an-scholarship-detail .an-specific-guide,
  #app .an-scholarship-detail .an-scholarship-help{padding:13px;margin:13px 0}
 }
+
+/* Scholarship type dropdown anchored to the graduation-cap control. */
+body.an-universities-mode #app .an-scholarship-category-wrap{position:relative!important;min-width:0!important}
+body.an-universities-mode #app .an-scholarship-category-wrap #an-scholarship-category-toggle{
+ display:flex!important;width:43px!important;min-width:43px!important;
+}
+body.an-universities-mode #app .an-university-directory-bar .an-directory-fav{display:none!important}
+/* The header Favorites link is a red heart, never the previously mistaken bounce effect. */
+.top .an-favorite-header:hover{transform:none!important}
+body.an-universities-mode #app #results .an-university-moi-badge,
+body.an-favorites-mode #app .an-university-moi-badge,
+#app .an-university-moi-badge{
+ display:inline-flex;align-items:center;justify-content:center;width:max-content;max-width:100%;
+ border-radius:7px;border:1px solid #2f9270;background:#123528;color:#b4f4cf!important;
+ font-weight:900;font-size:9px;line-height:1.25;padding:6px 7px;letter-spacing:.2px;
+ text-decoration:none;white-space:normal;margin:5px 0;
+}
+#app .an-university-moi-badge.no{border-color:#b95b59;background:#351619;color:#ffbdb9!important}
+#app .an-university-moi-explainer{
+ max-width:1220px;margin:8px auto 13px;padding:10px 14px;
+ border:1px solid #80734d;background:#121e21;border-radius:11px;
+}
+#app .an-university-moi-explainer p{margin:6px 0;color:#d9e1e1;font-size:12px}
+#app .an-moi-partners-grid{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:12px;margin:15px 0;
+}
+#app .an-moi-partners-grid>.uni-card{
+ display:flex;flex-direction:column;min-height:260px;border-radius:12px;
+ background:#141923;border:1px solid #855e3d;overflow:hidden;
+}
+#app .an-moi-partners-grid .uni-cover-wrap{min-height:124px;height:124px;position:relative}
+#app .an-moi-partners-grid .inside{
+ display:flex;flex:1;flex-direction:column;min-height:145px;padding:11px!important;
+}
+#app .an-moi-partners-grid .inside .an-guide-links{margin-top:auto}
+@media(max-width:750px){
+ #app .an-moi-partners-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
