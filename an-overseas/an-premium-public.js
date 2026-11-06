@@ -4,6 +4,22 @@
 const ROOT='https://svpgjrxeqnluipsgjywk.supabase.co';
 const KEY='sb_publishable_eR5TZxv2aWndxdwzU0RIUA_mXWcBcO3';
 let stories=[],insights=[],countries=null,team=[],teamIndex=0,snapshot='',working=false;
+const GALLERY_CACHE_KEY='an-approved-public-gallery-20261106-v1';
+function showCachedGallery(){
+ try{
+  const c=JSON.parse(localStorage.getItem(GALLERY_CACHE_KEY)||'null');
+  if(!c||!Number.isFinite(c.at)||Date.now()-c.at>24*60*60*1000)return;
+  stories=Array.isArray(c.stories)?c.stories.filter(x=>x&&x.approved===true):[];
+  insights=Array.isArray(c.insights)?c.insights.filter(x=>x&&x.approved===true):[];
+  if(stories.length||insights.length){window.ANPublicSearchData={stories,insights};apply();}
+ }catch(e){}
+}
+function saveCachedGallery(){
+ try{
+  const safe={at:Date.now(),stories:stories.filter(x=>x?.approved===true).slice(0,100),insights:insights.filter(x=>x?.approved===true).slice(0,100)};
+  localStorage.setItem(GALLERY_CACHE_KEY,JSON.stringify(safe));
+ }catch(e){}
+}
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const url=x=>{try{const u=new URL(x);return u.protocol==='https:'?u.href:'';}catch{return'';}};
 const img=x=>url(x)||(String(x||'').startsWith('photo-')?'https://images.unsplash.com/'+x+'?w=900&q=85&auto=format&fit=crop':'');
@@ -113,7 +129,9 @@ function showTeam(){
  const waNumber=phone.replace(/[^0-9]/g,'');
  const whatsappHtml=waNumber.length>=8?'<a class="an-manager-contact" href="https://wa.me/'+waNumber+'" target="_blank" rel="noopener noreferrer" aria-label="Chat with '+esc(m.name)+' on WhatsApp">'+waIcon+'<span><small>WHATSAPP</small><b>Start a conversation ↗</b></span></a>':
  '<span class="an-manager-contact an-contact-unavailable" title="WhatsApp number has not been published">'+waIcon+'<span><small>WHATSAPP</small><b>Contact number not published</b></span></span>';
- const nameHtml='<div class="an-manager-name-box"><span class="an-manager-label">NAME</span><h3 class="an-manager-white-name">'+esc(m.name)+'</h3></div>';
+ const displayName=String(m.name||'').trim();const nameParts=displayName.match(/^(AGRICULTURIST)\s+(.+)$/i);
+  const coloredName=nameParts?'<span class="an-manager-profession">'+esc(nameParts[1].toUpperCase())+'</span> <span class="an-manager-person-name">'+esc(nameParts[2].toUpperCase())+'</span>':esc(displayName);
+  const nameHtml='<div class="an-manager-name-box"><span class="an-manager-label">NAME</span><h3 class="an-manager-white-name">'+coloredName+'</h3></div>';
  const designationHtml='<div class="an-manager-position"><span class="an-manager-label">DESIGNATION</span><strong>'+positionHeading(role)+'</strong></div>';
  const supportHtml=help?'<div class="an-manager-support"><span class="an-manager-label">STUDENT SUPPORT</span><p>'+esc(help)+'</p></div>':'';
  const buttonsHtml=(portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'DISCOVER THE FOUNDER':'VIEW PORTFOLIO')+' ↗</a>':'')+
@@ -144,6 +162,7 @@ async function load(){
    countries=Array.isArray(data.countries)?data.countries:null;team=Array.isArray(data.management)?data.management:[];}
   window.ANPublicSearchData={stories,insights};
   window.dispatchEvent(new Event('an-public-search-updated'));
+  saveCachedGallery();
   apply();
  }catch(e){
   if(!snapshot&&current()==='success'){
@@ -273,6 +292,6 @@ if(appRoot)new MutationObserver(()=>{
 }).observe(appRoot,{childList:true});
 window.addEventListener('hashchange',()=>setTimeout(()=>{apply();restoreAboutAfterRender();},70));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void load();});
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>void load());else void load();
-setInterval(()=>{if(!document.hidden)void load();},15000);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{showCachedGallery();void load();});else{showCachedGallery();void load();}
+setInterval(()=>{if(!document.hidden)void load();},60000);
 })();
