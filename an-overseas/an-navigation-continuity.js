@@ -13,7 +13,7 @@ const scrollableSelectors=[
  '.an2-nav','.an-success-gallery','.an-manager-card','.an-university-profile'
 ];
 let activeRoute=root(), pending=null, scheduledSave=0, lastGesture=0, restoreToken=0;
-let initial=true, restoreInProgress=false;
+let initial=true, restoreInProgress=false, lastRenderedRoute=null;
 const safeGet=key=>{
  try{return sessionStorage.getItem(key)||localStorage.getItem(key);}catch{return null;}
 };
@@ -108,14 +108,16 @@ function restore(route,reason){
  requestAnimationFrame(()=>requestAnimationFrame(attempt));
 }
 function beforeRender(){
+ const route=root();
  if(initial){initial=false;return;}
- // The router will replace DOM but remain on the same hash for step/detail updates.
- if(!restoreInProgress)save(activeRoute);
+ // Avoid writing old-page scroll into the destination route on hash navigation.
+ if(!restoreInProgress&&lastRenderedRoute===route)save(route);
 }
 function afterRender(){
  const route=root();
  if(route!==activeRoute)activeRoute=route;
- restore(route,initial?'startup':'navigation');
+ lastRenderedRoute=route;
+ restore(route,'navigation');
 }
 function nextRoute(){
  const route=root();
