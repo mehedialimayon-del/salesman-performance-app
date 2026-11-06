@@ -51,8 +51,10 @@ const flagPhoto=p=>FLAGS[p.country]?'<img class="an-scholarship-flag" src="https
 const asList=text=>esc(text).replace(/(?:^|\n)(\d+\.) /g,'$&');
 const getUniList=()=>typeof U!=='undefined'&&Array.isArray(U)?U:[];
 function resolveUniversity(name){
- const catalog=getUniList(),key=easy(name);
- return catalog.find(u=>easy(u.name)===key)||null;
+ const catalog=getUniList(),raw=String(name||''),primary=raw.split(' / ')[0].split('/')[0].trim();
+ const aliases={'Stuttgart University of Applied Sciences (HFT Stuttgart)':'Stuttgart University of Applied Sciences (HFT Stuttgart)','Charité':'Charité'};
+ const key=easy(primary),full=easy(name);
+ return catalog.find(u=>easy(u.name)===full)||catalog.find(u=>easy(u.name)===key)||null;
 }
 const knownHosts=[
  ['Bonn-Rhein-Sieg University of Applied Sciences','Germany','Sankt Augustin','https://www.h-brs.de/en'],
@@ -100,13 +102,33 @@ const knownHosts=[
  ['University of Padua','Italy','Padua','https://www.unipd.it/en/'],
  ["Ca' Foscari University of Venice",'Italy','Venice','https://www.unive.it/pag/13526/'],
  ['Vilnius University','Lithuania','Vilnius','https://www.vu.lt/en/'],
- ['VILNIUS TECH','Lithuania','Vilnius','https://vilniustech.lt/en/']
+ ['VILNIUS TECH','Lithuania','Vilnius','https://vilniustech.lt/en/'],
+ ["University of Göttingen","Germany","Göttingen","https://www.uni-goettingen.de/en/"],
+ ["Leipzig University","Germany","Leipzig","https://www.uni-leipzig.de/en"],
+ ["Ruhr University Bochum","Germany","Bochum","https://www.ruhr-uni-bochum.de/en"],
+ ["University of Bonn","Germany","Bonn","https://www.uni-bonn.de/en"],
+ ["TU Dresden","Germany","Dresden","https://tu-dresden.de/"],
+ ["Europa-Universität Flensburg","Germany","Flensburg","https://www.uni-flensburg.de/en"],
+ ["University of Oldenburg","Germany","Oldenburg","https://uol.de/en"],
+ ["Stuttgart University of Applied Sciences (HFT Stuttgart)","Germany","Stuttgart","https://www.hft-stuttgart.de/en"],
+ ["Bauhaus-Universität Weimar","Germany","Weimar","https://www.uni-weimar.de/en/"],
+ ["TU Berlin","Germany","Berlin","https://www.tu.berlin/en"],
+ ["University of Stuttgart","Germany","Stuttgart","https://www.uni-stuttgart.de/en/"],
+ ["University of Hohenheim","Germany","Stuttgart","https://www.uni-hohenheim.de/en"],
+ ["University of Bremen","Germany","Bremen","https://www.uni-bremen.de/en/"],
+ ["TU Darmstadt","Germany","Darmstadt","https://www.tu-darmstadt.de/index.en.jsp"],
+ ["University of Freiburg","Germany","Freiburg","https://uni-freiburg.de/en/"],
+ ["University of Greifswald","Germany","Greifswald","https://www.uni-greifswald.de/en/"],
+ ["TH Köln","Germany","Cologne","https://www.th-koeln.de/en/"],
+ ["Charité","Germany","Berlin","https://www.charite.de/en/"],
+ ["Heidelberg University","Germany","Heidelberg","https://www.uni-heidelberg.de/en"],
+ ["Ludwigsburg University of Education","Germany","Ludwigsburg","https://www.ph-ludwigsburg.de/en"]
 ];
 function addKnownUniversities(list){
  if(!Array.isArray(list))return 0;
  let added=0;
  for(const [name,country,city,site] of knownHosts){
-  if(!items.some(p=>(p.universities||[]).some(x=>easy(x)===easy(name))))continue;
+  if(!items.some(p=>(p.universities||[]).some(x=>easy(x)===easy(name)))&&!window.ANEPOSDeep?.courses?.some(c=>easy(c.host.split(' / ')[0].split('/')[0])===easy(name)))continue;
   if(list.some(u=>easy(u.name)===easy(name) || (u.site&&u.site.replace(/^https?:\/\/(www\.)?/,'').split('/')[0]===site.replace(/^https?:\/\/(www\.)?/,'').split('/')[0])))continue;
   const id='scholarship-host-'+easy(name).slice(0,36);
   if(list.some(u=>u.id===id))continue;
