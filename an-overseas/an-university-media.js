@@ -129,6 +129,17 @@
        u.logoImage=asia.logo;
      }
    }
+   const commons=window.ANAsiaCommonsMedia?.[u.id];
+   if(commons){
+     if(commons.photo&&!u.cardPhoto&&!failedMediaUrls.has(commons.photo)){
+       u.cardPhoto=commons.photo;
+       u.cardSource=commons.source;
+       u.cardCredit='Wikimedia Commons photo · attribution & licence';
+     }
+     if(commons.logo&&!u.logoImage&&!failedMediaUrls.has(commons.logo)){
+       u.logoImage=commons.logo;
+     }
+   }
    const match=verifiedCoversById[u.id]||verifiedCovers[key];
    if(!match)return;
    if(match.site&&!u.site)u.site=match.site;
