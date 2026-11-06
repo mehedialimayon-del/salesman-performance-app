@@ -10,8 +10,8 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const safeUrl=u=>/^https:\/\/[a-z0-9.-]+\//i.test(String(u||''))?u:'#/scholarships';
 const money=(n,code)=>Number(n).toLocaleString('en-US',{maximumFractionDigits:0})+' '+code;
 const bdt=p=>p.amount==null||!FX[p.currency]?null:Math.round((p.amount*FX[p.currency])/10)*10;
-const approx=p=>bdt(p)==null?'Funding varies / official call':('≈ ৳'+bdt(p).toLocaleString('en-US')+' / '+(p.period==='once'?'award':p.period));
-const amountText=p=>p.amount==null?'Official award varies':money(p.amount,p.currency)+' / '+(p.period==='once'?'award':p.period);
+const approx=p=>p.discountPercent!=null?('Tuition discount · '+p.discountPercent+'% · no cash stipend'):bdt(p)==null?(p.awardDisplay?'Tuition/merit award · check full details':'Funding varies / official call'):('≈ ৳'+bdt(p).toLocaleString('en-US')+' / '+(p.period==='once'?'award':p.period));
+const amountText=p=>p.awardDisplay?String(p.awardDisplay):p.amount==null?'Official award varies':money(p.amount,p.currency)+' / '+(p.period==='once'?'award':p.period);
 const flagCountry=c=>({'Germany':'🇩🇪','United Kingdom':'🇬🇧','Hungary':'🇭🇺','Türkiye':'🇹🇷','Japan':'🇯🇵','China':'🇨🇳','South Korea':'🇰🇷','Australia':'🇦🇺','France':'🇫🇷','Netherlands':'🇳🇱','Romania':'🇷🇴','Azerbaijan':'🇦🇿','Malaysia':'🇲🇾','Taiwan':'🇹🇼','Finland':'🇫🇮','Sweden':'🇸🇪','United Arab Emirates':'🇦🇪','Saudi Arabia':'🇸🇦','Qatar':'🇶🇦','Hong Kong':'🇭🇰','Brunei':'🇧🇳'})[c]||'🌐';
 
 /* Country-specific destination photography already used by the A&N catalogue, with a gradient fallback.
@@ -161,7 +161,11 @@ function refreshList(){
  if(counter)counter.textContent='Showing '+eligible.length+' of '+items.length+' funding pathways · '+global.length+' international / research · '+merit.length+' merit / intake / semester';
 }
 
-const section=(n,title,content)=>'<section class="an-scholarship-section"><h2><span>'+String(n).padStart(2,'0')+'</span> · '+esc(title)+'</h2><p>'+esc(content)+'</p></section>';
+function highlightScholarshipFacts(value){
+ return esc(value).replace(/\b(IELTS|TOEFL|PTE|English|CGPA|GPA|B2|Tuition|Scholarship|Fully funded|Master|PhD|Bachelor|Recommendation|Visa|Passport|Deadline|Motivation|Research|University|Attendance)\b/gi,'<strong class="an-fact-highlight">$1</strong>')
+ .replace(/(≥\s*\d+(?:\.\d+)?|\d+(?:\.\d+)?\s*%|€\s*[\d,]+|RM\s*[\d,]+|USD\s*[\d,]+)/g,'<mark class="an-fact-number">$1</mark>');
+}
+const section=(n,title,content)=>'<section class="an-scholarship-section an-scholarship-section-'+n+'"><h2><span>'+String(n).padStart(2,'0')+'</span> · '+esc(title)+'</h2><p>'+highlightScholarshipFacts(content)+'</p></section>';
 function hostCards(p){
  const names=p.universities||[];
  if(!names.length)return '<div class="an-scholarship-info">'+esc(p.hostNote)+' <a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Open official host list ↗</a></div>';
@@ -178,7 +182,7 @@ function countryGuideHtml(p){
 function detailPage(id){
  const p=items.find(x=>x.id===id);
  if(!p)return '<div class="wrap content"><h1>Funding pathway not found</h1><a class="btn" href="#/scholarships">← Back to scholarship directory</a></div>';
- const conv=bdt(p)==null?'Award amount depends on institution / offer':('≈ ৳'+bdt(p).toLocaleString('en-US')+' / '+(p.period==='once'?'award':p.period));
+ const conv=p.discountPercent!=null?('Tuition discount '+p.discountPercent+'%, not a cash payment'):bdt(p)==null?(p.awardDisplay?'Tuition-waiver value depends on course fees':'Award amount depends on institution / offer'):('≈ ৳'+bdt(p).toLocaleString('en-US')+' / '+(p.period==='once'?'award':p.period));
  const sections=[
  ['Scholarship & financial coverage',p.coverage],
  ['Academic eligibility — Bangladeshi applicants',p.eligibility],
@@ -207,10 +211,7 @@ function onRender(page,second){
   const container=document.querySelector('.university-profile .profile-body')||document.querySelector('.university-profile');
   if(container&&!container.querySelector('.an-uni-scholarship-strip'))container.insertAdjacentHTML('beforeend','<section class="an-uni-scholarship-strip"><h3>🎓 Scholarships & Funding</h3><p>'+esc(matching.length?matching.length+' listed funding pathways mention this university. Eligibility is programme-specific and not automatic.':'Explore country-specific academic scholarship and funding opportunities. Only verified host associations are linked below.')+'</p>'+(matching.map(p=>'<a href="#/scholarship/'+esc(p.id)+'">'+esc(p.name)+' ↗</a>').join(''))+'<a href="#/scholarships">All Scholarships ↗</a></section>');
  }
- if(page==='countries'){
-  const container=document.querySelector('.an-country-page');
-  if(container&&!container.querySelector('.an-scholarship-page-shortcut'))container.insertAdjacentHTML('afterbegin','<p><a class="an-scholarship-page-shortcut" href="#/scholarships">🎓 Scholarships · Explore academic funding ↗</a></p>');
- }
+
 }
 document.addEventListener('click',e=>{
  const b=e.target.closest?.('[data-scholarship-slide]');
