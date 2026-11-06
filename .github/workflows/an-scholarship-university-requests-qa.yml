@@ -1,0 +1,111 @@
+name: A&N 10 Requests – Mobile/Desktop Interactive QA
+on:
+  push:
+    paths:
+      - "an-overseas/index.html"
+      - "an-overseas/an-user-requests-20261106.css"
+      - "an-overseas/an-scholarships.js"
+      - "an-overseas/an-moi-integration-20261106.js"
+      - ".github/workflows/an-scholarship-university-requests-qa.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser and Playwright
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Test actual page interactions on Android and desktop sizes
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --directory an-overseas >/tmp/an-browser-http.log 2>&1 &
+          sleep 2
+          timeout 180s node <<'JS'
+          const {chromium}=require('playwright');
+          (async()=>{
+           const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+           const all=[];
+           for(const [width,height] of [[375,812],[1366,768]]){
+            const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1});
+            const errors=[];page.on('pageerror',e=>errors.push(e.message));
+            const visit=async hash=>{
+             await page.goto('http://127.0.0.1:8765/index.html?qa=20261106-ten-requests#/'+hash,{waitUntil:'domcontentloaded',timeout:20000});
+             await page.waitForTimeout(420);
+            };
+            const out={width,height};
+            await visit('aboutdetails');
+            out.about=await page.evaluate(()=>{
+             const photo=document.querySelector('.an2-founder-person');
+             const img=photo?.querySelector('img');
+             const flag=document.querySelector('.an2-floating-flags .an2-flag');
+             const heart=document.querySelector('.top .an-favorite-header svg');
+             return {photoHeight:Math.round(photo?.getBoundingClientRect().height||0),
+              imageHeight:Math.round(img?.getBoundingClientRect().height||0),
+              flagWidth:Math.round(flag?.getBoundingClientRect().width||0),
+              heartFill:heart&&getComputedStyle(heart).fill,story:!!document.querySelector('.an2-story')};
+            });
+            await visit('universities?country=Malaysia');
+            await page.waitForSelector('#results .uni-card',{timeout:12000});
+            out.catalogue=await page.evaluate(()=>{
+             const cards=[...document.querySelectorAll('#results .uni-card')].slice(0,8);
+             const controls=['.catalogue-search','.catalogue-filter','#an-scholarship-category-toggle','.an-catalogue-favourites'].map(x=>document.querySelector(x)?.getBoundingClientRect());
+             const result=document.querySelector('#results');
+             return {visibleCards:cards.length,minHeight:Math.round(Math.min(...cards.map(c=>c.getBoundingClientRect().height))),
+              controlRows:controls.map(c=>Math.round(c?.top||-99)),cols:getComputedStyle(result).gridTemplateColumns.split(' ').length,
+              scrollHeight:result?.scrollHeight||0,clientHeight:result?.clientHeight||0};
+            });
+            await page.locator('#an-scholarship-category-toggle').click();
+            out.categoryOpen=await page.locator('#an-scholarship-category-panel').isVisible();
+            await page.locator('[data-scholarship-category="international"]').click();
+            out.categorySelected=await page.locator('#an-scholarship-category-toggle').getAttribute('aria-expanded')==='false' &&
+             await page.locator('#an-scholarship-category-toggle').evaluate(el=>el.classList.contains('an-category-active'));
+            await page.locator('#an-scholarship-category-toggle').click();
+            await page.locator('[data-scholarship-category=""]').click();
+            await visit('universities?country=China');
+            out.china=await page.evaluate(()=>({cards:document.querySelectorAll('#results .uni-card').length,minHeight:Math.round(document.querySelector('#results .uni-card')?.getBoundingClientRect().height||0)}));
+            await visit('scholarships');
+            out.scholarships=await page.evaluate(()=>{
+             const area=document.querySelector('.an-scholarship-content-scroll');
+             const filter=document.querySelector('.an-scholarship-filters');
+             return {features:document.querySelectorAll('.an-feature-scholarship').length,
+              nested:!!area?.querySelector('.an-feature-grid'),scrollHeight:area?.scrollHeight||0,
+              clientHeight:area?.clientHeight||0,filtersOutside:!!filter&&!area?.contains(filter),
+              cards:document.querySelectorAll('#an-global-rail .an-scholarship-card').length};
+            });
+            await page.locator('.an-scholarship-content-scroll').evaluate(el=>el.scrollTop=400);
+            out.scholarshipScrolled=await page.locator('.an-scholarship-content-scroll').evaluate(el=>el.scrollTop);
+            await visit('scholarship/erasmus-mundus');
+            out.erasmus=await page.evaluate(()=>({moi:!!document.querySelector('.an-moi-badge:not(.no):not(.unknown)'),
+             help:!!document.querySelector('#an-scholarship-help #contact-form'),
+             named:document.querySelectorAll('#an-scholarship-document-guide a[href*="i-mesc"],#an-scholarship-document-guide a[href*="euroculture"]').length,
+             checklist:document.querySelectorAll('.an-specific-guide article').length}));
+            await visit('scholarship/daad-epos-masters');
+            out.epos=await page.evaluate(()=>({courses:document.querySelectorAll('.an-epos-course').length,
+             noMoi:!!document.querySelector('.an-moi-badge.no'),help:!!document.querySelector('#an-scholarship-help #contact-form'),
+             deadline:document.querySelectorAll('.an-epos-countdown').length}));
+            await visit('scholarship/hungary-masters');
+            out.hungary=await page.evaluate(()=>({help:!!document.querySelector('#an-scholarship-help #contact-form'),docs:!!document.querySelector('#an-scholarship-document-guide')}));
+            out.errors=errors;all.push(out);
+            const valid=out.about.story&&out.about.photoHeight>=220&&out.about.flagWidth<=32&&
+             /rgb\(244, 38, 74\)/.test(out.about.heartFill)&&out.catalogue.minHeight>=200&&
+             out.catalogue.controlRows.every(y=>Math.abs(y-out.catalogue.controlRows[0])<=6)&&
+             out.categoryOpen&&out.categorySelected&&out.china.cards>=1&&out.china.minHeight>=200&&
+             out.scholarships.features===4&&out.scholarships.nested&&out.scholarships.filtersOutside&&
+             out.scholarships.scrollHeight>out.scholarships.clientHeight+100&&out.scholarshipScrolled>0&&
+             out.erasmus.moi&&out.erasmus.help&&out.erasmus.named>=2&&out.erasmus.checklist>=8&&
+             out.epos.courses>=27&&out.epos.noMoi&&out.epos.help&&out.hungary.help&&out.hungary.docs&&!errors.length;
+            console.log('TEN REQUESTS QA '+JSON.stringify(out));
+            if(!valid){console.error('TEN REQUESTS QA FAILED at '+width+'x'+height);process.exitCode=1}
+            await page.close();
+           }
+           await browser.close();
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          JS
