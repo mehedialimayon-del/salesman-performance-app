@@ -4,7 +4,7 @@
 'use strict';
 const E=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KEYS=[
- ['money',/\b(?:€1,400\s*\/\s*month|€33,600|€20,000|€2,300|€4,000\s*\/\s*year|€8,000|€0|full fee waiver|scholarship recipients?|scholarship holders|no application fee|industrial scholarship)\b/gi],
+ ['money',/(?:€1,400\s*\/\s*month|€33,600|€20,000|€2,300|€4,000\s*\/\s*year|€8,000|€0|\bfull fee waiver\b|\bscholarship recipients?\b|\bscholarship holders\b|\bno application fee\b|\bindustrial scholarship\b)/gi],
  ['duration',/\b(?:24 months|120 ECTS|four semesters|4 semesters|2 years|two years|minimum 180 ECTS|at least 30 ECTS)\b/gi],
  ['english',/\b(?:MOI|IELTS\s*6\.5|TOEFL\s*iBT\s*87|TOEFL\s*87|B2 First|CEFR B2|English-medium|Medium of Instruction|language certificate|IELTS|TOEFL)\b/gi],
  ['deadline',/\b(?:Class\s*#?23|2027[–-]2029|9 November 2026|26 January 2027|January 2027|Paris time|deadline|before 1st June|2-minute|two minutes|2 minutes|200 MB|no later than|submission|submit)\b/gi],
@@ -98,7 +98,10 @@ function courseRibbon(root){
  for(const a of guide.querySelectorAll(':scope .an-specific-grid > article')){
   const head=a.querySelector('h3')?.textContent||'';
   if(head==='Submission steps'||head.includes('Submission steps'))a.classList.add('an-premium-submission-steps');
-  if(head.startsWith('Application dates'))a.classList.add('an-premium-dates');
+  if(head.startsWith('Application dates')){
+   a.classList.add('an-premium-dates');
+   a.innerHTML='<h3>Application &amp; selection milestones</h3><ol><li><b>Class #23 (2027–2029):</b> expected portal opening <b>9 November 2026, 14:00 Paris time</b> (indicative).</li><li><b>Application deadline:</b> <b>26 January 2027, 12:00 Paris time</b> (indicative); submit all attachments before the portal closes.</li><li><b>Eligibility screening:</b> incomplete or non-compliant files are excluded before academic ranking. Read every mandatory field carefully.</li><li><b>Academic review &amp; result:</b> scoring, ranking and any interview/offer steps follow; exact Class #23 decision dates are not yet announced.</li><li><b>After an offer:</b> follow consortium visa, mobility, insurance and onboarding instructions; do not assume an automatic residence/work right.</li></ol><p><a target="_blank" rel="noopener noreferrer" href="https://i-mesc.eu/application/admission-criteria">Official programme timeline ↗</a></p>';
+  }
   highlightText(a);
  }
  guide.dataset.anPremiumCourse='1';
