@@ -24,6 +24,7 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - run: npm install --no-save xlsx@0.18.5
       - name: Syntax checks
         run: |
           node --check ffh-direct-filters.js
