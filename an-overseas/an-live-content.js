@@ -68,17 +68,8 @@ function applyPage(){
   if(work&&settings.work&&work.textContent!==settings.work)work.textContent=settings.work;
  }
  if(location.hash.startsWith('#/contact')){
-  const c=document.querySelector('#app .wrap.content .card .inside');
-  if(c){
-   let box=document.getElementById('an-public-contact');
-   if(!box){box=document.createElement('div');box.id='an-public-contact';c.appendChild(box);}
-   box.innerHTML='<p><b>Malaysia:</b> '+esc(settings.malaysiaOffice||'Kuala Lumpur')+'</p><p><b>Bangladesh:</b> '+esc(settings.bangladeshOffice||'Rangpur')+'</p>'
-    +(settings.phone?'<p><b>Phone:</b> '+esc(settings.phone)+'</p>':'')
-    +(settings.email?'<p><b>Email:</b> <a href="mailto:'+encodeURIComponent(settings.email)+'">'+esc(settings.email)+'</a></p>':'')
-    +(settings.whatsapp&&/^\+?[0-9 ()-]{8,25}$/.test(settings.whatsapp)?'<p><a href="https://wa.me/'+settings.whatsapp.replace(/[^0-9]/g,'')+'" target="_blank" rel="noopener">Message on WhatsApp ↗</a></p>':'');
-  }
-  const n=document.querySelector('#contact-form')?.previousElementSibling;
-  if(n&&n.tagName==='P')n.textContent='Send a message to A&N Overseas. Our team will review your enquiry.';
+  window.ANContactSettings={...settings};
+  window.dispatchEvent(new Event('an-contact-settings-updated'));
  }
 }
 document.addEventListener('submit',async e=>{
