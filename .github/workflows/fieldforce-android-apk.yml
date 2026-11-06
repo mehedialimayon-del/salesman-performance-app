@@ -18,6 +18,8 @@ on:
       - 'tests/**'
       - 'backend/claims-ai-work.sql'
       - 'contacts.js'
+      - 'ffh-orange-compact-20261107.css'
+      - 'ffh-selected-identity-20261107.js'
       - 'contacts.css'
       - 'compact-pages.css'
       - 'messenger-polish.css'
