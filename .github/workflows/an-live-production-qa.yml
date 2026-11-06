@@ -40,7 +40,7 @@ jobs:
             try{
              const response=await fetch(base+'?check='+Date.now(),{headers:{'Cache-Control':'no-cache'}});
              const html=await response.text();
-             if(response.ok&&html.includes('an-scholarship-dedup-programmes-20261106.js?v=20261106-once-v1')&&html.includes('an-final-precision-20261106.css?v=20261106-color-fact-cards-v2')){ready=true;break;}
+             if(response.ok&&html.includes('an-scholarship-dedup-programmes-20261106.js?v=20261106-expanded-fees-v2')&&html.includes('an-final-precision-20261106.css?v=20261106-color-fact-cards-v2')){ready=true;break;}
             }catch(e){console.log('Release polling:',e.message);}
             await new Promise(r=>setTimeout(r,5000));
            }
