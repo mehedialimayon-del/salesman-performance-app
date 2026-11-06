@@ -69,11 +69,19 @@ function showCountries(){
 }
 function contactNumber(n){return String(n||'').replace(/[^0-9+]/g,'');}
 function activeMembers(){return team.filter(m=>m&&String(m.name||'').trim());}
-function positionHeading(role){
- const words=String(role||'MANAGEMENT').trim().toUpperCase().split(/\s+/).filter(Boolean);
- const cut=Math.max(1,Math.ceil(words.length/2));
- const first=words.slice(0,cut).join(' '),last=words.slice(cut).join(' ');
- return '<span class="an-role-orange">'+esc(first)+'</span>'+(last?' <span class="an-role-white">'+esc(last)+'</span>':'');
+function positionHeading(role,name=''){
+ const source=String(role||'MANAGEMENT').trim().toUpperCase();
+ const words=source.split(/\s+/).filter(Boolean);
+ let cut=Math.max(1,Math.ceil(words.length/2));
+ // Keep an intentional orange/white split, rather than arbitrary character colours.
+ const ofMarketing=words.indexOf('OF');
+ if(ofMarketing>0 && words.slice(ofMarketing+1).includes('MARKETING'))cut=ofMarketing;
+ if(words.length===1){
+   return '<span class="an-role-orange">'+esc(source)+'</span>'+
+     (name?' <span class="an-role-white">'+esc(String(name).toUpperCase())+'</span>':'');
+ }
+ return '<span class="an-role-orange">'+esc(words.slice(0,cut).join(' '))+'</span>'+
+   ' <span class="an-role-white">'+esc(words.slice(cut).join(' '))+'</span>';
 }
 function managerField(label,value,extraClass=''){
  if(!value)return '';
@@ -94,6 +102,7 @@ function showTeam(){
  const email=String(m.email||'').trim(),phone=contactNumber(m.phone);
  const validEmail=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
  const role=String(m.position||m.designation||m.role||'Management').trim();
+ const linkedIn=url(m.linkedin||m.linkedin_url||m.linkedinUrl||m.socials?.linkedin||'');
  const help=String(m.help||m.bio||m.description||'').trim();
  const isFounder=m.id==='nusrat-nasrin'||String(m.name).trim().toLowerCase()==='nusrat nasrin';
  const imageHtml=photo?'<button class="an-manager-photo-button" type="button" data-an-preview="'+esc(photo)+'" data-an-title="'+esc(m.name)+'" aria-label="View full photo of '+esc(m.name)+'"><img class="an-manager-photo" src="'+esc(photo)+'" alt="'+esc(m.name)+'" loading="lazy"></button>'
@@ -104,13 +113,16 @@ function showTeam(){
  const waNumber=phone.replace(/[^0-9]/g,'');
  const whatsappHtml=waNumber.length>=8?'<a class="an-manager-contact" href="https://wa.me/'+waNumber+'" target="_blank" rel="noopener noreferrer" aria-label="Chat with '+esc(m.name)+' on WhatsApp">'+waIcon+'<span><small>WHATSAPP</small><b>Start a conversation ↗</b></span></a>':
  '<span class="an-manager-contact an-contact-unavailable" title="WhatsApp number has not been published">'+waIcon+'<span><small>WHATSAPP</small><b>Contact number not published</b></span></span>';
- const nameHtml='<div class="an-manager-name-box"><span class="an-manager-label">NAME</span><h3>'+esc(m.name)+'</h3></div>';
- const designationHtml='<div class="an-manager-position"><span class="an-manager-label">DESIGNATION</span><strong>'+esc(role)+'</strong></div>';
+ const nameHtml='<div class="an-manager-name-box"><span class="an-manager-label">NAME</span><h3 class="an-manager-white-name">'+esc(m.name)+'</h3></div>';
+ const designationHtml='<div class="an-manager-position"><span class="an-manager-label">DESIGNATION</span><strong>'+positionHeading(role)+'</strong></div>';
  const supportHtml=help?'<div class="an-manager-support"><span class="an-manager-label">STUDENT SUPPORT</span><p>'+esc(help)+'</p></div>':'';
- const buttonsHtml=portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'DISCOVER THE FOUNDER':'VIEW PORTFOLIO')+' ↗</a>':'';
- panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role)+'</div><div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
+ const buttonsHtml=(portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'DISCOVER THE FOUNDER':'VIEW PORTFOLIO')+' ↗</a>':'')+
+   (isFounder?'<a class="an-manager-action an-admin-entry" href="#/admin" aria-label="Open secure administration login">ADMIN PANEL ↗</a>':'');
+ const linkedinTarget=linkedIn||'https://www.linkedin.com/search/results/people/?keywords='+encodeURIComponent(String(m.name||'').trim());
+ const linkedInHtml='<a class="an-manager-contact an-manager-linkedin" href="'+esc(linkedinTarget)+'" target="_blank" rel="noopener noreferrer" aria-label="'+(linkedIn?'View':'Find')+' '+esc(m.name)+' on LinkedIn"><span class="an-linkedin-mark" aria-hidden="true">in</span><span><small>LINKEDIN</small><b>'+(linkedIn?'Open LinkedIn profile ↗':'Find on LinkedIn ↗')+'</b></span></a>';
+ panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role,isFounder?m.name:'')+'</div><div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
   +'<div class="an-manager-information">'+nameHtml+designationHtml+supportHtml
-  +'<div class="an-manager-contacts">'+emailHtml+whatsappHtml+'</div>'
+  +'<div class="an-manager-contacts">'+emailHtml+whatsappHtml+linkedInHtml+'</div>'
   +'<div class="an-manager-actions">'+buttonsHtml+'</div></div></div>';
  counter.textContent=(teamIndex+1)+' / '+members.length;
 }
