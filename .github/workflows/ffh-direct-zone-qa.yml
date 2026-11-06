@@ -10,6 +10,7 @@ on:
       - 'staff-identity.js'
       - 'searchable-picker.js'
       - 'tests/visual-followup.cjs'
+      - 'tests/visual-followup-browser.cjs'
       - 'reports-ui.js'
       - 'daily-performance.js'
       - 'tests/daily-performance-dom.cjs'
@@ -43,6 +44,7 @@ jobs:
           node --check staff-identity.js
           node --check ffh-visual-followup.js
           node --check tests/visual-followup.cjs
+          node --check tests/visual-followup-browser.cjs
           node --check tests/direct-filters.cjs
           node --check tests/direct-filters-browser.cjs
       - name: Zone / Combined / Manager and report regression
@@ -58,12 +60,16 @@ jobs:
       - name: Mobile Chromium scope-width and selection test
         env:
           FFH_CHROMIUM: /usr/bin/google-chrome
-        run: node tests/direct-filters-browser.cjs
+        run: |
+          node tests/direct-filters-browser.cjs
+          node tests/visual-followup-browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: direct-zone-mobile-qa
-          path: /tmp/ffh-direct-filter-*.png
+          path: |
+            /tmp/ffh-direct-filter-*.png
+            /tmp/ffh-followup-*.png
           if-no-files-found: ignore
       - name: Verify GitHub Pages deployment when published
         continue-on-error: true
