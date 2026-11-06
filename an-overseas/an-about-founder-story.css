@@ -295,3 +295,178 @@ body:not(.an-about-locked) #app .an2-story{--gold:#ffd19b;--orange:#ff962a;--cre
 @media(prefers-reduced-motion:reduce){
   #app .an2-floating-flags .an2-flag,#app .an2-plane-mark{animation:none!important}
 }
+
+
+/* 2026-11-06 / country-synced floating flags + enlarged corner portrait.
+   Scoped exclusively to the About Details founder quotation; other pages untouched. */
+#app .an2-founder-quote{padding-bottom:0!important}
+#app .an2-founder-quote .an2-quote-footer{
+  grid-template-columns:minmax(0,1fr) clamp(165px,30%,230px)!important;
+  align-items:end!important;
+  gap:6px!important;
+  min-height:280px!important;
+  overflow:visible!important;
+  margin-right:-9px!important;
+}
+#app .an2-founder-quote .an2-quote-sign{
+  align-self:stretch!important;
+  justify-content:flex-end!important;
+  min-width:0!important;
+  padding:13px 0 18px!important;
+  gap:6px!important;
+}
+#app .an2-founder-quote .an2-flags-journey{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  justify-content:flex-start!important;
+  gap:7px!important;
+  overflow:visible!important;
+}
+#app .an2-founder-quote .an2-floating-flags{
+  display:grid!important;
+  width:100%!important;
+  max-width:none!important;
+  grid-template-columns:repeat(8,minmax(0,1fr))!important;
+  gap:4px 1px!important;
+  align-content:start!important;
+  justify-items:center!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag-unit{
+  position:relative!important;
+  display:inline-flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  width:100%!important;
+  height:23px!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  background:transparent!important;
+  white-space:nowrap!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home{
+  grid-column:span 2;
+  height:37px!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-static-star{
+  position:absolute!important;
+  left:0!important;
+  top:3px!important;
+  color:#eabb6e!important;
+  font-size:7px!important;
+  line-height:1!important;
+  text-shadow:0 0 5px rgba(245,182,75,.6);
+  pointer-events:none;
+  animation:none!important;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag{
+  width:auto!important;height:auto!important;min-width:0!important;
+  padding:0!important;margin:0!important;
+  border:0!important;border-radius:0!important;
+  background:none!important;box-shadow:none!important;
+  display:inline-block!important;
+  font-size:18px!important;
+  line-height:1!important;
+  vertical-align:middle!important;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))!important;
+  transform-origin:left center!important;
+  animation:an2-flag-wave 3.1s ease-in-out infinite!important;
+  animation-delay:calc(var(--flag-index) * -0.11s)!important;
+  will-change:transform;
+}
+#app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home .an2-flag{
+  font-size:34px!important;
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,.4))!important;
+}
+#app .an2-founder-quote .an2-flags-overline{
+  color:#e5a869!important;
+  font-size:9px!important;
+}
+#app .an2-founder-quote .an2-founder-message-label{
+  display:block!important;
+  color:#d7b18a!important;
+  font-size:9px!important;
+  letter-spacing:.8px!important;
+  line-height:1.4!important;
+}
+#app .an2-founder-quote .an2-founder-person{
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  height:285px!important;
+  min-height:0!important;
+  margin:0!important;
+  align-self:end!important;
+  overflow:visible!important;
+  background:transparent!important;
+}
+#app .an2-founder-quote .an2-founder-person img{
+  position:absolute!important;
+  left:0!important;right:0!important;top:-32px!important;bottom:auto!important;
+  width:100%!important;
+  height:calc(100% + 2px)!important;
+  max-width:none!important;
+  object-fit:contain!important;
+  object-position:center bottom!important;
+  border:0!important;border-radius:0!important;
+  opacity:1!important;
+  filter:drop-shadow(0 9px 13px rgba(0,0,0,.38))!important;
+  -webkit-mask-image:none!important;mask-image:none!important;
+  z-index:1!important;
+}
+#app .an2-founder-quote .an2-founder-person figcaption{
+  position:absolute!important;
+  left:0!important;right:0!important;bottom:0!important;
+  z-index:2!important;
+  width:100%!important;height:auto!important;min-height:49px!important;
+  margin:0!important;padding:9px 3px 10px!important;
+  border:0!important;
+  clip:auto!important;overflow:visible!important;white-space:normal!important;
+  background:linear-gradient(0deg,rgba(14,12,11,.96),rgba(14,12,11,.7) 74%,transparent)!important;
+  display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:end!important;
+  gap:3px!important;text-align:center!important;
+}
+#app .an2-founder-quote .an2-founder-person figcaption strong{
+  color:#ffd0a1!important;font-size:12px!important;letter-spacing:.75px!important;line-height:1.2!important;
+}
+#app .an2-founder-quote .an2-founder-person figcaption span{
+  color:#efae5e!important;font-size:10px!important;letter-spacing:.4px!important;line-height:1.2!important;
+}
+@keyframes an2-flag-wave{
+  0%,100%{transform:perspective(80px) rotateY(-9deg) skewY(-3deg) translateY(0)}
+  32%{transform:perspective(80px) rotateY(8deg) skewY(2deg) translateY(-2px)}
+  65%{transform:perspective(80px) rotateY(-5deg) skewY(1deg) translateY(1px)}
+}
+@media(max-width:650px){
+  #app .an2-founder-quote .an2-quote-footer{
+    grid-template-columns:minmax(0,1fr) 153px!important;
+    gap:3px!important;
+    min-height:260px!important;
+    margin-right:-13px!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags{
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:2px 0!important;
+  }
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit{height:19px!important}
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home{height:34px!important}
+  #app .an2-founder-quote .an2-floating-flags .an2-flag{font-size:15px!important}
+  #app .an2-founder-quote .an2-floating-flags .an2-flag-unit--home .an2-flag{font-size:28px!important}
+  #app .an2-founder-quote .an2-floating-flags .an2-static-star{font-size:6px!important;top:2px!important}
+  #app .an2-founder-quote .an2-founder-person{height:265px!important}
+  #app .an2-founder-quote .an2-founder-person img{top:-36px!important;height:calc(100% + 10px)!important}
+  #app .an2-founder-quote .an2-founder-person figcaption{min-height:45px!important;padding:7px 2px 9px!important}
+  #app .an2-founder-quote .an2-founder-person figcaption strong{font-size:10px!important}
+  #app .an2-founder-quote .an2-founder-person figcaption span{font-size:9px!important}
+  #app .an2-founder-quote .an2-founder-message-label{font-size:8px!important;letter-spacing:.1px!important}
+  #app .an2-founder-quote .an2-flags-journey small{font-size:8px!important;line-height:1.25!important}
+}
+@media(max-width:380px){
+  #app .an2-founder-quote .an2-quote-footer{grid-template-columns:minmax(0,1fr) 135px!important;min-height:255px!important}
+  #app .an2-founder-quote .an2-founder-person{height:250px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #app .an2-founder-quote .an2-floating-flags .an2-flag{animation:none!important;will-change:auto!important}
+}
