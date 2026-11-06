@@ -216,3 +216,15 @@
 @media (prefers-reduced-motion:reduce) {
   #app .an2-floating-flags .an2-flag {animation:none!important}
 }
+
+/* Match the solid love icon used on the saved-university cards, desktop only. */
+@media (min-width:801px) {
+  .top .an-favorite-header svg{display:none!important}
+  .top .an-favorite-header::before{
+    content:"♥";display:inline-block;
+    font-family:Georgia,"Segoe UI Symbol",serif;
+    font-size:29px;line-height:1;color:#ff5979;
+    text-shadow:0 0 11px #e52e6c66,0 2px 4px #0009;
+  }
+  .top .an-favorite-header:hover::before{color:#ff93a9;transform:scale(1.08)}
+}
