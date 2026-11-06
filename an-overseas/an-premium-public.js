@@ -3,7 +3,7 @@
 'use strict';
 const ROOT='https://svpgjrxeqnluipsgjywk.supabase.co';
 const KEY='sb_publishable_eR5TZxv2aWndxdwzU0RIUA_mXWcBcO3';
-let stories=[],insights=[],countries=null,team=[],teamIndex=0,snapshot='',working=false;
+let stories=[],insights=[],countries=null,team=[],teamIndex=0,snapshot='',working=false,refreshQueued=false;
 const GALLERY_CACHE_KEY='an-approved-public-gallery-20261106-v1';
 function showCachedGallery(){
  try{
@@ -150,16 +150,24 @@ function apply(){
  if(current()==='about')showTeam();
 }
 async function load(){
- if(working)return;working=true;
+ const route=current();
+ const keys=route==='success'?'success_stories,study_insights':route==='about'?'management':route==='countries'?'countries':'';
+ if(!keys)return;
+ if(working){refreshQueued=true;return;}
+ working=true;
  try{
-  const r=await fetch(ROOT+'/rest/v1/an_site_content?select=key,value&key=in.(success_stories,study_insights,countries,management)',{
+  const r=await fetch(ROOT+'/rest/v1/an_site_content?select=key,value&key=in.('+keys+')',{
    headers:{apikey:KEY},cache:'no-store',signal:AbortSignal.timeout(8500)
   });
   if(!r.ok)throw Error('Could not load public media');
   const rows=await r.json(),data={};rows.forEach(r=>data[r.key]=r.value);
   const next=JSON.stringify(data);
-  if(snapshot!==next){snapshot=next;stories=Array.isArray(data.success_stories)?data.success_stories:[];insights=Array.isArray(data.study_insights)?data.study_insights:[];
-   countries=Array.isArray(data.countries)?data.countries:null;team=Array.isArray(data.management)?data.management:[];}
+  if(snapshot!==next){snapshot=next;
+   if(Object.prototype.hasOwnProperty.call(data,'success_stories'))stories=Array.isArray(data.success_stories)?data.success_stories:[];
+   if(Object.prototype.hasOwnProperty.call(data,'study_insights'))insights=Array.isArray(data.study_insights)?data.study_insights:[];
+   if(Object.prototype.hasOwnProperty.call(data,'countries'))countries=Array.isArray(data.countries)?data.countries:null;
+   if(Object.prototype.hasOwnProperty.call(data,'management'))team=Array.isArray(data.management)?data.management:[];
+  }
   window.ANPublicSearchData={stories,insights};
   window.dispatchEvent(new Event('an-public-search-updated'));
   saveCachedGallery();
@@ -169,7 +177,7 @@ async function load(){
    const msg='<div class="an-premium-empty" role="alert"><span>!</span><h2>Live content temporarily unavailable</h2><p>Could not load published posts. Check your connection and tap Refresh to try again.</p><button type="button" class="an-community-more" data-an-gallery-refresh>Refresh posts ↻</button></div>';
    ['an-insights-gallery','an-success-gallery'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=msg;});
   }else apply();
- }finally{working=false;}
+ }finally{working=false;if(refreshQueued){refreshQueued=false;queueMicrotask(()=>void load());}}
 }
 document.addEventListener('click',e=>{if(e.target.closest('[data-an-gallery-refresh]'))void load();});
 document.addEventListener('click',e=>{
@@ -290,7 +298,7 @@ const appRoot=document.getElementById('app');
 if(appRoot)new MutationObserver(()=>{
  if(current()==='about')requestAnimationFrame(restoreAboutAfterRender);
 }).observe(appRoot,{childList:true});
-window.addEventListener('hashchange',()=>setTimeout(()=>{apply();restoreAboutAfterRender();},70));
+window.addEventListener('hashchange',()=>setTimeout(()=>{apply();restoreAboutAfterRender();void load();},70));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void load();});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{showCachedGallery();void load();});else{showCachedGallery();void load();}
 setInterval(()=>{if(!document.hidden)void load();},60000);
