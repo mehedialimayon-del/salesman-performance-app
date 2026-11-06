@@ -56,7 +56,7 @@ for(const id of ['M21954','M22075']){
  if(id==='M21954'){
   await page.locator('[data-page="dashboard"]').click();
   await page.locator('.dashHero').waitFor();
-  const staff=page.locator('#ffScopeStaff');if(await staff.count()){await staff.evaluate(select=>{select.value='M22075';select.dispatchEvent(new Event('change',{bubbles:true}));});await page.locator('.ffDashStaffIdentity .ffStaffPhoto').waitFor({timeout:10000});}
+  const staff=page.locator('#ffScopeStaff');if(await staff.count()){await staff.evaluate(select=>{select.value='M22075';select.dispatchEvent(new Event('change',{bubbles:true}));});await page.locator('.ffDashSelectedIdentity .ffDashSelectedAvatar img:visible').waitFor({timeout:10000});assert.ok((await page.locator('.ffDashSelectedIdentity .ffDashSelectedName').textContent()).length>0,'selected staff name accompanies photo');}
  }
  await page.locator('#bh').click();await page.locator('[data-page="communication"]').click();
  await page.locator('#ffChooseChatPerson').waitFor({timeout:10000});
