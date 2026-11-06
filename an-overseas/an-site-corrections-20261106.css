@@ -1,0 +1,162 @@
+/* A&N Overseas — targeted route corrections, 2026-11-06.
+   Intentionally scoped: preserves current brand, university cards,
+   original About Details article and mobile layouts. */
+
+/* ABOUT: READ MORE is for the WHOLE story, outside the Our Vision box. */
+body.an-about-locked #app .an-about-v3 .an-about-intro-panel > .an2-readmore-separate{
+  display:flex!important;visibility:visible!important;opacity:1!important;
+  flex:0 0 auto!important;position:relative!important;
+  align-items:center!important;justify-content:center!important;
+  align-self:stretch!important;width:100%!important;max-width:none!important;
+  min-height:36px!important;padding:8px 0 0!important;
+  margin:5px 0 0!important;border:0!important;
+  border-top:1px solid #78532e!important;
+}
+body.an-about-locked #app .an-about-v3 .an-about-intro-panel > .an2-readmore-separate .an-about-readmore{
+  display:inline-flex!important;visibility:visible!important;opacity:1!important;
+  position:relative!important;pointer-events:auto!important;
+  min-height:34px!important;height:auto!important;align-items:center!important;
+  justify-content:center!important;margin:0!important;padding:8px 20px!important;
+  border:1px solid #f6a443!important;border-radius:10px!important;
+  background:linear-gradient(110deg,#ffb341,#f7800a)!important;color:#191007!important;
+  font-size:11px!important;font-weight:900!important;line-height:1.2!important;
+  letter-spacing:.65px!important;text-decoration:none!important;z-index:2!important;
+}
+body.an-about-locked #app .an-about-v3 .an-about-intro-panel > .an2-readmore-separate .an-about-readmore:hover{
+  background:linear-gradient(110deg,#ffd38a,#ff9e22)!important;
+}
+@media(max-width:800px){
+  body.an-about-locked #app .an-about-v3 .an-about-intro-panel > .an2-readmore-separate{
+    margin-top:10px!important;padding-top:9px!important;
+  }
+}
+
+/* ABOUT DETAILS: restore the original full-length article and document scrolling.
+   Do not hide the content in a viewport-locked About overview shell. */
+html:has(body.an-about-details-mode){
+  height:auto!important;max-height:none!important;overflow-x:clip!important;
+  overflow-y:auto!important;
+}
+body.an-about-details-mode{
+  display:block!important;position:static!important;height:auto!important;
+  min-height:100dvh!important;max-height:none!important;
+  overflow-x:clip!important;overflow-y:visible!important;
+}
+body.an-about-details-mode > .top{position:sticky!important;top:0!important;z-index:1000!important}
+body.an-about-details-mode #app{
+  position:relative!important;display:block!important;flex:none!important;
+  width:100%!important;height:auto!important;max-height:none!important;
+  min-height:40vh!important;overflow:visible!important;visibility:visible!important;
+}
+body.an-about-details-mode #app > .an2-story{
+  position:relative!important;display:block!important;visibility:visible!important;
+  opacity:1!important;height:auto!important;min-height:0!important;max-height:none!important;
+  overflow:visible!important;
+}
+body.an-about-details-mode #app .an2-story-chapter{scroll-margin-top:125px}
+
+/* COUNTRY: always show what the academic-funding shortcut does. */
+#app .an-country-hero-tools .an-country-cta-copy{
+  display:flex!important;flex-direction:column!important;gap:3px!important;
+  min-width:0!important;flex:1 1 auto!important;
+}
+#app .an-country-hero-tools .an-country-cta-copy small{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  font-size:clamp(9px,.83vw,11px)!important;line-height:1.35!important;
+  color:#592e14!important;white-space:normal!important;
+  max-height:none!important;overflow:visible!important;
+}
+#app .an-country-hero-tools .an-country-scholarship-cta{
+  height:auto!important;min-height:75px!important;overflow:visible!important;
+}
+@media(max-width:800px){
+ #app .an-country-hero-tools .an-country-cta-copy small{
+   font-size:10px!important;line-height:1.3!important;
+ }
+}
+
+/* SCHOLARSHIP DIRECTORY: top heading and filters are compact.
+   The FOUR FEATURED CARDS scroll with all content below them.
+   Only the filtering row remains pinned above that scroll area. */
+@media(min-width:801px){
+  html:has(body.an-scholarships-mode){
+    height:100%!important;overflow:hidden!important;
+  }
+  body.an-scholarships-mode{
+    display:flex!important;flex-direction:column!important;
+    height:100vh!important;height:100dvh!important;
+    min-height:0!important;max-height:100dvh!important;overflow:hidden!important;
+  }
+  body.an-scholarships-mode > .top,
+  body.an-scholarships-mode > .an-updates-bar{
+    position:relative!important;top:auto!important;flex:0 0 auto!important;
+  }
+  body.an-scholarships-mode > #app{
+    flex:1 1 0!important;min-height:0!important;height:auto!important;
+    display:flex!important;flex-direction:column!important;overflow:hidden!important;
+  }
+  body.an-scholarships-mode #app > .an-scholarship-head{
+    flex:0 0 auto!important;padding:5px 0 6px!important;
+  }
+  body.an-scholarships-mode #app .an-scholarship-head h1{
+    font-size:clamp(19px,2vw,26px)!important;margin:2px 0!important;
+  }
+  body.an-scholarships-mode #app > .an-scholarship-directory{
+    display:block!important;flex:1 1 0!important;min-height:0!important;
+    height:auto!important;max-height:none!important;overflow-x:hidden!important;
+    overflow-y:auto!important;overscroll-behavior-y:contain!important;
+    scrollbar-width:thin;scrollbar-color:#ba7532 #13161b;
+    -webkit-overflow-scrolling:touch;scroll-padding-top:69px;
+    width:100%!important;max-width:1230px!important;
+    padding-top:0!important;padding-bottom:55px!important;
+  }
+  body.an-scholarships-mode #app .an-scholarship-filters{
+    position:sticky!important;top:0!important;z-index:30!important;
+    margin:0 0 8px!important;padding:7px 0 9px!important;
+    background:linear-gradient(#0b1018 92%,#0b101800)!important;
+    border-bottom:1px solid #85562e!important;
+  }
+  body.an-scholarships-mode #app .an-scholarship-filters label{
+    gap:3px!important;font-size:9px!important;
+  }
+  body.an-scholarships-mode #app .an-scholarship-filters input,
+  body.an-scholarships-mode #app .an-scholarship-filters select{
+    min-height:35px!important;padding:7px 10px!important;
+  }
+  body.an-scholarships-mode #app .an-feature-grid{
+    position:static!important;overflow:visible!important;
+  }
+  body.an-scholarships-mode > .footer{display:none!important}
+}
+
+/* HUB: both post columns scroll independently irrespective of post count.
+   Avoid clipping growing sets of posts. */
+body.an-community-mode #app .an-community-panel{
+  min-height:0!important;
+}
+body.an-community-mode #app .an-community-scroll{
+  min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+  overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;
+  scrollbar-gutter:stable;
+}
+body.an-community-mode #app .an-community-grid,
+body.an-community-mode #app .an-youtube-grid{
+  height:auto!important;max-height:none!important;
+  align-content:start!important;
+}
+
+/* CONTACT: readable premium layout and clear submission feedback. */
+body.an-contact-mode #app .an-contact-content{
+  padding-top:18px!important;padding-bottom:72px!important;
+}
+body.an-contact-mode #app .an-contact-office,
+body.an-contact-mode #app .an-contact-enquiry{
+  border-color:#8f5b32!important;
+}
+body.an-contact-mode #app .an-contact-feedback{
+  color:#ffd49f;line-height:1.45;font-size:12px;
+  margin:10px 0 0;min-height:18px;
+}
+@media(max-width:800px){
+ body.an-contact-mode #app .an-contact-content{padding-top:12px!important}
+}
