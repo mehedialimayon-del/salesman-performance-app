@@ -1,0 +1,69 @@
+/* FieldForce Hub catalogue: PRAN orange + pure white, SKU-linked campaigns. */
+body .app .ffPremiumSku .ffSkuFour .ffSkuChip small,
+body .app .ffPremiumSku .ffSkuIdentity span {
+  color:#ff851b!important;
+  font-weight:900!important;
+}
+body .app .ffPremiumSku .ffSkuFour .ffSkuChip strong,
+body .app .ffPremiumSku .ffSkuIdentity strong {
+  color:#fff!important;
+  font-weight:950!important;
+}
+body .app .ffPremiumSku .ffSkuFour .ffSkuChip {
+  border-color:#e77f30!important;
+  background:linear-gradient(145deg,#24201d,#171b1e)!important;
+}
+body .app .ffPremiumSku {padding-bottom:16px!important;}
+.ffPremiumSku .ffSkuOfferStack {
+  display:grid;gap:7px;margin:7px 9px 10px;
+}
+.ffPremiumSku .ffSkuOffer {
+  display:flex;align-items:center;justify-content:space-between;
+  gap:7px;width:100%;min-height:37px;padding:6px 9px;
+  border:1px solid #9c5426;border-radius:9px;
+  background:linear-gradient(120deg,#1b1511,#0e1114);
+  box-shadow:inset 0 1px #ffffff08;cursor:pointer;text-align:left;
+}
+.ffPremiumSku .ffSkuOffer[disabled] {opacity:1;cursor:default;}
+.ffPremiumSku .ffSkuOfferLabel {font-weight:950;font-size:clamp(10px,2.5vw,12px);color:#ff851b;letter-spacing:.02em;}
+.ffPremiumSku .ffSkuOfferState {
+  min-width:44px;text-align:center;border-radius:7px;padding:4px 8px;
+  font-size:clamp(10px,2.4vw,12px);font-weight:950;
+  border:1px solid #5c4a3d;background:#27211d;color:#fff;
+}
+.ffPremiumSku .ffSkuOffer[data-status="ON"] {border-color:#ff851b;background:linear-gradient(100deg,#372010,#1a1410);}
+.ffPremiumSku .ffSkuOffer[data-status="ON"] .ffSkuOfferState {background:#ff851b;border-color:#ff851b;color:#111;}
+.ffPremiumSku .ffSkuOffer[data-status="SYNC"] .ffSkuOfferState {color:#c0b0a3;}
+.ffPremiumSku .ffSkuOffer[data-status="ON"]:focus-visible,
+.ffSkuOfferBack:focus-visible {outline:2px solid #fff;outline-offset:2px;}
+.ffSkuOfferOverlay {
+  position:fixed;inset:0;z-index:9999;display:flex;
+  justify-content:center;align-items:flex-start;overflow:auto;
+  padding:max(16px,env(safe-area-inset-top)) 10px max(16px,env(safe-area-inset-bottom));
+  background:rgba(0,0,0,.92);
+}
+.ffSkuOfferPanel {
+  width:min(600px,100%);background:linear-gradient(160deg,#1d1713,#0d0b0a);
+  border:1px solid #ef8a31;border-radius:18px;
+  box-shadow:0 20px 70px #000c;padding:15px;
+  color:#fff;max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;
+}
+.ffSkuOfferHeader {display:flex;gap:12px;align-items:center;border-bottom:1px solid #75441d;padding-bottom:12px;}
+.ffSkuOfferBack {background:#15110e;color:#ff8a29;border:1px solid #a45e2b;border-radius:10px;font-weight:900;padding:10px;cursor:pointer;}
+.ffSkuOfferHeader small {color:#ff983f;font-size:10px;font-weight:900;}
+.ffSkuOfferHeader h2 {margin:3px 0 0;font-size:clamp(16px,4vw,21px);color:#fff;}
+.ffSkuOfferProductName {font-weight:900;color:#ff9538;font-size:15px;}
+.ffSkuOfferEntry {border:1px solid #724320;background:#191410;border-radius:14px;margin-top:12px;padding:12px;}
+.ffSkuOfferEntry h3 {margin:0 0 11px;font-size:17px;color:#ff963c;}
+.ffSkuOfferInfo {display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #443324;font-size:12px;overflow-wrap:anywhere;}
+.ffSkuOfferInfo b {color:#ff8a23;font-weight:900;flex-shrink:0;}
+.ffSkuOfferInfo span {color:#fff;text-align:right;}
+.ffSkuOfferPhoto {display:block;max-width:100%;max-height:340px;object-fit:contain;margin:12px auto;border:1px solid #a56d38;border-radius:10px;}
+.ffSkuOfferDescription {white-space:pre-wrap;line-height:1.6;font-size:13px;color:#fff;overflow-wrap:anywhere;}
+.ffSkuOfferRule {padding:9px;border:1px solid #ac6330;border-radius:9px;margin:8px 0;}
+.ffSkuOfferRule>b {color:#ff9b4b;font-size:13px;}
+.ffSkuOfferReadOnly {font-size:11px;line-height:1.5;color:#d8c6b6;}
+@media(min-width:720px) {
+  .ffPremiumSku .ffSkuOfferStack {margin-top:10px;}
+  .ffSkuOfferPanel {padding:22px;}
+}
