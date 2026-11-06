@@ -1,0 +1,48 @@
+/* One complete scholarship guide per award — premium black/orange responsive system. */
+#app .an-scholarship-master-guide{
+ margin:22px 0 30px;padding:clamp(13px,2.5vw,24px);border:1px solid rgba(252,150,63,.58);
+ border-radius:24px;background:linear-gradient(135deg,rgba(253,142,31,.055),rgba(18,27,40,.68) 45%,rgba(13,19,29,.9));
+ box-shadow:0 18px 52px rgba(0,0,0,.19);
+}
+#app .an-unified-heading{padding:0 1px 18px;border-bottom:1px solid rgba(255,178,83,.24);margin-bottom:17px}
+#app .an-unified-heading h2{margin:0 0 6px;color:#ffb96d;font-size:clamp(22px,2.3vw,31px);font-weight:850}
+#app .an-unified-heading p{margin:0;color:#d4dce9;line-height:1.6;font-size:14px}
+#app .an-unified-programme-note,
+#app .an-programme-costs{margin:14px 0 23px;padding:clamp(14px,2vw,21px);background:linear-gradient(140deg,#122438,#151922);border:1px solid #447393;border-left:5px solid #59bcfa;border-radius:17px}
+#app .an-unified-programme-note h3{margin:0 0 8px;color:#8cdeff}
+#app .an-unified-programme-note p{color:#e2eaf3;line-height:1.7;margin:0}
+#app .an-programme-costs h2{font-size:clamp(19px,2.1vw,26px);color:#ffbd77;margin:0 0 7px}
+#app .an-programme-explainer{color:#d0d7e4;font-size:13px;line-height:1.55;margin:0 0 16px}
+#app .an-programme-cost-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:13px}
+#app .an-programme-cost-card{background:#0c1521;border:1px solid #4c6078;border-radius:15px;padding:16px;min-width:0;overflow-wrap:anywhere}
+#app .an-programme-cost-head{display:flex;align-items:flex-start;gap:10px}
+#app .an-programme-cost-head>span{display:inline-grid;place-items:center;min-width:34px;height:36px;border-radius:9px;background:#66310e;color:#ffcf97;font-weight:800}
+#app .an-programme-cost-head h3{margin:1px 0 7px;color:#fbd1ac;font-size:16px;line-height:1.4}
+#app .an-programme-host{font-size:12px;line-height:1.5;color:#b9c5d4;margin:0 0 12px}
+#app .an-programme-cost-card dl{display:grid;gap:9px;margin:0}
+#app .an-programme-cost-card dl>div{border:1px solid #364c64;border-left:4px solid #ffae65;border-radius:10px;padding:11px;background:#111b29}
+#app .an-programme-cost-card dl>div:nth-child(1){border-left-color:#65c4ff}
+#app .an-programme-cost-card dl>div:nth-child(2){border-left-color:#ffaf5f}
+#app .an-programme-cost-card dl>div:nth-child(3){border-left-color:#6cdfac}
+#app .an-programme-cost-card dt{font-weight:780;color:#8dd4ff;font-size:12px;margin-bottom:5px}
+#app .an-programme-cost-card dd{margin:0;color:#f3f5fa;font-size:14px;line-height:1.55}
+#app .an-programme-cost-card .an-programme-note{margin:12px 0;color:#d1c0d6;font-size:12px;line-height:1.6}
+#app .an-programme-cost-card>a{display:inline-block;margin-top:5px;color:#ffbd7d;text-decoration:underline;font-size:13px;font-weight:750}
+#app .an-programme-fee-breakdown{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
+#app .an-programme-fee-breakdown>div{min-width:0;background:#0c1726;border:1px solid #3c6079;border-left:3px solid #78cbfa;padding:10px;border-radius:10px}
+#app .an-programme-fee-breakdown>div:nth-child(2){border-left-color:#ffb56b}
+#app .an-programme-fee-breakdown>div:nth-child(3){border-left-color:#68d6aa}
+#app .an-programme-fee-breakdown>div:nth-child(4){border-left-color:#c79aff}
+#app .an-programme-fee-breakdown strong{display:block;color:#a8dfff;font-size:11px;margin:0 0 5px}
+#app .an-programme-fee-breakdown span{display:block;color:#f3f5fa;line-height:1.5;font-size:12px;overflow-wrap:anywhere}
+#app .an-programme-fee-breakdown>p{grid-column:1/-1;margin:2px 0}
+#app .an-programme-fee-breakdown a{color:#ffc68c;text-decoration:underline;font-size:12px}
+#app .an-scholarship-master-guide .an-scholarship-section-grid{margin:17px 0}
+#app .an-scholarship-master-guide .an-specific-guide{margin:24px 0}
+@media(max-width:640px){
+ #app .an-scholarship-master-guide{padding:12px;margin:16px 0;border-radius:18px}
+ #app .an-programme-fee-breakdown{grid-template-columns:1fr}
+ #app .an-programme-costs{padding:12px}
+ #app .an-programme-cost-card{padding:12px}
+ #app .an-programme-cost-card dl>div{padding:9px}
+}
