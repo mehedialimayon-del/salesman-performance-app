@@ -1,0 +1,193 @@
+/* A&N Overseas Scholarships 2026-11-06
+ * EXACTLY TWO scholarship sections: international/research, and intake/merit/semester.
+ * Keep the existing Countries cards and their country naming unchanged.
+ */
+
+/* Scholarship detail pages are long, ordinary scrollable documents on both screen sizes.
+   Override other viewport-first and fixed shell styles only for this route. */
+html:has(body.an-scholarship-detail-view){
+ height:auto!important;min-height:100%!important;max-height:none!important;
+ overflow-x:hidden!important;overflow-y:auto!important;scroll-behavior:smooth!important;
+}
+body.an-scholarship-detail-view{
+ position:static!important;display:block!important;
+ height:auto!important;min-height:100dvh!important;max-height:none!important;
+ overflow-x:hidden!important;overflow-y:auto!important;
+ overscroll-behavior-y:auto!important;touch-action:pan-y pinch-zoom!important;
+}
+body.an-scholarship-detail-view #app{
+ display:block!important;position:static!important;flex:none!important;
+ height:auto!important;min-height:100dvh!important;max-height:none!important;
+ overflow:visible!important;overflow-y:visible!important;touch-action:pan-y!important;
+}
+body.an-scholarship-detail-view #app>.an-scholarship-detail{
+ position:relative!important;display:block!important;
+ height:auto!important;max-height:none!important;min-height:0!important;
+ overflow:visible!important;overflow-y:visible!important;
+ padding-bottom:90px!important;overscroll-behavior-y:auto;
+}
+body.an-scholarship-detail-view #app .an-scholarship-section-grid,
+body.an-scholarship-detail-view #app .an-scholarship-section,
+body.an-scholarship-detail-view #app .an-scholarship-universities,
+body.an-scholarship-detail-view #app .an-scholarship-unigrid{
+ height:auto!important;max-height:none!important;overflow:visible!important;
+}
+body.an-scholarship-detail-view #app .an-scholarship-section{
+ scroll-margin-top:105px;border-color:#77502f;
+ background:radial-gradient(ellipse at top right,#ffad3613,transparent 65%),#111821;
+ box-shadow:inset 3px 0 #d07a36;
+}
+body.an-scholarship-detail-view .an-scholarship-section h2{
+ color:#ffc077!important;font-weight:900!important;font-size:clamp(14px,1.55vw,18px)!important;
+ letter-spacing:.01em;line-height:1.35;
+}
+body.an-scholarship-detail-view .an-scholarship-section h2 span{
+ display:inline-grid;place-items:center;min-width:26px;height:26px;
+ background:#59280c;color:#ffe0a4!important;border-radius:8px;
+ margin-right:5px;font-size:12px;
+}
+body.an-scholarship-detail-view .an-scholarship-section-2,
+body.an-scholarship-detail-view .an-scholarship-section-6{border-color:#398f87;box-shadow:inset 3px 0 #48b8aa}
+body.an-scholarship-detail-view .an-scholarship-section-2 h2,
+body.an-scholarship-detail-view .an-scholarship-section-6 h2{color:#75e0d1!important}
+body.an-scholarship-detail-view .an-scholarship-section-3{
+ background:linear-gradient(135deg,#11273b,#121821 70%)!important;
+ border:1px solid #477fc8!important;box-shadow:inset 4px 0 #42a8ff,0 5px 18px #0004;
+}
+body.an-scholarship-detail-view .an-scholarship-section-3 h2{
+ color:#84d5ff!important;font-size:clamp(16px,1.9vw,20px)!important;
+}
+body.an-scholarship-detail-view .an-scholarship-section-3 h2 span{
+ color:#fff!important;background:#15589a;
+}
+body.an-scholarship-detail-view .an-scholarship-section-4,
+body.an-scholarship-detail-view .an-scholarship-section-5{border-color:#8b65ad;box-shadow:inset 3px 0 #9e78d9}
+body.an-scholarship-detail-view .an-scholarship-section-4 h2,
+body.an-scholarship-detail-view .an-scholarship-section-5 h2{color:#d9b5ff!important}
+body.an-scholarship-detail-view .an-scholarship-section p{color:#e7e9ee!important;font-size:clamp(12px,1.1vw,14px)!important;line-height:1.8!important}
+body.an-scholarship-detail-view .an-fact-highlight{color:#ffbf75!important;font-weight:900!important}
+body.an-scholarship-detail-view .an-scholarship-section-3 .an-fact-highlight{color:#a1deff!important}
+body.an-scholarship-detail-view .an-fact-number{
+ color:#161008!important;background:#ffcb71!important;border-radius:4px;
+ padding:1px 4px;font-weight:900!important;white-space:normal;
+}
+body.an-scholarship-detail-view .an-scholarship-section-3 .an-fact-number{background:#90d3ff!important}
+body.an-scholarship-detail-view .an-scholarship-section a{color:#ffba78}
+
+/* Each category is ONE horizontally scrollable shelf. No country subdivisions. */
+.an-scholarship-directory .an-scholarship-rail-section{margin:16px 0 23px;min-width:0}
+.an-scholarship-directory .an-scholarship-rail-section[hidden]{display:none!important}
+.an-scholarship-directory .an-scholarship-rail-header{
+ display:flex;align-items:flex-end;justify-content:space-between;
+ gap:14px;margin:5px 0 10px;padding:0 2px 8px;
+ border-bottom:1px solid #8651299c;
+}
+.an-scholarship-rail-header h2{font-size:clamp(17px,2vw,24px);color:#ffbe76;margin:3px 0 4px;line-height:1.25}
+.an-scholarship-rail-header p{font-size:11px;color:#d1d5dc;line-height:1.45;margin:0}
+.an-scholarship-rail-eyebrow{color:#92d7ff;letter-spacing:.12em;font-size:9px;font-weight:900}
+.an-scholarship-rail-nav{display:flex;flex:none;gap:7px}
+.an-scholarship-rail-nav button{
+ display:grid;place-items:center;height:36px;width:38px;
+ border-radius:10px;border:1px solid #b67a43;color:#ffcd9c;
+ background:linear-gradient(140deg,#36200f,#16171c);
+ font-size:24px;font-weight:900;line-height:1;
+}
+.an-scholarship-rail-nav button:hover{background:#bd6114;color:#fff;border-color:#ffb16b}
+.an-scholarship-directory .an-scholarship-rail{
+ display:grid!important;
+ grid-auto-flow:column!important;
+ grid-auto-columns:minmax(0,calc((100% - 42px)/4))!important;
+ grid-template-columns:none!important;
+ gap:14px!important;align-items:stretch!important;
+ overflow-x:auto!important;overflow-y:hidden!important;
+ scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:thin;
+ scrollbar-color:#dc8a3b #161618;overscroll-behavior-x:contain;
+ padding:3px 2px 14px!important;
+}
+.an-scholarship-directory .an-scholarship-rail::-webkit-scrollbar{height:7px}
+.an-scholarship-directory .an-scholarship-rail::-webkit-scrollbar-thumb{border-radius:8px;background:#bd7b36}
+.an-scholarship-directory .an-scholarship-rail>.an-scholarship-card{
+ scroll-snap-align:start;min-width:0;width:100%;height:100%;
+}
+.an-scholarship-rail-empty{padding:20px;min-width:250px;color:#d9c6ac}
+.an-scholarship-directory .an-scholarship-meta{margin:12px 0!important}
+
+/* The Countries page keeps all its existing country cards and headings.
+   Only the previously unused right half of its TITLE row gets the CTA + dots. */
+#app>.an-country-hero{overflow:visible!important;z-index:16;isolation:isolate}
+#app>.an-country-hero .an-country-hero-layout{
+ width:100%;max-width:1510px;display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,.89fr);
+ gap:clamp(15px,3vw,50px);align-items:center;
+}
+.an-country-hero-intro{min-width:0}
+.an-country-hero-intro h1{margin:4px 0!important}
+.an-country-hero-intro p{margin:4px 0 0!important}
+.an-country-hero-tools{display:grid;grid-template-columns:minmax(0,1fr) 46px;align-items:stretch;gap:8px;position:relative;z-index:20}
+.an-country-scholarship-cta{
+ min-width:0;display:flex;align-items:center;gap:12px;min-height:74px;
+ border-radius:14px;padding:10px 16px;
+ background:linear-gradient(120deg,#ffd79e 0%,#ffae61 55%,#ff8d38 100%);
+ border:1px solid #ffddba;color:#281205!important;
+ box-shadow:0 6px 18px #cf651f35,inset 0 1px #fff7;transition:transform .2s,filter .2s;
+}
+.an-country-scholarship-cta:hover{transform:translateY(-2px);filter:brightness(1.05)}
+.an-country-cta-ico{font-size:27px;flex:none}
+.an-country-cta-copy{min-width:0;display:flex;flex-direction:column;gap:5px}
+.an-country-cta-copy strong{font-size:clamp(12px,1.16vw,16px);color:#241209!important;font-weight:950;line-height:1.25}
+.an-country-cta-copy small{font-size:clamp(10px,.83vw,12px);color:#5d2d10!important;line-height:1.35;font-weight:700}
+.an-country-advanced{position:relative}
+.an-country-advanced>summary{
+ list-style:none;cursor:pointer;display:grid;place-items:center;
+ height:100%;min-height:66px;min-width:44px;
+ border:1px solid #e5a267;border-radius:14px;
+ background:linear-gradient(140deg,#412414,#1d1717);color:#ffc88e;font-size:28px;font-weight:900;
+}
+.an-country-advanced>summary::-webkit-details-marker{display:none}
+.an-country-advanced[open]>summary{background:#94430b;color:white}
+.an-country-filter-panel{
+ position:absolute;right:0;top:calc(100% + 9px);width:min(360px,calc(100vw - 32px));
+ max-height:min(73dvh,600px);overflow-y:auto;overscroll-behavior:contain;
+ background:linear-gradient(130deg,#19202a,#0b0d13);border:1px solid #ffaf65;
+ box-shadow:0 18px 45px #000b;border-radius:16px;padding:16px;z-index:90;
+}
+.an-country-filter-panel form{display:grid;gap:11px}
+.an-country-filter-panel h3{color:#ffb978;font-size:16px;margin:0 0 2px}
+.an-country-filter-panel label{display:grid;gap:5px;font-size:10px;letter-spacing:.03em;font-weight:800;color:#ffbc81}
+.an-country-filter-panel label>input,.an-country-filter-panel select{
+ display:block;box-sizing:border-box;width:100%;min-height:38px!important;border:1px solid #89603c;
+ background:#151920;border-radius:9px;color:white;font-size:12px;padding:8px;
+}
+.an-country-fee-fields{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.an-country-filter-panel label.an-country-filter-check{display:flex;flex-direction:row;align-items:center;gap:9px;font-size:12px}
+.an-country-filter-check input{width:16px;height:16px;accent-color:#ff9b33}
+.an-country-filter-panel button{
+ background:linear-gradient(130deg,#ffe0b4,#ff9f42);color:#241003;
+ border:1px solid #ffc98a;border-radius:11px;padding:11px;font-weight:950;font-size:12px
+}
+.an-country-filter-panel p{font-size:10px!important;line-height:1.5;color:#d6d2d0;margin:0}
+@media(min-width:801px) and (max-width:1090px){
+ #app>.an-country-hero .an-country-hero-layout{grid-template-columns:minmax(0,1fr) minmax(285px,1fr);gap:13px}
+ .an-country-scholarship-cta{padding:9px;gap:7px}
+ .an-country-cta-ico{font-size:22px}
+}
+@media(max-width:800px){
+ #app>.an-country-hero .an-country-hero-layout{grid-template-columns:1fr;gap:8px}
+ .an-country-scholarship-cta{min-height:64px;padding:10px}
+ .an-country-advanced>summary{min-height:63px}
+ .an-country-cta-copy strong{font-size:12px}
+ .an-country-cta-copy small{font-size:10px}
+ .an-scholarship-directory .an-scholarship-rail{
+   grid-auto-columns:minmax(0,calc((100% - 10px)/2))!important;
+   gap:10px!important;
+ }
+ .an-scholarship-rail-header h2{font-size:17px}
+ .an-scholarship-rail-header p{font-size:10px}
+ .an-scholarship-rail-nav button{width:31px;height:34px}
+}
+@media(max-width:400px){
+ .an-country-cta-ico{display:none}
+ .an-country-hero-tools{grid-template-columns:minmax(0,1fr) 42px}
+ .an-country-cta-copy strong{font-size:11px}
+ .an-country-cta-copy small{font-size:9px}
+ .an-scholarship-rail-header h2{font-size:15px}
+}
