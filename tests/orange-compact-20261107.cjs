@@ -15,7 +15,8 @@ w.eval(fs.readFileSync('ffh-selected-identity-20261107.js','utf8'));
 (async()=>{
  await pause();
  let card=()=>query('.ffDashSelectedIdentity');
- assert.equal(card().querySelector('.ffDashSelectedName').textContent,'MEHEDI ALIM AYON','combined all zones uses signed-in manager');
+ assert.equal(card().querySelector('.ffDashSelectedName').textContent,'MEHEDI ALIM AYON','combined all zones uses overall KL owner');
+ w.localStorage.setItem('ffh_session',JSON.stringify({id:'MG_SUNGAI_BULOH'}));query('.dashHero').append(w.document.createElement('span'));await pause();assert.equal(card().querySelector('.ffDashSelectedName').textContent,'MEHEDI ALIM AYON','authorized non-owner All Zones view still shows overall KL owner');
  query('#ffDashboardZone').value='SUNGai_BULOH';query('#ffDashboardZone').dispatchEvent(new w.Event('change',{bubbles:true}));
  await pause();assert.equal(card().querySelector('.ffDashSelectedName').textContent,'JAMIL','individual zone uses assigned manager, never HoS');
  assert.match(card().querySelector('img').src,/jamil.jpg/);
