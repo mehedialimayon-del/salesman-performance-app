@@ -67,7 +67,7 @@ body.an-about-details-mode #app .an2-story-chapter{scroll-margin-top:125px}
   max-height:none!important;overflow:visible!important;
 }
 #app .an-country-hero-tools .an-country-scholarship-cta{
-  height:auto!important;min-height:75px!important;overflow:visible!important;
+  height:auto!important;min-height:57px!important;padding:7px 10px!important;overflow:visible!important;
 }
 @media(max-width:800px){
  #app .an-country-hero-tools .an-country-cta-copy small{
