@@ -64,7 +64,7 @@ jobs:
                 assert(boxes.length>5 && boxes.every(r => Math.abs(r.height-boxes[0].height)<2));
                 if(width<600) assert(boxes.every(r => r.x===boxes[0].x));
                 const colors = await cards.first().locator('.card-open,.an-guide-official,.an-catalogue-apply').evaluateAll(nodes => nodes.map(n => getComputedStyle(n).backgroundColor));
-                assert.deepEqual(colors,['rgb(240, 104, 0)','rgb(21, 43, 61)','rgb(8, 126, 82)']);
+                assert.deepEqual(colors,['rgb(240, 104, 0)','rgb(21, 43, 61)','rgb(6, 132, 85)']);
                 await page.screenshot({path:'universities-'+width+'.png'});
                 const search = page.getByRole('searchbox',{name:'Search universities'});
                 assert.equal(await search.isVisible(),false);
