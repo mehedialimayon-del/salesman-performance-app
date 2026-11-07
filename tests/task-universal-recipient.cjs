@@ -47,7 +47,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  assert.ok(![...select.options].some(o=>o.value==='M22328'),'Leadership does not include KL SR');
  scope.value='all';scope.dispatchEvent(new w.Event('change',{bubbles:true}));
  assert.ok([...select.options].some(o=>o.value==='M22075'),'All staff restores all managers');
- assert.match(q('.ffTaskRecipientScope small').textContent,/do not grant dashboard/i);
+ assert.match(q('.ffTaskRecipientScope small').textContent,/does not grant dashboard/i);
  const exactZone=[...scope.options].find(o=>o.value==='zone:CHERAS');
  assert.ok(exactZone,'zone-specific task filter is present');
  scope.value='zone:CHERAS';scope.dispatchEvent(new w.Event('change',{bubbles:true}));
