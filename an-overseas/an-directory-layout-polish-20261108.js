@@ -56,6 +56,32 @@ body:has(.university-catalogue) .page-head .catalogue-search:focus-within input{
 body:has(.university-catalogue) .catalogue-filter-panel{position:fixed!important;top:calc(var(--an-dir-top,0px) + 64px)!important;left:10px!important;right:10px!important;width:auto!important;max-width:none!important;max-height:65dvh!important;overflow-y:auto!important;z-index:250!important;background:#11151d!important;border:1px solid #ff6500!important;border-radius:12px!important;box-shadow:0 12px 40px #000c!important}
 body:has(.university-catalogue) .an-scholarship-category-panel:not([hidden]){position:fixed!important;top:calc(var(--an-dir-top,0px) + 64px)!important;left:10px!important;right:10px!important;max-height:65dvh!important;overflow-y:auto!important;z-index:250!important}
 }
+
+/* Mobile repair: no blank sticky offset, no clipped controls, restore original action colours. */
+@media(max-width:849px){
+body:has(.university-catalogue) .page-head{position:relative!important;top:auto!important;margin-top:0!important;transform:none!important}
+body:has(.university-catalogue) .page-head>.wrap{display:grid!important;grid-template-columns:minmax(0,1fr) 132px!important;gap:5px!important;padding:3px 8px!important;overflow:visible!important}
+body:has(.university-catalogue) .page-head .an-directory-heading{min-width:0!important;max-width:100%!important;overflow:hidden!important}
+body:has(.university-catalogue) .page-head .an-directory-heading h1{font-size:clamp(17px,3.8vw,24px)!important;line-height:1.12!important;overflow:visible!important}
+body:has(.university-catalogue) .page-head .catalogue-tools{width:132px!important;max-width:132px!important;min-width:132px!important;display:grid!important;grid-template-columns:repeat(4,30px)!important;gap:4px!important;overflow:visible!important}
+body:has(.university-catalogue) .page-head .catalogue-tools>*{width:30px!important;min-width:30px!important;max-width:30px!important;height:30px!important;min-height:30px!important;flex:none!important}
+body:has(.university-catalogue) .page-head .catalogue-search,
+body:has(.university-catalogue) .page-head .catalogue-filter summary,
+body:has(.university-catalogue) .page-head #an-scholarship-category-toggle,
+body:has(.university-catalogue) .page-head .an-catalogue-favourites{width:30px!important;min-width:30px!important;max-width:30px!important;height:30px!important;min-height:30px!important;padding:0!important;overflow:hidden!important}
+body:has(.university-catalogue) .page-head #an-scholarship-category-toggle{font-size:0!important}
+body:has(.university-catalogue) .page-head #an-scholarship-category-toggle::before{content:'🎓';font-size:17px!important;line-height:1}
+body:has(.university-catalogue) .page-head .catalogue-filter summary{font-size:0!important}
+body:has(.university-catalogue) .page-head .catalogue-filter summary::before{content:'☷';font-size:19px!important}
+body:has(.university-catalogue) .page-head .catalogue-search>span{font-size:18px!important}
+body:has(.university-catalogue) .page-head .an-catalogue-favourites{font-size:17px!important}
+body:has(.university-catalogue) .catalogue-filter-panel{top:calc(var(--an-dir-top,0px) + 8px)!important}
+}
+.university-catalogue #results .uni-card .card-open,
+.university-catalogue #results .uni-card a[href*="/university/"]{background:#f46b08!important;color:#fff!important;border-color:#ff9c3a!important}
+.university-catalogue #results .uni-card a[href^="https://"]{background:#152b3d!important;color:#38bfff!important;border-color:#2986bc!important}
+.university-catalogue #results .uni-card a[href*="/apply"],
+.university-catalogue #results .uni-card [class*="apply"]{background:#087e52!important;color:#fff!important;border-color:#27b979!important}
 `;
 document.head.appendChild(style);
 function mount(){
