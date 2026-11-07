@@ -70,6 +70,18 @@ jobs:
                 console.log('CARD METRICS',width,JSON.stringify(boxes));
                 assert(boxes.length>5 && boxes.every(r => Math.abs(r.height-boxes[0].height)<2));
                 if(width<600) assert(boxes.every(r => r.x===boxes[0].x));
+                const overview = await cards.first().evaluate(card => {
+                  const rects = [...card.querySelectorAll('.card-open,.an-guide-official,.an-catalogue-apply')].map(el => el.getBoundingClientRect());
+                  return {facts:card.querySelectorAll('.an-card-fact').length,rank:card.querySelector('.an-card-fact')?.textContent,
+                    overlay:!!card.querySelector('.an-guide-rank'),badge:card.querySelector('.an-card-identity .badge')?.textContent,
+                    buttonSizes:rects.map(r=>[r.width,r.height])};
+                });
+                console.log('CARD OVERVIEW',width,JSON.stringify(overview));
+                assert.equal(await page.locator('.an-directory-totals>span').count(),2);
+                assert.equal(overview.facts,4);
+                assert(overview.rank.includes('QS World Ranking') && overview.rank.includes('#56'));
+                assert(!overview.overlay && overview.badge.includes('Public University'));
+                assert(overview.buttonSizes.length===3 && overview.buttonSizes.every(([w,h])=>Math.abs(w-overview.buttonSizes[0][0])<=2 && h===33));
                 const colors = await cards.first().locator('.card-open,.an-guide-official,.an-catalogue-apply').evaluateAll(nodes => nodes.map(n => getComputedStyle(n).backgroundColor));
                 assert.deepEqual(colors,['rgb(240, 104, 0)','rgb(21, 43, 61)','rgb(6, 132, 85)']);
                 const search = page.getByRole('searchbox',{name:'Search universities'});
