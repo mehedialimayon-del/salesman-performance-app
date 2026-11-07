@@ -110,6 +110,8 @@
         [[102,60],[172,60],[241,62],[312,61],[381,65]].map(([x,w])=>[x,y,w,43])),
       [102,1140,61,42],[173,1140,62,42]
     ];
+    // Portrait sharpening reuses the approved artwork, not the flag tile images.
+    const image='<image href="'+src+'" x="0" y="0" width="864" height="1536" />';
     const allCodes=rows.flat();
     const cloth=positions.map(([x,y,w,h],i)=>{
       const code=allCodes[i];
