@@ -104,14 +104,19 @@
       +'<svg class="an2-approved-reference-waves" viewBox="18 235 828 1156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'
       +'<defs><clipPath id="an2-approved-flag-crop" clipPathUnits="userSpaceOnUse">'+masks+'</clipPath>'
       +'<filter id="an2-approved-cloth-distortion" x="-3%" y="-3%" width="106%" height="106%">'
-      +'<feTurbulence type="fractalNoise" baseFrequency="0.014 0.075" numOctaves="1" seed="9" result="noise">'
-      +'<animate attributeName="baseFrequency" values="0.014 0.075;0.034 0.091;0.013 0.061;0.014 0.075" dur="3.1s" repeatCount="indefinite"/>'
-      +'</feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="14" xChannelSelector="R" yChannelSelector="G">'
-      +'<animate attributeName="scale" values="9;17;11;9" dur="3.1s" repeatCount="indefinite"/>'
+      +'<feTurbulence type="fractalNoise" baseFrequency="0.006 0.020" numOctaves="1" seed="9" result="noise">'
+      +'<animate attributeName="baseFrequency" values="0.006 0.020;0.011 0.028;0.005 0.022;0.006 0.020" dur="3.1s" repeatCount="indefinite"/>'
+      +'</feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G">'
+      +'<animate attributeName="scale" values="3;7;4;3" dur="3.1s" repeatCount="indefinite"/>'
       +'</feDisplacementMap></filter></defs>'
-      +'<g clip-path="url(#an2-approved-flag-crop)"><g filter="url(#an2-approved-cloth-distortion)">'+image+'</g></g>'
+      +'<g opacity="0.30" clip-path="url(#an2-approved-flag-crop)"><g filter="url(#an2-approved-cloth-distortion)">'+image+'</g></g>'
       +'</svg></div>';
   }
+  document.addEventListener('error',event=>{
+    if(event.target?.classList?.contains('an2-approved-reference-source')){
+      event.target.closest('.an2-founder-hero')?.classList.add('an2-approved-source-error');
+    }
+  },true);
   function renderStory(){
     const directory = currentDirectory();
     const uniCount = directory.universities == null ? 'Loading…' : directory.universities.toLocaleString('en-US');
