@@ -105,26 +105,20 @@ function anNumberedCard(u){
  let html=card(u);
  if(u.kind==='Public'||u.kind==='Private'){
   html=html.replace(/<span class="badge">.*?<\/span>/,'<span class="badge an-type-'+u.kind.toLowerCase()+'"><span class="an-type-word">'+esc(u.kind)+'</span> University</span>');
- }else{
-  html=html.replace('<span class="badge">','<span class="badge an-type-unknown">');
-  html=html.replace('University · '+esc(u.country),'Type not verified · '+esc(u.country));
  }
- html=html.replace(/<span class="an-catalogue-index"[^>]*>[\s\S]*?<\/small><\/span>/,'');
- if(u.closedDate){
-   html=html.replace('<span class="badge">','<span class="badge an-type-closed">');
-   html=html.replace('<div class="inside">','<div class="inside"><div class="an-closed-status">HISTORICAL RECORD · CLOSED '+esc(u.closedDate)+'</div>');
-   return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite).replace('</article>','<p class="an-no-applications">Institution closed — applications unavailable</p></article>');
- }
- // Highlight the abbreviation in the displayed university name.
+ if(u.closedDate)return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite);
  const short=String(u.short||'').trim();
- if(short) html=html.replace('('+esc(short)+')','<span class="an-shortname">('+esc(short)+')</span>');
- html=html.replace(/<span class="an-guide-rank">[^<]*<\/span>/,'')');
-   html=html.replace(new RegExp('\\('+escaped+'\\)','g'),'<span class="an-shortname">('+esc(short)+')</span>');
+ if(short)html=html.replace('('+esc(short)+')','<span class="an-shortname">('+esc(short)+')</span>');
+ html=html.replace(/<span class="an-guide-rank">[^<]*<\/span>/,'');
+ // Keep one set of university facts; the base card already provides the four metric tiles.
+ // Only add the enhanced metrics when the original card has no fact grid.
+ const hasFacts=/an-card-facts|an-guide-facts|an-guide-metrics|an-guide-stat/i.test(html);
+ if(!hasFacts){
+  html=html.replace('<div class="inside">','<div class="inside"><div class="an-card-overview"><div class="an-card-identity">')
+   .replace('<div class="an-guide-links">','</div>'+cardMetrics(u,seq)+'</div><div class="an-guide-links">');
  }
- html=html.replace(/<span class="an-guide-rank">[^<]*<\/span>/,'')
-  .replace('<div class="inside">','<div class="inside"><div class="an-card-overview"><div class="an-card-identity">')
-  .replace('<div class="an-guide-links">','</div>'+cardMetrics(u,seq)+'</div><div class="an-guide-links">');
- return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite).replace('</article>','<a class="an-catalogue-apply" href="#/apply/'+encodeURIComponent(u.id)+'" aria-label="Start an A&amp;N application for '+esc(u.name)+'">Apply through A&amp;N ↗</a></article>');
+ // The base card already has its own Apply Now action.
+ return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite);
 }
 
 function filterStateSignature(){
