@@ -127,3 +127,34 @@ html body .top .links a[aria-current="page"]{
 @media (prefers-reduced-motion:reduce){
   html body .top .links a::before{animation:none!important;left:15%!important;opacity:.35!important}
 }
+
+/* 2026-11-07 correction: mobile subtitle must be more legible, not compressed.
+   Do not change menu button dimensions, spacing, header controls or other content. */
+@media(max-width:800px){
+ html body .top .brand-copy small{
+   font-size:clamp(8px,2.25vw,9.5px)!important;
+   letter-spacing:.05px!important;line-height:1.2!important;
+   font-weight:650!important;
+   transform:none!important;
+ }
+ html body .top .brand-copy strong{
+   font-size:clamp(16px,4.05vw,19px)!important;
+   letter-spacing:-.3px!important;
+ }
+ /* Make the original glass look visible even between animated sweeps. */
+ html body .top .links.open a{
+   background-image:
+    linear-gradient(160deg,rgba(255,255,255,.21) 0%,rgba(255,255,255,.07) 23%,transparent 52%),
+    linear-gradient(180deg,#2a241e,#0e1014)!important;
+   box-shadow:inset 0 1px 0 rgba(255,236,198,.48),inset 0 -1px 0 rgba(0,0,0,.65),0 2px 9px #0008!important;
+ }
+ html body .top .links.open a.current,
+ html body .top .links.open a:hover{
+   background-image:linear-gradient(155deg,rgba(255,255,255,.3),transparent 53%),linear-gradient(180deg,#ff9e2f,#c94a00)!important;
+ }
+}
+@media(min-width:801px){
+ html body .top .links a{
+  background-image:linear-gradient(160deg,rgba(255,255,255,.23),rgba(255,255,255,.06) 24%,transparent 53%),linear-gradient(180deg,#29231e,#0a0c10)!important;
+ }
+}
