@@ -79,3 +79,20 @@
 .an-guide-card:has(.an-guide-ticket) .an-guide-ticket{top:7px;left:7px;right:auto;bottom:auto;max-width:56%}
 .an-guide-card:has(.an-guide-ticket) .an-guide-rank{top:auto;bottom:7px;left:7px}
 .an-guide-card:has(.an-guide-ticket) .an-guide-credit{display:none}
+
+/* Consistent university portfolio hierarchy: white headings, orange accents, restrained notes. */
+#university-panel.white{background:#0d1016!important;color:#fff!important;border-color:#a74d1b!important}
+#university-panel.white h2,#university-panel.white h3{color:#fff!important}
+#university-panel.white p,#university-panel.white li{color:#f7f7f7!important}
+#university-panel.white a{color:#ff7525!important}
+#university-panel.white .an-guide-note{background:#211c19!important;color:#fff!important;border-left:4px solid #f46b08!important}
+#university-panel.white .an-guide-note strong{color:#fff!important}
+#university-panel.white .an-guide-check{background:#111923!important;border-color:#a74d1b!important}
+#university-panel.white .an-guide-check h3{color:#fff!important}
+#university-panel.white .an-guide-fee-grid b,#university-panel.white .an-guide-key strong{color:#fff!important}
+#university-panel.white .an-guide-fee-grid>div{background:#141923!important;border-color:#aa4b18!important}
+#university-panel.white .an-guide-btn{background:#f46b08!important;color:#fff!important;border-color:#ff963d!important}
+#university-panel.white .an-guide-btn.alt{background:#151b24!important;color:#fff!important;border-color:#ed6d27!important}
+#university-panel.white .an-guide-fee-table th{background:#25201c!important;color:#fff!important}
+#university-panel.white .an-guide-step b{background:#f46b08!important;color:#fff!important}
+#university-panel.white .an-guide-ticket-note{background:#211a16!important;color:#fff!important}
