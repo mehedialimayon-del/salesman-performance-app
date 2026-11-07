@@ -2,7 +2,7 @@
 (()=>{'use strict';
 const css=`
 body:has(.university-catalogue) .page-head{position:relative!important;top:auto!important;z-index:120!important;margin:0!important;padding:5px 0!important;background:#0c0f16!important;overflow:visible!important}
-body:has(.university-catalogue) .page-head>.wrap{max-width:100%!important;width:100%!important;box-sizing:border-box!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,236px)!important;align-items:center!important;gap:8px!important;padding:3px 12px!important;margin:0!important}
+body:has(.university-catalogue) .page-head>.wrap{max-width:100%!important;width:100%!important;box-sizing:border-box!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto minmax(0,236px)!important;align-items:center!important;gap:8px!important;padding:3px 12px!important;margin:0!important}
 body:has(.university-catalogue) .an-directory-heading{min-width:0!important;display:flex!important;flex-direction:column!important;gap:2px!important}
 body:has(.university-catalogue) .an-directory-heading h1{font-size:clamp(21px,2.5vw,30px)!important;line-height:1.1!important;margin:0!important;white-space:normal!important}
 body:has(.university-catalogue) .an-directory-heading .bread{font-size:10px!important;margin:0!important}
@@ -45,10 +45,15 @@ body:has(.university-catalogue) .catalogue-count{margin:0!important;padding:3px 
 body:has(.university-catalogue) .catalogue-filter[open]{z-index:250!important}
 body:has(.university-catalogue) .catalogue-filter-panel{z-index:260!important}
 .an-favorite-heart,.an-favorite-heart.saved{background:#0b0e14!important;color:#ff690b!important;border-color:#ff690b!important}
+ .an-directory-totals{display:flex;gap:5px;justify-content:flex-end}
+ .an-directory-totals>span{display:grid;grid-template-columns:auto auto;align-items:center;justify-content:center;column-gap:4px;padding:4px 5px;border:1px solid #895020;border-radius:8px;background:#141922;color:#fff;white-space:nowrap}
+ .an-directory-totals .an-directory-icon{width:12px;height:12px;color:#f06800}
+ .an-directory-totals b{font-size:12px;line-height:1}
+ .an-directory-totals small{grid-column:1/-1;text-align:center;font-size:8px;line-height:1.25}
 @media(max-width:849px){
-body:has(.university-catalogue) .page-head>.wrap{grid-template-columns:minmax(0,1fr)!important;gap:4px!important;padding:4px 10px!important}
-body:has(.university-catalogue) .an-directory-heading h1{font-size:24px!important}
-body:has(.university-catalogue) .page-head .catalogue-tools{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+body:has(.university-catalogue) .page-head>.wrap{grid-template-columns:minmax(0,1fr) auto!important;gap:4px!important;padding:4px 10px!important}
+body:has(.university-catalogue) .an-directory-heading h1{font-size:clamp(17px,5.25vw,24px)!important}
+body:has(.university-catalogue) .page-head .catalogue-tools{grid-column:1/-1;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
 body:has(.university-catalogue) .page-head .catalogue-tools>*{height:33px!important;min-height:33px!important}
 body.an-universities-mode #app .university-catalogue #results{grid-template-columns:minmax(0,1fr)!important}
 
@@ -56,6 +61,8 @@ body.an-universities-mode #app .university-catalogue #results{grid-template-colu
 `;
 const style=document.createElement('style');style.textContent=css;document.head.appendChild(style);
 const icons={
+ globe:'<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/>',
+ university:'<path d="m3 9 9-5 9 5M4 10h16M6 11v7m6-7v7m6-7v7M3 20h18"/>',
  search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/>',
  scholarship:'<path d="m2 9 10-5 10 5-10 5-10-5Zm4 2v5c3 3 9 3 12 0v-5m4-2v7"/>',
  favourites:'<path d="M12 20 4.5 12.5C0 8 6 2 10.5 6.5L12 8l1.5-1.5C18 2 24 8 19.5 12.5Z"/>',
@@ -106,6 +113,20 @@ function mount(){
  let heading=wrap.querySelector('.an-directory-heading');
  if(!heading){const h=wrap.querySelector('h1');if(!h)return;heading=document.createElement('div');heading.className='an-directory-heading';h.parentNode.insertBefore(heading,h);heading.appendChild(h);}
  const bread=wrap.querySelector('.bread');if(bread&&bread.parentNode!==heading)heading.insertBefore(bread,heading.firstChild);
+ let totals=wrap.querySelector('.an-directory-totals');
+ if(!totals){
+  totals=document.createElement('div');
+  totals.className='an-directory-totals';
+  heading.after(totals);
+ }
+ const universities=U.length.toLocaleString('en-US');
+ const destinations=new Set(U.map(university=>university.country==='Türkiye'?'Turkey':university.country).filter(Boolean)).size;
+ const signature=universities+'/'+destinations;
+ if(totals.dataset.count!==signature){
+  totals.dataset.count=signature;
+  totals.innerHTML='<span>'+icon('globe')+'<b>'+destinations+'</b><small>Countries</small></span>'
+   +'<span>'+icon('university')+'<b>'+universities+'</b><small>Universities</small></span>';
+ }
  if(tools.parentNode!==wrap)wrap.appendChild(tools);
  const search=tools.querySelector('.catalogue-search'),scholar=tools.querySelector('.an-scholarship-category-wrap'),fav=tools.querySelector('.an-catalogue-favourites'),filter=tools.querySelector('.catalogue-filter');
  [search,scholar,fav,filter].forEach((el,i)=>{if(el&&tools.children[i]!==el)tools.insertBefore(el,tools.children[i]||null)});
