@@ -82,14 +82,14 @@
 
 /* Consistent university portfolio hierarchy: white headings, orange accents, restrained notes. */
 #university-panel.white{background:#0d1016!important;color:#fff!important;border-color:#a74d1b!important}
-#university-panel.white h2,#university-panel.white h3{color:#fff!important}
-#university-panel.white p,#university-panel.white li{color:#f7f7f7!important}
+#university-panel.white h2{color:#fff!important}
+#university-panel.white h3{color:#f06800!important}
+#university-panel.white p,#university-panel.white li{color:#fff!important}
 #university-panel.white a{color:#ff7525!important}
-#university-panel.white .an-guide-note{background:#211c19!important;color:#fff!important;border-left:4px solid #f46b08!important}
-#university-panel.white .an-guide-note strong{color:#fff!important}
+#university-panel.white .an-guide-note{background:#1a1d23!important;color:#fff!important;border-left:4px solid #f46b08!important}
+#university-panel.white .an-guide-note strong{color:#f06800!important}
 #university-panel.white .an-guide-check{background:#111923!important;border-color:#a74d1b!important}
-#university-panel.white .an-guide-check h3{color:#fff!important}
-#university-panel.white .an-guide-fee-grid b,#university-panel.white .an-guide-key strong{color:#fff!important}
+#university-panel.white .an-guide-fee-grid b,#university-panel.white .an-guide-key strong{color:#f06800!important}
 #university-panel.white .an-guide-fee-grid>div{background:#141923!important;border-color:#aa4b18!important}
 #university-panel.white .an-guide-btn{background:#f46b08!important;color:#fff!important;border-color:#ff963d!important}
 #university-panel.white .an-guide-btn.alt{background:#151b24!important;color:#fff!important;border-color:#ed6d27!important}
@@ -98,7 +98,15 @@
 #university-panel.white .an-guide-ticket-note{background:#211a16!important;color:#fff!important}
 
 /* Card integrity repair: identical rows and isolated logo/name placement. */
-#results{align-items:stretch!important}
+.university-catalogue #results{align-items:stretch!important;grid-auto-rows:1fr}
+.university-catalogue #results .catalogue-load-more{align-self:start}
+.university-catalogue #results .uni-card .an-guide-links .card-open{background:#f06800!important;color:#fff!important;border-color:#ff9c3a!important}
+.university-catalogue #results .uni-card .an-guide-official{background:#152b3d!important;color:#8bddff!important;border-color:#2986bc!important}
+.university-catalogue #results .uni-card .an-catalogue-apply{background:#087e52!important;color:#fff!important;border-color:#27b979!important}
+.university-catalogue #results .uni-card .inside :is(h3,.university-fullname,.badge){color:#fff!important}
+.university-catalogue #results .an-identity-logo-only .an-identity-name{position:static!important;max-width:100%;text-align:center;color:#fff!important}
+.university-catalogue #results .an-identity-logo-only .an-logo-stage{padding-bottom:12px!important}
+.university-catalogue #results .uni-cover-wrap:has(.uni-card-logo) .an-guide-identity>strong{visibility:hidden}
 #results .uni-card,#results .an-guide-card{height:100%!important;min-height:0!important;display:flex!important;flex-direction:column!important}
 #results .uni-card .inside,#results .an-guide-card .inside{flex:1 1 auto!important;display:flex!important;flex-direction:column!important;min-height:0!important}
 #results .uni-card .an-guide-links,#results .an-guide-card .an-guide-links{margin-top:auto!important;padding-top:14px!important}
@@ -114,12 +122,7 @@
 #results .an-guide-card .inside{min-height:0!important}
 }
 
-/* Portfolio typography: white primary headings + deep-orange subheadings, not all-orange blocks. */
-#university-panel.white h2{color:#fff!important}
-#university-panel.white h3,
-#university-panel.white .an-guide-check h3{color:#ff741c!important}
-#university-panel.white .an-guide-note{color:#fff!important;background:#1a1d23!important}
-#university-panel.white .an-guide-note strong{color:#ff8a32!important}
-#university-panel.white .an-guide-fee-grid b{color:#ff8a32!important}
 #university-panel.white .an-guide-degree-box>summary{color:#fff!important;background:#161c25!important}
-#university-panel.white .an-guide-key strong{color:#ff8a32!important}
+body.an-portfolio-v2 #app :is(.an-portfolio-serial,.an-study-section-icon,.an-study-degree-body h4){color:#f06800!important}
+body.an-portfolio-v2 #app .an-study-section :is(p,li){color:#fff!important}
+body.an-portfolio-v2 #app .an-study-section :is(p,li) :is(strong,em){color:#f06800!important}
