@@ -1,0 +1,21 @@
+/* A&N Overseas — deep accent / pure white palette, site wide.
+   Colour-only: no geometry, content, imagery, movement, or interaction changes.
+   Specific gradients and older hardcoded colours are normalized by the
+   companion stylesheet-colour pass, while retaining every original selector. */
+:root{
+  --orange:#ff7900;
+  --gold:#ffae00;
+  --ink:#ffffff;
+  --light:#ffffff;
+  --an-orange:#ff7900;
+  --an-gold:#ffae00;
+  --an-ink:#ffffff;
+  --an-white:#ffffff;
+  --an-accent:#ff7900;
+  --an-accent-strong:#ff7900;
+  --primary-orange:#ff7900;
+  --accent-orange:#ff7900;
+}
+body{color:#fff}
+::selection{background:#ff7900;color:#fff}
+:focus-visible{outline-color:#ff9500}
