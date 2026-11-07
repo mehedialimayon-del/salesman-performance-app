@@ -4,7 +4,7 @@ const mock=fs.readFileSync('tests/duty-ui.cjs','utf8').split('const mock=')[1].s
 const browser=await chromium.launch({headless:true,executablePath:process.env.FFH_CHROMIUM||chromium.executablePath(),args:['--no-sandbox','--disable-dev-shm-usage']});
 try{
 for(const id of ['M21954','M22075']){
-const context=await browser.newContext({viewport:{width:390,height:844},acceptDownloads:true});
+const context=await browser.newContext({viewport:{width:390,height:844},acceptDownloads:true,geolocation:{latitude:3.139,longitude:101.687},permissions:['geolocation']});
 const page=await context.newPage(),errors=[];
 page.on('pageerror',e=>errors.push(e.message));
 page.on('dialog',d=>d.accept());

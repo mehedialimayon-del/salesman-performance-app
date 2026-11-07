@@ -167,3 +167,6 @@ html body.ffGlowOn #app .app.ffBlackGlow :is(.scope button.active,.tabs button.o
  color:#ffb587!important;overflow-wrap:anywhere!important
 }
 @media(max-width:340px){.ffZoneManagerPicker .ffZoneManagerAvatar{width:40px!important;height:40px!important;flex-basis:40px!important}.ffZoneManagerPicker .ffPickerText strong{font-size:12px!important}}
+
+/* Preserve the user's draggable AYON AI orb position while preventing it from covering the mobile popup Send button. */
+@media (max-width:650px){body:has(.aiPopupOverlay) .aiPopupComposer{padding-right:clamp(54px,17vw,72px)!important}}
