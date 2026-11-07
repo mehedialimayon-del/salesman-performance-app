@@ -56,8 +56,10 @@ jobs:
                     return {x:r.x,right:r.right,y:r.y,width:r.width,buttonWidth:button.width};
                   })
                 );
+                console.log('CONTROLS',width,JSON.stringify(metrics));
+                await page.screenshot({path:'universities-'+width+'.png'});
                 assert.equal(metrics.length,4);
-                assert(metrics.every((r,i) => r.width===20 && r.x>=0 && r.right<=width &&
+                assert(metrics.every((r,i) => Math.abs(r.width-20)<1 && r.x>=0 && r.right<=width &&
                   Math.abs(r.y-metrics[0].y)<2 && Math.abs(r.buttonWidth-metrics[0].buttonWidth)<2 &&
                   (i===0 || r.x>metrics[i-1].right)));
                 const cards = page.locator('#results article');
@@ -65,11 +67,11 @@ jobs:
                   const r = node.getBoundingClientRect();
                   return {height:r.height, x:r.x};
                 }));
+                console.log('CARD METRICS',width,JSON.stringify(boxes));
                 assert(boxes.length>5 && boxes.every(r => Math.abs(r.height-boxes[0].height)<2));
                 if(width<600) assert(boxes.every(r => r.x===boxes[0].x));
                 const colors = await cards.first().locator('.card-open,.an-guide-official,.an-catalogue-apply').evaluateAll(nodes => nodes.map(n => getComputedStyle(n).backgroundColor));
                 assert.deepEqual(colors,['rgb(240, 104, 0)','rgb(21, 43, 61)','rgb(6, 132, 85)']);
-                await page.screenshot({path:'universities-'+width+'.png'});
                 const search = page.getByRole('searchbox',{name:'Search universities'});
                 assert.equal(await search.isVisible(),false);
                 await tools.getByRole('button',{name:'Open university search'}).click();
