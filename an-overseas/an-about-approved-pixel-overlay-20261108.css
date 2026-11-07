@@ -199,22 +199,24 @@
 
 @media (min-width:801px){
  html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-exact-towers{
-   right:0!important;width:25%!important;height:70%!important;opacity:1!important;
+   right:0!important;width:24.5%!important;height:69%!important;opacity:1!important;
    background:
-    radial-gradient(ellipse at 61% 42%,#ffe0a370 0%,#ff961c57 36%,transparent 67%),
-    linear-gradient(0deg,#100704 2%,#9f2f06 22%,transparent 58%),
-    linear-gradient(90deg,#120805 0%,#4a1d08 23%,#a7410990 57%,#41150475 100%),
-    url('assets/malaysia-skyline-clean.jpg') 71% 43% / auto 125% no-repeat!important;
-   mask-image:linear-gradient(90deg,transparent 0%,#000 24%)!important;
+    radial-gradient(ellipse at 54% 46%,#fff0bdaf 0%,#ffac4778 27%,#e85c0d3d 53%,transparent 72%),
+    radial-gradient(ellipse at 96% 87%,#f16411b0 0%,transparent 58%),
+    linear-gradient(0deg,#180805 0%,transparent 35%),
+    linear-gradient(90deg,#351405 0%,#8d360bcd 18%,#7d30064a 44%,#46180830 100%),
+    url('assets/malaysia-skyline-clean.jpg') 68% 42% / auto 112% no-repeat!important;
+   -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 10%)!important;
+   mask-image:linear-gradient(90deg,transparent 0%,#000 10%)!important;
    border-top-right-radius:1.65vw;
  }
  html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-founder-person{
-   top:.7%!important;right:1.1%!important;width:19.5%!important;height:68.5%!important;overflow:hidden!important;
+   top:.7%!important;right:1.1%!important;width:20.4%!important;height:68.5%!important;overflow:hidden!important;
  }
  html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-founder-person img{
-   right:0!important;bottom:8%!important;width:100%!important;height:124%!important;
+   right:-8%!important;bottom:3%!important;width:124%!important;height:150%!important;
    object-position:center bottom!important;clip-path:inset(0 0 7% 0)!important;
-   transform:scaleX(1.13)!important;filter:drop-shadow(-2px 0 4px #ffba62b3) drop-shadow(0 0 12px #f5751594)!important;
+   transform:none!important;filter:drop-shadow(-2px 0 3px #ffe0a2) drop-shadow(0 0 13px #ff8a1dc9)!important;
  }
  html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-founder-person::before{
    content:"NUSRAT NASRIN";position:absolute;z-index:1;left:12%;right:7%;bottom:4.8%;
