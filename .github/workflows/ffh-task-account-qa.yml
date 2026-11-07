@@ -10,6 +10,8 @@ on:
       - 'tests/task-universal-recipient.cjs'
       - 'tests/zone-manager-picker.cjs'
       - 'index.html'
+      - 'ffh-task-selected-view-20261107.js'
+      - 'tests/task-selected-identity-20261107.cjs'
       - '.github/workflows/ffh-task-account-qa.yml'
   workflow_dispatch:
 permissions:
@@ -27,6 +29,8 @@ jobs:
         run: |
           node --check accounts.js
           node --check task-assignee-access.js
+          node --check ffh-task-selected-view-20261107.js
+          node --check tests/task-selected-identity-20261107.cjs
           node --check searchable-picker.js
           node --check tests/zone-manager-picker.cjs
           node --check tests/task-universal-recipient.cjs
@@ -34,6 +38,7 @@ jobs:
         run: |
           node tests/zone-manager-picker.cjs
           node tests/task-universal-recipient.cjs
+          node tests/task-selected-identity-20261107.cjs
       - name: Check entrypoint wiring and owner delete controls
         run: |
           node - <<'NODE'
