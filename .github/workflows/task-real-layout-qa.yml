@@ -1,16 +1,17 @@
-name: FieldForce Tasks Live Layout QA
+name: FieldForce Tasks Compact Filter QA
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'tests/task-real-layout-20261107.cjs'
+      - 'tests/feedback-20261107-browser.cjs'
       - 'ffh-task-compact-live.css'
+      - 'searchable-picker.js'
       - 'ffh-task-compact-live.js'
       - 'index.html'
       - '.github/workflows/task-real-layout-qa.yml'
 jobs:
-  real-task-dom:
+  mobile-layout:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,18 +20,17 @@ jobs:
           node-version: '24'
       - name: Install Chromium test runtime
         run: npm --prefix /tmp/ffh-qa install --no-save playwright@1.58.2
-      - name: Inspect real Tasks page in Chromium
+      - name: Run scoped mobile layout and picker regression
         env:
           NODE_PATH: /tmp/ffh-qa/node_modules
           FFH_CHROMIUM: /usr/bin/google-chrome
         run: |
           python3 -m http.server 8765 >/tmp/ffh-scope-http.log 2>&1 &
-          node -e 'const s=require("fs").readFileSync("app.js","utf8");const a=s.indexOf("function tasks(){");const b=s.indexOf("function scheduleNoteReminder(",a);console.log("REAL_TASK_SOURCE",s.slice(a,Math.min(a+13500,b)))'
-          node tests/task-real-layout-20261107.cjs
+          node tests/feedback-20261107-browser.cjs
       - name: Preserve screenshot
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: task-real-layout-screenshot
-          path: /tmp/ffh-actual-task-layout-debug.png
+          name: task-mobile-filter-regression
+          path: /tmp/ffh-followup-task-390.png
           if-no-files-found: ignore
