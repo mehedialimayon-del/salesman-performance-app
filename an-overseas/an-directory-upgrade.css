@@ -13,9 +13,9 @@
 .university-catalogue #results .uni-card,.an-favorite-page .uni-card{min-width:0;position:relative}
 .university-catalogue .uni-cover-wrap{position:relative}
 .university-catalogue .an-catalogue-index{z-index:12}
-.an-favorite-heart{position:absolute;right:10px;top:9px;z-index:14;border:1px solid #ffd08b;background:#0c0e13e8;color:#fff;font-size:25px;font-weight:900;border-radius:10px;width:39px;height:37px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 13px #0009}
-.an-favorite-heart.saved{color:#ff8842;background:#28110b;border-color:#ff8b24}
-.an-favorite-heart:hover,.an-favorite-heart:focus-visible{background:#81390a;color:#fff}
+.an-favorite-heart{position:absolute;right:10px;top:9px;z-index:14;border:1px solid #ff6500;background:#0c0e13e8;color:#ff6500;font-size:25px;font-weight:900;border-radius:10px;width:39px;height:37px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 13px #0009}
+.an-favorite-heart.saved{color:#ff6500;background:#0c0e13e8;border-color:#ff6500}
+.an-favorite-heart:hover,.an-favorite-heart:focus-visible{background:#0c0e13;color:#ff6500;border-color:#ff6500}
 .an-profile-fav{position:relative;display:inline-flex;align-self:center;margin-left:auto;flex:none}
 .an-profile-fav .an-favorite-heart{position:relative;top:auto;right:auto;width:43px;height:43px}
 .an-favourite-notice{font-size:12px;color:#d6c5b0;padding:12px;border:1px solid #715532;border-radius:12px;background:#24170d}
