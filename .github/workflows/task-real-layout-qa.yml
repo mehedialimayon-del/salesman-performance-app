@@ -27,6 +27,26 @@ jobs:
         run: |
           python3 -m http.server 8765 >/tmp/ffh-scope-http.log 2>&1 &
           node tests/feedback-20261107-browser.cjs
+      - name: Check actual GitHub Pages published version
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://mehedialimayon-del.github.io/salesman-performance-app"
+          ok=0
+          for i in $(seq 1 10); do
+            if curl --fail --silent --show-error --max-time 15 "$url/?qa_commit=${GITHUB_SHA}" > /tmp/ffh-live-index.html &&
+               grep -q 'ffh-task-compact-live.css' /tmp/ffh-live-index.html &&
+               grep -q 'ffh-task-compact-live.js' /tmp/ffh-live-index.html &&
+               grep -q '20261107-search-id-route-2' /tmp/ffh-live-index.html; then
+              ok=1
+              break
+            fi
+            sleep 4
+          done
+          test "$ok" -eq 1
+          curl --fail --silent --show-error --max-time 15 "$url/ffh-task-compact-live.css?qa_commit=${GITHUB_SHA}" | grep -q 'ffTaskCompactV2'
+          curl --fail --silent --show-error --max-time 15 "$url/ffh-task-compact-live.js?qa_commit=${GITHUB_SHA}" | grep -q 'SELECT SR / FILTER'
+          echo "PASS LIVE GitHub Pages: served compact Tasks CSS/JS and refreshed SR search script for commit ${GITHUB_SHA}"
       - name: Preserve screenshot
         if: always()
         uses: actions/upload-artifact@v4
