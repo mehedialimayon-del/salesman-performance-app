@@ -374,3 +374,19 @@
     clip-path:circle(49% at 50% 50%)!important;
   }
 }
+
+/* Delicately irregular fabric edges, with every flag staying in its own grid cell. */
+@keyframes an2-approved-flag-edge {
+  0%,100%{
+    clip-path:polygon(0 2%,20% 5%,43% 1%,65% 5%,84% 2%,100% 8%,100% 94%,83% 97%,60% 93%,38% 98%,18% 94%,0 98%);
+  }
+  50%{
+    clip-path:polygon(0 2%,20% 0,42% 4%,64% 1%,84% 7%,100% 1%,100% 99%,82% 93%,60% 98%,39% 94%,18% 98%,0 97%);
+  }
+}
+@media(prefers-reduced-motion:no-preference){
+  html body.an-about-details-mode #app .an2-founder-hero .an2-floating-flags .an2-flag-image{
+    animation:an2-approved-flag-edge 3.25s ease-in-out infinite!important;
+    animation-delay:calc(var(--flag-index) * -.14s)!important;
+  }
+}
