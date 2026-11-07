@@ -271,3 +271,63 @@
    height:91px!important;width:98px!important;
  }
 }
+
+/* Mobile founder refinement v5: precise header emblem; equal quotation glyphs; cloth waves tied to poles. */
+@media(max-width:800px){
+ html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+   width:104px!important;height:93px!important;clip-path:none!important;overflow:visible!important;
+   display:flex!important;align-items:center!important;justify-content:center!important;
+   background:transparent!important;mix-blend-mode:normal!important;
+ }
+ html body.an-about-details-mode #app .an2-founder-hero .an2-founder-logo-crop{
+   position:relative!important;display:block!important;flex:none!important;
+   width:78px!important;height:66px!important;overflow:hidden!important;
+   clip-path:ellipse(48% 49% at 50% 50%)!important;
+   mix-blend-mode:screen!important;filter:drop-shadow(0 2px 5px rgba(255,170,45,.22))!important;
+ }
+ html body.an-about-details-mode #app .an2-founder-hero .an2-founder-logo-crop>img{
+   position:absolute!important;display:block!important;top:5px!important;left:0!important;
+   width:218px!important;height:59px!important;max-width:none!important;max-height:none!important;
+   padding:0!important;margin:0!important;
+   object-fit:fill!important;border:0!important;border-radius:0!important;
+   filter:brightness(1.12)!important;mix-blend-mode:screen!important;
+ }
+ html body.an-about-details-mode #app .an2-approved-reference-hero .an2-mobile-complete-quote{
+   padding-left:19px!important;
+ }
+ html body.an-about-details-mode #app .an2-mobile-open-quote,
+ html body.an-about-details-mode #app .an2-mobile-close-quote{
+   font:900 1.15em/1 Georgia,'Times New Roman',serif!important;
+   color:#ffb55d!important;text-shadow:none!important;letter-spacing:0!important;
+ }
+ html body.an-about-details-mode #app .an2-mobile-open-quote{
+   position:static!important;display:inline!important;align-self:flex-start!important;
+   flex:0 0 auto!important;margin:0 1px 0 -13px!important;
+ }
+ html body.an-about-details-mode #app .an2-mobile-close-quote{
+   display:inline!important;position:static!important;margin-left:2px!important;
+   vertical-align:baseline!important;
+ }
+ html body.an-about-details-mode #app .an2-approved-reference-waves{
+   z-index:4!important;
+ }
+ html body.an-about-details-mode #app .an2-live-flag-fabric{
+   animation:an2-flag-fabric-fly var(--flag-speed,3.1s) ease-in-out infinite!important;
+   animation-delay:var(--flag-delay,0s)!important;
+   transform-box:view-box!important;
+ }
+ @keyframes an2-flag-fabric-fly{
+   0%,100%{transform:perspective(160px) rotateY(-5deg) skewY(-1deg) scaleX(.94)}
+   24%{transform:perspective(160px) rotateY(12deg) skewY(3deg) scaleX(1)}
+   49%{transform:perspective(160px) rotateY(-14deg) skewY(-3deg) scaleX(.87)}
+   72%{transform:perspective(160px) rotateY(10deg) skewY(2deg) scaleX(1.02)}
+ }
+}
+@media(max-width:380px){
+ html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+   width:94px!important;height:85px!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ html body.an-about-details-mode #app .an2-live-flag-fabric{animation:none!important;transform:none!important}
+}
