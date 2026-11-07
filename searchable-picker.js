@@ -39,7 +39,12 @@ window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect}){
   const term=ov.querySelector('input').value.trim().toLowerCase();
   const rows=items.filter(x=>{
    const manager=managers.get(String(x.value).toUpperCase());
-   return [x.label,x.detail,x.value,manager?.manager_name,manager?.login_id,manager?.designation].join(' ').toLowerCase().includes(term);
+   const staff=window.FFH_STAFF_PROFILE?.(String(x.value).replace(/^TEAM:/,''));
+   return [x.label,x.detail,x.value,manager?.manager_name,manager?.login_id,manager?.designation,
+     staff?.staff_id,staff?.id,staff?.companyStaffId,staff?.company_staff_id,
+     staff?.full_name,staff?.name,staff?.managerLabel,staff?.route,staff?.route_name,
+     staff?.zone,staff?.zone_id,staff?.designation,staff?.role]
+    .filter(Boolean).join(' ').toLowerCase().includes(term);
   });
   for(const item of rows){
    const manager=isZonePicker?managers.get(String(item.value).toUpperCase()):null;
