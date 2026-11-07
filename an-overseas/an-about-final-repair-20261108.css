@@ -51,3 +51,15 @@ html body.an-about-details-mode #app .an2-approved-reference-hero{margin-top:0!i
 @keyframes an-globe-turn{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
 }
 @media(prefers-reduced-motion:reduce){html body.an-about-details-mode #app .an-reference-flag-cloth img,html body.an-about-details-mode #app .an-reference-flag-cloth::after,html body.an-about-details-mode #app .an2-globe-world{animation:none!important}}
+
+/* About Details chapter cards and accents. */
+#app #an2-origins .an2-origin-aside {align-self:start}
+#app #an2-origins .an2-origin-aside img {height:clamp(170px,17vw,225px)}
+#app #an2-story .an2-card-icon {display:block;width:24px;height:24px;color:#ff7900;flex:none}
+#app #an2-story .an2-service-num .an2-card-icon {margin-top:8px}
+#app #an2-trust .an2-trust-grid article>b {display:flex;align-items:center;justify-content:space-between;gap:8px}
+#app #an2-future .an2-future-grid article>.an2-card-icon {margin-bottom:10px}
+#app #an2-future .an2-future-grid h3 {margin:0 0 8px;font-size:15px}
+#app #an2-story :is(#an2-trust,#an2-future) h3>.an2-card-accent {color:#ff7900!important;font:inherit;letter-spacing:inherit}
+#app #an2-story :is(#an2-trust,#an2-future) h3>.an2-card-white {color:#fff!important;font:inherit;letter-spacing:inherit}
+#app #an2-story .an2-closing>img {max-width:140px;height:auto;object-fit:contain}
