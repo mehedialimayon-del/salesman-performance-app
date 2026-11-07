@@ -46,15 +46,15 @@ body.an-universities-mode #app .an-scholarship-filter-note{
 }
 /* Restore actual height of cards: 117+ rows were compressed into orange lines */
 body.an-universities-mode #app .university-catalogue #results{
- display:grid!important;grid-auto-rows:max-content!important;align-content:start!important;
- align-items:start!important;justify-items:stretch!important;
+ display:grid!important;grid-auto-rows:1fr!important;align-content:start!important;
+ align-items:stretch!important;justify-items:stretch!important;
  row-gap:12px!important;column-gap:10px!important;min-height:0!important;
- overflow-y:auto!important;overflow-x:hidden!important;
+ overflow:visible!important;
 }
 body.an-universities-mode #app #results > .uni-card,
 body.an-universities-mode #app #results > .card{
  display:flex!important;flex-direction:column!important;
- position:relative!important;min-width:0!important;height:auto!important;
+ position:relative!important;min-width:0!important;
  min-height:280px!important;max-height:none!important;
  opacity:1!important;visibility:visible!important;overflow:hidden!important;
  border:1px solid #8a5b33!important;background:#141922!important;
