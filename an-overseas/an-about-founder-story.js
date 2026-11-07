@@ -110,6 +110,12 @@
       +'<animate attributeName="scale" values="3;7;4;3" dur="3.1s" repeatCount="indefinite"/>'
       +'</feDisplacementMap></filter></defs>'
       +'<g opacity="0.30" clip-path="url(#an2-approved-flag-crop)"><g filter="url(#an2-approved-cloth-distortion)">'+image+'</g></g>'
+      +'</svg>'
+      +'<svg class="an2-approved-reference-sharp" viewBox="18 235 828 1156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'
+      +'<defs><clipPath id="an2-approved-portrait-sharp-area" clipPathUnits="userSpaceOnUse"><rect x="452" y="684" width="378" height="638" rx="2"/></clipPath>'
+      +'<filter id="an2-approved-portrait-sharp-filter" x="-1%" y="-1%" width="102%" height="102%" color-interpolation-filters="sRGB">'
+      +'<feConvolveMatrix order="3" kernelMatrix="0 -0.14 0 -0.14 1.56 -0.14 0" edgeMode="duplicate" preserveAlpha="true"/></filter></defs>'
+      +'<g clip-path="url(#an2-approved-portrait-sharp-area)"><g filter="url(#an2-approved-portrait-sharp-filter)">'+image+'</g></g>'
       +'</svg></div>';
   }
   document.addEventListener('error',event=>{
