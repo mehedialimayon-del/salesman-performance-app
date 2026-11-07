@@ -181,3 +181,124 @@ body.an-about-details-mode #app .an2-founder-quote blockquote,
  #app .an-about-v3 .an-manager-contacts .an-manager-contact{min-height:25px!important;padding:2px 5px!important}
  #app .an-about-v3 .an-manager-actions .an-manager-action{min-height:22px!important;padding:2px 5px!important}
 }
+
+/* 2026-11-07 management polish v3: expand the quotation into the intentionally spare space.
+   No new page scroll; preserve portrait, header, theme and about-page layout. */
+#app .an-about-v3 .an-manager-quote-end{
+ display:inline!important;color:#ffae49!important;font:900 1.45em/.7 Georgia,'Times New Roman',serif!important;
+ vertical-align:-.18em;margin-left:3px;text-shadow:0 0 10px #ff9d2740;
+}
+#app .an-about-v3 .an-manager-contact{
+ position:relative!important;isolation:isolate;
+ border:1px solid rgba(255,166,74,.58)!important;
+ background:linear-gradient(115deg,rgba(63,36,16,.82),rgba(14,21,33,.96))!important;
+ box-shadow:inset 0 1px rgba(255,207,131,.15),0 3px 10px rgba(0,0,0,.2)!important;
+ transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease!important;
+}
+#app .an-about-v3 .an-manager-contact:hover,
+#app .an-about-v3 .an-manager-contact:focus-visible{
+ transform:translateY(-1px)!important;border-color:#ffd292!important;
+ box-shadow:0 4px 15px rgba(255,146,32,.25),inset 0 1px rgba(255,207,131,.3)!important;
+}
+#app .an-about-v3 .an-manager-linkedin{
+ border-color:#467dae!important;background:linear-gradient(125deg,#15314b,#101923)!important;
+}
+#app .an-about-v3 .an-manager-facebook{
+ border-color:#4779bd!important;background:linear-gradient(125deg,#17345a,#101d33)!important;
+}
+#app .an-about-v3 .an-facebook-mark{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ flex:0 0 23px!important;width:23px!important;height:23px!important;border-radius:7px!important;
+ background:linear-gradient(135deg,#2992ff,#1160cc)!important;color:#fff!important;
+ box-shadow:0 2px 7px rgba(27,112,226,.35)!important;
+}
+#app .an-about-v3 .an-facebook-mark svg{display:block!important;width:17px!important;height:17px!important}
+#app .an-about-v3 .an-manager-action{
+ border-radius:999px!important;letter-spacing:.3px!important;
+ box-shadow:inset 0 1px rgba(255,240,213,.28),0 4px 12px rgba(0,0,0,.26)!important;
+ transition:transform .2s ease,box-shadow .2s ease!important;
+}
+#app .an-about-v3 .an-manager-action:hover,
+#app .an-about-v3 .an-manager-action:focus-visible{
+ transform:translateY(-2px)!important;box-shadow:0 5px 15px rgba(252,142,31,.33)!important;
+}
+#app .an-about-v3 .an-manager-action.an-journey-cta{
+ background:linear-gradient(100deg,#ffc564,#ff8a23 65%,#fa6d07)!important;
+ color:#221305!important;border-color:#ffc77e!important;
+}
+#app .an-about-v3 .an-manager-action.an-admin-entry{
+ background:linear-gradient(110deg,#291c14,#131821)!important;
+ color:#fff5e8!important;border-color:#dd9350!important;
+}
+@media(min-width:801px){
+ body.an-about-locked #app .an-about-v3 .an-manager-information{
+   gap:clamp(4px,.65vh,8px)!important;
+ }
+ #app .an-about-v3 .an-manager-name-box h3{
+   font-size:clamp(18px,1.66vw,24px)!important;line-height:1.1!important;
+   letter-spacing:-.18px!important;font-weight:950!important;
+ }
+ #app .an-about-v3 .an-manager-name-box .an-manager-label{
+   font-size:10px!important;letter-spacing:.7px!important;
+ }
+ #app .an-about-v3 .an-manager-career .an-manager-label{
+   font-size:clamp(9px,.78vw,10px)!important;
+ }
+ #app .an-about-v3 .an-manager-career p{
+   font-size:clamp(10px,.83vw,11.5px)!important;line-height:1.22!important;
+ }
+ #app .an-about-v3 .an-manager-quote{
+   display:flex!important;align-items:center!important;justify-content:flex-start!important;
+   flex:1 1 auto!important;min-height:0!important;
+   margin:3px 0!important;padding:10px 12px 10px 31px!important;
+   border-radius:14px!important;
+   background:linear-gradient(130deg,rgba(68,38,20,.82),rgba(18,22,32,.9))!important;
+   box-shadow:inset 0 1px rgba(255,200,120,.18),0 4px 14px rgba(0,0,0,.22)!important;
+ }
+ #app .an-about-v3 .an-manager-quote-mark{
+   font-size:35px!important;left:8px!important;top:5px!important;
+ }
+ #app .an-about-v3 .an-manager-quote blockquote{
+   font-size:clamp(11px,.94vw,13px)!important;
+   line-height:1.37!important;letter-spacing:.02px!important;
+ }
+ #app .an-about-v3 .an-manager-contacts{
+   margin-top:3px!important;gap:5px!important;
+ }
+ #app .an-about-v3 .an-manager-contacts .an-manager-contact{
+   min-height:33px!important;padding:4px 7px!important;gap:6px!important;border-radius:10px!important;
+ }
+ #app .an-about-v3 .an-manager-contact small{font-size:8.5px!important}
+ #app .an-about-v3 .an-manager-contact b{
+   font-size:clamp(8.5px,.77vw,10.5px)!important;line-height:1.15!important;
+ }
+ #app .an-about-v3 .an-manager-actions{
+   margin-top:3px!important;gap:7px!important;
+ }
+ #app .an-about-v3 .an-manager-actions .an-manager-action{
+   min-height:28px!important;padding:5px 9px!important;
+   font-size:clamp(8px,.76vw,10.5px)!important;
+ }
+}
+@media(min-width:801px) and (max-height:700px){
+ #app .an-about-v3 .an-manager-name-box h3{
+   font-size:clamp(18px,1.55vw,21px)!important;
+ }
+ #app .an-about-v3 .an-manager-career p{font-size:10px!important;line-height:1.16!important}
+ #app .an-about-v3 .an-manager-quote{
+   margin:1px 0!important;padding:6px 8px 6px 23px!important;
+ }
+ #app .an-about-v3 .an-manager-quote blockquote{
+   font-size:clamp(10.5px,.84vw,11.5px)!important;line-height:1.23!important;
+ }
+ #app .an-about-v3 .an-manager-quote-mark{font-size:27px!important;left:5px!important;top:1px!important}
+ #app .an-about-v3 .an-manager-contacts .an-manager-contact{min-height:29px!important;padding:3px 5px!important}
+ #app .an-about-v3 .an-manager-actions .an-manager-action{min-height:24px!important;padding:3px 7px!important}
+}
+@media(max-width:800px){
+ #app .an-about-v3 .an-manager-quote-end{font-size:1.3em!important}
+ #app .an-about-v3 .an-facebook-mark svg{width:16px!important;height:16px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #app .an-about-v3 .an-manager-contact,#app .an-about-v3 .an-manager-action{transition:none!important}
+}
