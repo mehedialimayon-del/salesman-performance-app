@@ -104,13 +104,8 @@
     return '<div class="an2-approved-reference-hero" aria-label="A&N Overseas founder message from the approved reference artwork">'
       +'<img class="an2-approved-reference-source" src="'+src+'" alt="A&N Overseas founder artwork with study-destination flags and Nusrat Nasrin" loading="eager" decoding="async">'
       +'<figure class="an2-mobile-complete-quote"><span class="an2-mobile-open-quote" aria-hidden="true">“</span><blockquote><strong>International education should never be a privilege reserved for the few.</strong> It should be a bridge between potential and possibility—where trustworthy guidance, the right opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you. <span class="an2-mobile-close-quote" aria-hidden="true">”</span></blockquote></figure>'
-      // The published artwork already contains the correct flags, countries and pole positions.
-      // Animate only a transparent lighting ripple inside their outlines; NEVER redraw or distort the bitmap.
-      +'<svg class="an2-approved-reference-waves" viewBox="18 235 828 1156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'
-      +'<defs><clipPath id="an2-original-flags-only" clipPathUnits="userSpaceOnUse">'+masks+'</clipPath>'
-      +'<linearGradient id="an2-flag-wind-light" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#fff" stop-opacity="0"/><stop offset="40%" stop-color="#fff" stop-opacity=".25"/><stop offset="52%" stop-color="#fff" stop-opacity=".03"/><stop offset="100%" stop-color="#080910" stop-opacity=".07"/></linearGradient></defs>'
-      +'<g clip-path="url(#an2-original-flags-only)" opacity=".28">'
-      +'<rect class="an2-original-flag-sheen" x="80" y="730" width="405" height="465" fill="url(#an2-flag-wind-light)" pointer-events="none"/></g></svg>'
+      // IMPORTANT: no flag overlay. The original artwork is the single source of truth.
+      // Earlier SVG layers redraw the flags as enormous polygons on Android.
       +'<svg class="an2-approved-reference-sharp" viewBox="18 235 828 1156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'
       +'<defs><clipPath id="an2-approved-portrait-sharp-area" clipPathUnits="userSpaceOnUse"><rect x="452" y="684" width="378" height="638" rx="2"/></clipPath>'
       +'<filter id="an2-approved-portrait-sharp-filter" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">'
