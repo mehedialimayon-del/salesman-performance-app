@@ -79,23 +79,22 @@ function cardMetrics(u,seq){
  const qs=verifiedRank(u);
  const ranked=profile.rankSource&&profile.ranking&&profile.rankYear;
  const programmes=new Set((profile.programs?.length?profile.programs:u.programs||[]).map(name=>String(name).trim()).filter(Boolean));
- const fees=(profile.fees||[]).filter(row=>
-  Array.isArray(row)&&/^(?:Published international tuition|Published international total fees|Published \d+-year programme total)$/i.test(String(row[2]).trim())
- ).map(row=>String(row[1]).trim().match(/^(RM|MYR|EUR|GBP|USD|CAD|AUD|JPY|CNY|KRW)\s*([\d,]+(?:\.\d+)?)$/i)).filter(Boolean);
+ const total=Number.isInteger(profile.totalCourses)&&profile.totalCourses>0?profile.totalCourses:null;
+ const feeRows=(profile.fees||[]).filter(row=>Array.isArray(row)&&/^(?:Published international tuition|Published international total fees)$/i.test(String(row[2]||'').trim())&&/^(RM|MYR|EUR|GBP|USD|CAD|AUD|JPY|CNY|KRW)\\s*[\\d,.]+$/i.test(String(row[1]||'').trim()));
+ const firstYear=feeRows.filter(row=>/first.year|year 1|annual|per year/i.test(String(row[0]||'')+' '+String(row[2]||'')));
+ const parsed=firstYear.map(row=>String(row[1]).trim().match(/^(RM|MYR|EUR|GBP|USD|CAD|AUD|JPY|CNY|KRW)\\s*([\\d,.]+)$/i)).filter(Boolean);
  const currency=fee=>fee[1].toUpperCase().replace(/^RM$/,'MYR');
- const comparable=fees.length>1&&fees.every(fee=>currency(fee)===currency(fees[0]));
- const average=comparable?new Intl.NumberFormat('en-MY',{style:'currency',currency:currency(fees[0]),maximumFractionDigits:0}).format(
-  fees.reduce((sum,fee)=>sum+Number(fee[2].replaceAll(',','')),0)/fees.length
- ):'See fee details';
+ const comparable=parsed.length>0&&parsed.every(fee=>currency(fee)===currency(parsed[0]));
+ const average=comparable?new Intl.NumberFormat('en-MY',{style:'currency',currency:currency(parsed[0]),maximumFractionDigits:0}).format(parsed.reduce((sum,fee)=>sum+Number(fee[2].replaceAll(',','')),0)/parsed.length):'See official fees';
  const today=Date.parse(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kuala_Lumpur',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())+'T00:00:00Z');
  const date=profile.intakeDeadline;
- const days=date&&/^\d{4}-\d{2}-\d{2}$/.test(date.date)?(Date.parse(date.date+'T00:00:00Z')-today)/86400000:NaN;
+ const days=date&&/^\\d{4}-\\d{2}-\\d{2}$/.test(date.date)?(Date.parse(date.date+'T00:00:00Z')-today)/86400000:NaN;
  const tile=(symbol,label,value,note)=>'<div class="an-card-fact"><span aria-hidden="true">'+symbol+'</span><small>'+esc(label)+'</small><strong>'+esc(value)+'</strong>'+(note?'<em>'+esc(note)+'</em>':'')+'</div>';
  return '<div class="an-card-facts" aria-label="University facts">'
-  +tile('🏆',qs?'QS World Ranking':ranked?profile.rankYear:'Directory position',qs?'#'+qs:ranked?profile.ranking:'#'+seq.number,qs?'2027':ranked?'':'Catalogue order')
-  +tile('🎓','Courses',Number.isInteger(profile.totalCourses)&&profile.totalCourses>0?profile.totalCourses+' total':programmes.size?programmes.size+' listed':'See portfolio','')
-  +tile('◈','Average tuition',average,comparable?fees.length+' published examples':'')
-  +tile('◷','Intake deadline',days>=0?(days===0?'Due today':days+' days left'):'Check admissions',days>=0?date.label:'')
+  +tile('🏆',qs?'QS World Ranking':ranked?'Published ranking':'Ranking',qs?'#'+qs:ranked?profile.ranking:'See ranking',qs?'2027':ranked?profile.rankYear:'No verified rank')
+  +tile('🎓','Total Programs',total?String(total):programmes.size?programmes.size+' listed':'See full catalogue',total?'Official portfolio count':programmes.size?'Portfolio selection':'Official programme directory')
+  +tile('◈','First-year tuition',average,comparable?'Average of '+parsed.length+' published annual fees':'Check programme-specific fees')
+  +tile('◷','Upcoming intake',days>=0?date.label:'See intake dates',days>=0?'Deadline: '+date.date:'Official admissions schedule')
   +'</div>';
 }
 
@@ -105,7 +104,7 @@ function anNumberedCard(u){
  const favorite='<button class="an-favorite-heart" data-favorite-university="'+esc(u.id)+'" type="button" aria-label="Save '+esc(u.name)+' to favorites" aria-pressed="false" title="Save university">♡</button>';
  let html=card(u);
  if(u.kind==='Public'||u.kind==='Private'){
-  html=html.replace(/<span class="badge">.*?<\/span>/,'<span class="badge an-type-'+u.kind.toLowerCase()+'"><span class="an-type-word">'+esc(u.kind)+'</span> '+esc(u.institutionType||'University')+' · <span class="an-type-country">'+esc(u.country)+'</span></span>');
+  html=html.replace(/<span class="badge">.*?<\/span>/,'<span class="badge an-type-'+u.kind.toLowerCase()+'"><span class="an-type-word">'+esc(u.kind)+'</span> University</span>');
  }else{
   html=html.replace('<span class="badge">','<span class="badge an-type-unknown">');
   html=html.replace('University · '+esc(u.country),'Type not verified · '+esc(u.country));
