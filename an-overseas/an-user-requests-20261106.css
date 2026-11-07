@@ -25,32 +25,6 @@ body .top .an-favorite-header{animation:none!important;transform:none!important}
  body .top .an-favorite-header::before{animation:none!important}
 }
 .top .an-favorite-count{background:#f8af58!important;color:#150d09!important}
-/* Four useful catalogue controls in one tight row. */
-body.an-universities-mode #app .catalogue-tools{
- display:grid!important;grid-template-columns:minmax(105px,1fr) 40px 43px 44px!important;
- gap:6px!important;align-items:center!important;margin:2px 0 4px!important;
- width:100%!important;min-height:39px!important;
-}
-body.an-universities-mode #app .catalogue-tools > *{min-width:0!important;max-width:100%!important}
-body.an-universities-mode #app .catalogue-search{width:100%!important;min-width:0!important}
-body.an-universities-mode #app .catalogue-filter{position:relative!important}
-body.an-universities-mode #app .catalogue-filter>summary{height:38px!important;width:40px!important;min-height:38px!important;display:flex!important;justify-content:center!important;align-items:center!important}
-body.an-universities-mode #app .an-scholarship-only{
- min-width:0!important;width:43px!important;height:38px!important;min-height:38px!important;
- padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;
- font-size:0!important;line-height:1!important;
-}
-body.an-universities-mode #app .an-scholarship-only::before{content:"🎓";font-size:19px!important}
-body.an-universities-mode #app .an-scholarship-only.an-category-active{
- border-color:#ffb35a!important;background:#644016!important;box-shadow:0 0 0 1px #ffa95488;
-}
-body.an-universities-mode #app .an-catalogue-favourites{
- display:flex!important;align-items:center;justify-content:center;height:38px;min-height:38px;
- border-radius:12px;border:1px solid #a76b37;background:#251709;
- color:#ff385c!important;font-size:19px;font-weight:900;text-decoration:none;
-}
-body.an-universities-mode #app .an-catalogue-favourites:hover{background:#4b271c}
-body.an-universities-mode #app .an-catalogue-favourites span{font-size:10px;color:#ffd4a7;margin-left:2px}
 body.an-universities-mode #app .an-scholarship-category-panel{
  position:absolute;right:0;top:calc(100% + 9px);width:min(340px,calc(100vw - 40px));
  padding:13px;background:#151b25;border:1px solid #ad753b;border-radius:13px;z-index:90;
