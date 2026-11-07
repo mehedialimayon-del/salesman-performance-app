@@ -15,3 +15,12 @@
 #app main.ffTaskPage #ffScopeStaff + .ffSelectTrigger .ffSelectStaffLabel{display:block!important;flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;color:#fff!important;-webkit-text-fill-color:#fff!important;font-weight:800!important;font-size:10px!important}
 #app main.ffTaskPage #ffScopeStaff + .ffSelectTrigger .ffSelectStaffAvatar{flex:0 0 22px!important;width:22px!important;height:22px!important;min-width:22px!important}
 @media(max-width:380px){#app main.ffTaskPage .ffTaskViewingIdentity{max-width:100%}#app main.ffTaskPage .ffTaskList > .cardTitle{font-size:14px!important}}
+
+/* Assign Task: zone chip shows manager portrait, name, and real Staff ID. */
+#app .ffTaskRecipientScope .ffTaskRecipientManagerIdentity{display:inline-flex;align-items:center;gap:6px;flex:1 1 180px;min-width:0;max-width:100%;padding:4px 7px;background:#1d120b;border:1px solid #ef832e;border-radius:10px;color:#fff}
+#app .ffTaskRecipientScope .ffTaskRecipientManagerIdentity[hidden]{display:none!important}
+#app .ffTaskRecipientManagerAvatar{display:grid;place-items:center;width:29px;height:29px;min-width:29px;border:1px solid #ff9d56;border-radius:50%;overflow:hidden;background:#42210d;color:#fff;font-weight:850}
+#app .ffTaskRecipientManagerAvatar img{display:block;width:100%;height:100%;object-fit:cover;cursor:zoom-in}
+#app .ffTaskRecipientManagerText{font:750 11px/1.25 system-ui,sans-serif;min-width:0;overflow-wrap:anywhere;color:#fff}
+#app .ffTaskRecipientScope select[aria-label="Filter task recipient zone"]{max-width:min(100%,240px)!important;min-width:135px;color:#fff!important;background:#0c0b09!important;border-color:#f07a22!important}
+#app .ffTaskRecipientScope input[type="search"]{min-width:0;box-sizing:border-box}
