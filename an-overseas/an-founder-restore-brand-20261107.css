@@ -376,3 +376,35 @@
  html body.an-about-details-mode #app .an2-founder-header-logo .logo-motion,
  html body.an-about-details-mode #app .an2-original-flag-sheen{animation:none!important}
 }
+
+/* Founder v8: original unmodified flag pixels remain the only visible flags.
+   Previous feDisplacementMap redrew the image into torn geometric shapes on Android. */
+@media(max-width:800px){
+ html body.an-about-details-mode #app .an2-approved-reference-waves{
+   display:block!important;opacity:1!important;filter:none!important;
+   z-index:2!important;pointer-events:none!important;
+ }
+ html body.an-about-details-mode #app .an2-original-flag-sheen{
+   opacity:.3!important;
+   animation:an2-original-wind-sheen 3.9s ease-in-out infinite!important;
+   transform-origin:center center!important;
+ }
+ @keyframes an2-original-wind-sheen{
+   0%,100%{transform:translateX(-10px) scaleX(.98);opacity:.14}
+   33%{transform:translateX(8px) scaleX(1.03);opacity:.38}
+   66%{transform:translateX(-4px) scaleX(1);opacity:.2}
+ }
+ /* Same source and crop geometry as the actual website navigation crest. */
+ html body.an-about-details-mode #app .an2-founder-header-logo .logo-motion{
+   zoom:1.3!important;isolation:isolate!important;
+ }
+ html body.an-about-details-mode #app .an2-founder-header-logo .logo-crop{
+   background:transparent!important;box-shadow:none!important;
+ }
+ html body.an-about-details-mode #app .an2-founder-header-logo .logo-crop img{
+   image-rendering:auto!important;filter:brightness(1.12) contrast(1.04)!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ html body.an-about-details-mode #app .an2-original-flag-sheen{animation:none!important}
+}
