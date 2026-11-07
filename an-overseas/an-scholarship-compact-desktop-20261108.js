@@ -123,4 +123,39 @@ new MutationObserver(()=>{if(mobilePending)return;mobilePending=true;requestAnim
 window.addEventListener('resize',compactMobileFilters);
 compactMobileFilters();
 
+
+/* Mobile first-screen funding directory: prioritize full award cards. */
+const mobileFirstScreenCSS=`
+@media(max-width:800px){
+body:has(.an-scholarship-head) .an-scholarship-head{padding:2px 0!important}
+body:has(.an-scholarship-head) .an-scholarship-head h1{font-size:clamp(17px,4.2vw,22px)!important;line-height:1.04!important}
+body:has(.an-scholarship-head) .an-scholarship-head-inner{gap:5px!important}
+body:has(.an-scholarship-head) .an-scholarship-total{padding:3px 5px!important;font-size:9px!important}
+body:has(.an-scholarship-head) .an-scholarship-total .an-next-scholarship-deadline{padding:3px!important;font-size:8px!important}
+body:has(.an-scholarship-head) .an-scholarship-filters{margin:3px 0!important}
+body:has(.an-scholarship-head) .an-scholarship-filters input,
+body:has(.an-scholarship-head) .an-scholarship-filters select{height:31px!important;min-height:31px!important}
+body:has(.an-scholarship-head) .an-feature-grid{display:none!important}
+body:has(.an-scholarship-head) .an-scholarship-about{display:none!important}
+body:has(.an-scholarship-head) .an-scholarship-meta{display:none!important}
+body:has(.an-scholarship-head) .an-scholarship-directory.content{padding-top:0!important}
+body:has(.an-scholarship-head) .an-scholarship-scroll-region{margin-top:0!important;padding-top:0!important}
+body:has(.an-scholarship-head) .an-scholarship-scroll-region h2{color:#fff!important;line-height:1.15!important}
+body:has(.an-scholarship-head) .an-scholarship-scroll-region h2::first-letter{color:#ff7100!important}
+body:has(.an-scholarship-head) .an-scholarship-card h3{color:#fff!important}
+body:has(.an-scholarship-head) .an-scholarship-country{color:#fff!important}
+body:has(.an-scholarship-head) .an-scholarship-number{color:#fff!important}
+body:has(.an-scholarship-head) .an-scholarship-level{color:#ff7100!important}
+body:has(.an-scholarship-head) .an-scholarship-cover{min-height:76px!important;padding:7px!important}
+body:has(.an-scholarship-head) .an-scholarship-glyph{font-size:17px!important;padding:4px 7px!important}
+body:has(.an-scholarship-head) .an-scholarship-body{padding:8px!important}
+body:has(.an-scholarship-head) .an-scholarship-card h3{font-size:12px!important;min-height:0!important;margin:4px 0 6px!important}
+body:has(.an-scholarship-head) .an-scholarship-money{padding:6px 8px!important;margin-bottom:6px!important}
+body:has(.an-scholarship-head) .an-scholarship-desc{font-size:10px!important;line-height:1.35!important;margin-bottom:7px!important}
+body:has(.an-scholarship-head) .an-scholarship-actions{gap:5px!important}
+body:has(.an-scholarship-head) .an-scholarship-actions a{min-height:31px!important;padding:6px!important;font-size:10px!important}
+}
+`;
+const firstScreenStyle=document.createElement('style');firstScreenStyle.id='an-scholarship-mobile-firstscreen-v2';firstScreenStyle.textContent=mobileFirstScreenCSS;document.head.appendChild(firstScreenStyle);
+
 })();
