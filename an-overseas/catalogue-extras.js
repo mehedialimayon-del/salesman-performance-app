@@ -115,10 +115,10 @@ function anNumberedCard(u){
    html=html.replace('<div class="inside">','<div class="inside"><div class="an-closed-status">HISTORICAL RECORD · CLOSED '+esc(u.closedDate)+'</div>');
    return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite).replace('</article>','<p class="an-no-applications">Institution closed — applications unavailable</p></article>');
  }
- // Highlight the university abbreviation without shrinking its type size.
+ // Highlight the abbreviation in the displayed university name.
  const short=String(u.short||'').trim();
- if(short){
-   const escaped=short.replace(/[.*+?^$\{\}()|[\]\\]/g,'\\ html=html.replace(/<span class="an-guide-rank">[^<]*<\/span>/,'')');
+ if(short) html=html.replace('('+esc(short)+')','<span class="an-shortname">('+esc(short)+')</span>');
+ html=html.replace(/<span class="an-guide-rank">[^<]*<\/span>/,'')');
    html=html.replace(new RegExp('\\('+escaped+'\\)','g'),'<span class="an-shortname">('+esc(short)+')</span>');
  }
  html=html.replace(/<span class="an-guide-rank">[^<]*<\/span>/,'')
