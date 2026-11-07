@@ -5,7 +5,6 @@ on:
       - '.github/workflows/an-directory-live-qa.yml'
       - 'an-overseas/an-directory-layout-polish-20261108.js'
       - 'an-overseas/university-guide.css'
-      - 'an-overseas/index.html'
   workflow_dispatch:
 permissions:
   contents: read
@@ -90,8 +89,8 @@ jobs:
                 await page.waitForURL(target => target.hash==='#/favorites');
                 await page.goto(url + '#/universities');
                 await cards.first().getByRole('link',{name:'University Portfolio'}).click();
-                await page.locator('#university-panel').waitFor();
-                const headings = await page.locator('#university-panel h2,#university-panel h3').evaluateAll(nodes =>
+                await page.locator('.university-profile').waitFor();
+                const headings = await page.locator('.university-profile h2,.university-profile h3').evaluateAll(nodes =>
                   [...new Set(nodes.map(n => getComputedStyle(n).color))]
                 );
                 assert(headings.includes('rgb(255, 255, 255)') && headings.includes('rgb(240, 104, 0)'));
