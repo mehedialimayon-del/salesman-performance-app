@@ -512,3 +512,38 @@
 @media(prefers-reduced-motion:reduce){
  html body.an-about-details-mode #app .an2-founder-header-logo .logo-motion{animation:none!important}
 }
+
+/* Founder v12: exactly the shared header crest, correctly spaced; no art replacement. */
+@media(max-width:800px){
+ body.an-about-details-mode > .top .logo-motion,
+ body.an-about-details-mode > .top .logo-crop{
+   clip-path:none!important;border-radius:0!important;
+ }
+ body.an-about-details-mode > .top .logo-crop{
+   clip-path:ellipse(49% 49% at 50% 50%)!important;
+ }
+ /* Larger viewport to include full crest, but image stays at the original aspect ratio. */
+ html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+   width:clamp(110px,31vw,140px)!important;height:110px!important;
+   overflow:visible!important;clip-path:none!important;justify-self:center!important;
+ }
+ html body.an-about-details-mode #app .an2-founder-header-logo .logo-motion{
+   width:90px!important;height:75px!important;flex:0 0 90px!important;
+   zoom:1!important;transform-origin:center center!important;
+ }
+ html body.an-about-details-mode #app .an2-founder-header-logo .logo-crop{
+   width:90px!important;height:75px!important;
+   clip-path:ellipse(49% 49% at 50% 50%)!important;
+   border-radius:0!important;
+ }
+ html body.an-about-details-mode #app .an2-founder-header-logo .logo-crop img{
+   width:211px!important;height:60px!important;max-width:none!important;max-height:none!important;
+   margin:7px 0 0 0!important;
+   object-fit:fill!important;filter:brightness(1.12)!important;
+ }
+ /* Important: preserve the original flags bitmap, no animated image tiles or SVG redraw. */
+ html body.an-about-details-mode #app .an2-approved-reference-fabric,
+ html body.an-about-details-mode #app .an2-approved-reference-waves{
+   display:none!important;
+ }
+}
