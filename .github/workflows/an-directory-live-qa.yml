@@ -28,13 +28,17 @@ jobs:
           const fs = require('node:fs');
           const { chromium } = require('playwright');
           const base = 'https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/index.html';
-          const marker = fs.readFileSync('an-overseas/index.html','utf8').match(/an-directory-layout-polish-20261108\.js\?v=[^"]+/)[0];
+          const html = fs.readFileSync('an-overseas/index.html','utf8');
+          const markers = ['an-directory-layout-polish-20261108.js','an-user-requests-20261106.css'].map(file =>
+            html.split(file + '?v=')[1].split('"')[0]).map((v,i) =>
+              ['an-directory-layout-polish-20261108.js','an-user-requests-20261106.css'][i] + '?v=' + v);
           (async () => {
             let url;
             for (let attempt = 0; attempt < 30; attempt++) {
               url = base + '?directory_qa=' + Date.now();
               const response = await fetch(url);
-              if (response.ok && (await response.text()).includes(marker)) break;
+              const deployed = await response.text();
+              if (response.ok && markers.every(marker => deployed.includes(marker))) break;
               if (attempt === 29) throw Error('Current directory revision is not deployed');
               await new Promise(resolve => setTimeout(resolve, 6000));
             }
