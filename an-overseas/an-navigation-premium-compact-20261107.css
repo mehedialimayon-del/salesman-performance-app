@@ -181,3 +181,53 @@ html body .top .links a[aria-current="page"]{
  }
  html body .top #links.open a{flex:0 0 auto!important}
 }
+
+/* Compact floating mobile menu — buttons only, no full-screen sheet or backdrop.
+   Animate in/out from the three-line menu; preserve existing button visuals. */
+@media(max-width:800px){
+ html body .top #links,
+ html body .top #links.open{
+   display:flex!important;
+   position:fixed!important;
+   top:var(--an-menu-top,68px)!important;
+   left:10px!important;right:10px!important;bottom:auto!important;
+   width:calc(100vw - 20px)!important;height:auto!important;
+   max-height:calc(100dvh - var(--an-menu-top,68px) - 10px)!important;
+   min-height:0!important;
+   margin:0!important;
+   padding:8px 5px!important;
+   flex-direction:column!important;
+   justify-content:flex-start!important;
+   align-items:stretch!important;
+   gap:0!important;
+   overflow-x:hidden!important;overflow-y:auto!important;
+   border:0!important;border-radius:16px!important;
+   background:transparent!important;
+   background-image:none!important;
+   box-shadow:none!important;
+   backdrop-filter:none!important;
+   -webkit-backdrop-filter:none!important;
+   transform-origin:top right!important;
+   transform:translateY(-10px) scale(.975)!important;
+   opacity:0!important;visibility:hidden!important;pointer-events:none!important;
+   transition:opacity .22s ease,transform .26s cubic-bezier(.2,.75,.25,1),visibility .26s!important;
+   z-index:99999!important;
+ }
+ html body .top #links.open{
+   opacity:1!important;visibility:visible!important;pointer-events:auto!important;
+   transform:translateY(0) scale(1)!important;
+ }
+ html body .top #links > a,
+ html body .top #links.open > a{
+   flex:0 0 auto!important;
+   margin:3px 5px!important;
+   min-height:39px!important;
+   padding:8px 12px!important;
+   border-radius:13px!important;
+ }
+ /* Menu is only its original navigation links, no decorative header/cards. */
+ html body .top #links > :not(a){display:none!important}
+}
+@media(max-width:800px) and (prefers-reduced-motion:reduce){
+ html body .top #links,html body .top #links.open{transition:none!important}
+}
