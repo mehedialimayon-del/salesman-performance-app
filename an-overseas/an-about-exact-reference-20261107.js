@@ -89,8 +89,8 @@
   hero.appendChild(element('div','an2-exact-world-title','FROM <span>HOME</span> TO THE <span>WORLD</span>'));
   hero.appendChild(element('span','an2-exact-plane','✈'));
   hero.appendChild(portrait);
-  hero.appendChild(element('div','an2-exact-name','NUSRAT NASRIN'));
-  hero.appendChild(element('div','an2-exact-role','Founder, A&amp;N Overseas'));
+  // The existing transparent founder PNG already contains its name badge.
+  // Do not paint a duplicate badge on top of Nusrat's original picture.
   hero.appendChild(nav);
   nav.querySelectorAll('a[data-an-about-jump]').forEach((a,i)=>{
     if(!cards[i])return;
