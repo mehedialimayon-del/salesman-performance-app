@@ -96,3 +96,20 @@
 #university-panel.white .an-guide-fee-table th{background:#25201c!important;color:#fff!important}
 #university-panel.white .an-guide-step b{background:#f46b08!important;color:#fff!important}
 #university-panel.white .an-guide-ticket-note{background:#211a16!important;color:#fff!important}
+
+/* Card integrity repair: identical rows and isolated logo/name placement. */
+#results{align-items:stretch!important}
+#results .uni-card,#results .an-guide-card{height:100%!important;min-height:0!important;display:flex!important;flex-direction:column!important}
+#results .uni-card .inside,#results .an-guide-card .inside{flex:1 1 auto!important;display:flex!important;flex-direction:column!important;min-height:0!important}
+#results .uni-card .an-guide-links,#results .an-guide-card .an-guide-links{margin-top:auto!important;padding-top:14px!important}
+#results .an-guide-card .uni-cover-wrap{height:165px!important;min-height:165px!important;flex:0 0 165px!important;overflow:hidden!important}
+#results .an-guide-identity{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:8px!important;padding:14px 12px!important;text-align:center!important}
+#results .an-guide-identity img{max-height:72px!important;max-width:70%!important;object-fit:contain!important;flex-shrink:0!important}
+#results .an-guide-identity strong{position:relative!important;max-width:100%!important;font-size:12px!important;line-height:1.2!important;display:-webkit-box!important;-webkit-line-clamp:2!important;line-clamp:2!important;overflow:hidden!important;color:#fff!important}
+#results .an-guide-card .inside h3{overflow-wrap:anywhere!important}
+@media(max-width:600px){
+#results .an-guide-card .uni-cover-wrap{height:155px!important;min-height:155px!important;flex-basis:155px!important}
+#results .an-guide-identity img{max-height:62px!important}
+#results .an-guide-identity strong{font-size:11px!important}
+#results .an-guide-card .inside{min-height:0!important}
+}
