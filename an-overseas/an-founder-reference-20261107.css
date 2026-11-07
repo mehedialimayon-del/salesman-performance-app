@@ -367,13 +367,8 @@
 /* Make the existing A&N emblem a round globe at the header corner
    on this route, matching the user's desktop emblem without replacing
    the shared site's header markup or changing other pages. */
-@media(max-width:800px){
-  body.an-about-details-mode > .top .logo-motion,
-  body.an-about-details-mode > .top .logo-crop{
-    border-radius:50%!important;
-    clip-path:circle(49% at 50% 50%)!important;
-  }
-}
+/* About Details must inherit the same header logo crop as Home.
+   Do not force a second circular clip on this route. */
 
 /* Delicately irregular fabric edges, with every flag staying in its own grid cell. */
 @keyframes an2-approved-flag-edge {
