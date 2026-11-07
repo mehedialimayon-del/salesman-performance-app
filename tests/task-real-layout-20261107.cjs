@@ -11,7 +11,7 @@ const mock=fs.readFileSync('tests/duty-ui.cjs','utf8').split('const mock=')[1].s
   await page.route('https://cdn.onesignal.com/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
   await page.goto('http://127.0.0.1:8765');
   await page.locator('[data-page=tasks]').waitFor();
-  if(await page.locator('#ffhEntryAllow').count())await page.locator('#ffhEntryAllow').click();
+  // Fixture-only permission overlay: do not gate layout measurements on Android setup.\n  await page.evaluate(()=>{document.querySelector('#ffhEntryPermissions')?.remove();document.querySelector('#app>.app')?.removeAttribute('inert');});
   await page.locator('[data-page=tasks]').click();
   await page.locator('.ffTaskScope').waitFor();
   await page.waitForTimeout(900);
