@@ -1,0 +1,99 @@
+/* Exact approved Founder artwork — About Us > Read More, mobile only.
+   This is the SAME uploaded reference PNG, cropped to the founder frame.
+   Do not re-create/re-position the portrait, quote, countries, or nameplate.
+   Five chapter buttons and all subsequent story sections are untouched. */
+
+@media (max-width:800px){
+  html body.an-about-details-mode #app .an2-founder-hero{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    padding:0!important;
+    margin:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+    grid-template-columns:none!important;
+  }
+  /* Keep legacy material in the DOM for existing content and graceful fallback.
+     Showing BOTH was the reason the last live screenshots were misaligned. */
+  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-brand,
+  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-quote{
+    display:none!important;
+  }
+  html body.an-about-details-mode #app .an2-approved-reference-hero{
+    position:relative!important;
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    aspect-ratio:828 / 1156!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    overflow:hidden!important;
+    isolation:isolate!important;
+    background:#171411!important;
+    box-shadow:none!important;
+  }
+  html body.an-about-details-mode #app .an2-approved-reference-source{
+    position:absolute!important;
+    z-index:1!important;
+    display:block!important;
+    width:104.347826087%!important;
+    height:auto!important;
+    max-width:none!important;
+    max-height:none!important;
+    min-width:0!important;
+    min-height:0!important;
+    left:-2.173913043%!important;
+    top:-20.328719723%!important;
+    right:auto!important;
+    bottom:auto!important;
+    margin:0!important;
+    padding:0!important;
+    border:none!important;
+    border-radius:0!important;
+    object-fit:fill!important;
+    opacity:1!important;
+    transform:none!important;
+    filter:none!important;
+    clip-path:none!important;
+    -webkit-mask-image:none!important;
+    mask-image:none!important;
+  }
+  html body.an-about-details-mode #app .an2-approved-reference-waves{
+    position:absolute!important;
+    inset:0!important;
+    display:block!important;
+    z-index:2!important;
+    width:100%!important;
+    height:100%!important;
+    overflow:hidden!important;
+    pointer-events:none!important;
+    background:transparent!important;
+  }
+  /* If the CDN image fails, the original live HTML appears instead of blank. */
+  html body.an-about-details-mode #app .an2-founder-hero.an2-approved-source-error > .an2-founder-quote{
+    display:flex!important;
+  }
+  html body.an-about-details-mode #app .an2-founder-hero.an2-approved-source-error .an2-approved-reference-hero{
+    display:none!important;
+  }
+}
+@media (min-width:801px){
+  html body.an-about-details-mode #app .an2-approved-reference-hero{
+    display:none!important;
+  }
+}
+/* Keep legible static cloth folds for people who request reduced motion. */
+@media (prefers-reduced-motion:reduce){
+  html body.an-about-details-mode #app .an2-approved-reference-waves{
+    display:none!important;
+  }
+}
