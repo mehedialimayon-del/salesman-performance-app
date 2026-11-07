@@ -117,6 +117,55 @@ body:has(.university-catalogue) .page-head .catalogue-tools{width:100%!important
  body:has(.university-catalogue) .page-head .an-scholarship-category-wrap{min-width:0!important;width:100%!important}
  body:has(.university-catalogue) .page-head .an-catalogue-favourites{min-width:0!important;width:100%!important}
 }
+
+/* Final responsive university navigation: one slim bar, four original controls. */
+body:has(.university-catalogue) .an-university-directory-bar{margin:0!important;padding:0!important;min-height:0!important}
+body:has(.university-catalogue) .an-university-directory-bar strong,
+body:has(.university-catalogue) #an-global-count{display:none!important}
+body:has(.university-catalogue) .university-catalogue{padding-top:0!important}
+body:has(.university-catalogue) .catalogue-tools .an-directory-desktop-label{display:none!important}
+body:has(.university-catalogue) .catalogue-tools .filter-word{display:none!important}
+body:has(.university-catalogue) .page-head .an-directory-heading{min-width:0!important}
+body:has(.university-catalogue) .page-head .catalogue-tools{min-width:0!important}
+body:has(.university-catalogue) .page-head .catalogue-tools .catalogue-filter summary{font-size:0!important}
+body:has(.university-catalogue) .page-head .catalogue-tools .catalogue-filter summary::first-letter{font-size:18px!important}
+body:has(.university-catalogue) .page-head .catalogue-tools #an-scholarship-category-toggle{font-size:20px!important}
+body:has(.university-catalogue) .page-head .catalogue-tools .an-catalogue-favourites{font-size:20px!important}
+@media(min-width:1050px){
+ body:has(.university-catalogue) .page-head{padding:2px 0!important}
+ body:has(.university-catalogue) .page-head>.wrap{display:grid!important;grid-template-columns:minmax(260px,340px) minmax(0,1fr)!important;grid-template-rows:44px!important;gap:8px!important;padding:0 14px!important;margin:0 auto!important;align-items:center!important}
+ body:has(.university-catalogue) .page-head .an-directory-heading{grid-column:1!important;grid-row:1!important;margin:0!important;padding:0!important;justify-content:center!important}
+ body:has(.university-catalogue) .page-head .catalogue-tools{grid-column:2!important;grid-row:1!important;display:grid!important;grid-template-columns:minmax(0,1fr) repeat(3,44px)!important;gap:7px!important;width:100%!important;margin:0!important}
+ body:has(.university-catalogue) .page-head .catalogue-tools>*{width:100%!important;max-width:100%!important;min-width:0!important;min-height:38px!important;height:38px!important;margin:0!important}
+ body:has(.university-catalogue) .page-head .catalogue-search{display:flex!important;align-items:center!important}
+ body:has(.university-catalogue) .page-head .catalogue-search input{width:100%!important;min-width:0!important;height:38px!important}
+ body:has(.university-catalogue) .page-head .catalogue-filter summary,
+ body:has(.university-catalogue) .page-head #an-scholarship-category-toggle,
+ body:has(.university-catalogue) .page-head .an-catalogue-favourites{width:44px!important;min-width:44px!important;max-width:44px!important;height:38px!important;min-height:38px!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;gap:0!important}
+ body:has(.university-catalogue) .page-head .an-catalogue-favourites [data-favorite-count]{font-size:9px!important}
+}
+@media(max-width:1049px){
+ body:has(.university-catalogue) .page-head{padding:3px 0!important;overflow:visible!important}
+ body:has(.university-catalogue) .page-head>.wrap{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;grid-template-rows:auto!important;gap:5px!important;align-items:center!important;padding:2px 12px!important}
+ body:has(.university-catalogue) .page-head .an-directory-heading{grid-column:1!important;grid-row:1!important;padding:0!important;margin:0!important}
+ body:has(.university-catalogue) .page-head .an-directory-heading h1{font-size:clamp(19px,4.2vw,28px)!important;white-space:nowrap!important}
+ body:has(.university-catalogue) .page-head .an-directory-heading .an-directory-subtitle{font-size:9px!important}
+ body:has(.university-catalogue) .page-head .catalogue-tools{grid-column:2!important;grid-row:1!important;display:flex!important;flex-wrap:nowrap!important;gap:4px!important;width:auto!important;max-width:100%!important;margin:0!important}
+ body:has(.university-catalogue) .page-head .catalogue-tools>*{flex:0 0 34px!important;width:34px!important;min-width:34px!important;max-width:34px!important;height:34px!important;min-height:34px!important;margin:0!important;padding:0!important}
+ body:has(.university-catalogue) .page-head .catalogue-search{position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;border:1px solid #ff6500!important;border-radius:10px!important}
+ body:has(.university-catalogue) .page-head .catalogue-search>span{font-size:23px!important}
+ body:has(.university-catalogue) .page-head .catalogue-search input{position:absolute!important;right:0!important;top:0!important;width:0!important;max-width:0!important;min-width:0!important;height:34px!important;opacity:0!important;padding:0!important;border:0!important}
+ body:has(.university-catalogue) .page-head .catalogue-search:focus-within input{width:min(65vw,280px)!important;max-width:65vw!important;opacity:1!important;z-index:50!important;padding:5px 10px!important;background:#11141b!important;border:1px solid #ff6500!important;border-radius:10px!important}
+ body:has(.university-catalogue) .page-head .catalogue-filter summary,
+ body:has(.university-catalogue) .page-head #an-scholarship-category-toggle,
+ body:has(.university-catalogue) .page-head .an-catalogue-favourites{width:34px!important;min-width:34px!important;max-width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:0!important;overflow:hidden!important}
+ body:has(.university-catalogue) .page-head .catalogue-filter summary{font-size:17px!important}
+ body:has(.university-catalogue) .page-head .catalogue-tools .filter-word{display:none!important}
+ body:has(.university-catalogue) .page-head .catalogue-tools .an-directory-desktop-label{display:none!important}
+ body:has(.university-catalogue) .page-head .catalogue-tools #an-scholarship-category-toggle{font-size:19px!important}
+ body:has(.university-catalogue) .page-head .catalogue-tools .an-catalogue-favourites{font-size:19px!important}
+ body:has(.university-catalogue) .page-head .catalogue-tools .an-catalogue-favourites [data-favorite-count]{font-size:9px!important}
+}
 `;
 const style=document.createElement('style');style.textContent=css;document.head.appendChild(style);
 function setStickyTop(){
@@ -159,7 +208,9 @@ function mount(){
   const label=document.createElement('span');label.className='an-directory-desktop-label';label.textContent='Favourites';favorite.appendChild(label);
  }
  if(tools){
-  const search=tools.querySelector('.catalogue-search'),scholarship=tools.querySelector('.an-scholarship-category-wrap'),fav=tools.querySelector('.an-catalogue-favourites'),filter=tools.querySelector('.catalogue-filter');
+  const search=tools.querySelector('.catalogue-search');
+  if(search&&!search.dataset.anSearchToggle){search.dataset.anSearchToggle='1';const glyph=search.querySelector('span'),input=search.querySelector('input');if(glyph&&input){glyph.style.cursor='pointer';glyph.addEventListener('click',()=>input.focus())}}
+  const scholarship=tools.querySelector('.an-scholarship-category-wrap'),fav=tools.querySelector('.an-catalogue-favourites'),filter=tools.querySelector('.catalogue-filter');
   [search,scholarship,fav,filter].forEach((el,i)=>{if(el&&tools.children[i]!==el)tools.insertBefore(el,tools.children[i]||null)});
  }
  const count=directory.querySelector('#an-global-count');
