@@ -314,3 +314,14 @@
  html body.an-exact-desktop #app .an2-exact-flagband .an2-flag::after,
  html body.an-exact-desktop #app .an2-exact-plane{animation:none!important}
 }
+/* Match the reference's globe crest in the site's own desktop navigation. */
+@media(min-width:801px){
+ html body.an-exact-desktop .top .logo-crop{
+   background:url("assets/approved-reference-crest-20261107.svg") center/contain no-repeat!important;
+ }
+ html body.an-exact-desktop .top .logo-crop img{opacity:0!important}
+ html body.an-exact-desktop .top .brand-copy strong{
+   font-family:Georgia,"Times New Roman",serif!important;
+   color:#ffbb56!important;
+ }
+}
