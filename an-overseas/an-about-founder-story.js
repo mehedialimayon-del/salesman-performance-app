@@ -107,7 +107,7 @@
       +'<svg class="an2-approved-reference-waves" viewBox="18 235 828 1156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'
       +'<defs><clipPath id="an2-original-flags-only" clipPathUnits="userSpaceOnUse">'+masks+'</clipPath>'
       +'<filter id="an2-fabric-ripple-original" x="-1%" y="-3%" width="102%" height="106%" color-interpolation-filters="sRGB">'
-      +'<feTurbulence type="sine" baseFrequency="0.012 0.028" numOctaves="1" seed="2" result="fabric"><animate attributeName="baseFrequency" values="0.012 0.028;0.016 0.027;0.010 0.029;0.012 0.028" dur="3.8s" repeatCount="indefinite"/></feTurbulence>'
+      +'<feTurbulence type="fractalNoise" baseFrequency="0.012 0.028" numOctaves="1" seed="2" result="fabric"><animate attributeName="baseFrequency" values="0.012 0.028;0.016 0.027;0.010 0.029;0.012 0.028" dur="3.8s" repeatCount="indefinite"/></feTurbulence>'
       +'<feDisplacementMap in="SourceGraphic" in2="fabric" scale="2.7" xChannelSelector="R" yChannelSelector="G"><animate attributeName="scale" values="1.6;3.9;2.5;1.6" dur="3.8s" repeatCount="indefinite"/></feDisplacementMap></filter>'
       +'<linearGradient id="an2-fabric-moving-glow" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#fff" stop-opacity="0"/><stop offset="45%" stop-color="#fff" stop-opacity=".2"/><stop offset="58%" stop-color="#fff" stop-opacity=".02"/><stop offset="100%" stop-color="#111" stop-opacity=".1"/></linearGradient></defs>'
       +'<g clip-path="url(#an2-original-flags-only)"><g opacity=".54" filter="url(#an2-fabric-ripple-original)">'+image+'</g>'
