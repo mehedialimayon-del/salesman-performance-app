@@ -59,6 +59,10 @@ function teamRow(p,i){
  +fld('position','Position / Title',p.position||'')+fld('company','Company',p.company||'')
  +fld('department','Department',p.department||'')+fld('phone','Personal Contact Number',p.phone||'','tel')
  +fld('email','Email Address',p.email||'','email')+fld('portfolio','Personal Portfolio Website (https://)',p.portfolio||'','url')
+ +fld('linkedin','LinkedIn Profile URL',p.linkedin||p.linkedin_url||p.linkedinUrl||p.socials?.linkedin||'','url')
+ +fld('facebook','Facebook Profile URL',p.facebook||p.facebook_url||p.facebookUrl||p.socials?.facebook||'','url')
+ +area('career','Academic / Professional Journey',p.career||'')
+ +area('quote','Personal Quote (premium management card)',p.quote||'')
  +area('help','Biography / How This Person Helps Students',desc)+fileField('photo_file','Upload / Replace Profile Photo')
  +'</div><input type="hidden" name="photo" value="'+E(p.photo||'')+'">'
  +'<div class="actions">'+(safeUrl(p.photo)?action('Zoom / Position Existing Photo','adjust-team',i):'')+'</div><p class="help">Adjust selected photos before publishing. Existing photos can be repositioned too.</p></article>';
@@ -89,12 +93,16 @@ async function saveManagement(){
   if(portfolio&&!safeUrl(portfolio))throw Error('Portfolio must start with https://');
   const email=get('email');
   if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw Error('Invalid email for '+name);
+  const linkedin=get('linkedin'),facebook=get('facebook');
+  if(linkedin&&!safeUrl(linkedin))throw Error('LinkedIn must use a valid HTTPS URL');
+  if(facebook&&!safeUrl(facebook))throw Error('Facebook must use a valid HTTPS URL');
   const file=await window.ANPhotoEditor.selectedFile(row.querySelector('[name="photo_file"]'));
   const photo=file?.size?await upload(file,'team'):get('photo');
   const help=get('help'),designation=get('designation');
   result.push({...old,id:old.id||'member-'+uuid(),name,role:designation,designation,
     position:get('position'),company:get('company'),department:get('department'),
-    phone:get('phone'),email,portfolio,photo,help,bio:help,description:help});
+    phone:get('phone'),email,portfolio,linkedin,facebook,
+    career:get('career'),quote:get('quote'),photo,help,bio:help,description:help});
  }
  progress('Publishing management profiles...');
  await publish('management',result);
