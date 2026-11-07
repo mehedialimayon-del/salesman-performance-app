@@ -108,6 +108,11 @@
     display:none!important;
     order:2!important;
   }
+  /* Gentle clarity lift to the unchanged approved bitmap.
+     Does not redraw eyes, face, hair or change original image geometry. */
+  html body.an-about-details-mode #app .an2-founder-hero .an2-approved-reference-source{
+    filter:contrast(1.035) saturate(1.02)!important;
+  }
   /* Separate portrait-only sharpening without redrawing the face.
      Uses the very same approved bitmap; no generative facial changes. */
   html body.an-about-details-mode #app .an2-approved-reference-sharp{
