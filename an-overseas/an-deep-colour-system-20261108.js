@@ -58,10 +58,11 @@
         const isGold=h>=35;
         // Keep orange and gold distinct but give both saturated deep tones.
         // Dark border/gradient stops keep their existing shade hierarchy.
-        const targetL=l>=.68?(isGold?.52:.50):l>=.43?(isGold?.49:.47):clamp(l*1.07,.21,.43);
+        const foreground=prop==='color'||prop==='fill'||prop==='stroke';
+        const targetL=foreground&&l>=.43?(isGold?.70:.66):l>=.68?(isGold?.62:.56):l>=.43?(isGold?.54:.50):clamp(l*1.07,.21,.43);
         next=fromHsl(isGold?41:26,1,targetL);
         if((prop==='color'||prop==='fill'||prop==='stroke') && a<.84)a=Math.max(a,.94);
-        else if((prop.includes('border')||prop.includes('outline'))&&a>=.14&&a<.55)a=.66;
+        else if((prop.includes('border')||prop.includes('outline'))&&a>=.14&&a<.55)a=.40;
       }else if(h<5||h>=346){
         next=fromHsl(355,.94,clamp(l,.32,.52));
       }else if(h>=60&&h<177){
@@ -108,11 +109,11 @@
   function apply(){
     for(const sheet of document.styleSheets)processSheet(sheet);
     const root=document.documentElement.style;
-    root.setProperty('--orange','#ff7900');
-    root.setProperty('--gold','#ffae00');
+    root.setProperty('--orange','#ff9e42');
+    root.setProperty('--gold','#ffbd70');
     root.setProperty('--ink','#ffffff');
-    root.setProperty('--an-orange','#ff7900');
-    root.setProperty('--an-gold','#ffae00');
+    root.setProperty('--an-orange','#ff9e42');
+    root.setProperty('--an-gold','#ffbd70');
     root.setProperty('--an-white','#ffffff');
     root.setProperty('--an-ink','#ffffff');
     document.documentElement.dataset.anDeepPalette='active';
