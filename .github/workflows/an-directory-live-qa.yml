@@ -5,6 +5,7 @@ on:
       - '.github/workflows/an-directory-live-qa.yml'
       - 'an-overseas/an-directory-layout-polish-20261108.js'
       - 'an-overseas/university-guide.css'
+      - 'an-overseas/index.html'
   workflow_dispatch:
 permissions:
   contents: read
@@ -80,7 +81,7 @@ jobs:
                 await page.locator('#country-filter').waitFor();
                 await tools.locator('summary').click();
                 await tools.getByRole('link',{name:'Open Saved Universities'}).click();
-                await page.waitForURL('**/#/favorites');
+                await page.waitForURL(target => target.hash==='#/favorites');
                 await page.goto(url + '#/universities');
                 await cards.first().getByRole('link',{name:'University Portfolio'}).click();
                 await page.locator('#university-panel').waitFor();
