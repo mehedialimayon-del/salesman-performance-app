@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 const css=`
-.an-detail-jumpbar{position:sticky;top:var(--an-detail-sticky-top,90px);z-index:80;background:#10141bf5;border:1px solid #ff8a08;border-radius:10px;padding:7px;display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:thin;box-shadow:0 6px 22px #0009;margin:8px 0 12px}
+.an-detail-jumpbar{position:sticky;top:calc(var(--an-top-height,65px) + var(--an-ticker-height,32px));z-index:180;background:#10141bf5;border:1px solid #ff8a08;border-radius:10px;padding:7px;display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:thin;box-shadow:0 6px 22px #0009;margin:8px 0 12px}
 .an-detail-jumpbar a{flex:0 0 auto;color:#fff;background:#1e242c;border:1px solid #ff8a08;border-radius:7px;padding:7px 10px;font-size:11px;font-weight:750;text-decoration:none;white-space:nowrap}
 .an-detail-jumpbar a:hover,.an-detail-jumpbar a:focus-visible{background:#f97300;color:#fff}
 .an-detail-jumpbar .an-detail-back{background:#c95000}
