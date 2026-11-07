@@ -32,7 +32,8 @@ body:has(.an-scholarship-head) .an-scholarship-head{position:sticky!important;to
 .an-scholarship-head-inner .an-scholarship-total{font-size:9px!important;padding:8px 6px!important}
 }
 `;
-const style=document.createElement('style');style.id='an-scholarship-compact-desktop-style';style.textContent=css;document.head.appendChild(style);
+const desktopGapFix="\n/* an-scholarship-desktop-gap-fix-v2: keep heading directly under ticker,\n   compact controls without clipping option labels, preserve mobile layout. */\n@media(min-width:1050px){\n body:has(.an-scholarship-head) .an-scholarship-head{margin-block:0!important;transform:none!important}\n body:has(.an-scholarship-head) .an-scholarship-head-inner{min-height:46px!important;gap:8px!important}\n body:has(.an-scholarship-head) .an-scholarship-directory.content{padding-top:2px!important}\n body:has(.an-scholarship-head) .an-scholarship-filters{margin-block:0!important}\n body:has(.an-scholarship-head) .an-scholarship-filters select,\n body:has(.an-scholarship-head) .an-scholarship-filters input{box-sizing:border-box!important;text-overflow:ellipsis!important;min-width:0!important}\n body:has(.an-scholarship-head) .an-scholarship-meta{margin:5px 0 7px!important}\n body:has(.an-scholarship-head) .an-scholarship-about{margin-top:5px!important}\n body:has(.an-scholarship-head) .an-scholarship-scroll-region{scroll-margin-top:125px}\n}\n";
+const style=document.createElement('style');style.id='an-scholarship-compact-desktop-style';style.textContent=css+desktopGapFix;document.head.appendChild(style);
 function arrange(){
  const head=document.querySelector('.an-scholarship-head-inner');
  const filters=document.querySelector('.an-scholarship-directory > .an-scholarship-filters');
