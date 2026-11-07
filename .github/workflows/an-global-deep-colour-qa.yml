@@ -1,0 +1,79 @@
+name: A&N Global Deep Colour QA
+on:
+  push:
+    paths:
+      - '.github/workflows/an-global-deep-colour-qa.yml'
+      - 'an-overseas/an-deep-colour-system-20261108.css'
+      - 'an-overseas/an-deep-colour-system-20261108.js'
+      - 'an-overseas/index.html'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  colour-only-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Verify colours and page elements across major routes
+        shell: bash
+        run: |
+          mkdir -p qa-deep-colour
+          python3 -m http.server 8765 --directory an-overseas >/tmp/an-theme-server.log 2>&1 &
+          sleep 2
+          timeout 185s node <<'JS'
+          const {chromium}=require('playwright');
+          const fs=require('fs');
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+            const results=[];
+            for(const [width,height] of [[1366,768],[390,844]]){
+              const page=await browser.newPage({viewport:{width,height}});
+              const errors=[];page.on('pageerror',e=>errors.push(e.message));
+              for(const hash of ['home','about','aboutdetails','services','universities','scholarships','contact']){
+                await page.goto('http://127.0.0.1:8765/index.html#/'+hash,{waitUntil:'domcontentloaded',timeout:25000});
+                await page.waitForTimeout(500);
+                const state=await page.evaluate(()=>{
+                  const cs=getComputedStyle(document.documentElement);
+                  const all=[...document.querySelectorAll('a,button,input')];
+                  return {
+                    theme:document.documentElement.dataset.anDeepPalette,
+                    changed:parseInt(document.documentElement.dataset.anDeepChanges||'0',10),
+                    orange:cs.getPropertyValue('--orange').trim(),
+                    ink:cs.getPropertyValue('--ink').trim(),
+                    buttons:all.length,
+                    overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
+                    nav:!!document.querySelector('.top'),
+                    hero:!!document.querySelector('#app'),
+                    imageCount:document.images.length
+                  };
+                });
+                state.hash=hash;state.width=width;state.errors=errors.slice();
+                const ok=state.theme==='active'&&state.changed>30&&
+                  state.orange==='#ff7900'&&state.ink==='#ffffff'&&
+                  state.nav&&state.hero&&state.buttons>5&&state.overflow<=5&&!errors.length;
+                results.push({...state,ok});
+                console.log('A&N DEEP COLOUR QA',JSON.stringify({...state,ok}));
+                if(!ok)process.exitCode=1;
+                if(hash==='home'||hash==='aboutdetails')await page.screenshot({path:'qa-deep-colour/'+hash+'-'+width+'.png',fullPage:false});
+              }
+              await page.close();
+            }
+            fs.writeFileSync('qa-deep-colour/results.json',JSON.stringify(results,null,2));
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          JS
+      - name: Upload color QA report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: an-global-deep-colour-qa
+          path: qa-deep-colour/
+          retention-days: 7
