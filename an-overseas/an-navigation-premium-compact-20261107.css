@@ -159,177 +159,59 @@ html body .top .links a[aria-current="page"]{
  }
 }
 
-/* Mobile menu: restore the original full-screen menu experience.
-   The page below must never peek out while the three-line menu is open. */
-@media(max-width:800px){
- html body .top:has(#links.open){z-index:9999!important;isolation:isolate!important}
- html body .top #links.open{
-   position:fixed!important;
-   top:var(--an-menu-top,58px)!important;
-   left:0!important;right:0!important;bottom:0!important;
-   width:100vw!important;height:calc(100dvh - var(--an-menu-top,58px))!important;
-   min-height:0!important;max-height:none!important;
-   display:flex!important;flex-direction:column!important;
-   align-items:stretch!important;justify-content:flex-start!important;
-   overflow-x:hidden!important;overflow-y:auto!important;
-   overscroll-behavior:contain!important;
-   padding:18px 12px max(22px,env(safe-area-inset-bottom))!important;
-   margin:0!important;border-radius:0!important;
-   background:linear-gradient(160deg,#11151e 0%,#090b11 55%,#07080d 100%)!important;
-   box-shadow:0 18px 40px #000c!important;
-   z-index:99999!important;
- }
- html body .top #links.open a{flex:0 0 auto!important}
-}
-
-/* Compact floating mobile menu — buttons only, no full-screen sheet or backdrop.
-   Animate in/out from the three-line menu; preserve existing button visuals. */
-@media(max-width:800px){
- html body .top #links,
- html body .top #links.open{
-   display:flex!important;
-   position:fixed!important;
-   top:var(--an-menu-top,68px)!important;
-   left:10px!important;right:10px!important;bottom:auto!important;
-   width:calc(100vw - 20px)!important;height:auto!important;
-   max-height:calc(100dvh - var(--an-menu-top,68px) - 10px)!important;
-   min-height:0!important;
-   margin:0!important;
-   padding:8px 5px!important;
-   flex-direction:column!important;
-   justify-content:flex-start!important;
-   align-items:stretch!important;
-   gap:0!important;
-   overflow-x:hidden!important;overflow-y:auto!important;
-   border:0!important;border-radius:16px!important;
-   background:transparent!important;
-   background-image:none!important;
-   box-shadow:none!important;
-   backdrop-filter:none!important;
-   -webkit-backdrop-filter:none!important;
-   transform-origin:top right!important;
-   transform:translateY(-10px) scale(.975)!important;
-   opacity:0!important;visibility:hidden!important;pointer-events:none!important;
-   transition:opacity .22s ease,transform .26s cubic-bezier(.2,.75,.25,1),visibility .26s!important;
-   z-index:99999!important;
- }
- html body .top #links.open{
-   opacity:1!important;visibility:visible!important;pointer-events:auto!important;
-   transform:translateY(0) scale(1)!important;
- }
- html body .top #links > a,
- html body .top #links.open > a{
-   flex:0 0 auto!important;
-   margin:3px 5px!important;
-   min-height:39px!important;
-   padding:8px 12px!important;
-   border-radius:13px!important;
- }
- /* Menu is only its original navigation links, no decorative header/cards. */
- html body .top #links > :not(a){display:none!important}
-}
-@media(max-width:800px) and (prefers-reduced-motion:reduce){
- html body .top #links,html body .top #links.open{transition:none!important}
-}
-
-/* 2026-11-08 floating mobile menu popup */
-@media(max-width:800px){
- html body .top #links.open{
-  position:fixed!important;top:70px!important;
-  left:10px!important;right:10px!important;bottom:auto!important;
-  width:auto!important;height:auto!important;min-height:0!important;
-  max-height:calc(100dvh - 86px)!important;
-  display:flex!important;flex-direction:column!important;
-  justify-content:flex-start!important;align-items:stretch!important;
-  gap:clamp(5px,1vh,10px)!important;
-  margin:0!important;padding:7px 0!important;
-  overflow-x:hidden!important;overflow-y:auto!important;
-  background:transparent!important;background-image:none!important;
-  border:0!important;border-radius:0!important;box-shadow:none!important;
-  scrollbar-width:none!important;
-  transform-origin:top right!important;
-  animation:anFloatingMenuIn .25s cubic-bezier(.2,.8,.2,1) both!important;
- }
- html body .top #links.open::-webkit-scrollbar{display:none!important}
- html body .top #links.open::before,html body .top #links.open::after{display:none!important;content:none!important}
- html body .top #links.open a{
-  box-sizing:border-box!important;flex:0 0 auto!important;
-  width:100%!important;min-height:clamp(43px,5.4vh,58px)!important;
-  height:clamp(43px,5.4vh,58px)!important;
-  padding:8px 14px!important;margin:0!important;border-radius:18px!important;
- }
- html body .top #links.open.an-menu-closing{
-  pointer-events:none!important;animation:anFloatingMenuOut .2s ease-in both!important;
- }
-}
-@keyframes anFloatingMenuIn{from{opacity:0;transform:translateY(-12px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes anFloatingMenuOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-12px) scale(.97)}}
-@media(prefers-reduced-motion:reduce){html body .top #links.open,html body .top #links.open.an-menu-closing{animation:none!important}}
-
-/* 2026-11-08: centered floating mobile navigation, narrower, higher contrast.
-   Nine original buttons only; surrounding page softly recedes. */
-@media(max-width:800px){
- html body .top #links.open{
-  position:fixed!important;
-  top:50dvh!important;left:clamp(22px,6vw,38px)!important;
-  right:clamp(22px,6vw,38px)!important;bottom:auto!important;
-  width:auto!important;height:auto!important;
-  max-height:calc(100dvh - 120px)!important;
-  min-height:0!important;
-  display:flex!important;flex-direction:column!important;
-  justify-content:center!important;align-items:stretch!important;
-  gap:clamp(5px,1vh,10px)!important;
-  padding:8px 0!important;margin:0!important;
-  overflow-y:auto!important;overflow-x:hidden!important;
-  background:none!important;border:0!important;box-shadow:none!important;
-  border-radius:0!important;
-  transform:translateY(-50%)!important;
-  transform-origin:center center!important;
-  animation:anCenteredMenuIn .28s cubic-bezier(.18,.8,.25,1) both!important;
- }
- html body .top #links.open::before{
-  content:""!important;display:block!important;
-  position:fixed!important;inset:0!important;
-  background:rgba(1,3,8,.42)!important;
-  backdrop-filter:blur(2px)!important;
-  -webkit-backdrop-filter:blur(2px)!important;
-  z-index:-1!important;pointer-events:none!important;
- }
- html body .top #links.open > a{
-  position:relative!important;z-index:1!important;
-  width:100%!important;flex:0 0 auto!important;
-  height:clamp(43px,5.5vh,56px)!important;
-  min-height:clamp(43px,5.5vh,56px)!important;
-  margin:0!important;padding:8px 14px!important;
-  border:1.5px solid #bd7b39!important;
-  border-radius:17px!important;
-  background-image:linear-gradient(160deg,rgba(255,255,255,.25),rgba(255,255,255,.04) 35%,transparent 60%),linear-gradient(180deg,#302720,#0c0e13)!important;
-  box-shadow:inset 0 1px 0 #ffe6bb88,0 4px 14px #000c,0 0 12px #ec8a2722!important;
-  text-shadow:0 1px 2px #000!important;
- }
- html body .top #links.open > a.current,
- html body .top #links.open > a:hover{
-  border-color:#ffd38d!important;
-  background-image:linear-gradient(155deg,#ffffff5c,transparent 56%),linear-gradient(180deg,#ffa839,#d65b00)!important;
-  box-shadow:inset 0 1px 0 #fff9,0 4px 15px #000b,0 0 16px #ff8c2466!important;
- }
- html body .top #links.open.an-menu-closing{
-  animation:anCenteredMenuOut .2s ease-in both!important;
- }
-}
-@keyframes anCenteredMenuIn{
- from{opacity:0;transform:translateY(calc(-50% + 18px)) scale(.96);filter:blur(2px)}
- to{opacity:1;transform:translateY(-50%) scale(1);filter:blur(0)}
-}
-@keyframes anCenteredMenuOut{
- from{opacity:1;transform:translateY(-50%) scale(1)}
- to{opacity:0;transform:translateY(calc(-50% + 14px)) scale(.97)}
-}
-@media(max-width:800px) and (prefers-reduced-motion:reduce){
- html body .top #links.open,html body .top #links.open.an-menu-closing{
-  animation:none!important;transform:translateY(-50%)!important;
- }
-}
-
 /* Vivid deep-orange hover, focus, active, mobile menu. */
 html body .top .links a:hover,html body .top .links a:focus-visible,html body .top .links a.current,html body .top .links a[aria-current="page"],html body .top #links.open > a:hover,html body .top #links.open > a.current,html body .top #links.open > a:focus-visible{background:#ff7900!important;background-image:linear-gradient(180deg,#ff8800,#ef6200)!important;border-color:#ff7900!important;color:#fff!important;box-shadow:0 0 13px #ff790062,inset 0 1px #fff5!important}
+
+/* The phone menu floats above the page, with gaps open to page scrolling. */
+@media(max-width:800px){
+ html body .top:has(#links.open){
+  z-index:9999!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+ }
+ html body .top nav#links{
+  --an-menu-row:clamp(16px,calc((100svh - 108px) / 9),45px);
+  position:fixed!important;display:flex!important;
+  top:max(64px,calc((100svh - 9 * var(--an-menu-row) - 40px) / 2))!important;
+  left:50%!important;right:auto!important;bottom:auto!important;
+  width:min(82vw,380px)!important;height:auto!important;max-height:none!important;
+  margin:0!important;padding:0!important;
+  flex-direction:column!important;align-items:stretch!important;gap:5px!important;
+  overflow:visible!important;
+  background:none!important;border:0!important;box-shadow:none!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  z-index:99999!important;pointer-events:none!important;
+  visibility:hidden!important;opacity:0!important;
+  transform:translate(-50%,-8px)!important;
+  transition:opacity .18s ease,transform .18s ease,visibility .18s!important;
+ }
+ html body .top nav#links.open{
+  visibility:visible!important;opacity:1!important;transform:translateX(-50%)!important;
+ }
+ html body .top nav#links > :not(a),
+ html body .top nav#links > a > .an-nav-icon,
+ html body .top nav#links::before,html body .top nav#links::after,
+ html body .top nav#links > a::before,html body .top nav#links > a::after{
+  display:none!important;content:none!important;
+ }
+ html body .top nav#links.open > a{
+  pointer-events:auto!important;touch-action:pan-y;
+  box-sizing:border-box!important;flex:0 0 auto!important;
+  display:flex!important;justify-content:center!important;align-items:center!important;
+  text-align:center!important;width:100%!important;
+  height:var(--an-menu-row)!important;min-height:0!important;
+  margin:0!important;padding:0 8px!important;
+  border:2px solid #e85c00!important;border-radius:16px!important;
+  color:#fff!important;font-size:clamp(12px,3.5vw,15px)!important;font-weight:850!important;
+  text-shadow:none!important;
+  background:linear-gradient(180deg,#2a211d,#101014)!important;
+  box-shadow:0 3px 11px #0009!important;
+ }
+ html body .top nav#links.open > a:is(.current,:focus-visible,[aria-current="page"]){
+  background:linear-gradient(180deg,#a43a00,#772900)!important;
+  border-color:#f26a00!important;
+ }
+}
+@media(max-width:800px) and (prefers-reduced-motion:reduce){
+ html body .top nav#links{transition:none!important}
+}
