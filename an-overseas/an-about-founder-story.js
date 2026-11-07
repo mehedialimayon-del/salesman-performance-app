@@ -100,7 +100,8 @@
     const masks=bounds.map(([x,y,w,h])=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3"/>').join('');
     const image='<image href="'+src+'" x="0" y="0" width="864" height="1536" />';
     return '<div class="an2-approved-reference-hero" aria-label="A&N Overseas founder message from the approved reference artwork">'
-      +'<img class="an2-approved-reference-source" src="'+src+'" alt="Founder’s message: Global education opens doors to new opportunities and meaningful support. Below are waving study destination flags and Nusrat Nasrin in a black business suit." loading="eager" decoding="async">'
+      +'<img class="an2-approved-reference-source" src="'+src+'" alt="A&N Overseas founder artwork with study-destination flags and Nusrat Nasrin" loading="eager" decoding="async">'
+      +'<figure class="an2-mobile-complete-quote"><span class="an2-mobile-open-quote" aria-hidden="true">“</span><blockquote><strong>International education should never be a privilege reserved for the few.</strong> It should be a bridge between potential and possibility—where trustworthy guidance, the right opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you. <span class="an2-mobile-close-quote" aria-hidden="true">”</span></blockquote></figure>'
       +'<svg class="an2-approved-reference-waves" viewBox="18 235 828 1156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'
       +'<defs><clipPath id="an2-approved-flag-crop" clipPathUnits="userSpaceOnUse">'+masks+'</clipPath>'
       +'<filter id="an2-approved-cloth-distortion" x="-3%" y="-3%" width="106%" height="106%">'
@@ -113,8 +114,8 @@
       +'</svg>'
       +'<svg class="an2-approved-reference-sharp" viewBox="18 235 828 1156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'
       +'<defs><clipPath id="an2-approved-portrait-sharp-area" clipPathUnits="userSpaceOnUse"><rect x="452" y="684" width="378" height="638" rx="2"/></clipPath>'
-      +'<filter id="an2-approved-portrait-sharp-filter" x="-1%" y="-1%" width="102%" height="102%" color-interpolation-filters="sRGB">'
-      +'<feConvolveMatrix order="3" kernelMatrix="0 -0.14 0 -0.14 1.56 -0.14 0" edgeMode="duplicate" preserveAlpha="true"/></filter></defs>'
+      +'<filter id="an2-approved-portrait-sharp-filter" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">'
+      +'<feConvolveMatrix order="3" kernelMatrix="0 -0.18 0 -0.18 1.72 -0.18 0" edgeMode="duplicate" preserveAlpha="true"/></filter></defs>'
       +'<g clip-path="url(#an2-approved-portrait-sharp-area)"><g filter="url(#an2-approved-portrait-sharp-filter)">'+image+'</g></g>'
       +'</svg></div>';
   }
@@ -132,7 +133,7 @@
       '<div class="an2-topline"><a href="#/about" class="an2-back">← ABOUT US</a><span>THE PEOPLE · THE PURPOSE · THE PROMISE</span></div>'+
       '<header class="an2-founder-hero">'+
         approvedFounderArtwork()+
-        '<div class="an2-founder-brand"><img src="assets/brand-logo.jpg" alt="A&N Overseas Education & Consultancy brand logo"><span>ESTABLISHED 2024 · MALAYSIA & BANGLADESH</span><strong>ROOTED IN EXPERIENCE.<br><em>BUILT FOR YOUR FUTURE.</em></strong></div>'+
+        '<div class="an2-founder-brand"><img src="assets/approved-reference-crest-20261107.svg" alt="A&N Overseas gold circular crest, Education and Consultancy"><span>ESTABLISHED 2024 · MALAYSIA & BANGLADESH</span><strong>ROOTED IN EXPERIENCE.<br><em>BUILT FOR YOUR FUTURE.</em></strong></div>'+
         '<div class="an2-founder-quote"><span class="an2-quote-mark" aria-hidden="true">“</span><blockquote>Global education opens doors to new opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you. <span class="an2-end-quote" aria-label="End of quote">”</span></blockquote><div class="an2-quote-footer"><div class="an2-quote-sign"><div class="an2-flags-journey" aria-label="Bangladesh and Malaysia, with featured global study destinations"><span class="an2-flags-overline">FROM HOME TO THE WORLD <span class="an2-plane-mark" aria-hidden="true">✈</span></span><div class="an2-floating-flags">'+journeyFlags()+'</div>'+wavingFlagFilter+'<small>Bangladesh · Malaysia · Global possibilities</small></div><span class="an2-founder-message-label"><span class="an2-founder-msg-orange">FOUNDER’S MESSAGE</span> <span class="an2-founder-msg-white">· A&amp;N OVERSEAS</span></span></div><figure class="an2-founder-person"><img src="https://d2ol7oe51mr4n9.cloudfront.net/user_3J7eLpAsZ71YVjJWQaNzcGsV3TY/910707ad-d082-4cf5-8410-0bf049fdc75b.png" alt="Nusrat Nasrin — Founder, A&N Overseas" loading="eager" decoding="async"></figure></div></div>'+
       '</header>'+
       '<nav class="an2-nav" aria-label="Explore the A&N story">'+
