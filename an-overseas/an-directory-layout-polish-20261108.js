@@ -166,6 +166,16 @@ body:has(.university-catalogue) .page-head .catalogue-tools .an-catalogue-favour
  body:has(.university-catalogue) .page-head .catalogue-tools .an-catalogue-favourites{font-size:19px!important}
  body:has(.university-catalogue) .page-head .catalogue-tools .an-catalogue-favourites [data-favorite-count]{font-size:9px!important}
 }
+
+/* Portfolio colour hierarchy shared by desktop and mobile. */
+body:has(.an-study-section) .an-study-section{background:#10151d!important;border-color:#a94a17!important;color:#fff!important}
+body:has(.an-study-section) .an-study-section h2,
+body:has(.an-study-section) .an-study-section h3{color:#fff!important}
+body:has(.an-study-section) .an-study-section p,
+body:has(.an-study-section) .an-study-section li{color:#f7f7f7!important}
+body:has(.an-study-section) .an-study-section a{color:#ff7928!important}
+body:has(.an-study-section) .an-study-section strong{color:#fff}
+body:has(.an-study-section) .an-study-section .an-study-section-icon{color:#ff6500!important}
 `;
 const style=document.createElement('style');style.textContent=css;document.head.appendChild(style);
 function setStickyTop(){
