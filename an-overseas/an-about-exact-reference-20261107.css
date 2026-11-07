@@ -68,7 +68,7 @@
  }
  html body.an-exact-desktop #app .an2-exact-est small{display:block!important;font-size:clamp(10px,1.08vw,16px)!important}
  html body.an-exact-desktop #app .an2-exact-est em{font-style:normal!important}
- html body.an-exact-desktop #app .an2-exact-hero .an2-founder-brand>span{display:none!important}
+ html body.an-exact-desktop #app .an2-exact-hero .an2-founder-brand>span:not(.an2-exact-logo):not(.an2-exact-company):not(.an2-exact-sub){display:none!important}
  html body.an-exact-desktop #app .an2-exact-hero .an2-founder-quote {
    position:absolute!important;z-index:7!important;top:2.5%!important;left:29%!important;
    right:22.4%!important;width:auto!important;height:auto!important;min-height:0!important;
@@ -211,6 +211,13 @@
    top:77.3%!important;height:16.9%!important;overflow:hidden!important;
    margin:0!important;padding:0!important;display:block!important;
  }
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flags-journey{
+  display:block!important;width:100%!important;max-width:none!important;
+  height:100%!important;min-height:0!important;padding:0!important;margin:0!important;
+  overflow:hidden!important;flex:none!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flags-overline,
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flags-journey>small{display:none!important}
  html body.an-exact-desktop #app .an2-exact-flagband .an2-floating-flags {
    display:flex!important;flex-wrap:nowrap!important;gap:2px!important;
    align-items:end!important;justify-content:flex-start!important;
