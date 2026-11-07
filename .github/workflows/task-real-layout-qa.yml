@@ -25,6 +25,7 @@ jobs:
           FFH_CHROMIUM: /usr/bin/google-chrome
         run: |
           python3 -m http.server 8765 >/tmp/ffh-scope-http.log 2>&1 &
+          node -e 'const s=require("fs").readFileSync("app.js","utf8");const a=s.indexOf("function tasks(){");const b=s.indexOf("function scheduleNoteReminder(",a);console.log("REAL_TASK_SOURCE",s.slice(a,Math.min(a+13500,b)))'
           node tests/task-real-layout-20261107.cjs
       - name: Preserve screenshot
         if: always()
