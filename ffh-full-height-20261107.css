@@ -1,0 +1,208 @@
+/* FieldForce Hub · Nov 7 2026 · Mobile boards fill the available screen.
+   Presentation only: existing data, permissions and task state remain untouched. */
+#app .app > main.wrap:has(.ffZeroBoard),
+#app .app > main.wrap:has(.ffOutletBoard) {
+  display:flex!important;
+  flex:1 1 auto!important;
+  flex-direction:column!important;
+  height:auto!important;
+  max-height:none!important;
+  min-height:0!important;
+  padding-bottom:8px!important;
+  overflow-x:hidden!important;
+  overflow-y:hidden!important;
+}
+#app .ffZeroBoard,
+#app .ffZeroBoard.ffOutletBoard,
+#app .ffZeroBoard .ffOutletBoard {
+  display:flex!important;
+  flex:1 1 auto!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin-inline:0!important;
+  box-sizing:border-box!important;
+}
+#app .ffZeroBoard .ffOutletList {
+  position:relative!important;
+  display:flex!important;
+  flex:1 1 auto!important;
+  flex-direction:column!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-height:none!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  margin:0!important;
+  overflow:hidden!important;
+}
+#app .ffZeroBoard .ffOutletRows {
+  flex:1 1 auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior-y:contain!important;
+  touch-action:pan-y!important;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+}
+#app .ffZeroBoard :is(.ffZeroOutlet,.ffOutletRow) {
+  box-sizing:border-box!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow-wrap:anywhere!important;
+  flex-shrink:0!important;
+}
+/* Preserve the existing zero-sales search, leaving space for its expand icon. */
+#app .ffZeroBoard .ffOutletList > .ffOutletSearch {
+  width:calc(100% - 46px)!important;
+  max-width:calc(100% - 46px)!important;
+  margin-right:46px!important;
+  box-sizing:border-box!important;
+}
+#app .ffZeroBoard .ffZeroExpandButton {
+  position:absolute!important;
+  top:7px!important;
+  right:7px!important;
+  z-index:6;
+  display:grid!important;
+  place-items:center!important;
+  width:36px!important;
+  height:36px!important;
+  min-width:36px!important;
+  min-height:36px!important;
+  padding:0!important;
+  background:#0d0b0a!important;
+  color:#ff9c44!important;
+  border:1px solid #ef833c!important;
+  border-radius:10px!important;
+  box-shadow:0 0 12px #fa74192a!important;
+  font-size:24px!important;
+  line-height:1!important;
+  cursor:pointer;
+}
+#app .ffZeroBoard .ffZeroExpandButton:focus-visible {outline:2px solid white;outline-offset:2px}
+/* Zero Sales fullscreen: same live filters and existing search work in place. */
+#app .app > main.wrap.ffZeroFullscreen {
+  position:fixed!important;
+  inset:0!important;
+  z-index:70020!important;
+  display:flex!important;
+  flex-direction:column!important;
+  width:100vw!important;
+  max-width:none!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:calc(9px + env(safe-area-inset-top,0px)) 12px calc(10px + env(safe-area-inset-bottom,0px))!important;
+  background:#080808!important;
+  box-shadow:0 0 0 100vmax #000d!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+  transform:none!important;
+}
+/* Tasks: let the app's flex layout measure actual header/nav heights. */
+#app .app > main.wrap.ffTaskPage {
+  display:flex!important;
+  flex:1 1 auto!important;
+  flex-direction:column!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  margin:0 auto!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior-y:contain!important;
+  touch-action:pan-y!important;
+  box-sizing:border-box!important;
+}
+#app .ffTaskPage > :is(.ffTaskScope,.ffTaskList,.ffTaskComposer,.ffPrivateNoteDrawer),
+#app .ffTaskPage .ffHistoryScroll,
+#app .ffTaskPage .taskRow {
+  min-width:0!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+#app .ffTaskPage > .ffTaskList {
+  flex:1 1 auto!important;
+  min-height:160px!important;
+  max-height:none!important;
+  margin-inline:0!important;
+  align-self:stretch!important;
+  overflow:hidden!important;
+}
+#app .ffTaskPage > .ffTaskList > .ffHistoryScroll {
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  touch-action:pan-y!important;
+  overscroll-behavior-y:contain!important;
+}
+#app .ffTaskPage .taskRow {
+  width:100%!important;
+  flex-wrap:wrap!important;
+  overflow-wrap:anywhere!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  transform:none!important;
+}
+#app .ffTaskPage .taskRow > :is(div,section,article,p) {
+  min-width:0!important;
+  overflow-wrap:anywhere!important;
+}
+#app .ffTaskPage > :is(.ffTaskComposer,.ffPrivateNoteDrawer) {
+  width:100%!important;
+  margin-inline:0!important;
+  transform:none!important;
+  align-self:stretch!important;
+}
+#app .ffTaskPage:has(> .ffTaskComposer[open]),
+#app .ffTaskPage:has(> .ffPrivateNoteDrawer[open]) {
+  height:auto!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+}
+/* Fullscreen history and staff selection must be centred, not shifted left. */
+#app .ffTaskPage .ffHistoryExpanded {
+  position:fixed!important;
+  inset:calc(8px + env(safe-area-inset-top,0px)) 8px calc(8px + env(safe-area-inset-bottom,0px)) 8px!important;
+  width:auto!important;
+  max-width:none!important;
+  height:auto!important;
+  max-height:none!important;
+  margin:0!important;
+  transform:none!important;
+  box-sizing:border-box!important;
+  z-index:70030!important;
+}
+.globalSearchOverlay.ffItemPicker {
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+  max-width:100vw!important;
+  margin-inline:0!important;
+  transform:none!important;
+  overflow-x:hidden!important;
+  box-sizing:border-box!important;
+}
+.ffItemPicker .globalSearchBox {
+  width:100%!important;
+  max-width:min(680px,calc(100vw - 24px))!important;
+  min-width:0!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  box-sizing:border-box!important;
+}
+@media (max-width:380px) {
+  #app .ffZeroBoard .ffZeroExpandButton{width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important}
+  #app .ffZeroBoard .ffOutletList > .ffOutletSearch{width:calc(100% - 44px)!important;max-width:calc(100% - 44px)!important;margin-right:44px!important}
+}
