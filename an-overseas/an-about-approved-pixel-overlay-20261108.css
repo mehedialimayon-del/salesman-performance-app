@@ -206,8 +206,9 @@
     linear-gradient(0deg,#180805 0%,transparent 35%),
     linear-gradient(90deg,#351405 0%,#8d360bcd 18%,#7d30064a 44%,#46180830 100%),
     url('assets/malaysia-skyline-clean.jpg') 68% 42% / auto 112% no-repeat!important;
-   -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 10%)!important;
-   mask-image:linear-gradient(90deg,transparent 0%,#000 10%)!important;
+   -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 10%), linear-gradient(34deg,transparent 0%,transparent 10%,#000 23%)!important;
+   mask-image:linear-gradient(90deg,transparent 0%,#000 10%), linear-gradient(34deg,transparent 0%,transparent 10%,#000 23%)!important;
+   mask-composite:intersect!important;
    border-top-right-radius:1.65vw;
  }
  html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-founder-person{
