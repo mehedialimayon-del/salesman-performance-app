@@ -74,4 +74,53 @@ function countdown(){
 setInterval(countdown,60000);
 new MutationObserver(()=>{if(document.querySelector('.an-scholarship-head-inner .an-scholarship-total:not(:has(.an-next-scholarship-deadline))'))countdown()}).observe(document.body,{childList:true,subtree:true});
 countdown();
+
+/* Mobile-only scholarship compact layout; desktop styles untouched. */
+const mobileCSS=`
+@media(max-width:800px){
+body:has(.an-scholarship-head) .an-scholarship-head{padding:5px 0!important}
+body:has(.an-scholarship-head) .an-scholarship-head-inner{gap:8px!important;align-items:center!important}
+body:has(.an-scholarship-head) .an-scholarship-head h1{font-size:clamp(18px,4.5vw,25px)!important;line-height:1.08!important;margin:2px 0!important}
+body:has(.an-scholarship-head) .an-scholarship-head .an-eyebrow{font-size:8px!important}
+body:has(.an-scholarship-head) .an-scholarship-total{flex:0 0 45%!important;max-width:45%!important;min-width:0!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;padding:6px 7px!important;border-radius:12px!important;font-size:10px!important;line-height:1.2!important;background:linear-gradient(120deg,#25160e,#10151b)!important;border:1px solid #ff7100!important;color:#fff!important}
+body:has(.an-scholarship-head) .an-scholarship-total .an-next-scholarship-deadline{max-width:100%!important;box-sizing:border-box!important;font-size:9px!important;line-height:1.2!important;padding:4px!important;border-color:#ff8b24!important}
+body:has(.an-scholarship-head) .an-scholarship-directory.content{padding-top:3px!important}
+body:has(.an-scholarship-head) .an-scholarship-filters{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;margin:5px 0!important;align-items:stretch!important}
+body:has(.an-scholarship-head) .an-scholarship-filters label{grid-column:auto!important;min-width:0!important;gap:0!important;font-size:0!important;letter-spacing:0!important}
+body:has(.an-scholarship-head) .an-scholarship-filters input,
+body:has(.an-scholarship-head) .an-scholarship-filters select{height:34px!important;min-height:34px!important;padding:5px 7px!important;font-size:11px!important;border-radius:8px!important;min-width:0!important;text-overflow:ellipsis!important}
+body:has(.an-scholarship-head) .an-scholarship-meta{margin:3px 0 5px!important}
+body:has(.an-scholarship-head) .an-scholarship-about{margin:3px 0!important}
+body:has(.an-scholarship-head) .an-scholarship-scroll-region{margin-top:0!important}
+body:has(.an-scholarship-head) .an-scholarship-scroll-region h2{margin-top:3px!important;margin-bottom:3px!important}
+body:has(.an-scholarship-head) .an-scholarship-grid{gap:8px!important}
+}
+@media(max-width:430px){
+body:has(.an-scholarship-head) .an-scholarship-filters input,
+body:has(.an-scholarship-head) .an-scholarship-filters select{font-size:10px!important;padding:4px!important}
+}
+`;
+const mobileStyle=document.createElement('style');mobileStyle.id='an-mobile-scholarship-compact-20261108';mobileStyle.textContent=mobileCSS;document.head.appendChild(mobileStyle);
+function compactMobileFilters(){
+ if(window.innerWidth>800)return;
+ const head=document.querySelector('.an-scholarship-head');
+ const filters=document.querySelector('.an-scholarship-directory > .an-scholarship-filters');
+ if(!head||!filters)return;
+ const fields=filters.querySelectorAll('input,select');
+ fields.forEach((field,i)=>{
+  if(field.dataset.anMobileCompact==='yes')return;
+  field.dataset.anMobileCompact='yes';
+  const label=field.closest('label');
+  const caption=label?.textContent.trim()||'';
+  field.setAttribute('aria-label',field.getAttribute('aria-label')||caption||'Scholarship filter');
+  if(field.tagName==='INPUT')field.placeholder='Search funding / country';
+  else if(i===1){const o=field.options[0];if(o&&/all destinations/i.test(o.textContent))o.textContent='Destination';}
+  else if(i===2){const o=field.options[0];if(o&&/all degrees/i.test(o.textContent))o.textContent='Degree level';}
+ });
+}
+let mobilePending=false;
+new MutationObserver(()=>{if(mobilePending)return;mobilePending=true;requestAnimationFrame(()=>{mobilePending=false;compactMobileFilters()})}).observe(document.body,{childList:true,subtree:true});
+window.addEventListener('resize',compactMobileFilters);
+compactMobileFilters();
+
 })();
