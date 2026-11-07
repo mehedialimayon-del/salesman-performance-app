@@ -77,7 +77,7 @@
     managerBadge=chip('ffTaskZoneManagerChip',manager,managerName,managerId);
     managerBadge.dataset.key=mkey;
     managerBadge.setAttribute('aria-label',(zone==='PRIMARY'?'KL ZONE':zone+' ZONE')+' manager: '+managerName);
-    wrapper.append(managerBadge);
+    (wrapper.querySelector('.ffDirectScope,.ffScopeFilter')||wrapper).append(managerBadge);
    }
   }else managerBadge?.remove();
  }
