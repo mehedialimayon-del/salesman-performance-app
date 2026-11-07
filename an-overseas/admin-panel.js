@@ -155,6 +155,10 @@ function teamRow(i,v){
  +field("Company Name","team-company-"+i,m.company||m.department||"")
  +field("Department","team-department-"+i,m.department||"")
  +field("How This Person Helps Students","team-help-"+i,m.help||m.bio||m.description||"","textarea")
+ +field("Academic / Professional Journey","team-career-"+i,m.career||"","textarea")
+ +field("Personal Quote (premium management card)","team-quote-"+i,m.quote||"","textarea")
+ +field("LinkedIn Profile URL","team-linkedin-"+i,m.linkedin||m.linkedin_url||m.linkedinUrl||m.socials?.linkedin||"")
+ +field("Facebook Profile URL","team-facebook-"+i,m.facebook||m.facebook_url||m.facebookUrl||m.socials?.facebook||"")
  +field("Portfolio Website","team-portfolio-"+i,m.portfolio||"")
  +field("Phone Number","team-phone-"+i,m.phone||"")
  +field("Email","team-email-"+i,m.email||"")
@@ -251,7 +255,13 @@ document.addEventListener("submit",async e=>{
     const portfolio=v('team-portfolio-'+i);
     if(portfolio&&!/^https:\/\//i.test(portfolio))throw Error('Portfolio links must use https://');
     const help=v('team-help-'+i);
+    const linkedin=v('team-linkedin-'+i),facebook=v('team-facebook-'+i);
+    for(const [label,link] of [['LinkedIn',linkedin],['Facebook',facebook]]){
+      if(link&&!/^https:\/\//i.test(link))throw Error(label+' profile links must use https://');
+    }
+    const old=saved.management?.find(row=>row.id===el.dataset.teamId)||{};
     members.push({
+     ...old,
      id:el.dataset.teamId||'member-'+crypto.randomUUID(),
      name,
      designation:v('team-designation-'+i),
@@ -259,6 +269,9 @@ document.addEventListener("submit",async e=>{
      company:v('team-company-'+i),
      department:v('team-department-'+i),
      help,bio:help,
+     career:v('team-career-'+i),
+     quote:v('team-quote-'+i),
+     linkedin,facebook,
      portfolio,
      phone:v('team-phone-'+i),
      email:v('team-email-'+i),
