@@ -12,7 +12,7 @@ const mock=fs.readFileSync('tests/duty-ui.cjs','utf8').split('const mock=')[1].s
   await page.goto('http://127.0.0.1:8765');
   await page.locator('[data-page=tasks]').waitFor();
   // Fixture-only permission overlay: do not gate layout measurements on Android setup.\n  await page.evaluate(()=>{document.querySelector('#ffhEntryPermissions')?.remove();document.querySelector('#app>.app')?.removeAttribute('inert');});
-  await page.locator('[data-page=tasks]').click();
+  // Invoke the real Tasks navigation handler in this fixture; onboarding overlay blocks pointer clicks.\n  await page.locator('[data-page=tasks]').evaluate(el=>el.click());
   await page.locator('.ffTaskScope').waitFor();
   await page.waitForTimeout(900);
   const data=await page.evaluate(()=>{
