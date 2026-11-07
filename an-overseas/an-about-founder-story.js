@@ -91,47 +91,27 @@
      Only the country-flag patches are overlaid with moving cloth distortion. */
   function approvedFounderArtwork(){
     const src='https://d2ol7oe51mr4n9.cloudfront.net/user_3J7eLpAsZ71YVjJWQaNzcGsV3TY/adcc9b9f-f11c-4a3a-a811-b209ce412fbe.png';
-    // Actual fabric flags mapped to their existing positions in the approved artwork.
-    // A fixed left-edge acts as each flagpole; only the cloth flaps, never the entire grid.
-    const rows=[
-      ['bd','my','cn','jp'],
-      ['kr','sg','th','ae','tr'],
-      ['gb','de','fr','it','ie'],
-      ['nl','se','fi','at','be'],
-      ['ch','no','dk','es','pt'],
-      ['id','ru','hu','gr','lu'],
-      ['az','lk','hk','qa','ro'],
-      ['sa','tw','tr','ca','us'],
-      ['au','nz']
-    ];
-    const positions=[
+    // The flags are the ORIGINAL exact pixels from the approved artwork.
+    // Only a subtle moving fabric texture is clipped over them — no replacement flags or poles.
+    const bounds=[
       [104,744,94,56],[213,749,71,50],[293,745,70,55],[381,749,63,52],
       ...[810,859,906,954,1001,1048,1094].flatMap(y=>
         [[102,60],[172,60],[241,62],[312,61],[381,65]].map(([x,w])=>[x,y,w,43])),
       [102,1140,61,42],[173,1140,62,42]
     ];
-    // Portrait sharpening reuses the approved artwork, not the flag tile images.
+    const masks=bounds.map(([x,y,w,h])=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="2"/>').join('');
     const image='<image href="'+src+'" x="0" y="0" width="864" height="1536" />';
-    const allCodes=rows.flat();
-    const cloth=positions.map(([x,y,w,h],i)=>{
-      const code=allCodes[i];
-      if(!code)return '';
-      const id='an2-cloth-'+i;
-      const delay=((i%7)*-.37).toFixed(2)+'s';
-      return '<g class="an2-live-flag" style="--flag-delay:'+delay+';--flag-speed:'+((i%3)*.27+2.9).toFixed(2)+'s">'
-        +'<rect x="'+(x-2)+'" y="'+(y-2)+'" width="'+(w+5)+'" height="'+(h+4)+'" fill="#100e10" rx="2"/>'
-        +'<g class="an2-live-flag-fabric" style="transform-origin:'+x+'px '+(y+h/2)+'px">'
-        +'<image href="https://flagcdn.com/w80/'+code+'.png" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" preserveAspectRatio="none"/>'
-        +'<path d="M'+x+' '+y+' h'+w+' v'+h+' h-'+w+'z" fill="url(#an2-cloth-glimmer)" opacity=".20"/>'
-        +'</g><path d="M'+(x-3)+' '+(y-5)+' v'+(h+8)+'" stroke="#d4a95c" stroke-width="1.8"/>'
-        +'</g>';
-    }).join('');
     return '<div class="an2-approved-reference-hero" aria-label="A&N Overseas founder message from the approved reference artwork">'
       +'<img class="an2-approved-reference-source" src="'+src+'" alt="A&N Overseas founder artwork with study-destination flags and Nusrat Nasrin" loading="eager" decoding="async">'
       +'<figure class="an2-mobile-complete-quote"><span class="an2-mobile-open-quote" aria-hidden="true">“</span><blockquote><strong>International education should never be a privilege reserved for the few.</strong> It should be a bridge between potential and possibility—where trustworthy guidance, the right opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you. <span class="an2-mobile-close-quote" aria-hidden="true">”</span></blockquote></figure>'
       +'<svg class="an2-approved-reference-waves" viewBox="18 235 828 1156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'
-      +'<defs><linearGradient id="an2-cloth-glimmer" x1="0" y1="0" x2="1" y2=".1"><stop offset="0" stop-color="#fff" stop-opacity=".02"/><stop offset=".42" stop-color="#fff" stop-opacity=".36"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient></defs>'
-      +cloth+'</svg>'
+      +'<defs><clipPath id="an2-original-flags-only" clipPathUnits="userSpaceOnUse">'+masks+'</clipPath>'
+      +'<filter id="an2-fabric-ripple-original" x="-1%" y="-3%" width="102%" height="106%" color-interpolation-filters="sRGB">'
+      +'<feTurbulence type="sine" baseFrequency="0.012 0.028" numOctaves="1" seed="2" result="fabric"><animate attributeName="baseFrequency" values="0.012 0.028;0.016 0.027;0.010 0.029;0.012 0.028" dur="3.8s" repeatCount="indefinite"/></feTurbulence>'
+      +'<feDisplacementMap in="SourceGraphic" in2="fabric" scale="2.7" xChannelSelector="R" yChannelSelector="G"><animate attributeName="scale" values="1.6;3.9;2.5;1.6" dur="3.8s" repeatCount="indefinite"/></feDisplacementMap></filter>'
+      +'<linearGradient id="an2-fabric-moving-glow" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#fff" stop-opacity="0"/><stop offset="45%" stop-color="#fff" stop-opacity=".2"/><stop offset="58%" stop-color="#fff" stop-opacity=".02"/><stop offset="100%" stop-color="#111" stop-opacity=".1"/></linearGradient></defs>'
+      +'<g clip-path="url(#an2-original-flags-only)"><g opacity=".54" filter="url(#an2-fabric-ripple-original)">'+image+'</g>'
+      +'<rect class="an2-original-flag-sheen" x="80" y="740" width="380" height="450" fill="url(#an2-fabric-moving-glow)" opacity=".3" pointer-events="none"/></g></svg>'
       +'<svg class="an2-approved-reference-sharp" viewBox="18 235 828 1156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'
       +'<defs><clipPath id="an2-approved-portrait-sharp-area" clipPathUnits="userSpaceOnUse"><rect x="452" y="684" width="378" height="638" rx="2"/></clipPath>'
       +'<filter id="an2-approved-portrait-sharp-filter" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">'
@@ -153,7 +133,7 @@
       '<div class="an2-topline"><a href="#/about" class="an2-back">← ABOUT US</a><span>THE PEOPLE · THE PURPOSE · THE PROMISE</span></div>'+
       '<header class="an2-founder-hero">'+
         approvedFounderArtwork()+
-        '<div class="an2-founder-brand"><span class="an2-founder-header-logo" role="img" aria-label="A&N Overseas official header crest"><span class="an2-founder-logo-crop"><img src="assets/brand-logo.jpg" alt=""></span></span><span>ESTABLISHED 2024 · MALAYSIA & BANGLADESH</span><strong>ROOTED IN EXPERIENCE.<br><em>BUILT FOR YOUR FUTURE.</em></strong></div>'+
+        '<div class="an2-founder-brand"><span class="an2-founder-header-logo" role="img" aria-label="A&N Overseas animated header logo"><span class="logo-motion"><span class="logo-crop"><img src="assets/brand-logo.jpg" alt=""></span></span></span><span>ESTABLISHED 2024 · MALAYSIA & BANGLADESH</span><strong>ROOTED IN EXPERIENCE.<br><em>BUILT FOR YOUR FUTURE.</em></strong></div>'+
         '<div class="an2-founder-quote"><span class="an2-quote-mark" aria-hidden="true">“</span><blockquote>Global education opens doors to new opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you. <span class="an2-end-quote" aria-label="End of quote">”</span></blockquote><div class="an2-quote-footer"><div class="an2-quote-sign"><div class="an2-flags-journey" aria-label="Bangladesh and Malaysia, with featured global study destinations"><span class="an2-flags-overline">FROM HOME TO THE WORLD <span class="an2-plane-mark" aria-hidden="true">✈</span></span><div class="an2-floating-flags">'+journeyFlags()+'</div>'+wavingFlagFilter+'<small>Bangladesh · Malaysia · Global possibilities</small></div><span class="an2-founder-message-label"><span class="an2-founder-msg-orange">FOUNDER’S MESSAGE</span> <span class="an2-founder-msg-white">· A&amp;N OVERSEAS</span></span></div><figure class="an2-founder-person"><img src="https://d2ol7oe51mr4n9.cloudfront.net/user_3J7eLpAsZ71YVjJWQaNzcGsV3TY/910707ad-d082-4cf5-8410-0bf049fdc75b.png" alt="Nusrat Nasrin — Founder, A&N Overseas" loading="eager" decoding="async"></figure></div></div>'+
       '</header>'+
       '<nav class="an2-nav" aria-label="Explore the A&N story">'+
