@@ -156,7 +156,8 @@ function showTeam(){
  const founderQuote='From Bangladesh Agricultural University to KLUST and now UPM, my own academic journey has shown me the value of thoughtful guidance. As an aquaculture postgraduate student and research assistant, I understand the choices students face abroad—and I am committed to supporting them with clarity, care and first-hand experience.';
  const career=String(m.career|| (isFounder?founderCareer:'')).trim();
  const quote=String(m.quote|| (isFounder?founderQuote:'')).trim();
- const careerHtml=career?'<div class="an-manager-career"><span class="an-manager-label">ACADEMIC & PROFESSIONAL JOURNEY</span><p>'+esc(career)+'</p></div>':'';
+ const careerDecorated=isFounder?esc(career).replace(/Bangladesh Agricultural University/g,'<strong class="an-manager-career-key">Bangladesh Agricultural University</strong>').replace(/Kuala Lumpur University of Science and Technology/g,'<strong class="an-manager-career-key">Kuala Lumpur University of Science and Technology</strong>').replace(/Universiti Putra Malaysia \(UPM\)/g,'<strong class="an-manager-career-key">Universiti Putra Malaysia (UPM)</strong>').replace(/MSc Aquaculture/g,'<strong class="an-manager-career-key">MSc Aquaculture</strong>'):esc(career);
+ const careerHtml=career?'<div class="an-manager-career"><span class="an-manager-label">ACADEMIC & PROFESSIONAL JOURNEY</span><p>'+careerDecorated+'</p></div>':'';
  // The founder's support promise belongs inside her quotation, not in a second card.
  const promiseMatch=isFounder?quote.match(/(?:\band\s+)?\bI am committed to supporting them[\s\S]*$/i):null;
  const displayQuote=promiseMatch
