@@ -71,7 +71,7 @@
  html body.an-exact-desktop #app .an2-exact-hero .an2-founder-brand>span:not(.an2-exact-logo):not(.an2-exact-company):not(.an2-exact-sub){display:none!important}
  html body.an-exact-desktop #app .an2-exact-hero .an2-founder-quote {
    position:absolute!important;z-index:7!important;top:2.5%!important;left:29%!important;
-   right:22.4%!important;width:auto!important;height:auto!important;min-height:0!important;
+   right:22.4%!important;width:auto!important;height:31%!important;min-height:0!important;
    margin:0!important;padding:12px 18px 13px!important;
    display:block!important;max-height:34%!important;overflow:hidden!important;
    background:linear-gradient(117deg,#422414dd,#101218e8)!important;
@@ -105,7 +105,7 @@
  html body.an-exact-desktop #app .an2-exact-hero .an2-founder-person{
    position:absolute!important;z-index:8!important;top:.7%!important;right:1.2%!important;
    bottom:auto!important;left:auto!important;display:block!important;
-   width:22.2%!important;height:72%!important;min-height:0!important;max-height:none!important;
+   width:22.2%!important;height:68%!important;min-height:0!important;max-height:none!important;
    margin:0!important;padding:0!important;overflow:visible!important;
    pointer-events:none!important;filter:none!important;
  }
@@ -167,7 +167,7 @@
  }
  html body.an-exact-desktop #app .an2-exact-hero>.an2-nav{
    position:absolute!important;z-index:15!important;left:1%!important;right:18.2%!important;
-   top:62.4%!important;height:12.1%!important;min-height:55px!important;
+   top:59.5%!important;height:12.5%!important;min-height:55px!important;
    display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
    gap:8px!important;padding:0!important;margin:0!important;width:auto!important;
    border:0!important;background:none!important;backdrop-filter:none!important;
@@ -208,7 +208,7 @@
  }
  html body.an-exact-desktop #app .an2-exact-flagband{
    position:absolute!important;z-index:11!important;left:1.3%!important;right:1.3%!important;
-   top:77.3%!important;height:16.9%!important;overflow:hidden!important;
+   top:75%!important;height:18%!important;overflow:hidden!important;
    margin:0!important;padding:0!important;display:block!important;
  }
  html body.an-exact-desktop #app .an2-exact-flagband .an2-flags-journey{
