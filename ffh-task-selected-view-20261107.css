@@ -1,0 +1,17 @@
+/* Task page: selected staff name/photo/ID and selected zone manager, while preserving existing controls. */
+#app main.ffTaskPage .ffTaskList > .cardTitle{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:6px!important;min-width:0!important}
+#app main.ffTaskPage .ffPendingLabel{display:none!important}
+#app main.ffTaskPage .ffTaskViewingIdentity{display:inline-flex;align-items:center;gap:7px;min-width:0;max-width:100%;margin-left:auto;padding:3px 7px;border:1px solid #ff812c;border-radius:12px;background:#20120b;color:#fff}
+#app main.ffTaskPage .ffTaskIdentityAvatar{width:29px;height:29px;min-width:29px;display:grid;place-items:center;overflow:hidden;border-radius:50%;border:1px solid #ff812c;background:#4a2311;color:#fff;font-size:14px;font-weight:850}
+#app main.ffTaskPage .ffTaskIdentityAvatar img{display:block;width:100%;height:100%;object-fit:cover;cursor:zoom-in}
+#app main.ffTaskPage .ffTaskIdentityText{min-width:0;display:flex;flex-direction:column;gap:2px;text-align:left;overflow:hidden}
+#app main.ffTaskPage .ffTaskIdentityText strong{color:#fff;font:800 11px/1.15 system-ui,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#app main.ffTaskPage .ffTaskIdentityText small{color:#ffad73;font:750 9px/1.1 system-ui,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#app main.ffTaskPage .ffTaskZoneManagerChip{display:flex;align-items:center;gap:6px;width:fit-content;max-width:100%;margin:4px 7px 0;padding:3px 7px;border:1px solid #a95a26;border-radius:11px;background:#170f09;color:#fff}
+#app main.ffTaskPage > details.ffTaskScope.ffTaskCompactV2{max-height:none!important}
+#app main.ffTaskPage > details.ffTaskScope.ffTaskCompactV2 > :not(summary){max-height:none!important}
+#app main.ffTaskPage .ffTaskZoneManagerChip .ffTaskIdentityAvatar{width:24px;height:24px;min-width:24px}
+#app main.ffTaskPage #ffScopeStaff + .ffSelectTrigger{display:flex!important;align-items:center!important;gap:5px!important;white-space:nowrap!important}
+#app main.ffTaskPage #ffScopeStaff + .ffSelectTrigger .ffSelectStaffLabel{display:block!important;flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;color:#fff!important;-webkit-text-fill-color:#fff!important;font-weight:800!important;font-size:10px!important}
+#app main.ffTaskPage #ffScopeStaff + .ffSelectTrigger .ffSelectStaffAvatar{flex:0 0 22px!important;width:22px!important;height:22px!important;min-width:22px!important}
+@media(max-width:380px){#app main.ffTaskPage .ffTaskViewingIdentity{max-width:100%}#app main.ffTaskPage .ffTaskList > .cardTitle{font-size:14px!important}}
