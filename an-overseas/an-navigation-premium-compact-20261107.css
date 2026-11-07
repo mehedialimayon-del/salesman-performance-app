@@ -231,3 +231,37 @@ html body .top .links a[aria-current="page"]{
 @media(max-width:800px) and (prefers-reduced-motion:reduce){
  html body .top #links,html body .top #links.open{transition:none!important}
 }
+
+/* 2026-11-08 floating mobile menu popup */
+@media(max-width:800px){
+ html body .top #links.open{
+  position:fixed!important;top:70px!important;
+  left:10px!important;right:10px!important;bottom:auto!important;
+  width:auto!important;height:auto!important;min-height:0!important;
+  max-height:calc(100dvh - 86px)!important;
+  display:flex!important;flex-direction:column!important;
+  justify-content:flex-start!important;align-items:stretch!important;
+  gap:clamp(5px,1vh,10px)!important;
+  margin:0!important;padding:7px 0!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  background:transparent!important;background-image:none!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  scrollbar-width:none!important;
+  transform-origin:top right!important;
+  animation:anFloatingMenuIn .25s cubic-bezier(.2,.8,.2,1) both!important;
+ }
+ html body .top #links.open::-webkit-scrollbar{display:none!important}
+ html body .top #links.open::before,html body .top #links.open::after{display:none!important;content:none!important}
+ html body .top #links.open a{
+  box-sizing:border-box!important;flex:0 0 auto!important;
+  width:100%!important;min-height:clamp(43px,5.4vh,58px)!important;
+  height:clamp(43px,5.4vh,58px)!important;
+  padding:8px 14px!important;margin:0!important;border-radius:18px!important;
+ }
+ html body .top #links.open.an-menu-closing{
+  pointer-events:none!important;animation:anFloatingMenuOut .2s ease-in both!important;
+ }
+}
+@keyframes anFloatingMenuIn{from{opacity:0;transform:translateY(-12px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes anFloatingMenuOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-12px) scale(.97)}}
+@media(prefers-reduced-motion:reduce){html body .top #links.open,html body .top #links.open.an-menu-closing{animation:none!important}}
