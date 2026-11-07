@@ -408,3 +408,18 @@
 @media(prefers-reduced-motion:reduce){
  html body.an-about-details-mode #app .an2-original-flag-sheen{animation:none!important}
 }
+
+/* 2026-11-08 mobile hotfix: original flag artwork only.
+   The geometrically distorted overlays must NEVER be visible, including stale DOM
+   left behind by soft-navigation transitions. */
+@media(max-width:800px){
+ html body.an-about-details-mode #app .an2-approved-reference-waves,
+ html body.an-about-details-mode #app .an2-live-flag,
+ html body.an-about-details-mode #app .an2-original-flag-sheen{
+   display:none!important;visibility:hidden!important;opacity:0!important;
+   animation:none!important;filter:none!important;
+ }
+ html body.an-about-details-mode #app .an2-approved-reference-source{
+   display:block!important;visibility:visible!important;opacity:1!important;
+ }
+}
