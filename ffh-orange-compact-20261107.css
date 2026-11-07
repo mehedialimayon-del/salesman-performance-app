@@ -170,3 +170,9 @@ html body.ffGlowOn #app .app.ffBlackGlow :is(.scope button.active,.tabs button.o
 
 /* Preserve the user's draggable AYON AI orb position while preventing it from covering the mobile popup Send button. */
 @media (max-width:650px){body:has(.aiPopupOverlay) .aiPopupComposer{padding-right:clamp(54px,17vw,72px)!important}}
+
+/* Fix pure-white chat copy in the restored orange/white theme. */
+html body.ffGlowOn #app .app.ffBlackGlow .ffChatBubble p {
+ color:#fff!important;
+ -webkit-text-fill-color:#fff!important;
+}
