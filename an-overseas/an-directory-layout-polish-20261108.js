@@ -62,6 +62,7 @@ body:has(.university-catalogue) .page-head .catalogue-tools{width:100%!important
 }
 
 /* Desktop-only final alignment; mobile controls and behavior are untouched. */
+.an-directory-desktop-label,.an-directory-favorite-shortcut{display:none!important}
 @media(min-width:1050px){
  body:has(.university-catalogue) .page-head>.wrap{padding-left:0!important;margin-left:0!important;max-width:100%!important;gap:12px!important}
  body:has(.university-catalogue) .page-head .bread{margin-left:8px!important}
@@ -74,8 +75,8 @@ body:has(.university-catalogue) .page-head .catalogue-tools{width:100%!important
  body:has(.university-catalogue) .page-head .catalogue-filter summary .filter-word{font-size:12px!important;display:inline!important}
  body:has(.university-catalogue) .page-head .an-scholarship-category-wrap{flex:0 0 auto!important}
  body:has(.university-catalogue) .page-head #an-scholarship-category-toggle{min-width:132px!important;min-height:36px!important;padding:6px 10px!important;border:1px solid #ff6500!important;border-radius:10px!important;white-space:nowrap!important;font-size:12px!important}
- body:has(.university-catalogue) .page-head .an-directory-desktop-label{font-size:12px;font-weight:750;margin-left:5px;color:#fff}
- body:has(.university-catalogue) .page-head .an-directory-favorite-shortcut{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;min-height:36px;padding:6px 11px;border:1px solid #ff6500;border-radius:10px;background:#101218;color:#ff6500;font-size:12px;font-weight:750;white-space:nowrap}
+ body:has(.university-catalogue) .page-head .an-directory-desktop-label{display:inline!important;font-size:12px;font-weight:750;margin-left:5px;color:#fff}
+ body:has(.university-catalogue) .page-head .an-directory-favorite-shortcut{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;min-height:36px;padding:6px 11px;border:1px solid #ff6500;border-radius:10px;background:#101218;color:#ff6500;font-size:12px;font-weight:750;white-space:nowrap}
  body:has(.university-catalogue) .an-university-directory-bar{padding:0!important;margin:0!important;min-height:0!important}
  body:has(.university-catalogue) .an-university-directory-bar #an-global-count{display:none!important}
  body:has(.university-catalogue) .university-catalogue{padding-top:0!important}
