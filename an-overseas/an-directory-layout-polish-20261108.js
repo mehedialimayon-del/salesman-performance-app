@@ -58,6 +58,18 @@ body:has(.university-catalogue) .page-head .catalogue-tools>*{height:33px!import
 body.an-universities-mode #app .university-catalogue #results{grid-template-columns:minmax(0,1fr)!important}
 
 }
+
+/* Correct the photo overlay at the actual last-loaded runtime style layer. */
+body:has(.university-catalogue) #results .an-premium-uni-card .an-premium-hero-details{z-index:80!important;opacity:1!important;filter:none!important;visibility:visible!important}
+body:has(.university-catalogue) #results .an-premium-uni-card .an-premium-hero-details :is(h3,h3 span,.an-premium-type,.an-premium-location){opacity:1!important;filter:none!important;visibility:visible!important;mix-blend-mode:normal!important}
+body:has(.university-catalogue) #results .an-premium-uni-card .an-premium-name-orange,body:has(.university-catalogue) #results .an-premium-uni-card .an-premium-short{color:#ff7100!important;-webkit-text-fill-color:#ff7100!important}
+body:has(.university-catalogue) #results .an-premium-uni-card .an-premium-name-white{color:#fff!important;-webkit-text-fill-color:#fff!important}
+body:has(.university-catalogue) #results .an-premium-uni-card .an-premium-location{background:rgba(0,0,0,.93)!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border:1px solid #ff7100!important}
+body:has(.university-catalogue) #results .an-premium-uni-card .an-premium-type{background:#064536!important;color:#b8ffe2!important;-webkit-text-fill-color:#b8ffe2!important}
+body:has(.university-catalogue) #results .an-premium-uni-card .an-premium-type.is-private{background:#42245d!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+body:has(.university-catalogue) #results .an-premium-uni-card .uni-cover-wrap:after{background:linear-gradient(transparent 35%,rgba(0,0,0,.35) 58%,rgba(0,0,0,.96))!important;z-index:12!important}
+body:has(.university-catalogue) #results .an-premium-uni-card .an-guide-links{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}
+body:has(.university-catalogue) #results .an-premium-uni-card .an-guide-links a{min-width:0!important;overflow-wrap:anywhere!important}
 `;
 const style=document.createElement('style');style.textContent=css;document.head.appendChild(style);
 const icons={
