@@ -248,3 +248,22 @@ body.an-portfolio-v2 #app .an-study-section :is(p,li) :is(strong,em){color:#f068
 #results .an-premium-uni-card .an-premium-title-logo{display:inline-block!important;width:28px!important;height:28px!important;object-fit:contain!important;vertical-align:middle!important}
 @media(max-width:600px){#results .an-premium-uni-card .uni-cover-wrap{height:315px!important;min-height:315px!important;flex-basis:315px!important}#results .an-premium-uni-card .an-premium-university-title{font-size:21px!important}}
 @media(min-width:900px){#results .an-premium-uni-card .uni-cover-wrap{height:225px!important;min-height:225px!important;flex-basis:225px!important}#results .an-premium-uni-card .an-premium-university-title{font-size:17px!important}#results .an-premium-uni-card .an-premium-location{font-size:9px!important}}
+
+/* Viewport-fitted cards: retain detailed campus copy in a compact readable overlay. */
+#results .an-premium-uni-card{box-sizing:border-box!important;height:min(730px,calc(100dvh - 405px))!important;min-height:490px!important;max-height:730px!important;align-self:start!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+#results .an-premium-uni-card .uni-cover-wrap{box-sizing:border-box!important;flex:1 1 43%!important;height:auto!important;min-height:160px!important;max-height:none!important;position:relative!important}
+#results .an-premium-uni-card .an-premium-hero-details{bottom:6px!important;gap:3px!important;max-height:70%!important}
+#results .an-premium-uni-card .an-premium-university-title{font-size:clamp(14px,2.5vh,23px)!important;line-height:1.1!important}
+#results .an-premium-uni-card .an-premium-type{padding:3px 8px!important;font-size:9px!important}
+#results .an-premium-uni-card .an-premium-location{display:block!important;box-sizing:border-box!important;max-height:46px!important;min-height:28px!important;overflow-y:auto!important;overscroll-behavior:contain!important;scrollbar-width:thin!important;padding:4px 6px!important;font-size:9px!important;line-height:1.25!important;white-space:normal!important}
+#results .an-premium-uni-card .inside{box-sizing:border-box!important;flex:0 0 auto!important;padding:5px 7px!important;gap:4px!important}
+#results .an-premium-uni-card .an-premium-facts{gap:4px!important}
+#results .an-premium-uni-card .an-premium-fact{box-sizing:border-box!important;height:clamp(48px,8vh,70px)!important;min-height:0!important;gap:1px!important;padding:3px!important;overflow:hidden!important}
+#results .an-premium-uni-card .an-premium-fact-icon{font-size:12px!important}
+#results .an-premium-uni-card .an-premium-fact strong{font-size:9px!important}
+#results .an-premium-uni-card .an-premium-fact b{font-size:11px!important;line-height:1.1!important;max-height:2.4em!important;overflow-y:auto!important;overflow-wrap:anywhere!important}
+#results .an-premium-uni-card .an-premium-fact small{font-size:8px!important;line-height:1.1!important}
+#results .an-premium-uni-card .an-guide-links{grid-template-columns:1fr!important;gap:3px!important;margin:3px 0 0!important;padding:0!important}
+#results .an-premium-uni-card .an-guide-links a{box-sizing:border-box!important;height:clamp(25px,3.7vh,34px)!important;min-height:0!important;padding:3px 5px!important;font-size:10px!important}
+@media(min-width:900px){#results .an-premium-uni-card{height:min(720px,calc(100dvh - 240px))!important;min-height:430px!important}#results .an-premium-uni-card .uni-cover-wrap{min-height:125px!important}#results .an-premium-uni-card .an-premium-fact{height:clamp(50px,8vh,68px)!important}}
+@media(max-width:600px) and (max-height:750px){#results .an-premium-uni-card{min-height:470px!important}#results .an-premium-uni-card .an-premium-location{max-height:35px!important}}
