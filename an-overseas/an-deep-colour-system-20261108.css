@@ -19,3 +19,25 @@
 body{color:#fff}
 ::selection{background:#ff7900;color:#fff}
 :focus-visible{outline-color:#ff9500}
+
+/* Brandwide contrast: allow crisp white section headings and orange emphasis, not whole orange paragraphs. */
+#app :is(.service-detail,.an-service-detail,.service-page,.an-service-page,.an2-story) :is(h1,h2,h3){
+ color:#fff;
+}
+#app :is(.service-detail,.an-service-detail,.service-page,.an-service-page) p{color:#f6f6f6}
+#app :is(.service-detail,.an-service-detail,.service-page,.an-service-page) :is(em,.highlight,.key-point,.accent){
+ color:#ff9400;
+}
+#app :is(.service-detail,.an-service-detail,.service-page,.an-service-page) :is(a.btn,button.primary,.primary-btn){
+ background:linear-gradient(100deg,#ffab23,#ff7900);border-color:#ffa937;color:#150d08;
+}
+.an-updates-bar .an-updates-label{
+ background:linear-gradient(115deg,#16304b,#225a81)!important;
+ color:#fff!important;border-right:2px solid #ff8d1a!important;
+ box-shadow:inset 0 -2px rgba(255,255,255,.09)!important;
+}
+.an-updates-bar .an-updates-window{
+ background:#080d15!important;
+}
+.an-updates-bar .an-update-item{color:#fff4e8!important}
+.an-updates-bar .an-update-item :is(b,strong){color:#ff9d19!important}
