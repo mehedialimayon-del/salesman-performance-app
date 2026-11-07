@@ -5,7 +5,7 @@ const {chromium}=require('playwright');
 (async()=>{
  const installed=process.env.FFH_CHROMIUM&&fs.existsSync(process.env.FFH_CHROMIUM)?process.env.FFH_CHROMIUM:undefined;
  const browser=await chromium.launch({headless:true,...(installed?{executablePath:installed}:{}),args:['--no-sandbox','--disable-dev-shm-usage']});
- const css=['styles.css','ffh-direct-filters.css','ffh-visual-followup.css','ffh-orange-compact-20261107.css','ffh-full-height-20261107.css','ffh-feedback-20261107.css'];
+ const css=['styles.css','ffh-direct-filters.css','ffh-visual-followup.css','ffh-orange-compact-20261107.css','ffh-full-height-20261107.css','ffh-feedback-20261107.css','ffh-task-compact-live.css'];
  const apply=async page=>{for(const path of css)await page.addStyleTag({path});};
  try{
   const task=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
@@ -17,6 +17,7 @@ const {chromium}=require('playwright');
    };window.FFH_STAFF_PROFILE=id=>people[id]||null;});
   await task.addScriptTag({path:'searchable-picker.js'});
   await task.addScriptTag({path:'ffh-visual-followup.js'});
+  await task.addScriptTag({path:'ffh-task-compact-live.js'});
   for(const width of [320,360,390,412]){
    await task.setViewportSize({width,height:844});
    await task.locator('#ffScopeStaff + .ffSelectTrigger').waitFor();
@@ -26,10 +27,12 @@ const {chromium}=require('playwright');
     return {height:b.height,width:b.width,buttons:buttons.map(x=>({top:x.top,width:x.width,height:x.height})),scrollWidth:document.documentElement.scrollWidth};
    });
    assert.equal(dim.buttons.length,2,'two visible selectors');
-   assert.ok(dim.height>35&&dim.height<90,'scope is slim at '+width+': '+JSON.stringify(dim));
+   assert.ok(dim.height>35&&dim.height<=76,'scope is slim at '+width+': '+JSON.stringify(dim));
    assert.ok(Math.abs(dim.buttons[0].top-dim.buttons[1].top)<3,'scope controls stay on one line at '+width);
    assert.ok(dim.scrollWidth<=width+3,'no page horizontal overflow at '+width);
   }
+  assert.equal(await task.locator('.ffTaskScope .ffZoneScope').first().innerText().then(x=>x.split('\n')[0].trim()),'SELECT ZONE');
+  assert.ok((await task.locator('.ffTaskScope label').nth(1).innerText()).includes('SELECT SR / FILTER'));
   await task.locator('#ffScopeStaff + .ffSelectTrigger').click();
   await task.locator('.ffScopeStaffPicker .ffPickerOption[data-staff-id="S1"]').waitFor();
   for(const height of [844,550]){
