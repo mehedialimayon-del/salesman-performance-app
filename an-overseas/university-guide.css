@@ -113,3 +113,13 @@
 #results .an-guide-identity strong{font-size:11px!important}
 #results .an-guide-card .inside{min-height:0!important}
 }
+
+/* Portfolio typography: white primary headings + deep-orange subheadings, not all-orange blocks. */
+#university-panel.white h2{color:#fff!important}
+#university-panel.white h3,
+#university-panel.white .an-guide-check h3{color:#ff741c!important}
+#university-panel.white .an-guide-note{color:#fff!important;background:#1a1d23!important}
+#university-panel.white .an-guide-note strong{color:#ff8a32!important}
+#university-panel.white .an-guide-fee-grid b{color:#ff8a32!important}
+#university-panel.white .an-guide-degree-box>summary{color:#fff!important;background:#161c25!important}
+#university-panel.white .an-guide-key strong{color:#ff8a32!important}
