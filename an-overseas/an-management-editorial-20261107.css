@@ -115,3 +115,69 @@ body.an-about-details-mode #app .an2-founder-quote blockquote,
  #app .an-about-v3 .an-manager-contact b{font-size:9px!important}
  #app .an-about-v3 .an-manager-contacts .an-manager-contact{gap:4px!important;padding:5px 4px!important}
 }
+
+/* Desktop fixed-frame management: all details, contact cards and actions visible without inner scrolling.
+   Deliberately scoped to About management; mobile layout and the founder story are untouched. */
+#app .an-about-v3 .an-manager-quote-emphasis{
+ color:#ffad47!important;font-weight:800!important;font-style:italic!important;
+ text-shadow:0 0 9px rgba(255,155,36,.16);
+}
+@media(min-width:801px){
+ body.an-about-locked #app .an-about-v3 .an-manager-card,
+ body.an-about-locked #app .an-about-v3 .an-manager-main{
+   min-height:0!important;overflow:hidden!important;
+ }
+ body.an-about-locked #app .an-about-v3 .an-manager-information{
+   display:flex!important;flex-direction:column!important;
+   justify-content:flex-start!important;align-items:stretch!important;
+   height:100%!important;min-height:0!important;max-height:100%!important;
+   overflow:hidden!important;overflow-y:hidden!important;overflow-x:hidden!important;
+   scrollbar-width:none!important;overscroll-behavior:auto!important;
+   gap:clamp(2px,.38vh,5px)!important;padding:1px 1px 0!important;
+ }
+ #app .an-about-v3 .an-manager-information>*{min-width:0;flex-shrink:0}
+ #app .an-about-v3 .an-manager-name-box h3{
+   font-size:clamp(15px,1.47vw,20px)!important;line-height:1.09!important;
+ }
+ #app .an-about-v3 .an-manager-career .an-manager-label{
+   font-size:clamp(8px,.69vw,9px)!important;line-height:1.08!important;
+ }
+ #app .an-about-v3 .an-manager-career p{
+   margin:1px 0 0!important;font-size:clamp(9px,.75vw,10.5px)!important;
+   line-height:1.17!important;
+ }
+ #app .an-about-v3 .an-manager-quote{
+   margin:0!important;padding:6px 8px 6px 23px!important;
+   border-radius:10px!important;
+ }
+ #app .an-about-v3 .an-manager-quote-mark{font-size:25px!important;left:6px!important;top:1px!important}
+ #app .an-about-v3 .an-manager-quote blockquote{
+   font-size:clamp(9.3px,.77vw,10.7px)!important;line-height:1.22!important;
+ }
+ #app .an-about-v3 .an-manager-contacts{
+   flex:0 0 auto!important;margin-top:auto!important;
+   grid-template-columns:repeat(2,minmax(0,1fr))!important;
+   gap:4px!important;
+ }
+ #app .an-about-v3 .an-manager-contacts .an-manager-contact{
+   min-height:28px!important;padding:3px 6px!important;gap:5px!important;
+ }
+ #app .an-about-v3 .an-manager-contact small{font-size:8px!important;line-height:1!important}
+ #app .an-about-v3 .an-manager-contact b{
+   font-size:clamp(8px,.72vw,10px)!important;line-height:1.12!important;
+ }
+ #app .an-about-v3 .an-manager-actions{
+   flex:0 0 auto!important;margin-top:1px!important;padding-top:0!important;gap:4px!important;
+ }
+ #app .an-about-v3 .an-manager-actions .an-manager-action{
+   min-height:24px!important;padding:3px 7px!important;line-height:1.12!important;
+ }
+}
+@media(min-width:801px) and (max-height:700px){
+ #app .an-about-v3 .an-manager-name-box h3{font-size:clamp(14px,1.27vw,17px)!important}
+ #app .an-about-v3 .an-manager-career p{font-size:9px!important;line-height:1.1!important}
+ #app .an-about-v3 .an-manager-quote{padding:4px 7px 4px 20px!important}
+ #app .an-about-v3 .an-manager-quote blockquote{font-size:9px!important;line-height:1.15!important}
+ #app .an-about-v3 .an-manager-contacts .an-manager-contact{min-height:25px!important;padding:2px 5px!important}
+ #app .an-about-v3 .an-manager-actions .an-manager-action{min-height:22px!important;padding:2px 5px!important}
+}
