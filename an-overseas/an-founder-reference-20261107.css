@@ -390,3 +390,93 @@
     animation-delay:calc(var(--flag-index) * -.14s)!important;
   }
 }
+
+
+/* 2026-11-07 FINAL correction from the user's actual 23:09 live screenshot.
+   Keep each flag in its own fixed cell, move the portrait to the RIGHT of flags,
+   prevent hair overlapping the quote, and align the founder footer baseline. */
+html body.an-about-details-mode #app .an2-wave-filter-defs{
+  display:block!important;position:absolute!important;width:0!important;height:0!important;
+  overflow:hidden!important;pointer-events:none!important;visibility:hidden!important;
+}
+@media(max-width:800px){
+  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-quote{
+    padding-top:0!important;
+  }
+  html body.an-about-details-mode #app .an2-founder-hero .an2-quote-footer{
+    grid-template-columns:minmax(0,54%) minmax(0,46%)!important;
+    min-height:clamp(360px,96vw,420px)!important;
+    margin-top:12px!important;
+  }
+  html body.an-about-details-mode #app .an2-founder-hero .an2-founder-person{
+    position:relative!important;
+    z-index:2!important;
+    isolation:isolate!important;
+    overflow:visible!important;
+  }
+  html body.an-about-details-mode #app .an2-founder-hero .an2-founder-person img{
+    position:absolute!important;left:auto!important;top:auto!important;
+    right:-81px!important;bottom:27px!important;
+    height:138%!important;width:auto!important;
+    min-height:0!important;max-height:none!important;max-width:none!important;
+    object-fit:contain!important;object-position:right bottom!important;
+    transform:none!important;
+    filter:drop-shadow(0 9px 13px rgba(0,0,0,.32))!important;
+    z-index:1!important;
+  }
+  html body.an-about-details-mode #app .an2-founder-hero .an2-quote-sign{
+    z-index:3!important;position:relative!important;
+    min-height:0!important;padding-bottom:30px!important;
+  }
+  html body.an-about-details-mode #app .an2-founder-hero .an2-founder-message-label{
+    position:relative!important;z-index:4!important;
+    display:block!important;margin-top:auto!important;
+    padding:9px 0 0!important;
+    background:linear-gradient(to top,rgba(20,18,16,.96) 30%,rgba(20,18,16,.68),transparent)!important;
+    white-space:normal!important;
+  }
+  html body.an-about-details-mode #app .an2-founder-hero .an2-flags-journey small{
+    white-space:normal!important;
+    max-width:100%!important;overflow-wrap:normal!important;
+    z-index:4!important;
+  }
+  /* Fully opaque nameplate overlays the faint lettering inside the old PNG. */
+  html body.an-about-details-mode #app .an2-founder-hero .an2-founder-person::after{
+    content:"NUSRAT NASRIN"!important;display:flex!important;
+    position:absolute!important;z-index:6!important;
+    right:-3px!important;bottom:25px!important;
+    width:120%!important;height:29px!important;box-sizing:border-box!important;
+    align-items:center!important;justify-content:center!important;
+    background:linear-gradient(100deg,#17110f,#24170e,#17110f)!important;
+    border:2px solid #f3923c!important;border-radius:999px!important;
+    color:#ffad5b!important;
+    font:900 clamp(11px,3vw,15px)/1 Georgia,serif!important;
+    letter-spacing:1.5px!important;
+    box-shadow:0 1px 6px rgba(0,0,0,.35)!important;
+    white-space:nowrap!important;
+  }
+  html body.an-about-details-mode #app .an2-founder-hero .an2-floating-flags .an2-flag{
+    backface-visibility:visible!important;transform-origin:5% 50%!important;
+    overflow:visible!important;
+  }
+  html body.an-about-details-mode #app .an2-founder-hero .an2-floating-flags .an2-flag-image{
+    filter:url(#an2-flags-fabric-ripple) saturate(1.08) contrast(1.08)!important;
+    clip-path:polygon(0 4%,20% 0,41% 4%,64% 0,84% 6%,100% 3%,100% 94%,83% 98%,61% 93%,41% 98%,20% 94%,0 98%)!important;
+  }
+}
+@media(max-width:370px){
+  html body.an-about-details-mode #app .an2-founder-hero .an2-founder-person img{
+    right:-71px!important;height:130%!important;bottom:22px!important;
+  }
+}
+@media(prefers-reduced-motion:no-preference){
+  html body.an-about-details-mode #app .an2-founder-hero .an2-floating-flags .an2-flag-image{
+    animation:an2-approved-flag-edge 3.25s ease-in-out infinite!important;
+    animation-delay:calc(var(--flag-index) * -.17s)!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body.an-about-details-mode #app .an2-founder-hero .an2-floating-flags .an2-flag-image{
+    animation:none!important;filter:saturate(1.08) contrast(1.08)!important;
+  }
+}
