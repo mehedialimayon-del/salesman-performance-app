@@ -58,12 +58,29 @@ html body.an-about-details-mode #app .an2-approved-reference-hero{margin-top:0!i
 #app #an2-story .an2-card-icon {display:block;width:clamp(36px,3.5vw,46px);height:auto;aspect-ratio:1;color:#ff7900;flex:none}
 #app #an2-story .an2-service-num .an2-card-icon {margin-top:8px}
 #app #an2-trust .an2-trust-grid article>b {display:flex;align-items:center;justify-content:space-between;gap:8px}
-#app #an2-future .an2-future-graphic {display:block;width:clamp(158px,17vw,211px);max-width:100%;height:auto;margin:0 0 10px;overflow:visible}
-#app #an2-future .an2-graphic-track {fill:none;stroke:#f57928;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:3 4}
-#app #an2-future .an2-graphic-node {fill:#2c1c14;stroke:#ff7900;stroke-width:1.5}
-#app #an2-future .an2-graphic-symbol {fill:none;stroke:#fff;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+#app #an2-future .an2-future-grid article {text-align:center;background:radial-gradient(ellipse at 50% 0%,var(--an2-card-tone),#151518 84%)!important}
+#app #an2-future .an2-future-grid article:nth-child(1) {--an2-card-tone:#392922}
+#app #an2-future .an2-future-grid article:nth-child(2) {--an2-card-tone:#282d39}
+#app #an2-future .an2-future-grid article:nth-child(3) {--an2-card-tone:#30352c}
+#app #an2-future .an2-future-grid p {color:#fff!important;text-align:center;font-size:clamp(13px,1.12vw,16px);line-height:1.65}
+#app #an2-future .an2-future-graphic {display:block;width:clamp(76px,7vw,102px);height:auto;margin:0 auto 13px}
+#app #an2-future .an2-graphic-halo {fill:#100d126b;stroke:#ffad6259;stroke-width:1}
+#app #an2-future :is(.an2-graphic-outline,.an2-graphic-accent) {fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#app #an2-future .an2-graphic-outline {stroke:#fff}
+#app #an2-future .an2-graphic-accent {stroke:#ffae68}
 #app #an2-future .an2-future-note {color:#ff7900!important}
-#app #an2-future .an2-future-grid h3 {margin:0 0 8px;font-size:15px}
+#app #an2-future .an2-future-grid h3 {margin:0 0 9px;font-size:clamp(16px,1.45vw,21px);text-align:center}
 #app #an2-story :is(#an2-trust,#an2-future) h3>.an2-card-accent {color:#ff7900!important;font:inherit;letter-spacing:inherit}
 #app #an2-story :is(#an2-trust,#an2-future) h3>.an2-card-white {color:#fff!important;font:inherit;letter-spacing:inherit}
 #app #an2-story .an2-closing>img {max-width:140px;height:auto;object-fit:contain}
+
+@media(min-width:801px){
+ html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-exact-towers {
+   background:
+     linear-gradient(90deg,#0a0b10 0%,#120d12 13%,#20130fdb 26%,transparent 54%),
+     radial-gradient(ellipse at 62% 37%,#ffe3b7dc 0%,#ffc16bb5 24%,#ff8a3766 49%,transparent 75%),
+     linear-gradient(0deg,#1c0e0b 0%,transparent 40%),
+     linear-gradient(90deg,#23130d 0%,#a7471a7a 46%,#b3532466 100%),
+     url('assets/malaysia-skyline-clean.jpg') 68% 42% / auto 112% no-repeat!important;
+ }
+}

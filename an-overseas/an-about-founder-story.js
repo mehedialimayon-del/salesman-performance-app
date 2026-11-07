@@ -37,36 +37,25 @@
     return '<span class="an2-card-accent">'+esc(accent)+'</span> <span class="an2-card-white">'+esc(rest)+'</span>';
   }
   const futureGraphics = {
-    mission: [
-      'M2 4h6l4 2 4-2h6v15h-6l-4 2-4-2H2z M12 6v15 M6 9h2 M6 12h2 M17 10h.1 M17 13v3',
-      'M4 5h16v15H4z M4 9h16 M8 3v4 M16 3v4 M8 14l2 2 5-4',
-      'M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M3 20v-2a6 6 0 0 1 12 0v2 M17 5a3 3 0 0 1 0 6 M21 20v-2a5 5 0 0 0-3-5',
-      'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M15 8h-4a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4H9 M12 6v12'
-    ],
-    vision: [
-      'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M3 12h18 M12 3c-5 5-5 13 0 18 5-5 5-13 0-18z',
-      'M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M6 21a6 6 0 0 1 12 0 M4 10a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z M20 10a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z M1 17a4 4 0 0 1 5-4 M23 17a4 4 0 0 0-5-4',
-      'M12 3l8 3v5c0 5-3 8-8 10-5-2-8-5-8-10V6z M8.5 12l2.5 2.5 4.5-5'
-    ],
-    road: [
-      'M3 10l9-6 9 6H3z M6 11v7 M12 11v7 M18 11v7 M3 20h18',
-      'M3 4h18v13H3z M8 21h8 M12 17v4 M7 12l3-3 3 2 4-4',
-      'M4 13v-2a8 8 0 0 1 16 0v2 M4 12h3v6H4z M17 12h3v6h-3z M20 18v2h-6',
-      'M5 3h14v18H5z M8 17h8 M12 14a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M9 11h6'
-    ]
+    mission: {
+      outline: 'M11 39c9-3 18-1 25 5 7-6 16-8 25-5v20c-10-3-18-1-25 4-7-5-15-7-25-4z M36 44v19 M18 46l11 3 M18 52l11 3 M43 49l11-3 M43 55l11-3',
+      accent: 'M16 23 36 13l20 10-20 10z M24 27v8c7 5 17 5 24 0v-8 M56 23v11 M7 28h5 M9.5 25.5v5 M61 15h5 M63.5 12.5v5'
+    },
+    vision: {
+      outline: 'M15 36a21 21 0 1 1 42 0 21 21 0 0 1-42 0z M15 36h42 M36 15c-13 12-13 30 0 42 13-12 13-30 0-42 M19 25c11 5 23 5 34 0 M19 47c11-5 23-5 34 0',
+      accent: 'M23 13 36 6l13 7-13 7z M46 15v7 M8 46c2 11 14 18 28 18s26-7 28-18 M10 47l-2-4-4 4 M61 46l3-3 4 4'
+    },
+    road: {
+      outline: 'M43 24 55 16l12 8z M46 26v10 M55 26v10 M64 26v10 M43 39h24 M13 43h10v12H13z M12 56h12 M16 47h4 M16 51h4',
+      accent: 'M19 64h14c9 0 12-10 5-14l-7-4c-6-4-3-13 5-13h6 M24 18 35 12l11 6-11 6z M28 21v5c4 3 10 3 14 0v-5 M8 28h7 M11.5 24.5v7'
+    }
   };
   function futureGraphic(topic) {
-    const symbols = futureGraphics[topic];
-    const centers = symbols.map((_, index) => 25 + index * 150 / (symbols.length - 1));
-    const last = centers[centers.length - 1];
-    const path = topic === 'road' ? 'M25 31H203l-5-5m5 5-5 5' : 'M25 31H'+last;
-    return '<svg class="an2-future-graphic" viewBox="0 0 211 62" aria-hidden="true" focusable="false">'
-      +'<path class="an2-graphic-track" d="'+path+'"/>'
-      +symbols.map((symbol, index) => {
-        const x = centers[index];
-        return '<circle class="an2-graphic-node" cx="'+x+'" cy="31" r="19"/>'
-          +'<path class="an2-graphic-symbol" d="'+symbol+'" transform="translate('+(x - 12)+' 19)"/>';
-      }).join('')+'</svg>';
+    const {outline, accent} = futureGraphics[topic];
+    return '<svg class="an2-future-graphic" viewBox="0 0 72 72" aria-hidden="true" focusable="false">'
+      +'<circle class="an2-graphic-halo" cx="36" cy="36" r="34"/>'
+      +'<path class="an2-graphic-outline" d="'+outline+'"/>'
+      +'<path class="an2-graphic-accent" d="'+accent+'"/></svg>';
   }
   function steps() {
     return serviceItems.map((item, index) => '<article class="an2-service"><span class="an2-service-num">'+item[0]+cardIcon(serviceIcons[index])+'</span><div><h3><span class="an2-title-accent">'+esc(item[1].split(' ')[0])+'</span> <span class="an2-title-rest">'+esc(item[1].split(' ').slice(1).join(' '))+'</span></h3><p>'+esc(item[2])+'</p><a href="#/'+item[3]+'">EXPLORE SERVICE <span aria-hidden="true">↗</span></a></div></article>').join('');
