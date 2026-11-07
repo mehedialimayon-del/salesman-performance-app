@@ -1,0 +1,343 @@
+/* FieldForce Hub · 2026-11-07 · mobile feedback follow-up.
+   Visual/layout-only. Does not modify Zone/SR scope, Tasks, chat messages,
+   contacts records, permissions, or the existing black/orange palette. */
+
+/* TASKS — one narrow, top-level two-column selector bar. */
+#app .app>main.wrap.ffTaskPage>.ffTaskScope{
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:0!important;
+  flex:0 0 auto!important;
+  margin:0 0 5px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+#app .ffTaskPage>.ffTaskScope>.ffScopeFilter.ffDirectScope{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:5px 7px!important;
+  border:1px solid #e77731!important;
+  border-radius:12px!important;
+  background:linear-gradient(120deg,#22140c,#090909)!important;
+  box-sizing:border-box!important;
+}
+#app .ffTaskPage>.ffTaskScope .ffDirectScopeFields,
+#app .ffTaskPage>.ffTaskScope .ffScopeFilterBody{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  width:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  gap:7px!important;
+  align-items:stretch!important;
+}
+#app .ffTaskPage>.ffTaskScope .ffDirectScopeFields>label{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:3px!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  line-height:1.1!important;
+  color:#ff9d55!important;
+  font-size:9px!important;
+  letter-spacing:0!important;
+  font-weight:850!important;
+}
+#app .ffTaskPage>.ffTaskScope .ffDirectScopeFields>label .ffSelectTrigger,
+#app .ffTaskPage>.ffTaskScope .ffDirectScopeFields>label select:not([hidden]){
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:35px!important;
+  min-height:35px!important;
+  max-height:35px!important;
+  padding:5px 21px 5px 9px!important;
+  margin:0!important;
+  border:1px solid #e57d36!important;
+  border-radius:9px!important;
+  font-size:11px!important;
+  line-height:1.1!important;
+  font-weight:850!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  background:linear-gradient(130deg,#160e09,#080808)!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+  overflow:hidden!important;
+  position:relative!important;
+}
+#app .ffTaskPage>.ffTaskScope .ffDirectScopeFields>label select[hidden]{
+  display:none!important;
+}
+#app .ffTaskPage>.ffTaskScope .ffDirectScopeFields>label .ffSelectTrigger{
+  display:block!important;
+  text-align:left!important;
+}
+#app .ffTaskPage>.ffTaskScope .ffDirectScopeFields>label .ffSelectTrigger::after{
+  content:"⌄";
+  position:absolute;
+  right:8px;
+  top:50%;
+  transform:translateY(-58%);
+  color:#ffa65f;
+  font-size:17px;
+  font-weight:900;
+  line-height:1;
+  pointer-events:none;
+}
+/* Keep the already-working Notes, Done and Assign Task positioning untouched. */
+
+/* SCOPE PICKER — readable three-line staff identities, even with keyboard open. */
+.globalSearchOverlay.ffItemPicker.ffScopeStaffPicker,
+.globalSearchOverlay.ffItemPicker.ffZoneManagerPicker{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100vw!important;
+  max-width:100vw!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  inset:0!important;
+  margin:0!important;
+  padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px))!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+.ffScopeStaffPicker .globalSearchBox,
+.ffZoneManagerPicker .globalSearchBox{
+  display:flex!important;
+  flex-direction:column!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:580px!important;
+  height:auto!important;
+  max-height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  padding:12px!important;
+  box-sizing:border-box!important;
+  border-radius:20px!important;
+}
+.ffScopeStaffPicker .globalSearchBox>.row,
+.ffZoneManagerPicker .globalSearchBox>.row{
+  display:flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  gap:10px!important;
+  margin:0 0 9px!important;
+  min-height:48px!important;
+}
+.ffScopeStaffPicker .globalSearchBox>.row h2,
+.ffZoneManagerPicker .globalSearchBox>.row h2{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  overflow-wrap:anywhere!important;
+  font-size:clamp(16px,5vw,23px)!important;
+  line-height:1.2!important;
+}
+.ffScopeStaffPicker .ffPickerSearch,
+.ffZoneManagerPicker .ffPickerSearch{
+  flex:0 0 auto!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:45px!important;
+  min-height:45px!important;
+  margin:0 0 7px!important;
+  box-sizing:border-box!important;
+}
+.ffScopeStaffPicker .ffPickerRows,
+.ffZoneManagerPicker .ffPickerRows{
+  display:flex!important;
+  flex:1 1 auto!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  min-height:0!important;
+  width:100%!important;
+  max-width:100%!important;
+  padding:5px 2px 18px!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  align-content:start!important;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  box-sizing:border-box!important;
+}
+.ffScopeStaffPicker .ffPickerOption,
+.ffZoneManagerPicker .ffPickerOption.ffZoneManagerRow{
+  display:flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  max-height:none!important;
+  min-height:92px!important;
+  padding:12px 11px!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  overflow:visible!important;
+  white-space:normal!important;
+  border-radius:14px!important;
+}
+.ffScopeStaffPicker .ffPickerText,
+.ffZoneManagerPicker .ffPickerText{
+  display:flex!important;
+  flex:1 1 0!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  gap:4px!important;
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:visible!important;
+  box-sizing:border-box!important;
+}
+.ffScopeStaffPicker .ffPickerText>:is(strong,small),
+.ffZoneManagerPicker .ffPickerText>:is(strong,small){
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  overflow:visible!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  line-height:1.35!important;
+  text-overflow:clip!important;
+}
+.ffScopeStaffPicker .ffPickerText>.ffScopeStaffName{
+  color:#ff933a!important;
+  -webkit-text-fill-color:#ff933a!important;
+  font-size:14px!important;
+  font-weight:900!important;
+}
+.ffScopeStaffPicker .ffPickerText>.ffScopeStaffManager{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  font-size:11px!important;
+}
+.ffScopeStaffPicker .ffPickerText>.ffScopeStaffFine{
+  color:#eec49b!important;
+  -webkit-text-fill-color:#eec49b!important;
+  font-size:10px!important;
+}
+@media(max-width:370px){
+  .ffScopeStaffPicker .ffPickerOption{padding:11px 8px!important}
+  .ffScopeStaffPicker .ffPickerAvatar{flex-basis:38px!important;width:38px!important;height:38px!important}
+  #app .ffTaskPage>.ffTaskScope .ffDirectScopeFields>label .ffSelectTrigger{font-size:10px!important}
+}
+@media(max-height:520px){
+ .ffScopeStaffPicker .globalSearchBox,.ffZoneManagerPicker .globalSearchBox{padding:8px!important}
+ .ffScopeStaffPicker .globalSearchBox>.row,.ffZoneManagerPicker .globalSearchBox>.row{min-height:36px!important;margin-bottom:4px!important}
+ .ffScopeStaffPicker .ffPickerSearch,.ffZoneManagerPicker .ffPickerSearch{height:37px!important;min-height:37px!important}
+}
+
+/* CONTACT CARD — slim centered zone band exactly aligned to portrait width. */
+#app .ffContactIdentityCompact .ffContactVisual{
+  display:flex!important;
+  flex-direction:column!important;
+  min-width:0!important;
+  max-width:100%!important;
+  align-items:stretch!important;
+}
+#app .ffContactCard .ffContactIdentityCompact .ffContactVisual>.ffContactZone{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  height:29px!important;
+  min-height:29px!important;
+  max-height:29px!important;
+  box-sizing:border-box!important;
+  margin:5px 0 0!important;
+  padding:3px 5px!important;
+  border:1px solid #e27832!important;
+  border-radius:9px!important;
+  background:linear-gradient(115deg,#21140e,#0e0a07)!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  font-size:clamp(8px,2.6vw,11px)!important;
+  line-height:1!important;
+  font-weight:850!important;
+  letter-spacing:0!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-align:center!important;
+  text-overflow:ellipsis!important;
+}
+#app .ffContactIdentityCompact .ffContactZone>small{
+  display:inline!important;
+  flex:0 0 auto!important;
+  color:#ff974c!important;
+  -webkit-text-fill-color:#ff974c!important;
+  font-size:8px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+}
+#app .ffContactIdentityCompact .ffContactZone{
+  overflow-wrap:normal!important;
+}
+
+/* LIVE CHAT — stable name plus designation, never glowing split-letter text. */
+#app .ffMessenger .ffChatConversation #ffChatTitle{
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:5px 8px 8px!important;
+  overflow:hidden!important;
+  line-height:1.25!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  text-shadow:none!important;
+}
+#app .ffMessenger #ffChatTitle .ffChatTitleAvatar{
+  flex:0 0 38px!important;
+  width:38px!important;
+  height:38px!important;
+}
+#app .ffMessenger #ffChatTitle .ffChatIdentityDetails{
+  display:flex!important;
+  flex:1 1 auto!important;
+  flex-direction:column!important;
+  gap:2px!important;
+  min-width:0!important;
+  overflow:hidden!important;
+}
+#app .ffMessenger #ffChatTitle .ffChatIdentityName{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  color:#ff9a48!important;
+  -webkit-text-fill-color:#ff9a48!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  text-overflow:clip!important;
+}
+#app .ffMessenger #ffChatTitle .ffChatIdentityRole{
+  display:block!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  font-size:10px!important;
+  font-weight:700!important;
+  white-space:normal!important;
+}
