@@ -330,3 +330,6 @@ html body .top .links a[aria-current="page"]{
   animation:none!important;transform:translateY(-50%)!important;
  }
 }
+
+/* Vivid deep-orange hover, focus, active, mobile menu. */
+html body .top .links a:hover,html body .top .links a:focus-visible,html body .top .links a.current,html body .top .links a[aria-current="page"],html body .top #links.open > a:hover,html body .top #links.open > a.current,html body .top #links.open > a:focus-visible{background:#ff7900!important;background-image:linear-gradient(180deg,#ff8800,#ef6200)!important;border-color:#ff7900!important;color:#fff!important;box-shadow:0 0 13px #ff790062,inset 0 1px #fff5!important}
