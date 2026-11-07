@@ -101,8 +101,21 @@
     ];
     const masks=bounds.map(([x,y,w,h])=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="2"/>').join('');
     const image='<image href="'+src+'" x="0" y="0" width="864" height="1536" />';
+    // Real fabric animation uses CSS on crop windows of the SAME original artwork.
+    // No SVG nested viewBox, no alternate flags, no distorted country designs.
+    const flagTiles=bounds.map(([x,y,w,h],i)=>{
+      const left=((x-18)/828*100).toFixed(5),top=((y-235)/1156*100).toFixed(5);
+      const width=(w/828*100).toFixed(5),height=(h/1156*100).toFixed(5);
+      const bgWidth=(864/w*100).toFixed(5),bgHeight=(1536/h*100).toFixed(5);
+      const bgX=(x/(864-w)*100).toFixed(5),bgY=(y/(1536-h)*100).toFixed(5);
+      const duration=(2.8+(i%5)*.23).toFixed(2);
+      const delay=(-((i%8)*.37)).toFixed(2);
+      return '<span class="an2-native-cloth-flag" style="left:'+left+'%;top:'+top+'%;width:'+width+'%;height:'+height+'%;background-image:url('+src+');background-size:'+bgWidth+'% '+bgHeight+'%;background-position:'+bgX+'% '+bgY+'%;--wave-duration:'+duration+'s;--wave-delay:'+delay+'s"></span>';
+    }).join('');
+
     return '<div class="an2-approved-reference-hero" aria-label="A&N Overseas founder message from the approved reference artwork">'
       +'<img class="an2-approved-reference-source" src="'+src+'" alt="A&N Overseas founder artwork with study-destination flags and Nusrat Nasrin" loading="eager" decoding="async">'
+      +'<div class="an2-native-cloth-layer" aria-hidden="true">'+flagTiles+'</div>'
       +'<figure class="an2-mobile-complete-quote"><span class="an2-mobile-open-quote" aria-hidden="true">“</span><blockquote><strong>International education should never be a privilege reserved for the few.</strong> It should be a bridge between potential and possibility—where trustworthy guidance, the right opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you. <span class="an2-mobile-close-quote" aria-hidden="true">”</span></blockquote></figure>'
       // IMPORTANT: no flag overlay. The original artwork is the single source of truth.
       // Earlier SVG layers redraw the flags as enormous polygons on Android.
