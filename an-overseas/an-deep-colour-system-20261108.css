@@ -41,3 +41,55 @@ body{color:#fff}
 }
 .an-updates-bar .an-update-item{color:#fff4e8!important}
 .an-updates-bar .an-update-item :is(b,strong){color:#ff9d19!important}
+
+
+/* Light orange / white hierarchy, on the existing components and breakpoints. */
+:root {
+  --an-theme-light: hsl(30 100% 72%);
+  --an-theme-orange: hsl(27 100% 52%);
+  --an-theme-key: hsl(27 100% 59%);
+  --an-theme-fade: hsl(29 100% 70% / .34);
+}
+body .brand :is(strong,.brand-title,.an-brand-name) { color:var(--an-theme-light); }
+
+#app :is(.page-head,.hero,.an-directory-heading) h1 {
+  color:var(--an-theme-light);
+}
+#app :is(.page-head,.hero,.an-directory-heading) h1 .gradient {
+  color:white;
+  -webkit-text-fill-color:white;
+}
+#app :is(.an-about-fixed,.an2-story,.an-scholarship-detail,.an-portfolio-v2) :is(h1,h2,h3) .an-light {
+  color:white;
+}
+body.an-portfolio-v2 #app .page-head h1,
+#app :is(.university-fullname,.uni-card h3,.an-manager-card h3) {
+  color:var(--an-theme-light)!important;
+}
+#app :is(.an-about-fixed,.an2-story,.an-scholarship-detail,.an-scholarship-card,
+ .university-catalogue,#university-panel,.sidebar,.an-service-detail,.service-detail) :is(p,li,dd) {
+  font-weight:550;
+}
+#app :is(.an2-story,.an-scholarship-detail,#university-panel,.an-service-detail,.service-detail) :is(p,li,dd) :is(strong,.key-point,.highlight),
+#app :is(.profile-facts,.an-scholarship-facts) :is(dt,b,strong),
+#app #catalogue-count strong {
+  color:var(--an-theme-key);
+  font-weight:700;
+}
+#app :is(.uni-card,.an-scholarship-card,.an2-about-box,.an-vision-inline,.an-manager-card,.profile-facts) {
+  border-color:var(--an-theme-fade);
+}
+#app :is(a.btn,button.btn):not(.outline,.soft,.danger,.success) {
+  background-image:linear-gradient(110deg,var(--an-theme-orange),hsl(24 100% 46%));
+}
+#app :is(a.btn,button.btn)[href^="#/apply"]:not(.outline),
+header a[href="#/apply"]:is(.btn,.an-apply) {
+  background-image:linear-gradient(110deg,hsl(35 100% 76%),var(--an-theme-light));
+  color:hsl(24 38% 10%);
+}
+@media (hover:hover) {
+  #app :is(a.btn,button.btn,.tab,.card-open):not(:disabled):hover,
+  header .links a:hover {
+    border-color:var(--an-theme-orange);
+  }
+}
