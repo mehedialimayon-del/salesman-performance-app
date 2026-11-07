@@ -131,7 +131,16 @@ async function managementPage(){
  management=await getContent('management',[]);
  page(head('Team &','Management','Update public team member profiles.')+panel('<h2>Public Management Cards</h2><form id="management-form"><div id="management-list">'+management.map((m,i)=>cardTeam(m,i)).join('')+'</div><div class="actions">'+btn('Add New Person','add-person','alt')+'<button type="submit" class="btn">Publish Team</button></div></form>')+'<p class="help">Use public image URLs that you own or have permission to share.</p>');
 }
-function cardTeam(m,i){return '<div class="record team-item" data-i="'+i+'"><div class="split"><b>Team Member '+(i+1)+'</b><button class="btn sm danger" data-remove-person="'+i+'" type="button">Remove</button></div>'+field('name','Full Name',m.name||'')+field('role','Designation',m.role||'')+field('photo','Public Photo URL',m.photo||'')+field('description','Description',m.description||'',false,true)+'</div>';}
+function cardTeam(m,i){return '<div class="record team-item" data-i="'+i+'"><div class="split"><b>Team Member '+(i+1)+'</b><button class="btn sm danger" data-remove-person="'+i+'" type="button">Remove</button></div>'+field('name','Full Name',m.name||'')+field('role','Designation',m.role||m.designation||'')
+ +field('position','Position / Banner Title',m.position||m.role||'')
+ +field('photo','Public Photo URL',m.photo||'')
+ +field('email','Email',m.email||'')+field('phone','WhatsApp / Phone',m.phone||'')
+ +field('portfolio','Portfolio URL',m.portfolio||'')
+ +field('linkedin','LinkedIn Profile URL',m.linkedin||m.linkedin_url||'')
+ +field('facebook','Facebook Profile URL',m.facebook||m.facebook_url||'')
+ +field('career','Academic & Professional Journey',m.career||'',false,true)
+ +field('quote','Personal Quote',m.quote||'',false,true)
+ +field('description','How This Person Helps Students',m.help||m.description||'',false,true)+'</div>';}
 async function uploadUniversityImage(file,prefix){
  if(!(file instanceof File)||!file.size)return '';
  const types={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'};
@@ -244,8 +253,18 @@ document.addEventListener('submit',async e=>{
   if(form.id==='settings-form'){const next={...content};Object.keys(data).forEach(k=>next[k]=String(data[k]).trim());await publish('settings',next);content=next;return;}
   if(form.id==='ticker-form'){const lines=String(data.ticker||'').split('\n').map(s=>s.trim()).filter(Boolean);if(lines.some(s=>s.length>400))throw Error('Each announcement must be under 400 characters.');await publish('latest_updates',lines.map((text,i)=>({text,color:i%2?'white':'orange'})));await publish('settings',{...content,ticker:lines.join(' • ')});return;}
   if(form.id==='management-form'){
-   const people=Array.from(form.querySelectorAll('.team-item')).map(row=>Object.fromEntries(new FormData(newFormFromRow(row)).entries()));
+   const people=Array.from(form.querySelectorAll('.team-item')).map(row=>{
+     const values=Object.fromEntries(new FormData(newFormFromRow(row)).entries());
+     const previous=management[Number(row.dataset.i)]||{};
+     const help=String(values.description||'').trim();
+     return {...previous,...values,id:previous.id||'member-'+crypto.randomUUID(),
+       designation:values.role,position:values.position||values.role,
+       help,bio:help,description:help};
+   });
    if(people.some(p=>!p.name.trim()||!p.role.trim()))throw Error('Provide a name and designation for every person.');
+   for(const person of people){for(const field of ['linkedin','facebook','portfolio']){
+     if(person[field]&&!/^https:\/\//i.test(person[field]))throw Error(field+' URL must use https://');
+   }}
    await publish('management',people);management=people;await managementPage();return;
   }
   if(form.id==='university-form'){
