@@ -378,7 +378,8 @@
   background:linear-gradient(110deg,#ffce74,#ff9c1d)!important;
   border-color:#ffd396!important;
 }
-#app .an-about-v3 .an2-readmore-separate{display:none!important}
+/* Read More is active in both viewports; the new cards contain links. */
+#app .an-about-v3 .an2-readmore-separate{display:flex!important}
 
 /* Desktop About overview: the five photo facts are thinner and the About and
    Management panels claim the space recovered. Do not affect phones/tablets. */
