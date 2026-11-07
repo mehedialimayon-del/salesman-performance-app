@@ -603,3 +603,21 @@
  html body.an-about-details-mode #app .an2-native-cloth-flag,
  html body.an-about-details-mode #app .an2-founder-header-logo .logo-motion{animation:none!important;transform:none!important}
 }
+
+/* Founder v13b — About Details nav crest should not be masked on the right. */
+@media(max-width:800px){
+ html body.an-about-details-mode > header.top .logo-motion,
+ html body.an-about-details-mode > header.top .logo-crop{
+   display:block!important;flex:0 0 73px!important;width:73px!important;height:58px!important;
+   max-width:none!important;overflow:visible!important;
+   clip-path:none!important;border-radius:0!important;background:transparent!important;
+ }
+ html body.an-about-details-mode > header.top .logo-crop{
+   overflow:hidden!important;
+ }
+ html body.an-about-details-mode > header.top .logo-crop img{
+   display:block!important;width:174px!important;height:47px!important;
+   max-width:none!important;margin:5px 0 0!important;
+   object-fit:fill!important;mix-blend-mode:screen!important;
+ }
+}
