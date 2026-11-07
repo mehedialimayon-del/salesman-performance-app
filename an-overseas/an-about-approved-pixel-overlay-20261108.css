@@ -196,3 +196,19 @@
   }
  }
 }
+
+@media (min-width:801px){
+ html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-founder-person{
+   top:1.3%!important;right:1.2%!important;width:20%!important;height:68.5%!important;overflow:hidden!important;
+ }
+ html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-founder-person img{
+   right:0!important;bottom:4.2%!important;width:100%!important;height:110%!important;
+   object-position:center bottom!important;clip-path:inset(0 0 7% 0)!important;
+ }
+ html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-founder-person::before{
+   content:"NUSRAT NASRIN";position:absolute;z-index:1;left:8%;right:8%;bottom:4.8%;
+   padding:.2em 0;text-align:center;border:1px solid #ef8b29;border-radius:999px;
+   background:#140a04;color:#fff;font-size:clamp(8px,1.25vw,17px);font-weight:850;letter-spacing:.09em;
+ }
+ html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-founder-person::after{z-index:1;}
+}
