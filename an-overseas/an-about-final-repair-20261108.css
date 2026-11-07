@@ -1,0 +1,53 @@
+/* 2026-11-08 About Details targeted visual repair. */
+html body.an-about-details-mode #app .an2-story{--orange:#ff7900;--gold:#e9a900;--ink:#fff}
+html body.an-about-details-mode #app .an2-story :is(.an2-nav a,.an2-service,.an2-chapter,.an2-cta a,.an2-founder-brand,.an2-founder-quote){border-color:rgba(255,119,0,.78)!important}
+html body.an-about-details-mode #app .an2-story :is(.an2-nav a,.an2-cta a){box-shadow:inset 0 1px rgba(255,181,60,.32),0 0 14px rgba(255,103,0,.22)!important}
+html body.an-about-details-mode #app .an2-story :is(.an2-story-highlight,.an2-story-highlight strong){color:#ff7900!important}
+@media(min-width:801px){
+html body.an-about-details-mode.an-reference-pixel-view #app .an2-exact-hero .an2-exact-towers{
+ background:radial-gradient(ellipse at 38% 53%,rgba(255,103,0,.52),transparent 69%),linear-gradient(90deg,rgba(255,105,0,.23),transparent 80%),url('assets/malaysia-skyline-clean.jpg') 69% 43% / auto 128% no-repeat!important;
+ opacity:1!important;mask-image:linear-gradient(90deg,transparent,black 36%),linear-gradient(0deg,transparent,black 18%)!important;mask-composite:intersect!important;
+}
+html body.an-about-details-mode.an-reference-pixel-view #app .an2-exact-hero .an2-founder-person{
+ background:radial-gradient(ellipse at 50% 61%,rgba(255,108,0,.27),transparent 75%)!important;
+}
+html body.an-about-details-mode.an-reference-pixel-view #app .an2-exact-hero .an2-founder-person img{
+ -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 16%,#000 88%,transparent 100%),linear-gradient(0deg,transparent 0%,#000 13%,#000 96%)!important;
+ mask-image:linear-gradient(90deg,transparent 0%,#000 16%,#000 88%,transparent 100%),linear-gradient(0deg,transparent 0%,#000 13%,#000 96%)!important;
+ mask-composite:intersect!important;
+}
+html body.an-about-details-mode.an-reference-pixel-view #app .an-reference-flag-cloth{
+ animation:none!important;transform:none!important;perspective:none!important;
+}
+html body.an-about-details-mode.an-reference-pixel-view #app .an-reference-flag-cloth img{
+ clip-path:polygon(0 0,24% 1%,50% 5%,76% 1%,100% 6%,98% 30%,100% 55%,96% 79%,100% 96%,74% 99%,50% 94%,25% 100%,0 100%)!important;
+ transform-origin:left center!important;
+ animation:an-real-fabric 2.45s ease-in-out infinite!important;
+ animation-delay:calc(var(--an-flag-order) * -.097s)!important;
+}
+html body.an-about-details-mode.an-reference-pixel-view #app .an-reference-flag-cloth::after{
+ background:repeating-linear-gradient(105deg,transparent 0%,rgba(0,0,0,.25) 19%,rgba(255,255,255,.36) 35%,transparent 54%,rgba(0,0,0,.16) 69%,transparent 85%)!important;
+ background-size:250% 100%!important;mix-blend-mode:soft-light!important;
+ animation:an-fabric-light 2.45s linear infinite!important;
+ animation-delay:calc(var(--an-flag-order) * -.097s)!important;
+}
+@keyframes an-real-fabric{
+ 0%,100%{transform:scaleX(.96) skewY(-3deg);clip-path:polygon(0 0,24% 3%,50% 0,75% 6%,100% 1%,97% 26%,100% 52%,96% 78%,100% 100%,75% 95%,50% 100%,24% 96%,0 100%)}
+ 25%{transform:scaleX(1.02) skewY(2deg);clip-path:polygon(0 0,24% 0,50% 7%,75% 1%,100% 8%,96% 29%,100% 48%,98% 75%,100% 96%,75% 100%,50% 94%,24% 100%,0 100%)}
+ 50%{transform:scaleX(.95) skewY(-1deg);clip-path:polygon(0 0,24% 6%,50% 1%,75% 7%,100% 0,98% 26%,100% 55%,95% 77%,100% 100%,75% 94%,50% 100%,24% 95%,0 100%)}
+ 75%{transform:scaleX(1.02) skewY(2deg);clip-path:polygon(0 0,24% 0,50% 5%,75% 0,100% 7%,96% 28%,100% 50%,98% 79%,100% 96%,75% 100%,50% 95%,24% 100%,0 100%)}
+}
+@keyframes an-fabric-light{from{background-position:0 0}to{background-position:250% 0}}
+}
+@media(max-width:800px){
+html body.an-about-details-mode #app .an2-topline{margin-top:0!important;padding-top:0!important;padding-bottom:2px!important;min-height:0!important}
+html body.an-about-details-mode #app .an2-story{padding-top:0!important}
+html body.an-about-details-mode #app .an2-founder-hero{padding-top:3px!important}
+html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand{min-height:84px!important;padding:4px 7px!important;margin-bottom:3px!important}
+html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-graduate-globe{height:85px!important;width:99px!important}
+html body.an-about-details-mode #app .an2-globe-world{font-size:79px!important;animation:an-globe-turn 9s linear infinite!important;transform-origin:center!important}
+html body.an-about-details-mode #app .an2-globe-cap{font-size:65px!important;top:-13%!important;left:50%!important;animation:none!important;transform:translateX(-50%)!important;filter:sepia(1) saturate(4) hue-rotate(345deg) brightness(.85) drop-shadow(0 3px 3px #000a)!important}
+html body.an-about-details-mode #app .an2-approved-reference-hero{margin-top:0!important}
+@keyframes an-globe-turn{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
+}
+@media(prefers-reduced-motion:reduce){html body.an-about-details-mode #app .an-reference-flag-cloth img,html body.an-about-details-mode #app .an-reference-flag-cloth::after,html body.an-about-details-mode #app .an2-globe-world{animation:none!important}}
