@@ -423,3 +423,48 @@
    display:block!important;visibility:visible!important;opacity:1!important;
  }
 }
+
+/* Mobile Founder v10 — match header-logo crop exactly; wind through the original flag fabric. */
+@media(max-width:800px){
+ html body.an-about-details-mode #app .an2-founder-header-logo .logo-motion{
+   zoom:1!important;transform-origin:center!important;
+   width:62px!important;height:52px!important;flex:0 0 62px!important;
+ }
+ html body.an-about-details-mode #app .an2-founder-header-logo .logo-crop{
+   width:62px!important;height:52px!important;
+   clip-path:ellipse(48% 49% at 50% 50%)!important;
+ }
+ html body.an-about-details-mode #app .an2-founder-header-logo .logo-crop img{
+   position:static!important;width:174px!important;height:44px!important;
+   max-width:none!important;max-height:none!important;
+   margin:4px 0 0!important;transform:none!important;object-fit:fill!important;
+ }
+ html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+   width:99px!important;height:86px!important;justify-self:center!important;
+   overflow:visible!important;clip-path:none!important;
+ }
+ html body.an-about-details-mode #app .an2-approved-reference-fabric{
+   display:block!important;visibility:visible!important;opacity:1!important;
+   position:absolute!important;inset:0!important;z-index:2!important;
+   width:100%!important;height:100%!important;overflow:hidden!important;
+   pointer-events:none!important;
+ }
+ html body.an-about-details-mode #app .an2-original-fabric-tile{
+   overflow:hidden!important;transform-box:fill-box!important;
+   transform-origin:0% 50%!important;
+   animation:an2-original-cloth-wave var(--fabric-time,3.4s) ease-in-out infinite!important;
+   animation-delay:var(--fabric-delay,0s)!important;
+   backface-visibility:visible!important;
+ }
+ @keyframes an2-original-cloth-wave{
+   0%,100%{transform:scaleX(.975) skewY(-.8deg);filter:brightness(1)}
+   22%{transform:scaleX(.91) skewY(1.8deg);filter:brightness(1.07)}
+   48%{transform:scaleX(.985) skewY(-1.3deg);filter:brightness(.95)}
+   74%{transform:scaleX(.935) skewY(1.3deg);filter:brightness(1.06)}
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ html body.an-about-details-mode #app .an2-original-fabric-tile{
+   animation:none!important;transform:none!important;filter:none!important
+ }
+}
