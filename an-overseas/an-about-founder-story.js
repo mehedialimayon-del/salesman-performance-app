@@ -101,11 +101,23 @@
     ];
     const masks=bounds.map(([x,y,w,h])=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="2"/>').join('');
     const image='<image href="'+src+'" x="0" y="0" width="864" height="1536" />';
+    // Crop moving fabric patches from the ORIGINAL supplied artwork. No new flag graphics.
+    // Each tile is a separate tiny SVG viewport, left-anchored at the unchanged flag location.
+    const fabricTiles=bounds.map(([x,y,w,h],i)=>{
+      const duration=(3.1+(i%4)*.32).toFixed(2)+'s';
+      const delay=(-((i%8)*.41)).toFixed(2)+'s';
+      return '<svg class="an2-original-fabric-tile" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" viewBox="'+x+' '+y+' '+w+' '+h+'" preserveAspectRatio="none" style="--fabric-time:'+duration+';--fabric-delay:'+delay+'">'
+        +'<image href="'+src+'" x="0" y="0" width="864" height="1536" preserveAspectRatio="none"/>'
+        +'</svg>';
+    }).join('');
+
     return '<div class="an2-approved-reference-hero" aria-label="A&N Overseas founder message from the approved reference artwork">'
       +'<img class="an2-approved-reference-source" src="'+src+'" alt="A&N Overseas founder artwork with study-destination flags and Nusrat Nasrin" loading="eager" decoding="async">'
       +'<figure class="an2-mobile-complete-quote"><span class="an2-mobile-open-quote" aria-hidden="true">“</span><blockquote><strong>International education should never be a privilege reserved for the few.</strong> It should be a bridge between potential and possibility—where trustworthy guidance, the right opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you. <span class="an2-mobile-close-quote" aria-hidden="true">”</span></blockquote></figure>'
       // IMPORTANT: no flag overlay. The original artwork is the single source of truth.
       // Earlier SVG layers redraw the flags as enormous polygons on Android.
+      // Moving flag patches are cropped only from the already-approved image.
+      +'<svg class="an2-approved-reference-fabric" viewBox="18 235 828 1156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'+fabricTiles+'</svg>'
       +'<svg class="an2-approved-reference-sharp" viewBox="18 235 828 1156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'
       +'<defs><clipPath id="an2-approved-portrait-sharp-area" clipPathUnits="userSpaceOnUse"><rect x="452" y="684" width="378" height="638" rx="2"/></clipPath>'
       +'<filter id="an2-approved-portrait-sharp-filter" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">'
