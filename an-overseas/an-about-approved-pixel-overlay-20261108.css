@@ -18,7 +18,7 @@
    height:var(--an-exact-h,660px)!important;min-height:420px!important;
    max-height:none!important;margin:0!important;padding:0!important;
    border:none!important;border-radius:0!important;overflow:hidden!important;
-   background:#080c13 url('assets/an-about-approved-reference-hero-20261108.webp') center center / 100% 100% no-repeat!important;
+   background:#080c13 url('assets/an-about-approved-reference-hero-20261108.webp?v=hires-q90-v2') center center / 100% 100% no-repeat!important;
    box-shadow:none!important;
  }
  html body.an-about-details-mode.an-reference-pixel-view #app .an2-exact-hero::before,
