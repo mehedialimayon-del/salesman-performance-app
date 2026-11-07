@@ -308,7 +308,7 @@ body.home-view .hero>.wrap{z-index:3}
 @media(max-width:360px){.top .brand-copy{min-width:137px}.top .brand-copy strong{font-size:16px}.top .brand-copy small{font-size:6px;letter-spacing:.5px}.logo-motion,.logo-crop{width:47px}.logo-crop img{width:140px}.site-refresh{width:31px;height:34px;font-size:22px}.top .hamb{padding:5px 8px}}
 
 
-</style><link rel="icon" type="image/jpeg" href="./assets/brand-logo.jpg?v=an-20261106"><link rel="apple-touch-icon" href="./assets/brand-logo.jpg?v=an-20261106"><link rel="manifest" href="./manifest.webmanifest?v=an-20261106-separate-v3"><link rel="stylesheet" href="an-portfolio-2026.css?v=20261106-layout4"><link rel="stylesheet" href="an-directory-upgrade.css?v=20261106-images2"><link rel="stylesheet" href="university-ui.css?v=20261029-portfolio"><link rel="stylesheet" href="university-guide.css?v=20261105-rank-degree-v7"><link rel="stylesheet" href="service-journey.css?v=20261030-01"><link rel="stylesheet" href="an-premium.css?v=20261031-1"><link rel="stylesheet" href="an-insights.css?v=20261104-fullreader-v1"><link rel="stylesheet" href="an-about-fixed.css?v=20261031-qa-fitted"><link rel="stylesheet" href="university-campaigns.css?v=20261030-2"><link rel="stylesheet" href="an-university-media.css?v=20261106-commons-credit-v18"><link rel="stylesheet" href="an-student-guide.css?v=20261105-admissions-v2"><link rel="stylesheet" href="an-country-cards.css?v=20261105-v1"><link rel="stylesheet" href="an-about-experience.css?v=20261106-vision-v2"><link rel="stylesheet" href="an-about-compact.css?v=20261106-facts-v5"><link rel="stylesheet" href="an-about-founder-story.css?v=20261108-graduate-globe-v15"><link rel="stylesheet" href="an-university-media.css?v=20261106-asia-focus-v12"><link rel="stylesheet" href="an-scholarships.css?v=20261106-compact-photo-v3"><link rel="stylesheet" href="an-desktop-header-about-20261106.css?v=20261106-desktop-nav-flags-love-v2"><link rel="stylesheet" href="an-about-precision-20261106.css?v=20261106-founder-portrait-flags-v4"><link rel="stylesheet" href="an-scholarship-categories-20261106.css?v=20261106-sticky-nav-v3"><link rel="stylesheet" href="an-epos-detailed-view.css?v=20261106-a-z-v1"><link rel="stylesheet" href="an-layout-search-20261106.css?v=20261106-desktop-services-hub-search-v2"><link rel="stylesheet" href="an-ux-fixes-20261106.css?v=20261106-responsive-r1"><link rel="stylesheet" href="an-site-corrections-20261106.css?v=20261106-compact-contacts-v3"><link rel="stylesheet" href="an-user-requests-20261106.css?v=20261106-static-red-compact-flags-v8"><style id="an-owner-visual-corrections-20261106">
+</style><link rel="icon" type="image/jpeg" href="./assets/brand-logo.jpg?v=an-20261106"><link rel="apple-touch-icon" href="./assets/brand-logo.jpg?v=an-20261106"><link rel="manifest" href="./manifest.webmanifest?v=an-20261106-separate-v3"><link rel="stylesheet" href="an-portfolio-2026.css?v=20261106-layout4"><link rel="stylesheet" href="an-directory-upgrade.css?v=20261106-images2"><link rel="stylesheet" href="university-ui.css?v=20261029-portfolio"><link rel="stylesheet" href="university-guide.css?v=20261105-rank-degree-v7"><link rel="stylesheet" href="service-journey.css?v=20261030-01"><link rel="stylesheet" href="an-premium.css?v=20261031-1"><link rel="stylesheet" href="an-insights.css?v=20261104-fullreader-v1"><link rel="stylesheet" href="an-about-fixed.css?v=20261031-qa-fitted"><link rel="stylesheet" href="university-campaigns.css?v=20261030-2"><link rel="stylesheet" href="an-university-media.css?v=20261106-commons-credit-v18"><link rel="stylesheet" href="an-student-guide.css?v=20261105-admissions-v2"><link rel="stylesheet" href="an-country-cards.css?v=20261105-v1"><link rel="stylesheet" href="an-about-experience.css?v=20261106-vision-v2"><link rel="stylesheet" href="an-about-compact.css?v=20261106-facts-v5"><link rel="stylesheet" href="an-about-founder-story.css?v=20261108-graduate-globe-v15"><link rel="stylesheet" href="an-university-media.css?v=20261106-asia-focus-v12"><link rel="stylesheet" href="an-scholarships.css?v=20261106-compact-photo-v3"><link rel="stylesheet" href="an-desktop-header-about-20261106.css?v=20261106-desktop-nav-flags-love-v2"><link rel="stylesheet" href="an-about-precision-20261106.css?v=20261108-visible-cards-v17"><link rel="stylesheet" href="an-scholarship-categories-20261106.css?v=20261106-sticky-nav-v3"><link rel="stylesheet" href="an-epos-detailed-view.css?v=20261106-a-z-v1"><link rel="stylesheet" href="an-layout-search-20261106.css?v=20261106-desktop-services-hub-search-v2"><link rel="stylesheet" href="an-ux-fixes-20261106.css?v=20261106-responsive-r1"><link rel="stylesheet" href="an-site-corrections-20261106.css?v=20261106-compact-contacts-v3"><link rel="stylesheet" href="an-user-requests-20261106.css?v=20261106-static-red-compact-flags-v8"><style id="an-owner-visual-corrections-20261106">
 /* Explicit user direction: favourites are a static solid RED heart.
    Flags are SMALLER with more space for Nusrat's full-height portrait. */
 html body .top .an-favorite-header svg,
@@ -613,6 +613,84 @@ body .top nav#links a.current,body .top nav#links a[aria-current="page"]{
 body .top nav#links.open>a:hover,body .top nav#links.open>a:focus-visible{
  background:#ff7900!important;background-image:linear-gradient(180deg,#ff8d08,#ef5d00)!important;
  color:#fff!important;border-color:#ff7900!important;
+}
+</style><style id="an-about-visibility-v17">
+/* v17: Remove obsolete line-clamp and clipping from actual About-v3 layout.
+   Use content-flow inside the left card, keep other pages untouched. */
+body.an-about-locked #app .an-about-v3 .an-about-intro-panel{
+ display:flex!important;flex-direction:column!important;
+ align-items:stretch!important;justify-content:flex-start!important;
+ gap:clamp(6px,.8vh,12px)!important;
+ overflow-y:auto!important;overflow-x:hidden!important;
+ scrollbar-width:thin!important;scrollbar-color:#ff7900 transparent!important;
+ min-height:0!important;
+}
+body.an-about-locked #app .an-about-v3 .an-about-intro-panel>.an2-about-box,
+body.an-about-locked #app .an-about-v3 .an-about-intro-panel>.an-vision-inline{
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ flex-direction:column!important;align-items:stretch!important;
+ flex:0 0 auto!important;width:100%!important;height:auto!important;
+ min-height:clamp(130px,22vh,210px)!important;
+ padding:clamp(13px,1.4vw,20px)!important;margin:0!important;
+ border:1.5px solid #dc770c!important;border-radius:16px!important;
+ background:linear-gradient(120deg,#241810,#11171f)!important;
+ overflow:visible!important;
+}
+body.an-about-locked #app .an-about-v3 .an-about-intro-panel>.an2-about-box p,
+body.an-about-locked #app .an-about-v3 .an-about-intro-panel>.an-vision-inline p,
+body.an-about-locked #app .an-about-v3 #an-about-intro{
+ display:block!important;visibility:visible!important;opacity:1!important;
+ max-height:none!important;height:auto!important;min-height:0!important;
+ overflow:visible!important;text-overflow:clip!important;
+ -webkit-line-clamp:unset!important;line-clamp:unset!important;
+ -webkit-box-orient:initial!important;
+ color:#fff!important;font-size:clamp(11px,1vw,14px)!important;line-height:1.48!important;
+ margin:5px 0 0!important;
+}
+body.an-about-locked #app .an-about-v3 .an-about-intro-panel .an-end-readmore{
+ display:inline!important;visibility:visible!important;opacity:1!important;
+ position:static!important;white-space:nowrap!important;
+ color:#ff930c!important;font-weight:900!important;
+ border-bottom:1px solid #ff930c!important;
+}
+body.an-about-locked #app .an-about-v3 .an-about-intro-panel>.an2-readmore-separate{
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ position:relative!important;z-index:3!important;
+ flex:0 0 auto!important;flex-direction:column!important;
+ align-items:stretch!important;width:100%!important;
+ height:auto!important;min-height:65px!important;
+ padding:7px 0 0!important;margin-top:8px!important;
+ overflow:visible!important;
+}
+body.an-about-locked #app .an-about-v3 .an-about-intro-panel>.an2-readmore-separate .an-about-readmore{
+ display:flex!important;visibility:visible!important;
+ width:100%!important;min-height:44px!important;
+ background:linear-gradient(110deg,#ffb235,#ff7900)!important;
+ color:#160e05!important;border:2px solid #ffc065!important;
+ border-radius:13px!important;
+}
+body.an-about-locked #app .an-about-v3 .an-manager-career .an-manager-label{color:#fff!important}
+body.an-about-locked #app .an-about-v3 .an-manager-career .an-career-bau{color:#ff7900!important}
+body.an-about-locked #app .an-about-v3 .an-manager-career .an-career-klust{color:#fff!important}
+body.an-about-locked #app .an-about-v3 .an-manager-career .an-career-upm{color:#ffc078!important}
+body.an-about-locked #app .an-about-v3 .an-manager-career .an-career-msc{color:#35d78c!important}
+body.an-about-locked #app .an-about-v3 .an-manager-career .an-career-research{color:#8ec8ff!important}
+@media(max-width:800px){
+ body.an-about-locked{overflow-y:auto!important;height:auto!important}
+ body.an-about-locked #app>.an-about-v3{height:auto!important;min-height:calc(100dvh - 105px)!important;max-height:none!important;overflow:visible!important}
+ body.an-about-locked #app .an-about-v3 .an-about-summary,
+ body.an-about-locked #app .an-about-v3 .an-about-duo,
+ body.an-about-locked #app .an-about-v3 .an-about-intro-panel,
+ body.an-about-locked #app .an-about-v3 .an-about-management{
+  height:auto!important;max-height:none!important;overflow:visible!important;
+ }
+ body.an-about-locked #app .an-about-v3 .an-about-intro-panel>.an2-about-box,
+ body.an-about-locked #app .an-about-v3 .an-about-intro-panel>.an-vision-inline{
+  min-height:0!important;padding:13px!important;
+ }
+ body.an-about-locked #app .an-about-v3 .an-about-intro-panel :is(.an2-about-box,.an-vision-inline)>p{
+  font-size:clamp(12px,3.1vw,14px)!important;line-height:1.45!important;
+ }
 }
 </style></head>
 <body><script id="an-prelayout-home">(function(){var route=(location.hash.replace(/^#\/?/,'').split('?')[0]||'home').split('/')[0];if(route==='home')document.body.classList.add('home-view');})();</script><header class="top"><div class="wrap"><a class="brand" href="#/home" aria-label="A&N Overseas Home"><span class="logo-motion" aria-hidden="true"><span class="logo-crop"><img src="assets/brand-logo.jpg" alt="" width="190" height="47" fetchpriority="high" decoding="sync"></span></span><span class="brand-copy"><strong id="brand-typing" aria-hidden="true">A&N Overseas</strong><small>EDUCATION & CONSULTANCY</small></span></a><nav class="links" id="links" aria-label="Main menu"><a href="#/home"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-7h6v7"/></svg>HOME</a><a href="#/about"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>ABOUT US</a><a href="#/services"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"/></svg>OUR SERVICES</a><a href="./index.html?hub_refresh=20261103-fresh-1#/success"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 7v14M3 18V4a2 2 0 0 1 2-2h3a4 4 0 0 1 4 4 4 4 0 0 1 4-4h3a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2h-3a4 4 0 0 0-4 4 4 4 0 0 0-4-4H5a2 2 0 0 0-2 2Z"/></svg>STUDY &amp; SUCCESS HUB</a><a href="#/countries"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></svg>COUNTRIES</a><a href="#/universities"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7M4 10h16M6 10v9M10 10v9M14 10v9M18 10v9M3 21h18M2 7l10-5 10 5"/></svg>UNIVERSITIES</a><a href="#/scholarships"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m2 10 10-5 10 5-10 5-10-5ZM6 12v5c4 3 8 3 12 0v-5M22 10v6"/></svg>SCHOLARSHIPS</a><a href="#/login"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2M8 21h8"/></svg>STUDENT LOGIN</a><a href="#/contact"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22 16.9V20a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3.1a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.7L7 10a16 16 0 0 0 7 7l1.6-2a2 2 0 0 1 1.7-.6l3 .5A2 2 0 0 1 22 16.9Z"/></svg>CONTACT</a></nav><a class="an-desktop-login" href="#/login" aria-label="Student login"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2M8 21h8"/></svg>LOGIN ↗</a><a class="btn tiny" href="#/apply">Apply Now ↗</a><a class="an-favorite-header" href="#/favorites" aria-label="Open saved universities" title="Saved universities"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"/></svg><span class="an-favorite-count" data-favorite-count>0</span></a><button type="button" id="site-refresh" class="site-refresh" aria-label="Refresh website" title="Refresh website">↻</button><button class="hamb" id="hamb" aria-label="Open menu" aria-expanded="false">☰</button></div></header><div id="app"></div><footer class="footer"><div class="wrap"><div class="footer-layout"><div><a class="brand" href="#/home"><img class="brand-logo" src="assets/brand-logo.jpg" alt="A&N Overseas Education & Consultancy"></a><p>Personalised education consultancy for students planning their study abroad journey, from choosing a programme to arrival support.</p></div><div><h4>Explore</h4><a href="#/countries">Destinations</a><a href="#/universities">Universities</a><a href="#/services">Services</a><a href="#/apply">Apply Now</a></div><div><h4>Student Portal</h4><a href="#/register">Register</a><a href="#/login">Login</a><a href="#/dashboard">Dashboard preview</a><a href="#/tracking">EMGS progress preview</a></div><div><h4>Our Offices</h4><p>📍 Kuala Lumpur, Malaysia<br>📍 Rangpur, Bangladesh</p><p>For the latest contact details, please use our contact page.</p></div></div><div class="copyright">© <span id="year"></span> A&N Overseas Education & Consultancy · Designed for your future</div></div></footer><div id="toast" class="toast" role="status" aria-live="polite"></div>
