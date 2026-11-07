@@ -110,13 +110,6 @@ function anNumberedCard(u){
  const short=String(u.short||'').trim();
  if(short)html=html.replace('('+esc(short)+')','<span class="an-shortname">('+esc(short)+')</span>');
  html=html.replace(/<span class="an-guide-rank">[^<]*<\/span>/,'');
- // Keep one set of university facts; the base card already provides the four metric tiles.
- // Only add the enhanced metrics when the original card has no fact grid.
- const hasFacts=/an-card-facts|an-guide-facts|an-guide-metrics|an-guide-stat/i.test(html);
- if(!hasFacts){
-  html=html.replace('<div class="inside">','<div class="inside"><div class="an-card-overview"><div class="an-card-identity">')
-   .replace('<div class="an-guide-links">','</div>'+cardMetrics(u,seq)+'</div><div class="an-guide-links">');
- }
  // The base card already has its own Apply Now action.
  return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite);
 }
