@@ -1,0 +1,105 @@
+name: A&N University Directory Live QA
+on:
+  push:
+    paths:
+      - '.github/workflows/an-directory-live-qa.yml'
+      - 'an-overseas/an-directory-layout-polish-20261108.js'
+      - 'an-overseas/university-guide.css'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Check the deployed directory and portfolio
+        run: |
+          node <<'JS'
+          const assert = require('node:assert/strict');
+          const fs = require('node:fs');
+          const { chromium } = require('playwright');
+          const base = 'https://mehedialimayon-del.github.io/salesman-performance-app/an-overseas/index.html';
+          const marker = fs.readFileSync('an-overseas/index.html','utf8').match(/an-directory-layout-polish-20261108\.js\?v=[^"]+/)[0];
+          (async () => {
+            let url;
+            for (let attempt = 0; attempt < 30; attempt++) {
+              url = base + '?directory_qa=' + Date.now();
+              const response = await fetch(url);
+              if (response.ok && (await response.text()).includes(marker)) break;
+              if (attempt === 29) throw Error('Current directory revision is not deployed');
+              await new Promise(resolve => setTimeout(resolve, 6000));
+            }
+            const browser = await chromium.launch();
+            try {
+              for (const width of [360, 412, 1366]) {
+                const page = await browser.newPage({viewport:{width,height:850},isMobile:width<600,hasTouch:width<600});
+                await page.goto(url + '#/universities', {waitUntil:'domcontentloaded'});
+                const tools = page.locator('.an-directory-controls');
+                await tools.waitFor();
+                const metrics = await tools.locator('svg.an-directory-icon').evaluateAll(icons =>
+                  icons.map(el => {
+                    const r = el.getBoundingClientRect();
+                    const button = el.parentElement.getBoundingClientRect();
+                    return {x:r.x,right:r.right,y:r.y,width:r.width,buttonWidth:button.width};
+                  })
+                );
+                assert.equal(metrics.length,4);
+                assert(metrics.every((r,i) => r.width===20 && r.x>=0 && r.right<=width &&
+                  Math.abs(r.y-metrics[0].y)<2 && Math.abs(r.buttonWidth-metrics[0].buttonWidth)<2 &&
+                  (i===0 || r.x>metrics[i-1].right)));
+                const cards = page.locator('#results article');
+                const boxes = await cards.evaluateAll(nodes => nodes.slice(0,16).map(node => {
+                  const r = node.getBoundingClientRect();
+                  return {height:r.height, x:r.x};
+                }));
+                assert(boxes.length>5 && boxes.every(r => Math.abs(r.height-boxes[0].height)<2));
+                if(width<600) assert(boxes.every(r => r.x===boxes[0].x));
+                const colors = await cards.first().locator('.card-open,.an-guide-official,.an-catalogue-apply').evaluateAll(nodes => nodes.map(n => getComputedStyle(n).backgroundColor));
+                assert.deepEqual(colors,['rgb(240, 104, 0)','rgb(21, 43, 61)','rgb(8, 126, 82)']);
+                await page.screenshot({path:'universities-'+width+'.png'});
+                const search = page.getByRole('searchbox',{name:'Search universities'});
+                assert.equal(await search.isVisible(),false);
+                await tools.getByRole('button',{name:'Open university search'}).click();
+                await search.fill('Universiti Malaya');
+                await page.waitForFunction(() => document.querySelectorAll('#results article').length===1);
+                await search.fill('');
+                await search.press('Escape');
+                assert.equal(await search.isVisible(),false);
+                await tools.getByRole('button',{name:'Choose scholarship type'}).click();
+                await page.locator('#an-scholarship-category-panel').waitFor();
+                await page.getByRole('button',{name:'All universities',exact:true}).click();
+                await tools.locator('summary').click();
+                await page.locator('#country-filter').waitFor();
+                await tools.locator('summary').click();
+                await tools.getByRole('link',{name:'Open Saved Universities'}).click();
+                await page.waitForURL('**/#/favorites');
+                await page.goto(url + '#/universities');
+                await cards.first().getByRole('link',{name:'University Portfolio'}).click();
+                await page.locator('#university-panel').waitFor();
+                const headings = await page.locator('#university-panel h2,#university-panel h3').evaluateAll(nodes =>
+                  [...new Set(nodes.map(n => getComputedStyle(n).color))]
+                );
+                assert(headings.includes('rgb(255, 255, 255)') && headings.includes('rgb(240, 104, 0)'));
+                await page.screenshot({path:'portfolio-'+width+'.png'});
+                console.log('PASS',width,JSON.stringify({metrics,cardHeight:boxes[0].height,colors,headings}));
+                await page.close();
+              }
+            } finally { await browser.close(); }
+          })().catch(e => {console.error(e);process.exitCode=1;});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-university-screenshots
+          path: |
+            universities-*.png
+            portfolio-*.png
+          if-no-files-found: ignore
