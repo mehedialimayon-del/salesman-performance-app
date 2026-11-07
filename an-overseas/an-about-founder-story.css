@@ -765,3 +765,37 @@ body:not(.an-about-locked) #app .an2-story{--gold:#ffd19b;--orange:#ff962a;--cre
 #app .an2-founder-quote .an2-founder-person figcaption{display:none!important}
 @media(max-width:650px){#app .an2-founder-quote .an2-quote-footer{grid-template-columns:minmax(0,1fr) 165px!important;min-height:275px!important;margin-right:-20px!important}#app .an2-founder-quote .an2-founder-person{width:165px!important;height:275px!important}#app .an2-founder-quote .an2-founder-person img{width:207px!important;right:-36px!important;bottom:11px!important}}
 @media(max-width:380px){#app .an2-founder-quote .an2-quote-footer{grid-template-columns:minmax(0,1fr) 151px!important;min-height:264px!important;margin-right:-20px!important}#app .an2-founder-quote .an2-founder-person{width:151px!important;height:264px!important}#app .an2-founder-quote .an2-founder-person img{width:187px!important;right:-36px!important;bottom:11px!important}}
+
+/* 2026-11-08 restrained editorial colour balance — black/white lead, orange meaning. */
+#app .an2-story h1,#app .an2-story h2,#app .an2-story h3{
+ color:#fff!important;
+}
+#app .an2-story p,#app .an2-story .an2-prose-columns p{
+ color:#f5f3ef!important;
+}
+#app .an2-story .an2-story-highlight{
+ color:#ff940e!important;font-weight:800!important;
+ text-shadow:0 0 8px rgba(255,130,0,.10);
+}
+#app .an2-story .an2-shared-mission{
+ color:#f9f6f2!important;border-left:3px solid #ff7900!important;
+ padding:12px 15px!important;background:rgba(255,255,255,.045)!important;
+ border-radius:0 11px 11px 0!important;
+}
+#app .an2-story .an2-shared-mission strong{
+ color:#ffce78!important;font-size:1.075em!important;line-height:1.55!important;
+ display:inline!important;
+}
+#app .an2-story .an2-service h3{color:#fff!important}
+#app .an2-story .an2-nav a{
+ color:#fff!important;border-color:#ff8c22!important;
+ background:linear-gradient(125deg,#40200d,#15171c)!important;
+ box-shadow:inset 0 1px rgba(255,183,99,.15)!important;
+}
+#app .an2-story .an2-primary,#app .an2-story .an2-cta a:first-child{
+ background:linear-gradient(105deg,#ffab26,#ff7900)!important;color:#160e08!important;
+ border:1px solid #ffbc65!important;font-weight:900!important;
+}
+#app .an2-story .an2-cta a:not(:first-child){
+ border:1px solid #ff8b28!important;color:#fff!important;
+}
