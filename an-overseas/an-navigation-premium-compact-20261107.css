@@ -77,3 +77,53 @@
   html body .top .links.open a:hover .an-nav-icon,
   html body .top .links.open a[aria-current="page"] .an-nav-icon{color:#fff!important}
 }
+
+/* 2026-11-07 — glass-polished light sweep, confined to navigation pills. */
+html body .top .links a{
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  background-image:
+    linear-gradient(115deg,rgba(255,255,255,.15) 0%,rgba(255,255,255,.045) 30%,transparent 51%),
+    linear-gradient(180deg,#24201c 0%,#0c0d11 100%)!important;
+  box-shadow:inset 0 1px 0 rgba(255,231,191,.38),inset 0 -1px 0 rgba(0,0,0,.55),0 2px 7px rgba(0,0,0,.5)!important;
+}
+html body .top .links a::before{
+  content:""!important;position:absolute!important;z-index:0!important;
+  top:-65%!important;left:-110%!important;width:52%!important;height:235%!important;
+  border-radius:50%!important;transform:skewX(-24deg)!important;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06) 24%,rgba(255,241,207,.43) 50%,rgba(255,255,255,.06) 76%,transparent)!important;
+  pointer-events:none!important;animation:anNavGlassSweep 5.8s ease-in-out infinite!important;
+}
+html body .top .links a .an-nav-icon{position:relative!important;z-index:1!important}
+html body .top .links a:hover,
+html body .top .links a.current,
+html body .top .links a[aria-current="page"]{
+  background-image:linear-gradient(115deg,rgba(255,255,255,.22),transparent 55%),linear-gradient(180deg,#ffa937,#d65a00)!important;
+}
+@keyframes anNavGlassSweep{
+  0%,17%{left:-110%;opacity:0}
+  23%{opacity:1}
+  48%{left:155%;opacity:1}
+  52%,100%{left:155%;opacity:0}
+}
+@media (max-width:800px){
+  /* Enlarge only the company lettering on phones; preserve logo, actions and header layout. */
+  html body .top .brand-copy strong{
+    font-size:clamp(15px,3.8vw,19px)!important;
+    letter-spacing:-.2px!important;line-height:1.13!important;
+  }
+  html body .top .brand-copy small{
+    font-size:clamp(6.6px,1.75vw,8px)!important;
+    letter-spacing:0!important;line-height:1.25!important;
+  }
+  html body .top .links.open a{
+    background-image:linear-gradient(115deg,rgba(255,255,255,.13),transparent 55%),linear-gradient(180deg,#29211b,#101114)!important;
+  }
+  html body .top .links.open a.current,
+  html body .top .links.open a:hover,
+  html body .top .links.open a[aria-current="page"]{
+    background-image:linear-gradient(115deg,rgba(255,255,255,.22),transparent 55%),linear-gradient(90deg,#e96807,#a93d00)!important;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  html body .top .links a::before{animation:none!important;left:15%!important;opacity:.35!important}
+}
