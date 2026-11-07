@@ -2,9 +2,10 @@
 (function(){
 'use strict';
 const css=`
-body:has(.an-scholarship-detail) .top,body:has(.an-scholarship-head) .top{position:sticky!important;top:0!important;z-index:200!important}
+@media(min-width:1050px){body:has(.an-scholarship-detail) .top,body:has(.an-scholarship-head) .top{position:sticky!important;top:0!important;z-index:200!important}
 body:has(.an-scholarship-detail) .ticker,body:has(.an-scholarship-head) .ticker{position:sticky!important;top:var(--an-top-height,65px)!important;z-index:190!important}
 body:has(.an-scholarship-head) .an-scholarship-head{position:sticky!important;top:calc(var(--an-top-height,65px) + var(--an-ticker-height,32px))!important;z-index:180!important;background:#101319!important;border-bottom:1px solid #ff8a08!important}
+}
 .an-scholarship-filters .an-section-selector{position:relative;display:flex;flex-direction:column;gap:3px;font-size:9px;font-weight:800;color:#ffd28a;min-width:0}
 .an-section-selector select{width:100%;height:35px;background:#1d242d;color:#fff;border:1px solid #ff8a08;border-radius:7px;font-size:11px;padding:4px}
 .an-scholarship-head-inner .an-scholarship-total{align-self:stretch!important;justify-content:center!important;min-width:145px!important}
@@ -33,8 +34,9 @@ body:has(.an-scholarship-head) .an-scholarship-head{position:sticky!important;to
 }
 `;
 const desktopGapFix="\n/* an-scholarship-desktop-gap-fix-v2: keep heading directly under ticker,\n   compact controls without clipping option labels, preserve mobile layout. */\n@media(min-width:1050px){\n body:has(.an-scholarship-head) .an-scholarship-head{margin-block:0!important;transform:none!important}\n body:has(.an-scholarship-head) .an-scholarship-head-inner{min-height:46px!important;gap:8px!important}\n body:has(.an-scholarship-head) .an-scholarship-directory.content{padding-top:2px!important}\n body:has(.an-scholarship-head) .an-scholarship-filters{margin-block:0!important}\n body:has(.an-scholarship-head) .an-scholarship-filters select,\n body:has(.an-scholarship-head) .an-scholarship-filters input{box-sizing:border-box!important;text-overflow:ellipsis!important;min-width:0!important}\n body:has(.an-scholarship-head) .an-scholarship-meta{margin:5px 0 7px!important}\n body:has(.an-scholarship-head) .an-scholarship-about{margin-top:5px!important}\n body:has(.an-scholarship-head) .an-scholarship-scroll-region{scroll-margin-top:125px}\n}\n";
-const style=document.createElement('style');style.id='an-scholarship-compact-desktop-style';style.textContent=css+desktopGapFix;document.head.appendChild(style);
+const style=document.createElement('style');style.id='an-scholarship-compact-desktop-style';style.textContent=css+desktopGapFix+"\n@media(min-width:1050px){\nbody:has(.an-scholarship-head) main,body:has(.an-scholarship-head) #app{min-height:0!important}\nbody:has(.an-scholarship-head) .an-scholarship-head{position:relative!important;top:auto!important;z-index:5!important;padding:3px 0!important}\nbody:has(.an-scholarship-head) .an-scholarship-head-inner{min-height:48px!important;align-items:center!important}\nbody:has(.an-scholarship-head) .an-scholarship-directory{padding-top:2px!important}\nbody:has(.an-scholarship-head) .an-feature-grid{margin-top:0!important}\nbody:has(.an-scholarship-head) .an-scholarship-filters input,\nbody:has(.an-scholarship-head) .an-scholarship-filters select{min-height:32px!important;height:32px!important}\n}\n";document.head.appendChild(style);
 function arrange(){
+ if(window.innerWidth<1050)return;
  const head=document.querySelector('.an-scholarship-head-inner');
  const filters=document.querySelector('.an-scholarship-directory > .an-scholarship-filters');
  if(!head||!filters||filters.parentElement===head)return;
@@ -45,6 +47,7 @@ let queued=false;
 new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;arrange();addFourth();syncSticky()})}).observe(document.body,{childList:true,subtree:true});
 arrange();
 function addFourth(){
+ if(window.innerWidth<1050)return;
  const filters=document.querySelector('.an-scholarship-head-inner .an-scholarship-filters');if(!filters||filters.querySelector('.an-section-selector'))return;
  const label=document.createElement('label');label.className='an-section-selector';label.textContent='PAGE SECTIONS';
  const select=document.createElement('select');select.setAttribute('aria-label','Jump to scholarship section');
@@ -52,7 +55,7 @@ function addFourth(){
  select.addEventListener('change',()=>{const target=document.querySelector(select.value);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});select.value='';});label.appendChild(select);filters.appendChild(label);
 }
 function syncSticky(){const top=document.querySelector('.top'),ticker=document.querySelector('.ticker');document.documentElement.style.setProperty('--an-top-height',(top?.getBoundingClientRect().height||65)+'px');document.documentElement.style.setProperty('--an-ticker-height',(ticker?.getBoundingClientRect().height||32)+'px')}
-window.addEventListener('resize',syncSticky);syncSticky();addFourth();
+window.addEventListener('resize',()=>{syncSticky();arrange();addFourth()});syncSticky();addFourth();
 function countdown(){
  const host=document.querySelector('.an-scholarship-head-inner .an-scholarship-total');
  if(!host)return;
