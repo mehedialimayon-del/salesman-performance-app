@@ -138,6 +138,7 @@ function showTeam(){
  const validEmail=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
  const role=String(m.position||m.designation||m.role||'Management').trim();
  const linkedIn=url(m.linkedin||m.linkedin_url||m.linkedinUrl||m.socials?.linkedin||'');
+ const facebook=url(m.facebook||m.facebook_url||m.facebookUrl||m.socials?.facebook||'');
  const help=String(m.help||m.bio||m.description||'').trim();
  const isFounder=m.id==='nusrat-nasrin'||String(m.name).trim().toLowerCase()==='nusrat nasrin';
  const imageHtml=photo?'<button class="an-manager-photo-button" type="button" data-an-preview="'+esc(photo)+'" data-an-title="'+esc(m.name)+'" aria-label="View full photo of '+esc(m.name)+'"><img class="an-manager-photo" src="'+esc(photo)+'" alt="'+esc(m.name)+'" loading="lazy"></button>'
@@ -151,15 +152,22 @@ function showTeam(){
  const displayName=String(m.name||'').trim();const nameParts=displayName.match(/^(AGRICULTURIST)\s+(.+)$/i);
   const coloredName=nameParts?'<span class="an-manager-profession">'+esc(nameParts[1].toUpperCase())+'</span> <span class="an-manager-person-name">'+esc(nameParts[2].toUpperCase())+'</span>':esc(displayName);
   const nameHtml='<div class="an-manager-name-box"><span class="an-manager-label">NAME</span><h3 class="an-manager-white-name">'+coloredName+'</h3></div>';
- const designationHtml='<div class="an-manager-position"><span class="an-manager-label">DESIGNATION</span><strong>'+positionHeading(role)+'</strong></div>';
- const supportHtml=help?'<div class="an-manager-support"><span class="an-manager-label">STUDENT SUPPORT</span><p>'+esc(help)+'</p></div>':'';
+ const founderCareer='Bangladesh Agricultural University · Kuala Lumpur University of Science and Technology · Universiti Putra Malaysia (UPM) | MSc Aquaculture & Research Assistant';
+ const founderQuote='From Bangladesh Agricultural University to KLUST and now UPM, my own academic journey has shown me the value of thoughtful guidance. As an aquaculture postgraduate student and research assistant, I understand the choices students face abroad—and I am committed to supporting them with clarity, care and first-hand experience.';
+ const career=String(m.career|| (isFounder?founderCareer:'')).trim();
+ const quote=String(m.quote|| (isFounder?founderQuote:'')).trim();
+ const careerHtml=career?'<div class="an-manager-career"><span class="an-manager-label">ACADEMIC & PROFESSIONAL JOURNEY</span><p>'+esc(career)+'</p></div>':'';
+ const quoteHtml=quote?'<figure class="an-manager-quote"><span class="an-manager-quote-mark" aria-hidden="true">“</span><blockquote>'+esc(quote)+'</blockquote></figure>':'';
+ const supportHtml=help?'<div class="an-manager-support"><span class="an-manager-label">HOW I SUPPORT STUDENTS</span><p>'+esc(help)+'</p></div>':'';
  const buttonsHtml=(portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'DISCOVER THE FOUNDER':'VIEW PORTFOLIO')+' ↗</a>':'')+
    (isFounder?'<a class="an-manager-action an-admin-entry" href="#/admin" aria-label="Open secure administration login">ADMIN PANEL ↗</a>':'');
  const linkedinTarget=linkedIn||'https://www.linkedin.com/search/results/people/?keywords='+encodeURIComponent(String(m.name||'').trim());
- const linkedInHtml='<a class="an-manager-contact an-manager-linkedin" href="'+esc(linkedinTarget)+'" target="_blank" rel="noopener noreferrer" aria-label="'+(linkedIn?'View':'Find')+' '+esc(m.name)+' on LinkedIn"><span class="an-linkedin-mark" aria-hidden="true">in</span><span><small>LINKEDIN</small><b>'+(linkedIn?'Open LinkedIn profile ↗':'Find on LinkedIn ↗')+'</b></span></a>';
+ const linkedInHtml='<a class="an-manager-contact an-manager-linkedin" href="'+esc(linkedinTarget)+'" target="_blank" rel="noopener noreferrer" aria-label="'+(linkedIn?'View':'Find')+' '+esc(m.name)+' on LinkedIn"><span class="an-linkedin-mark" aria-hidden="true">in</span><span><small>LINKEDIN</small><b>'+(linkedIn?'Open profile ↗':'Find profile ↗')+'</b></span></a>';
+ const facebookHtml=facebook?'<a class="an-manager-contact an-manager-facebook" href="'+esc(facebook)+'" target="_blank" rel="noopener noreferrer" aria-label="Open '+esc(m.name)+' Facebook profile"><span class="an-facebook-mark" aria-hidden="true">f</span><span><small>FACEBOOK</small><b>Open profile ↗</b></span></a>':'';
  panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role,isFounder?m.name:'')+'</div><div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
-  +'<div class="an-manager-information">'+nameHtml+designationHtml+supportHtml
-  +'<div class="an-manager-contacts">'+emailHtml+whatsappHtml+linkedInHtml+'</div>'
+  +'<div class="an-manager-information">'+nameHtml+careerHtml+quoteHtml+supportHtml
+  +'<div class="an-manager-assistance-label">FOR ANY ASSISTANCE</div>'
+  +'<div class="an-manager-contacts">'+emailHtml+whatsappHtml+linkedInHtml+facebookHtml+'</div>'
   +'<div class="an-manager-actions">'+buttonsHtml+'</div></div></div>';
  counter.textContent=(teamIndex+1)+' / '+members.length;
 }
