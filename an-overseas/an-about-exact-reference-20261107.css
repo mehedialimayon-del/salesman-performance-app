@@ -1,0 +1,309 @@
+/* A&N Overseas About Details — final approved 1536×864 desktop reference.
+   Desktop-only; all existing chapters, mobile layout, route actions stay intact. */
+@media (min-width:801px){
+ html body.an-exact-desktop #app>.an2-story{
+   width:calc(100% - 24px)!important;max-width:1800px!important;
+   margin:0 auto!important;padding:2px 0 70px!important;
+   height:auto!important;max-height:none!important;overflow:visible!important;
+ }
+ html body.an-exact-desktop #app .an2-topline{
+   min-height:42px!important;padding:3px 8px 7px!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero {
+   isolation:isolate!important;position:relative!important;display:block!important;
+   width:100%!important;height:var(--an-exact-h,660px)!important;
+   min-height:480px!important;max-height:none!important;margin:0!important;
+   border:2px solid #f79319!important;border-radius:26px!important;overflow:hidden!important;
+   background:
+      radial-gradient(ellipse 46% 48% at 60% 76%,#1140788a,transparent 84%),
+      radial-gradient(ellipse 27% 42% at 98% 48%,#c5571344,transparent 80%),
+      linear-gradient(118deg,#080d16 0%,#070910 57%,#1a1110 100%)!important;
+   box-shadow:0 0 22px #f8941b2a,inset 0 1px 2px #ffa6417d!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero::before {
+   content:"";position:absolute;inset:auto -6% 6.5% -6%;
+   height:8%;border-radius:50%;z-index:1;pointer-events:none;
+   border-bottom:2px solid #ffae3a94;box-shadow:0 10px 32px #ff820b50;
+   background:radial-gradient(ellipse at 52% 110%,#ff8c084d,transparent 65%);
+ }
+ html body.an-exact-desktop #app .an2-exact-hero::after {
+   content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+   background:linear-gradient(160deg,transparent 45%,#ff760d0b 90%);
+ }
+ html body.an-exact-desktop #app .an2-exact-hero .an2-founder-brand {
+   position:absolute!important;z-index:5!important;top:1.7%!important;left:1.8%!important;
+   width:26.4%!important;height:49%!important;margin:0!important;padding:0!important;
+   display:flex!important;align-items:center!important;justify-content:flex-start!important;
+   flex-direction:column!important;gap:0!important;text-align:center!important;
+   min-height:0!important;max-height:none!important;overflow:visible!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero .an2-founder-brand>img {display:none!important}
+ html body.an-exact-desktop #app .an2-exact-logo {
+   display:block!important;flex:0 0 auto!important;
+   width:min(59%,244px)!important;height:clamp(105px,19vh,190px)!important;
+   background:url("assets/approved-reference-crest-20261107.svg") center/contain no-repeat!important;
+   filter:drop-shadow(0 1px 8px #ec990736)!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-company {
+   margin:0!important;line-height:1.07!important;
+   font:900 clamp(22px,2.45vw,42px)/1.07 Georgia,"Times New Roman",serif!important;
+   letter-spacing:-.8px!important;white-space:nowrap!important;
+   color:#ffcd65!important;text-shadow:0 2px 12px #b85e203c!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-sub {
+   margin-top:3px!important;line-height:1.17!important;letter-spacing:.1px!important;
+   font:800 clamp(11px,1.23vw,20px)/1.17 Arial, sans-serif!important;
+   color:#f6f5f2!important;white-space:nowrap!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-est {
+   margin-top:clamp(7px,1.2vh,15px)!important;padding-top:13px!important;
+   width:90%!important;border-top:1px solid #efab4982!important;
+   color:#fff6e9!important;text-align:center!important;
+   font:bold clamp(11px,1.12vw,18px)/1.28 Arial,sans-serif!important;
+   letter-spacing:.12px!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-est strong {
+   display:block!important;color:#fff!important;font-size:clamp(14px,1.45vw,22px)!important;
+   font-weight:900!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-est small{display:block!important;font-size:clamp(10px,1.08vw,16px)!important}
+ html body.an-exact-desktop #app .an2-exact-est em{font-style:normal!important}
+ html body.an-exact-desktop #app .an2-exact-hero .an2-founder-brand>span{display:none!important}
+ html body.an-exact-desktop #app .an2-exact-hero .an2-founder-quote {
+   position:absolute!important;z-index:7!important;top:2.5%!important;left:29%!important;
+   right:22.4%!important;width:auto!important;height:auto!important;min-height:0!important;
+   margin:0!important;padding:12px 18px 13px!important;
+   display:block!important;max-height:34%!important;overflow:hidden!important;
+   background:linear-gradient(117deg,#422414dd,#101218e8)!important;
+   border:1.7px solid #ff931b!important;border-radius:19px!important;
+   box-shadow:0 0 18px #fa881772,inset 0 0 23px #d87d1117!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero .an2-quote-mark{
+   display:none!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero .an2-founder-quote blockquote{
+   display:block!important;margin:0!important;padding:0!important;
+   border:0!important;border-radius:0!important;background:none!important;
+   color:#fff4e9!important;box-shadow:none!important;
+   font:italic 600 clamp(12px,1.19vw,18px)/1.26 Georgia,"Times New Roman",serif!important;
+   letter-spacing:.02px!important;overflow:visible!important;
+ }
+ html body.an-exact-desktop #app .an2-founder-quote blockquote .an2-exact-lead{
+   color:#ffad2c!important;font-weight:900!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero .an2-quote-footer{
+   display:none!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-towers{
+   position:absolute;right:0;top:0;bottom:31%;width:18.5%;z-index:2;pointer-events:none;
+   background:
+     linear-gradient(90deg,#0d0f18 0%,#0c0c147a 38%,#2c150a13 100%),
+     linear-gradient(0deg,#0b0a12 0%,transparent 42%),
+     url("assets/malaysia-skyline-clean.jpg") 71.2% 35%/auto 108% no-repeat;
+   opacity:.8;mask-image:linear-gradient(90deg,transparent 0%,black 37%);
+ }
+ html body.an-exact-desktop #app .an2-exact-hero .an2-founder-person{
+   position:absolute!important;z-index:8!important;top:.7%!important;right:1.2%!important;
+   bottom:auto!important;left:auto!important;display:block!important;
+   width:22.2%!important;height:72%!important;min-height:0!important;max-height:none!important;
+   margin:0!important;padding:0!important;overflow:visible!important;
+   pointer-events:none!important;filter:none!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero .an2-founder-person img{
+   display:block!important;position:absolute!important;top:auto!important;left:auto!important;
+   right:-2%!important;bottom:0!important;height:100%!important;width:auto!important;
+   max-height:100%!important;max-width:none!important;
+   object-fit:contain!important;object-position:right bottom!important;
+   opacity:1!important;transform:none!important;
+   filter:drop-shadow(0 5px 9px #0008)!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero .an2-founder-person figcaption{
+   display:none!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-name{
+   position:absolute;right:1%;top:62.6%;z-index:9;width:16.2%;padding:4px 7px;
+   border:2px solid #ff9b2c;border-radius:999px;text-align:center;line-height:1.1;
+   color:#fcb75b;background:linear-gradient(115deg,#151211,#03060b);box-shadow:0 0 13px #ff840a48;
+   font:900 clamp(13px,1.48vw,22px)/1.14 Arial,sans-serif;
+   text-shadow:0 2px 6px #fb8a1744;letter-spacing:.7px;
+ }
+ html body.an-exact-desktop #app .an2-exact-role{
+   position:absolute;right:1.8%;top:69%;z-index:9;width:15.5%;
+   color:#ffefe2;font:italic clamp(10px,1.14vw,17px)/1.25 Georgia,serif;text-align:center;
+ }
+ html body.an-exact-desktop #app .an2-exact-world-title{
+   position:absolute!important;z-index:5!important;
+   left:29%!important;right:21.8%!important;top:39.5%!important;
+   width:auto!important;text-align:center!important;white-space:nowrap!important;
+   color:#fff!important;font:italic 950 clamp(27px,3.4vw,54px)/1.05 Arial,sans-serif!important;
+   letter-spacing:-1.1px!important;text-shadow:0 3px 12px #000!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-world-title span{color:#ff8d18!important}
+ html body.an-exact-desktop #app .an2-exact-plane{
+   position:absolute;z-index:6;left:69.5%;top:34%;pointer-events:none;
+   color:#fff;font-size:clamp(22px,3vw,43px);transform:rotate(-17deg);
+   text-shadow:0 0 8px #fff9;animation:an2-exact-flight 6s ease-in-out infinite;
+ }
+ @keyframes an2-exact-flight{
+   0%,100%{transform:translateY(0) rotate(-17deg)}
+   50%{transform:translateY(-6px) rotate(-11deg)}
+ }
+ html body.an-exact-desktop #app .an2-exact-globe{
+   position:absolute!important;z-index:1!important;
+   top:48.5%!important;left:27.5%!important;width:53.8%!important;height:76%!important;
+   overflow:hidden!important;border-radius:50% 50% 0 0 / 46% 46% 0 0!important;
+   background:
+     linear-gradient(to bottom,#3bb8ff5a 0%,transparent 11%,#030918b0 90%),
+     url("https://svs.gsfc.nasa.gov/vis/a030000/a030800/a030876/BlackMarble_2016_global_7km_print.jpg") center 44%/cover no-repeat,
+     radial-gradient(ellipse at top,#1b70af,#020711 76%)!important;
+   border-top:5px solid #5cc9ffee!important;
+   box-shadow:inset 0 9px 21px #52aeff85,0 -8px 14px #15a4ff45,0 -2px 28px #ffc35744!important;
+   filter:saturate(1.5) contrast(1.19)!important;
+   pointer-events:none!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-globe::after{
+   content:"";position:absolute;inset:0;
+   background:radial-gradient(ellipse at 50% 0%,transparent 0,#040b1680 74%,#04070f 95%);
+ }
+ html body.an-exact-desktop #app .an2-exact-hero>.an2-nav{
+   position:absolute!important;z-index:15!important;left:1%!important;right:18.2%!important;
+   top:62.4%!important;height:12.1%!important;min-height:55px!important;
+   display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+   gap:8px!important;padding:0!important;margin:0!important;width:auto!important;
+   border:0!important;background:none!important;backdrop-filter:none!important;
+   overflow:visible!important;box-shadow:none!important;scrollbar-width:none!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero>.an2-nav a{
+   position:relative!important;display:flex!important;align-items:center!important;
+   justify-content:flex-start!important;min-width:0!important;width:auto!important;
+   height:100%!important;min-height:0!important;margin:0!important;padding:5px 8px!important;
+   border:1.7px solid #ff8b14!important;border-radius:15px!important;
+   background:linear-gradient(130deg,#472107f0 0%,#15100eea 100%)!important;
+   box-shadow:0 0 13px #ff851344,inset 0 1px #ffca8f55!important;
+   color:#fff!important;text-decoration:none!important;gap:8px!important;
+   white-space:normal!important;cursor:pointer!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero>.an2-nav a:hover,
+ html body.an-exact-desktop #app .an2-exact-hero>.an2-nav a:focus-visible{
+   transform:translateY(-3px)!important;box-shadow:0 0 24px #ff831672!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero .an2-exact-icon{
+   display:grid!important;place-items:center!important;flex:0 0 clamp(35px,3.7vw,61px)!important;
+   height:clamp(38px,5vw,57px)!important;width:clamp(35px,3.7vw,61px)!important;
+   border-radius:11px!important;background:linear-gradient(120deg,#ffbe40,#fe7e0a)!important;
+   box-shadow:0 2px 12px #f47e145c!important;color:#fff!important;
+   font-size:clamp(18px,1.9vw,30px)!important;line-height:1!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-cardcopy{
+   display:flex!important;flex-direction:column!important;gap:3px!important;
+   text-align:left!important;min-width:0!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-cardcopy b{
+   font:900 clamp(9px,1.13vw,17px)/1.1 Arial,sans-serif!important;
+   color:#fff!important;white-space:normal!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-cardcopy small{
+   font:700 clamp(8px,.81vw,12px)/1.1 Arial,sans-serif!important;
+   color:#ffb457!important;white-space:normal!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-flagband{
+   position:absolute!important;z-index:11!important;left:1.3%!important;right:1.3%!important;
+   top:77.3%!important;height:16.9%!important;overflow:hidden!important;
+   margin:0!important;padding:0!important;display:block!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-floating-flags {
+   display:flex!important;flex-wrap:nowrap!important;gap:2px!important;
+   align-items:end!important;justify-content:flex-start!important;
+   width:100%!important;max-width:none!important;height:100%!important;
+   overflow-x:auto!important;overflow-y:hidden!important;
+   scrollbar-width:none!important;scroll-snap-type:x proximity!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-floating-flags::-webkit-scrollbar{display:none}
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flag-unit{
+   display:flex!important;align-items:flex-start!important;justify-content:center!important;
+   flex:0 0 5.5%!important;position:relative!important;min-width:0!important;
+   max-width:none!important;height:96%!important;min-height:0!important;
+   grid-column:auto!important;overflow:visible!important;padding:5px 3px 0!important;
+   scroll-snap-align:start!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flag-unit::before{
+   content:"";position:absolute;left:18%;top:5%;bottom:0;width:2px;
+   background:linear-gradient(90deg,#a2670c,#f2d389,#784406)!important;
+   box-shadow:1px 0 2px #e6a13d77!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flag-unit::after{
+   content:"";position:absolute;top:0;left:calc(18% - 3px);width:8px;height:8px;
+   background:radial-gradient(circle at 35% 25%,#fff1a5,#b67816 70%);
+   border-radius:50%;box-shadow:0 0 3px #ffd177!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-static-star {display:none!important}
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flag {
+   position:relative!important;display:block!important;
+   flex:none!important;margin:3px 0 0 17%!important;padding:0!important;
+   width:min(82%,70px)!important;height:clamp(25px,4.6vw,49px)!important;
+   min-width:0!important;max-width:none!important;
+   border:0!important;border-radius:0!important;background:none!important;
+   transform-origin:left center!important;filter:drop-shadow(1px 3px 3px #0008)!important;
+   will-change:transform!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flag-image{
+   display:block!important;width:100%!important;height:100%!important;
+   object-fit:fill!important;border-radius:1px!important;
+   clip-path:polygon(0 0,100% 0,97% 27%,100% 55%,96% 79%,100% 100%,0 100%)!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flag-emoji{display:none!important}
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flag:has(.an2-flag-image-error) .an2-flag-emoji{
+   display:inline!important;font-size:28px!important;
+ }
+ @keyframes an2-exact-flag-fly {
+   0%,100% {transform:perspective(140px) rotateY(-13deg) skewY(-2deg) scaleX(.95)}
+   25% {transform:perspective(140px) rotateY(12deg) skewY(1.7deg) scaleX(1.02)}
+   52% {transform:perspective(140px) rotateY(-7deg) skewY(-1deg) scaleX(.98)}
+   78% {transform:perspective(140px) rotateY(8deg) skewY(.9deg) scaleX(1)}
+ }
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flag {
+   animation:an2-exact-flag-fly 2.8s ease-in-out infinite!important;
+   animation-delay:calc(var(--flag-index) * -.19s)!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flag::after{
+   content:"";position:absolute;inset:0;pointer-events:none;
+   background:linear-gradient(105deg,#0009,transparent 24%,#fff6 40%,transparent 62%,#0005 100%);
+   background-size:210% 100%;mix-blend-mode:soft-light;
+   animation:an2-exact-flag-shine 2.8s ease-in-out infinite;
+   animation-delay:calc(var(--flag-index) * -.19s);
+ }
+ @keyframes an2-exact-flag-shine{
+   0%,100%{background-position:0% center}
+   50%{background-position:100% center}
+ }
+ html body.an-exact-desktop #app .an2-exact-hero .an2-exact-slogan{
+   position:absolute!important;z-index:16!important;bottom:0!important;left:0!important;
+   right:0!important;top:auto!important;display:flex!important;justify-content:center!important;
+   align-items:center!important;width:100%!important;height:7.3%!important;
+   min-height:38px!important;margin:0!important;padding:4px 14px!important;
+   border-top:1px solid #ffc269aa!important;border-radius:0!important;
+   background:linear-gradient(90deg,#662509,#ff8917 49%,#6c2b0c)!important;
+   color:#fff2db!important;text-align:center!important;
+   font:italic 950 clamp(15px,2.22vw,31px)/1.12 Arial,sans-serif!important;
+   white-space:nowrap!important;letter-spacing:-.3px!important;
+   text-shadow:0 3px 7px #7c340a!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero .an2-exact-slogan em{color:#fff1dc!important}
+ html body.an-exact-desktop #app .an2-exact-hero .an2-founder-message-label,
+ html body.an-exact-desktop #app .an2-exact-hero .an2-quote-sign{display:none!important}
+ html body.an-exact-desktop #app :is(.an2-intro-section,.an2-story-chapter,.an2-platform,.an2-all-services,.an2-future){
+   scroll-margin-top:calc(var(--an-details-header-h,92px) + var(--an-details-ticker-h,28px) + 22px)!important;
+ }
+}
+@media(min-width:801px) and (max-height:700px){
+ html body.an-exact-desktop #app .an2-exact-hero .an2-founder-quote blockquote{
+   font-size:clamp(10.5px,1.05vw,15px)!important;line-height:1.2!important;
+ }
+ html body.an-exact-desktop #app .an2-exact-hero .an2-exact-logo{height:clamp(85px,16vh,130px)!important}
+ html body.an-exact-desktop #app .an2-exact-hero .an2-exact-flagband{top:77%!important;height:16.5%!important}
+}
+@media(prefers-reduced-motion:reduce){
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flag,
+ html body.an-exact-desktop #app .an2-exact-flagband .an2-flag::after,
+ html body.an-exact-desktop #app .an2-exact-plane{animation:none!important}
+}
