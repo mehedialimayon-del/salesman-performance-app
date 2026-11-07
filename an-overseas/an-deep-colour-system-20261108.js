@@ -115,6 +115,8 @@
     root.setProperty('--an-gold','#ffae00');
     root.setProperty('--an-white','#ffffff');
     root.setProperty('--an-ink','#ffffff');
+    document.documentElement.dataset.anDeepPalette='active';
+    document.documentElement.dataset.anDeepChanges=String(changed);
   }
   // Styles added by route-specific modules use the same palette.
   let queued=false;
