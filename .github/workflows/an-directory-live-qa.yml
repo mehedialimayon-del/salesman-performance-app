@@ -47,14 +47,15 @@ jobs:
                 const page = await browser.newPage({viewport:{width,height:850},isMobile:width<600,hasTouch:width<600});
                 await page.goto(url + '#/universities', {waitUntil:'domcontentloaded'});
                 const tools = page.locator('.an-directory-controls');
-                await tools.waitFor();
-                const metrics = await tools.locator('svg.an-directory-icon').evaluateAll(icons =>
-                  icons.map(el => {
+                const metrics = await page.waitForFunction(() => {
+                  const icons = [...document.querySelectorAll('.an-directory-controls svg.an-directory-icon')];
+                  if (icons.length !== 4 || document.querySelectorAll('#results article').length < 6) return false;
+                  return icons.map(el => {
                     const r = el.getBoundingClientRect();
                     const button = el.parentElement.getBoundingClientRect();
                     return {x:r.x,right:r.right,y:r.y,width:r.width,buttonWidth:button.width};
-                  })
-                );
+                  });
+                }).then(handle => handle.jsonValue());
                 console.log('CONTROLS',width,JSON.stringify(metrics));
                 await page.screenshot({path:'universities-'+width+'.png'});
                 assert.equal(metrics.length,4);
