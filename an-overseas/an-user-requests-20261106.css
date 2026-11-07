@@ -196,11 +196,6 @@ body.an-scholarships-mode #app .an-scholarship-content-scroll .an-scholarship-in
  #app .an-scholarship-detail .an-scholarship-help{padding:13px;margin:13px 0}
 }
 
-/* Scholarship type dropdown anchored to the graduation-cap control. */
-body.an-universities-mode #app .an-scholarship-category-wrap{position:relative!important;min-width:0!important}
-body.an-universities-mode #app .an-scholarship-category-wrap #an-scholarship-category-toggle{
- display:flex!important;width:43px!important;min-width:43px!important;
-}
 body.an-universities-mode #app .an-university-directory-bar .an-directory-fav{display:none!important}
 /* The header Favorites link remains red and animates internally, without moving the navigation box. */
 .top .an-favorite-header:hover{transform:none!important}
