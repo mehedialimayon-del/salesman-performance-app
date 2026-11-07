@@ -162,13 +162,15 @@ function showTeam(){
  const displayQuote=promiseMatch
    ?esc(quote.slice(0,promiseMatch.index))+'<strong class="an-manager-quote-emphasis">'+esc(promiseMatch[0])+'</strong>'
    :esc(quote);
- const quoteHtml=quote?'<figure class="an-manager-quote"><span class="an-manager-quote-mark" aria-hidden="true">“</span><blockquote>'+displayQuote+'</blockquote></figure>':'';
+ const quoteHtml=quote?'<figure class="an-manager-quote"><span class="an-manager-quote-mark" aria-hidden="true">“</span><blockquote>'+displayQuote+'<span class="an-manager-quote-end" aria-hidden="true">”</span></blockquote></figure>':'';
  const supportHtml=!isFounder&&help?'<div class="an-manager-support"><span class="an-manager-label">HOW I SUPPORT STUDENTS</span><p>'+esc(help)+'</p></div>':'';
  const buttonsHtml=(portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'DISCOVER THE FOUNDER':'VIEW PORTFOLIO')+' ↗</a>':'')+
    (isFounder?'<a class="an-manager-action an-admin-entry" href="#/admin" aria-label="Open secure administration login">ADMIN PANEL ↗</a>':'');
  const linkedinTarget=linkedIn||'https://www.linkedin.com/search/results/people/?keywords='+encodeURIComponent(String(m.name||'').trim());
  const linkedInHtml='<a class="an-manager-contact an-manager-linkedin" href="'+esc(linkedinTarget)+'" target="_blank" rel="noopener noreferrer" aria-label="'+(linkedIn?'View':'Find')+' '+esc(m.name)+' on LinkedIn"><span class="an-linkedin-mark" aria-hidden="true">in</span><span><small>LINKEDIN</small><b>'+(linkedIn?'Open profile ↗':'Find profile ↗')+'</b></span></a>';
- const facebookHtml=facebook?'<a class="an-manager-contact an-manager-facebook" href="'+esc(facebook)+'" target="_blank" rel="noopener noreferrer" aria-label="Open '+esc(m.name)+' Facebook profile"><span class="an-facebook-mark" aria-hidden="true">f</span><span><small>FACEBOOK</small><b>Open profile ↗</b></span></a>':'';
+ // A Facebook profile is linked only when published; otherwise the founder card shows an honest search action.
+ const facebookTarget=facebook||(isFounder?'https://www.facebook.com/search/people/?q='+encodeURIComponent('Nusrat Nasrin'):'');
+ const facebookHtml=facebookTarget?'<a class="an-manager-contact an-manager-facebook" href="'+esc(facebookTarget)+'" target="_blank" rel="noopener noreferrer" aria-label="'+(facebook?'Open Facebook profile of ':'Find on Facebook: ')+esc(m.name)+'"><span class="an-facebook-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" focusable="false"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></span><span><small>FACEBOOK</small><b>'+(facebook?'Open profile ↗':'Find on Facebook ↗')+'</b></span></a>':'';
  panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role,isFounder?m.name:'')+'</div><div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
   +'<div class="an-manager-information">'+nameHtml+careerHtml+quoteHtml+supportHtml
   +'<div class="an-manager-contacts">'+emailHtml+whatsappHtml+linkedInHtml+facebookHtml+'</div>'
