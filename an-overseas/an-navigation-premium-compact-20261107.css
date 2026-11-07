@@ -1,0 +1,79 @@
+/* A&N Overseas — compact premium navigation only.
+   Preserves header size, existing responsive menu, login/apply positioning,
+   favourite/search controls and mobile brand typography. */
+.top .links .an-nav-icon,
+.top .an-desktop-login .an-nav-icon{
+  display:inline-block;vertical-align:middle;flex:0 0 auto;
+  width:12px;height:12px;color:#ffad25;
+  stroke:currentColor;fill:none;stroke-width:2.05;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+@media (min-width:801px){
+  html body .top .links a{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    gap:4px!important;white-space:nowrap!important;
+    padding:5px clamp(4px,.42vw,7px)!important;
+    min-height:25px!important;max-height:28px!important;
+    border:1px solid #b67325!important;border-radius:999px!important;
+    background:linear-gradient(180deg,#1d1b1a 0%,#090b0e 100%)!important;
+    color:#fef9f3!important;
+    box-shadow:inset 0 1px 0 #ffbd5630,0 1px 4px #0006!important;
+    font-size:clamp(8px,.72vw,10.5px)!important;
+    font-weight:750!important;letter-spacing:0!important;line-height:1.1!important;
+    transition:background .15s,border-color .15s,box-shadow .15s!important;
+  }
+  html body .top .links a:hover,
+  html body .top .links a.current,
+  html body .top .links a[aria-current="page"]{
+    color:#fff!important;border-color:#ffae45!important;
+    background:linear-gradient(180deg,#ff9e24 0%,#dd5f00 100%)!important;
+    box-shadow:inset 0 1px 0 #fff4,0 0 9px #ff851440!important;
+  }
+  html body .top .links a:hover .an-nav-icon,
+  html body .top .links a.current .an-nav-icon,
+  html body .top .links a[aria-current="page"] .an-nav-icon{color:#fff!important}
+  html body .top .links a .an-nav-icon{width:11px;height:11px}
+  html body .top .an-desktop-login .an-nav-icon{
+    width:12px;height:12px;margin-right:4px;color:#ffae30;
+  }
+  /* The typed company name becomes a little larger on laptop/desktop only. */
+  html body .top .brand-copy strong{
+    font-size:clamp(20px,1.52vw,23px)!important;line-height:1.1!important;
+  }
+  html body .top .brand-copy small{
+    font-size:8.5px!important;letter-spacing:.48px!important;line-height:1.2!important;
+  }
+}
+@media (min-width:1180px){
+  /* Provide room for the slightly larger company name without enlarging nav pills. */
+  html body .top .wrap{
+    grid-template-columns:minmax(242px,260px) minmax(0,1fr) 37px 40px 108px!important;
+  }
+}
+@media (min-width:801px) and (max-width:1179px){
+  html body .top .brand-copy strong{font-size:21px!important}
+}
+@media (max-width:800px){
+  /* Only the links inside the existing three-dot menu change appearance. */
+  html body .top .links.open a{
+    display:flex!important;align-items:center!important;justify-content:flex-start!important;
+    gap:9px!important;margin:5px 10px!important;
+    min-height:32px!important;padding:7px 11px!important;
+    border:1px solid #9b5e24!important;border-radius:12px!important;
+    background:linear-gradient(180deg,#211b17,#101114)!important;
+    color:#fff9f3!important;box-shadow:inset 0 1px 0 #ffc1721c!important;
+    font-size:12px!important;font-weight:750!important;letter-spacing:.1px!important;
+  }
+  html body .top .links.open a .an-nav-icon{
+    width:15px;height:15px;color:#ffaf2e!important;
+  }
+  html body .top .links.open a.current,
+  html body .top .links.open a:hover,
+  html body .top .links.open a[aria-current="page"]{
+    color:#fff!important;border-color:#ffc267!important;
+    background:linear-gradient(90deg,#e96807,#a93d00)!important;
+  }
+  html body .top .links.open a.current .an-nav-icon,
+  html body .top .links.open a:hover .an-nav-icon,
+  html body .top .links.open a[aria-current="page"] .an-nav-icon{color:#fff!important}
+}
