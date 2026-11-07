@@ -302,3 +302,16 @@ body.an-about-details-mode #app .an2-founder-quote blockquote,
 @media(prefers-reduced-motion:reduce){
  #app .an-about-v3 .an-manager-contact,#app .an-about-v3 .an-manager-action{transition:none!important}
 }
+
+/* About action hierarchy: compact inline links and one broad premium CTA. */
+#app .an-about-v3 .an-inline-heading{display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:wrap!important;gap:5px 8px!important}
+#app .an-about-v3 .an-inline-heading>h1,#app .an-about-v3 .an-inline-heading>h2{flex:1 1 auto!important;min-width:0!important;margin:0!important}
+#app .an-about-v3 .an-inline-readmore{display:inline-flex!important;align-items:center!important;flex:0 0 auto!important;color:#ff8900!important;font-size:clamp(8px,.72vw,10px)!important;font-weight:900!important;text-decoration:none!important;border-bottom:1px solid #ff7900!important;padding:4px 2px!important}
+#app .an-about-v3 .an-inline-readmore:hover,#app .an-about-v3 .an-inline-readmore:focus-visible{color:#fff!important;border-color:#fff!important}
+#app .an-about-v3 .an-about-intro-panel>.an2-readmore-separate{display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:5!important;width:100%!important;max-width:none!important;flex-direction:column!important;align-items:stretch!important;gap:5px!important;margin:7px 0 0!important;padding:6px 0 0!important;border-top:1px solid #ff790055!important;flex:0 0 auto!important}
+#app .an-about-v3 .an-about-intro-panel>.an2-readmore-separate .an-about-readmore{display:flex!important;visibility:visible!important;pointer-events:auto!important;width:100%!important;min-height:clamp(38px,4.7vh,48px)!important;align-items:center!important;justify-content:center!important;gap:12px!important;margin:0!important;padding:6px 10px!important;border:1.5px solid #ffba56!important;border-radius:12px!important;background:linear-gradient(105deg,#ffb32f,#ff7900 65%,#e55b00)!important;color:#1a0e04!important;font-size:clamp(11px,.95vw,15px)!important;font-weight:950!important;letter-spacing:1px!important;text-decoration:none!important;box-shadow:0 5px 18px #ff79003c!important}
+#app .an-about-v3 .an-readmore-tagline{display:block!important;color:#fff!important;font-size:clamp(8px,.65vw,10px)!important;line-height:1.24!important;text-align:center!important}
+#app .an-about-v3 .an-about-intro-panel>.an2-readmore-separate .an-about-readmore:hover{background:linear-gradient(105deg,#ffc44a,#ff8200)!important;box-shadow:0 5px 22px #ff790075!important}
+#app .an-about-v3 .an-manager-career p{color:#fff!important}
+#app .an-about-v3 .an-manager-career .an-manager-career-key{color:#ff9200!important;font-weight:850!important}
+#app .an-about-v3 .an-manager-career .an-manager-label{color:#ff7900!important}
