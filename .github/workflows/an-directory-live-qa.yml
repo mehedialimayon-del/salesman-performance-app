@@ -78,8 +78,8 @@ jobs:
                 await search.fill('Universiti Malaya');
                 await page.waitForFunction(() => document.querySelectorAll('#results article').length===1);
                 await search.fill('');
-                await search.press('Escape');
-                assert.equal(await search.isVisible(),false);
+                await page.keyboard.press('Escape');
+                await search.waitFor({state:'hidden'});
                 await tools.getByRole('button',{name:'Choose scholarship type'}).click();
                 await page.locator('#an-scholarship-category-panel').waitFor();
                 await page.getByRole('button',{name:'All universities',exact:true}).click();
