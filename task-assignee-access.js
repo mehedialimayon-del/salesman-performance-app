@@ -11,6 +11,13 @@
    return id.includes('task')||(content.includes('assign')&&content.includes('task'));
  };
  const escapeHtml=s=>safe(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+ const isLeadership=p=>{
+   const id=String(p.staff_id||'').toUpperCase(),role=String(p.designation||'').toUpperCase().replaceAll(' ','_');
+   return ['PERVES_HIRA','WAHID_ADMIN'].includes(id)||String(p.zone_id||'').toUpperCase()==='HEAD_OFFICE'
+     ||/(HEAD_OF_SALES|SALES_ADMIN|DIRECTOR|CEO|HEAD_OFFICE)/.test(role);
+ };
+ const zoneLabel=id=>String(id||'').toUpperCase()==='PRIMARY'?'KL ZONE':String(id||'').replaceAll('_',' ').toUpperCase()+' ZONE';
+ const photoUrl=value=>{try{const u=new URL(String(value||''));return u.protocol==='https:'?u.href:'';}catch{return '';}};
  const lookup=async()=>{
    const db=window.FFH_SUPABASE;if(!db?.rpc)throw new Error('Cloud account service not connected');
    const {data,error}=await db.rpc('ffh_task_recipients');if(error)throw error;
@@ -30,8 +37,12 @@
    caption.style.cssText='color:#ff7b23;font-weight:800;letter-spacing:.04em';
    const scope=document.createElement('select');
    scope.setAttribute('aria-label','Filter task recipient zone');scope.style.cssText='background:#090b0e;color:white;border:1px solid #fa762b;border-radius:9px;padding:9px;max-width:250px';
-   scope.innerHTML='<option value="all">All active staff · company-wide</option><option value="zone">My zone + leadership</option>';
+   scope.innerHTML='<option value="leadership">LEADERSHIP · HEAD OFFICE</option><option value="zone:PRIMARY">KL ZONE</option><option value="all">ALL PERMITTED STAFF</option>';
    toolbar.append(caption,scope);
+   const managerIdentity=document.createElement('div');
+   managerIdentity.className='ffTaskRecipientManagerIdentity';
+   managerIdentity.setAttribute('aria-live','polite');
+   toolbar.append(managerIdentity);
    const search=document.createElement('input');
    search.type='search';search.setAttribute('aria-label','Search task recipients');
    search.placeholder='Search SR / manager / staff ID / zone';
@@ -48,9 +59,39 @@
    try{
      const people=await lookup();if(!form.isConnected)return;
      const managerGroup=people.filter(p=>p.can_manage===true);
-     if(!managerGroup.length)scope.value='zone';
-     for(const id of [...new Set(people.map(p=>p.zone_id).filter(Boolean))].sort()){
-       scope.add(new Option('ZONE · '+id,'zone:'+id));
+     const zones=[...new Set(people.map(p=>String(p.zone_id||'')).filter(Boolean))].sort();
+     for(const id of zones){
+       if(id==='PRIMARY')continue; // KL Zone is already present and always first after Leadership.
+       scope.add(new Option(zoneLabel(id),'zone:'+id));
+     }
+     const ownZone=people.find(p=>p.same_zone===true&&p.zone_id)?.zone_id;
+     scope.value=zones.includes('PRIMARY')&&people.some(p=>p.zone_id==='PRIMARY'&&p.same_zone===true)
+       ?'zone:PRIMARY':ownZone?'zone:'+ownZone:managerGroup.some(isLeadership)?'leadership':'all';
+     let zoneManagers=[];
+     function updateManagerIdentity(){
+       managerIdentity.replaceChildren();
+       const zid=scope.value.startsWith('zone:')?scope.value.slice(5):'';
+       if(!zid){managerIdentity.hidden=true;return;}
+       const row=zoneManagers.find(p=>String(p.zone_id||'').toUpperCase()===zid.toUpperCase());
+       const manager=people.find(p=>p.can_manage===true&&p.zone_id===zid&&p.staff_id===row?.staff_id)
+         ||people.find(p=>p.can_manage===true&&p.zone_id===zid);
+       const id=String(row?.login_id||manager?.login_id||manager?.staff_id||row?.staff_id||'');
+       const name=String(row?.manager_name||manager?.name||'Manager not assigned').trim();
+       const avatar=document.createElement('span');avatar.className='ffTaskRecipientManagerAvatar';
+       const url=photoUrl(row?.photo_url||window.FFH_STAFF_PHOTOS?.find?.(row?.staff_id||manager?.staff_id)?.photo_url);
+       if(url){
+         const img=document.createElement('img');img.src=url;img.alt=name+' profile photo';img.loading='lazy';
+         img.onerror=()=>{img.remove();avatar.textContent=(name[0]||'M').toUpperCase();};
+         img.onclick=e=>{e.stopPropagation();window.FFH_OPEN_IMAGE?.(url.includes('/photo-v2-')?url.replace('/photo-v2-','/full-v2-'):url);};
+         avatar.append(img);
+       }else avatar.textContent=(name[0]||'M').toUpperCase();
+       const label=document.createElement('span');label.className='ffTaskRecipientManagerText';
+       label.textContent=zoneLabel(zid)+' · '+name+(id?' · '+id:' · Staff ID pending');
+       managerIdentity.append(avatar,label);managerIdentity.hidden=false;
+     }
+     if(typeof ffhZoneManagers==='function'){
+       ffhZoneManagers().then(rows=>{zoneManagers=Array.isArray(rows)?rows:[];if(form.isConnected)updateManagerIdentity();})
+         .catch(err=>console.warn('Task recipient manager photo not available:',err?.message||err));
      }
      directoryButton.onclick=async()=>{
        directoryButton.disabled=true;
@@ -74,7 +115,7 @@
      };
      function render(){
        const selected=select.value||previous;
-       const scoped=scope.value==='zone'?people.filter(p=>p.same_zone===true||p.is_upward===true):
+       const scoped=scope.value==='leadership'?people.filter(isLeadership):
          scope.value.startsWith('zone:')?people.filter(p=>p.zone_id===scope.value.slice(5)):people;
        const term=search.value.trim().toLocaleLowerCase();
        const matched=term?scoped.filter(p=>[p.name,p.staff_id,p.login_id,p.zone_id,p.designation].join(' ').toLocaleLowerCase().includes(term)):scoped;
@@ -89,7 +130,8 @@
        if(people.some(p=>p.staff_id===selected)&&scoped.some(p=>p.staff_id===selected))select.value=selected;
        else select.value='';
        select.required=true;select.disabled=false;
-       note.textContent=matched.length+' of '+scoped.length+' active staff · All means all returned by signed-in cloud RPC; assignments do not grant dashboard, location, or private chat access.';
+       note.textContent=matched.length+' of '+scoped.length+' permitted staff · Assignment does not grant dashboard, location, or private chat access.';
+       updateManagerIdentity();
        window.FFH_STYLE_SELECT?.(select,{title:'Assign task to'});
      }
      // Keep the All active staff filter available for every logged-in role.
