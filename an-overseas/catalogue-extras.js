@@ -93,7 +93,7 @@ function cardMetrics(u,seq){
  return '<div class="an-card-facts" aria-label="University facts">'
   +tile('🏆',qs?'QS World Ranking':ranked?'Published ranking':'Ranking',qs?'#'+qs:ranked?profile.ranking:'See ranking',qs?'2027':ranked?profile.rankYear:'No verified rank')
   +tile('🎓','Total Programs',total?String(total):programmes.size?programmes.size+' listed':'See full catalogue',total?'Official portfolio count':programmes.size?'Portfolio selection':'Official programme directory')
-  +tile('◈','First-year tuition',average,comparable?'Average of '+parsed.length+' published annual fees':'Check programme-specific fees')
+  +tile('◈','Average Tuition Fee',average,comparable?'Average of '+parsed.length+' published annual fees':'Check programme-specific fees')
   +tile('◷','Upcoming intake',days>=0?date.label:'See intake dates',days>=0?'Deadline: '+date.date:'Official admissions schedule')
   +'</div>';
 }
@@ -114,6 +114,12 @@ function anNumberedCard(u){
    html=html.replace('<span class="badge">','<span class="badge an-type-closed">');
    html=html.replace('<div class="inside">','<div class="inside"><div class="an-closed-status">HISTORICAL RECORD · CLOSED '+esc(u.closedDate)+'</div>');
    return html.replace(/(<div class="uni-cover-wrap"[^>]*>)/,($0)=>$0+badge+favorite).replace('</article>','<p class="an-no-applications">Institution closed — applications unavailable</p></article>');
+ }
+ // Highlight the university abbreviation without shrinking its type size.
+ const short=String(u.short||'').trim();
+ if(short){
+   const escaped=short.replace(/[.*+?^$\{\}()|[\]\\]/g,'\\ html=html.replace(/<span class="an-guide-rank">[^<]*<\/span>/,'')');
+   html=html.replace(new RegExp('\\('+escaped+'\\)','g'),'<span class="an-shortname">('+esc(short)+')</span>');
  }
  html=html.replace(/<span class="an-guide-rank">[^<]*<\/span>/,'')
   .replace('<div class="inside">','<div class="inside"><div class="an-card-overview"><div class="an-card-identity">')
