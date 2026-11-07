@@ -100,6 +100,23 @@ body:has(.university-catalogue) .page-head .catalogue-tools{width:100%!important
  body:has(.university-catalogue) .an-university-directory-bar{margin:0!important;padding:0!important}
  body:has(.university-catalogue) .university-catalogue{padding-top:0!important}
 }
+
+/* Correct the grid collision visible in the desktop screenshot. */
+@media(min-width:1050px){
+ body:has(.university-catalogue) .page-head>.wrap{display:grid!important;grid-template-columns:minmax(245px,330px) minmax(0,1fr)!important;align-items:center!important;gap:12px!important;min-height:47px!important}
+ body:has(.university-catalogue) .page-head .an-directory-heading{grid-column:1!important;grid-row:1!important;display:flex!important;flex-direction:column!important;justify-content:center!important;margin:0!important;padding:0 0 0 10px!important;min-width:0!important}
+ body:has(.university-catalogue) .page-head .an-directory-heading .bread{display:none!important}
+ body:has(.university-catalogue) .page-head .an-directory-heading h1{font-size:clamp(23px,2.1vw,31px)!important;white-space:nowrap!important;line-height:1.05!important}
+ body:has(.university-catalogue) .page-head .an-directory-heading .an-directory-subtitle{margin-top:2px!important}
+ body:has(.university-catalogue) .page-head .catalogue-tools{grid-column:2!important;grid-row:1!important;display:grid!important;grid-template-columns:minmax(150px,1fr) 132px 118px 105px!important;gap:8px!important;min-width:0!important;width:100%!important;margin:0!important;align-items:center!important}
+ body:has(.university-catalogue) .page-head .catalogue-tools>*{min-width:0!important;max-width:100%!important;position:relative!important}
+ body:has(.university-catalogue) .page-head .catalogue-filter{min-width:0!important;width:100%!important}
+ body:has(.university-catalogue) .page-head .catalogue-filter summary{width:100%!important;min-width:0!important}
+ body:has(.university-catalogue) .page-head .catalogue-search{min-width:0!important;width:100%!important}
+ body:has(.university-catalogue) .page-head .catalogue-search input{width:100%!important;min-width:0!important}
+ body:has(.university-catalogue) .page-head .an-scholarship-category-wrap{min-width:0!important;width:100%!important}
+ body:has(.university-catalogue) .page-head .an-catalogue-favourites{min-width:0!important;width:100%!important}
+}
 `;
 const style=document.createElement('style');style.textContent=css;document.head.appendChild(style);
 function setStickyTop(){
@@ -114,6 +131,11 @@ function mount(){
  if(!directory||!head)return;
  const tools=directory.querySelector('.catalogue-tools'),wrap=head.querySelector('.wrap');
  if(tools&&wrap&&tools.parentElement!==wrap)wrap.appendChild(tools);
+ if(wrap){
+  const bread=wrap.querySelector('.bread');
+  const heading=wrap.querySelector('.an-directory-heading');
+  if(bread&&heading&&bread.parentElement!==heading)heading.insertBefore(bread,heading.firstChild);
+ }
  if(wrap&&!wrap.querySelector('.an-directory-heading')){
   const h=wrap.querySelector('h1');
   if(h){
@@ -122,6 +144,7 @@ function mount(){
    const sub=document.createElement('div');sub.className='an-directory-subtitle';
    sub.innerHTML='<b>6,210 Universities</b> <span>• 40 Study Destinations</span>';
    holder.appendChild(sub);
+   const bread=wrap.querySelector('.bread');if(bread)holder.insertBefore(bread,holder.firstChild);
   }
  }
  if(tools){
@@ -137,7 +160,7 @@ function mount(){
  }
  if(tools){
   const search=tools.querySelector('.catalogue-search'),scholarship=tools.querySelector('.an-scholarship-category-wrap'),fav=tools.querySelector('.an-catalogue-favourites'),filter=tools.querySelector('.catalogue-filter');
-  [search,scholarship,fav,filter].forEach(el=>{if(el)tools.appendChild(el)});
+  [search,scholarship,fav,filter].forEach((el,i)=>{if(el&&tools.children[i]!==el)tools.insertBefore(el,tools.children[i]||null)});
  }
  const count=directory.querySelector('#an-global-count');
  if(count&&count.textContent.includes('universities in our world directory'))count.textContent='6,210 matching universities of 6,210 worldwide · All Countries';
