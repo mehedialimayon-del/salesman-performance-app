@@ -209,3 +209,10 @@ body.an-about-details-mode #app .an2-service a:focus-visible {
     animation:none!important;
   }
 }
+
+/* Split colour titles with readable white description on dark card. */
+body.an-about-details-mode #app .an2-service-grid .an2-service h3{color:#fff!important;font-weight:900!important}
+body.an-about-details-mode #app .an2-service-grid .an2-service h3 .an2-title-accent{color:#ff7900!important}
+body.an-about-details-mode #app .an2-service-grid .an2-service h3 .an2-title-rest{color:#fff!important}
+body.an-about-details-mode #app .an2-service-grid .an2-service p{color:#fff!important;opacity:1!important}
+body.an-about-details-mode #app .an2-service-grid .an2-service-num{color:#ff7900!important}
