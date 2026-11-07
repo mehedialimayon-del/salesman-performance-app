@@ -85,6 +85,33 @@
   }
   // SVG displacement creates real ripples within each stationary country flag.
   const wavingFlagFilter='<svg class="an2-wave-filter-defs" aria-hidden="true" width="0" height="0" focusable="false" xmlns="http://www.w3.org/2000/svg"><defs><filter id="an2-flags-fabric-ripple" x="-14%" y="-20%" width="128%" height="140%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.024 0.075" numOctaves="1" seed="8" result="fabricNoise"><animate attributeName="baseFrequency" values="0.024 0.075;0.035 0.095;0.018 0.08;0.024 0.075" dur="3.2s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="fabricNoise" scale="3.8" xChannelSelector="R" yChannelSelector="G"/></filter></defs></svg>';
+
+  /* Approved image supplied in chat, shown without reconstruction on mobile.
+     Source pixels: 864 x 1536; hero crop: x18..846 and y235..1391.
+     Only the country-flag patches are overlaid with moving cloth distortion. */
+  function approvedFounderArtwork(){
+    const src='https://d2ol7oe51mr4n9.cloudfront.net/user_3J7eLpAsZ71YVjJWQaNzcGsV3TY/adcc9b9f-f11c-4a3a-a811-b209ce412fbe.png';
+    const bounds=[
+      [104,744,94,56],[213,749,71,50],[293,745,70,55],[381,749,63,52],
+      ...[810,859,906,954,1001,1048,1094].flatMap(y=>
+        [[102,60],[172,60],[241,62],[312,61],[381,65]].map(([x,w])=>[x,y,w,43])),
+      [102,1140,61,42],[173,1140,62,42]
+    ];
+    const masks=bounds.map(([x,y,w,h])=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3"/>').join('');
+    const image='<image href="'+src+'" x="0" y="0" width="864" height="1536" />';
+    return '<div class="an2-approved-reference-hero" aria-label="A&N Overseas founder message from the approved reference artwork">'
+      +'<img class="an2-approved-reference-source" src="'+src+'" alt="Founder’s message: Global education opens doors to new opportunities and meaningful support. Below are waving study destination flags and Nusrat Nasrin in a black business suit." loading="eager" decoding="async">'
+      +'<svg class="an2-approved-reference-waves" viewBox="18 235 828 1156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'
+      +'<defs><clipPath id="an2-approved-flag-crop" clipPathUnits="userSpaceOnUse">'+masks+'</clipPath>'
+      +'<filter id="an2-approved-cloth-distortion" x="-3%" y="-3%" width="106%" height="106%">'
+      +'<feTurbulence type="fractalNoise" baseFrequency="0.014 0.075" numOctaves="1" seed="9" result="noise">'
+      +'<animate attributeName="baseFrequency" values="0.014 0.075;0.034 0.091;0.013 0.061;0.014 0.075" dur="3.1s" repeatCount="indefinite"/>'
+      +'</feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="14" xChannelSelector="R" yChannelSelector="G">'
+      +'<animate attributeName="scale" values="9;17;11;9" dur="3.1s" repeatCount="indefinite"/>'
+      +'</feDisplacementMap></filter></defs>'
+      +'<g clip-path="url(#an2-approved-flag-crop)"><g filter="url(#an2-approved-cloth-distortion)">'+image+'</g></g>'
+      +'</svg></div>';
+  }
   function renderStory(){
     const directory = currentDirectory();
     const uniCount = directory.universities == null ? 'Loading…' : directory.universities.toLocaleString('en-US');
@@ -93,6 +120,7 @@
     return '<main class="an2-story wrap" id="an2-story">'+
       '<div class="an2-topline"><a href="#/about" class="an2-back">← ABOUT US</a><span>THE PEOPLE · THE PURPOSE · THE PROMISE</span></div>'+
       '<header class="an2-founder-hero">'+
+        approvedFounderArtwork()+
         '<div class="an2-founder-brand"><img src="assets/brand-logo.jpg" alt="A&N Overseas Education & Consultancy brand logo"><span>ESTABLISHED 2024 · MALAYSIA & BANGLADESH</span><strong>ROOTED IN EXPERIENCE.<br><em>BUILT FOR YOUR FUTURE.</em></strong></div>'+
         '<div class="an2-founder-quote"><span class="an2-quote-mark" aria-hidden="true">“</span><blockquote>Global education opens doors to new opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you. <span class="an2-end-quote" aria-label="End of quote">”</span></blockquote><div class="an2-quote-footer"><div class="an2-quote-sign"><div class="an2-flags-journey" aria-label="Bangladesh and Malaysia, with featured global study destinations"><span class="an2-flags-overline">FROM HOME TO THE WORLD <span class="an2-plane-mark" aria-hidden="true">✈</span></span><div class="an2-floating-flags">'+journeyFlags()+'</div>'+wavingFlagFilter+'<small>Bangladesh · Malaysia · Global possibilities</small></div><span class="an2-founder-message-label"><span class="an2-founder-msg-orange">FOUNDER’S MESSAGE</span> <span class="an2-founder-msg-white">· A&amp;N OVERSEAS</span></span></div><figure class="an2-founder-person"><img src="https://d2ol7oe51mr4n9.cloudfront.net/user_3J7eLpAsZ71YVjJWQaNzcGsV3TY/910707ad-d082-4cf5-8410-0bf049fdc75b.png" alt="Nusrat Nasrin — Founder, A&N Overseas" loading="eager" decoding="async"></figure></div></div>'+
       '</header>'+
