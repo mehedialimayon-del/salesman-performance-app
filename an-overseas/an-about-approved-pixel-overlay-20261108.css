@@ -220,9 +220,12 @@
    transform:none!important;filter:drop-shadow(-2px 0 3px #ffe0a2) drop-shadow(0 0 13px #ff8a1dc9)!important;
  }
  html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-founder-person::before{
-   content:"NUSRAT NASRIN";position:absolute;z-index:1;left:12%;right:7%;bottom:4.8%;
-   padding:.2em 0;text-align:center;border:1px solid #ffad56;box-shadow:0 0 9px #ed680b80;border-radius:999px;
-   background:#140a04;color:#fff;font-size:clamp(8px,1.25vw,17px);font-weight:850;letter-spacing:.09em;
+   content:"NUSRAT NASRIN";position:absolute;z-index:1;left:22%;right:3%;bottom:0;
+   padding:.25em .15em 1.35em;text-align:center;border:1px solid #ffad56;box-shadow:inset 0 0 9px #ed680b60;border-radius:9px;
+   background:#140a04;color:#fff;font-size:clamp(9px,1.2vw,16px);font-weight:850;letter-spacing:.06em;line-height:1.15;
  }
- html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-founder-person::after{z-index:1;}
+ html body.an-about-details-mode.an-reference-pixel-view #app #an2-story .an2-exact-hero .an2-founder-person::after{
+   z-index:2;left:22%;right:3%;bottom:.4em;color:#ffc675;
+   font-size:clamp(6px,.74vw,11px);white-space:nowrap;
+ }
 }
