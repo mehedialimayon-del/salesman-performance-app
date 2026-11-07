@@ -22,3 +22,20 @@ html body.an-about-details-mode #app .an2-trust-grid article{border-color:#f0781
  html body.an-about-details-mode.an-reference-pixel-view #app .an2-exact-hero .an2-exact-towers{background:radial-gradient(ellipse at 60% 53%,rgba(255,106,0,.57),transparent 73%),linear-gradient(90deg,rgba(255,108,0,.32),transparent 85%),url('assets/malaysia-skyline-clean.jpg') 69% 43% / auto 128% no-repeat!important;mask-image:linear-gradient(90deg,transparent,black 24%)!important;-webkit-mask-image:linear-gradient(90deg,transparent,black 24%)!important}
  html body.an-about-details-mode.an-reference-pixel-view #app .an2-exact-hero>.an2-nav a:hover{background:rgba(255,113,0,.24)!important;border-color:#ff7900!important}
 }
+
+/* Exact requested identity-card palette, including mobile. */
+html body.an-about-details-mode #app .an2-trust-grid article b,
+html body.an-about-details-mode #app .an2-trust-grid article:nth-child(n) b{color:#fff!important}
+html body.an-about-details-mode #app .an2-trust-grid article h3,
+html body.an-about-details-mode #app .an2-trust-grid article:nth-child(n) h3{color:#fff!important}
+html body.an-about-details-mode #app .an2-trust-grid article p,
+html body.an-about-details-mode #app .an2-trust-grid article:nth-child(n) p{color:#fff!important}
+html body.an-about-details-mode #app .an2-trust-grid article p strong,
+html body.an-about-details-mode #app .an2-trust-grid article p em{color:#ff8500!important}
+html body.an-about-details-mode #app .an2-trust-grid article{background:linear-gradient(125deg,#291b17,#10141b)!important}
+html body.an-about-details-mode #app .an2-story :is(.an2-section-label,.an2-nav a:hover,.an2-service-num){color:#ff7900!important}
+@media(max-width:800px){
+ html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-graduate-globe{overflow:visible!important;clip-path:none!important;isolation:isolate!important}
+ html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-graduate-globe .an2-globe-cap{display:block!important;visibility:visible!important;opacity:1!important;z-index:12!important;top:10px!important}
+ html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-graduate-globe .an2-globe-cap svg{display:block!important;visibility:visible!important;opacity:1!important}
+}
