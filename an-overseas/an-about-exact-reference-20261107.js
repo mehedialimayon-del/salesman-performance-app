@@ -59,7 +59,7 @@
    sign.insertBefore(flags,sign.querySelector('.an2-founder-message-label'));
   }
   if(portrait&&footer)footer.appendChild(portrait);
-  if(slogan&&brand){slogan.classList.remove('an2-exact-slogan');brand.appendChild(slogan)}
+  if(slogan&&brand){slogan.classList.remove('an2-exact-slogan');slogan.innerHTML=old.originalSlogan;brand.appendChild(slogan)}
   quote.querySelector('blockquote').innerHTML=old.originalQuote;
   hero.querySelectorAll('.an2-exact-logo,.an2-exact-company,.an2-exact-sub,.an2-exact-est,.an2-exact-towers,.an2-exact-world-title,.an2-exact-plane,.an2-exact-globe,.an2-exact-name,.an2-exact-role,.an2-exact-flagband').forEach(n=>n.remove());
   hero.classList.remove('an2-exact-hero');
@@ -77,7 +77,7 @@
   const blockquote=quote?.querySelector('blockquote');
   const flagNodes=flags?.querySelector('.an2-floating-flags') ? Array.from(flags.querySelector('.an2-floating-flags').children):[];
   if(!brand||!quote||!nav||!footer||!sign||!flags||!portrait||!slogan||!blockquote)return;
-  snapshots.set(hero,{brand,quote,nav,footer,sign,flags,portrait,slogan,flagNodes,originalQuote:blockquote.innerHTML});
+  snapshots.set(hero,{brand,quote,nav,footer,sign,flags,portrait,slogan,flagNodes,originalQuote:blockquote.innerHTML,originalSlogan:slogan.innerHTML});
   hero.classList.add('an2-exact-hero');
   blockquote.innerHTML=quoteHtml;
   brand.insertBefore(element('span','an2-exact-logo'),brand.firstChild);
