@@ -60,10 +60,11 @@
  html body.an-about-details-mode.an-reference-pixel-view #app .an2-exact-hero .an2-founder-person img{
    display:block!important;visibility:visible!important;opacity:1!important;
    position:absolute!important;top:auto!important;left:auto!important;
-   right:-2.2%!important;bottom:0!important;
-   height:100%!important;width:auto!important;max-width:none!important;max-height:none!important;
+   right:-12%!important;bottom:-25px!important;
+   height:150%!important;width:auto!important;max-width:none!important;max-height:none!important;
    object-fit:contain!important;object-position:right bottom!important;
    filter:drop-shadow(0 5px 7px #0007)!important;transform:none!important;
+   clip-path:none!important;-webkit-mask-image:none!important;mask-image:none!important;
  }
  html body.an-about-details-mode.an-reference-pixel-view #app .an2-exact-hero .an2-founder-person figcaption{
    display:none!important;
@@ -179,5 +180,10 @@
   html body.an-about-details-mode.an-reference-pixel-view #app .an-reference-flag-cloth::after{
     animation:none!important;transform:none!important;
   }
+ }
+}
+@media(min-width:801px) and (max-width:1199px){
+ html body.an-about-details-mode.an-reference-pixel-view #app .an2-exact-hero .an2-founder-person img{
+  height:124%!important;right:-6%!important;bottom:-16px!important;
  }
 }
