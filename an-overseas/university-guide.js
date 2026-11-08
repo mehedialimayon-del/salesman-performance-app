@@ -281,6 +281,9 @@ const leidenPanel=u=>{
  link(leidenLink(record),'CWTS university profile')+link('https://open.leidenranking.com/resources','Open edition data')+'</div>';
 };
 const additionalRankProviders={
+ q:['QS World 2027','World ranking',ref=>'https://www.topuniversities.com/universities/'+ref],
+ a:['QS 2027','South-Eastern Asia',ref=>'https://www.topuniversities.com/universities/'+ref],
+ b:['QS Asia 2026','Asia ranking',ref=>'https://www.topuniversities.com/universities/'+ref],
  c:['CWUR 2026','World · Global 2000',ref=>'https://www.cwur.org/2026/'+ref+'.php'],
  s:['SCImago 2026','World · universities',()=> 'https://www.scimagoir.com/rankings.php?sector=Higher+educ&year=2026'],
  e:['EduRank 2026','World · overall',ref=>'https://edurank.org/uni/'+ref+'/rankings/'],
