@@ -181,3 +181,63 @@ body.an-about-locked #app>.an-about-v3{box-sizing:border-box;display:flex!import
  #app .an-about-v3 .an-fact-note{font-size:10.5px!important;line-height:1.38!important}
  #app .an-about-v3 .an-fact-tile:last-child{min-height:175px!important}
 }
+
+/* Mobile About opens with the founder story and keeps management below it. */
+#app .an-about-mobile-opening,
+#app .an2-overview-cards { display:none; }
+
+@media (max-width:800px) {
+  html body #app .an-about-v3 .an-about-duo > .an-about-intro-panel {
+    display:none!important;
+  }
+  #app .an-about-mobile-opening {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    width:100%;
+    min-height:var(--an-about-opening-height, 70dvh);
+    padding:0 0 max(8px, env(safe-area-inset-bottom));
+  }
+  #app .an-about-mobile-art {
+    flex:1;
+    display:grid;
+    align-items:center;
+    width:min(100%, max(280px, calc((var(--an-about-opening-height, 70dvh) - 163px) * .716)));
+  }
+  #app .an-about-mobile-readmore {
+    display:grid;
+    grid-auto-flow:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    width:100%;
+    min-height:44px;
+    border:1px solid #ffac36;
+    border-radius:14px;
+    background:linear-gradient(110deg,#ffb42d,#ff7600);
+    color:#1c1108;
+    font-weight:900;
+    letter-spacing:.08em;
+  }
+  #app .an2-overview-cards {
+    display:grid;
+    gap:12px;
+    margin:0 0 18px;
+  }
+  #app .an2-overview-cards article {
+    background:linear-gradient(130deg,#291b17,#10141b);
+    border-color:#f07813;
+  }
+  #app .an2-overview-cards h2 {
+    margin:0 0 8px;
+    font-size:clamp(19px,5vw,26px);
+  }
+  #app .an2-overview-cards .an2-future-graphic {
+    display:block;
+    width:55px;
+    height:55px;
+    margin-bottom:8px;
+  }
+}

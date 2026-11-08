@@ -2,7 +2,7 @@
    the user's exact founder reference artwork. Mobile only.
    Existing desktop design, chapters, tabs, services and navigation are untouched. */
 @media(max-width:800px){
-  html body.an-about-details-mode #app .an2-founder-hero{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero{
     display:flex!important;
     flex-direction:column!important;
     justify-content:flex-start!important;
@@ -21,7 +21,7 @@
   }
   /* Restore the ORIGINAL DOM section that an earlier override hid.
      It contains the logo, ESTABLISHED 2024, and ROOTED IN EXPERIENCE slogan. */
-  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-brand{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero > .an2-founder-brand{
     display:grid!important;
     grid-template-columns:minmax(94px,29%) minmax(0,1fr)!important;
     grid-template-rows:auto auto!important;
@@ -45,7 +45,7 @@
     z-index:4!important;
     text-align:left!important;
   }
-  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-brand > img{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero > .an2-founder-brand > img{
     display:block!important;
     grid-column:1!important;grid-row:1 / span 2!important;
     align-self:center!important;justify-self:center!important;
@@ -59,7 +59,7 @@
     background:transparent!important;
     filter:drop-shadow(0 4px 8px rgba(0,0,0,.22))!important;
   }
-  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-brand > span{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero > .an2-founder-brand > span{
     display:block!important;
     grid-column:2!important;grid-row:1!important;
     align-self:end!important;justify-self:start!important;
@@ -71,7 +71,7 @@
     white-space:normal!important;
     margin:0!important;padding:0!important;
   }
-  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-brand > strong{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero > .an2-founder-brand > strong{
     display:block!important;
     grid-column:2!important;grid-row:2!important;
     align-self:start!important;justify-self:start!important;
@@ -83,12 +83,12 @@
     margin:0!important;padding:3px 0 0!important;
     white-space:normal!important;
   }
-  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-brand > strong em{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero > .an2-founder-brand > strong em{
     color:#ffae53!important;
     font-style:normal!important;
   }
   /* The approved photo starts exactly where its quote begins, not above logo. */
-  html body.an-about-details-mode #app .an2-founder-hero > .an2-approved-reference-hero{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero > .an2-approved-reference-hero{
     display:block!important;
     order:1!important;
     flex:0 0 auto!important;
@@ -104,18 +104,18 @@
     border:0!important;
     background:#191513!important;
   }
-  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-quote{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero > .an2-founder-quote{
     display:none!important;
     order:2!important;
   }
   /* Gentle clarity lift to the unchanged approved bitmap.
      Does not redraw eyes, face, hair or change original image geometry. */
-  html body.an-about-details-mode #app .an2-founder-hero .an2-approved-reference-source{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero .an2-approved-reference-source{
     filter:contrast(1.035) saturate(1.02)!important;
   }
   /* Separate portrait-only sharpening without redrawing the face.
      Uses the very same approved bitmap; no generative facial changes. */
-  html body.an-about-details-mode #app .an2-approved-reference-sharp{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-sharp{
     display:block!important;
     position:absolute!important;
     inset:0!important;
@@ -125,30 +125,30 @@
     overflow:hidden!important;
     pointer-events:none!important;
   }
-  html body.an-about-details-mode #app .an2-founder-hero.an2-approved-source-error > .an2-approved-reference-hero{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero.an2-approved-source-error > .an2-approved-reference-hero{
     display:none!important;
   }
-  html body.an-about-details-mode #app .an2-founder-hero.an2-approved-source-error > .an2-founder-quote{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero.an2-approved-source-error > .an2-founder-quote{
     display:flex!important;
   }
 }
 @media(max-width:370px){
-  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-brand{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero > .an2-founder-brand{
     grid-template-columns:minmax(86px,29%) minmax(0,1fr)!important;
     column-gap:9px!important;
     padding:9px 7px 12px!important;
     min-height:106px!important;
   }
-  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-brand > img{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero > .an2-founder-brand > img{
     height:88px!important;max-height:88px!important;
   }
-  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-brand > strong{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero > .an2-founder-brand > strong{
     font-size:clamp(13px,4.05vw,17px)!important;
   }
 }
 /* Do not alter desktop layout: the approved image/extra brand row is mobile only. */
 @media(min-width:801px){
-  html body.an-about-details-mode #app .an2-approved-reference-sharp{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-sharp{
     display:none!important;
   }
 }
@@ -156,16 +156,16 @@
 /* About Details: restore the entire founder quote as crisp accessible live text.
    The original supplied art and portrait underneath remain unchanged. Mobile only. */
 @media(max-width:800px){
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand{
    grid-template-columns:minmax(104px,31%) minmax(0,1fr)!important;
  }
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>img{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>img{
    width:100%!important;height:104px!important;max-width:125px!important;
    object-fit:contain!important;border:0!important;border-radius:0!important;
    background:transparent!important;mix-blend-mode:screen!important;
    filter:drop-shadow(0 1px 3px rgba(246,159,55,.24))!important;
  }
- html body.an-about-details-mode #app .an2-approved-reference-hero .an2-mobile-complete-quote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-hero .an2-mobile-complete-quote{
    display:flex!important;position:absolute!important;z-index:4!important;
    top:0.5%!important;left:6.4%!important;width:87.2%!important;
    height:32.9%!important;min-height:0!important;box-sizing:border-box!important;
@@ -177,34 +177,34 @@
    box-shadow:inset 0 1px rgba(255,210,148,.24),0 2px 12px rgba(255,128,34,.2)!important;
    color:#fff3e7!important;
  }
- html body.an-about-details-mode #app .an2-mobile-complete-quote blockquote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-mobile-complete-quote blockquote{
    display:block!important;width:100%!important;max-width:100%!important;
    margin:0!important;padding:0!important;border:0!important;
    font:italic 500 clamp(10.5px,2.9vw,15px)/1.24 Georgia,'Times New Roman',serif!important;
    letter-spacing:0!important;color:#fff2e5!important;text-align:left!important;
    overflow-wrap:break-word!important;
  }
- html body.an-about-details-mode #app .an2-mobile-complete-quote blockquote strong{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-mobile-complete-quote blockquote strong{
    font-weight:850!important;color:#ffba65!important;
  }
- html body.an-about-details-mode #app .an2-mobile-open-quote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-mobile-open-quote{
    position:absolute!important;left:5px!important;top:-8px!important;
    font:900 35px/.95 Georgia,serif!important;color:#ffc072!important;
    text-shadow:0 0 8px rgba(255,145,41,.3);
  }
- html body.an-about-details-mode #app .an2-mobile-close-quote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-mobile-close-quote{
    color:#ffab58!important;font-weight:900!important;font-size:1.55em!important;
    line-height:.6!important;vertical-align:-.2em!important;
  }
- html body.an-about-details-mode #app .an2-approved-reference-sharp{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-sharp{
    opacity:1!important;filter:contrast(1.07) saturate(1.035)!important;
  }
 }
 @media(max-width:380px){
- html body.an-about-details-mode #app .an2-approved-reference-hero .an2-mobile-complete-quote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-hero .an2-mobile-complete-quote{
    padding:11px 7px 6px 10px!important;height:33.8%!important;
  }
- html body.an-about-details-mode #app .an2-mobile-complete-quote blockquote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-mobile-complete-quote blockquote{
    font-size:clamp(9.8px,2.85vw,11px)!important;line-height:1.17!important;
  }
 }
@@ -213,7 +213,7 @@
 /* Founder mobile v4 — one continuous hero surface, one clean quotation frame.
    Do not change the flags/portrait positions, desktop layout or navigation. */
 @media(max-width:800px){
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
    display:block!important;grid-column:1!important;grid-row:1 / span 2!important;
    position:relative!important;justify-self:center!important;align-self:center!important;
    width:clamp(102px,28vw,133px)!important;height:104px!important;
@@ -222,7 +222,7 @@
    overflow:hidden!important;clip-path:ellipse(48% 49% at 50% 50%)!important;
    mix-blend-mode:screen!important;filter:drop-shadow(0 2px 6px rgba(255,155,35,.2))!important;
  }
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo img{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo img{
    display:block!important;position:absolute!important;top:8%!important;left:0!important;
    width:300%!important;height:84%!important;max-width:none!important;max-height:none!important;
    margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
@@ -230,11 +230,11 @@
    filter:brightness(1.12) contrast(1.06)!important;
  }
  /* Keep original artwork below, but remove its old quote frame/text cleanly. */
- html body.an-about-details-mode #app .an2-founder-hero>.an2-approved-reference-hero{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-approved-reference-hero{
    border-radius:19px!important;overflow:hidden!important;
    background:#1a1513!important;
  }
- html body.an-about-details-mode #app .an2-approved-reference-hero::before{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-hero::before{
    content:"";display:block!important;position:absolute!important;z-index:3!important;
    top:0!important;left:0!important;width:100%!important;height:35.1%!important;
    border:0!important;margin:0!important;padding:0!important;
@@ -242,7 +242,7 @@
    background:linear-gradient(135deg,#1b1514 0%,#211713 54%,#191519 100%)!important;
    pointer-events:none!important;
  }
- html body.an-about-details-mode #app .an2-approved-reference-hero .an2-mobile-complete-quote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-hero .an2-mobile-complete-quote{
    top:1.4%!important;left:5.5%!important;width:89%!important;height:32.5%!important;
    border:1.4px solid #fba04c!important;border-radius:17px!important;
    padding:14px 12px 11px 18px!important;
@@ -250,65 +250,65 @@
    box-shadow:inset 0 1px rgba(255,213,155,.16),0 4px 13px rgba(0,0,0,.16)!important;
    overflow:hidden!important;z-index:5!important;
  }
- html body.an-about-details-mode #app .an2-mobile-open-quote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-mobile-open-quote{
    top:1px!important;left:6px!important;font-size:30px!important;
  }
- html body.an-about-details-mode #app .an2-mobile-complete-quote blockquote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-mobile-complete-quote blockquote{
    font-size:clamp(10.5px,2.83vw,14px)!important;line-height:1.25!important;
  }
- html body.an-about-details-mode #app .an2-approved-reference-sharp{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-sharp{
    filter:contrast(1.065) saturate(1.035)!important;
  }
 }
 @media(max-width:380px){
- html body.an-about-details-mode #app .an2-approved-reference-hero .an2-mobile-complete-quote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-hero .an2-mobile-complete-quote{
    top:1.25%!important;height:33%!important;padding:10px 8px 8px 13px!important;
  }
- html body.an-about-details-mode #app .an2-mobile-complete-quote blockquote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-mobile-complete-quote blockquote{
    font-size:clamp(9.7px,2.77vw,10.6px)!important;line-height:1.19!important;
  }
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
    height:91px!important;width:98px!important;
  }
 }
 
 /* Mobile founder refinement v5: precise header emblem; equal quotation glyphs; cloth waves tied to poles. */
 @media(max-width:800px){
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
    width:104px!important;height:93px!important;clip-path:none!important;overflow:visible!important;
    display:flex!important;align-items:center!important;justify-content:center!important;
    background:transparent!important;mix-blend-mode:normal!important;
  }
- html body.an-about-details-mode #app .an2-founder-hero .an2-founder-logo-crop{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero .an2-founder-logo-crop{
    position:relative!important;display:block!important;flex:none!important;
    width:78px!important;height:66px!important;overflow:hidden!important;
    clip-path:ellipse(48% 49% at 50% 50%)!important;
    mix-blend-mode:screen!important;filter:drop-shadow(0 2px 5px rgba(255,170,45,.22))!important;
  }
- html body.an-about-details-mode #app .an2-founder-hero .an2-founder-logo-crop>img{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero .an2-founder-logo-crop>img{
    position:absolute!important;display:block!important;top:5px!important;left:0!important;
    width:218px!important;height:59px!important;max-width:none!important;max-height:none!important;
    padding:0!important;margin:0!important;
    object-fit:fill!important;border:0!important;border-radius:0!important;
    filter:brightness(1.12)!important;mix-blend-mode:screen!important;
  }
- html body.an-about-details-mode #app .an2-approved-reference-hero .an2-mobile-complete-quote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-hero .an2-mobile-complete-quote{
    padding-left:19px!important;
  }
- html body.an-about-details-mode #app .an2-mobile-open-quote,
- html body.an-about-details-mode #app .an2-mobile-close-quote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-mobile-open-quote,
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-mobile-close-quote{
    font:900 1.15em/1 Georgia,'Times New Roman',serif!important;
    color:#ffb55d!important;text-shadow:none!important;letter-spacing:0!important;
  }
- html body.an-about-details-mode #app .an2-mobile-open-quote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-mobile-open-quote{
    position:static!important;display:inline!important;align-self:flex-start!important;
    flex:0 0 auto!important;margin:0 1px 0 -13px!important;
  }
- html body.an-about-details-mode #app .an2-mobile-close-quote{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-mobile-close-quote{
    display:inline!important;position:static!important;margin-left:2px!important;
    vertical-align:baseline!important;
  }
- html body.an-about-details-mode #app .an2-approved-reference-waves{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-waves{
    z-index:4!important;
  }
  html body.an-about-details-mode #app .an2-live-flag-fabric{
@@ -324,7 +324,7 @@
  }
 }
 @media(max-width:380px){
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
    width:94px!important;height:85px!important;
  }
 }
@@ -334,7 +334,7 @@
 
 /* Founder v7: mirror the actual animated website-header logo; keep ORIGINAL flag artwork. */
 @media(max-width:800px){
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
    display:flex!important;align-items:center!important;justify-content:center!important;
    width:108px!important;height:91px!important;clip-path:none!important;
    background:transparent!important;overflow:visible!important;filter:none!important;
@@ -359,7 +359,7 @@
  html body.an-about-details-mode #app .an2-founder-header-logo .logo-motion{
    zoom:1.3!important;
  }
- html body.an-about-details-mode #app .an2-approved-reference-waves{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-waves{
    z-index:2!important;pointer-events:none!important;
  }
  html body.an-about-details-mode #app .an2-original-flag-sheen{
@@ -380,7 +380,7 @@
 /* Founder v8: original unmodified flag pixels remain the only visible flags.
    Previous feDisplacementMap redrew the image into torn geometric shapes on Android. */
 @media(max-width:800px){
- html body.an-about-details-mode #app .an2-approved-reference-waves{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-waves{
    display:block!important;opacity:1!important;filter:none!important;
    z-index:2!important;pointer-events:none!important;
  }
@@ -413,13 +413,13 @@
    The geometrically distorted overlays must NEVER be visible, including stale DOM
    left behind by soft-navigation transitions. */
 @media(max-width:800px){
- html body.an-about-details-mode #app .an2-approved-reference-waves,
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-waves,
  html body.an-about-details-mode #app .an2-live-flag,
  html body.an-about-details-mode #app .an2-original-flag-sheen{
    display:none!important;visibility:hidden!important;opacity:0!important;
    animation:none!important;filter:none!important;
  }
- html body.an-about-details-mode #app .an2-approved-reference-source{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-source{
    display:block!important;visibility:visible!important;opacity:1!important;
  }
 }
@@ -439,11 +439,11 @@
    max-width:none!important;max-height:none!important;
    margin:4px 0 0!important;transform:none!important;object-fit:fill!important;
  }
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
    width:99px!important;height:86px!important;justify-self:center!important;
    overflow:visible!important;clip-path:none!important;
  }
- html body.an-about-details-mode #app .an2-approved-reference-fabric{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-fabric{
    display:block!important;visibility:visible!important;opacity:1!important;
    position:absolute!important;inset:0!important;z-index:2!important;
    width:100%!important;height:100%!important;overflow:hidden!important;
@@ -473,11 +473,11 @@
    The source artwork alone paints the original flags, preserving faces and shapes.
    Resize the SAME header logo without truncating the A&N crest. */
 @media(max-width:800px){
- html body.an-about-details-mode #app .an2-approved-reference-fabric,
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-fabric,
  html body.an-about-details-mode #app .an2-original-fabric-tile{
    display:none!important;visibility:hidden!important;animation:none!important;
  }
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
    width:clamp(104px,29vw,128px)!important;height:103px!important;
    overflow:visible!important;clip-path:none!important;
    display:flex!important;justify-content:center!important;align-items:center!important;
@@ -523,7 +523,7 @@
    clip-path:ellipse(49% 49% at 50% 50%)!important;
  }
  /* Larger viewport to include full crest, but image stays at the original aspect ratio. */
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
    width:clamp(110px,31vw,140px)!important;height:110px!important;
    overflow:visible!important;clip-path:none!important;justify-self:center!important;
  }
@@ -542,8 +542,8 @@
    object-fit:fill!important;filter:brightness(1.12)!important;
  }
  /* Important: preserve the original flags bitmap, no animated image tiles or SVG redraw. */
- html body.an-about-details-mode #app .an2-approved-reference-fabric,
- html body.an-about-details-mode #app .an2-approved-reference-waves{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-fabric,
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-waves{
    display:none!important;
  }
 }
@@ -551,7 +551,7 @@
 /* 2026-11-08 v13: restore full crest & animate only original flag pixels.
    Each crop has matching source dimensions and a fixed left attachment. */
 @media(max-width:800px){
-  html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo {
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo {
     width:122px!important;height:105px!important;overflow:visible!important;
     display:flex!important;align-items:center!important;justify-content:center!important;
     clip-path:none!important;filter:none!important;
@@ -579,12 +579,12 @@
     50%{transform:translateY(-2px)}
   }
   /* Native image crops: source bitmap, no SVG transformations. */
-  html body.an-about-details-mode #app .an2-native-cloth-layer{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-native-cloth-layer{
     display:block!important;position:absolute!important;inset:0!important;
     width:100%!important;height:100%!important;z-index:2!important;
     pointer-events:none!important;overflow:hidden!important;
   }
-  html body.an-about-details-mode #app .an2-native-cloth-flag{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-native-cloth-flag{
     display:block!important;position:absolute!important;
     background-repeat:no-repeat!important;border-radius:2px!important;
     transform-origin:0% 50%!important;
@@ -600,7 +600,7 @@
   }
 }
 @media(prefers-reduced-motion:reduce){
- html body.an-about-details-mode #app .an2-native-cloth-flag,
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-native-cloth-flag,
  html body.an-about-details-mode #app .an2-founder-header-logo .logo-motion{animation:none!important;transform:none!important}
 }
 
@@ -625,7 +625,7 @@
 /* Founder crest final alignment: mirror the site header source with no duplicate cropping.
    The wide JPEG is intentionally cropped to ONLY its left circular emblem. */
 @media(max-width:800px){
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-founder-header-logo{
    display:flex!important;align-items:center!important;justify-content:center!important;
    width:clamp(106px,29vw,130px)!important;height:108px!important;
    overflow:visible!important;clip-path:none!important;background:transparent!important;

@@ -172,6 +172,19 @@
       event.target.closest('.an2-founder-hero')?.classList.add('an2-approved-source-error');
     }
   },true);
+  function founderHero(){
+    return '<header class="an2-founder-hero">'+
+        approvedFounderArtwork()+
+        '<div class="an2-founder-brand"><span class="an2-graduate-globe" role="img" aria-label="Animated colourful globe with graduation cap"><span class="an2-globe-world" aria-hidden="true">🌎</span><span class="an2-globe-cap" aria-hidden="true">🎓</span></span><span>ESTABLISHED 2024 · MALAYSIA & BANGLADESH</span><strong>ROOTED IN EXPERIENCE.<br><em>BUILT FOR YOUR FUTURE.</em></strong></div>'+
+        '<div class="an2-founder-quote"><span class="an2-quote-mark" aria-hidden="true">“</span><blockquote>Global education opens doors to new opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you. <span class="an2-end-quote" aria-label="End of quote">”</span></blockquote><div class="an2-quote-footer"><div class="an2-quote-sign"><div class="an2-flags-journey" aria-label="Bangladesh and Malaysia, with featured global study destinations"><span class="an2-flags-overline">FROM HOME TO THE WORLD <span class="an2-plane-mark" aria-hidden="true">✈</span></span><div class="an2-floating-flags">'+journeyFlags()+'</div>'+wavingFlagFilter+'<small>Bangladesh · Malaysia · Global possibilities</small></div><span class="an2-founder-message-label"><span class="an2-founder-msg-orange">FOUNDER’S MESSAGE</span> <span class="an2-founder-msg-white">· A&amp;N OVERSEAS</span></span></div><figure class="an2-founder-person"><img src="https://d2ol7oe51mr4n9.cloudfront.net/user_3J7eLpAsZ71YVjJWQaNzcGsV3TY/910707ad-d082-4cf5-8410-0bf049fdc75b.png" alt="Nusrat Nasrin — Founder, A&N Overseas" loading="eager" decoding="async"></figure></div></div>'+
+      '</header>';
+  }
+  function overviewCards(){
+    return '<section class="an2-overview-cards an2-future-grid" aria-label="Our story and purpose">'+
+      '<article>'+futureGraphic('mission')+'<h2>'+cardTitle('About', 'Our Consultancy')+'</h2><p>Founded in 2024, A&amp;N Overseas makes Malaysian higher education more accessible. Our Malaysia-focused team guides public and private university applications, while separate specialists support other destinations. We help families explore practical, more affordable study pathways and career-ready futures.</p></article>'+
+      '<article>'+futureGraphic('vision')+'<h2>'+cardTitle('Our', 'Vision')+'</h2><p>We believe a student’s ambition should not be limited by a family’s budget. Our vision is to make quality study-abroad opportunities more understandable and accessible through honest university information, practical planning and support from the first consultation to arrival.</p></article>'+
+    '</section>';
+  }
   function renderStory(){
     const directory = currentDirectory();
     const uniCount = directory.universities == null ? 'Loading…' : directory.universities.toLocaleString('en-US');
@@ -179,14 +192,11 @@
     const countryCount = directory.countries.toLocaleString('en-US');
     return '<main class="an2-story wrap" id="an2-story">'+
       '<div class="an2-topline"><a href="#/about" class="an2-back">← ABOUT US</a><span>THE PEOPLE · THE PURPOSE · THE PROMISE</span></div>'+
-      '<header class="an2-founder-hero">'+
-        approvedFounderArtwork()+
-        '<div class="an2-founder-brand"><span class="an2-graduate-globe" role="img" aria-label="Animated colourful globe with graduation cap"><span class="an2-globe-world" aria-hidden="true">🌎</span><span class="an2-globe-cap" aria-hidden="true">🎓</span></span><span>ESTABLISHED 2024 · MALAYSIA & BANGLADESH</span><strong>ROOTED IN EXPERIENCE.<br><em>BUILT FOR YOUR FUTURE.</em></strong></div>'+
-        '<div class="an2-founder-quote"><span class="an2-quote-mark" aria-hidden="true">“</span><blockquote>Global education opens doors to new opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you. <span class="an2-end-quote" aria-label="End of quote">”</span></blockquote><div class="an2-quote-footer"><div class="an2-quote-sign"><div class="an2-flags-journey" aria-label="Bangladesh and Malaysia, with featured global study destinations"><span class="an2-flags-overline">FROM HOME TO THE WORLD <span class="an2-plane-mark" aria-hidden="true">✈</span></span><div class="an2-floating-flags">'+journeyFlags()+'</div>'+wavingFlagFilter+'<small>Bangladesh · Malaysia · Global possibilities</small></div><span class="an2-founder-message-label"><span class="an2-founder-msg-orange">FOUNDER’S MESSAGE</span> <span class="an2-founder-msg-white">· A&amp;N OVERSEAS</span></span></div><figure class="an2-founder-person"><img src="https://d2ol7oe51mr4n9.cloudfront.net/user_3J7eLpAsZ71YVjJWQaNzcGsV3TY/910707ad-d082-4cf5-8410-0bf049fdc75b.png" alt="Nusrat Nasrin — Founder, A&N Overseas" loading="eager" decoding="async"></figure></div></div>'+
-      '</header>'+
+      founderHero()+
       '<nav class="an2-nav" aria-label="Explore the A&N story">'+
         '<a href="#/aboutdetails" data-an-about-jump="an2-origins">Our Beginning</a><a href="#/aboutdetails" data-an-about-jump="an2-purpose">Why We Began</a><a href="#/aboutdetails" data-an-about-jump="an2-platform">Global Directory</a><a href="#/aboutdetails" data-an-about-jump="an2-services">What We Do</a><a href="#/aboutdetails" data-an-about-jump="an2-future">Our Vision</a>'+
       '</nav>'+
+      overviewCards()+
       '<section class="an2-intro-section" id="an2-origins"><div class="an2-section-label">CHAPTER 01 <i></i> THE BEGINNING</div><div class="an2-chapter-layout"><div><h1>Two people. <em>One journey.</em><br><em class="an2-story-highlight">A bigger purpose.</em></h1><p>In <strong class="an2-story-highlight">2024</strong>, <strong class="an2-story-highlight">Nusrat Nasrin</strong> and her husband, <strong class="an2-story-highlight">Mehedi Alim Ayon</strong>, arrived in Malaysia to begin a new chapter of academic and personal growth. Like many international students, they faced unfamiliar systems, important choices, everyday responsibilities and the challenge of making a new country feel like home.</p><p>Through perseverance, study and first-hand experience, they learned to navigate Malaysia’s higher-education landscape. <strong class="an2-story-highlight">Mehedi</strong> pursued <strong class="an2-story-highlight">postgraduate studies in Communication</strong> at <strong class="an2-story-highlight">Kuala Lumpur University of Science and Technology (KLUST)</strong>, while <strong class="an2-story-highlight">Nusrat</strong> continued her own higher-education and research journey, including at <strong class="an2-story-highlight">Universiti Putra Malaysia (UPM)</strong>. Their academic paths made them more aware of the questions families ask before sending a loved one abroad.</p><p class="an2-shared-mission"><strong>What began as an individual education journey gradually became a shared mission.</strong> Our purpose is to make the process clearer, more transparent and more human for the students who would come next.</p></div><aside class="an2-origin-aside"><img src="assets/malaysia-skyline-clean.jpg" alt="Kuala Lumpur skyline" loading="lazy"><div><span>OUR FIRST HOME ABROAD</span><strong>KUALA LUMPUR</strong><p>Physical guidance, real local experience and a commitment that continues after arrival.</p></div></aside></div></section>'+
       '<section class="an2-story-chapter" id="an2-purpose"><div class="an2-section-label">CHAPTER 02 <i></i> THE REASON WE STARTED</div><h2>When information is unclear,<br><em>ambition pays the price.</em></h2><div class="an2-prose-columns"><p>They saw how confusing study-abroad decisions could become: incomplete information, unrealistic promises, unclear charges and, in some cases, students being misled by intermediaries. Such experiences can damage a family’s trust and turn an exciting opportunity into unnecessary anxiety. Their answer was not to make louder promises. It was to offer clearer information and more accountable support.</p><p>They also discovered that, for some students, Malaysia could offer recognised programmes, international exposure and a comparatively manageable combination of tuition and living costs. It is not the cheapest or best choice for everyone—each case deserves a realistic comparison—but it can open a door for families who thought overseas education was beyond their means. <strong class="an2-story-highlight">This realisation inspired A&amp;N Overseas Education &amp; Consultancy in 2024.</strong></p></div><div class="an2-promise-line"><span>OUR BELIEF</span><strong>A family’s budget should shape a sensible plan—not silence a student’s dream.</strong></div></section>'+
       '<section class="an2-platform" id="an2-platform"><div class="an2-platform-copy"><div class="an2-section-label">CHAPTER 03 <i></i> A DIGITAL HOME FOR BIG DREAMS</div><h2>Thousands of universities.<br><em>One starting point.</em></h2><p>Students often know they want to study abroad before they know which university to choose, what a qualification means or how to apply. The A&N online directory brings institutions, programme discovery, portfolio pages and links to published or official sources together in one place.</p><p>Building a searchable platform of this scale took sustained research and development. The directory continues to grow and improve; its purpose is to help families discover options, compare routes and know where to verify important admissions details—not to suggest that every listed institution is an A&N partner.</p><div class="an2-metrics"><div><strong id="an2-directory-entry-count">'+uniCount+'</strong><span>DIRECTORY ENTRIES</span></div><div><strong>'+countryCount+'</strong><span>COUNTRIES LISTED</span></div><div><strong>2024</strong><span>JOURNEY BEGAN</span></div></div><a class="an2-primary" href="#/universities">EXPLORE THE UNIVERSITY DIRECTORY ↗</a></div><div class="an2-platform-visual"><span>DISCOVER</span><strong>ONE PLATFORM.<br>MORE POSSIBILITIES.</strong><div><small>COMPARE</small><small>VERIFY</small><small>PREPARE</small></div></div></section>'+
@@ -207,6 +217,25 @@
     if(route!=='#/aboutdetails'||!app||app.querySelector('.an2-story'))return;
     app.innerHTML=renderStory();
   }
+  const mobileAbout = matchMedia('(max-width:800px)');
+  function fitMobileOpening(opening) {
+    const top = opening.getBoundingClientRect().top;
+    const height = window.visualViewport?.height ?? window.innerHeight;
+    opening.style.setProperty('--an-about-opening-height', Math.max(0, height - Math.max(0, top + window.scrollY)) + 'px');
+  }
+  function renderMobileOpening(intro) {
+    if (!mobileAbout.matches) return;
+    let opening = intro.previousElementSibling;
+    if (!opening?.classList.contains('an-about-mobile-opening')) {
+      opening = document.createElement('section');
+      opening.className = 'an-about-mobile-opening';
+      opening.setAttribute('aria-label', 'About A&N Overseas');
+      opening.innerHTML = '<div class="an-about-mobile-art">'+founderHero()+'</div>'+
+        '<a class="an-about-mobile-readmore" href="#/aboutdetails">READ MORE <span aria-hidden="true">↗</span></a>';
+      intro.before(opening);
+    }
+    fitMobileOpening(opening);
+  }
   function relocateReadMore() {
     // READ MORE belongs to the overall A&N story, BELOW the two separate
     // About and Our Vision sections, not inside the Vision content panel.
@@ -214,6 +243,7 @@
     const intro = document.querySelector('#an-about-fixed .an-about-intro-panel');
     const vision = intro?.querySelector('.an-vision-inline');
     if (!intro || !vision) return;
+    renderMobileOpening(intro);
     const button = intro.querySelector('.an-about-readmore');
     if (!button) return;
     if (!intro.querySelector('.an2-about-box')) {
@@ -248,6 +278,15 @@
   function setup() {
     ensureFounderPage();
     relocateReadMore();
+    window.addEventListener('resize', relocateReadMore, {passive:true});
+    window.visualViewport?.addEventListener('resize', relocateReadMore, {passive:true});
+    if (typeof ResizeObserver !== 'undefined') {
+      const observer = new ResizeObserver(relocateReadMore);
+      for (const selector of ['header.top', '#an-global-ticker']) {
+        const element = document.querySelector(selector);
+        if (element) observer.observe(element);
+      }
+    }
     const app=document.getElementById('app');
     if (app) new MutationObserver(() => {
       if(location.hash.split('?')[0]==='#/aboutdetails')ensureFounderPage();

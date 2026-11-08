@@ -9,12 +9,12 @@ html body.an-about-details-mode #app .an2-trust-grid article{border-color:#f0781
  html body.an-about-details-mode #app .an2-topline{width:100%!important;max-width:100%!important;overflow:visible!important;display:flex!important;justify-content:space-between!important;align-items:center!important;gap:5px!important;padding:2px 0 5px!important}
  html body.an-about-details-mode #app .an2-topline>a{flex:0 0 auto!important;max-width:45%!important;margin-left:0!important;transform:none!important;padding:8px 12px!important;position:relative!important;left:0!important;white-space:nowrap!important}
  html body.an-about-details-mode #app .an2-topline>span{flex:1 1 auto!important;min-width:0!important;text-align:right!important;font-size:clamp(7px,1.8vw,10px)!important;letter-spacing:.5px!important;white-space:normal!important}
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand{grid-template-columns:115px minmax(0,1fr)!important;align-items:center!important;min-height:114px!important;padding:9px 10px!important;overflow:visible!important}
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-graduate-globe{width:112px!important;height:112px!important;display:flex!important;align-items:center!important;justify-content:center!important;justify-self:center!important;overflow:visible!important;clip-path:none!important}
- html body.an-about-details-mode #app .an2-graduate-globe .an2-globe-world{font-size:85px!important;display:block!important;line-height:1!important;transform-origin:center!important}
- html body.an-about-details-mode #app .an2-graduate-globe .an2-globe-cap{top:1px!important;left:50%!important;width:107px!important;height:69px!important;font-size:0!important;line-height:0!important;transform:translateX(-50%)!important;animation:none!important;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6))!important;z-index:4!important;overflow:visible!important}
- html body.an-about-details-mode #app .an2-globe-cap svg{display:block;width:100%;height:100%;overflow:visible}
- html body.an-about-details-mode #app .an2-founder-hero>.an2-approved-reference-hero{margin-top:0!important}
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand{grid-template-columns:115px minmax(0,1fr)!important;align-items:center!important;min-height:114px!important;padding:9px 10px!important;overflow:visible!important}
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-graduate-globe{width:112px!important;height:112px!important;display:flex!important;align-items:center!important;justify-content:center!important;justify-self:center!important;overflow:visible!important;clip-path:none!important}
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-graduate-globe .an2-globe-world{font-size:85px!important;display:block!important;line-height:1!important;transform-origin:center!important}
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-graduate-globe .an2-globe-cap{top:1px!important;left:50%!important;width:107px!important;height:69px!important;font-size:0!important;line-height:0!important;transform:translateX(-50%)!important;animation:none!important;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6))!important;z-index:4!important;overflow:visible!important}
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-globe-cap svg{display:block;width:100%;height:100%;overflow:visible}
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-approved-reference-hero{margin-top:0!important}
 }
 @media(min-width:801px){
  html body.an-about-details-mode.an-reference-pixel-view #app .an2-exact-hero .an2-founder-person{top:0!important;right:0!important;width:22.8%!important;height:69%!important;overflow:visible!important}
@@ -35,7 +35,7 @@ html body.an-about-details-mode #app .an2-trust-grid article p em{color:#ff8500!
 html body.an-about-details-mode #app .an2-trust-grid article{background:linear-gradient(125deg,#291b17,#10141b)!important}
 html body.an-about-details-mode #app .an2-story :is(.an2-section-label,.an2-nav a:hover,.an2-service-num){color:#ff7900!important}
 @media(max-width:800px){
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-graduate-globe{overflow:visible!important;clip-path:none!important;isolation:isolate!important}
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-graduate-globe .an2-globe-cap{display:block!important;visibility:visible!important;opacity:1!important;z-index:12!important;top:10px!important}
- html body.an-about-details-mode #app .an2-founder-hero>.an2-founder-brand>.an2-graduate-globe .an2-globe-cap svg{display:block!important;visibility:visible!important;opacity:1!important}
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-graduate-globe{overflow:visible!important;clip-path:none!important;isolation:isolate!important}
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-graduate-globe .an2-globe-cap{display:block!important;visibility:visible!important;opacity:1!important;z-index:12!important;top:10px!important}
+ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero>.an2-founder-brand>.an2-graduate-globe .an2-globe-cap svg{display:block!important;visibility:visible!important;opacity:1!important}
 }

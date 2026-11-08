@@ -4,7 +4,7 @@
    Five chapter buttons and all subsequent story sections are untouched. */
 
 @media (max-width:800px){
-  html body.an-about-details-mode #app .an2-founder-hero{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero{
     display:block!important;
     width:100%!important;
     height:auto!important;
@@ -21,11 +21,11 @@
   }
   /* Keep legacy material in the DOM for existing content and graceful fallback.
      Showing BOTH was the reason the last live screenshots were misaligned. */
-  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-brand,
-  html body.an-about-details-mode #app .an2-founder-hero > .an2-founder-quote{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero > .an2-founder-brand,
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero > .an2-founder-quote{
     display:none!important;
   }
-  html body.an-about-details-mode #app .an2-approved-reference-hero{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-hero{
     position:relative!important;
     display:block!important;
     width:100%!important;
@@ -41,7 +41,7 @@
     background:#171411!important;
     box-shadow:none!important;
   }
-  html body.an-about-details-mode #app .an2-approved-reference-source{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-source{
     position:absolute!important;
     z-index:1!important;
     display:block!important;
@@ -67,7 +67,7 @@
     -webkit-mask-image:none!important;
     mask-image:none!important;
   }
-  html body.an-about-details-mode #app .an2-approved-reference-waves{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-waves{
     position:absolute!important;
     inset:0!important;
     display:block!important;
@@ -79,21 +79,21 @@
     background:transparent!important;
   }
   /* If the CDN image fails, the original live HTML appears instead of blank. */
-  html body.an-about-details-mode #app .an2-founder-hero.an2-approved-source-error > .an2-founder-quote{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero.an2-approved-source-error > .an2-founder-quote{
     display:flex!important;
   }
-  html body.an-about-details-mode #app .an2-founder-hero.an2-approved-source-error .an2-approved-reference-hero{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-founder-hero.an2-approved-source-error .an2-approved-reference-hero{
     display:none!important;
   }
 }
 @media (min-width:801px){
-  html body.an-about-details-mode #app .an2-approved-reference-hero{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-hero{
     display:none!important;
   }
 }
 /* Keep legible static cloth folds for people who request reduced motion. */
 @media (prefers-reduced-motion:reduce){
-  html body.an-about-details-mode #app .an2-approved-reference-waves{
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-approved-reference-waves{
     display:none!important;
   }
 }
