@@ -140,13 +140,13 @@ function addKnownUniversities(list){
 let filters={search:'',country:'All destinations',level:'All degrees'};
 const imescClosing='2027-01-26T11:00:00Z';
 const timelines=new Map();
-function timeline(ids,label,note,source,dates=[]){
- for(const id of ids.split(' '))timelines.set(id,{label,note,source,dates});
+function timeline(ids,label,note,source,dates=[],annualDay){
+ for(const id of ids.split(' '))timelines.set(id,{label,note,source,dates,annualDay});
 }
 timeline('erasmus-mundus','i-MESC (indicative)','i-MESC 2027–29: indicative opening 9 Nov 2026, 14:00 Paris time. Indicative closing 26 Jan 2027, 12:00 Paris time. Other Erasmus Mundus programmes publish separate calls.','https://i-mesc.eu/create-account',[imescClosing]);
 timeline('daad-epos-masters daad-epos-phd','Course deadline','Use the DAAD 2027/28 course table to choose a programme, then follow that university’s scholarship deadline and submission route. EPOS has separate dates by course.','https://static.daad.de/media/daad_de/pdfs_nicht_barrierefrei/in-deutschland-studieren-forschen-lehren/daad_epos_deadlines.pdf');
 timeline('hungary-bachelors hungary-masters hungary-phd-1 hungary-phd-2','Prior call · 15 Jan 2026','The 2026/27 cycle used 15 January. Choose Bangladesh as sending partner, select eligible programmes, submit via DreamApply, then complete the Bangladesh nomination process. The prior date is historical.','https://stipendiumhungaricum.hu/apply/');
-timeline('turkiye-ba turkiye-ma turkiye-phd','Annual · 10 Jan–20 Feb','The regular official calendar opens 10 January and closes 20 February. Evaluation is March–April, interviews April–June, results in early August and travel in September. This is the recurring calendar.','https://www.turkiyeburslari.gov.tr/calendar');
+timeline('turkiye-ba turkiye-ma turkiye-phd','Türkiye annual deadline','YTB publishes an annual 10 January–20 February application period. Apply online, then follow evaluation in March–April, interviews in April–June, and results in early August. The countdown follows the published annual rule.','https://www.ytb.gov.tr/daireler/uluslararasi-ogrenciler/turkiye-burslari/',[], '02-20');
 timeline('turkiye-success-ba turkiye-success-ma turkiye-success-phd','Annual · Oct–Nov','The official Success Scholarship calendar places applications in October–November and evaluation in November. Specific opening and closing days are given in the annual announcement.','https://www.turkiyeburslari.gov.tr/calendar');
 timeline('turkiye-research','Rolling · year-round','Applications are accepted year-round. Quarterly evaluation windows are January–March, April–June, July–September and October–December.','https://turkiyeburslari.gov.tr/shorttermprograms');
 timeline('turkiye-katip','KATİP call dates','KATİP runs for eight months. Its dates follow the programme announcement and are separate from the general degree scholarship calendar.','https://turkiyeburslari.gov.tr/shorttermprograms');
@@ -167,7 +167,8 @@ timeline('jj-wbgsp','2027 window','2027 applications: Window 1 runs 18 January�
 timeline('romania-mfa','Prior call · 31 Mar 2026');
 timeline('az-heydar','2026/27 nomination cycle');
 timeline('taiwan-moe-ug taiwan-moe-grad','Representative office dates');
-timeline('taiwan-ncku-grad taiwan-ncku-elite','NCKU intake dates');
+timeline('taiwan-ncku-grad','Spring 2027 closed · 15 Sep','The February 2027 international degree round opened 1 July and closed 15 September 2026. Admission and scholarship results are scheduled for 30 November 2026. Register one account, complete the application, pay the published NT$2,000 application fee, and upload the required PDFs before submitting.','https://oia.ncku.edu.tw/p/404-1032-229817.php?Lang=en');
+timeline('taiwan-ncku-elite','Separate Elite call','The February 2027 general degree deadline was 15 September 2026. The Elite award follows its own applicable nomination and award conditions.','https://oia.ncku.edu.tw/p/404-1032-229817.php?Lang=en');
 timeline('si-global','Separate admission and award windows');
 timeline('finland-uni','Joint admission','The Finnish autumn 2027 joint application opens 7 January and closes 21 January 2027 for participating programmes. Check whether the selected degree joins this round and whether its tuition waiver is requested with admission.','https://www.studyinfinland.fi/news-events/prepare-for-2027',['2027-01-21']);
 timeline('finland-phd-paid europe-euraxess','Vacancy-specific deadline');
@@ -183,8 +184,8 @@ timeline('my-sunway-taught-masters-50 my-sunway-professional-doctorate-50','With
 timeline('my-curtin-pvc-50','Prior call · 20 Feb 2026');
 timeline('my-monash-continuing-high-achiever','Automatic semester assessment');
 timeline('my-monash-new-high-achiever my-monash-female-engineering my-monash-research-pathway','Course admission deadline');
-timeline('my-monash-pharmacy-excellence','Published annual day · 31 Jan');
-timeline('my-monash-ai-bursary','Intakes through Oct 2027');
+timeline('my-monash-pharmacy-excellence','Published closing day · 31 Jan','Monash lists 31 January without an intake year. Apply to the Bachelor of Pharmacy (Honours), then submit the separate scholarship application in SORS or send the official form and required records to the scholarship office.','https://www.monash.edu.my/student-services/financial-assistance/undergraduate-scholarships-and-bursaries/merit-scholarships');
+timeline('my-monash-ai-bursary','Oct 2027 admission','For the October 2027 intake, Monash lists the Bachelor of Computer Science in Artificial Intelligence. International admission closes 13 August 2027, the student-visa deadline is 20 August, and classes start 25 October. This timer is for admission to the bursary-eligible course.','https://www.monash.edu.my/study/apply/intake-periods/october-intake',['2027-08-13']);
 timeline('my-monash-health-bursary','Through Semester 1, 2027');
 timeline('my-klust-progression-50 my-klust-progression-5000','Mar/Apr · Jun/Jul · Nov/Dec');
 timeline('it-padua-excellence-ba it-padua-excellence-ma it-padua-fee-waiver','First admission call · 15 Sep','Padua opened the first 2027/28 admission call for most programmes on 15 September 2026. The specific degree’s admission call sets its closing date and award eligibility.','https://www.unipd.it/en/ammissione-studenti-internazionali');
@@ -194,9 +195,10 @@ timeline('it-cafoscari-college-ba it-cafoscari-college-ma','College and degree d
 timeline('it-maeci-master','2026/27 call closed');
 timeline('lt-vu-masters-fee','Prior call · 1 Apr 2026');
 timeline('lt-vu-political-ma','Published day · 15 May');
-timeline('lt-vu-political-ba lt-vu-feba-admission','Vilnius programme dates');
+timeline('lt-vu-political-ba','Published closing day · 1 Jul','First apply online for Politics of Global Challenges. Send the written waiver request and motivation letter to the institute by its published 1 July closing day. The institute lists results by 15 July. The page gives the day and month without an intake year.','https://www.tspmi.vu.lt/en/admission/');
+timeline('lt-vu-feba-admission','Vilnius programme dates');
 timeline('lt-vtech-ba-full lt-vtech-ba-partial','2027/28 Bachelor award','Apply for an eligible degree and submit the scholarship application by 20 April 2027.','https://vilniustech.lt/en/international-students/full-time-students/scholarships/',['2027-04-20']);
-timeline('daad-helmut','DAAD annual intake','Choose an eligible public-policy master’s course and follow the DAAD application instructions and host submission timetable.','https://www.daad.de/en/studying-in-germany/scholarships/daad-funding-programmes/helmut-schmidt-programme/');
+timeline('daad-helmut','DAAD annual deadline','DAAD publishes 1 June as the opening and 31 July as the deadline each year. Choose one or two eligible courses, complete the DAAD form, then submit it with the required documents directly to each chosen course. The countdown follows the published annual rule.','https://static.daad.de/media/daad_de/pdfs_nicht_barrierefrei/in-deutschland-studieren-forschen-lehren/daad_helmut_schmidt_programme_frequently_asked_questions.pdf',[], '07-31');
 timeline('nl-scholarship','Institution deadline','The 2026/27 call opened 1 November 2025. Participating institutions publish individual closing dates and application instructions.','https://studyinnl.org/finances/nl-scholarship');
 timeline('adb-jsp','Host deadline · allow 6 months','ADB recommends submitting at least six months before the planned start. The partner institution sets the actual intake and deadline.','https://www.adb.org/work-with-us/careers/japan-scholarship-program/faq');
 timeline('it-maeci-master','Prior call · 26 Mar 2026','The 2026/27 MAECI call closed 26 March 2026. The next call determines eligible countries, documents and submission dates.','https://studyinitaly.esteri.it/');
@@ -215,39 +217,44 @@ function deadlineStatus(date,now){
  if(seconds<0)return 'Closed';
  return Math.floor(seconds/86400)+'d '+Math.floor(seconds/3600)%24+'h '+Math.floor(seconds/60)%60+'m '+seconds%60+'s';
 }
-function nextClosing(dates,now){
+function nextClosing({dates,annualDay},now){
+ if(annualDay){
+  const year=now.getFullYear();
+  const thisYear=year+'-'+annualDay;
+  return deadlineStatus(thisYear,now)==='Closed'?(year+1)+'-'+annualDay:thisYear;
+ }
  return dates.find(date=>deadlineStatus(date,now)!=='Closed');
 }
-function timelineBadge(label,dates,now){
- const date=nextClosing(dates,now);
- return date ? label+' · '+deadlineStatus(date,now) : label+(dates.length?' · Closed':'');
+function timelineBadge(schedule,now){
+ const date=nextClosing(schedule,now);
+ return date ? schedule.label+' · '+deadlineStatus(date,now) : schedule.label+(schedule.dates.length?' · Closed':'');
 }
 function cardDeadline(p){
- const {label,note,dates}=scholarshipTimeline(p);
- return '<span class="an-card-deadline" data-timeline-id="'+esc(p.id)+'" title="'+esc(note||p.deadline)+'">'+esc(timelineBadge(label,dates,new Date()))+'</span>';
+ const schedule=scholarshipTimeline(p);
+ return '<span class="an-card-deadline" data-timeline-id="'+esc(p.id)+'" title="'+esc(schedule.note||p.deadline)+'">'+esc(timelineBadge(schedule,new Date()))+'</span>';
 }
 function timelineDetail(p){
- const {label,note,source,dates}=scholarshipTimeline(p);
+ const {label,note,source,dates,annualDay}=scholarshipTimeline(p);
  return '<section class="an-scholarship-datecard"><span>Application timeline</span><h3>'+esc(label)+'</h3><p>'+esc(note||p.deadline)+'</p>'+
- (dates.length?cardDeadline(p).replace('class="an-card-deadline"','class="an-profile-deadline"'):'')+
+ ((dates.length||annualDay)?cardDeadline(p).replace('class="an-card-deadline"','class="an-profile-deadline"'):'')+
  '<p><a href="'+esc(safeUrl(source||p.source))+'" target="_blank" rel="noopener noreferrer">Official timeline and application instructions ↗</a></p></section>';
 }
 let directoryTimer;
 function mountDirectoryDeadlines(){
  clearInterval(directoryTimer);
- const badges=[...document.querySelectorAll('[data-timeline-id]')].map(el=>({el,...timelines.get(el.dataset.timelineId)})).filter(x=>x.dates?.length);
+ const badges=[...document.querySelectorAll('[data-timeline-id]')].map(el=>({el,...timelines.get(el.dataset.timelineId)})).filter(x=>x.dates?.length||x.annualDay);
  const next=document.querySelector('.an-next-scholarship-deadline');
  if(!badges.length&&!next)return;
  function update(){
   const now=new Date();
-  for(const {el,label,dates} of badges){
-   const status=timelineBadge(label,dates,now);
+  for(const {el,...schedule} of badges){
+   const status=timelineBadge(schedule,now);
    if(el.textContent!==status)el.textContent=status;
   }
   if(!next)return;
   let upcoming;
   for(const p of items){
-   const date=nextClosing(scholarshipTimeline(p).dates,now);
+   const date=nextClosing(scholarshipTimeline(p),now);
    if(date&&(!upcoming||Date.parse(date)<Date.parse(upcoming.date)))upcoming={p,date};
   }
   const label=upcoming?'Next · '+deadlineStatus(upcoming.date,now):'No upcoming date listed';
