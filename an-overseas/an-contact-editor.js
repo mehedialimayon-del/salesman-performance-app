@@ -2,9 +2,13 @@
   'use strict';
   const fields = [
     ['facebook', 'Facebook Page URL', 'url'],
+    ['facebookName', 'Facebook Profile Name', 'text'],
     ['tiktok', 'TikTok Profile URL', 'url'],
+    ['tiktokName', 'TikTok Profile Name', 'text'],
     ['youtube', 'YouTube Channel URL', 'url'],
+    ['youtubeName', 'YouTube Profile Name', 'text'],
     ['linkedin', 'LinkedIn Page URL', 'url'],
+    ['linkedinName', 'LinkedIn Profile Name', 'text'],
     ['whatsapp', 'WhatsApp Number or wa.me Link', 'text'],
     ['phone', 'Call Us Number', 'tel'],
     ['email', 'Contact Email', 'email'],

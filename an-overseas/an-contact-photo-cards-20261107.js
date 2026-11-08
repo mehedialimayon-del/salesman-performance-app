@@ -66,7 +66,10 @@
    }
    const url=s[n];
    const active=!!(a.getAttribute('href')&&!a.classList.contains('an-social-unset'));
-   set(details,active?'Open profile ↗':url?'Link pending':'Link not published');
+   const profileName=String(s[n+'Name']||'').trim();
+   set(details,profileName||(active?'':url?'Link pending':'Link not published'));
+   const accessibleName=profileName?labels[n]+' · '+profileName:labels[n]+' contact';
+   if(a.getAttribute('aria-label')!==accessibleName)a.setAttribute('aria-label',accessibleName);
   }
   const call=host.querySelector('.an-contact-phone');
   if(call){

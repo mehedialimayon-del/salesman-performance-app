@@ -1,5 +1,5 @@
 /* Contact Our Team second-pass layout: photo office tiles, actual contact icons,
-   Social cards + full-width Gmail and a compact bottom enquiry form.
+   Social cards, full-width Gmail and a bottom-aligned enquiry form.
    Scoped to #/contact; preserves existing CMS links and form handlers. */
 body.an-contact-mode #app .an-contact-offices{gap:0!important}
 body.an-contact-mode #app .an-contact-channels-title{
@@ -87,22 +87,31 @@ body.an-contact-mode #app .an-contact-social [data-an-social="gmail"]{
 }
 body.an-contact-mode #app .an-contact-social [data-an-social="gmail"] .an-contact-card-copy{flex:0 1 auto}
 body.an-contact-mode #app .an-contact-email{display:none!important}
-/* Keep desktop's left offices and right enquiry columns. Compact fields at the top. */
+/* Use the available desktop panel height for the contact cards and message. */
 @media(min-width:801px){
- body.an-contact-mode #app .an-contact-offices{overflow:visible!important;gap:0!important}
  body.an-contact-mode #app .an-contact-social{
-   gap:4px!important;
+   flex:1 0 auto!important;
+   grid-auto-rows:minmax(48px,1fr);
+   gap:7px!important;
  }
- body.an-contact-mode #app .an-contact-enquiry{
-   justify-content:flex-start!important;
+ body.an-contact-mode #app .an-contact-social a,
+ body.an-contact-mode #app .an-contact-social .an-contact-phone{
+   padding:6px 10px!important;
  }
- body.an-contact-mode #app .an-contact-enquiry form{
-   flex:0 0 auto!important;
-   overflow:visible!important;
+ body.an-contact-mode #app .an-contact-social a small,
+ body.an-contact-mode #app .an-contact-social .an-contact-phone small{
+   font-size:13px!important;
+ }
+ body.an-contact-mode #app .an-contact-social .an-contact-card-detail{
+   font-size:12px;
  }
  body.an-contact-mode #app .an-contact-fields{
-   flex:0 0 auto!important;
-   overflow:visible!important;
+   grid-template-rows:auto auto minmax(min-content,1fr);
+   align-content:stretch!important;
+ }
+ body.an-contact-mode #app .an-contact-fields textarea{
+   min-height:132px!important;
+   flex:1 0 auto;
  }
 }
 @media(max-width:800px){
@@ -211,7 +220,7 @@ body.an-contact-mode #app .an-contact-email{display:none!important}
  }
  body.an-contact-mode #app .an-contact-social a,
  body.an-contact-mode #app .an-contact-social .an-contact-phone{
-   min-height:34px!important;
+   min-height:38px!important;
    height:auto!important;
    padding:3px 6px!important;
    gap:4px!important;
@@ -229,9 +238,7 @@ body.an-contact-mode #app .an-contact-email{display:none!important}
  body.an-contact-mode #app .an-contact-social .an-contact-card-detail{
    font-size:9px!important;
    line-height:1.12!important;
-   white-space:nowrap!important;
-   text-overflow:ellipsis!important;
-   overflow:hidden!important;
+   white-space:normal!important;
  }
  body.an-contact-mode #app .an-contact-social [data-an-social="gmail"]{
    min-height:32px!important;
@@ -280,7 +287,7 @@ body.an-contact-mode #app .an-contact-email{display:none!important}
    font-size:11px!important;
  }
  body.an-contact-mode #app .an-contact-fields textarea{
-   min-height:68px!important;
+   min-height:82px!important;
    height:auto!important;
    flex:1 0 auto;
    resize:vertical!important;
@@ -307,7 +314,7 @@ body.an-contact-mode #app .an-contact-feedback:empty{display:none!important}
 }
 @media(max-width:800px) and (max-height:660px){
  body.an-contact-mode #app .an-contact-fields textarea{
-   min-height:54px!important;
-   height:54px!important;
+   min-height:65px!important;
+   height:65px!important;
  }
 }
