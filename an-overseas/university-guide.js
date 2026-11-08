@@ -97,7 +97,24 @@ const amcRegister='https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=4
 const amcMbaFees='https://amc.edu.my/wp-content/uploads/2025/08/MBA-Prospectus-2.pdf';
 const amcDbaFees='https://amc.edu.my/wp-content/uploads/2026/01/DBA-Prospectus.pdf';
 const amcMaccFees='https://amc.edu.my/wp-content/uploads/2025/10/MAcc-Prospectus-edition-4.pdf';
+const manchesterCourse='https://www.manchester.ac.uk/study/undergraduate/courses/2027/00560/bsc-computer-science/application-and-selection/';
+const manchesterAdmissions='https://www.manchester.ac.uk/study/undergraduate/applying/how-to-apply/';
+const uniklEngineering='https://www.unikl.edu.my/programme/bachelor-of-electrical-engineering-with-honours/';
+const klustCalendar='https://klust.edu.my/current-students/academic-calendar/';
 const verifiedCardFacts={
+ manchester:{
+  ranking:['#=40','QS World University Rankings','https://www.topuniversities.com/universities/university-manchester'],
+  programmes:['BSc Computer Science','Undergraduate example',manchesterCourse],
+  tuition:['GBP 39,700','International · 2027/28 year',manchesterCourse],
+  intake:['September 2027','13 Jan 2027 · 18:00 GMT',manchesterAdmissions,'2027-01-13T18:00:00Z']
+ },
+ unikl:{
+  ranking:['#1401+','QS World University Rankings','https://www.topuniversities.com/universities/universiti-kuala-lumpur-unikl'],
+  programmes:['Electrical Engineering','Four-year bachelor example',uniklEngineering],
+  tuition:['RM 83,200','Full international degree tuition',uniklEngineering],
+  intake:['January · September','Electrical Engineering',uniklEngineering]
+ },
+ klust:{intake:['9 December 2026','New student registration',klustCalendar]},
  utm:{
   ranking:['#158','QS World · Asia #25 (2027)','https://civil.utm.my/utm-rises-to-the-top-25-in-qs-world-university-rankings-asia-2027/'],
   programmes:['44','International bachelor listings',utmCourses],
@@ -159,7 +176,7 @@ const factKey=u=>{
  return verifiedCardFacts[u.id]?u.id:malaysiaFactIds[name];
 };
 const countdownText=(date,now=Date.now())=>{
- const minutes=Math.ceil((Date.parse(date+'T23:59:59+08:00')-now)/60000);
+ const minutes=Math.ceil((Date.parse(date.includes('T')?date:date+'T23:59:59+08:00')-now)/60000);
  return minutes<1?'Deadline passed':Math.floor(minutes/1440)+'d '+Math.floor(minutes%1440/60)+'h '+minutes%60+'m left';
 };
 const countdown=date=>'<span data-an-deadline="'+e(date)+'">'+e(countdownText(date))+'</span>';
@@ -170,6 +187,9 @@ setInterval(()=>{
  });
 },1000);
 const factNotes={
+ manchester:{fees:'The international BSc Computer Science tuition is GBP 39,700 for the 2027/28 academic year. Manchester states that subsequent academic-year fees may rise by up to 7% per year.',entry:'For September 2027 entry, the UCAS equal-consideration deadline for most courses is 13 January 2027 at 18:00 GMT, or 14 January at 02:00 Malaysia time. Medicine and Dentistry have a separate 15 October 2026 deadline. Later applications depend on vacancies.'},
+ unikl:{fees:'The Bachelor of Electrical Engineering with Honours costs RM 10,400 per semester or RM 83,200 for the full four-year degree for international students. Published tuition excludes visa processing and is subject to SST.',entry:'The Electrical Engineering programme lists January and September intakes. The programme page does not give an exact application cutoff.'},
+ klust:{entry:'The December–April 2026/27 calendar lists new student registration on 9 December 2026 and first lectures on 14 December. KLUST’s general international admission guidance asks applicants to submit two months before the semester. A specific cohort application cutoff was not published on the calendar.'},
  utm:{fees:'The Engineering example is RM 75,000 for the full degree: RM 14,758 for semester 1 and RM 60,242 combined for semesters 2–8. Accommodation is separate.',programmes:'UTM lists 44 international bachelor programmes across its catalogue. Its February table shows Civil Engineering and three Malaysia–Japan International Institute of Technology programmes open: Electronic Systems Engineering, Mechanical Precision Engineering and Chemical Process Engineering.',entry:'International bachelor applications for February 2027 run from 1 November to 31 December 2026. The countdown uses the end of the published deadline day in Malaysia time.',ranking:'UTM is #158 globally and #25 in Asia in the QS 2027 editions. The 2026 QS subject results put UTM first in Malaysia for Civil & Structural Engineering, Chemical Engineering, Mineral & Mining Engineering, and Architecture / Built Environment.'},
  amc:{fees:'AMC’s international MBA example is RM 24,000 tuition before RM 1,440 SST. Add RM 1,500 registration, RM 4,500 assessment and RM 1,000 facilities for the published RM 32,440 total.',programmes:'The catalogue lists 1 foundation, 12 diplomas, 8 bachelor’s, 4 master’s and 2 doctoral programmes.',entry:'The degree calendar shows teaching week 1 beginning 25 January 2027. This is a semester start date. Business Management lists January, June and September as intake months. An application cutoff was not verified.'},
  um:{fees:'RM 98,097 is the rounded arithmetic mean of 74 full-degree tuition amounts in UM’s 2025/26 international bachelor fee schedule. Higher-priced clinical degrees, including medicine and dentistry, raise the average. Check your programme’s fee and any separately stated taxes and charges.',programmes:'UM lists 80 bachelor’s programmes for 2026/27. The number covers the academic session across the university. March availability varies by programme.',entry:'The March 2027 international undergraduate application deadline is 30 January 2027. UM publishes a calendar date. The site countdown uses the end of that day in Malaysia time.'},
