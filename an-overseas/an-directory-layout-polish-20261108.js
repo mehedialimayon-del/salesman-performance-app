@@ -134,7 +134,31 @@ function setupControls(tools,search,scholar,fav,filter){
  filter.querySelector('summary').innerHTML=icon('filter');
 }
 
-function mount(){
+
+/* Centre the university name and relocate the institution logo beside metadata. */
+function alignUniversityCards(){
+ document.querySelectorAll('.university-catalogue .uni-card').forEach(card=>{
+  const inside=card.querySelector('.inside'),title=inside?.querySelector('.university-fullname'),cover=card.querySelector('.uni-cover-wrap');
+  if(!inside||!title||!cover)return;
+  card.classList.add('an-centred-university-card');
+  let meta=inside.querySelector('.an-university-meta');
+  if(!meta){meta=document.createElement('div');meta.className='an-university-meta';title.after(meta);}
+  const badge=inside.querySelector('.badge'),location=inside.querySelector('.university-location');
+  if(badge&&badge.parentElement!==meta)meta.appendChild(badge);
+  if(location&&location.parentElement!==meta)meta.appendChild(location);
+  const logo=cover.querySelector('.uni-card-logo');
+  if(logo&&logo.parentElement!==meta)meta.insertBefore(logo,meta.firstChild);
+  const short=inside.querySelector('h3');if(short)short.style.display='none';
+ });
+}
+const alignStyle=document.createElement('style');alignStyle.textContent=`
+.university-catalogue .an-centred-university-card .inside>.university-fullname{display:block!important;width:100%!important;text-align:center!important;font-weight:850!important;line-height:1.35!important;margin:6px 0 10px!important;color:#fff!important}
+.university-catalogue .an-centred-university-card .an-university-meta{display:grid!important;grid-template-columns:58px minmax(0,1fr)!important;grid-template-rows:auto auto!important;column-gap:10px!important;row-gap:6px!important;align-items:center!important;margin:0 0 10px!important}
+.university-catalogue .an-centred-university-card .an-university-meta .uni-card-logo{position:static!important;grid-column:1!important;grid-row:1/span 2!important;width:54px!important;height:54px!important;max-width:54px!important;object-fit:contain!important;border:1px solid #f07820!important;border-radius:9px!important;padding:5px!important;background:#10141a!important;box-shadow:none!important}
+.university-catalogue .an-centred-university-card .an-university-meta .badge{grid-column:2!important;grid-row:1!important;justify-self:start!important;margin:0!important}
+.university-catalogue .an-centred-university-card .an-university-meta .university-location{grid-column:2!important;grid-row:2!important;justify-self:start!important;margin:0!important;padding:5px 9px!important;border:1px solid #e96b1c!important;border-radius:8px!important;background:#151922!important;color:#fff!important;font-size:12px!important}
+`;document.head.appendChild(alignStyle);
+\nfunction mount(){
  const dir=document.querySelector('.university-catalogue'),head=document.querySelector('.page-head');if(!dir||!head)return;
  const wrap=head.querySelector('.wrap'),tools=dir.querySelector('.catalogue-tools')||head.querySelector('.catalogue-tools');if(!wrap||!tools)return;
  let heading=wrap.querySelector('.an-directory-heading');
@@ -157,7 +181,7 @@ function mount(){
  if(tools.parentNode!==wrap)wrap.appendChild(tools);
  const search=tools.querySelector('.catalogue-search'),scholar=tools.querySelector('.an-scholarship-category-wrap'),fav=tools.querySelector('.an-catalogue-favourites'),filter=tools.querySelector('.catalogue-filter');
  [search,scholar,fav,filter].forEach((el,i)=>{if(el&&tools.children[i]!==el)tools.insertBefore(el,tools.children[i]||null)});
- setupControls(tools,search,scholar,fav,filter);
+ setupControls(tools,search,scholar,fav,filter);alignUniversityCards();
 }
 let pending=false;new MutationObserver(()=>{if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;mount()})}).observe(document.body,{childList:true,subtree:true});mount();
 })();
