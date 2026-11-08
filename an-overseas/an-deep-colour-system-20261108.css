@@ -52,10 +52,12 @@ body{color:#fff}
 }
 body .brand :is(strong,.brand-title,.an-brand-name) { color:var(--an-theme-light); }
 
-#app :is(.page-head,.hero,.an-directory-heading) h1 {
+#app :is(.page-head,.hero) h1 {
   color:var(--an-theme-light);
 }
-#app :is(.page-head,.hero,.an-directory-heading) h1 .gradient {
+#app .an-directory-heading h1 { color:white; }
+#app .an-directory-heading h1 > span { color:var(--an-theme-light); }
+#app :is(.page-head,.hero) h1 .gradient {
   color:white;
   -webkit-text-fill-color:white;
 }
