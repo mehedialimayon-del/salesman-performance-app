@@ -31,11 +31,13 @@ function render(country){
  const flagsHtml=iso?'<img class="an-country-flag-img" src="https://flagcdn.com/w80/'+iso+'.png" alt="'+esc(name)+' flag" loading="lazy" decoding="async" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline\'">'
   +'<span class="an-country-flag-fallback" aria-hidden="true">'+esc(flag)+'</span>':'<span class="an-country-flag-fallback" style="display:inline" aria-hidden="true">'+esc(flag)+'</span>';
  const imgHtml=bg?'<img class="an-country-backdrop" src="'+esc(bg)+'" alt="'+esc(name)+' destination landscape" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">':'';
+ const split=name.indexOf(' ');
+ const heading=split<0?esc(name):esc(name.slice(0,split))+' <span>'+esc(name.slice(split+1))+'</span>';
  const count=Number.isFinite(country.count)?'<span class="an-country-count">'+country.count.toLocaleString('en-US')+' universities</span> · ':'';
  return '<a class="country an-country-card an-country-enriched" href="'+safeLink+'" aria-label="Explore '+esc(name)+' universities">'+imgHtml+
   '<span class="an-country-metadata"><span class="an-country-flag">'+flagsHtml+'</span>'+
   (hasPr?badge('is-pr','🏡 PR',prTitle):'')+(hasSpouse?badge('is-spouse','💍 Spouse',spouseTitle):'')+'</span>'+
-  '<strong>'+esc(name)+'</strong><small>'+count+'Explore universities <span aria-hidden="true">↗</span></small></a>';
+  '<strong>'+heading+'</strong><small>'+count+'<span class="an-country-explore">Explore universities</span> <span aria-hidden="true">↗</span></small></a>';
 }
 window.ANCountryCards={render,flags,pr,spouse,specificPhotos};
 })();
