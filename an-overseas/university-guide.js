@@ -163,12 +163,16 @@ const profileFact=(u,section)=>{
  const detail=factNotes[key]?.[section]||(section==='ranking'?item[1]:item[0]+' · '+item[1]);
  return '<div class="an-profile-fact"><h3>'+label+'</h3><p>'+e(detail)+(item[3]?' · '+countdown(item[3]):'')+'</p>'+link(item[2],'Published source')+(key==='amu'&&section==='entry'?link(amuAdmissions,'International admissions'):'')+'</div>';
 };
-const institutionLogo=(u,p)=>factKey(u)==='amu'?'assets/universities/amu-official-logo.png':u.logoImage||p?.logo||'';
+const verifiedLogoFiles={aimstuniversity:'aimst',ucsiuniversity:'ucsi'};
+const institutionLogo=(u,p)=>{
+ const file=factKey(u)==='amu'?'amu':verifiedLogoFiles[norm(String(u.name||'').replace(/\s*\([^)]*\)\s*$/,''))];
+ return file?'assets/universities/'+file+'-official-logo.png':u.logoImage||p?.logo||'';
+};
 const card=(u,p)=>{
  const rank=getRank(u),kind=u.kind||'University',official=validUrl(u.site),registry=validUrl(u.registrySource);
  const name=String(u.name||u.short||'University').trim(),words=name.split(/\s+/),cut=Math.max(1,Math.ceil(words.length/2));
  const mainName='<span class="an-premium-name-orange">'+e(words.slice(0,cut).join(' '))+'</span> <span class="an-premium-name-white">'+e(words.slice(cut).join(' '))+'</span>';
- const short=String(u.short||'').trim(),shortLabel=short&&short.toLowerCase()!==name.toLowerCase()?' <span class="an-premium-short">('+e(short)+')</span>':'';
+ const short=String(u.short||'').trim(),shortLabel=short&&norm(short)!==norm(name)&&!norm(name.match(/\(([^)]+)\)\s*$/)?.[1]).startsWith(norm(short))?' <span class="an-premium-short">('+e(short)+')</span>':'';
  const privateUni=/private/i.test(kind),typeText=privateUni?'PRIVATE UNIVERSITY':/public/i.test(kind)?'PUBLIC UNIVERSITY':(/university/i.test(kind)?String(kind).toUpperCase():String(kind).toUpperCase()+' UNIVERSITY');
  const discount=window.ANUniversityTools?.badge?.(u.id)||'';
  const mark=rank?'<span class="an-guide-rank">QS World 2027 #'+rank+'</span>':'';
@@ -184,8 +188,8 @@ const card=(u,p)=>{
  const fact=(icon,label,value,extra='',source='',date='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon" aria-hidden="true">'+icon+'</span><strong>'+label+'</strong><b>'+(source?'<a href="'+e(source)+'" rel="noopener noreferrer" target="_blank">'+(date?countdown(date):e(value))+'</a>':e(value))+'</b>'+(extra?'<small>'+e(extra)+'</small>':'')+'</div>';
  const intake=verified?.intake;
  const facts=fact('♛',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'Ranking unverified',rank?'QS World 2027':'']))
-  +fact('▤','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText==='See official catalogue'?'':'Published count']))
-  +fact('◈',verified?.tuition&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||[tuitionText,firstYear?'Published fee example':'Programme-specific fees']))
+  +fact('▤','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText==='See official catalogue'?'':'Published count',validUrl(p?.programSource)||official]))
+  +fact('◈',verified?.tuition&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||[tuitionText,firstYear?'Published fee example':'Programme-specific fees',validUrl(p?.feeSource)||official]))
   +(intake?fact('▦','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):fact('▦','UPCOMING INTAKE',intakeText,'',validUrl(p?.intakeSource)||official));
  return '<article class="card uni-card an-guide-card an-premium-uni-card"><div class="uni-cover-wrap">'+imageMarkup(u,p)+mark+discount+'<div class="an-premium-hero-details"><h3 class="an-premium-university-title">'+mainName+shortLabel+'</h3><div class="an-premium-meta">'+logoMarkup+'<div class="an-premium-meta-text"><div class="an-premium-type '+(privateUni?'is-private':'is-public')+'">'+e(typeText)+'</div><p class="university-location an-premium-location">'+e(country)+'</p></div></div></div></div><div class="inside"><div class="an-premium-facts">'+facts+'</div><div class="an-guide-links"><a class="card-open" href="#/university/'+encodeURIComponent(u.id)+'">University Portfolio <span>↗</span></a>'+(official?'<a class="an-guide-official" href="'+e(official)+'" rel="noopener noreferrer" target="_blank">Official Website ↗</a>':registry?'<a class="an-guide-official" href="'+e(registry)+'" rel="noopener noreferrer" target="_blank">Official Register ↗</a>':'')+'<a class="an-premium-apply" href="#/apply">Apply Now ↗</a></div></div></article>';
 };
