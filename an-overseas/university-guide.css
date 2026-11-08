@@ -318,3 +318,22 @@ body.an-portfolio-v2 #app .an-study-section :is(p,li) :is(strong,em){color:#f068
 #app .university-profile .an-profile-fact h3{margin:0 0 6px}
 #app .university-profile .an-profile-fact p{margin:0 0 8px}
 #app .university-profile .an-profile-fact [data-an-deadline]{font-variant-numeric:tabular-nums;font-weight:800}
+
+/* Compact card names, evenly centred marks and a consistent portfolio palette. */
+#app .university-catalogue #results .an-premium-uni-card .an-premium-university-title{font-size:clamp(15px,1.45vw,21px)!important;line-height:1.23!important;padding:5px 8px}
+#app .university-catalogue #results .an-premium-uni-card .an-premium-meta-logo{width:60px;height:49px;align-self:center;box-sizing:border-box;padding:3px}
+#app .university-catalogue #results .an-premium-uni-card .an-premium-fact-icon{color:#ff7100!important;width:22px;height:22px;flex:none}
+#app .university-catalogue #results .an-premium-uni-card .an-premium-fact-icon svg{display:block;width:100%;height:100%}
+#app .university-catalogue #results .an-premium-uni-card .an-premium-fact strong{color:#ff791f!important}
+#app .university-catalogue #results .an-premium-uni-card .an-guide-links a{border:1px solid #e65c00!important;background:#261105!important;color:#fff!important}
+#app .university-catalogue #results .an-premium-uni-card .an-guide-links .card-open{background:#ac3c00!important}
+#app .university-catalogue #results .an-premium-uni-card .an-guide-links .an-premium-apply{background:#973400!important}
+#app .university-catalogue #results .an-premium-uni-card .uni-cover-wrap::after{background:linear-gradient(transparent 27%,#26130738 60%,#110901ee)!important}
+#app .university-profile .profile-body :is(.profile-section,.an-study-section) :is(h2,header>h3){color:#ff7a21!important;-webkit-text-fill-color:#ff7a21!important}
+#app .university-profile .an-portfolio-icon{width:36px;height:36px;min-width:36px;font-size:20px;color:#fff!important;-webkit-text-fill-color:#fff!important;background:#592400!important;border-color:#e65c00!important}
+#app .university-profile .profile-body .an-portfolio-serial{color:#ff7100!important;-webkit-text-fill-color:#ff7100!important}
+#app .university-profile .profile-identity .university-logo{object-fit:contain;padding:5px}
+@media(max-width:800px){
+ #app .university-catalogue #results .an-premium-uni-card .an-premium-university-title{font-size:clamp(16px,4.3vw,21px)!important}
+ #app .university-catalogue #results .an-premium-uni-card .an-premium-fact{min-height:86px!important}
+}

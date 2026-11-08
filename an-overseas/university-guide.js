@@ -88,7 +88,25 @@ const imageMarkup=(u,p)=>{
 const amuAdmissions='https://amu.edu.my/international-students-admissions/';
 const amuProgrammes='https://amu.edu.my/undergraduate-programmes/';
 const amuFees='https://amu.edu.my/fees-and-fundings/fees-for-international-students/';
+const utmAdmissions='https://admission.utm.my/undergraduate-international/';
+const utmCourses='https://admission.utm.my/offered-allcourses-international/';
+const utmFees='https://admission.utm.my/programme-fees-ug-international/';
+const amcCourses='https://amc.edu.my/programmes/';
+const amcCalendar='https://amc.edu.my/wp-content/uploads/2026/02/Master-Academic-Calendar-2026-2027-Degree-Updated.pdf';
+const amcRegister='https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=447';
+const amcRegistration='https://amc.edu.my/crm/onlineForms/diploma_programmes.php';
 const verifiedCardFacts={
+ utm:{
+  ranking:['#158','QS World · Asia #25 (2027)','https://civil.utm.my/utm-rises-to-the-top-25-in-qs-world-university-rankings-asia-2027/'],
+  programmes:['44','International bachelor listings',utmCourses],
+  tuition:['RM 75,000','Full Engineering degree',utmFees],
+  intake:['February 2027','Feb intake · 31 Dec 2026',utmAdmissions,'2026-12-31']
+ },
+ amc:{
+  programmes:['27','Academic catalogue listings',amcCourses],
+  tuition:['Tuition not verified','Degree registration: RM 500',amcRegistration],
+  intake:['25 January 2027','Degree semester start',amcCalendar]
+ },
  amu:{
   programmes:['10','Undergraduate catalogue entries',amuProgrammes],
   tuition:['RM 48,500','Full international BBA tuition',amuFees],
@@ -126,6 +144,8 @@ const verifiedCardFacts={
 };
 const malaysiaFactIds={
  universitimalaya:'um',
+ universititeknologimalaysia:'utm',
+ amcuniversitycollege:'amc',
  universitisainsmalaysia:'usm',
  universitikebangsaanmalaysia:'ukm',
  universitiputramalaysia:'upm'
@@ -148,6 +168,8 @@ setInterval(()=>{
  });
 },1000);
 const factNotes={
+ utm:{fees:'The Engineering example is RM 75,000 for the full degree: RM 14,758 for semester 1 and RM 60,242 combined for semesters 2–8. Accommodation is separate.',programmes:'UTM lists 44 international bachelor programmes across its catalogue. Its February table shows Civil Engineering and three Malaysia–Japan International Institute of Technology programmes open: Electronic Systems Engineering, Mechanical Precision Engineering and Chemical Process Engineering.',entry:'International bachelor applications for February 2027 run from 1 November to 31 December 2026. The countdown uses the end of the published deadline day in Malaysia time.',ranking:'UTM is #158 globally and #25 in Asia in the QS 2027 editions. The 2026 QS subject results put UTM first in Malaysia for Civil & Structural Engineering, Chemical Engineering, Mineral & Mining Engineering, and Architecture / Built Environment.'},
+ amc:{fees:'AMC publishes a registration charge of RM 500 for degree, master’s and doctoral programmes, and RM 300 for foundation and diploma. These are separate from tuition. A full international tuition figure was not verified in the published materials reviewed.',programmes:'The catalogue lists 1 foundation, 12 diplomas, 8 bachelor’s, 4 master’s and 2 doctoral programmes.',entry:'The degree calendar shows teaching week 1 beginning 25 January 2027. This is a semester start date. Business Management lists January, June and September as intake months. An application cutoff was not verified.'},
  um:{fees:'RM 98,097 is the rounded arithmetic mean of 74 full-degree tuition amounts in UM’s 2025/26 international bachelor fee schedule. Higher-priced clinical degrees, including medicine and dentistry, raise the average. Check your programme’s fee and any separately stated taxes and charges.',programmes:'UM lists 80 bachelor’s programmes for 2026/27. The number covers the academic session across the university. March availability varies by programme.',entry:'The March 2027 international undergraduate application deadline is 30 January 2027. UM publishes a calendar date. The site countdown uses the end of that day in Malaysia time.'},
  usm:{fees:'USD 16,000 is the full international tuition published for the Bachelor of Management with Honours. USM lists USD 2,285.71 per semester and separate recurring charges.'},
  ukm:{fees:'RM 19,050 is first-year international BBA tuition in the 2024/25 UKMi schedule, calculated as RM 10,650 + RM 8,400. The schedule lists the RM 2,520 registration charge separately.'},
@@ -163,10 +185,32 @@ const profileFact=(u,section)=>{
  const detail=factNotes[key]?.[section]||(section==='ranking'?item[1]:item[0]+' · '+item[1]);
  return '<div class="an-profile-fact"><h3>'+label+'</h3><p>'+e(detail)+(item[3]?' · '+countdown(item[3]):'')+'</p>'+link(item[2],'Published source')+(key==='amu'&&section==='entry'?link(amuAdmissions,'International admissions'):'')+'</div>';
 };
-const verifiedLogoFiles={aimstuniversity:'aimst',ucsiuniversity:'ucsi'};
+const verifiedLogoFiles={aimstuniversity:'aimst',ucsiuniversity:'ucsi',amcuniversitycollege:'amc'};
 const institutionLogo=(u,p)=>{
  const file=factKey(u)==='amu'?'amu':verifiedLogoFiles[norm(String(u.name||'').replace(/\s*\([^)]*\)\s*$/,''))];
  return file?'assets/universities/'+file+'-official-logo.png':u.logoImage||p?.logo||'';
+};
+const profileData=(u,p={})=>{
+ const key=factKey(u);
+ if(key==='amc')return {...p,founded:'1985',size:'Kota Kinabalu, Sabah',
+  history:'AMC University College was established in 1985. The institution is privately owned by Advanced Business Systems Consultants Sdn Bhd and registered with Malaysia’s Ministry of Higher Education. It offers academic qualifications and professional ICT training.',
+  historySource:'https://amc.edu.my/about-us/',
+  campus:'AMC is at Lot 43–44, Likas Square Commercial Centre, Jalan Istiadat Likas, 88400 Kota Kinabalu, Sabah. Its facilities include a library, computer lab, training food-and-beverage space, student lounge and prayer room.',
+  campusSource:'https://amc.edu.my/facilities/',
+  housing:'AMC lists student accommodation with bedrooms, shared living space and kitchen facilities.',
+  housingSource:'https://amc.edu.my/facilities/',
+  programs:['Foundation in Arts','Diploma in Accounting','Diploma in Business Administration','Diploma in Digital Marketing','Diploma in Hotel Management','Diploma in Hotel Management (Work-Based Learning)','Diploma in Computer Science','Diploma in Information Technology','Diploma in Digital Creative Design','Diploma in Digital Media Content','Diploma in e-Governance','Diploma in Law Enforcement','Diploma in Policing and Investigation','Bachelor in Accounting (Honours)','Bachelor of Business Administration (Honours)','Bachelor in Business Management (Honours)','Bachelor in Digital Marketing (Honours)','Bachelor in Hospitality Management (Honours)','Bachelor in Computer Science (Honours)','Bachelor in Information Technology (Honours)','Bachelor in Corporate Governance (Honours)','Master in Business Administration','Master in Accounting','Master in Corporate Governance','Master in Information Technology','Doctor of Business Administration','Doctor of Philosophy'],
+  programSource:amcCourses,pgSource:amcCourses,feeSource:amcRegistration,feeNote:'A complete international tuition schedule was not verified.',
+  intake:'Degree teaching week 1 starts 25 January 2027 on the academic calendar.',intakeSource:amcCalendar,rankSource:amcRegister};
+ if(key==='utm')return {...p,programSource:utmCourses,feeSource:utmFees,intakeSource:utmAdmissions,
+  intake:'February 2027 applications for international bachelor’s study run 1 November–31 December 2026.'};
+ return p;
+};
+const factIcons={
+ rank:'<path d="M8 21h8M12 17v4M7 4h10v7a5 5 0 0 1-10 0zM7 6H3v2a4 4 0 0 0 4 4m10-6h4v2a4 4 0 0 1-4 4"/>',
+ programmes:'<path d="M12 7v13M3 5h4a5 5 0 0 1 5 2 5 5 0 0 1 5-2h4v13h-4a5 5 0 0 0-5 2 5 5 0 0 0-5-2H3z"/>',
+ tuition:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h1m10 0h1"/>',
+ intake:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-14 5h2m3 0h2m3 0h2"/>'
 };
 const card=(u,p)=>{
  const rank=getRank(u),kind=u.kind||'University',official=validUrl(u.site),registry=validUrl(u.registrySource);
@@ -185,12 +229,12 @@ const card=(u,p)=>{
  const logo=institutionLogo(u,p);
  const logoMarkup=validUrl(logo)||/^assets\//.test(logo)?'<img class="an-premium-meta-logo" src="'+e(logo)+'" alt="'+e(name)+' logo" loading="lazy" onerror="this.remove()">':'';
  const country=u.country||u.city||'';
- const fact=(icon,label,value,extra='',source='',date='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon" aria-hidden="true">'+icon+'</span><strong>'+label+'</strong><b>'+(source?'<a href="'+e(source)+'" rel="noopener noreferrer" target="_blank">'+(date?countdown(date):e(value))+'</a>':e(value))+'</b>'+(extra?'<small>'+e(extra)+'</small>':'')+'</div>';
+ const fact=(icon,label,value,extra='',source='',date='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+factIcons[icon]+'</svg></span><strong>'+label+'</strong><b>'+(source?'<a href="'+e(source)+'" rel="noopener noreferrer" target="_blank">'+(date?countdown(date):e(value))+'</a>':e(value))+'</b>'+(extra?'<small>'+e(extra)+'</small>':'')+'</div>';
  const intake=verified?.intake;
- const facts=fact('♛',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'Ranking unverified',rank?'QS World 2027':'']))
-  +fact('▤','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText==='See official catalogue'?'':'Published count',validUrl(p?.programSource)||official]))
-  +fact('◈',verified?.tuition&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||[tuitionText,firstYear?'Published fee example':'Programme-specific fees',validUrl(p?.feeSource)||official]))
-  +(intake?fact('▦','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):fact('▦','UPCOMING INTAKE',intakeText,'',validUrl(p?.intakeSource)||official));
+ const rankingFact=key==='amc'?fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister):fact('rank',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'Ranking unverified',rank?'QS World 2027':'']));
+ const facts=rankingFact+fact('programmes','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText==='See official catalogue'?'':'Published count',validUrl(p?.programSource)||official]))
+  +fact('tuition',verified?.tuition&&!['um','amc'].includes(key)?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||[tuitionText,firstYear?'Published fee example':'Programme-specific fees',validUrl(p?.feeSource)||official]))
+  +(intake?fact('intake','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):fact('intake','UPCOMING INTAKE',intakeText,'',validUrl(p?.intakeSource)||official));
  return '<article class="card uni-card an-guide-card an-premium-uni-card"><div class="uni-cover-wrap">'+imageMarkup(u,p)+mark+discount+'<div class="an-premium-hero-details"><h3 class="an-premium-university-title">'+mainName+shortLabel+'</h3><div class="an-premium-meta">'+logoMarkup+'<div class="an-premium-meta-text"><div class="an-premium-type '+(privateUni?'is-private':'is-public')+'">'+e(typeText)+'</div><p class="university-location an-premium-location">'+e(country)+'</p></div></div></div></div><div class="inside"><div class="an-premium-facts">'+facts+'</div><div class="an-guide-links"><a class="card-open" href="#/university/'+encodeURIComponent(u.id)+'">University Portfolio <span>↗</span></a>'+(official?'<a class="an-guide-official" href="'+e(official)+'" rel="noopener noreferrer" target="_blank">Official Website ↗</a>':registry?'<a class="an-guide-official" href="'+e(registry)+'" rel="noopener noreferrer" target="_blank">Official Register ↗</a>':'')+'<a class="an-premium-apply" href="#/apply">Apply Now ↗</a></div></div></article>';
 };
 const link=(url,text,kind='')=>{const x=validUrl(url);return x?'<a class="an-guide-btn '+e(kind)+'" href="'+e(x)+'" target="_blank" rel="noopener noreferrer">'+e(text)+' ↗</a>':''};
@@ -285,5 +329,5 @@ document.addEventListener('error',event=>{
  }
 },true);
 const extended=(u,p)=>'<section class="profile-section an-guide-degrees" id="profile-degree"><h2><span>Degree-wise</span> Application Guide</h2><p>Expand a level for its application preparation, recognised-document checklist and official route.</p><div class="an-guide-degree-grid">'+['Bachelor','Master','PhD'].map((level,i)=>'<details class="an-guide-degree-box"'+(i===0?' open':'')+'><summary>'+e(level)+' <span>⌄</span></summary>'+degree(u,level)+'</details>').join('')+'</div></section>'+support(u);
-window.ANUniGuide={card,compare,getRank,panel,mount,route,photos,extended,profileFact,institutionLogo};
+window.ANUniGuide={card,compare,getRank,panel,mount,route,photos,extended,profileFact,institutionLogo,profileData};
 })();
