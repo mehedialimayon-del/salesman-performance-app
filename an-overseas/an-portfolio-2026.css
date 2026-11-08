@@ -219,6 +219,8 @@ body.an-portfolio-v2 #profile-support .an-guide-support-head h2 .an-portfolio-ic
  color:#68df98!important;
  -webkit-text-fill-color:#68df98!important;
 }
-#app .university-profile #profile-ranking .profile-apply{
+#app .university-profile #profile-ranking .profile-end-actions .btn{
  color:#fff!important;
+ -webkit-text-fill-color:#fff!important;
+ background:#a63f0b!important;
 }
