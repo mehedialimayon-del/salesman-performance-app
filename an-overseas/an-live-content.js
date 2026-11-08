@@ -4,6 +4,8 @@
 const ROOT='https://svpgjrxeqnluipsgjywk.supabase.co';
 const KEY='sb_publishable_eR5TZxv2aWndxdwzU0RIUA_mXWcBcO3';
 const headers={'apikey':KEY,'Content-Type':'application/json'};
+const contactDefaults={phone:'+8801315200899',whatsapp:'+8801315200899'};
+window.ANContactSettings={...contactDefaults};
 let settings={},news=[],team=[],universityOverrides=[],version='',busy=false;
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeLink=x=>{try{const u=new URL(x);return u.protocol==='https:'?u.href:'';}catch{return'';}};
@@ -68,7 +70,7 @@ function applyPage(){
   if(work&&settings.work&&work.textContent!==settings.work)work.textContent=settings.work;
  }
  if(location.hash.startsWith('#/contact')){
-  window.ANContactSettings={...settings};
+  window.ANContactSettings={...settings,phone:settings.phone||settings.whatsapp||contactDefaults.phone,whatsapp:settings.whatsapp||contactDefaults.whatsapp};
   window.dispatchEvent(new Event('an-contact-settings-updated'));
  }
 }

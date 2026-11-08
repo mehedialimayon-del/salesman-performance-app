@@ -86,7 +86,7 @@ jobs:
                   assert(x.enquiry.top>x.contactGrid.top,name+': compact form below socials');
                   assert(x.enquiry.height<260,name+': enquiry panel is compact');
                   assert(x.gmail.bottom<=x.officePanel.bottom+3,name+': Gmail card not clipped by contact panel');
-                  assert(Math.abs(x.fb.top-x.tt.top)<4&&Math.abs(x.yt.top-x.li.top)<4&&Math.abs(x.wa.top-x.call.top)<4,name+': three rows of two icon cards');
+                  assert(Math.abs(x.fb.top-x.yt.top)<4&&Math.abs(x.li.top-x.call.top)<4&&x.li.top>x.fb.top,name+': two rows of three icon cards');
                   assert(x.gmail.top>x.call.top&&x.gmail.width>=x.fb.width*1.9,name+': centered full-width Gmail last');
                 }else{
                   assert(x.enquiry.left>x.officePanel.right,name+': form to the right on laptop');

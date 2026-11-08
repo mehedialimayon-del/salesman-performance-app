@@ -1,9 +1,9 @@
 /* Contact Our Team second-pass layout: photo office tiles, actual contact icons,
-   3 x 2 social cards + full-width Gmail and a compact bottom enquiry form.
+   Social cards + full-width Gmail and a compact bottom enquiry form.
    Scoped to #/contact; preserves existing CMS links and form handlers. */
 body.an-contact-mode #app .an-contact-offices{gap:0!important}
 body.an-contact-mode #app .an-contact-channels-title{
-  margin:12px 0 8px!important;
+  margin:5px 0 4px!important;
   font-size:15px!important;
   font-weight:850!important;
   color:#ffa446!important;
@@ -11,7 +11,7 @@ body.an-contact-mode #app .an-contact-channels-title{
 body.an-contact-mode #app .an-contact-social{
   display:grid!important;
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  gap:8px!important;
+  gap:4px!important;
   margin:0!important;
   align-items:stretch!important;
 }
@@ -21,37 +21,36 @@ body.an-contact-mode #app .an-contact-social .an-contact-phone{
   min-width:0!important;
   width:100%!important;
   height:auto!important;
-  min-height:50px!important;
+  min-height:36px!important;
   display:flex!important;
   flex-direction:row!important;
   justify-content:flex-start!important;
   align-items:center!important;
   gap:9px!important;
-  padding:8px 10px!important;
-  border:1px solid #855b38!important;
+  padding:3px 8px!important;
+  border:1px solid #db8a46!important;
   border-radius:11px!important;
-  background:linear-gradient(118deg,#251b16,#131721)!important;
+  background:linear-gradient(110deg,#42251b,#221821)!important;
   text-decoration:none!important;
   color:#fff!important;
   font-size:13px!important;
   box-shadow:0 5px 16px #0002;
 }
-body.an-contact-mode #app .an-contact-social a:not(.an-social-unset):hover,
-body.an-contact-mode #app .an-contact-social .an-contact-phone:not(.an-social-unset):hover{
+body.an-contact-mode #app .an-contact-social a:not(.an-social-unset):is(:hover,:focus-visible){
   background:linear-gradient(115deg,#3b2414,#1b1e2b)!important;
   border-color:#ffb55a!important;
 }
 body.an-contact-mode #app .an-contact-social .an-contact-icon{
   display:inline-flex;
-  width:33px; height:33px;
-  flex:0 0 33px;
+  width:27px; height:27px;
+  flex:0 0 27px;
   align-items:center;justify-content:center;
   border-radius:9px;
   background:#fff;
   box-shadow:0 0 0 1px #ffffff22;
 }
 body.an-contact-mode #app .an-contact-social .an-contact-icon svg{
-  display:block;width:23px;height:23px;
+  display:block;width:19px;height:19px;
 }
 body.an-contact-mode #app .an-contact-social .an-contact-card-copy{
   flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px;
@@ -74,7 +73,7 @@ body.an-contact-mode #app .an-contact-social .an-contact-card-detail{
   word-break:break-word;
 }
 body.an-contact-mode #app .an-contact-social .an-social-unset{
-  opacity:.6!important;
+  opacity:1!important;
   filter:none!important;
   cursor:not-allowed!important;
   pointer-events:none!important;
@@ -90,9 +89,9 @@ body.an-contact-mode #app .an-contact-social [data-an-social="gmail"] .an-contac
 body.an-contact-mode #app .an-contact-email{display:none!important}
 /* Keep desktop's left offices and right enquiry columns. Compact fields at the top. */
 @media(min-width:801px){
- body.an-contact-mode #app .an-contact-offices{overflow-y:auto!important;gap:0!important}
+ body.an-contact-mode #app .an-contact-offices{overflow:visible!important;gap:0!important}
  body.an-contact-mode #app .an-contact-social{
-   gap:8px!important;
+   gap:4px!important;
  }
  body.an-contact-mode #app .an-contact-enquiry{
    justify-content:flex-start!important;
@@ -112,16 +111,15 @@ body.an-contact-mode #app .an-contact-email{display:none!important}
    display:flex!important;
    flex-direction:column!important;
    gap:6px!important;
-   overflow:hidden!important;
+   overflow:visible!important;
    min-height:0!important;
  }
  body.an-contact-mode #app .an-contact-offices{
-   flex:1 1 0!important;
+   flex:0 0 auto!important;
    display:flex!important;
    flex-direction:column!important;
    min-height:0!important;
-   overflow-y:auto!important;
-   overscroll-behavior:contain;
+   overflow:visible!important;
    padding:7px 8px!important;
  }
  body.an-contact-mode #app .an-contact-main h2{font-size:14px!important;margin:0 0 5px!important}
@@ -132,15 +130,15 @@ body.an-contact-mode #app .an-contact-email{display:none!important}
    flex:0 0 auto!important;
  }
  body.an-contact-mode #app .an-contact-office{
-   height:clamp(108px,14vh,132px)!important;
-   min-height:108px!important;
+   height:auto!important;
+   min-height:62px!important;
    display:flex!important;
    flex-direction:column!important;
    justify-content:flex-end!important;
    gap:0!important;
    position:relative!important;
    isolation:isolate;
-   padding:8px!important;
+   padding:5px!important;
    overflow:hidden!important;
    border:1px solid #ad733f!important;
    border-radius:11px!important;
@@ -205,25 +203,23 @@ body.an-contact-mode #app .an-contact-email{display:none!important}
    line-height:1.1!important;
  }
  body.an-contact-mode #app .an-contact-social{
-   grid-template-columns:repeat(2,minmax(0,1fr))!important;
-   grid-template-rows:repeat(4,minmax(38px,1fr))!important;
+   grid-template-columns:repeat(3,minmax(0,1fr))!important;
    flex:1 1 auto!important;
    min-height:0!important;
    gap:5px 6px!important;
  }
  body.an-contact-mode #app .an-contact-social a,
  body.an-contact-mode #app .an-contact-social .an-contact-phone{
-   min-height:38px!important;
-   height:100%!important;
-   max-height:none!important;
+   min-height:34px!important;
+   height:auto!important;
    padding:3px 6px!important;
-   gap:7px!important;
+   gap:4px!important;
    border-radius:9px!important;
  }
  body.an-contact-mode #app .an-contact-social .an-contact-icon{
-   width:27px;height:27px;flex-basis:27px;border-radius:7px;
+   width:21px;height:21px;flex-basis:21px;border-radius:7px;
  }
- body.an-contact-mode #app .an-contact-social .an-contact-icon svg{width:19px;height:19px}
+ body.an-contact-mode #app .an-contact-social .an-contact-icon svg{width:15px;height:15px}
  body.an-contact-mode #app .an-contact-social a small,
  body.an-contact-mode #app .an-contact-social .an-contact-phone small{
    font-size:10px!important;
@@ -237,7 +233,7 @@ body.an-contact-mode #app .an-contact-email{display:none!important}
    overflow:hidden!important;
  }
  body.an-contact-mode #app .an-contact-social [data-an-social="gmail"]{
-   min-height:39px!important;
+   min-height:32px!important;
    padding:4px 10px!important;
    grid-column:1/-1!important;
  }
@@ -245,10 +241,9 @@ body.an-contact-mode #app .an-contact-email{display:none!important}
    flex:0 0 auto!important;
    display:block!important;
    height:auto!important;
-   max-height:45%!important;
    min-height:0!important;
    padding:8px 9px!important;
-   overflow-y:auto!important;
+   overflow:visible!important;
    background:linear-gradient(140deg,#201f28,#11131a)!important;
    box-shadow:0 -7px 28px #0007;
  }
@@ -273,7 +268,7 @@ body.an-contact-mode #app .an-contact-email{display:none!important}
    align-content:start!important;
  }
  body.an-contact-mode #app .an-contact-fields label{font-size:10px!important;gap:2px!important}
- body.an-contact-mode #app .an-contact-fields label:last-child{grid-column:auto!important}
+ body.an-contact-mode #app .an-contact-fields label:last-child{grid-column:1 / -1!important}
  body.an-contact-mode #app .an-contact-fields input,
  body.an-contact-mode #app .an-contact-fields textarea{
    min-height:30px!important;
@@ -283,8 +278,8 @@ body.an-contact-mode #app .an-contact-email{display:none!important}
    font-size:11px!important;
  }
  body.an-contact-mode #app .an-contact-fields textarea{
-   min-height:40px!important;
-   height:40px!important;
+   min-height:68px!important;
+   height:68px!important;
    resize:vertical!important;
  }
  body.an-contact-mode #app .an-contact-enquiry button[type=submit]{
@@ -300,10 +295,10 @@ body.an-contact-mode #app .an-contact-email{display:none!important}
    line-height:1.2!important;
  }
 }
-@media(max-height:660px) and (max-width:800px){
- body.an-contact-mode #app .an-contact-head{padding:4px 0!important}
- body.an-contact-mode #app .an-contact-office{min-height:78px!important;height:78px!important}
- body.an-contact-mode #app .an-contact-social a,
- body.an-contact-mode #app .an-contact-social .an-contact-phone{min-height:38px!important}
- body.an-contact-mode #app .an-contact-enquiry{max-height:47%!important}
+
+body.an-contact-mode #app .an-contact-feedback:empty{display:none!important}
+@media(max-width:800px){
+ body.an-contact-mode #app .an-contact-social a{padding-inline:4px!important}
+ body.an-contact-mode #app .an-contact-social [data-an-social="whatsapp"] .an-contact-card-detail,
+ body.an-contact-mode #app .an-contact-social .an-contact-phone .an-contact-card-detail{font-size:8px!important}
 }
