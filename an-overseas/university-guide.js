@@ -85,22 +85,68 @@ const imageMarkup=(u,p)=>{
  if(!photo)return fallback(u);
  return fallback(u)+'<img class="campus-cover an-guide-photo" src="'+e(photo.url)+'" alt="'+e(u.name)+' — university campus" loading="lazy" decoding="async" data-guide-image>'+(photo.source?'<a class="an-guide-credit" href="'+e(photo.source)+'" target="_blank" rel="noopener noreferrer">'+e(photo.credit)+' ↗</a>':'<span class="an-guide-credit">'+e(photo.credit)+'</span>');
 };
+const verifiedCardFacts={
+ um:{
+  ranking:['#56','Asia =17 · SE Asia 3 · MY 1','https://www.um.edu.my/news/universiti-malaya-retains-asia-rsquo-s-top-20-spot-wins-global-engagement-champions-award'],
+  programmes:['80','Bachelor’s · 2026/27','https://study.um.edu.my/programmes'],
+  tuition:['RM 98,097','Intl. UG mean · 2025/26','https://study.um.edu.my/doc/tution-fee/Fee%20Structure%2C%20UG%2C%20International%20-%20Updated%2022%20Oct%202025.pdf'],
+  intake:['Mar 2027','Mar intake · 30 Jan 2027','https://study.um.edu.my/how-to-apply','2027-01-30']
+ },
+ usm:{
+  ranking:['#=128','Asia 27 · MY 5 (Asia table)','https://news.usm.my/english-news/usm-rises-seven-places-to-27th-in-qs-asia-university-rankings-2027'],
+  programmes:['60+','International bachelor’s','https://admission.usm.my/index.php/main/undergraduate/international'],
+  tuition:['USD 16,000','Management degree example','https://admission.usm.my/undergraduate/undergraduate-international?id=769&view=article'],
+  intake:['March intake','15 Jan · 2025/26 schedule','https://admission.usm.my/images/00uginternational/download_2025/BOOKLET_INTERNATIONAL_2025-2026.pdf']
+ },
+ ukm:{
+  ranking:['#130','Asia =20 · MY 2 (Asia table)','https://www.prnewswire.co.uk/news-releases/qs-asia-rankings-2027-302924353.html'],
+  programmes:['12 faculties','UKMi bachelor’s catalogue','https://www.ukm.my/studyukm/ukmi/'],
+  tuition:['RM 19,050','BBA year 1 tuition · 2024/25','https://shape.ukm.my/storage/lampiran/struktur_yuran/FEP/pra/strukturyuran_FEP_UKMi_pra_F_int_120242025.pdf'],
+  intake:['March / October','UKMi bachelor’s intakes','https://www.ukm.my/studyukm/ukmi/']
+ },
+ upm:{
+  ranking:['#138','Asia 24 · MY 3 (Asia table)','https://www.thestar.com.my/news/nation/2026/11/03/eleven-malaysian-varsities-ranked-among-top-100-in-asia'],
+  programmes:['74 codes','Intl. UG fee schedule','https://bursar.upm.edu.my/upload/dokumen/20260406115752Tuition_Fees_International_%281%29.pdf'],
+  tuition:['RM 96,000','Agricultural Science example','https://bursar.upm.edu.my/upload/dokumen/20260406115752Tuition_Fees_International_%281%29.pdf'],
+  intake:['March intake','31 Dec · published cycle','https://akademik.upm.edu.my/upload/dokumen/menul320250417184027Undergraduate_Programmes_Brochure_for_International_Students.pdf']
+ }
+};
+const malaysiaFactIds={
+ 'universiti malaya':'um',
+ 'universiti sains malaysia':'usm',
+ 'universiti kebangsaan malaysia':'ukm',
+ 'universiti putra malaysia':'upm'
+};
+const deadlineLabel=(date, fallback)=>{
+ if(!date)return fallback;
+ const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Kuala_Lumpur',dateStyle:'short'}).format();
+ const days=Math.round((Date.parse(date)-Date.parse(today))/86400000);
+ return days<0?'Deadline passed':days===0?'Closes today':days+' days left';
+};
 const card=(u,p)=>{
  const rank=getRank(u),kind=u.kind||'University',official=validUrl(u.site),registry=validUrl(u.registrySource);
  const name=String(u.name||u.short||'University').trim(),words=name.split(/\s+/),cut=Math.max(1,Math.ceil(words.length/2));
  const mainName='<span class="an-premium-name-orange">'+e(words.slice(0,cut).join(' '))+'</span> <span class="an-premium-name-white">'+e(words.slice(cut).join(' '))+'</span>';
  const short=String(u.short||'').trim(),shortLabel=short&&short.toLowerCase()!==name.toLowerCase()?' <span class="an-premium-short">('+e(short)+')</span>':'';
- const privateUni=/private/i.test(kind),typeText=privateUni?'PRIVATE UNIVERSITY':/public/i.test(kind)?'PUBLIC UNIVERSITY':String(kind).toUpperCase()+' UNIVERSITY';
+ const privateUni=/private/i.test(kind),typeText=privateUni?'PRIVATE UNIVERSITY':/public/i.test(kind)?'PUBLIC UNIVERSITY':(/university/i.test(kind)?String(kind).toUpperCase():String(kind).toUpperCase()+' UNIVERSITY');
  const discount=window.ANUniversityTools?.badge?.(u.id)||'';
  const mark=rank?'<span class="an-guide-rank">QS World 2027 #'+rank+'</span>':'';
+ const verified=verifiedCardFacts[u.id]||verifiedCardFacts[malaysiaFactIds[norm(name.replace(/\s*\([^)]*\)\s*$/,''))]];
  const programmeCount=Number(u.totalPrograms||p?.totalPrograms||p?.programmeCount);
  const programmeText=Number.isInteger(programmeCount)&&programmeCount>0?String(programmeCount):'See official catalogue';
  const fees=Array.isArray(p?.fees)?p.fees:[],annualFees=fees.filter(x=>/first.year|annual|per year|1.year/i.test(String(x?.[2]||'')+' '+String(x?.[0]||''))).map(x=>String(x?.[1]||''));const firstYear=annualFees.length?annualFees[0]:null;
  const tuitionText=firstYear?firstYear:'See official fee guide';
  const intakeText=String(p?.intake||u.intake||'See official admissions calendar');
- const campusDetails=String(p?.campus||u.address||p?.address||u.city||u.country||'').trim();
- const fact=(icon,label,value,extra='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon">'+icon+'</span><strong>'+label+'</strong><b>'+e(value)+'</b>'+(extra?'<small>'+e(extra)+'</small>':'')+'</div>';
- return '<article class="card uni-card an-guide-card an-premium-uni-card"><div class="uni-cover-wrap">'+imageMarkup(u,p)+(validUrl(u.logoImage||p?.logo)||/^assets\//.test(String(u.logoImage||p?.logo||''))?'<img class="uni-card-logo" src="'+e(u.logoImage||p.logo)+'" alt="'+e(u.name)+' logo" loading="lazy" data-guide-image>':'')+mark+discount+'<div class="an-premium-hero-details"><h3 class="an-premium-university-title">'+(validUrl(u.logoImage||p?.logo)||/^assets\//.test(String(u.logoImage||p?.logo||''))?'<img class="an-premium-title-logo" src="'+e(u.logoImage||p.logo)+'" alt="" loading="lazy">':'')+mainName+shortLabel+'</h3><div class="an-premium-type '+(privateUni?'is-private':'is-public')+'"><span class="an-premium-type-icon">◆</span>'+e(typeText)+'</div><p class="university-location an-premium-location">⌖ '+e(campusDetails)+'</p></div></div><div class="inside"><div class="an-premium-facts">'+fact('♛','WORLD RANKING',rank?'#'+rank:'See ranking sources',rank?'QS World 2027':'No QS rank recorded')+fact('▤','TOTAL PROGRAMS',programmeText,'Bachelor · Master · PhD')+fact('◈','AVERAGE TUITION FEE',tuitionText,firstYear?'Published fee example':'Programme-specific fees')+fact('▦','UPCOMING INTAKE',intakeText)+'</div><div class="an-guide-links"><a class="card-open" href="#/university/'+encodeURIComponent(u.id)+'">University Portfolio <span>↗</span></a>'+(official?'<a class="an-guide-official" href="'+e(official)+'" rel="noopener noreferrer" target="_blank">Official Website ↗</a>':registry?'<a class="an-guide-official" href="'+e(registry)+'" rel="noopener noreferrer" target="_blank">Official Register ↗</a>':'')+'<a class="an-premium-apply" href="#/apply">Apply Now ↗</a></div></div></article>';
+ const logo=u.logoImage||p?.logo||'';
+ const logoMarkup=validUrl(logo)||/^assets\//.test(logo)?'<img class="an-premium-meta-logo" src="'+e(logo)+'" alt="'+e(name)+' logo" loading="lazy" onerror="this.remove()">':'';
+ const country=u.country||u.city||'';
+ const fact=(icon,label,value,extra='',source='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon" aria-hidden="true">'+icon+'</span><strong>'+label+'</strong><b>'+(source?'<a href="'+e(source)+'" rel="noopener noreferrer" target="_blank">'+e(value)+'</a>':e(value))+'</b>'+(extra?'<small>'+e(extra)+'</small>':'')+'</div>';
+ const intake=verified?.intake;
+ const facts=fact('♛',verified?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'Ranking unverified',rank?'QS World 2027':'']))
+  +fact('▤','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText==='See official catalogue'?'':'Published count']))
+  +fact('◈',verified?.tuition&&u.id!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||[tuitionText,firstYear?'Published fee example':'Programme-specific fees']))
+  +(intake?fact('▦','UPCOMING INTAKE',deadlineLabel(intake[3],intake[0]),intake[1],intake[2]):fact('▦','UPCOMING INTAKE',intakeText));
+ return '<article class="card uni-card an-guide-card an-premium-uni-card"><div class="uni-cover-wrap">'+imageMarkup(u,p)+mark+discount+'<div class="an-premium-hero-details"><h3 class="an-premium-university-title">'+mainName+shortLabel+'</h3><div class="an-premium-meta">'+logoMarkup+'<div class="an-premium-meta-text"><div class="an-premium-type '+(privateUni?'is-private':'is-public')+'">'+e(typeText)+'</div><p class="university-location an-premium-location">'+e(country)+'</p></div></div></div></div><div class="inside"><div class="an-premium-facts">'+facts+'</div><div class="an-guide-links"><a class="card-open" href="#/university/'+encodeURIComponent(u.id)+'">University Portfolio <span>↗</span></a>'+(official?'<a class="an-guide-official" href="'+e(official)+'" rel="noopener noreferrer" target="_blank">Official Website ↗</a>':registry?'<a class="an-guide-official" href="'+e(registry)+'" rel="noopener noreferrer" target="_blank">Official Register ↗</a>':'')+'<a class="an-premium-apply" href="#/apply">Apply Now ↗</a></div></div></article>';
 };
 const link=(url,text,kind='')=>{const x=validUrl(url);return x?'<a class="an-guide-btn '+e(kind)+'" href="'+e(x)+'" target="_blank" rel="noopener noreferrer">'+e(text)+' ↗</a>':''};
 const contactLink=u=>'<a class="an-guide-btn" href="#/contact">Contact A&N Overseas →</a>';

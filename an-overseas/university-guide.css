@@ -280,3 +280,16 @@ body.an-portfolio-v2 #app .an-study-section :is(p,li) :is(strong,em){color:#f068
 #results .an-premium-uni-card .an-guide-links{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 #results .an-premium-uni-card .an-guide-links a{min-width:0!important;overflow-wrap:anywhere!important;font-size:10px!important}
 #results .an-premium-uni-card .an-premium-fact b{scrollbar-width:thin!important}
+
+/* Keep the full name centered independently of the identity row. */
+#app .university-catalogue #results .an-premium-university-title{display:block!important;width:100%}
+#app .university-catalogue #results .an-premium-meta{display:flex;align-items:center;justify-content:center;gap:8px;max-width:100%}
+#app .university-catalogue #results .an-premium-meta-logo{width:40px;height:40px;flex:none;object-fit:contain;padding:3px;background:#fff;border-radius:7px}
+#app .university-catalogue #results .an-premium-meta-text{display:grid;gap:4px;justify-items:stretch;min-width:0}
+#app .university-catalogue #results .an-premium-meta .an-premium-location{min-height:0!important;width:auto!important;overflow:visible!important}
+#app .university-catalogue #results .an-premium-fact a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+@media(max-width:800px){
+ #app .university-catalogue #results{grid-template-columns:minmax(0,1fr)!important}
+ #app .university-catalogue #results .an-premium-uni-card{height:auto!important;min-height:0!important;max-height:none!important}
+ #app .university-catalogue #results .an-premium-uni-card .uni-cover-wrap{height:clamp(185px,35svh,290px)!important;min-height:0!important;flex:none!important}
+}

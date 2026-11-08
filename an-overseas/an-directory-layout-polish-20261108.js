@@ -158,7 +158,7 @@ const alignStyle=document.createElement('style');alignStyle.textContent=`
 .university-catalogue .an-centred-university-card .an-university-meta .badge{grid-column:2!important;grid-row:1!important;justify-self:start!important;margin:0!important}
 .university-catalogue .an-centred-university-card .an-university-meta .university-location{grid-column:2!important;grid-row:2!important;justify-self:start!important;margin:0!important;padding:5px 9px!important;border:1px solid #e96b1c!important;border-radius:8px!important;background:#151922!important;color:#fff!important;font-size:12px!important}
 `;document.head.appendChild(alignStyle);
-\nfunction mount(){
+function mount(){
  const dir=document.querySelector('.university-catalogue'),head=document.querySelector('.page-head');if(!dir||!head)return;
  const wrap=head.querySelector('.wrap'),tools=dir.querySelector('.catalogue-tools')||head.querySelector('.catalogue-tools');if(!wrap||!tools)return;
  let heading=wrap.querySelector('.an-directory-heading');
