@@ -881,44 +881,23 @@ html body > #an-global-ticker {
 </style>
 <style id="an26-contact-mobile">
 @media(max-width:767px){
-body.an-contact-mode{overflow:hidden!important}
+html:has(body.an-contact-mode),body.an-contact-mode{overflow:hidden!important;overscroll-behavior:none}
 body.an-contact-mode #app{min-height:0!important}
+body.an-contact-mode .an-contact-head{border-bottom:0!important}
 body.an-contact-mode .an-contact-head{padding:6px 0!important;margin:0!important}
 body.an-contact-mode .an-contact-head .wrap{padding:0 14px!important}
 body.an-contact-mode .an-contact-head h1{font-size:clamp(19px,5vw,26px)!important;margin:2px 0!important;line-height:1.1!important}
 body.an-contact-mode .an-contact-head .bread{font-size:10px!important}
-.an26-contact{height:calc(100dvh - var(--an26-contact-top, 260px));min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:5px;padding:5px 7px max(7px,env(safe-area-inset-bottom));background:#050505;color:#fff}
-.an26-top{min-height:0;flex:0 0 54%;display:flex;flex-direction:column;position:relative;isolation:isolate;gap:5px}
-.an26-art{position:absolute;inset:0 0 25%;z-index:-1;display:flex;flex-direction:column;justify-content:space-between;align-items:center;overflow:hidden;background:radial-gradient(ellipse at 45% 50%,#d10000 0 16%,#064527 17% 28%,#062e72 29% 45%,#050505 72%);opacity:.92}
-.an26-flagline{white-space:nowrap;font-size:clamp(15px,4vw,23px);letter-spacing:-3px;filter:drop-shadow(0 0 3px #ff8700)}
-.an26-graduates{font-size:clamp(36px,11vw,70px);filter:drop-shadow(0 0 7px #ff8a00)}
-.an26-graduates span{font-size:.8em}
-.an26-pill{align-self:center;max-width:95%;margin:0!important;border:2px solid #ff9c20;border-radius:999px;background:linear-gradient(110deg,#0c0501,#391805,#090605);box-shadow:0 0 9px #ff8a0080;padding:3px 20px;color:#fff;font-size:clamp(15px,4.1vw,24px);line-height:1.1;text-align:center}
-.an26-pill span,.an26-office em{color:#ff8a00;font-style:normal}
-.an26-offices{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:auto}
-.an26-office{border:2px solid #ff8a00;border-radius:22px;background:#090909e8;text-align:center;min-width:0;padding:5px 2px;box-shadow:0 0 8px #ff800080;display:flex;flex-direction:column;justify-content:center;gap:3px}
-.an26-office strong{font-size:clamp(11px,3vw,16px);white-space:nowrap}
-.an26-office small{font-size:clamp(9px,2.35vw,12px);line-height:1.1}
-.an26-links{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,minmax(0,1fr));grid-auto-flow:column;gap:5px 8px;min-height:0;flex:0 0 39%;padding:0 6%}
-.an26-social{display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid #ff9c24;border-radius:999px;box-shadow:0 0 7px #ff81007d,inset 0 0 8px #ffffff55;color:white;font-weight:800;font-size:clamp(13px,3.6vw,20px);min-width:0;text-shadow:0 1px 2px #000;cursor:pointer}
-.an26-icon{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:8px;background:#fff2;color:#fff;font-weight:900;font-size:18px}
-.an26-facebook,.an26-linkedin{background:linear-gradient(#1689ff,#00105c)}
-.an26-tiktok{background:linear-gradient(#343434,#000)}
-.an26-youtube{background:linear-gradient(#ff2727,#680000)}
-.an26-whatsapp{background:linear-gradient(#00e65c,#005e1d)}
-.an26-gmail{background:linear-gradient(#ff9b00,#f52e00)}
-.an26-social:not([href]){opacity:.65;cursor:not-allowed}
-.an26-form{min-height:0;flex:1;border:3px solid #ff8200;border-radius:20px;display:flex;flex-direction:column;padding:6px 10px;box-shadow:0 0 8px #ff80006b}
-.an26-form .an26-pill{margin:0 auto 5px!important}
-.an26-form form{min-height:0;flex:1;display:flex;flex-direction:column;gap:4px}
-.an26-fields{min-height:0;flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto minmax(0,1fr);gap:4px 8px}
-.an26-fields label{display:flex;flex-direction:column;min-height:0;color:#fff;font-size:clamp(10px,2.65vw,14px);font-weight:800;gap:2px}
-.an26-fields input,.an26-fields textarea{width:100%;min-width:0;min-height:0;border:1.5px solid #ff8a00;border-radius:9px;background:#090e16;color:white;padding:5px 8px;font-size:clamp(11px,3vw,15px);outline-offset:1px}
-.an26-fields input{height:clamp(25px,4.5dvh,40px)}
-.an26-fields textarea{flex:1;resize:none}
-.an26-wide{grid-column:1/-1}
-.an26-submit{flex:none;width:100%;min-height:clamp(32px,5.2dvh,49px);border:2px solid white;border-radius:999px;background:linear-gradient(#ff9e00,#ff5500);font-weight:900;color:#090909;font-size:clamp(15px,4.4vw,23px)}
-.an26-form #an-contact-feedback{margin:0;font-size:10px}
+.an26-contact{position:relative;height:calc(100dvh - var(--an26-contact-top, 140px));background:#000;overflow:hidden}
+.an26-reference{display:block;width:100%;height:100%;max-width:none;object-fit:fill}
+.an26-control{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);box-sizing:border-box;margin:0;border:0;background:transparent;color:transparent;padding:0;border-radius:8px}
+.an26-control:focus-visible{outline:2px solid #fff;outline-offset:0}
+.an26-contact input.an26-control,.an26-contact textarea.an26-control{min-height:0;min-width:0;resize:none;font:16px/1.15 system-ui;color:transparent;caret-color:#fff;padding:0 6px;box-shadow:none}
+.an26-contact input.an26-control:focus,.an26-contact textarea.an26-control:focus,.an26-contact .an26-control:not(:placeholder-shown):is(input,textarea){background:#07101a;color:#fff}
+.an26-contact textarea.an26-control{padding-top:4px}
+.an26-contact a:not([href]){cursor:not-allowed}
+.an26-contact button.an26-control{box-shadow:none}
+.an26-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 }
 </style></head>
 <body><script id="an-prelayout-home">(function(){var route=(location.hash.replace(/^#\/?/,'').split('?')[0]||'home').split('/')[0];if(route==='home')document.body.classList.add('home-view');})();</script><div id="an-site-header-space" aria-hidden="true"></div><header class="top"><div class="wrap"><a class="brand" href="#/home" aria-label="A&N Overseas Home"><span class="logo-motion" aria-hidden="true"><span class="logo-crop"><img src="assets/brand-logo.jpg" alt="" width="190" height="47" fetchpriority="high" decoding="sync"></span></span><span class="brand-copy"><strong id="brand-typing" aria-hidden="true">A&N Overseas</strong><small>EDUCATION & CONSULTANCY</small></span></a><nav class="links" id="links" aria-label="Main menu"><a href="#/home"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-7h6v7"/></svg><span class="an-nav-label"><span class="an-nav-label-accent">HO</span>ME</span></a><a href="#/about"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="an-nav-label"><span class="an-nav-label-accent">ABOUT</span> US</span></a><a href="#/services"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"/></svg><span class="an-nav-label"><span class="an-nav-label-accent">OUR</span> SERVICES</span></a><a href="./index.html?hub_refresh=20261103-fresh-1#/success"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 7v14M3 18V4a2 2 0 0 1 2-2h3a4 4 0 0 1 4 4 4 4 0 0 1 4-4h3a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2h-3a4 4 0 0 0-4 4 4 4 0 0 0-4-4H5a2 2 0 0 0-2 2Z"/></svg><span class="an-nav-label"><span class="an-nav-label-accent">STUDY &amp;</span> SUCCESS HUB</span></a><a href="#/countries"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></svg><span class="an-nav-label"><span class="an-nav-label-accent">COUNT</span>RIES</span></a><a href="#/universities"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7M4 10h16M6 10v9M10 10v9M14 10v9M18 10v9M3 21h18M2 7l10-5 10 5"/></svg><span class="an-nav-label"><span class="an-nav-label-accent">UNIVER</span>SITIES</span></a><a href="#/scholarships"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m2 10 10-5 10 5-10 5-10-5ZM6 12v5c4 3 8 3 12 0v-5M22 10v6"/></svg><span class="an-nav-label"><span class="an-nav-label-accent">SCHOLAR</span>SHIPS</span></a><a href="#/login"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2M8 21h8"/></svg><span class="an-nav-label"><span class="an-nav-label-accent">STUDENT</span> LOGIN</span></a><a href="#/contact"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22 16.9V20a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3.1a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.7L7 10a16 16 0 0 0 7 7l1.6-2a2 2 0 0 1 1.7-.6l3 .5A2 2 0 0 1 22 16.9Z"/></svg><span class="an-nav-label"><span class="an-nav-label-accent">CONT</span>ACT</span></a><button type="button" id="an-mobile-menu-close" aria-label="Close menu"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8.5"/><path d="m7 7 6 6m0-6-6 6"/></svg><span><span class="an-nav-label-accent">CLO</span>SE</span></button></nav><a class="an-desktop-login" href="#/login" aria-label="Student login"><svg class="an-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2M8 21h8"/></svg>LOGIN ↗</a><a class="btn tiny" href="#/apply">Apply Now ↗</a><a class="an-favorite-header" href="#/favorites" aria-label="Open saved universities" title="Saved universities"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"/></svg><span class="an-favorite-count" data-favorite-count>0</span></a><button type="button" id="site-refresh" class="site-refresh" aria-label="Refresh website" title="Refresh website">↻</button><button class="hamb" id="hamb" aria-label="Open menu" aria-expanded="false">☰</button></div></header><script>
@@ -1033,13 +1012,25 @@ function contactPageDesktop(){return "<section class=\"page-head an-contact-head
 /* Mobile-only contact replacement; desktop implementation is retained unchanged. */
 function contactPage(){
  if(!window.matchMedia('(max-width: 767px)').matches)return contactPageDesktop();
- const social=[['facebook','f','Facebook'],['linkedin','in','LinkedIn'],['tiktok','♪','TikTok'],['whatsapp','☎','WhatsApp'],['youtube','▶','YouTube'],['gmail','M','Gmail']];
- const link=(name,icon,label)=>'<a class="an26-social an26-'+name+'" data-an-social="'+name+'" aria-label="'+label+'" tabindex="-1"><span class="an26-icon">'+icon+'</span><span>'+label+'</span></a>';
- return '<section class="page-head an-contact-head"><div class="wrap"><div class="bread">HOME › CONTACT OUR TEAM</div><h1><span>Contact</span> Our Team</h1></div></section>'+
- '<main class="an26-contact" aria-label="Contact our team"><div class="an26-top"><div class="an26-art" aria-hidden="true"><span class="an26-flagline">🇦🇺 🇺🇸 🇬🇧 🇨🇦 🇨🇳 🇲🇾 🇧🇩 🇫🇷 🇯🇵 🇰🇷 🇩🇪 🇹🇷 🇮🇳 🇸🇪</span><span class="an26-graduates">🎓 <span>🌏</span> 🎓</span><span class="an26-flagline">🇧🇩 🇲🇾 🇨🇳 🇯🇵 🇰🇷 🇹🇷 🇬🇧 🇫🇷 🇸🇪 🇺🇸 🇦🇺</span></div>'+
- '<h2 class="an26-pill"><span>Our</span> Offices</h2><div class="an26-offices"><div class="an26-office"><strong>🇲🇾 <em>Malaysia</em> Office</strong><small data-an-office="malaysiaOffice">Kuala Lumpur, Malaysia</small></div><div class="an26-office"><strong>🇧🇩 <em>Bangladesh</em> Office</strong><small data-an-office="bangladeshOffice">Dhap, Rangpur 5401, Bangladesh</small></div></div>'+
- '<div class="an26-links">'+social.map(x=>link(...x)).join('')+'</div></div>'+
- '<section class="an26-form"><h2 class="an26-pill"><span>➤ Send an</span> Enquiry</h2><form id="contact-form"><div class="an26-fields"><label>Your Name *<input name="name" required autocomplete="name" placeholder="Full name"></label><label>Email *<input name="email" type="email" required autocomplete="email" placeholder="you@example.com"></label><label class="an26-wide">Phone (optional)<input name="phone" autocomplete="tel" placeholder="+60 ..."></label><label class="an26-wide an26-message">Message *<textarea name="message" required placeholder="How can we help?"></textarea></label></div><button type="submit" class="an26-submit">➤ Send Enquiry ↗</button><p id="an-contact-feedback" role="status" aria-live="polite"></p></form></section></main>';
+ const box=(x,y,w,h)=>'style="--x:'+x/9.76+'%;--y:'+y/13.91+'%;--w:'+w/9.76+'%;--h:'+h/13.91+'%"';
+ const socials=[
+  ['facebook','Facebook',74,592],['linkedin','LinkedIn',530,592],
+  ['tiktok','TikTok',74,657],['whatsapp','WhatsApp',530,657],
+  ['youtube','YouTube',74,722],['gmail','Gmail',530,722]
+ ];
+ const links=socials.map(([key,label,x,y])=>'<a class="an26-control" '+box(x,y,374,62)+' data-an-social="'+key+'" aria-label="'+label+'"></a>').join('');
+ return `<section class="page-head an-contact-head"><div class="wrap"><div class="bread">HOME › CONTACT OUR TEAM</div><h1><span>Contact</span> Our Team</h1></div></section>
+ <section class="an26-contact" aria-label="Contact offices and enquiry">
+ <img class="an26-reference" src="assets/contact-mobile-reference-20261109.svg" width="976" height="1391" fetchpriority="high" alt="Our Offices. Malaysia Office, Kuala Lumpur, Malaysia. Bangladesh Office, Dhap, Rangpur 5401, Bangladesh.">
+ ${links}
+ <form id="contact-form" aria-label="Send an Enquiry">
+ <input class="an26-control" ${box(52,928,430,36)} name="name" required autocomplete="name" aria-label="Your Name" placeholder=" ">
+ <input class="an26-control" ${box(516,928,410,36)} name="email" type="email" required autocomplete="email" aria-label="Email" placeholder=" ">
+ <input class="an26-control" ${box(52,1014,874,35)} name="phone" type="tel" autocomplete="tel" aria-label="Phone (optional)" placeholder=" ">
+ <textarea class="an26-control" ${box(52,1101,874,97)} name="message" required aria-label="Message" placeholder=" "></textarea>
+ <button class="an26-control" ${box(31,1228,914,99)} type="submit" aria-label="Send Enquiry"></button>
+ <p class="an26-sr" id="an-contact-feedback" role="status" aria-live="polite"></p>
+ </form></section>`;
 }
 
 window.ANCompactContactPage=contactPage;
@@ -1164,10 +1155,18 @@ body.home-view .hero img.an-gateway-flags{position:absolute!important;left:0!imp
 })();
 </script><script>
 (function(){
-function fit(){if(!document.body.classList.contains('an-contact-mode'))return;const h=document.querySelector('.an-contact-head'), c=document.querySelector('.an26-contact');if(!c)return;const y=c.getBoundingClientRect().top;c.style.height=Math.max(240,window.innerHeight-y)+'px';}
+function fit(){
+ const contact=document.querySelector('.an26-contact');
+ if(!contact)return;
+ contact.style.setProperty('--an26-contact-top',Math.max(0,contact.getBoundingClientRect().top)+'px');
+}
 function syncLinks(){const host=document.querySelector('.an26-contact');if(!host)return;const cfg=window.ANContactSettings||{};for(const a of host.querySelectorAll('[data-an-social]')){const n=a.dataset.anSocial;let v=String(cfg[n]||'').trim();if(n==='gmail')v='mailto:'+String(cfg.gmail||cfg.email||'educationanoverseas@gmail.com').trim();if(n==='whatsapp'){const digits=v.replace(/\D/g,'');v=digits.length>=8?'https://wa.me/'+digits:'';}if(v&&n!=='gmail'&&n!=='whatsapp'&&!/^https:\/\//i.test(v))v='';if(v){a.href=v;a.target=n==='gmail'?'_self':'_blank';a.rel='noopener noreferrer';a.removeAttribute('tabindex');a.removeAttribute('aria-disabled')}else{a.removeAttribute('href');a.setAttribute('aria-disabled','true');a.tabIndex=-1;}}}
 window.addEventListener('an-contact-settings-updated',syncLinks);
-window.addEventListener('resize',fit);window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.addEventListener('DOMContentLoaded',()=>{new MutationObserver(()=>{if(document.querySelector('.an26-contact')){fit();syncLinks()}}).observe(document.getElementById('app'),{childList:true});fit();syncLinks()});
-document.addEventListener('submit',function(e){if(e.target.id!=='contact-form'||!e.target.closest('.an26-contact'))return;e.preventDefault();e.stopImmediatePropagation();const f=e.target;if(!f.reportValidity())return;const d=new FormData(f),email=window.ANContactSettings?.gmail||window.ANContactSettings?.email||'educationanoverseas@gmail.com';const subject='A&N Overseas Enquiry from '+d.get('name');const body='Name: '+d.get('name')+'\nEmail: '+d.get('email')+'\nPhone: '+(d.get('phone')||'Not provided')+'\n\nMessage:\n'+d.get('message');const status=f.querySelector('#an-contact-feedback');if(status)status.textContent='Opening your email app. Please press Send there to complete the enquiry.';location.href='mailto:'+encodeURIComponent(email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);},true);
+window.addEventListener('resize',fit);
+const contactViewport=window.matchMedia('(max-width: 767px)');
+contactViewport.addEventListener('change',()=>{if(document.body.classList.contains('an-contact-mode'))render();});
+const contactHeadingObserver=new ResizeObserver(fit);
+const observeHeading=()=>{contactHeadingObserver.disconnect();const heading=document.querySelector('.an-contact-head');if(heading)contactHeadingObserver.observe(heading);};
+window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.addEventListener('DOMContentLoaded',()=>{new MutationObserver(()=>{if(document.querySelector('.an26-contact')){fit();observeHeading();syncLinks()}}).observe(document.getElementById('app'),{childList:true});fit();observeHeading();syncLinks()});
 })();
 </script></body></html>
