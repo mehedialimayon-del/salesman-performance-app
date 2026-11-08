@@ -340,11 +340,28 @@ body.an-contact-mode #app .an-contact-feedback:empty{display:none!important}
  }
 }
 
-/* One continuous flag mosaic under both offices and the contact channels. */
+/* The mosaic ends immediately above the social buttons. */
 body.an-contact-mode #app .an-contact-offices{
+  --office-panel-pad-block:9px;
+  --office-panel-pad-inline:9px;
+  padding:var(--office-panel-pad-block) var(--office-panel-pad-inline)!important;
+  overflow:hidden!important;
+}
+body.an-contact-mode #app .an-contact-office-backdrop{
+  display:flow-root;
+  flex:0 0 auto;
+  min-width:0;
+  margin:calc(-1 * var(--office-panel-pad-block)) calc(-1 * var(--office-panel-pad-inline)) 0;
+  padding:var(--office-panel-pad-block) var(--office-panel-pad-inline) 0;
   background:
-    linear-gradient(#090c15a8,#090c15a8),
-    #0c0f16 url('assets/contact-flag-mosaic.webp') center / 100% 100% no-repeat!important;
+    linear-gradient(#090c1573,#090c1573),
+    #0c0f16 url('assets/contact-flag-mosaic.webp') center / 100% 100% no-repeat;
+}
+@media(max-width:800px){
+  body.an-contact-mode #app .an-contact-offices{
+    --office-panel-pad-block:7px;
+    --office-panel-pad-inline:8px;
+  }
 }
 body.an-contact-mode #app .an-contact-offices h2,
 body.an-contact-mode #app .an-contact-channels-title{
