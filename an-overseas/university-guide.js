@@ -30,14 +30,14 @@ const ranked=[
 ['Politecnico di Milano',87],['Uppsala University',87],['University of Warwick',68],
 ['University of Bristol',57],['University of Birmingham',68],['University of Zurich',98],
 ['University of Nottingham',97],['RWTH Aachen University',104],['Sapienza University of Rome',111],
-['University of Southampton',112],['University of Liverpool',139],['University of Leeds',77],
+['University of Southampton',111],['University of Liverpool',139],['University of Leeds',77],
 ['University of St Andrews',115],['Erasmus University Rotterdam',148],['Wageningen University and Research',154],
 ['Vrije Universiteit Amsterdam',185],['Universitaet Heidelberg',86],['Karlsruhe Institute of Technology',110],
 ['Complutense University of Madrid',199],['University of Reading',196],
 ['Universite Paris-Saclay',76],['University of Bern',191]
 ];
 const ranks=new Map(ranked.map(([name,rank])=>[norm(name),rank]));
-const idRank={upm:138,um:56,ukm:130,utm:158,usm:128,manchester:40,warwick:68,toronto:32,ubc:45,melbourne:22,monash:31,snu:38,tsinghua:14};
+const idRank={upm:138,um:56,ukm:130,utm:158,usm:128,manchester:40,warwick:68,'eu-gb-university-college-london-ucl':8,'scholarship-host-vilniusuniversity':465,toronto:32,ubc:45,melbourne:22,monash:31,snu:38,tsinghua:14};
 const countryRoute={
  'United Kingdom':{name:'UCAS undergraduate application',url:'https://www.ucas.com/international/international-students/applying-to-university-as-an-international-student',level:'Bachelor',note:'Undergraduate: use UCAS for most courses; postgraduate and research applications follow the university instructions.'},
  'Germany':{name:'DAAD / university or uni-assist',url:'https://www.daad.de/en/studying-in-germany/requirements/overview/',note:'Depending on the programme, apply to the institution or through uni-assist; confirm the route first.'},
@@ -102,6 +102,31 @@ const manchesterAdmissions='https://www.manchester.ac.uk/study/undergraduate/app
 const uniklEngineering='https://www.unikl.edu.my/programme/bachelor-of-electrical-engineering-with-honours/';
 const klustCalendar='https://klust.edu.my/current-students/academic-calendar/';
 const verifiedCardFacts={
+ 'scholarship-host-vilniusuniversity':{
+  tuition:['EUR 3,250','Politics of Global Challenges BA · annual tuition','https://www.vu.lt/en/studies/bachelor-studies/politics-of-global-challenges'],
+  intake:['Autumn 2027','Bachelor’s admission · non-EU/EFTA · 1 May 2027','https://www.vu.lt/en/admissions/admissions-to-bachelor-studies','2027-05-01']
+ },
+ 'eu-gb-university-college-london-ucl':{
+  tuition:['GBP 48,600','Computer Science BSc · international annual tuition · 2027/28','https://www.ucl.ac.uk/study/prospective-students/undergraduate/courses/computer-science-bsc'],
+  intake:['September 2027','Computer Science BSc · UCAS equal consideration 13 Jan, 18:00 GMT','https://www.ucl.ac.uk/study/prospective-students/undergraduate/courses/computer-science-bsc','2027-01-13T18:00:00Z']
+ },
+ warwick:{
+  tuition:['GBP 37,310','Computer Science BSc · overseas annual tuition · 2027/28','https://warwick.ac.uk/services/finance/studentfinance/fees/overseasfees/'],
+  intake:['27 September 2027','Computer Science BSc · UCAS equal consideration 13 Jan, 18:00 GMT','https://www.ucas.com/explore/courses/96187c1d-ee68-4b33-3c0e-b040a93861f8/computer-science?studyYear=2027','2027-01-13T18:00:00Z']
+ },
+ 'eu-gb-university-of-bristol':{
+  tuition:['GBP 34,700','Computer Science BSc · international first year · 2027/28','https://www.bristol.ac.uk/study/undergraduate/2027/computer-science/bsc-computer-science/'],
+  intake:['September 2027','Computer Science BSc · UCAS equal consideration 13 Jan, 18:00 GMT','https://www.ucas.com/explore/courses/7b138283-6c18-ccaf-8161-614238289b2a/course?studyYear=2027','2027-01-13T18:00:00Z']
+ },
+ 'eu-gb-university-of-edinburgh':{
+  intake:['2027 entry','Computer Science BEng · UCAS deadline 13 Jan, 18:00 GMT','https://study.ed.ac.uk/programmes/undergraduate/58-computer-science','2027-01-13T18:00:00Z']
+ },
+ 'eu-gb-university-of-southampton':{
+  intake:['20 September 2027','Computer Science BSc · UCAS equal consideration 13 Jan, 18:00 GMT','https://www.ucas.com/explore/courses/9a3f103c-66ca-22ed-5c80-20f5736622ef/course?studyYear=2027','2027-01-13T18:00:00Z']
+ },
+ 'an-h-dir-unitedkingdom-rhulacuk':{
+  intake:['20 September 2027','Computer Science BSc · UCAS equal consideration 13 Jan, 18:00 GMT','https://www.ucas.com/explore/courses/af54dadf-118f-d112-33b2-871327d04c9a/computer-science?studyYear=2027','2027-01-13T18:00:00Z']
+ },
  aimst:{
   ranking:['#78','QS South Eastern Asia 2027','https://www.topuniversities.com/universities/aimst-university'],
   intake:['7 December 2026','Master of Physiotherapy (Musculoskeletal)','https://aimst.edu.my/admission/']
@@ -181,7 +206,12 @@ const factKey=u=>{
  return verifiedCardFacts[u.id]?u.id:malaysiaFactIds[name];
 };
 const countdownText=(date,now=Date.now())=>{
- const minutes=Math.ceil((Date.parse(date.includes('T')?date:date+'T23:59:59+08:00')-now)/60000);
+ if(date.length===10){
+  const today=new Date(now);
+  const days=(Date.parse(date)-Date.UTC(today.getFullYear(),today.getMonth(),today.getDate()))/86400000;
+  return days<0?'Deadline passed':days===0?'Closes today':days+'d left';
+ }
+ const minutes=Math.ceil((Date.parse(date)-now)/60000);
  return minutes<1?'Deadline passed':Math.floor(minutes/1440)+'d '+Math.floor(minutes%1440/60)+'h '+minutes%60+'m left';
 };
 const countdown=date=>'<span data-an-deadline="'+e(date)+'">'+e(countdownText(date))+'</span>';
@@ -352,7 +382,7 @@ const card=(u,p)=>{
  const researchRank=leidenRank(u);
  const rankingFact=!verified?.ranking&&!rank&&researchRank?fact('rank','RESEARCH RANK','#'+researchRank[0],'Leiden Open 2026 · publications',leidenLink(researchRank)):key==='amc'?fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister):fact('rank',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'',rank?'QS World 2027':'']));
  const facts=rankingFact+fact('programmes','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText?'Published count':'',validUrl(p?.programSource)||official]))
-  +fact('tuition',tuitionFact&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(tuitionFact?.slice(0,2)||historicalFact?.slice(0,2)||[firstYear||'',firstYear?'Published fee example':'']))
+  +fact('tuition',tuitionFact&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(tuitionFact||historicalFact||[firstYear||'',firstYear?'Published fee example':'']))
   +(intake?fact('intake','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):admissionDeadline?fact('intake','APPLICATION DEADLINE',...admissionDeadline):fact('intake','UPCOMING INTAKE',''));
  return '<article class="card uni-card an-guide-card an-premium-uni-card"><div class="uni-cover-wrap">'+imageMarkup(u,p)+mark+discount+'<div class="an-premium-hero-details"><h3 class="an-premium-university-title">'+mainName+shortLabel+'</h3><div class="an-premium-meta">'+logoMarkup+'<div class="an-premium-meta-text"><div class="an-premium-type '+(privateUni?'is-private':'is-public')+'">'+e(typeText)+'</div><p class="university-location an-premium-location">'+e(country)+'</p></div></div></div></div><div class="inside"><div class="an-premium-facts">'+facts+'</div><div class="an-guide-links"><a class="card-open" href="#/university/'+encodeURIComponent(u.id)+'">University Portfolio <span>↗</span></a>'+(official?'<a class="an-guide-official" href="'+e(official)+'" rel="noopener noreferrer" target="_blank">Official Website ↗</a>':registry?'<a class="an-guide-official" href="'+e(registry)+'" rel="noopener noreferrer" target="_blank">Official Register ↗</a>':'')+'<a class="an-premium-apply" href="#/apply">Apply Now ↗</a></div></div></article>';
 };
