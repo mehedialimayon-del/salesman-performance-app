@@ -105,30 +105,30 @@ body:is(.an-inner-application,.an-portfolio-v2,.an-scholarship-detail-view,.an-s
   color:white;
 }
 body:is(.an-inner-application,.an-portfolio-v2,.an-scholarship-detail-view,.an-service-detail-mode) #app :is(
-  .white,.sidebar,.doccard,.apply-form-card,.apply-aside,.profile-section,
+  .white,.live-panel,.sidebar,.doccard,.apply-form-card,.apply-aside,.profile-section,
   .profile-facts,.an-scholarship-facts,.an-scholarship-amount-panel,.an-journey-block,.an-flow-step
 ) {
   border-color:var(--an-theme-fade);
 }
 body:is(.an-inner-application,.an-portfolio-v2,.an-scholarship-detail-view,.an-service-detail-mode) #app :is(
-  .white,.sidebar,.apply-form-card,.apply-side-body,.profile-body,
+  .white,.live-panel,.sidebar,.apply-form-card,.apply-side-body,.profile-body,
   .an-scholarship-detail,.an-journey,.page-head
 ) :is(p,li,dd,td) {
   color:white;
   font-weight:550;
 }
 body:is(.an-inner-application,.an-portfolio-v2,.an-scholarship-detail-view,.an-service-detail-mode) #app :is(
-  .white,.sidebar,.apply-intro,.apply-form-card,.profile-section,.an-scholarship-detail,.an-journey
+  .white,.live-panel,.sidebar,.apply-intro,.apply-form-card,.profile-section,.an-scholarship-detail,.an-journey
 ) :is(h2,h3) {
   color:var(--an-theme-light);
 }
 body:is(.an-inner-application,.an-portfolio-v2,.an-scholarship-detail-view,.an-service-detail-mode) #app :is(
-  .white,.apply-form-card,.profile-body,.profile-facts,.an-scholarship-detail,.an-scholarship-facts,.an-journey
+  .white,.live-panel,.apply-form-card,.profile-body,.profile-facts,.an-scholarship-detail,.an-scholarship-facts,.an-journey
 ) :is(dt,th,strong,.profile-label,.an-step-label,.key-point,.highlight) {
   color:var(--an-theme-key);
   font-weight:700;
 }
-body.an-inner-application #app :is(.field label,.apply-label,.doccard strong) {
+body.an-inner-application #app :is(.field label,.an-portal-field,.apply-label,.doccard strong) {
   color:var(--an-theme-light);
   font-weight:700;
 }
