@@ -11,7 +11,7 @@
   phone:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#E88119"/><path d="M7 4.8 9.9 7.7 8.5 9.4c1 2.6 3.4 5 6.1 6.1l1.7-1.4 2.9 2.9-1.6 2c-.4.6-1.2.9-2 .7C9.4 18.5 5.5 14.5 4.4 8.4c-.2-.8.1-1.6.7-2z" fill="none" stroke="#fff" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>',
   gmail:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.2V19h3.2V9.2L12 13l5.8-3.8V19H21V6.2L12 12z" fill="#4285F4"/><path d="M3 6.2 12 13V9.4L4.4 3.9C3.6 3.3 3 4.1 3 5z" fill="#EA4335"/><path d="M21 6.2 12 13V9.4l7.6-5.5C20.4 3.3 21 4.1 21 5z" fill="#34A853"/><path d="M3 6.2V19h3.2V8.6z" fill="#4285F4"/><path d="M21 6.2V19h-3.2V8.6z" fill="#FBBC05"/></svg>'
  };
- const order=['facebook','tiktok','youtube','linkedin','whatsapp','phone','gmail'];
+ const order=['facebook','tiktok','youtube','linkedin','whatsapp','gmail'];
  const labels={facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',whatsapp:'WhatsApp',phone:'Call Us',gmail:'Gmail'};
  const set=(e,t)=>{if(e&&e.textContent!==t)e.textContent=t;};
  const phone=(s)=>String(s?.phone||s?.whatsapp||'').replace(/[^0-9+]/g,'');
@@ -35,7 +35,7 @@
     const icon=document.createElement('span');
     icon.className='an-contact-icon';icon.innerHTML=icons[name];
     const copy=document.createElement('span');copy.className='an-contact-card-copy';
-    const title=document.createElement('small');title.textContent=labels[name];
+    const title=document.createElement('small');const label=labels[name]; const half=Math.ceil(label.length/2); title.innerHTML='<span class="an-title-orange">'+label.slice(0,half)+'</span><span class="an-title-white">'+label.slice(half)+'</span>';
     const detail=document.createElement('span');detail.className='an-contact-card-detail';
     detail.textContent='Checking contact details…';
     copy.append(title,detail);
