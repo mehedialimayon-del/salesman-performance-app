@@ -1044,4 +1044,38 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'}).catch(()=>{});
  });
 }
-</script><script defer src="an-site-search-20261106.js?v=20261106-global-search-v2"></script><script defer src="an-aboutdetails-recovery-20261106.js?v=20261106-immediate-v2"></script><script defer src="an-moi-integration-20261106.js?v=20261106-mou-sources-v1"></script><script defer src="an-ux-fixes-20261106.js?v=20261106-map-synced-r4"></script><script defer src="an-scholarship-verified-points-20261106.js?v=20261106-no-duplicate-v3"></script><script defer src="an-scholarship-dedup-programmes-20261106.js?v=20261106-expanded-fees-v2"></script><script defer src="an-erasmus-catalogue-extra-20261106.js?v=20261106-all215"></script><script defer src="an-erasmus-programme-explorer-20261106.js?v=20261106-all215"></script><script defer src="an-contact-photo-cards-20261107.js?v=20261108-social-names-v3"></script><script defer src="an-scholarship-detail-highlights-20261107.js?v=20261107-premium-v1"></script><script defer src="an-about-details-viewport-20261107.js?v=20261107-founder-fit-v1"></script><script defer src="an-about-exact-reference-20261107.js?v=20261107-ref-hero-v4"></script><script defer src="an-about-approved-pixel-overlay-20261108.js?v=20261108-ordered-flags-v2"></script><script defer src="an-scholarship-compact-desktop-20261108.js?v=20261108-v1"></script><script defer src="an-scholarship-detail-sticky-20261108.js?v=20261108-v1"></script><script defer src="an-deep-colour-system-20261108.js?v=20261108-vivid-orange-v19"></script><script defer src="an-directory-layout-polish-20261108.js?v=20261108-card-fix"></script><script defer src="an-about-golden-cap-20261108.js?v=20261108-cap-v1"></script></body></html>
+</script><script defer src="an-site-search-20261106.js?v=20261106-global-search-v2"></script><script defer src="an-aboutdetails-recovery-20261106.js?v=20261106-immediate-v2"></script><script defer src="an-moi-integration-20261106.js?v=20261106-mou-sources-v1"></script><script defer src="an-ux-fixes-20261106.js?v=20261106-map-synced-r4"></script><script defer src="an-scholarship-verified-points-20261106.js?v=20261106-no-duplicate-v3"></script><script defer src="an-scholarship-dedup-programmes-20261106.js?v=20261106-expanded-fees-v2"></script><script defer src="an-erasmus-catalogue-extra-20261106.js?v=20261106-all215"></script><script defer src="an-erasmus-programme-explorer-20261106.js?v=20261106-all215"></script><script defer src="an-contact-photo-cards-20261107.js?v=20261108-social-names-v3"></script><script defer src="an-scholarship-detail-highlights-20261107.js?v=20261107-premium-v1"></script><script defer src="an-about-details-viewport-20261107.js?v=20261107-founder-fit-v1"></script><script defer src="an-about-exact-reference-20261107.js?v=20261107-ref-hero-v4"></script><script defer src="an-about-approved-pixel-overlay-20261108.js?v=20261108-ordered-flags-v2"></script><script defer src="an-scholarship-compact-desktop-20261108.js?v=20261108-v1"></script><script defer src="an-scholarship-detail-sticky-20261108.js?v=20261108-v1"></script><script defer src="an-deep-colour-system-20261108.js?v=20261108-vivid-orange-v19"></script><script defer src="an-directory-layout-polish-20261108.js?v=20261108-card-fix"></script><script defer src="an-about-golden-cap-20261108.js?v=20261108-cap-v1"></script><style id="an-flag-stand-precision-20261108">
+body.home-view .hero .eyebrow.an-gateway-title{position:relative!important;overflow:visible!important}
+body.home-view .hero img.an-gateway-flags{position:absolute!important;left:0!important;bottom:calc(100% - 4px)!important;width:100%!important;height:auto!important;opacity:1!important;mix-blend-mode:normal!important;filter:none!important;mask:none!important;-webkit-mask:none!important;background:transparent!important;object-fit:contain!important;pointer-events:none!important}
+</style><script id="an-transparent-flags-fix-20261108">
+(function(){
+  function makeFlagsTransparent(){
+    document.querySelectorAll('img.an-gateway-flags').forEach(function(img){
+      if(img.dataset.flagsProcessed==='yes'||img.dataset.flagsProcessing==='yes')return;
+      img.dataset.flagsProcessing='yes';
+      var source=new Image();
+      source.onload=function(){
+        try{
+          var c=document.createElement('canvas');c.width=source.naturalWidth;c.height=source.naturalHeight;
+          var ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(source,0,0);
+          var im=ctx.getImageData(0,0,c.width,c.height),d=im.data;
+          for(var i=0;i<d.length;i+=4){
+            var r=d[i],g=d[i+1],b=d[i+2],hi=Math.max(r,g,b),lo=Math.min(r,g,b);
+            // Remove neutral black backdrop; preserve colorful flag fabric and gold stands.
+            if(hi<18){d[i+3]=0;continue;}
+            if(hi<95&&hi-lo<23){d[i+3]=Math.round(d[i+3]*Math.max(0,(hi-18)/85));}
+            else if(hi<55){d[i+3]=Math.round(d[i+3]*(hi/65));}
+          }
+          ctx.putImageData(im,0,0);img.src=c.toDataURL('image/png');
+          img.dataset.flagsProcessed='yes';img.style.opacity='1';
+        }catch(e){img.dataset.flagsProcessing='no';}
+      };
+      source.onerror=function(){img.dataset.flagsProcessing='no';};
+      source.src='assets/gateway-flags-reference.jpg?v=20261108-transparent-source';
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',makeFlagsTransparent);
+  else makeFlagsTransparent();
+  new MutationObserver(function(){makeFlagsTransparent()}).observe(document.getElementById('app')||document.body,{childList:true,subtree:true});
+})();
+</script></body></html>
