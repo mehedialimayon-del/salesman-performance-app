@@ -213,13 +213,23 @@ const ipedsPanel=(u,section)=>{
  (fees===null?'':' Separately reported required fees: '+e(usd(fees))+'.')+
  ' Historical NCES data. Current tuition and international-student charges may differ.</p>'+source+link(ipedsSource,'Source: IPEDS 2023/24 data')+'</div>';
 };
+const leidenRank=u=>Object.hasOwn(window.ANLeiden2026||{},u.id)?window.ANLeiden2026[u.id]:null;
+const leidenLink=entry=>'https://open.leidenranking.com/ranking/2026/university/'+entry[2];
+const leidenPanel=u=>{
+ const record=leidenRank(u);
+ if(!record)return '';
+ return '<div class="an-profile-fact"><h3>Leiden Open 2026 · Research output</h3><p>World position <strong>#'+e(record[0])+'</strong> by publication count (P), all sciences. '+
+ e(record[1].toLocaleString('en-US'))+' core publications, 2021–2024, full counting. The displayed ranking uses a minimum of 100 publications.</p>'+
+ link(leidenLink(record),'CWTS university profile')+link('https://open.leidenranking.com/resources','Open edition data')+'</div>';
+};
 const profileFact=(u,section)=>{
  const key=factKey(u),facts=verifiedCardFacts[key];
  const item=facts?.[{fees:'tuition',programmes:'programmes',entry:'intake',ranking:'ranking'}[section]];
- if(!item)return ipedsPanel(u,section);
+ const research=section==='ranking'?leidenPanel(u):'';
+ if(!item)return ipedsPanel(u,section)+research;
  const label={fees:'Tuition basis',programmes:'Published programme scope',entry:'Published intake',ranking:'Regional ranking'}[section];
  const detail=factNotes[key]?.[section]||(section==='ranking'?item[1]:item[0]+' · '+item[1]);
- return '<div class="an-profile-fact"><h3>'+label+'</h3><p>'+e(detail)+(item[3]?' · '+countdown(item[3]):'')+'</p>'+link(item[2],'Published source')+(key==='amu'&&section==='entry'?link(amuAdmissions,'International admissions'):'')+'</div>';
+ return '<div class="an-profile-fact"><h3>'+label+'</h3><p>'+e(detail)+(item[3]?' · '+countdown(item[3]):'')+'</p>'+link(item[2],'Published source')+(key==='amu'&&section==='entry'?link(amuAdmissions,'International admissions'):'')+'</div>'+research;
 };
 const verifiedLogoFiles={aimstuniversity:'aimst',ucsiuniversity:'ucsi',amcuniversitycollege:'amc'};
 const institutionLogo=(u,p)=>{
@@ -271,7 +281,8 @@ const card=(u,p)=>{
  const factHeading=label=>{const space=label.indexOf(' ');const cut=space>0?space:Math.ceil(label.length/2);return '<span>'+e(label.slice(0,cut))+'</span>'+e(label.slice(cut));};
  const fact=(icon,label,value,extra='',source='',date='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+factIcons[icon]+'</svg></span><strong>'+factHeading(label)+'</strong><b>'+(source?'<a href="'+e(source)+'" rel="noopener noreferrer" target="_blank">'+(date?countdown(date):e(value))+'</a>':e(value))+'</b>'+(extra?'<small>'+e(extra)+'</small>':'')+'</div>';
  const intake=verified?.intake;
- const rankingFact=key==='amc'?fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister):fact('rank',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'Ranking unverified',rank?'QS World 2027':'']));
+ const researchRank=leidenRank(u);
+ const rankingFact=!verified?.ranking&&!rank&&researchRank?fact('rank','RESEARCH RANK','#'+researchRank[0],'Leiden Open 2026 · publications',leidenLink(researchRank)):key==='amc'?fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister):fact('rank',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'Ranking unverified',rank?'QS World 2027':'']));
  const facts=rankingFact+fact('programmes','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText==='See official catalogue'?'':'Published count',validUrl(p?.programSource)||official]))
   +fact('tuition',verified?.tuition&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||historicalFact||[tuitionText,firstYear?'Published fee example':'Programme-specific fees',validUrl(p?.feeSource)||official]))
   +(intake?fact('intake','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):fact('intake','UPCOMING INTAKE',intakeText,'',validUrl(p?.intakeSource)||official));
@@ -369,5 +380,5 @@ document.addEventListener('error',event=>{
  }
 },true);
 const extended=(u,p)=>'<section class="profile-section an-guide-degrees" id="profile-degree"><h2><span>Degree-wise</span> Application Guide</h2><p>Expand a level for its application preparation, recognised-document checklist and official route.</p><div class="an-guide-degree-grid">'+['Bachelor','Master','PhD'].map((level,i)=>'<details class="an-guide-degree-box"'+(i===0?' open':'')+'><summary>'+e(level)+' <span>⌄</span></summary>'+degree(u,level)+'</details>').join('')+'</div></section>'+support(u);
-window.ANUniGuide={card,compare,getRank,panel,mount,route,photos,extended,profileFact,institutionLogo,profileData};
+window.ANUniGuide={card,compare,getRank,panel,mount,route,photos,extended,profileFact,institutionLogo,profileData,leidenRank};
 })();
