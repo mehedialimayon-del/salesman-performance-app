@@ -199,10 +199,24 @@ const factNotes={
  amu:{fees:'AMU lists RM 48,500 in full BBA tuition. Registration (RM 2,000), processing (RM 1,500) and visa application (RM 2,800) bring the published total to RM 54,800.',programmes:'The official undergraduate catalogue lists 2 foundation programmes, 4 diplomas and 4 bachelor’s programmes.',entry:'AMU lists January, February, June, July and September for the BBA. Its international admissions page advises sending documents three months before intake. Ask AMU to confirm the exact cutoff for your cohort.'},
  mediu:{fees:'RM 28,451.80 is the published tuition for the full-time online Bachelor of Islamic Studies example in the faculty brochure. Campus-based programmes and other study modes have separate fees.',entry:'MEDIU announced its November 2026 intake for bachelor’s, master’s and doctoral programmes. Its admissions guidance advises applying at least six weeks before the new semester.'}
 };
+const ipedsSource='https://nces.ed.gov/ipeds/datacenter/data/IC2023_AY.zip';
+const ipedsEntry=u=>u.country==='United States'&&Object.hasOwn(window.ANIPEDS2023||{},u.id)?window.ANIPEDS2023[u.id]:null;
+const usd=value=>'USD '+value.toLocaleString('en-US');
+const ipedsPanel=(u,section)=>{
+ const record=ipedsEntry(u);
+ if(!record||!['fees','ranking'].includes(section))return '';
+ const [unitId,tuition,fees]=record;
+ const source=link('https://nces.ed.gov/collegenavigator/?id='+unitId,'NCES College Navigator');
+ if(section==='ranking')return '<div class="an-profile-fact"><h3>U.S. federal directory</h3><p>IPEDS institution ID: '+e(unitId)+'</p>'+source+'</div>';
+ if(tuition===null)return '';
+ return '<div class="an-profile-fact"><h3>2023/24 published out-of-state tuition</h3><p><strong>'+e(usd(tuition))+'</strong> for the full academic year, for first-time, full-time undergraduates.'+
+ (fees===null?'':' Separately reported required fees: '+e(usd(fees))+'.')+
+ ' Historical NCES data. Current tuition and international-student charges may differ.</p>'+source+link(ipedsSource,'Source: IPEDS 2023/24 data')+'</div>';
+};
 const profileFact=(u,section)=>{
  const key=factKey(u),facts=verifiedCardFacts[key];
  const item=facts?.[{fees:'tuition',programmes:'programmes',entry:'intake',ranking:'ranking'}[section]];
- if(!item)return '';
+ if(!item)return ipedsPanel(u,section);
  const label={fees:'Tuition basis',programmes:'Published programme scope',entry:'Published intake',ranking:'Regional ranking'}[section];
  const detail=factNotes[key]?.[section]||(section==='ranking'?item[1]:item[0]+' · '+item[1]);
  return '<div class="an-profile-fact"><h3>'+label+'</h3><p>'+e(detail)+(item[3]?' · '+countdown(item[3]):'')+'</p>'+link(item[2],'Published source')+(key==='amu'&&section==='entry'?link(amuAdmissions,'International admissions'):'')+'</div>';
@@ -247,7 +261,9 @@ const card=(u,p)=>{
  const programmeCount=Number(u.totalPrograms||p?.totalPrograms||p?.programmeCount);
  const programmeText=Number.isInteger(programmeCount)&&programmeCount>0?String(programmeCount):'See official catalogue';
  const fees=Array.isArray(p?.fees)?p.fees:[],annualFees=fees.filter(x=>/first.year|annual|per year|1.year/i.test(String(x?.[2]||'')+' '+String(x?.[0]||''))).map(x=>String(x?.[1]||''));const firstYear=annualFees.length?annualFees[0]:null;
- const tuitionText=firstYear?firstYear:'See official fee guide';
+ const historicalTuition=ipedsEntry(u)?.[1];
+ const tuitionText=firstYear||'See official fee guide';
+ const historicalFact=!firstYear&&Number.isInteger(historicalTuition)?[usd(historicalTuition),'Out-of-state UG · 2023/24',ipedsSource]:null;
  const intakeText='Check admissions calendar';
  const logo=institutionLogo(u,p);
  const logoMarkup=validUrl(logo)||/^assets\//.test(logo)?'<img class="an-premium-meta-logo" src="'+e(logo)+'" alt="'+e(name)+' logo" loading="lazy" onerror="this.remove()">':'';
@@ -257,7 +273,7 @@ const card=(u,p)=>{
  const intake=verified?.intake;
  const rankingFact=key==='amc'?fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister):fact('rank',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'Ranking unverified',rank?'QS World 2027':'']));
  const facts=rankingFact+fact('programmes','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText==='See official catalogue'?'':'Published count',validUrl(p?.programSource)||official]))
-  +fact('tuition',verified?.tuition&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||[tuitionText,firstYear?'Published fee example':'Programme-specific fees',validUrl(p?.feeSource)||official]))
+  +fact('tuition',verified?.tuition&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||historicalFact||[tuitionText,firstYear?'Published fee example':'Programme-specific fees',validUrl(p?.feeSource)||official]))
   +(intake?fact('intake','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):fact('intake','UPCOMING INTAKE',intakeText,'',validUrl(p?.intakeSource)||official));
  return '<article class="card uni-card an-guide-card an-premium-uni-card"><div class="uni-cover-wrap">'+imageMarkup(u,p)+mark+discount+'<div class="an-premium-hero-details"><h3 class="an-premium-university-title">'+mainName+shortLabel+'</h3><div class="an-premium-meta">'+logoMarkup+'<div class="an-premium-meta-text"><div class="an-premium-type '+(privateUni?'is-private':'is-public')+'">'+e(typeText)+'</div><p class="university-location an-premium-location">'+e(country)+'</p></div></div></div></div><div class="inside"><div class="an-premium-facts">'+facts+'</div><div class="an-guide-links"><a class="card-open" href="#/university/'+encodeURIComponent(u.id)+'">University Portfolio <span>↗</span></a>'+(official?'<a class="an-guide-official" href="'+e(official)+'" rel="noopener noreferrer" target="_blank">Official Website ↗</a>':registry?'<a class="an-guide-official" href="'+e(registry)+'" rel="noopener noreferrer" target="_blank">Official Register ↗</a>':'')+'<a class="an-premium-apply" href="#/apply">Apply Now ↗</a></div></div></article>';
 };
