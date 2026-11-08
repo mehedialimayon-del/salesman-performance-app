@@ -350,3 +350,7 @@
  body.an-scholarships-mode .an-scholarship-total{background:#14110f!important;border-color:#b86234!important;color:#fff!important}
  body.an-scholarships-mode .an-scholarship-filters input::placeholder{color:#eae3df}
 }
+
+/* Keep long timeline labels within the existing cover dimensions. */
+.an-card-deadline{max-width:75%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.an-profile-deadline{display:inline-block;color:#fff;background:#18100d;border:1px solid #ff8a35;padding:4px 8px;border-radius:6px;font-variant-numeric:tabular-nums}
