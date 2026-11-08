@@ -1,8 +1,9 @@
 (function(){
 "use strict";
 const get=()=>window.ANLive, db=()=>get().db, esc=s=>get().ed(s), pretty=s=>get().dt(s);
-const sections=["Overview","Students","Applications","Documents","Enquiries","Messages","Invoices","Latest Updates","Website","Management","Services","Service Requests","Service Prices","Countries","Universities","University Offers & PDFs","Success Stories","Media"];
+const sections=["Overview","Students","Applications","Documents","Enquiries","Messages","Invoices","Latest Updates","Website","Contact","Management","Services","Service Requests","Service Prices","Countries","Universities","University Offers & PDFs","Success Stories","Media"];
 let section="Overview", selectedStudent="",saved={};
+const websiteFields=["ticker","motto","heroLead","heroAccent","heroDescription","heroImage","about","work"];
 const panel=s=>'<section class="live-panel">'+s+'</section>';
 const field=(label,key,value="",type="text")=>'<label>'+esc(label)+(type==="textarea"?'<textarea name="'+key+'">'+esc(value)+'</textarea>':'<input name="'+key+'" type="'+type+'" value="'+esc(value)+'">')+'</label>';
 const dropdown=(label,key,values,value)=>'<label>'+esc(label)+'<select name="'+key+'">'+values.map(v=>'<option'+(String(v)===String(value)?' selected':'')+'>'+esc(v)+'</option>').join('')+'</select></label>';
@@ -81,7 +82,13 @@ async function draw(){
  }
  if(section==="Website"){
   saved.settings=await content("settings")||{};
-  html=panel('<h2>Edit Website Settings</h2><form id="admin-settings-form"><div class="live-fieldgrid">'+["ticker","motto","heroLead","heroAccent","heroDescription","heroImage","about","work","malaysiaOffice","bangladeshOffice","phone","whatsapp","email","gmail","facebook","tiktok","youtube","linkedin"].map(k=>field(k,k,saved.settings[k]||"",/ticker|about|work/.test(k)?"textarea":"text")).join("")+'</div><button class="btn mt" type="submit">Publish Settings</button></form><div class="mt"><h3>Homepage Image Upload</h3><p>Upload your preferred student/graduate photo. It will automatically replace the homepage background.</p><form id="admin-home-image-form"><input type="file" name="image" required accept="image/jpeg,image/png,image/webp"><button type="submit" class="btn mt">Upload & Set Home Image</button></form></div>');
+  html=panel('<h2>Edit Website Settings</h2><form id="admin-settings-form"><div class="live-fieldgrid">'+websiteFields.map(k=>field(k,k,saved.settings[k]||"",/ticker|about|work/.test(k)?"textarea":"text")).join("")+'</div><button class="btn mt" type="submit">Publish Settings</button></form><div class="mt"><h3>Homepage Image Upload</h3><p>Upload your preferred student/graduate photo. It will automatically replace the homepage background.</p><form id="admin-home-image-form"><input type="file" name="image" required accept="image/jpeg,image/png,image/webp"><button type="submit" class="btn mt">Upload & Set Home Image</button></form></div>');
+ }
+ if(section==="Contact"){
+  const settings=await content("settings")||{};
+  html=panel('<h2>Contact Editor</h2><p>Paste the full HTTPS profile links. For Call Us and WhatsApp, include the country code. Blank social links disable their buttons.</p><form id="admin-contact-form"><div class="live-fieldgrid">'
+   +window.ANContactEditor.fields.map(([key,label,type])=>field(label,key,settings[key]||"",type)).join("")
+   +'</div><div class="live-controls mt"><button class="btn" type="submit">Publish Contact Details</button><a href="#/contact" target="_blank" rel="noopener">View Live Contact Page ↗</a></div></form>');
  }
  if(section==="Management"){
   saved.management=await content("management")||[];
@@ -223,7 +230,7 @@ document.addEventListener("click",async e=>{
 },true);
 document.addEventListener("submit",async e=>{
  if(!get()?.isAdmin||!location.hash.startsWith("#/admin"))return;
- const f=e.target,id=f.id,allowed=["admin-case-form","admin-update-form","admin-message-form","admin-invoice-form","admin-settings-form","admin-latest-form","admin-management-form","admin-services-form","admin-countries-form","admin-university-form","admin-story-form","admin-media-form","admin-home-image-form"];
+ const f=e.target,id=f.id,allowed=["admin-case-form","admin-update-form","admin-message-form","admin-invoice-form","admin-settings-form","admin-contact-form","admin-latest-form","admin-management-form","admin-services-form","admin-countries-form","admin-university-form","admin-story-form","admin-media-form","admin-home-image-form"];
  if(!allowed.includes(id))return;
  e.preventDefault();e.stopImmediatePropagation();
  const b=f.querySelector("[type=submit]");if(b)b.disabled=true;
@@ -242,7 +249,11 @@ document.addEventListener("submit",async e=>{
    await publish("latest_updates",items);get().latestUpdates=items;
    window.ANUpdateTicker?.(items);showMsg("Published scrolling updates across the website.");
  }
- if(id==="admin-settings-form"){const s={...saved.settings};for(const k of ["ticker","motto","heroLead","heroAccent","heroDescription","heroImage","about","work","malaysiaOffice","bangladeshOffice","phone","whatsapp","email","gmail","facebook","tiktok","youtube","linkedin"])s[k]=v(k);await publish("settings",s);}
+ if(id==="admin-settings-form"){const s=await content("settings")||{};for(const k of websiteFields)s[k]=v(k);await publish("settings",s);}
+ if(id==="admin-contact-form"){
+  const contact=window.ANContactEditor.read(f);
+  await publish("settings",{...await content("settings"),...contact});
+ }
  if(id==="admin-management-form"){
    const members=[];
    for(const el of f.querySelectorAll('[data-team-index]')){

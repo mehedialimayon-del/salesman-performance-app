@@ -122,6 +122,9 @@ async function website(){
  +field('malaysiaOffice','Malaysia Office Address',content.malaysiaOffice||'',true,true)
  +field('bangladeshOffice','Bangladesh Office Address',content.bangladeshOffice||'',true,true)
  +'</div><button class="btn" type="submit" style="width:100%;margin-top:19px">Publish Website Changes</button></form>')
+ +panel('<h2>Contact Editor</h2><p class="muted">Paste full HTTPS profile links. Include the country code for Call Us and WhatsApp. Blank social links disable their buttons.</p><form id="contact-settings-form"><div class="grid-fields">'
+ +window.ANContactEditor.fields.map(([key,label,type])=>field(key,label,content[key],false,false,type)).join('')
+ +'</div><button class="btn" type="submit" style="margin-top:19px">Publish Contact Details</button></form><a class="link-card" href="'+WEBSITE+'index.html#/contact" target="_blank" rel="noopener">View Live Contact Page ↗</a>')
  +panel('<h2>Content Publishing</h2><p class="muted">Publish Study Updates and student Success Stories directly to the two-column public page.</p>'+btn('Study Updates & Insights','updates')+' '+btn('Success Stories','success','alt'))
  +panel('<h2>Live News / Announcements</h2><p class="muted">One message per line. These appear on the website in Orange and White.</p><form id="ticker-form">'+field('ticker','Scrolling Announcements',(Array.isArray(latest)&&latest.length?latest.map(x=>x.text).join('\n'):content.ticker||''),true,true)
  +'<button class="btn" type="submit" style="width:100%;margin-top:13px">Publish Announcements</button></form>')
@@ -237,7 +240,7 @@ document.addEventListener('change',async e=>{if(e.target.id==='choose-student'){
 document.addEventListener('submit',async e=>{
  const form=e.target;
  if(!(form instanceof HTMLFormElement))return;
- if(!['login-form','chat-form','settings-form','ticker-form','management-form','university-form'].includes(form.id)&&!form.dataset.application&&!form.dataset.lead&&!form.dataset.service)return;
+ if(!['login-form','chat-form','settings-form','contact-settings-form','ticker-form','management-form','university-form'].includes(form.id)&&!form.dataset.application&&!form.dataset.lead&&!form.dataset.service)return;
  e.preventDefault();const data=Object.fromEntries(new FormData(form).entries());
  const submit=form.querySelector('button[type=submit]');if(submit)submit.disabled=true;
  try{
@@ -250,8 +253,13 @@ document.addEventListener('submit',async e=>{
   if(form.dataset.application){const pct=Number(data.emgs_percent);if(!Number.isInteger(pct)||pct<0||pct>100)throw Error('Progress must be 0–100.');const{error}=await db.from('an_applications').update({status:data.status,emgs_percent:pct}).eq('id',form.dataset.application);if(error)throw error;toast('Student application updated.');await files();return;}
   if(form.dataset.lead){const{error}=await db.from('an_portal_leads').update({state:data.state,payment_status:data.payment_status}).eq('id',form.dataset.lead);if(error)throw error;toast('Lead updated.');await files();return;}
   if(form.dataset.service){const pct=Number(data.progress);if(!Number.isInteger(pct)||pct<0||pct>100)throw Error('Progress must be 0–100.');const{error}=await db.from('an_service_requests').update({status:data.status,progress:pct}).eq('id',form.dataset.service);if(error)throw error;toast('Request updated.');await servicesPage();return;}
-  if(form.id==='settings-form'){const next={...content};Object.keys(data).forEach(k=>next[k]=String(data[k]).trim());await publish('settings',next);content=next;return;}
-  if(form.id==='ticker-form'){const lines=String(data.ticker||'').split('\n').map(s=>s.trim()).filter(Boolean);if(lines.some(s=>s.length>400))throw Error('Each announcement must be under 400 characters.');await publish('latest_updates',lines.map((text,i)=>({text,color:i%2?'white':'orange'})));await publish('settings',{...content,ticker:lines.join(' • ')});return;}
+  if(form.id==='settings-form'){const next=await getContent('settings',{});Object.keys(data).forEach(k=>next[k]=String(data[k]).trim());await publish('settings',next);content=next;return;}
+  if(form.id==='contact-settings-form'){
+   const contact=window.ANContactEditor.read(form);
+   const next={...await getContent('settings',{}),...contact};
+   await publish('settings',next);content=next;return;
+  }
+  if(form.id==='ticker-form'){const lines=String(data.ticker||'').split('\n').map(s=>s.trim()).filter(Boolean);if(lines.some(s=>s.length>400))throw Error('Each announcement must be under 400 characters.');await publish('latest_updates',lines.map((text,i)=>({text,color:i%2?'white':'orange'})));await publish('settings',{...await getContent('settings',{}),ticker:lines.join(' • ')});return;}
   if(form.id==='management-form'){
    const people=Array.from(form.querySelectorAll('.team-item')).map(row=>{
      const values=Object.fromEntries(new FormData(newFormFromRow(row)).entries());
