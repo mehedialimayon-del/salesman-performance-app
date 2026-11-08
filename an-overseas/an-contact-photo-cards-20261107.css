@@ -343,10 +343,11 @@ body.an-contact-mode #app .an-contact-feedback:empty{display:none!important}
 /* Keep the office and social cards on one edge-to-edge artwork. */
 body.an-contact-mode #app .an-contact-offices{
   overflow:hidden!important;
+  --mosaic-inset:clamp(12px,4vw,22px);
+  --mosaic-size:calc(100% - 2 * var(--mosaic-inset));
   background:
-    radial-gradient(ellipse at 50% 48%,#fff2b713 0%,transparent 37%),
-    radial-gradient(ellipse at 50% 48%,#090c1517 8%,#090c1573 85%),
-    #0c0f16 url('assets/contact-flag-mosaic.webp') 0% 50% / 118% 118% no-repeat!important;
+    linear-gradient(#090c1524,#090c1552) center / var(--mosaic-size) var(--mosaic-size) no-repeat,
+    #050608 url('assets/contact-flag-mosaic.webp') center / var(--mosaic-size) var(--mosaic-size) no-repeat!important;
   margin:clamp(12px,3vw,28px);
   box-shadow:0 0 0 clamp(12px,3vw,28px) #050608;
 }
@@ -381,7 +382,7 @@ body.an-contact-mode #app .an-contact-office p{
   font-weight:550;
 }
 
-/* A separate title strip leaves the branded detail row transparent. */
+/* A compact title badge leaves the flag visible around it. */
 body.an-contact-mode #app .an-contact-social :is(a,.an-contact-phone){
   display:grid!important;
   grid-template-columns:auto minmax(0,1fr);
@@ -394,14 +395,21 @@ body.an-contact-mode #app .an-contact-social :is(a,.an-contact-phone){
 body.an-contact-mode #app .an-contact-social .an-contact-card-copy{display:contents}
 body.an-contact-mode #app .an-contact-social :is(a,.an-contact-phone) small{
   grid-area:1 / 1 / 2 / -1;
-  width:100%;
-  padding:3px 5px;
-  border-bottom:1px solid #ffc27d94;
-  background:linear-gradient(100deg,#a24b16dc,#bd5919bf);
-  color:#fff!important;
+  justify-self:center;
+  width:max-content;
+  max-width:calc(100% - 8px);
+  margin-top:3px;
+  padding:1px 6px;
+  border:1px solid #ff9b554d;
+  border-radius:999px;
+  background:
+    linear-gradient(90deg,#ff823b 0 33%,#fff 33% 68%,#ff9b5e 68% 78%,#fff 78%) text,
+    linear-gradient(#08090de0,#08090de0) padding-box;
+  color:transparent!important;
   text-align:center;
-  font-size:clamp(10px,3vw,14px)!important;
-  font-weight:900!important;
+  text-shadow:none;
+  font-size:clamp(9px,2.5vw,12px)!important;
+  font-weight:800!important;
 }
 body.an-contact-mode #app .an-contact-social .an-contact-icon{
   grid-area:2 / 1;
@@ -442,5 +450,7 @@ body.an-contact-mode #app .an-contact-office :is(b,p){
   background:#090d1480;
 }
 body.an-contact-mode #app .an-contact-office b{
+  align-self:center;
+  text-align:center;
   border:1px solid #ffb05b91;
 }
