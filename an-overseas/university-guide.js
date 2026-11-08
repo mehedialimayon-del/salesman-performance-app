@@ -102,6 +102,10 @@ const manchesterAdmissions='https://www.manchester.ac.uk/study/undergraduate/app
 const uniklEngineering='https://www.unikl.edu.my/programme/bachelor-of-electrical-engineering-with-honours/';
 const klustCalendar='https://klust.edu.my/current-students/academic-calendar/';
 const verifiedCardFacts={
+ aimst:{
+  ranking:['#78','QS South Eastern Asia 2027','https://www.topuniversities.com/universities/aimst-university'],
+  intake:['7 December 2026','Master of Physiotherapy (Musculoskeletal)','https://aimst.edu.my/admission/']
+ },
  manchester:{
   ranking:['#=40','QS World University Rankings','https://www.topuniversities.com/universities/university-manchester'],
   programmes:['BSc Computer Science','Undergraduate example',manchesterCourse],
@@ -162,6 +166,7 @@ const verifiedCardFacts={
  }
 };
 const malaysiaFactIds={
+ aimstuniversity:'aimst',
  universitimalaya:'um',
  universititeknologimalaysia:'utm',
  amcuniversitycollege:'amc',
@@ -298,23 +303,21 @@ const card=(u,p)=>{
  const mark=rank?'<span class="an-guide-rank">QS World 2027 #'+rank+'</span>':'';
  const key=factKey(u),verified=verifiedCardFacts[key];
  const programmeCount=Number(u.totalPrograms||p?.totalPrograms||p?.programmeCount);
- const programmeText=Number.isInteger(programmeCount)&&programmeCount>0?String(programmeCount):'See official catalogue';
+ const programmeText=Number.isInteger(programmeCount)&&programmeCount>0?String(programmeCount):'';
  const fees=Array.isArray(p?.fees)?p.fees:[],annualFees=fees.filter(x=>/first.year|annual|per year|1.year/i.test(String(x?.[2]||'')+' '+String(x?.[0]||''))).map(x=>String(x?.[1]||''));const firstYear=annualFees.length?annualFees[0]:null;
  const historicalTuition=ipedsEntry(u)?.[1];
- const tuitionText=firstYear||'See official fee guide';
  const historicalFact=!firstYear&&Number.isInteger(historicalTuition)?[usd(historicalTuition),'Out-of-state UG · 2023/24',ipedsSource]:null;
- const intakeText='Check admissions calendar';
  const logo=institutionLogo(u,p);
- const logoMarkup=validUrl(logo)||/^assets\//.test(logo)?'<img class="an-premium-meta-logo" src="'+e(logo)+'" alt="'+e(name)+(isWebsiteIcon(u,logo)?' website icon':' logo')+'" loading="lazy" onerror="this.remove()">':'';
+ const logoMarkup=validUrl(logo)||/^assets\//.test(logo)?'<img class="an-premium-meta-logo'+(logo==='assets/universities/aimst-official-logo.png'?' an-premium-logo-on-dark':'')+'" src="'+e(logo)+'" alt="'+e(name)+(isWebsiteIcon(u,logo)?' website icon':' logo')+'" loading="lazy" onerror="this.remove()">':'';
  const country=u.country||u.city||'';
  const factHeading=label=>{const space=label.indexOf(' ');const cut=space>0?space:Math.ceil(label.length/2);return '<span>'+e(label.slice(0,cut))+'</span>'+e(label.slice(cut));};
- const fact=(icon,label,value,extra='',source='',date='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+factIcons[icon]+'</svg></span><strong>'+factHeading(label)+'</strong><b>'+(source?'<a href="'+e(source)+'" rel="noopener noreferrer" target="_blank">'+(date?countdown(date):e(value))+'</a>':e(value))+'</b>'+(extra?'<small>'+e(extra)+'</small>':'')+'</div>';
+ const fact=(icon,label,value,extra='',source='',date='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+factIcons[icon]+'</svg></span><strong>'+factHeading(label)+'</strong>'+(value?'<b>'+(source?'<a href="'+e(source)+'" rel="noopener noreferrer" target="_blank">'+(date?countdown(date):e(value))+'</a>':e(value))+'</b>':'')+(value&&extra?'<small>'+e(extra)+'</small>':'')+'</div>';
  const intake=verified?.intake,admissionDeadline=commonAppCard(u);
  const researchRank=leidenRank(u);
- const rankingFact=!verified?.ranking&&!rank&&researchRank?fact('rank','RESEARCH RANK','#'+researchRank[0],'Leiden Open 2026 · publications',leidenLink(researchRank)):key==='amc'?fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister):fact('rank',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'Ranking unverified',rank?'QS World 2027':'']));
- const facts=rankingFact+fact('programmes','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText==='See official catalogue'?'':'Published count',validUrl(p?.programSource)||official]))
-  +fact('tuition',verified?.tuition&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||historicalFact||[tuitionText,firstYear?'Published fee example':'Programme-specific fees',validUrl(p?.feeSource)||official]))
-  +(intake?fact('intake','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):admissionDeadline?fact('intake','APPLICATION DEADLINE',...admissionDeadline):fact('intake','UPCOMING INTAKE',intakeText,'',validUrl(p?.intakeSource)||official));
+ const rankingFact=!verified?.ranking&&!rank&&researchRank?fact('rank','RESEARCH RANK','#'+researchRank[0],'Leiden Open 2026 · publications',leidenLink(researchRank)):key==='amc'?fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister):fact('rank',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'',rank?'QS World 2027':'']));
+ const facts=rankingFact+fact('programmes','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText?'Published count':'',validUrl(p?.programSource)||official]))
+  +fact('tuition',verified?.tuition&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||historicalFact||[firstYear||'',firstYear?'Published fee example':'',validUrl(p?.feeSource)||official]))
+  +(intake?fact('intake','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):admissionDeadline?fact('intake','APPLICATION DEADLINE',...admissionDeadline):fact('intake','UPCOMING INTAKE',''));
  return '<article class="card uni-card an-guide-card an-premium-uni-card"><div class="uni-cover-wrap">'+imageMarkup(u,p)+mark+discount+'<div class="an-premium-hero-details"><h3 class="an-premium-university-title">'+mainName+shortLabel+'</h3><div class="an-premium-meta">'+logoMarkup+'<div class="an-premium-meta-text"><div class="an-premium-type '+(privateUni?'is-private':'is-public')+'">'+e(typeText)+'</div><p class="university-location an-premium-location">'+e(country)+'</p></div></div></div></div><div class="inside"><div class="an-premium-facts">'+facts+'</div><div class="an-guide-links"><a class="card-open" href="#/university/'+encodeURIComponent(u.id)+'">University Portfolio <span>↗</span></a>'+(official?'<a class="an-guide-official" href="'+e(official)+'" rel="noopener noreferrer" target="_blank">Official Website ↗</a>':registry?'<a class="an-guide-official" href="'+e(registry)+'" rel="noopener noreferrer" target="_blank">Official Register ↗</a>':'')+'<a class="an-premium-apply" href="#/apply">Apply Now ↗</a></div></div></article>';
 };
 const link=(url,text,kind='')=>{const x=validUrl(url);return x?'<a class="an-guide-btn '+e(kind)+'" href="'+e(x)+'" target="_blank" rel="noopener noreferrer">'+e(text)+' ↗</a>':''};

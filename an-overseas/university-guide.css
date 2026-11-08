@@ -337,3 +337,6 @@ body.an-portfolio-v2 #app .an-study-section :is(p,li) :is(strong,em){color:#f068
  #app .university-catalogue #results .an-premium-uni-card .an-premium-university-title{font-size:clamp(16px,4.3vw,21px)!important}
  #app .university-catalogue #results .an-premium-uni-card .an-premium-fact{min-height:86px!important}
 }
+
+/* The AIMST crest is supplied in white with transparency. */
+#app .university-catalogue #results .an-premium-uni-card .an-premium-logo-on-dark{background:#11151b}
