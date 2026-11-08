@@ -222,14 +222,35 @@ const leidenPanel=u=>{
  e(record[1].toLocaleString('en-US'))+' core publications, 2021–2024, full counting. The displayed ranking uses a minimum of 100 publications.</p>'+
  link(leidenLink(record),'CWTS university profile')+link('https://open.leidenranking.com/resources','Open edition data')+'</div>';
 };
+const commonAppSource='https://content.commonapp.org/Files/ReqGrid.pdf';
+const commonAppPlans=['Early Decision','Early Decision II','Early Action','Early Action II','Restrictive Early Action','Regular Decision'];
+const commonAppDates=u=>u.country==='United States'&&Object.hasOwn(window.ANCommonApp2027||{},u.id)?window.ANCommonApp2027[u.id]:null;
+const admissionDateFormat=new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});
+const formatAdmissionDate=date=>admissionDateFormat.format(new Date(date));
+const commonAppCard=u=>{
+ const dates=commonAppDates(u);
+ if(!dates)return null;
+ const today=new Date().toISOString().slice(0,10);
+ const regular=dates[5]>=today?5:-1;
+ const next=dates.reduce((best,date,i)=>date>=today&&(best===-1||date<dates[best])?i:best,-1);
+ const previous=dates.reduce((best,date,i)=>date&&(best===-1||date>dates[best])?i:best,-1);
+ const selected=regular>=0?regular:next>=0?next:previous;
+ return [formatAdmissionDate(dates[selected]),commonAppPlans[selected]+(next<0?' · past date':''),commonAppSource];
+};
+const commonAppPanel=u=>{
+ const dates=commonAppDates(u);
+ if(!dates)return '';
+ const list=dates.map((date,i)=>date?'<li><strong>'+e(commonAppPlans[i])+'</strong> · '+e(formatAdmissionDate(date))+'</li>':'').join('');
+ return '<div class="an-profile-fact"><h3>Common App first-year deadlines · 2026/27</h3><ul>'+list+'</ul><p>Published calendar dates for first-year applicants. Check the college’s requirements for your programme and applicant type.</p>'+link(commonAppSource,'Common App requirements grid')+'</div>';
+};
 const profileFact=(u,section)=>{
  const key=factKey(u),facts=verifiedCardFacts[key];
  const item=facts?.[{fees:'tuition',programmes:'programmes',entry:'intake',ranking:'ranking'}[section]];
- const research=section==='ranking'?leidenPanel(u):'';
- if(!item)return ipedsPanel(u,section)+research;
+ const supplemental=section==='ranking'?leidenPanel(u):section==='entry'?commonAppPanel(u):'';
+ if(!item)return ipedsPanel(u,section)+supplemental;
  const label={fees:'Tuition basis',programmes:'Published programme scope',entry:'Published intake',ranking:'Regional ranking'}[section];
  const detail=factNotes[key]?.[section]||(section==='ranking'?item[1]:item[0]+' · '+item[1]);
- return '<div class="an-profile-fact"><h3>'+label+'</h3><p>'+e(detail)+(item[3]?' · '+countdown(item[3]):'')+'</p>'+link(item[2],'Published source')+(key==='amu'&&section==='entry'?link(amuAdmissions,'International admissions'):'')+'</div>'+research;
+ return '<div class="an-profile-fact"><h3>'+label+'</h3><p>'+e(detail)+(item[3]?' · '+countdown(item[3]):'')+'</p>'+link(item[2],'Published source')+(key==='amu'&&section==='entry'?link(amuAdmissions,'International admissions'):'')+'</div>'+supplemental;
 };
 const verifiedLogoFiles={aimstuniversity:'aimst',ucsiuniversity:'ucsi',amcuniversitycollege:'amc'};
 const institutionLogo=(u,p)=>{
@@ -280,12 +301,12 @@ const card=(u,p)=>{
  const country=u.country||u.city||'';
  const factHeading=label=>{const space=label.indexOf(' ');const cut=space>0?space:Math.ceil(label.length/2);return '<span>'+e(label.slice(0,cut))+'</span>'+e(label.slice(cut));};
  const fact=(icon,label,value,extra='',source='',date='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+factIcons[icon]+'</svg></span><strong>'+factHeading(label)+'</strong><b>'+(source?'<a href="'+e(source)+'" rel="noopener noreferrer" target="_blank">'+(date?countdown(date):e(value))+'</a>':e(value))+'</b>'+(extra?'<small>'+e(extra)+'</small>':'')+'</div>';
- const intake=verified?.intake;
+ const intake=verified?.intake,admissionDeadline=commonAppCard(u);
  const researchRank=leidenRank(u);
  const rankingFact=!verified?.ranking&&!rank&&researchRank?fact('rank','RESEARCH RANK','#'+researchRank[0],'Leiden Open 2026 · publications',leidenLink(researchRank)):key==='amc'?fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister):fact('rank',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'Ranking unverified',rank?'QS World 2027':'']));
  const facts=rankingFact+fact('programmes','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText==='See official catalogue'?'':'Published count',validUrl(p?.programSource)||official]))
   +fact('tuition',verified?.tuition&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||historicalFact||[tuitionText,firstYear?'Published fee example':'Programme-specific fees',validUrl(p?.feeSource)||official]))
-  +(intake?fact('intake','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):fact('intake','UPCOMING INTAKE',intakeText,'',validUrl(p?.intakeSource)||official));
+  +(intake?fact('intake','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):admissionDeadline?fact('intake','APPLICATION DEADLINE',...admissionDeadline):fact('intake','UPCOMING INTAKE',intakeText,'',validUrl(p?.intakeSource)||official));
  return '<article class="card uni-card an-guide-card an-premium-uni-card"><div class="uni-cover-wrap">'+imageMarkup(u,p)+mark+discount+'<div class="an-premium-hero-details"><h3 class="an-premium-university-title">'+mainName+shortLabel+'</h3><div class="an-premium-meta">'+logoMarkup+'<div class="an-premium-meta-text"><div class="an-premium-type '+(privateUni?'is-private':'is-public')+'">'+e(typeText)+'</div><p class="university-location an-premium-location">'+e(country)+'</p></div></div></div></div><div class="inside"><div class="an-premium-facts">'+facts+'</div><div class="an-guide-links"><a class="card-open" href="#/university/'+encodeURIComponent(u.id)+'">University Portfolio <span>↗</span></a>'+(official?'<a class="an-guide-official" href="'+e(official)+'" rel="noopener noreferrer" target="_blank">Official Website ↗</a>':registry?'<a class="an-guide-official" href="'+e(registry)+'" rel="noopener noreferrer" target="_blank">Official Register ↗</a>':'')+'<a class="an-premium-apply" href="#/apply">Apply Now ↗</a></div></div></article>';
 };
 const link=(url,text,kind='')=>{const x=validUrl(url);return x?'<a class="an-guide-btn '+e(kind)+'" href="'+e(x)+'" target="_blank" rel="noopener noreferrer">'+e(text)+' ↗</a>':''};
