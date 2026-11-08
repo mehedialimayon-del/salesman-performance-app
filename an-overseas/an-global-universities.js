@@ -113,6 +113,17 @@ async function loadPublicDirectory(){
  })();return loading;
 }
 function maybeLoad(){
+ const profile=location.hash.match(/^#\/university\/([^?/#]+)/);
+ if(profile&&typeof U!=='undefined'&&!U.some(u=>u.id===profile[1])){
+  const route=location.hash;
+  const hasProfile=()=>U.some(u=>u.id===profile[1]);
+  loadLocalSnapshot().then(async()=>{
+   if(location.hash!==route)return;
+   if(!hasProfile())await loadPublicDirectory();
+   if(location.hash===route&&hasProfile()&&typeof render==='function')render();
+  });
+  return;
+ }
  if(!/^#\/(universities|countries|favorites)\b/.test(location.hash))return;
  enrich();
  loadLocalSnapshot();
