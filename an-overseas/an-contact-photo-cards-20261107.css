@@ -340,28 +340,22 @@ body.an-contact-mode #app .an-contact-feedback:empty{display:none!important}
  }
 }
 
-/* The mosaic ends immediately above the social buttons. */
+/* Keep the office and social cards on one edge-to-edge artwork. */
 body.an-contact-mode #app .an-contact-offices{
-  --office-panel-pad-block:9px;
-  --office-panel-pad-inline:9px;
-  padding:var(--office-panel-pad-block) var(--office-panel-pad-inline)!important;
   overflow:hidden!important;
-}
-body.an-contact-mode #app .an-contact-office-backdrop{
-  display:flow-root;
-  flex:0 0 auto;
-  min-width:0;
-  margin:calc(-1 * var(--office-panel-pad-block)) calc(-1 * var(--office-panel-pad-inline)) 0;
-  padding:var(--office-panel-pad-block) var(--office-panel-pad-inline) 0;
   background:
-    linear-gradient(#090c1573,#090c1573),
-    #0c0f16 url('assets/contact-flag-mosaic.webp') center / 100% 100% no-repeat;
+    linear-gradient(#090c1555,#090c1566),
+    #0c0f16 url('assets/contact-flag-mosaic.webp') center / 118% 118% no-repeat!important;
 }
-@media(max-width:800px){
-  body.an-contact-mode #app .an-contact-offices{
-    --office-panel-pad-block:7px;
-    --office-panel-pad-inline:8px;
-  }
+body.an-contact-mode #app .an-contact-social :is(a,.an-contact-phone){
+  background:
+    linear-gradient(160deg,#ffffff28,transparent 60%),
+    color-mix(in srgb,var(--contact-card-edge,#ffae71) 19%,#0a101966)!important;
+  backdrop-filter:blur(1px);
+  text-shadow:0 1px 3px #000,0 0 5px #000;
+}
+body.an-contact-mode #app .an-contact-social .an-contact-card-detail{
+  color:#fff3df!important;
 }
 body.an-contact-mode #app .an-contact-offices h2,
 body.an-contact-mode #app .an-contact-channels-title{
@@ -370,7 +364,7 @@ body.an-contact-mode #app .an-contact-channels-title{
 body.an-contact-mode #app .an-contact-office{
   position:relative;
   isolation:isolate;
-  background:linear-gradient(105deg,#080b13bd 0%,#080b138f 64%,#080b132b 100%)!important;
+  background:linear-gradient(105deg,#080b1399 0%,#080b1366 64%,#080b1326 100%)!important;
 }
 body.an-contact-mode #app .an-contact-office .an-contact-office-photo{
   opacity:.18;
