@@ -346,9 +346,9 @@ body.an-contact-mode #app .an-contact-offices{
   background:
     radial-gradient(ellipse at 50% 48%,#fff2b713 0%,transparent 37%),
     radial-gradient(ellipse at 50% 48%,#090c1517 8%,#090c1573 85%),
-    #0c0f16 url('assets/contact-flag-mosaic.webp') 4% 50% / 135% 125% no-repeat!important;
-  margin:clamp(8px,2vw,24px);
-  box-shadow:0 0 0 clamp(8px,2vw,24px) #090b0f;
+    #0c0f16 url('assets/contact-flag-mosaic.webp') 0% 50% / 118% 118% no-repeat!important;
+  margin:clamp(12px,3vw,28px);
+  box-shadow:0 0 0 clamp(12px,3vw,28px) #050608;
 }
 body.an-contact-mode #app .an-contact-social :is(a,.an-contact-phone){
   background:
@@ -381,34 +381,58 @@ body.an-contact-mode #app .an-contact-office p{
   font-weight:550;
 }
 
-/* Brand titles remain prominent while profile details stay compact. */
+/* A separate title strip leaves the branded detail row transparent. */
+body.an-contact-mode #app .an-contact-social :is(a,.an-contact-phone){
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr);
+  grid-template-rows:auto 1fr;
+  align-items:center;
+  gap:0 5px!important;
+  padding:0!important;
+  overflow:hidden;
+}
+body.an-contact-mode #app .an-contact-social .an-contact-card-copy{display:contents}
 body.an-contact-mode #app .an-contact-social :is(a,.an-contact-phone) small{
-  color:var(--contact-title,#ffb15a)!important;
-  font-size:clamp(11px,3vw,14px)!important;
+  grid-area:1 / 1 / 2 / -1;
+  width:100%;
+  padding:3px 5px;
+  border-bottom:1px solid #ffc27d94;
+  background:linear-gradient(100deg,#a24b16dc,#bd5919bf);
+  color:#fff!important;
+  text-align:center;
+  font-size:clamp(10px,3vw,14px)!important;
   font-weight:900!important;
-  text-shadow:0 1px 3px #000,0 0 4px #000;
+}
+body.an-contact-mode #app .an-contact-social .an-contact-icon{
+  grid-area:2 / 1;
+  margin:4px 0 4px 4px;
 }
 body.an-contact-mode #app .an-contact-social .an-contact-card-detail{
-  color:#fff!important;
-  font-size:clamp(8px,2.45vw,10px)!important;
-  font-weight:650!important;
+  grid-area:2 / 2;
+  padding:4px 4px 4px 0;
+  color:var(--contact-detail,#101216)!important;
+  font-size:clamp(8px,2.35vw,10px)!important;
+  font-weight:750!important;
+  text-shadow:0 1px 2px #000,0 0 4px #000;
 }
-body.an-contact-mode #app .an-contact-social [data-an-social="facebook"]{--contact-title:#75b3ff}
-body.an-contact-mode #app .an-contact-social [data-an-social="linkedin"]{--contact-title:#82d0ff}
-body.an-contact-mode #app .an-contact-social [data-an-social="youtube"]{--contact-title:#ff6969}
-body.an-contact-mode #app .an-contact-social [data-an-social="whatsapp"]{--contact-title:#71ee99}
-body.an-contact-mode #app .an-contact-social [data-an-social="tiktok"] small{
-  color:#090b0f!important;
-  text-shadow:0 0 2px #fff,0 0 3px #fff,0 0 5px #fff;
+body.an-contact-mode #app .an-contact-social [data-an-social="facebook"]{--contact-detail:#8ec4ff}
+body.an-contact-mode #app .an-contact-social [data-an-social="linkedin"]{--contact-detail:#89d4ff}
+body.an-contact-mode #app .an-contact-social [data-an-social="youtube"]{--contact-detail:#ff8b8b}
+body.an-contact-mode #app .an-contact-social [data-an-social="whatsapp"]{--contact-detail:#88f3ab}
+body.an-contact-mode #app .an-contact-social :is([data-an-social="tiktok"],.an-contact-phone) .an-contact-card-detail{
+  text-shadow:0 0 2px #fff,0 0 4px #fff;
 }
-body.an-contact-mode #app .an-contact-social [data-an-social="gmail"] small{
-  width:max-content;
-  font-family:ui-monospace,monospace;
-  background:linear-gradient(90deg,#83b9ff 20%,#ff7777 20% 40%,#ffd46a 40% 60%,#83b9ff 60% 80%,#78ee9e 80%);
+body.an-contact-mode #app .an-contact-social [data-an-social="gmail"]{
+  grid-template-columns:minmax(0,1fr) auto auto minmax(0,1fr);
+}
+body.an-contact-mode #app .an-contact-social [data-an-social="gmail"] .an-contact-icon{grid-column:2}
+body.an-contact-mode #app .an-contact-social [data-an-social="gmail"] .an-contact-card-detail{
+  grid-column:3;
+  background:linear-gradient(90deg,#9bc8ff,#ffa7a7,#ffe499,#9aeeb4);
   background-clip:text;
   color:transparent!important;
-  filter:drop-shadow(0 1px 2px #000);
   text-shadow:none;
+  filter:drop-shadow(0 1px 2px #000);
 }
 body.an-contact-mode #app .an-contact-office :is(b,p){
   align-self:flex-start;
