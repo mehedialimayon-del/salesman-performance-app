@@ -221,7 +221,20 @@
   function fitMobileOpening(opening) {
     const top = opening.getBoundingClientRect().top;
     const height = window.visualViewport?.height ?? window.innerHeight;
-    opening.style.setProperty('--an-about-opening-height', Math.max(0, height - Math.max(0, top + window.scrollY)) + 'px');
+    const available = Math.max(0, height - Math.max(0, top + window.scrollY));
+    opening.style.setProperty('--an-about-opening-height', available + 'px');
+    const art = opening.querySelector('.an-about-mobile-art');
+    const hero = art.firstElementChild;
+    const button = opening.querySelector('.an-about-mobile-readmore');
+    const currentScale = Number(hero.style.zoom) || 1;
+    const artWidth = Math.min(390, art.clientWidth);
+    hero.style.setProperty('--an-about-art-width', artWidth + 'px');
+    const naturalHeight = hero.getBoundingClientRect().height / currentScale;
+    const openingStyle = getComputedStyle(opening);
+    const reserved = button.offsetHeight + parseFloat(openingStyle.paddingBottom) + parseFloat(openingStyle.rowGap);
+    if (naturalHeight > 0) {
+      hero.style.zoom = Math.min(1, Math.max(.15, (available - reserved - 2) / naturalHeight));
+    }
   }
   function renderMobileOpening(intro) {
     if (!mobileAbout.matches) return;

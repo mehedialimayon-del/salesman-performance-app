@@ -184,10 +184,13 @@ body.an-about-locked #app>.an-about-v3{box-sizing:border-box;display:flex!import
 
 /* Mobile About opens with the founder story and keeps management below it. */
 #app .an-about-mobile-opening,
-#app .an2-overview-cards { display:none; }
+#app .an2-story .an2-overview-cards { display:none; }
 
 @media (max-width:800px) {
-  html body #app .an-about-v3 .an-about-duo > .an-about-intro-panel {
+  body.an-about-locked > #an-site-header-space {
+    display:none!important;
+  }
+  html body #app .an-about-v3 .an-about-duo:has(> .an-about-mobile-opening) > .an-about-intro-panel {
     display:none!important;
   }
   #app .an-about-mobile-opening {
@@ -202,9 +205,20 @@ body.an-about-locked #app>.an-about-v3{box-sizing:border-box;display:flex!import
   }
   #app .an-about-mobile-art {
     flex:1;
-    display:grid;
+    display:flex;
     align-items:center;
-    width:min(100%, max(280px, calc((var(--an-about-opening-height, 70dvh) - 163px) * .716)));
+    justify-content:center;
+    width:100%;
+  }
+  html body #app .an-about-mobile-opening .an-about-mobile-art .an2-founder-hero {
+    width:var(--an-about-art-width, 100%)!important;
+  }
+  #app .an-about-mobile-opening .an2-approved-reference-hero {
+    container-type:inline-size;
+  }
+  html body #app .an-about-mobile-opening .an2-approved-reference-hero .an2-mobile-complete-quote blockquote {
+    font-size:3.25cqw!important;
+    line-height:1.2!important;
   }
   #app .an-about-mobile-readmore {
     display:grid;
@@ -221,7 +235,7 @@ body.an-about-locked #app>.an-about-v3{box-sizing:border-box;display:flex!import
     font-weight:900;
     letter-spacing:.08em;
   }
-  #app .an2-overview-cards {
+  #app .an2-story .an2-overview-cards {
     display:grid;
     gap:12px;
     margin:0 0 18px;
