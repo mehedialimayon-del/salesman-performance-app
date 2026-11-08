@@ -60,12 +60,44 @@ function label(node,key,i){
  node.querySelector(':scope > header > .an-study-section-icon')?.remove();
  const h=node.querySelector(':scope > h2')||node.querySelector(':scope > header > h3')||node.querySelector('.an-guide-support-head h2');
  if(h){
-   h.textContent=title;
+   const divider=title.indexOf(' ');
+   const name=document.createElement('span');
+   name.className='an-portfolio-heading-text';
+   const accent=document.createElement('span');
+   accent.className='an-portfolio-heading-accent';
+   accent.textContent=divider<0?title:title.slice(0,divider);
+   name.append(accent,title.slice(accent.textContent.length));
+   h.replaceChildren(name);
    const ic=document.createElement('span');ic.className='an-portfolio-icon';ic.setAttribute('aria-hidden','true');ic.textContent=icon;
    const n=document.createElement('span');n.className='an-portfolio-serial';n.textContent=number;
    h.prepend(ic);h.append(n);
  }
  node.querySelector(':scope > .section-number')?.remove();
+}
+function highlightDetails(section,u){
+ const terms=/\b(?:admission requirements|admission information|recognised qualifications|teaching locations|campus address|application deadline|tuition fees?|entry requirements|official university website|student pass|scholarships?|intake dates?)\b/i;
+ const name=String(u.name||'');
+ for(const p of section.querySelectorAll('p')){
+  const walker=document.createTreeWalker(p,NodeFilter.SHOW_TEXT);
+  const nodes=[];
+  while(walker.nextNode())nodes.push(walker.currentNode);
+  let budget=2;
+  for(const node of nodes){
+   if(!budget)break;
+   if(node.parentElement.closest('a,strong,b,em,.an-portfolio-detail-accent'))continue;
+   const value=node.data;
+   const index=name?value.indexOf(name):-1;
+   const match=index<0?terms.exec(value):null;
+   const start=index>=0?index:match?.index;
+   if(start===undefined)continue;
+   const text=index>=0?name:match[0];
+   const accent=document.createElement('strong');
+   accent.className='an-portfolio-detail-accent';
+   accent.textContent=text;
+   node.replaceWith(value.slice(0,start),accent,value.slice(start+text.length));
+   budget--;
+  }
+ }
 }
 function fallback(id,u){
  const title=ORDER.find(x=>x[0]===id)?.[1]||id;
@@ -118,7 +150,7 @@ function apply(u,p){
  jumps.innerHTML=ORDER.map(([key,title],i)=>'<button data-profile-jump="'+key+'" title="'+esc(title)+'"><b>'+String(i+1).padStart(2,'0')+'</b>'+esc(title)+'</button>').join('');
  f.append(jumps);
  const expand=document.createElement('button');expand.type='button';expand.className='an-portfolio-jumps-toggle';expand.textContent='Show all 20 sections ↓';expand.addEventListener('click',()=>{const on=jumps.classList.toggle('expanded');expand.textContent=on?'Show fewer sections ↑':'Show all 20 sections ↓';});f.append(expand);
- ORDER.forEach(([key],i)=>{const n=mapped[key]||fallback(key,u);label(n,key,i);f.append(n);});
+ ORDER.forEach(([key],i)=>{const n=mapped[key]||fallback(key,u);label(n,key,i);highlightDetails(n,u);f.append(n);});
  rest.forEach(n=>mapped.support.append(n));
  if(foot)mapped.support.append(foot);if(back)mapped.support.append(back);
  main.replaceChildren(f);
