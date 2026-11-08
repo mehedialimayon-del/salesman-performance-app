@@ -138,10 +138,132 @@ function addKnownUniversities(list){
  return added;
 }
 let filters={search:'',country:'All destinations',level:'All degrees'};
+const imescClosing='2027-01-26T11:00:00Z';
+const timelines=new Map();
+function timeline(ids,label,note,source,dates=[]){
+ for(const id of ids.split(' '))timelines.set(id,{label,note,source,dates});
+}
+timeline('erasmus-mundus','i-MESC (indicative)','i-MESC 2027–29: indicative opening 9 Nov 2026, 14:00 Paris time. Indicative closing 26 Jan 2027, 12:00 Paris time. Other Erasmus Mundus programmes publish separate calls.','https://i-mesc.eu/create-account',[imescClosing]);
+timeline('daad-epos-masters daad-epos-phd','Course deadline','Use the DAAD 2027/28 course table to choose a programme, then follow that university’s scholarship deadline and submission route. EPOS has separate dates by course.','https://static.daad.de/media/daad_de/pdfs_nicht_barrierefrei/in-deutschland-studieren-forschen-lehren/daad_epos_deadlines.pdf');
+timeline('hungary-bachelors hungary-masters hungary-phd-1 hungary-phd-2','Prior call · 15 Jan 2026','The 2026/27 cycle used 15 January. Choose Bangladesh as sending partner, select eligible programmes, submit via DreamApply, then complete the Bangladesh nomination process. The prior date is historical.','https://stipendiumhungaricum.hu/apply/');
+timeline('turkiye-ba turkiye-ma turkiye-phd','Annual · 10 Jan–20 Feb','The regular official calendar opens 10 January and closes 20 February. Evaluation is March–April, interviews April–June, results in early August and travel in September. This is the recurring calendar.','https://www.turkiyeburslari.gov.tr/calendar');
+timeline('turkiye-success-ba turkiye-success-ma turkiye-success-phd','Annual · Oct–Nov','The official Success Scholarship calendar places applications in October–November and evaluation in November. Specific opening and closing days are given in the annual announcement.','https://www.turkiyeburslari.gov.tr/calendar');
+timeline('turkiye-research','Rolling · year-round','Applications are accepted year-round. Quarterly evaluation windows are January–March, April–June, July–September and October–December.','https://turkiyeburslari.gov.tr/shorttermprograms');
+timeline('turkiye-katip','KATİP call dates','KATİP runs for eight months. Its dates follow the programme announcement and are separate from the general degree scholarship calendar.','https://turkiyeburslari.gov.tr/shorttermprograms');
+timeline('mext-ug mext-research mext-masters mext-phd','Host route · Jan–Feb','The Japanese Embassy in Bangladesh lists November–December to January–February as the usual university recommendation window. Embassy recommendation and host university deadlines are separate.','https://www.bd.emb-japan.go.jp/itpr_en/scholarshipnotice.html');
+timeline('mext-teacher mext-ylp','Embassy / nomination dates','Teacher Training and Young Leaders’ Program follow separate annual calls and nomination channels. The degree scholarship calendar does not set these deadlines.','https://www.bd.emb-japan.go.jp/itpr_en/scholarshipnotice.html');
+timeline('jasso-exchange gks-exchange','Host nomination dates','The exchange period and internal nomination deadline depend on the participating institution and its exchange agreement. Begin with the sending institution’s exchange office.');
+timeline('gks-undergrad','Prior call · 16 Oct 2025','Bangladesh Embassy Track for 2026 undergraduate entry ran 6–16 October 2025. University Track has a separate application timetable.','https://overseas.mofa.go.kr/bd-en/brd/m_2124/view.do?seq=760082');
+timeline('gks-grad','Prior call · 25 Feb 2026','Bangladesh Embassy Track for 2026 graduate entry accepted online applications 12–25 February 2026. University Track deadlines are set separately.','https://overseas.mofa.go.kr/bd-en/brd/m_2124/view.do?seq=760090');
+timeline('csc-ug csc-ma csc-phd','Prior call · 10 Jan 2026','The Bangladesh Type A call closed 10 January 2026. The embassy announcement applies to that cycle.','https://bd.china-embassy.gov.cn/eng/sghd/202512/t20251219_11776194.htm');
+timeline('mis-malaysia','2026/27 applications closed');
+timeline('chevening','2027/28 closed · Oct 2026','For 2027/28, applications opened in August and closed in October 2026. Screening and reading follow, interviews are March–April 2027 and results are expected from mid-June.','https://www.chevening.org/scholarships/application-timeline/');
+timeline('commonwealth-masters','Prior call · 20 Oct 2026');
+timeline('australia-awards','Prior call · 30 Apr 2026');
+timeline('australia-short','Short-course call dates');
+timeline('eiffel-master eiffel-phd','Host submission','Campus France receives nominations by 6 January 2027. Applicants first apply to a French host and must meet its earlier internal deadline. The timer tracks the institution’s national submission.','https://www.campusfrance.org/en/france-excellence-eiffel-scholarship-program',['2027-01-06']);
+timeline('nl-scholarship adb-jsp great-bd','Host programme dates');
+timeline('jj-wbgsp','2027 window','2027 applications: Window 1 runs 18 January–26 February and Window 2 runs 29 March–21 May. First obtain unconditional admission to an eligible programme, then apply in that programme’s assigned window.','https://www.worldbank.org/en/programs/scholarships/jj-wbgsp',['2027-02-26','2027-05-21']);
+timeline('romania-mfa','Prior call · 31 Mar 2026');
+timeline('az-heydar','2026/27 nomination cycle');
+timeline('taiwan-moe-ug taiwan-moe-grad','Representative office dates');
+timeline('taiwan-ncku-grad taiwan-ncku-elite','NCKU intake dates');
+timeline('si-global','Separate admission and award windows');
+timeline('finland-uni','Joint admission','The Finnish autumn 2027 joint application opens 7 January and closes 21 January 2027 for participating programmes. Check whether the selected degree joins this round and whether its tuition waiver is requested with admission.','https://www.studyinfinland.fi/news-events/prepare-for-2027',['2027-01-21']);
+timeline('finland-phd-paid europe-euraxess','Vacancy-specific deadline');
+timeline('mbzuai-msc mbzuai-phd','Main graduate round','Most graduate applications close 15 December 2026. Computational Biology MSc and PhD use 22 January 2027. The main-round timer uses the published 17:00 Gulf time.','https://mbzuai.ac.ae/study-artificial-intelligence',['2026-12-15T13:00:00Z']);
+timeline('kaust-master kaust-phd','Fall 2027 · Round 2','Round 2 opened 28 September 2026, closes 3 January 2027 and releases decisions 25 February 2027. Fall semester starts 29 August 2027. Applies to MS, MS/PhD and PhD.','https://admissions.kaust.edu.sa/how-to-apply/admission-timelines',['2027-01-03']);
+timeline('qatar-qu-international qatar-qu-talent','International dates pending','Qatar University lists Spring 2027 but says international application dates have yet to be determined. Talent and general awards may follow different submission schedules.','https://business.qu.edu.qa/en-us/students/admission/undergraduate/Pages/application-timeline.aspx');
+timeline('hku-presidential hku-pgs','HKU admission round','2027/28 main round: 1 September–1 December 2026. Clearing rounds end 30 April and 31 August 2027 at 23:59 Hong Kong time, subject to vacancies.','https://gradsch.hku.hk/prospective_students/application/application_period',['2026-12-01T15:59:00Z','2027-04-30T15:59:00Z','2027-08-31T15:59:00Z']);
+timeline('hku-hkpfs','RGC initial application','Submit the initial RGC application by noon Hong Kong time on 1 December 2026, then use the reference number for the separate HKU admission submission.','https://cerg1.ugc.edu.hk/hkpfs/apply.html',['2026-12-01T04:00:00Z']);
+timeline('brunei-foreign','Usual notice · Nov–Dec');
+timeline('my-sdckl-excellence-50 my-sdckl-excellence-20','After semester results');
+timeline('my-nilai-has-50 my-nilai-merit-25 my-nilai-application-2000','Nilai admission intake');
+timeline('my-sunway-taught-masters-50 my-sunway-professional-doctorate-50','Within 7 days of course start');
+timeline('my-curtin-pvc-50','Prior call · 20 Feb 2026');
+timeline('my-monash-continuing-high-achiever','Automatic semester assessment');
+timeline('my-monash-new-high-achiever my-monash-female-engineering my-monash-research-pathway','Course admission deadline');
+timeline('my-monash-pharmacy-excellence','Published annual day · 31 Jan');
+timeline('my-monash-ai-bursary','Intakes through Oct 2027');
+timeline('my-monash-health-bursary','Through Semester 1, 2027');
+timeline('my-klust-progression-50 my-klust-progression-5000','Mar/Apr · Jun/Jul · Nov/Dec');
+timeline('it-padua-excellence-ba it-padua-excellence-ma it-padua-fee-waiver','First admission call · 15 Sep','Padua opened the first 2027/28 admission call for most programmes on 15 September 2026. The specific degree’s admission call sets its closing date and award eligibility.','https://www.unipd.it/en/ammissione-studenti-internazionali');
+timeline('it-padua-regional','Prior call · 30 Sep 2026');
+timeline('it-cafoscari-honours-ba it-cafoscari-honours-ma','2027/28 award call','The 2027/28 award is listed for eligible first-year students. Apply for degree admission and separately follow the Honours call and its deadlines.','https://www.unive.it/pag/19545');
+timeline('it-cafoscari-college-ba it-cafoscari-college-ma','College and degree dates','Submit the degree application on the university portal first, then answer the separate International College call at the chosen level.','https://www.unive.it/pag/19545');
+timeline('it-maeci-master','2026/27 call closed');
+timeline('lt-vu-masters-fee','Prior call · 1 Apr 2026');
+timeline('lt-vu-political-ma','Published day · 15 May');
+timeline('lt-vu-political-ba lt-vu-feba-admission','Vilnius programme dates');
+timeline('lt-vtech-ba-full lt-vtech-ba-partial','2027/28 Bachelor award','Apply for an eligible degree and submit the scholarship application by 20 April 2027.','https://vilniustech.lt/en/international-students/full-time-students/scholarships/',['2027-04-20']);
+timeline('daad-helmut','DAAD annual intake','Choose an eligible public-policy master’s course and follow the DAAD application instructions and host submission timetable.','https://www.daad.de/en/studying-in-germany/scholarships/daad-funding-programmes/helmut-schmidt-programme/');
+timeline('nl-scholarship','Institution deadline','The 2026/27 call opened 1 November 2025. Participating institutions publish individual closing dates and application instructions.','https://studyinnl.org/finances/nl-scholarship');
+timeline('adb-jsp','Host deadline · allow 6 months','ADB recommends submitting at least six months before the planned start. The partner institution sets the actual intake and deadline.','https://www.adb.org/work-with-us/careers/japan-scholarship-program/faq');
+timeline('it-maeci-master','Prior call · 26 Mar 2026','The 2026/27 MAECI call closed 26 March 2026. The next call determines eligible countries, documents and submission dates.','https://studyinitaly.esteri.it/');
+timeline('lt-vu-masters-fee','Prior call · 1 Apr 2026','The 2026 waiver deadline was 1 April. Vilnius University scheduled its award list by 15 May 2026.','https://www.vu.lt/en/students/services-for-students/finance/tuition-fee-waiver-for-full-time-master-degree-studies');
+timeline('my-curtin-pvc-50','Prior call · 20 Feb 2026','The published round opened 19 January and closed 20 February 2026. It applies to that cycle.','https://curtin.edu.my/study/scholarships/internal-scholarships/pro-vice-chancellor-international-scholarship/');
+function scholarshipTimeline(p){
+ return timelines.get(p.id)||{label:'Provider schedule',dates:[]};
+}
+function deadlineStatus(date,now){
+ if(date.length===10){
+  const today=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
+  const days=Math.round((Date.parse(date)-today)/86400000);
+  return days<0?'Closed':days===0?'Closes today':days+'d left';
+ }
+ const seconds=Math.floor((Date.parse(date)-now)/1000);
+ if(seconds<0)return 'Closed';
+ return Math.floor(seconds/86400)+'d '+Math.floor(seconds/3600)%24+'h '+Math.floor(seconds/60)%60+'m '+seconds%60+'s';
+}
+function nextClosing(dates,now){
+ return dates.find(date=>deadlineStatus(date,now)!=='Closed');
+}
+function timelineBadge(label,dates,now){
+ const date=nextClosing(dates,now);
+ return date ? label+' · '+deadlineStatus(date,now) : label+(dates.length?' · Closed':'');
+}
+function cardDeadline(p){
+ const {label,note,dates}=scholarshipTimeline(p);
+ return '<span class="an-card-deadline" data-timeline-id="'+esc(p.id)+'" title="'+esc(note||p.deadline)+'">'+esc(timelineBadge(label,dates,new Date()))+'</span>';
+}
+function timelineDetail(p){
+ const {label,note,source,dates}=scholarshipTimeline(p);
+ return '<section class="an-scholarship-datecard"><span>Application timeline</span><h3>'+esc(label)+'</h3><p>'+esc(note||p.deadline)+'</p>'+
+ (dates.length?cardDeadline(p).replace('class="an-card-deadline"','class="an-profile-deadline"'):'')+
+ '<p><a href="'+esc(safeUrl(source||p.source))+'" target="_blank" rel="noopener noreferrer">Official timeline and application instructions ↗</a></p></section>';
+}
+let directoryTimer;
+function mountDirectoryDeadlines(){
+ clearInterval(directoryTimer);
+ const badges=[...document.querySelectorAll('[data-timeline-id]')].map(el=>({el,...timelines.get(el.dataset.timelineId)})).filter(x=>x.dates?.length);
+ const next=document.querySelector('.an-next-scholarship-deadline');
+ if(!badges.length&&!next)return;
+ function update(){
+  const now=new Date();
+  for(const {el,label,dates} of badges){
+   const status=timelineBadge(label,dates,now);
+   if(el.textContent!==status)el.textContent=status;
+  }
+  if(!next)return;
+  let upcoming;
+  for(const p of items){
+   const date=nextClosing(scholarshipTimeline(p).dates,now);
+   if(date&&(!upcoming||Date.parse(date)<Date.parse(upcoming.date)))upcoming={p,date};
+  }
+  const label=upcoming?'Next · '+deadlineStatus(upcoming.date,now):'No upcoming date listed';
+  if(next.textContent!==label)next.textContent=label;
+  if(upcoming){
+   next.href='#/scholarship/'+encodeURIComponent(upcoming.p.id);
+   next.title=upcoming.p.name+' · '+scholarshipTimeline(upcoming.p).label;
+  }else next.removeAttribute('href');
+ }
+ update();
+ directoryTimer=setInterval(update,1000);
+}
 function card(p,i){
  let desc=p.coverage.length>120?p.coverage.slice(0,117).replace(/\s+\S*$/,'')+'…':p.coverage;
  const initials=p.name.split(/[ \-·]/).filter(x=>/[A-Za-z]/.test(x)).slice(0,3).map(x=>x[0]).join('').toUpperCase();
- return '<article class="an-scholarship-card"><div class="an-scholarship-cover">'+coverPhoto(p,'an-scholarship-cover-photo')+'<div class="an-scholarship-cover-top"><span class="an-scholarship-number">'+String(i+1).padStart(3,'0')+' / '+items.length+'</span><span class="an-scholarship-country">'+flagPhoto(p)+esc(p.country)+'</span></div><span class="an-scholarship-glyph" aria-hidden="true">'+esc(initials)+'</span></div><div class="an-scholarship-body"><small class="an-scholarship-level">'+esc(p.level)+'</small><h3>'+esc(p.name)+'</h3><div class="an-scholarship-money"><strong>'+esc(amountText(p))+'</strong><small>'+esc(approx(p))+'</small></div><p class="an-scholarship-desc">'+esc(desc)+'</p><div class="an-scholarship-actions"><a href="#/scholarship/'+esc(p.id)+'">View full funding & requirements ↗</a><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Official application ↗</a></div></div></article>';
+ return '<article class="an-scholarship-card"><div class="an-scholarship-cover">'+coverPhoto(p,'an-scholarship-cover-photo')+'<div class="an-scholarship-cover-top"><span class="an-scholarship-number">'+String(i+1).padStart(3,'0')+' / '+items.length+'</span><span class="an-scholarship-country">'+flagPhoto(p)+esc(p.country)+'</span>'+cardDeadline(p)+'</div><span class="an-scholarship-glyph" aria-hidden="true">'+esc(initials)+'</span></div><div class="an-scholarship-body"><small class="an-scholarship-level">'+esc(p.level)+'</small><h3>'+esc(p.name)+'</h3><div class="an-scholarship-money"><strong>'+esc(amountText(p))+'</strong><small>'+esc(approx(p))+'</small></div><p class="an-scholarship-desc">'+esc(desc)+'</p><div class="an-scholarship-actions"><a href="#/scholarship/'+esc(p.id)+'">View full funding & requirements ↗</a><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Official application ↗</a></div></div></article>';
 }
 
 function featureCard(p){
@@ -167,7 +289,7 @@ function listPage(){
  const countries=['All destinations',...new Set(items.map(p=>p.country))].sort((a,b)=>a==='All destinations'?-1:b==='All destinations'?1:a.localeCompare(b));
  const degrees=['All degrees','Bachelor','Master','PhD','Research','Professional','Exchange','Training'];
  const featured=['erasmus-mundus','daad-epos-masters','hungary-masters','turkiye-ma'].map(id=>items.find(p=>p.id===id)).filter(Boolean);
- return '<section class="an-scholarship-head"><div class="wrap"><div class="an-scholarship-head-inner"><div><span class="an-eyebrow">A&N Overseas · Funding Library</span><h1>Explore <span>Global Scholarships</span></h1></div><span class="an-scholarship-total">🎓 '+items.length+' Scholarship Pathways</span></div></div></section>'+
+ return '<section class="an-scholarship-head"><div class="wrap"><div class="an-scholarship-head-inner"><div><span class="an-eyebrow">A&N Overseas · Funding Library</span><h1>Explore <span>Global Scholarships</span></h1></div><span class="an-scholarship-total">🎓 '+items.length+' Scholarship Pathways<a class="an-next-scholarship-deadline"></a></span></div></div></section>'+
  '<main class="wrap content an-scholarship-directory">'+
  '<div class="an-scholarship-filters"><label>SEARCH FUNDING / COUNTRY<input id="an-scholarship-search" type="search" autocomplete="off" placeholder="e.g. DAAD, PhD, Erasmus, Japan…" value="'+esc(filters.search)+'"></label><label>DESTINATION<select id="an-scholarship-country">'+countries.map(c=>'<option'+(filters.country===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></label><label>DEGREE LEVEL<select id="an-scholarship-level">'+degrees.map(x=>'<option'+(filters.level===x?' selected':'')+'>'+esc(x)+'</option>').join('')+'</select></label></div>'+
  '<div class="an-scholarship-content-scroll" tabindex="0" role="region" aria-label="Scroll featured and all scholarship cards">'+
@@ -191,6 +313,7 @@ function refreshList(){
  }
  const counter=document.getElementById('an-scholarship-count');
  if(counter)counter.textContent='Showing '+eligible.length+' of '+items.length+' funding pathways · '+global.length+' international / research · '+merit.length+' merit / intake / semester';
+ mountDirectoryDeadlines();
 }
 
 function highlightScholarshipFacts(value){
@@ -223,24 +346,6 @@ function countryGuideHtml(p){
  if(!x)return '';
  return '<section class="an-scholarship-section an-scholarship-section-full"><h2><span>✈</span> · Country-specific visa, spouse, work & settlement</h2><p>'+esc(x.text)+'</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(x.url))+'" target="_blank" rel="noopener noreferrer">Official immigration / student guidance ↗</a></div></section>';
 }
-function genericDeadline(p){
- if(!p.deadlineISO||!/^\d{4}-\d{2}-\d{2}$/.test(p.deadlineISO))return '';
- return '<section class="an-scholarship-datecard"><span>📅 Published scholarship deadline</span><h3>'+esc(p.deadlineKind||'Application deadline')+'</h3><strong>'+esc(p.deadlineISO)+'</strong><b data-scholarship-date="'+esc(p.deadlineISO)+'">Checking date…</b><p>Closing time not published; calendar-day counter is based on the device clock, not a live provider feed.</p></section>';
-}
-let genericDeadlineTimer;
-function mountGenericDeadlines(){
- if(genericDeadlineTimer)clearInterval(genericDeadlineTimer);
- const tick=()=>{
-  for(const el of document.querySelectorAll('[data-scholarship-date]')){
-   const [y,m,d]=el.dataset.scholarshipDate.split('-').map(Number),now=new Date();
-   const days=Math.round((Date.UTC(y,m-1,d)-Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
-   el.textContent=days<0?'Listed intake deadline has passed':days===0?'Closing calendar date is TODAY':days+' calendar days remaining';
-   el.classList.toggle('an-expired',days<0);
-  }
- };
- if(document.querySelector('[data-scholarship-date]')){tick();genericDeadlineTimer=setInterval(tick,60000);}
-}
-
 /* Verified versus programme-dependent requirements are kept separate.
    Values not published by a provider are NEVER fabricated. */
 function detailPreparation(p){
@@ -266,7 +371,7 @@ function detailPreparation(p){
 
 /* Current official call examples: never turn an indicative round into a guaranteed open application. */
 function verifiedCallHtml(p){
- if(p.id==='erasmus-mundus')return '<section class="an-specific-guide"><h2>Verified Erasmus Mundus programme example: i-MESC 2027–2029</h2><div class="an-specific-grid"><article><h3>Course & universities</h3><p>i-MESC · interdisciplinary Materials for Energy Storage and Conversion. Four semesters, 120 ECTS, approximately 24 months. The five awarding partners and associated institutions are linked in the university cards below.</p><p><b>Funding:</b> EU EMJM scholarship €1,400/month for up to 24 months = maximum €33,600 for selected scholarship recipients; not every admission is funded.</p><p><a target="_blank" rel="noopener noreferrer" href="https://i-mesc.eu/for-students">Official award details ↗</a></p></article><article><h3>Application timeline — published indicative dates</h3><p><b>Indicative opening:</b> 9 November 2026, 14:00 Paris time. <span class="an-deadline-live" data-call-utc="2026-11-09T13:00:00Z">Checking live time…</span></p><p><b>Indicative closing:</b> 26 January 2027, 12:00 Paris time. <span class="an-deadline-live" data-call-utc="2027-01-26T11:00:00Z">Checking live time…</span></p><p>These dates are expressly described by the programme as indicative and must be reconfirmed when its portal opens.</p><p><a target="_blank" rel="noopener noreferrer" href="https://i-mesc.eu/application/admission-criteria">Official programme calendar ↗</a></p></article><article><h3>Language and supporting materials</h3><p><span class="an-moi-badge">MOI accepted for qualifying English-medium previous study</span> Submit an official university-issued English Medium of Instruction certificate when the programme’s exemption criteria are met. Otherwise IELTS/TOEFL or another listed accepted test is required.</p><p>Mandatory i-MESC documents: copy of passport/ID, separate proof of residence (a bill, bank statement or valid certificate, NOT your ID card), university-stamped transcripts with certified English translations, <b>Europass CV maximum TWO pages</b>, <b>TWO referee letters using the required i-MESC template</b>, an English-medium university certificate if claiming the MOI waiver, and a <b>self-presentation and motivation VIDEO maximum TWO minutes and 200 MB (AVI, MOV, MP4)</b>. If a standard test is used instead of MOI: <b>IELTS 6.5, TOEFL iBT 87, Cambridge B2 First or CEFR B2</b> according to the programme list. Use the official upload form for actual file-size limits; a universal passport-page count or photo pixel size is not stated.</p><p><a target="_blank" rel="noopener noreferrer" href="https://i-mesc.eu/application/student">i-MESC official document requirements ↗</a></p></article><article><h3>Submission steps</h3><ol><li>Visit the i-MESC official application page once the 2027–2029 call opens.</li><li>Choose the correct Class #23 intake; create the applicant account when the form becomes available.</li><li>Complete personal, academic, programme and language fields.</li><li>Upload the named documents and any video statement required by the live portal.</li><li>Review, submit before the published Paris-time deadline and keep the confirmation.</li></ol><p>No A&N website can submit directly to the consortium on your behalf without a formal official integration.</p></article></div></section>';
+ if(p.id==='erasmus-mundus')return '<section class="an-specific-guide"><h2>Verified Erasmus Mundus programme example: i-MESC 2027–2029</h2><div class="an-specific-grid"><article><h3>Course & universities</h3><p>i-MESC · interdisciplinary Materials for Energy Storage and Conversion. Four semesters, 120 ECTS, approximately 24 months. The five awarding partners and associated institutions are linked in the university cards below.</p><p><b>Funding:</b> EU EMJM scholarship €1,400/month for up to 24 months = maximum €33,600 for selected scholarship recipients; not every admission is funded.</p><p><a target="_blank" rel="noopener noreferrer" href="https://i-mesc.eu/for-students">Official award details ↗</a></p></article><article><h3>Application timeline — published indicative dates</h3><p><b>Indicative opening:</b> 9 November 2026, 14:00 Paris time. <span class="an-deadline-live" data-call-utc="2026-11-09T13:00:00Z">Checking live time…</span></p><p><b>Indicative closing:</b> 26 January 2027, 12:00 Paris time. <span class="an-deadline-live" data-call-utc="'+imescClosing+'">Checking live time…</span></p><p>These dates are expressly described by the programme as indicative and must be reconfirmed when its portal opens.</p><p><a target="_blank" rel="noopener noreferrer" href="https://i-mesc.eu/application/admission-criteria">Official programme calendar ↗</a></p></article><article><h3>Language and supporting materials</h3><p><span class="an-moi-badge">MOI accepted for qualifying English-medium previous study</span> Submit an official university-issued English Medium of Instruction certificate when the programme’s exemption criteria are met. Otherwise IELTS/TOEFL or another listed accepted test is required.</p><p>Mandatory i-MESC documents: copy of passport/ID, separate proof of residence (a bill, bank statement or valid certificate, NOT your ID card), university-stamped transcripts with certified English translations, <b>Europass CV maximum TWO pages</b>, <b>TWO referee letters using the required i-MESC template</b>, an English-medium university certificate if claiming the MOI waiver, and a <b>self-presentation and motivation VIDEO maximum TWO minutes and 200 MB (AVI, MOV, MP4)</b>. If a standard test is used instead of MOI: <b>IELTS 6.5, TOEFL iBT 87, Cambridge B2 First or CEFR B2</b> according to the programme list. Use the official upload form for actual file-size limits; a universal passport-page count or photo pixel size is not stated.</p><p><a target="_blank" rel="noopener noreferrer" href="https://i-mesc.eu/application/student">i-MESC official document requirements ↗</a></p></article><article><h3>Submission steps</h3><ol><li>Visit the i-MESC official application page once the 2027–2029 call opens.</li><li>Choose the correct Class #23 intake; create the applicant account when the form becomes available.</li><li>Complete personal, academic, programme and language fields.</li><li>Upload the named documents and any video statement required by the live portal.</li><li>Review, submit before the published Paris-time deadline and keep the confirmation.</li></ol><p>No A&N website can submit directly to the consortium on your behalf without a formal official integration.</p></article></div></section>';
  if(p.id.startsWith('hungary-'))return '<section class="an-specific-guide"><h2>Hungary — country-specific official submission route</h2><div class="an-specific-grid"><article><h3>Bangladesh sending partner</h3><p>Bangladesh nominates through the Secondary and Higher Education Division, Ministry of Education. The available study fields and programmes must be selected under Bangladesh in the official portal; nomination is required to continue.</p><p><a href="https://stipendiumhungaricum.hu/partners/www.ugc.gov.in/?partner=bangladesh" target="_blank" rel="noopener noreferrer">Official Bangladesh partner details ↗</a></p></article><article><h3>Official DreamApply steps & fee</h3><ol><li>Open the official application portal and create an account when the current call is published.</li><li>Select Bangladesh as the sending partner and your eligible Master/PhD programme(s).</li><li>Complete personal, education and language fields; upload all documents in the live portal checklist.</li><li>Submit the free online application and separately complete any Bangladesh sending-partner requirements.</li><li>Nomination, institutional assessment and admission follow according to official rules.</li></ol><p><b>Application fee:</b> The official online Stipendium Hungaricum application and admission examinations are free. A&N offers optional independent preparation help, not government nomination.</p><p><b>2027/28 deadline:</b> not confirmed by the official programme yet; do not use the expired 15 January 2026 date as the next deadline.</p><p><a href="https://stipendiumhungaricum.hu/apply/" target="_blank" rel="noopener noreferrer">Official guide and instructions ↗</a></p></article></div></section>';
  if(p.id.startsWith('turkiye-'))return '<section class="an-specific-guide"><h2>Türkiye Scholarships — official online timeline and criteria</h2><div class="an-specific-grid"><article><h3>Eligibility and annual dates</h3><p>Regular full-time scholarship applications are generally accepted <b>10 January – 20 February</b> each year. Do not describe the 2027 intake as currently open without its specific announcement. Minimum academic achievement: Bachelor 70%; Master/PhD 75%; health degree options 90%. Age limits: Bachelor under 21, Master under 30 and PhD under 35.</p><p><a href="https://www.turkiyeburslari.gov.tr/scholarshipsprograms" target="_blank" rel="noopener noreferrer">Official eligibility ↗</a> · <a href="https://turkiyeburslari.gov.tr/calendar" target="_blank" rel="noopener noreferrer">Official calendar ↗</a></p></article><article><h3>Where to submit</h3><ol><li>Open the Türkiye Scholarships TBBS system in the published application window.</li><li>Create your applicant profile and complete citizenship, academic history and contact data.</li><li>Choose eligible programmes shown for your qualifications.</li><li>Upload the required academic documents, photo, test certificates and other items as instructed by TBBS.</li><li>Review, submit and monitor interview and selection notices in the official account.</li></ol><p><a href="https://tbbs.turkiyeburslari.gov.tr/" target="_blank" rel="noopener noreferrer">Official TBBS application ↗</a></p></article></div></section>';
  return '';
@@ -309,7 +414,7 @@ function detailPage(id){
   const guide=window.ANEPOSGuide.render(p,bdt(p),name=>resolveUniversity(name));
   return '<main class="wrap an-scholarship-detail"><nav class="an-breadcrumb"><a href="#/home">Home</a> › <a href="#/scholarships">Scholarships</a> › '+esc(p.name)+'</nav>'+
    '<section class="an-scholarship-lead"><div class="an-scholarship-intro"><span class="an-type">🇩🇪 GERMANY · '+esc(p.level)+'</span><h1>'+esc(p.name)+'</h1><p>Government-funded DAAD EPOS scholarship for named development-related courses, with separate university application, exact academic prerequisites and verified programme-specific deadlines.</p><div class="an-scholarship-cta"><button type="button" data-epos-jump>Read Full A–Z Guide ↓</button><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Official DAAD award ↗</a></div></div><aside class="an-scholarship-amount-panel"><small>DAAD Monthly Award</small><strong>'+esc(amountText(p))+'</strong><small>Approximate BDT equivalent</small><em>'+esc(conv)+'</em><p style="color:#e5d4bc;font-size:12px">Only a planning currency conversion. Tuition, insurance, rent and travel are separately itemised below.</p></aside></section>'+
-   guide+detailPreparation(p)+verifiedCallHtml(p)+scholarshipSupportCard(p)+'<div class="an-scholarship-cta"><a href="#/scholarships">← Back to all scholarships</a></div></main>';
+   timelineDetail(p)+guide+detailPreparation(p)+verifiedCallHtml(p)+scholarshipSupportCard(p)+'<div class="an-scholarship-cta"><a href="#/scholarships">← Back to all scholarships</a></div></main>';
  }
  const sections=[
  ['Scholarship & financial coverage',p.coverage],
@@ -325,13 +430,14 @@ function detailPage(id){
  ['Student work permissions',p.work],
  ['Post-study stay, PR & return duties',p.post]
  ];
- return '<main class="wrap an-scholarship-detail"><div class="an-breadcrumb"><a href="#/home">Home</a> › <a href="#/scholarships">Scholarships</a> › '+esc(p.name)+'</div><div class="an-scholarship-lead"><div class="an-scholarship-intro"><span class="an-type">'+flagCountry(p.country)+' '+esc(p.country)+' · '+esc(p.level)+'</span><h1>'+esc(p.name)+'</h1><p>'+esc(p.coverage)+'</p><p>Last source review: '+esc(p.updated)+' · Bangladesh-oriented application guidance</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Apply at official provider ↗</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Scholarship official details ↗</a></div></div><aside class="an-scholarship-amount-panel"><small>Funding in original currency</small><strong>'+esc(amountText(p))+'</strong><small>Indicative Bangladesh taka conversion</small><em>'+esc(conv)+'</em><p style="line-height:1.6;font-size:11px;color:#dcc7b9;margin-top:15px">Currency figures are not an offer and do not include unfunded tuition, travel, visa or living-cost differences. <a href="'+BANK+'" target="_blank" rel="noopener noreferrer" style="color:#ffd097">FX reference ↗</a></p></aside></div>'+genericDeadline(p)+'<div class="an-scholarship-section-grid">'+sections.map((item,i)=>section(i+1,item[0],item[1])).join('')+'</div>'+countryGuideHtml(p)+'<section class="an-scholarship-universities"><h2>Universities & eligible programmes</h2><p style="font-size:12px;color:#c7c9cd;line-height:1.65">'+esc(p.hostNote)+'</p>'+hostCards(p)+'</section><section class="an-scholarship-section an-scholarship-section-full"><h2><span>13</span> · Official sources, application & reliability</h2><p>Scholarship operator: '+esc(p.name)+'\nApplication window and amounts are subject to the current annual call. Some awards require separate university admission, nomination or an embassy route. A&N can guide preparation but cannot submit an official award decision or guarantee scholarship, visa, family residence or PR.</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Open official application ↗</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Read official award & document list ↗</a><a href="#/scholarships">← All scholarship cards</a></div></section>'+detailPreparation(p)+verifiedCallHtml(p)+scholarshipSupportCard(p)+'</main>';
+ return '<main class="wrap an-scholarship-detail"><div class="an-breadcrumb"><a href="#/home">Home</a> › <a href="#/scholarships">Scholarships</a> › '+esc(p.name)+'</div><div class="an-scholarship-lead"><div class="an-scholarship-intro"><span class="an-type">'+flagCountry(p.country)+' '+esc(p.country)+' · '+esc(p.level)+'</span><h1>'+esc(p.name)+'</h1><p>'+esc(p.coverage)+'</p><p>Last source review: '+esc(p.updated)+' · Bangladesh-oriented application guidance</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Apply at official provider ↗</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Scholarship official details ↗</a></div></div><aside class="an-scholarship-amount-panel"><small>Funding in original currency</small><strong>'+esc(amountText(p))+'</strong><small>Indicative Bangladesh taka conversion</small><em>'+esc(conv)+'</em><p style="line-height:1.6;font-size:11px;color:#dcc7b9;margin-top:15px">Currency figures are not an offer and do not include unfunded tuition, travel, visa or living-cost differences. <a href="'+BANK+'" target="_blank" rel="noopener noreferrer" style="color:#ffd097">FX reference ↗</a></p></aside></div>'+timelineDetail(p)+'<div class="an-scholarship-section-grid">'+sections.map((item,i)=>section(i+1,item[0],item[1])).join('')+'</div>'+countryGuideHtml(p)+'<section class="an-scholarship-universities"><h2>Universities & eligible programmes</h2><p style="font-size:12px;color:#c7c9cd;line-height:1.65">'+esc(p.hostNote)+'</p>'+hostCards(p)+'</section><section class="an-scholarship-section an-scholarship-section-full"><h2><span>13</span> · Official sources, application & reliability</h2><p>Scholarship operator: '+esc(p.name)+'\nApplication window and amounts are subject to the current annual call. Some awards require separate university admission, nomination or an embassy route. A&N can guide preparation but cannot submit an official award decision or guarantee scholarship, visa, family residence or PR.</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Open official application ↗</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Read official award & document list ↗</a><a href="#/scholarships">← All scholarship cards</a></div></section>'+detailPreparation(p)+verifiedCallHtml(p)+scholarshipSupportCard(p)+'</main>';
 }
 function onRender(page,second){
+ if(page!=='scholarships')clearInterval(directoryTimer);
  if(page==='scholarships'){refreshList();}
  if(page==='scholarship'){
   const p=items.find(x=>x.id===second);if(p)document.title=p.name+' | A&N Scholarships';
-  window.ANEPOSGuide?.mount?.();mountGenericDeadlines();mountSpecificTimers();
+  window.ANEPOSGuide?.mount?.();mountDirectoryDeadlines();mountSpecificTimers();
  }
  if(page==='university'){
   const u=getUniList().find(x=>x.id===second);

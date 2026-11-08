@@ -273,3 +273,84 @@
 .an-feature-scholarship:before{z-index:1!important}
 .an-feature-main,.an-feature-arrow{position:relative;z-index:2!important}
 .an-feature-arrow{position:absolute}
+
+/* Funding directory controls, featured contrast and card deadlines. */
+.an-scholarship-head-inner .an-next-scholarship-deadline{
+ display:block;background:#15100d;color:#fff;border:1px solid #ff8a35;
+ border-radius:6px;padding:3px 5px;text-align:center;text-decoration:none;line-height:1.2
+}
+.an-scholarship-directory .an-feature-scholarship{
+ background:#14100e!important;border-color:#ff8a35!important
+}
+.an-scholarship-directory .an-feature-photo{opacity:.57!important}
+.an-scholarship-directory .an-feature-scholarship::before{
+ background:linear-gradient(180deg,#0a080578,#0b0908ed 90%)!important
+}
+.an-scholarship-directory .an-feature-main strong{color:#fff!important}
+.an-scholarship-directory .an-feature-tag,
+.an-scholarship-directory .an-feature-main small,
+.an-scholarship-directory .an-feature-arrow,
+.an-scholarship-directory .an-scholarship-rail-eyebrow{color:#ff9b51!important}
+.an-scholarship-directory .an-feature-arrow{background:#15100d!important;border-color:#ff8a35!important}
+.an-card-deadline{
+ position:absolute;right:0;top:calc(100% + 3px);max-width:100%;padding:2px 5px;
+ color:#fff;background:#15100d;border:1px solid #ff8a35;border-radius:5px;
+ font-size:clamp(8px,1vw,10px);font-weight:700;line-height:1.15;text-align:right;
+ font-variant-numeric:tabular-nums;z-index:1;white-space:nowrap
+}
+@media(min-width:1050px){
+ body.an-scholarships-mode #app>.an-scholarship-head{padding:2px 0!important}
+ body.an-scholarships-mode #app>.an-scholarship-head .an-scholarship-head-inner{min-height:42px!important;gap:8px!important}
+ body.an-scholarships-mode #app .an-scholarship-head-inner h1{font-size:clamp(19px,1.7vw,27px)!important}
+ body.an-scholarships-mode #app .an-scholarship-head-inner .an-scholarship-total{
+  display:flex!important;min-width:130px!important;padding:3px 5px!important;
+  font-size:9px!important;line-height:1.1!important;background:#17110e!important;gap:2px!important
+ }
+ body.an-scholarships-mode #app .an-scholarship-head-inner .an-scholarship-filters{
+  grid-template-columns:minmax(128px,1.2fr) repeat(3,minmax(104px,1fr))!important;
+  gap:6px!important;margin:0!important
+ }
+ body.an-scholarships-mode #app .an-scholarship-head-inner .an-scholarship-filters label{
+  color:#ff9b51!important;gap:0!important
+ }
+ body.an-scholarships-mode #app .an-scholarship-head-inner .an-scholarship-filters :is(input,select){
+  height:26px!important;min-height:26px!important;padding:2px 7px!important;margin-top:2px!important;
+  border:1px solid #b86234!important;border-radius:6px!important;background:#14110f!important;
+  color:#fff!important;color-scheme:dark
+ }
+ body.an-scholarships-mode #app .an-scholarship-filters select{cursor:pointer}
+ body.an-scholarships-mode #app .an-scholarship-filters input::placeholder{color:#eae3df}
+ body.an-scholarships-mode #app .an-scholarship-filters :is(input,select):focus-visible{outline:2px solid #ff9b51;outline-offset:1px}
+ body.an-scholarships-mode #app>.an-scholarship-directory{padding-top:2px!important}
+ body.an-scholarships-mode #app .an-feature-scholarship{min-height:70px!important;padding:6px 8px!important}
+ body.an-scholarships-mode #app .an-scholarship-about,
+ body.an-scholarships-mode #app .an-scholarship-meta,
+ body.an-scholarships-mode #app .an-scholarship-rail-section{margin-top:3px!important}
+ body.an-scholarships-mode #app .an-scholarship-rail-header{margin:0 0 2px!important;padding-bottom:2px!important}
+}
+@media(max-width:430px){
+ .an-card-deadline{max-width:100%;white-space:normal}
+}
+@media(min-width:1050px){
+ .an-scholarship-head-inner .an-scholarship-filters label{position:relative}
+ .an-scholarship-head-inner .an-scholarship-filters label::after{
+  content:"";position:absolute;left:8px;bottom:7px;width:12px;height:12px;
+  background:#ff9b51;mask:var(--an-filter-icon) center/contain no-repeat;pointer-events:none
+ }
+ body.an-scholarships-mode #app .an-scholarship-head-inner .an-scholarship-filters :is(input,select){padding-left:25px!important}
+ .an-scholarship-filters label:nth-child(1){--an-filter-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.6'%3E%3Ccircle cx='7' cy='7' r='4.5'/%3E%3Cpath d='m10.4 10.4 3.6 3.6'/%3E%3C/svg%3E")}
+ .an-scholarship-filters label:nth-child(2){--an-filter-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5'%3E%3Ccircle cx='8' cy='8' r='6'/%3E%3Cellipse cx='8' cy='8' rx='2.8' ry='6'/%3E%3Cpath d='M2 8h12'/%3E%3C/svg%3E")}
+ .an-scholarship-filters label:nth-child(3){--an-filter-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.4'%3E%3Cpath d='m1 6 7-3 7 3-7 3-7-3Zm3 2v4l4 1.5 4-1.5V8m3-2v5'/%3E%3C/svg%3E")}
+ .an-scholarship-filters label:nth-child(4){--an-filter-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5'%3E%3Cpath d='M3 4h10M3 8h10M3 12h10'/%3E%3C/svg%3E")}
+}
+@media(max-width:800px){
+ body.an-scholarships-mode .an-scholarship-filters label,
+ body.an-scholarships-mode .an-scholarship-money strong{color:#ff9b51!important}
+ body.an-scholarships-mode .an-scholarship-filters :is(input,select),
+ body.an-scholarships-mode .an-scholarship-total{background:#14110f!important;border-color:#b86234!important;color:#fff!important}
+ body.an-scholarships-mode .an-scholarship-filters input::placeholder{color:#eae3df}
+}
+
+/* Keep long timeline labels within the existing cover dimensions. */
+.an-card-deadline{max-width:75%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.an-profile-deadline{display:inline-block;color:#fff;background:#18100d;border:1px solid #ff8a35;padding:4px 8px;border-radius:6px;font-variant-numeric:tabular-nums}

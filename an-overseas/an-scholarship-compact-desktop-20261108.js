@@ -36,7 +36,15 @@ body:has(.an-scholarship-head) .an-scholarship-head{position:sticky!important;to
 const desktopGapFix="\n/* an-scholarship-desktop-gap-fix-v2: keep heading directly under ticker,\n   compact controls without clipping option labels, preserve mobile layout. */\n@media(min-width:1050px){\n body:has(.an-scholarship-head) .an-scholarship-head{margin-block:0!important;transform:none!important}\n body:has(.an-scholarship-head) .an-scholarship-head-inner{min-height:46px!important;gap:8px!important}\n body:has(.an-scholarship-head) .an-scholarship-directory.content{padding-top:2px!important}\n body:has(.an-scholarship-head) .an-scholarship-filters{margin-block:0!important}\n body:has(.an-scholarship-head) .an-scholarship-filters select,\n body:has(.an-scholarship-head) .an-scholarship-filters input{box-sizing:border-box!important;text-overflow:ellipsis!important;min-width:0!important}\n body:has(.an-scholarship-head) .an-scholarship-meta{margin:5px 0 7px!important}\n body:has(.an-scholarship-head) .an-scholarship-about{margin-top:5px!important}\n body:has(.an-scholarship-head) .an-scholarship-scroll-region{scroll-margin-top:125px}\n}\n";
 const style=document.createElement('style');style.id='an-scholarship-compact-desktop-style';style.textContent=css+desktopGapFix+"\n@media(min-width:1050px){\nbody:has(.an-scholarship-head) main,body:has(.an-scholarship-head) #app{min-height:0!important}\nbody:has(.an-scholarship-head) .an-scholarship-head{position:relative!important;top:auto!important;z-index:5!important;padding:3px 0!important}\nbody:has(.an-scholarship-head) .an-scholarship-head-inner{min-height:48px!important;align-items:center!important}\nbody:has(.an-scholarship-head) .an-scholarship-directory{padding-top:2px!important}\nbody:has(.an-scholarship-head) .an-feature-grid{margin-top:0!important}\nbody:has(.an-scholarship-head) .an-scholarship-filters input,\nbody:has(.an-scholarship-head) .an-scholarship-filters select{min-height:32px!important;height:32px!important}\n}\n";document.head.appendChild(style);
 function arrange(){
- if(window.innerWidth<1050)return;
+ if(window.innerWidth<1050){
+  const directory=document.querySelector('.an-scholarship-directory');
+  const moved=document.querySelector('.an-scholarship-head-inner .an-scholarship-filters');
+  if(directory&&moved){
+   moved.querySelector('.an-section-selector')?.remove();
+   directory.prepend(moved);
+  }
+  return;
+ }
  const head=document.querySelector('.an-scholarship-head-inner');
  const filters=document.querySelector('.an-scholarship-directory > .an-scholarship-filters');
  if(!head||!filters||filters.parentElement===head)return;
@@ -51,30 +59,11 @@ function addFourth(){
  const filters=document.querySelector('.an-scholarship-head-inner .an-scholarship-filters');if(!filters||filters.querySelector('.an-section-selector'))return;
  const label=document.createElement('label');label.className='an-section-selector';label.textContent='PAGE SECTIONS';
  const select=document.createElement('select');select.setAttribute('aria-label','Jump to scholarship section');
- [['','Choose section'],['.an-feature-grid','Featured awards'],['.an-scholarship-meta','All funding pathways'],['.an-scholarship-scroll-region','Funding categories']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;select.appendChild(o)});
- select.addEventListener('change',()=>{const target=document.querySelector(select.value);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});select.value='';});label.appendChild(select);filters.appendChild(label);
+ [['','Choose section'],['.an-feature-grid','Featured awards'],['.an-scholarship-meta','All funding pathways'],['#an-global-rail','International funding'],['#an-merit-rail','Intake & merit']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;select.appendChild(o)});
+ select.addEventListener('change',()=>{const target=select.value&&document.querySelector(select.value);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});select.value='';});label.appendChild(select);filters.appendChild(label);
 }
 function syncSticky(){const top=document.querySelector('.top'),ticker=document.querySelector('.ticker');document.documentElement.style.setProperty('--an-top-height',(top?.getBoundingClientRect().height||65)+'px');document.documentElement.style.setProperty('--an-ticker-height',(ticker?.getBoundingClientRect().height||32)+'px')}
-window.addEventListener('resize',()=>{syncSticky();arrange();addFourth()});syncSticky();addFourth();
-function countdown(){
- const host=document.querySelector('.an-scholarship-head-inner .an-scholarship-total');
- if(!host)return;
- let widget=host.querySelector('.an-next-scholarship-deadline');
- if(!widget){widget=document.createElement('a');widget.className='an-next-scholarship-deadline';widget.style.cssText='display:block;color:#fff;background:#1b100c;border:1px solid #ffcc65;border-radius:6px;padding:3px 7px;text-decoration:none;text-align:center;font-size:10px;max-width:210px;white-space:normal;line-height:1.25';host.appendChild(widget);}
- const entries=(window.ANScholarships?.items||[]).filter(p=>/^\\d{4}-\\d{2}-\\d{2}$/.test(p.deadlineISO||'')).map(p=>({p,day:new Date(p.deadlineISO+'T00:00:00')})).filter(x=>!Number.isNaN(x.day.getTime()));
- const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
- const future=entries.filter(x=>x.day>=today).sort((a,b)=>a.day-b.day);
- if(!future.length){widget.textContent='Next verified deadline: awaiting official dates';widget.removeAttribute('href');widget.style.cursor='default';return;}
- const item=future[0],days=Math.round((item.day-today)/86400000);
- const name=item.p.short||item.p.abbr||item.p.name;
- widget.textContent='⏳ '+name+' · '+(days===0?'Deadline date TODAY':days+' calendar day'+(days===1?'':'s')+' left')+' · '+item.p.deadlineISO;
- widget.href='#/scholarship/'+encodeURIComponent(item.p.id);
- widget.title='Open scholarship details; exact closing time and timezone must be verified with the provider';
-}
-setInterval(countdown,60000);
-new MutationObserver(()=>{if(document.querySelector('.an-scholarship-head-inner .an-scholarship-total:not(:has(.an-next-scholarship-deadline))'))countdown()}).observe(document.body,{childList:true,subtree:true});
-countdown();
-
+window.addEventListener('resize',()=>{syncSticky();arrange();addFourth()});syncSticky();arrange();addFourth();
 /* Mobile-only scholarship compact layout; desktop styles untouched. */
 const mobileCSS=`
 @media(max-width:800px){
