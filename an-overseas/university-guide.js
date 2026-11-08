@@ -94,7 +94,9 @@ const utmFees='https://admission.utm.my/programme-fees-ug-international/';
 const amcCourses='https://amc.edu.my/programmes/';
 const amcCalendar='https://amc.edu.my/wp-content/uploads/2026/02/Master-Academic-Calendar-2026-2027-Degree-Updated.pdf';
 const amcRegister='https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=447';
-const amcRegistration='https://amc.edu.my/crm/onlineForms/diploma_programmes.php';
+const amcMbaFees='https://amc.edu.my/wp-content/uploads/2025/08/MBA-Prospectus-2.pdf';
+const amcDbaFees='https://amc.edu.my/wp-content/uploads/2026/01/DBA-Prospectus.pdf';
+const amcMaccFees='https://amc.edu.my/wp-content/uploads/2025/10/MAcc-Prospectus-edition-4.pdf';
 const verifiedCardFacts={
  utm:{
   ranking:['#158','QS World · Asia #25 (2027)','https://civil.utm.my/utm-rises-to-the-top-25-in-qs-world-university-rankings-asia-2027/'],
@@ -104,7 +106,7 @@ const verifiedCardFacts={
  },
  amc:{
   programmes:['27','Academic catalogue listings',amcCourses],
-  tuition:['Tuition not verified','Degree registration: RM 500',amcRegistration],
+  tuition:['RM 24,000','Full international MBA · before SST',amcMbaFees],
   intake:['25 January 2027','Degree semester start',amcCalendar]
  },
  amu:{
@@ -169,7 +171,7 @@ setInterval(()=>{
 },1000);
 const factNotes={
  utm:{fees:'The Engineering example is RM 75,000 for the full degree: RM 14,758 for semester 1 and RM 60,242 combined for semesters 2–8. Accommodation is separate.',programmes:'UTM lists 44 international bachelor programmes across its catalogue. Its February table shows Civil Engineering and three Malaysia–Japan International Institute of Technology programmes open: Electronic Systems Engineering, Mechanical Precision Engineering and Chemical Process Engineering.',entry:'International bachelor applications for February 2027 run from 1 November to 31 December 2026. The countdown uses the end of the published deadline day in Malaysia time.',ranking:'UTM is #158 globally and #25 in Asia in the QS 2027 editions. The 2026 QS subject results put UTM first in Malaysia for Civil & Structural Engineering, Chemical Engineering, Mineral & Mining Engineering, and Architecture / Built Environment.'},
- amc:{fees:'AMC publishes a registration charge of RM 500 for degree, master’s and doctoral programmes, and RM 300 for foundation and diploma. These are separate from tuition. A full international tuition figure was not verified in the published materials reviewed.',programmes:'The catalogue lists 1 foundation, 12 diplomas, 8 bachelor’s, 4 master’s and 2 doctoral programmes.',entry:'The degree calendar shows teaching week 1 beginning 25 January 2027. This is a semester start date. Business Management lists January, June and September as intake months. An application cutoff was not verified.'},
+ amc:{fees:'AMC’s international MBA example is RM 24,000 tuition before RM 1,440 SST. Add RM 1,500 registration, RM 4,500 assessment and RM 1,000 facilities for the published RM 32,440 total.',programmes:'The catalogue lists 1 foundation, 12 diplomas, 8 bachelor’s, 4 master’s and 2 doctoral programmes.',entry:'The degree calendar shows teaching week 1 beginning 25 January 2027. This is a semester start date. Business Management lists January, June and September as intake months. An application cutoff was not verified.'},
  um:{fees:'RM 98,097 is the rounded arithmetic mean of 74 full-degree tuition amounts in UM’s 2025/26 international bachelor fee schedule. Higher-priced clinical degrees, including medicine and dentistry, raise the average. Check your programme’s fee and any separately stated taxes and charges.',programmes:'UM lists 80 bachelor’s programmes for 2026/27. The number covers the academic session across the university. March availability varies by programme.',entry:'The March 2027 international undergraduate application deadline is 30 January 2027. UM publishes a calendar date. The site countdown uses the end of that day in Malaysia time.'},
  usm:{fees:'USD 16,000 is the full international tuition published for the Bachelor of Management with Honours. USM lists USD 2,285.71 per semester and separate recurring charges.'},
  ukm:{fees:'RM 19,050 is first-year international BBA tuition in the 2024/25 UKMi schedule, calculated as RM 10,650 + RM 8,400. The schedule lists the RM 2,520 registration charge separately.'},
@@ -200,7 +202,8 @@ const profileData=(u,p={})=>{
   housing:'AMC lists student accommodation with bedrooms, shared living space and kitchen facilities.',
   housingSource:'https://amc.edu.my/facilities/',
   programs:['Foundation in Arts','Diploma in Accounting','Diploma in Business Administration','Diploma in Digital Marketing','Diploma in Hotel Management','Diploma in Hotel Management (Work-Based Learning)','Diploma in Computer Science','Diploma in Information Technology','Diploma in Digital Creative Design','Diploma in Digital Media Content','Diploma in e-Governance','Diploma in Law Enforcement','Diploma in Policing and Investigation','Bachelor in Accounting (Honours)','Bachelor of Business Administration (Honours)','Bachelor in Business Management (Honours)','Bachelor in Digital Marketing (Honours)','Bachelor in Hospitality Management (Honours)','Bachelor in Computer Science (Honours)','Bachelor in Information Technology (Honours)','Bachelor in Corporate Governance (Honours)','Master in Business Administration','Master in Accounting','Master in Corporate Governance','Master in Information Technology','Doctor of Business Administration','Doctor of Philosophy'],
-  programSource:amcCourses,pgSource:amcCourses,feeSource:amcRegistration,feeNote:'A complete international tuition schedule was not verified.',
+  programSource:amcCourses,pgSource:amcCourses,fees:[['MBA','RM 24,000','Full international tuition before SST; published total RM 32,440'],['Master in Accounting','RM 25,200','Full international tuition before SST; published total RM 34,087'],['Doctor of Business Administration','RM 47,200','Full-time international tuition before SST; published total RM 58,782']],
+  feeSource:amcMbaFees,feeSources:[['Master in Accounting prospectus',amcMaccFees],['DBA prospectus',amcDbaFees]],feeNote:'Published examples cover the full programme. Totals include the charges shown in each prospectus. Undergraduate tuition remains unverified.',
   intake:'Degree teaching week 1 starts 25 January 2027 on the academic calendar.',intakeSource:amcCalendar,rankSource:amcRegister};
  if(key==='utm')return {...p,programSource:utmCourses,feeSource:utmFees,intakeSource:utmAdmissions,
   intake:'February 2027 applications for international bachelor’s study run 1 November–31 December 2026.'};
@@ -233,7 +236,7 @@ const card=(u,p)=>{
  const intake=verified?.intake;
  const rankingFact=key==='amc'?fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister):fact('rank',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'Ranking unverified',rank?'QS World 2027':'']));
  const facts=rankingFact+fact('programmes','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText==='See official catalogue'?'':'Published count',validUrl(p?.programSource)||official]))
-  +fact('tuition',verified?.tuition&&!['um','amc'].includes(key)?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||[tuitionText,firstYear?'Published fee example':'Programme-specific fees',validUrl(p?.feeSource)||official]))
+  +fact('tuition',verified?.tuition&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||[tuitionText,firstYear?'Published fee example':'Programme-specific fees',validUrl(p?.feeSource)||official]))
   +(intake?fact('intake','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):fact('intake','UPCOMING INTAKE',intakeText,'',validUrl(p?.intakeSource)||official));
  return '<article class="card uni-card an-guide-card an-premium-uni-card"><div class="uni-cover-wrap">'+imageMarkup(u,p)+mark+discount+'<div class="an-premium-hero-details"><h3 class="an-premium-university-title">'+mainName+shortLabel+'</h3><div class="an-premium-meta">'+logoMarkup+'<div class="an-premium-meta-text"><div class="an-premium-type '+(privateUni?'is-private':'is-public')+'">'+e(typeText)+'</div><p class="university-location an-premium-location">'+e(country)+'</p></div></div></div></div><div class="inside"><div class="an-premium-facts">'+facts+'</div><div class="an-guide-links"><a class="card-open" href="#/university/'+encodeURIComponent(u.id)+'">University Portfolio <span>↗</span></a>'+(official?'<a class="an-guide-official" href="'+e(official)+'" rel="noopener noreferrer" target="_blank">Official Website ↗</a>':registry?'<a class="an-guide-official" href="'+e(registry)+'" rel="noopener noreferrer" target="_blank">Official Register ↗</a>':'')+'<a class="an-premium-apply" href="#/apply">Apply Now ↗</a></div></div></article>';
 };
