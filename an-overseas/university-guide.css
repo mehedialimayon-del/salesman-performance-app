@@ -295,3 +295,26 @@ body.an-portfolio-v2 #app .an-study-section :is(p,li) :is(strong,em){color:#f068
 }
 #app .university-catalogue #results .an-premium-uni-card .an-premium-hero-details{z-index:20!important}
 #app .university-catalogue #results .an-premium-fact b{overflow:visible!important;max-height:none!important}
+
+/* One legible title and one identity, even without a campus photograph. */
+#app .university-catalogue #results .an-premium-uni-card .an-premium-university-title{
+ padding:6px 9px;border:1px solid #ff933e;border-radius:10px;
+ background:#17100bf5;box-shadow:0 2px 12px #0008;
+}
+#app .university-catalogue #results .an-premium-uni-card .an-guide-identity :is(.an-identity-name,.an-identity-awaiting,strong,small,.an-guide-country){display:none!important}
+#app .university-catalogue #results .an-premium-uni-card .an-identity-logo-only{
+ position:absolute!important;inset:8% 0 42%!important;min-height:0!important;
+ padding:0!important;background:none!important;display:grid!important;place-items:center;
+}
+#app .university-catalogue #results .an-premium-uni-card .an-identity-logo-only .an-logo-stage{padding:0!important;min-height:0!important}
+#app .university-catalogue #results .an-premium-uni-card .an-identity-logo-only .an-center-logo{max-height:clamp(40px,12vh,90px)!important;object-fit:contain}
+#app .university-catalogue #results .an-premium-uni-card .uni-cover-wrap:not(:has(.an-guide-photo:not([hidden]))) .an-identity-logo-only:has(.an-center-logo:not([style*="display: none"])) ~ .an-premium-hero-details .an-premium-meta-logo{display:none}
+#app .university-catalogue #results .an-premium-uni-card .an-premium-fact b{font-variant-numeric:tabular-nums}
+#app .university-profile .profile-body .profile-section h2{color:#fff!important;-webkit-text-fill-color:#fff!important}
+#app .university-profile .profile-body .profile-section h2>span,
+#app .university-profile .profile-body .profile-section h3{color:#ffab68!important;-webkit-text-fill-color:#ffab68!important}
+#app .university-profile .profile-body .profile-section :is(p,li,td){color:#fff}
+#app .university-profile .an-profile-fact{padding:12px 15px;margin:0 0 14px;border:1px solid #a94e19;border-radius:10px;background:#24180f}
+#app .university-profile .an-profile-fact h3{margin:0 0 6px}
+#app .university-profile .an-profile-fact p{margin:0 0 8px}
+#app .university-profile .an-profile-fact [data-an-deadline]{font-variant-numeric:tabular-nums;font-weight:800}

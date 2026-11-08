@@ -85,17 +85,30 @@ const imageMarkup=(u,p)=>{
  if(!photo)return fallback(u);
  return fallback(u)+'<img class="campus-cover an-guide-photo" src="'+e(photo.url)+'" alt="'+e(u.name)+' — university campus" loading="lazy" decoding="async" data-guide-image>'+(photo.source?'<a class="an-guide-credit" href="'+e(photo.source)+'" target="_blank" rel="noopener noreferrer">'+e(photo.credit)+' ↗</a>':'<span class="an-guide-credit">'+e(photo.credit)+'</span>');
 };
+const amuAdmissions='https://amu.edu.my/international-students-admissions/';
+const amuProgrammes='https://amu.edu.my/undergraduate-programmes/';
+const amuFees='https://amu.edu.my/fees-and-fundings/fees-for-international-students/';
 const verifiedCardFacts={
+ amu:{
+  programmes:['10','Undergraduate catalogue entries',amuProgrammes],
+  tuition:['RM 48,500','Full international BBA tuition',amuFees],
+  intake:['Jan · Feb · Jun · Jul · Sep','BBA · published intake months',amuProgrammes]
+ },
+ mediu:{
+  programmes:['Bachelor · Master · PhD','Official programme search','https://www.mediu.edu.my/search-programs/'],
+  tuition:['RM 28,451.80','Full online Islamic Studies degree','https://fedu.mediu.edu.my/wp-content/uploads/sites/14/2020/09/bachelor-OF-EDUCATION_islamic-studies.pdf'],
+  intake:['November 2026','Published intake announcement','https://www.mediu.edu.my/admission-for-november-2026-intake-is-now-open/']
+ },
  um:{
   ranking:['#56','Asia =17 · SE Asia 3 · MY 1','https://www.um.edu.my/news/universiti-malaya-retains-asia-rsquo-s-top-20-spot-wins-global-engagement-champions-award'],
   programmes:['80','Bachelor’s · 2026/27','https://study.um.edu.my/programmes'],
-  tuition:['RM 98,097','Intl. UG mean · 2025/26','https://study.um.edu.my/doc/tution-fee/Fee%20Structure%2C%20UG%2C%20International%20-%20Updated%2022%20Oct%202025.pdf'],
+  tuition:['RM 98,097','Full degree average · 2025/26','https://study.um.edu.my/doc/tution-fee/Fee%20Structure%2C%20UG%2C%20International%20-%20Updated%2022%20Oct%202025.pdf'],
   intake:['Mar 2027','Mar intake · 30 Jan 2027','https://study.um.edu.my/how-to-apply','2027-01-30']
  },
  usm:{
   ranking:['#=128','Asia 27 · MY 5 (Asia table)','https://news.usm.my/english-news/usm-rises-seven-places-to-27th-in-qs-asia-university-rankings-2027'],
   programmes:['60+','International bachelor’s','https://admission.usm.my/index.php/main/undergraduate/international'],
-  tuition:['USD 16,000','Management degree example','https://admission.usm.my/undergraduate/undergraduate-international?id=769&view=article'],
+  tuition:['USD 16,000','Full Management degree','https://admission.usm.my/undergraduate/undergraduate-international?id=769&view=article'],
   intake:['March intake','15 Jan · 2025/26 schedule','https://admission.usm.my/images/00uginternational/download_2025/BOOKLET_INTERNATIONAL_2025-2026.pdf']
  },
  ukm:{
@@ -107,7 +120,7 @@ const verifiedCardFacts={
  upm:{
   ranking:['#138','Asia 24 · MY 3 (Asia table)','https://www.thestar.com.my/news/nation/2026/11/03/eleven-malaysian-varsities-ranked-among-top-100-in-asia'],
   programmes:['74 codes','Intl. UG fee schedule','https://bursar.upm.edu.my/upload/dokumen/20260406115752Tuition_Fees_International_%281%29.pdf'],
-  tuition:['RM 96,000','Agricultural Science example','https://bursar.upm.edu.my/upload/dokumen/20260406115752Tuition_Fees_International_%281%29.pdf'],
+  tuition:['RM 96,000','Full Agricultural Science degree','https://bursar.upm.edu.my/upload/dokumen/20260406115752Tuition_Fees_International_%281%29.pdf'],
   intake:['March intake','31 Dec · published cycle','https://akademik.upm.edu.my/upload/dokumen/menul320250417184027Undergraduate_Programmes_Brochure_for_International_Students.pdf']
  }
 };
@@ -117,12 +130,40 @@ const malaysiaFactIds={
  universitikebangsaanmalaysia:'ukm',
  universitiputramalaysia:'upm'
 };
-const deadlineLabel=(date, fallback)=>{
- if(!date)return fallback;
- const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Kuala_Lumpur',dateStyle:'short'}).format();
- const days=Math.round((Date.parse(date)-Date.parse(today))/86400000);
- return days<0?'Deadline passed':days===0?'Closes today':days+' days left';
+const factKey=u=>{
+ const name=norm(String(u.name||'').replace(/\s*\([^)]*\)\s*$/,''));
+ if(u.country==='Malaysia'&&name.startsWith('asiametropolitanuniversity'))return 'amu';
+ if(u.country==='Malaysia'&&name.startsWith('almadinahinternationaluniversity'))return 'mediu';
+ return verifiedCardFacts[u.id]?u.id:malaysiaFactIds[name];
 };
+const countdownText=(date,now=Date.now())=>{
+ const minutes=Math.ceil((Date.parse(date+'T23:59:59+08:00')-now)/60000);
+ return minutes<1?'Deadline passed':Math.floor(minutes/1440)+'d '+Math.floor(minutes%1440/60)+'h '+minutes%60+'m left';
+};
+const countdown=date=>'<span data-an-deadline="'+e(date)+'">'+e(countdownText(date))+'</span>';
+setInterval(()=>{
+ document.querySelectorAll('[data-an-deadline]').forEach(el=>{
+  const value=countdownText(el.dataset.anDeadline);
+  if(el.textContent!==value)el.textContent=value;
+ });
+},1000);
+const factNotes={
+ um:{fees:'RM 98,097 is the rounded arithmetic mean of 74 full-degree tuition amounts in UM’s 2025/26 international bachelor fee schedule. Higher-priced clinical degrees, including medicine and dentistry, raise the average. Check your programme’s fee and any separately stated taxes and charges.',programmes:'UM lists 80 bachelor’s programmes for 2026/27. The number covers the academic session across the university. March availability varies by programme.',entry:'The March 2027 international undergraduate application deadline is 30 January 2027. UM publishes a calendar date. The site countdown uses the end of that day in Malaysia time.'},
+ usm:{fees:'USD 16,000 is the full international tuition published for the Bachelor of Management with Honours. USM lists USD 2,285.71 per semester and separate recurring charges.'},
+ ukm:{fees:'RM 19,050 is first-year international BBA tuition in the 2024/25 UKMi schedule, calculated as RM 10,650 + RM 8,400. The schedule lists the RM 2,520 registration charge separately.'},
+ upm:{fees:'RM 96,000 is the published full-degree international tuition example for Agricultural Science with Honours, calculated as eight semesters × RM 12,000.'},
+ amu:{fees:'AMU lists RM 48,500 in full BBA tuition. Registration (RM 2,000), processing (RM 1,500) and visa application (RM 2,800) bring the published total to RM 54,800.',programmes:'The official undergraduate catalogue lists 2 foundation programmes, 4 diplomas and 4 bachelor’s programmes.',entry:'AMU lists January, February, June, July and September for the BBA. Its international admissions page advises sending documents three months before intake. Ask AMU to confirm the exact cutoff for your cohort.'},
+ mediu:{fees:'RM 28,451.80 is the published tuition for the full-time online Bachelor of Islamic Studies example in the faculty brochure. Campus-based programmes and other study modes have separate fees.',entry:'MEDIU announced its November 2026 intake for bachelor’s, master’s and doctoral programmes. Its admissions guidance advises applying at least six weeks before the new semester.'}
+};
+const profileFact=(u,section)=>{
+ const key=factKey(u),facts=verifiedCardFacts[key];
+ const item=facts?.[{fees:'tuition',programmes:'programmes',entry:'intake',ranking:'ranking'}[section]];
+ if(!item)return '';
+ const label={fees:'Tuition basis',programmes:'Published programme scope',entry:'Published intake',ranking:'Regional ranking'}[section];
+ const detail=factNotes[key]?.[section]||(section==='ranking'?item[1]:item[0]+' · '+item[1]);
+ return '<div class="an-profile-fact"><h3>'+label+'</h3><p>'+e(detail)+(item[3]?' · '+countdown(item[3]):'')+'</p>'+link(item[2],'Published source')+(key==='amu'&&section==='entry'?link(amuAdmissions,'International admissions'):'')+'</div>';
+};
+const institutionLogo=(u,p)=>factKey(u)==='amu'?'assets/universities/amu-official-logo.png':u.logoImage||p?.logo||'';
 const card=(u,p)=>{
  const rank=getRank(u),kind=u.kind||'University',official=validUrl(u.site),registry=validUrl(u.registrySource);
  const name=String(u.name||u.short||'University').trim(),words=name.split(/\s+/),cut=Math.max(1,Math.ceil(words.length/2));
@@ -131,21 +172,21 @@ const card=(u,p)=>{
  const privateUni=/private/i.test(kind),typeText=privateUni?'PRIVATE UNIVERSITY':/public/i.test(kind)?'PUBLIC UNIVERSITY':(/university/i.test(kind)?String(kind).toUpperCase():String(kind).toUpperCase()+' UNIVERSITY');
  const discount=window.ANUniversityTools?.badge?.(u.id)||'';
  const mark=rank?'<span class="an-guide-rank">QS World 2027 #'+rank+'</span>':'';
- const verified=verifiedCardFacts[u.id]||verifiedCardFacts[malaysiaFactIds[norm(name.replace(/\s*\([^)]*\)\s*$/,''))]];
+ const key=factKey(u),verified=verifiedCardFacts[key];
  const programmeCount=Number(u.totalPrograms||p?.totalPrograms||p?.programmeCount);
  const programmeText=Number.isInteger(programmeCount)&&programmeCount>0?String(programmeCount):'See official catalogue';
  const fees=Array.isArray(p?.fees)?p.fees:[],annualFees=fees.filter(x=>/first.year|annual|per year|1.year/i.test(String(x?.[2]||'')+' '+String(x?.[0]||''))).map(x=>String(x?.[1]||''));const firstYear=annualFees.length?annualFees[0]:null;
  const tuitionText=firstYear?firstYear:'See official fee guide';
- const intakeText=String(p?.intake||u.intake||'See official admissions calendar');
- const logo=u.logoImage||p?.logo||'';
+ const intakeText='Check admissions calendar';
+ const logo=institutionLogo(u,p);
  const logoMarkup=validUrl(logo)||/^assets\//.test(logo)?'<img class="an-premium-meta-logo" src="'+e(logo)+'" alt="'+e(name)+' logo" loading="lazy" onerror="this.remove()">':'';
  const country=u.country||u.city||'';
- const fact=(icon,label,value,extra='',source='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon" aria-hidden="true">'+icon+'</span><strong>'+label+'</strong><b>'+(source?'<a href="'+e(source)+'" rel="noopener noreferrer" target="_blank">'+e(value)+'</a>':e(value))+'</b>'+(extra?'<small>'+e(extra)+'</small>':'')+'</div>';
+ const fact=(icon,label,value,extra='',source='',date='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon" aria-hidden="true">'+icon+'</span><strong>'+label+'</strong><b>'+(source?'<a href="'+e(source)+'" rel="noopener noreferrer" target="_blank">'+(date?countdown(date):e(value))+'</a>':e(value))+'</b>'+(extra?'<small>'+e(extra)+'</small>':'')+'</div>';
  const intake=verified?.intake;
- const facts=fact('♛',verified?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'Ranking unverified',rank?'QS World 2027':'']))
+ const facts=fact('♛',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'Ranking unverified',rank?'QS World 2027':'']))
   +fact('▤','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText==='See official catalogue'?'':'Published count']))
-  +fact('◈',verified?.tuition&&u.id!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||[tuitionText,firstYear?'Published fee example':'Programme-specific fees']))
-  +(intake?fact('▦','UPCOMING INTAKE',deadlineLabel(intake[3],intake[0]),intake[1],intake[2]):fact('▦','UPCOMING INTAKE',intakeText));
+  +fact('◈',verified?.tuition&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||[tuitionText,firstYear?'Published fee example':'Programme-specific fees']))
+  +(intake?fact('▦','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):fact('▦','UPCOMING INTAKE',intakeText,'',validUrl(p?.intakeSource)||official));
  return '<article class="card uni-card an-guide-card an-premium-uni-card"><div class="uni-cover-wrap">'+imageMarkup(u,p)+mark+discount+'<div class="an-premium-hero-details"><h3 class="an-premium-university-title">'+mainName+shortLabel+'</h3><div class="an-premium-meta">'+logoMarkup+'<div class="an-premium-meta-text"><div class="an-premium-type '+(privateUni?'is-private':'is-public')+'">'+e(typeText)+'</div><p class="university-location an-premium-location">'+e(country)+'</p></div></div></div></div><div class="inside"><div class="an-premium-facts">'+facts+'</div><div class="an-guide-links"><a class="card-open" href="#/university/'+encodeURIComponent(u.id)+'">University Portfolio <span>↗</span></a>'+(official?'<a class="an-guide-official" href="'+e(official)+'" rel="noopener noreferrer" target="_blank">Official Website ↗</a>':registry?'<a class="an-guide-official" href="'+e(registry)+'" rel="noopener noreferrer" target="_blank">Official Register ↗</a>':'')+'<a class="an-premium-apply" href="#/apply">Apply Now ↗</a></div></div></article>';
 };
 const link=(url,text,kind='')=>{const x=validUrl(url);return x?'<a class="an-guide-btn '+e(kind)+'" href="'+e(x)+'" target="_blank" rel="noopener noreferrer">'+e(text)+' ↗</a>':''};
@@ -240,5 +281,5 @@ document.addEventListener('error',event=>{
  }
 },true);
 const extended=(u,p)=>'<section class="profile-section an-guide-degrees" id="profile-degree"><h2><span>Degree-wise</span> Application Guide</h2><p>Expand a level for its application preparation, recognised-document checklist and official route.</p><div class="an-guide-degree-grid">'+['Bachelor','Master','PhD'].map((level,i)=>'<details class="an-guide-degree-box"'+(i===0?' open':'')+'><summary>'+e(level)+' <span>⌄</span></summary>'+degree(u,level)+'</details>').join('')+'</div></section>'+support(u);
-window.ANUniGuide={card,compare,getRank,panel,mount,route,photos,extended};
+window.ANUniGuide={card,compare,getRank,panel,mount,route,photos,extended,profileFact,institutionLogo};
 })();
