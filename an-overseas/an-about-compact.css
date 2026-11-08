@@ -227,7 +227,7 @@ body.an-about-locked #app>.an-about-v3{box-sizing:border-box;display:flex!import
   @media (orientation:portrait) {
     #app .an-about-mobile-opening {
       align-self:center;
-      width:calc(100vw - 20px);
+      width:calc(100% + 10px);
     }
   }
   #app .an-about-mobile-readmore {

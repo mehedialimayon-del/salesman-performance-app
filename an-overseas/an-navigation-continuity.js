@@ -140,6 +140,12 @@ document.addEventListener('keydown',gesture,{passive:true,capture:true});
 document.addEventListener('click',event=>{
  const a=event.target.closest?.('a[href^="#/"]');
  if(a&&!restoreInProgress)save(activeRoute);
+ if(!a || !matchMedia('(max-width:800px)').matches || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)return;
+ const destination=a.getAttribute('href');
+ if(destination==='#/about'||(destination==='#/aboutdetails'&&a.classList.contains('an-about-mobile-readmore'))){
+  safeSet(PREFIX+destination,JSON.stringify({savedAt:Date.now(),y:0,x:0,containers:{}}));
+  if(destination===activeRoute)restore(destination,'navigation');
+ }
 },true);
 window.addEventListener('hashchange',nextRoute);
 window.addEventListener('scroll',()=>{
