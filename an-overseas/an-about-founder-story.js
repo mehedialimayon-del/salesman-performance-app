@@ -226,15 +226,19 @@
     const art = opening.querySelector('.an-about-mobile-art');
     const hero = art.firstElementChild;
     const button = opening.querySelector('.an-about-mobile-readmore');
-    const currentScale = Number(hero.style.zoom) || 1;
-    const artWidth = Math.min(390, art.clientWidth);
-    hero.style.setProperty('--an-about-art-width', artWidth + 'px');
-    const naturalHeight = hero.getBoundingClientRect().height / currentScale;
     const openingStyle = getComputedStyle(opening);
     const reserved = button.offsetHeight + parseFloat(openingStyle.paddingBottom) + parseFloat(openingStyle.rowGap);
-    if (naturalHeight > 0) {
-      hero.style.zoom = Math.min(1, Math.max(.15, (available - reserved - 2) / naturalHeight));
-    }
+    const availableArtHeight = Math.max(0, available - reserved - 2);
+    const portrait = matchMedia('(orientation:portrait)').matches;
+    const artWidth = portrait ? art.clientWidth : Math.min(390, art.clientWidth);
+    hero.style.setProperty('--an-about-art-width', artWidth + 'px');
+    hero.style.zoom = '';
+    const naturalHeight = hero.offsetHeight;
+    if (!naturalHeight) return;
+    const scale = Math.min(1, Math.max(portrait ? .8 : .15, availableArtHeight / naturalHeight));
+    hero.style.setProperty('--an-about-art-scale-y', portrait ? scale : 1);
+    art.style.minHeight = naturalHeight * scale + 'px';
+    hero.style.zoom = portrait ? '' : scale;
   }
   function renderMobileOpening(intro) {
     if (!mobileAbout.matches) return;

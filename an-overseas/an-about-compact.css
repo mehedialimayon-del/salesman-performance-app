@@ -204,21 +204,31 @@ body.an-about-locked #app>.an-about-v3{box-sizing:border-box;display:flex!import
     padding:0 0 max(8px, env(safe-area-inset-bottom));
   }
   #app .an-about-mobile-art {
+    position:relative;
     flex:1;
     display:flex;
-    align-items:center;
     justify-content:center;
     width:100%;
   }
   html body #app .an-about-mobile-opening .an-about-mobile-art .an2-founder-hero {
+    position:absolute!important;
+    top:0;
     width:var(--an-about-art-width, 100%)!important;
+    transform:scaleY(var(--an-about-art-scale-y, 1));
+    transform-origin:top center;
   }
-  #app .an-about-mobile-opening .an2-approved-reference-hero {
+  #app :is(.an-about-mobile-opening,.an2-story) .an2-approved-reference-hero {
     container-type:inline-size;
   }
-  html body #app .an-about-mobile-opening .an2-approved-reference-hero .an2-mobile-complete-quote blockquote {
+  html body #app :is(.an-about-mobile-opening,.an2-story) .an2-approved-reference-hero .an2-mobile-complete-quote blockquote {
     font-size:3.25cqw!important;
     line-height:1.2!important;
+  }
+  @media (orientation:portrait) {
+    #app .an-about-mobile-opening {
+      align-self:center;
+      width:calc(100vw - 20px);
+    }
   }
   #app .an-about-mobile-readmore {
     display:grid;
