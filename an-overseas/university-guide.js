@@ -280,6 +280,27 @@ const leidenPanel=u=>{
  e(record[1].toLocaleString('en-US'))+' core publications, 2021–2024, full counting. The displayed ranking uses a minimum of 100 publications.</p>'+
  link(leidenLink(record),'CWTS university profile')+link('https://open.leidenranking.com/resources','Open edition data')+'</div>';
 };
+const additionalRankProviders={
+ c:['CWUR 2026','World · Global 2000',ref=>'https://www.cwur.org/2026/'+ref+'.php'],
+ s:['SCImago 2026','World · universities',()=> 'https://www.scimagoir.com/rankings.php?sector=Higher+educ&year=2026'],
+ e:['EduRank 2026','World · overall',ref=>'https://edurank.org/uni/'+ref+'/rankings/'],
+ w:['Webometrics · Jul 2026','World · web and research indicators',ref=>'https://www.webometrics.org/'+ref],
+ h:['WalletHub 2026','US · community colleges',()=> 'https://wallethub.com/edu/e/best-worst-community-colleges/15076'],
+ u:['uniRank 2026','National · web popularity',ref=>'https://www.unirank.org/'+ref+'/ranking/']
+};
+const additionalRank=u=>{
+ const ranks=window.ANAdditionalRanks2026||{};
+ if(!Object.hasOwn(ranks,u.id))return null;
+ const [key,position,ref,sourceName]=ranks[u.id];
+ const [name,scope,source]=additionalRankProviders[key];
+ return {name,scope,position,sourceName,url:source(ref)};
+};
+const additionalRankPanel=u=>{
+ const rank=additionalRank(u);
+ if(!rank)return '';
+ return '<div class="an-profile-fact"><h3>'+e(rank.name)+'</h3><p><strong>#'+e(rank.position)+'</strong> · '+e(rank.scope)+'</p>'+
+  (rank.sourceName?'<p>Listed as '+e(rank.sourceName)+'</p>':'')+link(rank.url,'Published ranking')+'</div>';
+};
 const commonAppSource='https://content.commonapp.org/Files/ReqGrid.pdf';
 const commonAppPlans=['Early Decision','Early Decision II','Early Action','Early Action II','Restrictive Early Action','Regular Decision'];
 const commonAppDates=u=>u.country==='United States'&&Object.hasOwn(window.ANCommonApp2027||{},u.id)?window.ANCommonApp2027[u.id]:null;
@@ -304,7 +325,7 @@ const commonAppPanel=u=>{
 const profileFact=(u,section)=>{
  const key=factKey(u),facts=verifiedCardFacts[key];
  const item=facts?.[{fees:'tuition',programmes:'programmes',entry:'intake',ranking:'ranking'}[section]];
- const supplemental=section==='ranking'?leidenPanel(u):section==='entry'?commonAppPanel(u):'';
+ const supplemental=section==='ranking'?leidenPanel(u)+additionalRankPanel(u):section==='entry'?commonAppPanel(u):'';
  if(!item)return ipedsPanel(u,section)+supplemental;
  const label={fees:'Tuition basis',programmes:'Published programme scope',entry:'Published intake',ranking:'Regional ranking'}[section];
  const detail=factNotes[key]?.[section]||(section==='ranking'?item[1]:item[0]+' · '+item[1]);
@@ -379,8 +400,21 @@ const card=(u,p)=>{
  const factHeading=label=>{const space=label.indexOf(' ');const cut=space>0?space:Math.ceil(label.length/2);return '<span>'+e(label.slice(0,cut))+'</span>'+e(label.slice(cut));};
  const fact=(icon,label,value,extra='',source='',date='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+factIcons[icon]+'</svg></span><strong>'+factHeading(label)+'</strong>'+(value?'<b>'+(source?'<a href="'+e(source)+'" rel="noopener noreferrer" target="_blank">'+(date?countdown(date):e(value))+'</a>':e(value))+'</b>':'')+(value&&extra?'<small>'+e(extra)+'</small>':'')+'</div>';
  const intake=verified?.intake,admissionDeadline=commonAppCard(u);
- const researchRank=leidenRank(u);
- const rankingFact=!verified?.ranking&&!rank&&researchRank?fact('rank','RESEARCH RANK','#'+researchRank[0],'Leiden Open 2026 · publications',leidenLink(researchRank)):key==='amc'?fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister):fact('rank',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'',rank?'QS World 2027':'']));
+ const researchRank=leidenRank(u),publishedRank=additionalRank(u);
+ let rankingFact;
+ if(verified?.ranking){
+  rankingFact=fact('rank','QS RANKINGS 2027',...verified.ranking);
+ }else if(rank){
+  rankingFact=fact('rank','WORLD RANKING','#'+rank,'QS World 2027',qsSource);
+ }else if(researchRank){
+  rankingFact=fact('rank','RESEARCH RANK','#'+researchRank[0],'Leiden Open 2026 · publications',leidenLink(researchRank));
+ }else if(publishedRank){
+  rankingFact=fact('rank','PUBLISHED RANK','#'+publishedRank.position,publishedRank.name+' · '+publishedRank.scope,publishedRank.url);
+ }else if(key==='amc'){
+  rankingFact=fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister);
+ }else{
+  rankingFact=fact('rank','WORLD RANKING','');
+ }
  const facts=rankingFact+fact('programmes','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText?'Published count':'',validUrl(p?.programSource)||official]))
   +fact('tuition',tuitionFact&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(tuitionFact||historicalFact||[firstYear||'',firstYear?'Published fee example':'']))
   +(intake?fact('intake','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):admissionDeadline?fact('intake','APPLICATION DEADLINE',...admissionDeadline):fact('intake','UPCOMING INTAKE',''));
@@ -448,9 +482,10 @@ const panel=(u,tab,p)=>{
  if(tab==='Gallery')return gallery(u,p);
  const history=p?.history?'<section class="an-guide-check"><h3>History & Campus</h3><p>'+e(p.history)+'</p>'+(p.campus?'<p>'+e(p.campus)+'</p>':'')+link(p.historySource,'Official university history','alt')+link(p.campusSource,'Campus source','alt')+'</section>':'';
  const requirements=p?.entry?'<section class="an-guide-check"><h3>Official-source entry information</h3><p>'+e(p.entry)+'</p>'+link(p.entrySource,'Detailed entry requirements','alt')+'</section>':'';
+ const publishedRank=additionalRank(u),researchRank=leidenRank(u);
  const housing=p?.housing?'<section class="an-guide-check"><h3>Accommodation and campus life</h3><p>'+e(p.housing)+'</p>'+link(p.housingSource,'Housing information','alt')+'</section>':'';
  return intro(u)+history+requirements+housing+
- '<div class="an-guide-key"><strong>'+((getRank(u))?'QS World University Rankings 2027: #'+getRank(u):'World ranking not independently verified for this entry')+'</strong>'+(getRank(u)?link(qsSource,'Official QS 2027 ranking','alt'):'')+'</div>'+
+ '<div class="an-guide-key">'+(getRank(u)?'<strong>QS World University Rankings 2027: #'+getRank(u)+'</strong>'+link(qsSource,'Official QS 2027 ranking','alt'):researchRank?leidenPanel(u):publishedRank?additionalRankPanel(u):'<strong>Published ranking not verified for this entry</strong>')+'</div>'+
  '<h3>Subject areas listed</h3><p>'+e((u.programs||[]).join(' · ')||'Choose programmes from the official degree directory')+'</p>'+
  '<h3>Three study levels</h3><div class="an-guide-level-links"><button type="button" data-tab="Bachelor">Bachelor Guide</button><button type="button" data-tab="Master">Master Guide</button><button type="button" data-tab="PhD">PhD Guide</button></div>'+
  note+routesPanel(u,'Bachelor');
