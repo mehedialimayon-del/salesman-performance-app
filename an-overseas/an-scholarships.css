@@ -354,3 +354,13 @@
 /* Keep long timeline labels within the existing cover dimensions. */
 .an-card-deadline{max-width:75%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .an-profile-deadline{display:inline-block;color:#fff;background:#18100d;border:1px solid #ff8a35;padding:4px 8px;border-radius:6px;font-variant-numeric:tabular-nums}
+@media(min-width:1050px){
+ body.an-scholarships-mode #app>.an-scholarship-head .an-scholarship-head-inner{
+  display:grid!important;grid-template-columns:auto minmax(0,1fr) 130px;
+  width:100%;box-sizing:border-box
+ }
+ body.an-scholarships-mode #app .an-scholarship-head-inner .an-scholarship-filters{
+  width:100%!important;grid-template-columns:minmax(120px,1.2fr) repeat(3,minmax(100px,1fr))!important
+ }
+}
+.an-card-deadline{max-width:calc(100% - 72px)}
