@@ -199,3 +199,26 @@ body.an-portfolio-v2 #profile-support .an-guide-support-head>div{min-width:0;fle
 body.an-portfolio-v2 #profile-support .an-guide-support-head h2{display:flex;align-items:center;gap:8px;width:100%;font-size:clamp(17px,2vw,23px)}
 body.an-portfolio-v2 #profile-support .an-guide-support-head h2 .an-portfolio-serial{margin-left:auto!important;color:#bd711e}
 body.an-portfolio-v2 #profile-support .an-guide-support-head h2 .an-portfolio-icon{flex:none}
+
+/* Use orange for accents and white for the readable costing and visa copy. */
+#app .university-profile :is(#profile-fees,#profile-arrival,#profile-spouse,#profile-visa) :is(.cost-note,.an-portfolio-alert,.an-portfolio-cost-grid label,.an-portfolio-total small,.visa-steps span){
+ color:#fff!important;
+ -webkit-text-fill-color:#fff!important;
+}
+#app .university-profile #profile-arrival .an-portfolio-total{
+ background:#15171b!important;
+}
+#app .university-profile #profile-arrival .an-portfolio-total b{
+ color:#ff8b3d!important;
+}
+#app .university-profile #profile-arrival .an-currency-myr{
+ color:#77b9ff!important;
+ -webkit-text-fill-color:#77b9ff!important;
+}
+#app .university-profile #profile-arrival .an-currency-bdt{
+ color:#68df98!important;
+ -webkit-text-fill-color:#68df98!important;
+}
+#app .university-profile #profile-ranking .profile-apply{
+ color:#fff!important;
+}

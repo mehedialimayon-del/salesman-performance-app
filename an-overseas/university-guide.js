@@ -207,6 +207,29 @@ const factNotes={
 const ipedsSource='https://nces.ed.gov/ipeds/datacenter/data/IC2023_AY.zip';
 const ipedsEntry=u=>u.country==='United States'&&Object.hasOwn(window.ANIPEDS2023||{},u.id)?window.ANIPEDS2023[u.id]:null;
 const usd=value=>'USD '+value.toLocaleString('en-US');
+const recentTuition={
+ "an-global-upenn-edu": [
+  "USD 65,670",
+  "2026/27 annual undergraduate",
+  "https://srfs.upenn.edu/costs-budgeting/undergraduate-cost-attendance"
+ ],
+ "an-global-cornell-edu": [
+  "USD 73,946",
+  "2026/27 annual undergraduate, endowed Ithaca or contract nonresident",
+  "https://courses.cornell.edu/general-information/tuition/"
+ ],
+ "an-global-usc-edu": [
+  "USD 75,384",
+  "2026/27 two semesters, 12–18 units each",
+  "https://financialaid.usc.edu/undergraduate-financial-aid/cost-of-attendance/"
+ ],
+ "an-h-dir-unitedstates-wwwriceedu": [
+  "USD 71,140",
+  "2026/27 annual undergraduate, entered 2024 or later",
+  "https://financialaid.rice.edu/cost-attendance"
+ ]
+};
+const publishedTuition=u=>Object.hasOwn(recentTuition,u.id)?recentTuition[u.id]:verifiedCardFacts[factKey(u)]?.tuition;
 const ipedsPanel=(u,section)=>{
  const record=ipedsEntry(u);
  if(!record||!['fees','ranking'].includes(section))return '';
@@ -270,6 +293,18 @@ const institutionLogo=(u,p)=>{
  const file=factKey(u)==='amu'?'amu':verifiedLogoFiles[norm(String(u.name||'').replace(/\s*\([^)]*\)\s*$/,''))];
  return file?'assets/universities/'+file+'-official-logo.png':u.logoImage||p?.logo||catalogueIcon(u);
 };
+const tuitionRows=(u,p)=>{
+ const rows=(p.fees||[]).filter(r=>/^(?:RM|MYR|USD|AUD|CAD|EUR|GBP|€|£|\$)\s*[\d,.]+/i.test(String(r?.[1]||'')));
+ const known=publishedTuition(u);
+ if(known){
+  const existing=rows.findIndex(r=>r[1]===known[0]);
+  if(existing<0)rows.unshift(['Published tuition',known[0],factNotes[factKey(u)]?.fees||known[1],known[2]]);
+  else if(!rows[existing][3])rows[existing]=[...rows[existing].slice(0,3),known[2]];
+ }
+ const historical=ipedsEntry(u);
+ if(!rows.length&&Number.isInteger(historical?.[1]))rows.push(['Undergraduate tuition',usd(historical[1]),'2023/24 annual out-of-state tuition · historical NCES figure',ipedsSource]);
+ return rows;
+};
 const profileData=(u,p={})=>{
  const key=factKey(u);
  if(key==='amc')return {...p,founded:'1985',size:'Kota Kinabalu, Sabah',
@@ -306,6 +341,7 @@ const card=(u,p)=>{
  const programmeText=Number.isInteger(programmeCount)&&programmeCount>0?String(programmeCount):'';
  const fees=Array.isArray(p?.fees)?p.fees:[],annualFees=fees.filter(x=>/first.year|annual|per year|1.year/i.test(String(x?.[2]||'')+' '+String(x?.[0]||''))).map(x=>String(x?.[1]||''));const firstYear=annualFees.length?annualFees[0]:null;
  const historicalTuition=ipedsEntry(u)?.[1];
+ const tuitionFact=publishedTuition(u);
  const historicalFact=!firstYear&&Number.isInteger(historicalTuition)?[usd(historicalTuition),'Out-of-state UG · 2023/24',ipedsSource]:null;
  const logo=institutionLogo(u,p);
  const logoMarkup=validUrl(logo)||/^assets\//.test(logo)?'<img class="an-premium-meta-logo'+(logo==='assets/universities/aimst-official-logo.png'?' an-premium-logo-on-dark':'')+'" src="'+e(logo)+'" alt="'+e(name)+(isWebsiteIcon(u,logo)?' website icon':' logo')+'" loading="lazy" onerror="this.remove()">':'';
@@ -316,7 +352,7 @@ const card=(u,p)=>{
  const researchRank=leidenRank(u);
  const rankingFact=!verified?.ranking&&!rank&&researchRank?fact('rank','RESEARCH RANK','#'+researchRank[0],'Leiden Open 2026 · publications',leidenLink(researchRank)):key==='amc'?fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister):fact('rank',verified?.ranking?'QS RANKINGS 2027':'WORLD RANKING',...(verified?.ranking||[rank?'#'+rank:'',rank?'QS World 2027':'']));
  const facts=rankingFact+fact('programmes','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText?'Published count':'',validUrl(p?.programSource)||official]))
-  +fact('tuition',verified?.tuition&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(verified?.tuition||historicalFact||[firstYear||'',firstYear?'Published fee example':'',validUrl(p?.feeSource)||official]))
+  +fact('tuition',tuitionFact&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(tuitionFact?.slice(0,2)||historicalFact?.slice(0,2)||[firstYear||'',firstYear?'Published fee example':'']))
   +(intake?fact('intake','UPCOMING INTAKE',intake[0],intake[1],intake[2],intake[3]):admissionDeadline?fact('intake','APPLICATION DEADLINE',...admissionDeadline):fact('intake','UPCOMING INTAKE',''));
  return '<article class="card uni-card an-guide-card an-premium-uni-card"><div class="uni-cover-wrap">'+imageMarkup(u,p)+mark+discount+'<div class="an-premium-hero-details"><h3 class="an-premium-university-title">'+mainName+shortLabel+'</h3><div class="an-premium-meta">'+logoMarkup+'<div class="an-premium-meta-text"><div class="an-premium-type '+(privateUni?'is-private':'is-public')+'">'+e(typeText)+'</div><p class="university-location an-premium-location">'+e(country)+'</p></div></div></div></div><div class="inside"><div class="an-premium-facts">'+facts+'</div><div class="an-guide-links"><a class="card-open" href="#/university/'+encodeURIComponent(u.id)+'">University Portfolio <span>↗</span></a>'+(official?'<a class="an-guide-official" href="'+e(official)+'" rel="noopener noreferrer" target="_blank">Official Website ↗</a>':registry?'<a class="an-guide-official" href="'+e(registry)+'" rel="noopener noreferrer" target="_blank">Official Register ↗</a>':'')+'<a class="an-premium-apply" href="#/apply">Apply Now ↗</a></div></div></article>';
 };
@@ -412,5 +448,5 @@ document.addEventListener('error',event=>{
  }
 },true);
 const extended=(u,p)=>'<section class="profile-section an-guide-degrees" id="profile-degree"><h2><span>Degree-wise</span> Application Guide</h2><p>Expand a level for its application preparation, recognised-document checklist and official route.</p><div class="an-guide-degree-grid">'+['Bachelor','Master','PhD'].map((level,i)=>'<details class="an-guide-degree-box"'+(i===0?' open':'')+'><summary>'+e(level)+' <span>⌄</span></summary>'+degree(u,level)+'</details>').join('')+'</div></section>'+support(u);
-window.ANUniGuide={card,compare,getRank,panel,mount,route,photos,extended,profileFact,institutionLogo,profileData,leidenRank,isWebsiteIcon};
+window.ANUniGuide={card,compare,getRank,panel,mount,route,photos,extended,profileFact,institutionLogo,profileData,tuitionRows,leidenRank,isWebsiteIcon};
 })();

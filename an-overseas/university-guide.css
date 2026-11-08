@@ -340,3 +340,15 @@ body.an-portfolio-v2 #app .an-study-section :is(p,li) :is(strong,em){color:#f068
 
 /* The AIMST crest is supplied in white with transparency. */
 #app .university-catalogue #results .an-premium-uni-card .an-premium-logo-on-dark{background:#11151b}
+/* Let logo-only covers use the available media space without cropping the emblem. */
+#app .university-catalogue #results .an-premium-uni-card .uni-cover-wrap:not(:has(.an-guide-photo:not([hidden]))) .an-identity-logo-only:has(.an-center-logo){
+ inset:2% 4% 41%!important;
+}
+#app .university-catalogue #results .an-premium-uni-card .an-identity-logo-only .an-logo-stage{
+ width:100%!important;height:100%!important;
+}
+#app .university-catalogue #results .an-premium-uni-card .an-identity-logo-only .an-logo-stage .an-center-logo{
+ width:min(86%, 420px)!important;height:96%!important;
+ max-width:100%!important;max-height:100%!important;
+ padding:clamp(5px,1vw,11px)!important;
+}
