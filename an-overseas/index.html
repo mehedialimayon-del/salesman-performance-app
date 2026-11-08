@@ -777,6 +777,11 @@ body.home-view #app .hero .home-shortcuts a:is(:hover,:focus-visible) :is(strong
  }
 }
 </style><style id="an-portfolio-polish-20261108">
+html body.an-portfolio-v2 #app .an-portfolio-jumps:not(.expanded) > button:nth-child(n+5){display:none!important}
+@media(max-width:800px){
+ html body.an-portfolio-v2 .top nav#links:not(.open){display:none!important}
+}
+
 html body.an-portfolio-v2 #app .university-profile .an-portfolio-jumps > button{
  color:white!important;border-color:hsl(27 100% 47%)!important;
  background:linear-gradient(145deg,hsl(25 52% 20%),hsl(216 22% 8%) 70%)!important;
