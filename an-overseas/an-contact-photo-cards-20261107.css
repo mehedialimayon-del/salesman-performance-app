@@ -339,3 +339,30 @@ body.an-contact-mode #app .an-contact-feedback:empty{display:none!important}
    height:65px!important;
  }
 }
+
+/* One continuous flag mosaic under both offices and the contact channels. */
+body.an-contact-mode #app .an-contact-offices{
+  background:
+    linear-gradient(#090c15a8,#090c15a8),
+    #0c0f16 url('assets/contact-flag-mosaic.webp') center / 100% 100% no-repeat!important;
+}
+body.an-contact-mode #app .an-contact-offices h2,
+body.an-contact-mode #app .an-contact-channels-title{
+  text-shadow:0 1px 3px #000,0 0 9px #000;
+}
+body.an-contact-mode #app .an-contact-office{
+  position:relative;
+  isolation:isolate;
+  background:linear-gradient(105deg,#080b13bd 0%,#080b138f 64%,#080b132b 100%)!important;
+}
+body.an-contact-mode #app .an-contact-office .an-contact-office-photo{
+  opacity:.18;
+}
+body.an-contact-mode #app .an-contact-office :is(b,p,.an-contact-map){
+  position:relative;
+  text-shadow:0 1px 3px #000,0 0 5px #000;
+}
+body.an-contact-mode #app .an-contact-office p{
+  color:#fff!important;
+  font-weight:550;
+}
