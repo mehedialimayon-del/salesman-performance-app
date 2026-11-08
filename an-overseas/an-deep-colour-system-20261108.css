@@ -45,9 +45,9 @@ body{color:#fff}
 
 /* Light orange / white hierarchy, on the existing components and breakpoints. */
 :root {
-  --an-theme-light: hsl(30 100% 72%);
+  --an-theme-light: hsl(28 100% 50%);
   --an-theme-orange: hsl(27 100% 52%);
-  --an-theme-key: hsl(27 100% 59%);
+  --an-theme-key: hsl(26 100% 54%);
   --an-theme-fade: hsl(29 100% 70% / .34);
 }
 body .brand :is(strong,.brand-title,.an-brand-name) { color:var(--an-theme-light); }
@@ -86,7 +86,7 @@ body.an-portfolio-v2 #app .page-head h1,
 }
 #app :is(a.btn,button.btn)[href^="#/apply"]:not(.outline),
 header a[href="#/apply"]:is(.btn,.an-apply) {
-  background-image:linear-gradient(110deg,hsl(35 100% 76%),var(--an-theme-light));
+  background-image:linear-gradient(110deg,hsl(34 100% 69%),hsl(29 100% 60%));
   color:hsl(24 38% 10%);
 }
 @media (hover:hover) {
@@ -139,5 +139,41 @@ body.an-inner-application #app :is(input,select,textarea):not([type=checkbox],[t
   body:is(.an-inner-application,.an-portfolio-v2,.an-scholarship-detail-view,.an-service-detail-mode) #app
   :is(button,a.btn,[role=tab]):not(:disabled,[aria-disabled=true]):hover {
     border-color:var(--an-theme-orange);
+  }
+}
+
+
+/* Keep the brand and primary accents vivid; reserve the softer fill for Apply. */
+html body .top .brand-copy #brand-typing,
+body.home-view #app .hero h1 { color:var(--an-theme-orange)!important; }
+body.home-view #app .hero h1 .gradient { color:white!important;-webkit-text-fill-color:white!important; }
+html body .top #links > a:is(:hover,:focus-visible,.current,[aria-current="page"]) {
+  background-color:var(--an-theme-orange)!important;
+  background-image:linear-gradient(180deg,hsl(29 100% 52%),hsl(24 100% 45%))!important;
+  border-color:var(--an-theme-orange)!important;
+}
+#app :is(.an-journey-lead,.an-journey-block,.profile-section,.an-scholarship-detail) :is(h2,h3) > span:first-child,
+#app :is(.an-flow-step,.an-scholarship-amount-panel) :is(strong,b) {
+  color:var(--an-theme-key);
+}
+#app :is(.an-journey,.profile-body,.an-scholarship-detail,.live-panel) thead th {
+  color:var(--an-theme-light);
+  border-color:var(--an-theme-fade);
+}
+@media(max-width:800px){
+  html body .top:has(#links.open) {
+    transform:none!important;filter:none!important;contain:none!important;
+  }
+  html body .top nav#links.open > a {
+    flex-direction:row!important;gap:8px!important;
+    border-color:var(--an-theme-orange)!important;
+  }
+  html body .top nav#links.open > a > .an-nav-icon {
+    display:block!important;visibility:visible!important;opacity:1!important;
+    width:16px!important;height:16px!important;flex:none!important;
+    color:var(--an-theme-orange)!important;stroke:currentColor!important;
+  }
+  html body .top nav#links.open > a:is(.current,[aria-current="page"]) > .an-nav-icon {
+    color:hsl(32 100% 74%)!important;
   }
 }
