@@ -112,10 +112,10 @@ const verifiedCardFacts={
  }
 };
 const malaysiaFactIds={
- 'universiti malaya':'um',
- 'universiti sains malaysia':'usm',
- 'universiti kebangsaan malaysia':'ukm',
- 'universiti putra malaysia':'upm'
+ universitimalaya:'um',
+ universitisainsmalaysia:'usm',
+ universitikebangsaanmalaysia:'ukm',
+ universitiputramalaysia:'upm'
 };
 const deadlineLabel=(date, fallback)=>{
  if(!date)return fallback;

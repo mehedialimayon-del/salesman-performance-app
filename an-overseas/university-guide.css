@@ -293,3 +293,5 @@ body.an-portfolio-v2 #app .an-study-section :is(p,li) :is(strong,em){color:#f068
  #app .university-catalogue #results .an-premium-uni-card{height:auto!important;min-height:0!important;max-height:none!important}
  #app .university-catalogue #results .an-premium-uni-card .uni-cover-wrap{height:clamp(185px,35svh,290px)!important;min-height:0!important;flex:none!important}
 }
+#app .university-catalogue #results .an-premium-uni-card .an-premium-hero-details{z-index:20!important}
+#app .university-catalogue #results .an-premium-fact b{overflow:visible!important;max-height:none!important}
