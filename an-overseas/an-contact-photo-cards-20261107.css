@@ -344,8 +344,11 @@ body.an-contact-mode #app .an-contact-feedback:empty{display:none!important}
 body.an-contact-mode #app .an-contact-offices{
   overflow:hidden!important;
   background:
-    linear-gradient(#090c1555,#090c1566),
-    #0c0f16 url('assets/contact-flag-mosaic.webp') center / 118% 118% no-repeat!important;
+    radial-gradient(ellipse at 50% 48%,#fff2b713 0%,transparent 37%),
+    radial-gradient(ellipse at 50% 48%,#090c1517 8%,#090c1573 85%),
+    #0c0f16 url('assets/contact-flag-mosaic.webp') 4% 50% / 135% 125% no-repeat!important;
+  margin:clamp(8px,2vw,24px);
+  box-shadow:0 0 0 clamp(8px,2vw,24px) #090b0f;
 }
 body.an-contact-mode #app .an-contact-social :is(a,.an-contact-phone){
   background:
@@ -364,7 +367,7 @@ body.an-contact-mode #app .an-contact-channels-title{
 body.an-contact-mode #app .an-contact-office{
   position:relative;
   isolation:isolate;
-  background:linear-gradient(105deg,#080b1399 0%,#080b1366 64%,#080b1326 100%)!important;
+  background:linear-gradient(105deg,#080b1366 0%,#080b1340 64%,#080b131a 100%)!important;
 }
 body.an-contact-mode #app .an-contact-office .an-contact-office-photo{
   opacity:.18;
@@ -376,4 +379,44 @@ body.an-contact-mode #app .an-contact-office :is(b,p,.an-contact-map){
 body.an-contact-mode #app .an-contact-office p{
   color:#fff!important;
   font-weight:550;
+}
+
+/* Brand titles remain prominent while profile details stay compact. */
+body.an-contact-mode #app .an-contact-social :is(a,.an-contact-phone) small{
+  color:var(--contact-title,#ffb15a)!important;
+  font-size:clamp(11px,3vw,14px)!important;
+  font-weight:900!important;
+  text-shadow:0 1px 3px #000,0 0 4px #000;
+}
+body.an-contact-mode #app .an-contact-social .an-contact-card-detail{
+  color:#fff!important;
+  font-size:clamp(8px,2.45vw,10px)!important;
+  font-weight:650!important;
+}
+body.an-contact-mode #app .an-contact-social [data-an-social="facebook"]{--contact-title:#75b3ff}
+body.an-contact-mode #app .an-contact-social [data-an-social="linkedin"]{--contact-title:#82d0ff}
+body.an-contact-mode #app .an-contact-social [data-an-social="youtube"]{--contact-title:#ff6969}
+body.an-contact-mode #app .an-contact-social [data-an-social="whatsapp"]{--contact-title:#71ee99}
+body.an-contact-mode #app .an-contact-social [data-an-social="tiktok"] small{
+  color:#090b0f!important;
+  text-shadow:0 0 2px #fff,0 0 3px #fff,0 0 5px #fff;
+}
+body.an-contact-mode #app .an-contact-social [data-an-social="gmail"] small{
+  width:max-content;
+  font-family:ui-monospace,monospace;
+  background:linear-gradient(90deg,#83b9ff 20%,#ff7777 20% 40%,#ffd46a 40% 60%,#83b9ff 60% 80%,#78ee9e 80%);
+  background-clip:text;
+  color:transparent!important;
+  filter:drop-shadow(0 1px 2px #000);
+  text-shadow:none;
+}
+body.an-contact-mode #app .an-contact-office :is(b,p){
+  align-self:flex-start;
+  max-width:100%;
+  border-radius:6px;
+  padding:2px 4px;
+  background:#090d1480;
+}
+body.an-contact-mode #app .an-contact-office b{
+  border:1px solid #ffb05b91;
 }
