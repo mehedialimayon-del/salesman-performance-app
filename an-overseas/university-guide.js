@@ -253,9 +253,17 @@ const profileFact=(u,section)=>{
  return '<div class="an-profile-fact"><h3>'+label+'</h3><p>'+e(detail)+(item[3]?' · '+countdown(item[3]):'')+'</p>'+link(item[2],'Published source')+(key==='amu'&&section==='entry'?link(amuAdmissions,'International admissions'):'')+'</div>'+supplemental;
 };
 const verifiedLogoFiles={aimstuniversity:'aimst',ucsiuniversity:'ucsi',amcuniversitycollege:'amc'};
+const catalogueIcon=u=>{
+ const icons=window.ANCatalogueWebsiteIcons||{};
+ if(!Object.hasOwn(icons,u.id))return '';
+ const host=icons[u.id];
+ try{if(new URL(u.site).hostname.toLowerCase()!==host)return '';}catch{return '';}
+ return 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(host)+'&sz=64';
+};
+const isWebsiteIcon=(u,logo)=>Boolean(logo&&logo===catalogueIcon(u));
 const institutionLogo=(u,p)=>{
  const file=factKey(u)==='amu'?'amu':verifiedLogoFiles[norm(String(u.name||'').replace(/\s*\([^)]*\)\s*$/,''))];
- return file?'assets/universities/'+file+'-official-logo.png':u.logoImage||p?.logo||'';
+ return file?'assets/universities/'+file+'-official-logo.png':u.logoImage||p?.logo||catalogueIcon(u);
 };
 const profileData=(u,p={})=>{
  const key=factKey(u);
@@ -297,7 +305,7 @@ const card=(u,p)=>{
  const historicalFact=!firstYear&&Number.isInteger(historicalTuition)?[usd(historicalTuition),'Out-of-state UG · 2023/24',ipedsSource]:null;
  const intakeText='Check admissions calendar';
  const logo=institutionLogo(u,p);
- const logoMarkup=validUrl(logo)||/^assets\//.test(logo)?'<img class="an-premium-meta-logo" src="'+e(logo)+'" alt="'+e(name)+' logo" loading="lazy" onerror="this.remove()">':'';
+ const logoMarkup=validUrl(logo)||/^assets\//.test(logo)?'<img class="an-premium-meta-logo" src="'+e(logo)+'" alt="'+e(name)+(isWebsiteIcon(u,logo)?' website icon':' logo')+'" loading="lazy" onerror="this.remove()">':'';
  const country=u.country||u.city||'';
  const factHeading=label=>{const space=label.indexOf(' ');const cut=space>0?space:Math.ceil(label.length/2);return '<span>'+e(label.slice(0,cut))+'</span>'+e(label.slice(cut));};
  const fact=(icon,label,value,extra='',source='',date='')=>'<div class="an-premium-fact"><span class="an-premium-fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+factIcons[icon]+'</svg></span><strong>'+factHeading(label)+'</strong><b>'+(source?'<a href="'+e(source)+'" rel="noopener noreferrer" target="_blank">'+(date?countdown(date):e(value))+'</a>':e(value))+'</b>'+(extra?'<small>'+e(extra)+'</small>':'')+'</div>';
@@ -401,5 +409,5 @@ document.addEventListener('error',event=>{
  }
 },true);
 const extended=(u,p)=>'<section class="profile-section an-guide-degrees" id="profile-degree"><h2><span>Degree-wise</span> Application Guide</h2><p>Expand a level for its application preparation, recognised-document checklist and official route.</p><div class="an-guide-degree-grid">'+['Bachelor','Master','PhD'].map((level,i)=>'<details class="an-guide-degree-box"'+(i===0?' open':'')+'><summary>'+e(level)+' <span>⌄</span></summary>'+degree(u,level)+'</details>').join('')+'</div></section>'+support(u);
-window.ANUniGuide={card,compare,getRank,panel,mount,route,photos,extended,profileFact,institutionLogo,profileData,leidenRank};
+window.ANUniGuide={card,compare,getRank,panel,mount,route,photos,extended,profileFact,institutionLogo,profileData,leidenRank,isWebsiteIcon};
 })();
