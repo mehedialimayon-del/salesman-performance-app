@@ -84,7 +84,7 @@ jobs:
                   assert(x.offices[1].right<=width+3,name+': office within screen');
                   assert(x.contacts.top>x.offices[0].top&&x.contacts.bottom<x.enquiry.top,name+': contacts below office');
                   assert(x.enquiry.top>x.contactGrid.top,name+': compact form below socials');
-                  assert(x.enquiry.height<260,name+': enquiry panel is compact');
+                  assert(x.enquiry.bottom>=height-20,name+': enquiry panel uses the available space');
                   assert(x.gmail.bottom<=x.officePanel.bottom+3,name+': Gmail card not clipped by contact panel');
                   assert(Math.abs(x.fb.top-x.yt.top)<4&&Math.abs(x.li.top-x.call.top)<4&&x.li.top>x.fb.top,name+': two rows of three icon cards');
                   assert(x.gmail.top>x.call.top&&x.gmail.width>=x.fb.width*1.9,name+': centered full-width Gmail last');
