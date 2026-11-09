@@ -78,3 +78,13 @@
  .an-elig .an-elig-grid label{font-size:.78rem}
  .an-elig .an-elig-tabs{flex-direction:row}
 }
+
+/* Mobile-menu style full-width academic choices */
+.an-elig .an-elig-suggestions{background:#100e0c;border:1px solid #a96632;border-radius:13px;padding:7px;max-height:min(52vh,390px);overflow-y:auto;overscroll-behavior:contain;box-shadow:0 15px 32px #0009}
+.an-elig .an-elig-suggestions button{display:block;width:100%;text-align:left;background:#211914;border:1px solid #a96632;border-radius:10px;padding:12px 13px;margin:0 0 7px;color:#ff871d;overflow-wrap:anywhere;white-space:normal;line-height:1.4}
+.an-elig .an-elig-suggestions button:nth-of-type(even){color:#fff}
+.an-elig .an-elig-suggestions button:hover,.an-elig .an-elig-suggestions button:focus-visible{background:#342317;border-color:#ff9a3a}
+.an-elig .an-elig-suggestions button small{display:block;color:#cbb7a7;font-size:.75rem;margin-top:4px}
+.an-elig .an-elig-education-row{overflow:visible;min-width:0}
+.an-elig .an-elig-education-row [data-secondary-group],.an-elig .an-elig-education-row [data-secondary-board]{min-width:0}
+@media(max-width:720px){.an-elig .an-elig-education-row .an-elig-grid{grid-template-columns:1fr}.an-elig .an-elig-suggestions{max-height:42svh}}
