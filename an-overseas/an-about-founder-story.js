@@ -180,10 +180,11 @@
     return '<main class="an2-story wrap" id="an2-story">'+
       '<div class="an2-topline"><a href="#/about" class="an2-back">← ABOUT US</a><span>THE PEOPLE · THE PURPOSE · THE PROMISE</span></div>'+
       founderHero()+
-      '<section class="an2-mobile-overview" aria-label="A&N Overseas at a glance"><h1>Welcome to <em>A&amp;N Overseas</em></h1><p class="an2-overview-intro">Find universities, scholarships and answers to your study abroad questions, from programme choice to application.</p><div class="an2-overview-metrics">'+
-        '<div>'+cardIcon('M3 9l9-5 9 5H3z M5 19h14 M7 10v7 M12 10v7 M17 10v7')+'<strong data-an-story-university-total>'+uniCount+'</strong><span>Universities</span></div>'+
-        '<div>'+cardIcon('M3 9l9-5 9 5-9 5-9-5z M7 11v5q5 4 10 0v-5 M21 9v7')+'<strong>'+(window.ANScholarships?.items?.length?.toLocaleString('en-US') ?? '—')+'</strong><span>Scholarships</span></div>'+
-        '<div>'+cardIcon('M3 5h18v14H3z M3 9h18 M7 13h4 M7 16h10')+'<strong>One site</strong><span>Study abroad resources</span></div>'+
+      '<section class="an2-mobile-overview" aria-label="A&N Overseas at a glance"><h1>Welcome to <em>A&amp;N Overseas</em></h1><p class="an2-overview-intro"><strong>Your study abroad journey on one platform.</strong><br>From choosing a programme to preparing your application.</p><div class="an2-overview-metrics">'+
+        '<a href="#/universities">'+cardIcon('M3 9l9-5 9 5H3z M5 19h14 M7 10v7 M12 10v7 M17 10v7')+'<strong data-an-story-university-total>'+uniCount+'</strong><span>Universities</span></a>'+
+        '<a href="#/scholarships">'+cardIcon('M3 9l9-5 9 5-9 5-9-5z M7 11v5q5 4 10 0v-5 M21 9v7')+'<strong>'+(window.ANScholarships?.items?.length?.toLocaleString('en-US') ?? '—')+'</strong><span>Scholarships</span></a>'+
+        '<a href="#/success">'+cardIcon('M4 5h16v11H9l-5 4z M8 9h8 M8 12h5')+'<strong>Study Abroad Answers</strong><span>Guides and insights</span></a>'+
+        '<a href="#/tracking">'+cardIcon('M3 12h4l3-6 4 12 3-6h4')+'<strong>Live Tracking</strong><span>EMGS stages preview</span></a>'+
       '</div></section>'+
       '<nav class="an2-nav" aria-label="Explore the A&N story">'+
         '<a href="#/aboutdetails" data-an-about-jump="an2-origins">Our Beginning</a><a href="#/aboutdetails" data-an-about-jump="an2-purpose">Why We Began</a><a href="#/aboutdetails" data-an-about-jump="an2-platform">Global Directory</a><a href="#/aboutdetails" data-an-about-jump="an2-services">What We Do</a><a href="#/aboutdetails" data-an-about-jump="an2-future">Our Vision</a>'+
