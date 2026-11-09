@@ -934,7 +934,7 @@ body.an-contact-mode .an-contact-head .bread{font-size:10px!important}
  html body.an-about-locked #app .an-about-v3 .an-about-intro-panel{justify-content:flex-start!important;overflow-y:auto!important}
 }
 </style>
-<link rel="stylesheet" href="an-about-banner.css?v=20261110-1">
+<link rel="stylesheet" href="an-about-banner.css?v=20261110-2">
 <style id="an-desktop-navigation-fit">
 @media (min-width: 801px) {
   html body > header.top > .wrap {
@@ -1061,7 +1061,7 @@ body.an-contact-mode .an-contact-head .bread{font-size:10px!important}
 <script src="europe-catalog.js?v=20261101-sourced-525"></script><script src="university-contacts.js?v=20261105-official-contacts-v1"></script><script src="an-ipeds-us-2023.js?v=20261108-v1"></script><script src="an-leiden-ranks-2026.js?v=20261108-v1"></script><script src="an-common-app-deadlines-2027.js?v=20261108-v1"></script><script src="an-catalogue-website-icons.js?v=20261108-v1"></script><script src="an-additional-ranks-2026.js?v=20261108-v2"></script><script src="an-university-profile-batch-1000.js?v=20261109-batch1"></script><script src="an-university-profile-batch-2000.js?v=20261109-batch2and3"></script><script src="an-university-profile-batch-final-103.js?v=20261109-final"></script><script src="an-ranking-supplement-20261109.js?v=1"></script><script src="university-guide.js?v=20261109-admissions-v5"></script><script src="an-asia-verified-media.js?v=20261106-malaysia-three-verified-v2"></script><script src="an-asia-commons-media.js?v=20261106-commons-57-v1"></script><script src="an-asia-supplementary-logos.js?v=20261106-official-421-v1"></script><script src="an-asia-institution-icons.js?v=20261106-identities-106-v1"></script><script src="an-asia-commons-additional.js?v=20261106-commons-13-v2"></script><script src="an-university-media.js?v=20261106-final-asia-v20"></script><script src="an-world-directory-packed.js?v=20261106-snapshot-v1"></script><script src="an-global-universities.js?v=20261109-coverage-v4"></script><script src="an-student-country-data.js?v=20261105-work-family-v4"></script><script src="an-student-guide.js?v=20261105-guide-v3"></script>
 <script src="an-country-cards.js?v=20261108-name-split-v2"></script>
 <script src="an-favorites.js?v=20261106-v1"></script><script src="an-eligibility-picker-data.js?v=4"></script><script src="an-eligibility-rules.js?v=4"></script><script src="an-eligibility.js?v=20261109-qual-v7"></script><script src="an-scholarship-catalogue.js?v=20261109-award-terms-v5"></script><script src="an-epos-deep-guide.js?v=20261106-sept-corrected-v2"></script><script src="an-epos-detailed-view.js?v=20261106-full-a-z-v1"></script><script src="an-scholarships.js?v=20261109-award-terms-v5"></script><script src="an-scholarship-country-guide.js?v=20261106-countries-v1"></script>
-<script src="an-portfolio-2026.js?v=20261108-visa-cost-v2"></script><script src="an-about-founder-story.js?v=20261109-about-original-chapters"></script><script src="an-navigation-continuity.js?v=20261109-about-top"></script>
+<script src="an-portfolio-2026.js?v=20261108-visa-cost-v2"></script><script src="an-about-founder-story.js?v=20261110-about-flags"></script><script src="an-navigation-continuity.js?v=20261109-about-top"></script>
 <script>
 'use strict';
 const U=[
@@ -1158,27 +1158,32 @@ function successPage(){return '<div class="an-community-page" id="an-community">
  '<section class="an-community-panel" aria-label="Success Stories"><div class="an-community-panel-head"><div><span class="an-community-eyebrow">REAL JOURNEYS · REAL EXPERIENCES</span><h2>Student <span>Success Stories</span></h2><small>Published only with student permission</small></div><div class="an-panel-icon" aria-hidden="true">★</div></div><div class="an-community-scroll" id="an-success-gallery" tabindex="0" aria-label="Scroll student success stories"><div class="an-premium-empty"><span>✦</span><h2>Success Stories</h2><p>Loading approved photos and videos...</p></div></div></section>'+
  '</div></div>';}
 function servicesPage(){return title('Our Services','From programme selection to pre-departure preparation, we support your next big step.')+`<div class="wrap content"><div class="grid">${serviceList.map(([ico,h,desc])=>`<div class="card"><div class="inside"><div class="iconbox">${ico}</div><h3>${h}</h3><p>${desc}</p></div></div>`).join('')}</div><div class="callout mt"><div><h2>Not sure where to begin?</h2><p class="muted">Explore universities and prepare questions for our counselling team.</p></div>${a('contact','Contact Our Team →')}</div></div>`}
-function aboutBannerCrop(x,y,w,h){
- return `<span class="an-banner-crop" style="--x:${x};--y:${y};--w:${w};--h:${h}"><img src="assets/about-founder-banner-20261110.webp" alt="" width="1859" height="846"></span>`;
-}
 function aboutPage(){
  return `<section class="an-about-banner" aria-label="About A&N Overseas">
   <div class="an-about-art">
-   <div class="an-about-banner-desktop"><img src="assets/about-founder-banner-20261110.webp" alt="" width="1859" height="846" fetchpriority="high"></div>
-   <div class="an-about-banner-mobile" aria-hidden="true">
-    ${aboutBannerCrop(40,0,1250,112)}
-    ${aboutBannerCrop(52,119,895,486)}
-    <div class="an-banner-mobile-pair">${aboutBannerCrop(1007,134,396,447)}${aboutBannerCrop(1404,0,450,618)}</div>
-   </div>
-   <div class="an-banner-accessible">
-    <h1>Founder’s Message</h1>
-    <p>Rooted in experience. Built for your future.</p>
-    <blockquote>International education should never be a privilege reserved for the few. It should be a bridge between potential and possibility—where trustworthy guidance, the right opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you.</blockquote>
-    <p>Nusrat Nasrin, CEO &amp; Founder</p>
-   </div>
+   <header class="an-banner-brand">
+    <span class="an-banner-globe" aria-hidden="true"><span class="an-banner-earth">🌎</span><svg viewBox="0 0 84 52"><path fill="#a94a00" stroke="#ff9a28" d="M24 22v14q18 13 36 0V22z"/><path fill="#ff8500" stroke="#ffb44b" d="M3 20 42 6l39 14-39 14z"/><path fill="none" stroke="#ffaf31" stroke-width="2" d="M76 22v19"/><path fill="#ffaf31" d="m76 39-4 9h8z"/></svg></span>
+    <p>Rooted in experience. <strong>Built for your future.</strong></p>
+   </header>
+   <article class="an-banner-message">
+    <h1><span>Founder’s</span> Message</h1>
+    <blockquote><strong>“International education should never be a privilege reserved for the few.</strong> It should be a bridge between potential and possibility—where trustworthy guidance, the right opportunities and meaningful support turn uncertainty into confidence. At A&amp;N Overseas, we do more than help students cross borders; we stand beside them as they discover what they can become. From your first dream to your first confident step abroad, we are committed to walking this journey with you.<strong>”</strong></blockquote>
+   </article>
+   <section class="an-banner-destinations" aria-label="Study destinations">
+    <h2>From Home to the World</h2>
+    <div class="an-banner-flags">${window.ANAboutJourneyFlags?.() || ''}</div>
+    <small>Bangladesh · Malaysia · Global possibilities</small>
+   </section>
+   <figure class="an-banner-founder">
+    <svg class="an-banner-portrait" viewBox="1404 0 450 521" role="img" aria-label="Portrait of Nusrat Nasrin">
+     <image href="assets/about-founder-banner-20261110.webp" width="1859" height="846"/>
+    </svg>
+    <figcaption><strong>Nusrat Nasrin</strong><span>CEO &amp; Founder</span></figcaption>
+   </figure>
    <nav class="an-banner-actions" aria-label="Explore A&N Overseas">
-    <a class="an-banner-read" href="#/aboutdetails" aria-label="Read More">${aboutBannerCrop(69,676,513,87)}</a>
-    <a class="an-banner-team" href="#/management" aria-label="Explore Our Management">${aboutBannerCrop(611,676,622,87)}</a>
+    <a class="an-banner-read" href="#/aboutdetails">Read More <span aria-hidden="true">↗</span></a>
+    <a class="an-banner-team" href="#/management">Explore Our Management</a>
+    <p>Meet the team behind A&amp;N Overseas.</p>
    </nav>
   </div>
  </section>`;

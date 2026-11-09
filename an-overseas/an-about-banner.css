@@ -4,68 +4,182 @@ body.an-about-banner-mode {
   flex-direction: column;
   background: #000;
 }
-body.an-about-banner-mode #app {
-  flex: 1 0 auto;
-  display: flex;
-  min-height: 0;
-}
+body.an-about-banner-mode #app { flex: 1 0 auto; display: flex; min-height: 0; }
 body.an-about-banner-mode > .footer { display: none; }
+
 .an-about-banner {
   --an-banner-height: calc(100dvh - var(--an-top-height, 78px) - 28px);
+  --an-banner-orange: #ff6500;
   flex: 1;
-  min-height: var(--an-banner-height);
+  min-width: 0;
+  color: #fff;
   background: #000;
 }
 .an-about-art {
-  position: relative;
-  width: min(100%, calc(var(--an-banner-height) * 1859 / 846));
-  margin-inline: auto;
+  min-height: var(--an-banner-height);
+  width: 100%;
+  display: grid;
+  grid-template: "brand brand portrait" auto "message flags portrait" 1fr "actions actions actions" auto / minmax(0, 1.9fr) minmax(0, .83fr) minmax(0, .92fr);
+  gap: clamp(9px, 1.25vw, 23px);
+  padding: 0 clamp(9px, 1.35vw, 27px) clamp(8px, 1.4vh, 18px);
 }
-.an-about-banner-desktop img {
+.an-banner-brand {
+  grid-area: brand;
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.2vw, 22px);
+  border-bottom: 2px solid var(--an-banner-orange);
+}
+.an-banner-brand p {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(17px, 2vw, 37px);
+  font-weight: 850;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+.an-banner-brand strong,
+.an-banner-message h1 span,
+.an-banner-message blockquote strong { color: var(--an-banner-orange); }
+.an-banner-globe {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: clamp(53px, 7vw, 104px);
+  aspect-ratio: 1;
+}
+.an-banner-earth { font-size: clamp(39px, 5vw, 82px); line-height: 1; }
+.an-banner-globe svg { position: absolute; width: 85%; top: 8%; left: 7.5%; }
+.an-banner-message {
+  grid-area: message;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.1vh, 16px);
+  min-width: 0;
+}
+.an-banner-message h1 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(24px, 3.25vw, 63px);
+  font-weight: 900;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+.an-banner-message blockquote {
+  flex: 1;
+  display: block;
+  align-content: center;
+  margin: 0;
+  padding: clamp(10px, 1.45vw, 27px);
+  border: 2px solid var(--an-banner-orange);
+  border-radius: 19px;
+  color: #fff;
+  font: italic clamp(15px, min(1.63vw, 3.5dvh), 32px)/1.19 Georgia, serif;
+}
+.an-banner-destinations {
+  grid-area: flags;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  gap: clamp(6px, 1.1vh, 14px);
+  padding-left: clamp(6px, .8vw, 15px);
+  border-left: 2px solid var(--an-banner-orange);
+}
+.an-banner-destinations h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(12px, 1.4vw, 26px);
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+.an-banner-destinations small { color: #fff; font-size: clamp(9px, .9vw, 16px); }
+.an-banner-flags {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(3px, .6vh, 8px) clamp(2px, .45vw, 9px);
+}
+.an-banner-flags .an2-flag-unit { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.an-banner-flags .an2-static-star { color: var(--an-banner-orange); font-size: clamp(7px, .65vw, 12px); }
+.an-banner-flags .an2-flag { position: relative; display: block; width: 100%; min-width: 0; aspect-ratio: 3 / 2; }
+.an-banner-flags .an2-flag-emoji { position: absolute; inset: 0; font-size: clamp(10px, 1.5vw, 24px); line-height: 1; }
+.an-banner-flags .an2-flag-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; border-radius: 2px; }
+.an-banner-founder {
+  grid-area: portrait;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  min-width: 0;
+}
+.an-banner-portrait {
   display: block;
   width: 100%;
-  height: auto;
+  max-height: max(180px, calc(var(--an-banner-height) - 145px));
+  flex: 0 1 auto;
 }
-.an-about-banner-mobile { display: none; }
-.an-banner-accessible {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
+.an-banner-founder figcaption { display: grid; justify-items: center; gap: 4px; text-align: center; width: 100%; }
+.an-banner-founder figcaption strong {
+  padding: .26em .65em;
+  border: 1px solid var(--an-banner-orange);
+  border-radius: 99px;
+  color: var(--an-banner-orange);
+  font-size: clamp(12px, 1.3vw, 24px);
+  line-height: 1.1;
+  letter-spacing: .09em;
+  text-transform: uppercase;
 }
-.an-banner-crop {
-  display: block;
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: var(--w) / var(--h);
+.an-banner-founder figcaption span {
+  padding: .24em .7em;
+  border-radius: 99px;
+  background: #b23e00;
+  color: #fff;
+  font-size: clamp(11px, 1.05vw, 21px);
+  font-weight: 750;
 }
-.an-banner-crop img {
-  position: absolute;
-  display: block;
-  width: calc(185900% / var(--w));
-  height: auto;
-  max-width: none;
-  left: calc(-100% * var(--x) / var(--w));
-  top: calc(-100% * var(--y) / var(--h));
+.an-banner-actions {
+  grid-area: actions;
+  display: grid;
+  grid-template-columns: 1fr 1.18fr 1fr;
+  align-items: center;
+  gap: clamp(8px, 1.3vw, 24px);
+  padding-top: clamp(8px, 1.45vh, 17px);
+  border-top: 2px solid var(--an-banner-orange);
 }
 .an-banner-actions a {
-  position: absolute;
-  top: calc(67600% / 846);
-  display: block;
-  background: #000;
-  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .4em;
+  min-height: clamp(42px, 6.5vh, 72px);
+  padding: .4em .65em;
+  border: 2px solid var(--an-banner-orange);
+  border-radius: 12px;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: clamp(12px, 1.43vw, 26px);
+  font-weight: 850;
+  line-height: 1.15;
+  transition: transform .2s ease-out, box-shadow .2s ease-out;
 }
-.an-banner-read { left: calc(6900% / 1859); width: calc(51300% / 1859); }
-.an-banner-team { left: calc(61100% / 1859); width: calc(62200% / 1859); }
-.an-banner-actions a:focus-visible { outline: 2px solid white; outline-offset: 3px; }
-.an-banner-actions a:hover .an-banner-crop { filter: brightness(1.12); }
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .an-banner-actions a:hover .an-banner-crop { animation: an-banner-shake .34s ease-out; }
-  @keyframes an-banner-shake {
-    25% { transform: translateY(-3px) rotate(-.6deg); }
-    60% { transform: translateY(-1px) rotate(.5deg); }
+.an-banner-actions .an-banner-read { background: var(--an-banner-orange); color: #fff; }
+.an-banner-actions .an-banner-team { background: #000; color: #fff; }
+.an-banner-actions a:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.an-banner-actions p { margin: 0; color: #fff; font: italic clamp(12px, 1.3vw, 24px)/1.15 Georgia, serif; }
+@media (prefers-reduced-motion: no-preference) {
+  .an-banner-earth { animation: an-banner-earth-turn 8s linear infinite; }
+  .an-banner-flags .an2-flag {
+    animation: anTinyFlagWave 3.7s ease-in-out infinite;
+    animation-delay: calc(var(--flag-index) * -.17s);
   }
+  .an-banner-actions a:is(:hover,:focus-visible) {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 13px #ff650054;
+  }
+  @keyframes an-banner-earth-turn { to { transform: rotate(1turn); } }
 }
 .an-management-page {
   min-height: calc(100dvh - var(--an-top-height, 78px) - 28px);
@@ -77,10 +191,13 @@ body.an-about-banner-mode > .footer { display: none; }
 #app .an-management-page .an-manager-white-name { font-size: clamp(19px, 3vw, 34px) !important; }
 @media (max-width: 800px) and (orientation: portrait) {
   #app .an-management-page .an-manager-card { min-height: 0 !important; }
-  .an-about-art { width: min(100%, 560px); padding: 8px 10px 12px; }
-  .an-about-banner-desktop { display: none; }
-  .an-about-banner-mobile { display: grid; gap: 8px; }
-  .an-banner-mobile-pair { display: grid; grid-template-columns: 1fr 1.18fr; align-items: center; gap: 4px; }
-  .an-banner-actions { display: grid; grid-template-columns: .84fr 1fr; gap: 8px; margin-top: 9px; }
-  .an-banner-actions a { position: static; width: auto; display: grid; align-content: center; min-height: 44px; }
+  .an-about-art {
+    grid-template: "brand brand" auto "message message" auto "flags portrait" 1fr "actions actions" auto / minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 9px;
+    padding-inline: 8px;
+  }
+  .an-banner-message blockquote { font-size: clamp(13px, 3.55vw, 19px); }
+  .an-banner-destinations { border-left: 0; padding-left: 0; }
+  .an-banner-actions { grid-template-columns: .85fr 1fr; }
+  .an-banner-actions p { display: none; }
 }

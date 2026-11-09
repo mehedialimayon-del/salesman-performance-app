@@ -202,6 +202,7 @@
   }
   // Public route renderer: loaded before the SPA router so direct links work on first paint.
   window.ANAboutFounderStory = renderStory;
+  window.ANAboutJourneyFlags = journeyFlags;
   // Route function is defined in index.html. Replacing it preserves the existing hash router.
   if (typeof aboutDetailsPage === 'function') aboutDetailsPage = renderStory;
   function ensureFounderPage() {
