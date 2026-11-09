@@ -304,7 +304,7 @@
       .concat(['Bangladesh Madrasah Education Board','Bangladesh Technical Education Board']);
     function rebuildChoices() {
       const buckets = new Map();
-      const subjects = new Set(window.ANEligibilitySubjects || []);
+      const subjects = new Set(); // Only programmes recorded in the site directory, not generic international subject vocabularies.
       const add = (country,name,short) => {
         if (!name || !country) return;
         if (!buckets.has(country)) buckets.set(country,new Map());
@@ -352,11 +352,14 @@
       const type=box.dataset.picker;
       const query=input.value;
       const preferred=institutionsByCountry.get(priority) || [];
-      const data=type==='subject' ? (row && ['SSC','HSC'].includes(row.dataset.qualification) && priority==='Bangladesh' ? bdGroups.map(value=>({value,query:value})) : subjectChoices) : type==='institution' ? preferred :
+      const institution=row?.querySelector('[name=institution]')?.value.trim();
+      const matchedEntry=row && institution ? entries.find(entry=>normalize(entry.name)===normalize(institution) && entry.country===priority) : null;
+      const verifiedPrograms=matchedEntry && Array.isArray(matchedEntry.programs) ? matchedEntry.programs.filter(p=>typeof p==='string' && p.length<120).map(value=>({value,query:value})) : [];
+      const data=type==='subject' ? (row && ['SSC','HSC'].includes(row.dataset.qualification) && priority==='Bangladesh' ? bdGroups.map(value=>({value,query:value})) : row ? verifiedPrograms : subjectChoices) : type==='institution' ? preferred :
         [...preferred,...[...institutionsByCountry].filter(([country])=>country!==priority).flatMap(([,list])=>list)];
       const found=data.filter(item=>matches(query,item.query));
       const shown=found.slice(0,query ? 160 : type==='issuer' ? 120 : found.length);
-      panel.innerHTML=shown.length ? shown.map(item=>`<button type="button" data-pick="${escape(item.value)}">${escape(item.value)}${item.hint ? '<small>'+escape(item.hint)+'</small>' : ''}</button>`).join('') : '<p>No catalogue match. You can keep your typed entry.</p>';
+      panel.innerHTML=shown.length ? shown.map(item=>`<button type="button" data-pick="${escape(item.value)}">${escape(item.value)}${item.hint ? '<small>'+escape(item.hint)+'</small>' : ''}</button>`).join('') : '<p>No verified programme listed for this institution yet. You may type your programme manually; it will not be treated as verified.</p>';
       panel.hidden=false;
       input.setAttribute('aria-expanded','true');
     }
@@ -475,6 +478,7 @@
         syncEducationCountry(row);
       }
       if (field.name==='group') row.querySelector('[name=subject]').value=field.value;
+      if (field.name==='institution' && row) { row.querySelector('[name=subject]').value=''; row.querySelector('[name=faculty]').value=''; }
       if (field.name==='gradeScale') row.querySelector('[data-custom-scale]').hidden=field.value!=='other';
       if (field.name==='confirmed') confirmButton.disabled=!field.checked;
     });
@@ -486,6 +490,7 @@
     form.addEventListener('input', event=>{
       const box=event.target.closest('[data-picker]');
       if (box) showPicker(box);
+      if (event.target.name==='institution' && event.target.closest('[data-qualification]')) { const row=event.target.closest('[data-qualification]'); row.querySelector('[name=subject]').value=''; row.querySelector('[name=faculty]').value=''; }
       if (event.target.name!=='confirmed') {
         review.hidden=true;
         results.hidden=true;
@@ -545,7 +550,7 @@
       draft={...fields,nationality:countryNames.of(fields.nationality),education:rows};
       const lines=[
         ['Destination and programme',[draft.country || 'All destinations',draft.level,draft.goal,draft.intake || 'Any published intake',draft.nationality].filter(Boolean).join(' · ')],
-        ...rows.map(row=>[row.credential,[row.subject,row.institution,row.educationCountry,row.completion,row.year,row.grade!=null ? row.grade+' / '+row.scale : '',row.stream,row.honours ? 'Honours: '+row.honours : '',row.englishMedium ? 'English-taught: '+row.englishMedium : '',row.educationCountry==='Malaysia' && row.mqa ? 'MQA recognition: '+row.mqa : ''].filter(Boolean).join(' · ')]),
+        ...rows.map(row=>[row.credential,[row.group || row.subject,row.board,row.faculty,row.institution,row.educationCountry,row.completion,row.year,row.grade!=null ? row.grade+' / '+row.scale : '',row.stream,row.honours ? 'Honours: '+row.honours : '',row.englishMedium ? 'English-taught: '+row.englishMedium : '',row.educationCountry==='Malaysia' && row.mqa ? 'MQA recognition: '+row.mqa : ''].filter(Boolean).join(' · ')]),
         ['English evidence',[draft.english,draft.english==='MOI' ? draft.issuer : [draft.englishScore,draft.bands,draft.testDate].filter(Boolean).join(' · ')].filter(Boolean).join(' · ')],
         ['Work and skills',[draft.jobTitle,draft.employer,draft.experience ? draft.experience+' years' : '',draft.relevance,draft.skills,draft.workHours ? draft.workHours+' post-degree work hours' : ''].filter(Boolean).join(' · ')],
         ['Research and supporting evidence',[draft.research,draft.proposal,draft.awards,draft.gap ? draft.gap+'-year study gap' : ''].filter(Boolean).join(' · ')]
