@@ -995,26 +995,52 @@ body.an-contact-mode .an-contact-head .bread{font-size:10px!important}
 }
 @media (min-width: 801px) and (max-width: 1359px) {
   html body > header.top {
-    height: 104px !important;
-    min-height: 104px !important;
-    max-height: 104px !important;
-    flex-basis: 104px !important;
+    height: 65px !important;
+    min-height: 65px !important;
+    max-height: 65px !important;
+    flex-basis: 65px !important;
   }
   html body > header.top > .wrap {
-    grid-template-columns: minmax(0,1fr) 37px 40px 108px !important;
-    grid-template-areas: "brand search favorite actions" "nav nav nav nav" !important;
-    grid-template-rows: minmax(0,1fr) 34px !important;
+    grid-template-columns: minmax(188px,17vw) minmax(0,1fr) 35px 38px 98px !important;
+    grid-template-rows: minmax(0,1fr) !important;
     height: 100% !important;
     min-height: 0 !important;
     max-height: none !important;
-    padding-block: 3px 6px !important;
+    gap: 4px !important;
+    padding: 3px 9px !important;
+  }
+  html body > header.top > .wrap > :is(.an-desktop-login,.btn.tiny) {
+    width: 100% !important;
+  }
+  html body > header.top nav#links {
+    justify-content: safe center !important;
+    gap: 3px !important;
+    overflow-x: auto !important;
+    padding: 4px !important;
+    scrollbar-width: thin;
+    scrollbar-color: #a74818 transparent;
   }
   html body > header.top nav#links > a {
-    flex: 1 1 auto !important;
+    font-size: 9.5px !important;
+    padding-inline: 4px !important;
+  }
+}
+@media (min-width: 801px) and (max-width: 1280px) {
+  html body > header.top > .wrap > .brand .brand-copy strong {
+    font-size: 19px !important;
+  }
+  html body > header.top nav#links > a {
+    flex-direction: column;
+    gap: 2px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    padding-inline: 5px !important;
     white-space: normal !important;
   }
-  html body > header.top nav#links .an-nav-label-accent {
-    display: inline !important;
+  html body > header.top nav#links > a > .an-nav-label {
+    max-inline-size: 86px;
+    text-wrap: balance;
   }
 }
 </style>
