@@ -404,6 +404,7 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
     background: #0b0e13;
   }
 
+  html body.an-about-details-mode #app .an2-story > section[id] { scroll-margin-top: 4px; }
   html body.an-about-details-mode #app .an2-story > .an2-founder-hero { display: none !important; }
   #app .an2-mobile-overview {
     display: block;
@@ -423,7 +424,7 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
   .an2-mobile-overview h1 em { color: #ff6500; font-style: normal; }
   html body.an-about-details-mode #app .an2-mobile-overview .an2-overview-intro {
     margin: 0 auto 7px !important;
-    max-width: 46ch;
+    max-width: 58ch;
     color: #fff;
     font-size: clamp(10px, 2.9vw, 13px) !important;
     line-height: 1.3 !important;
@@ -438,8 +439,8 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
     border-radius: 8px;
     background: #090b10;
   }
-  #app .an2-overview-metrics svg { width: 20px; height: 20px; color: #82caff; }
-  .an2-overview-metrics strong { color: #ff6500; font-size: clamp(12px, 4vw, 19px); }
+  #app #an2-story .an2-overview-metrics .an2-card-icon { width: 20px; height: 20px; color: #82caff !important; }
+  .an2-overview-metrics strong { color: #ff6500; font-size: clamp(12px, 4vw, 19px); line-height: 1.15; }
   .an2-overview-metrics span { color: #fff; font-size: clamp(9px, 2.8vw, 12px); line-height: 1.2; }
 
   #app .an-management-page.an-about-v3 {

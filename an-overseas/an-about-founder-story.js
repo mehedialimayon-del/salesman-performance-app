@@ -180,7 +180,7 @@
     return '<main class="an2-story wrap" id="an2-story">'+
       '<div class="an2-topline"><a href="#/about" class="an2-back">← ABOUT US</a><span>THE PEOPLE · THE PURPOSE · THE PROMISE</span></div>'+
       founderHero()+
-      '<section class="an2-mobile-overview" aria-label="A&N Overseas at a glance"><h1>Welcome to <em>A&amp;N Overseas</em></h1><p class="an2-overview-intro">Explore universities, find scholarships and get answers to your study abroad questions, from choosing a programme to preparing your application.</p><div class="an2-overview-metrics">'+
+      '<section class="an2-mobile-overview" aria-label="A&N Overseas at a glance"><h1>Welcome to <em>A&amp;N Overseas</em></h1><p class="an2-overview-intro">Find universities, scholarships and answers to your study abroad questions, from programme choice to application.</p><div class="an2-overview-metrics">'+
         '<div>'+cardIcon('M3 9l9-5 9 5H3z M5 19h14 M7 10v7 M12 10v7 M17 10v7')+'<strong data-an-story-university-total>'+uniCount+'</strong><span>Universities</span></div>'+
         '<div>'+cardIcon('M3 9l9-5 9 5-9 5-9-5z M7 11v5q5 4 10 0v-5 M21 9v7')+'<strong>'+(window.ANScholarships?.items?.length?.toLocaleString('en-US') ?? '—')+'</strong><span>Scholarships</span></div>'+
         '<div>'+cardIcon('M3 5h18v14H3z M3 9h18 M7 13h4 M7 16h10')+'<strong>One site</strong><span>Study abroad resources</span></div>'+
