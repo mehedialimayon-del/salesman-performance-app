@@ -825,6 +825,8 @@ html body #app .university-catalogue #results .an-premium-uni-card .an-premium-u
  html body .top nav#links{
   --an-menu-row:clamp(16px,calc((100svh - 144px) / 9),45px);
  }
+ /* Hide immediately when closing, before the open-only button styles drop away. */
+ html body .top nav#links:not(.open){display:none!important}
  html body .top nav#links.open > #an-mobile-menu-close{
   box-sizing:border-box;display:inline-flex!important;align-self:center;
   align-items:center;justify-content:center;gap:9px;
