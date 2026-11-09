@@ -183,8 +183,7 @@ body.an-about-locked #app>.an-about-v3{box-sizing:border-box;display:flex!import
 }
 
 /* Mobile About opens with the founder story and keeps management below it. */
-#app .an-about-mobile-opening,
-#app .an2-story .an2-overview-cards { display:none; }
+#app .an-about-mobile-opening { display:none; }
 
 @media (max-width:800px) {
   body.an-about-locked > #an-site-header-space {
@@ -244,24 +243,5 @@ body.an-about-locked #app>.an-about-v3{box-sizing:border-box;display:flex!import
     color:#1c1108;
     font-weight:900;
     letter-spacing:.08em;
-  }
-  #app .an2-story .an2-overview-cards {
-    display:grid;
-    gap:12px;
-    margin:0 0 18px;
-  }
-  #app .an2-overview-cards article {
-    background:linear-gradient(130deg,#291b17,#10141b);
-    border-color:#f07813;
-  }
-  #app .an2-overview-cards h2 {
-    margin:0 0 8px;
-    font-size:clamp(19px,5vw,26px);
-  }
-  #app .an2-overview-cards .an2-future-graphic {
-    display:block;
-    width:55px;
-    height:55px;
-    margin-bottom:8px;
   }
 }
