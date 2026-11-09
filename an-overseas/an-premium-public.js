@@ -123,7 +123,7 @@ function managerField(label,value,extraClass=''){
  return '<div class="an-manager-field '+extraClass+'"><span class="an-manager-field-label">'+esc(label.toUpperCase())+'</span><span class="an-manager-field-value">'+esc(value)+'</span></div>';
 }
 function showTeam(){
- if(current()!=='about')return;
+ if(current()!=='management')return;
  const panel=document.getElementById('an-manager-card'),counter=document.getElementById('an-manager-counter');
  if(!panel||!counter)return;
  const members=activeMembers(),arrows=[...document.querySelectorAll('.an-manager-controls [data-an-manager]')];
@@ -186,11 +186,11 @@ function showTeam(){
 function apply(){
  if(current()==='success'){showInsights();showStories();}
  if(current()==='countries')showCountries();
- if(current()==='about')showTeam();
+ if(current()==='management')showTeam();
 }
 async function load(){
  const route=current();
- const keys=route==='success'?'success_stories,study_insights':route==='about'?'management':route==='countries'?'countries':'';
+ const keys=route==='success'?'success_stories,study_insights':route==='management'?'management':route==='countries'?'countries':'';
  if(!keys)return;
  if(working){refreshQueued=true;return;}
  working=true;
@@ -221,7 +221,7 @@ async function load(){
 document.addEventListener('click',e=>{if(e.target.closest('[data-an-gallery-refresh]'))void load();});
 document.addEventListener('click',e=>{
  const arrow=e.target.closest('[data-an-manager]');
- if(!arrow||current()!=='about'||arrow.disabled)return;
+ if(!arrow||current()!=='management'||arrow.disabled)return;
  const count=activeMembers().length;
  if(count<2)return;
  teamIndex=(teamIndex+Number(arrow.dataset.anManager)+count)%count;
@@ -229,10 +229,10 @@ document.addEventListener('click',e=>{
 });
 let startX=null;
 document.addEventListener('touchstart',e=>{
- if(current()==='about'&&e.target.closest('#an-manager-card'))startX=e.touches[0]?.clientX??null;
+ if(current()==='management'&&e.target.closest('#an-manager-card'))startX=e.touches[0]?.clientX??null;
 },{passive:true});
 document.addEventListener('touchend',e=>{
- if(startX===null||current()!=='about')return;
+ if(startX===null||current()!=='management')return;
  const next=e.changedTouches[0]?.clientX??startX,delta=next-startX;
  startX=null;
  if(Math.abs(delta)<50||activeMembers().length<2)return;
@@ -326,10 +326,10 @@ document.addEventListener('cancel',e=>{
  if(anPhotoPopPending){e.preventDefault();history.back();}
 });
 // The university CMS can re-render #app after this gallery has already filled the
-// About carousel. Observe only its direct children to restore a lost management
+// Management carousel. Observe only its direct children to restore a lost management
 // profile without recursively observing updates inside the carousel itself.
-function restoreAboutAfterRender(){
- if(current()!=='about'||!activeMembers().length)return;
+function restoreManagementAfterRender(){
+ if(current()!=='management'||!activeMembers().length)return;
  const card=document.getElementById('an-manager-card');
  if(card&&!card.querySelector('.an-manager-name-box'))showTeam();
 }
@@ -337,7 +337,7 @@ const appRoot=document.getElementById('app');
 if(appRoot)new MutationObserver(()=>{
  // A routed page may be rewritten by another module after published content
  // arrives. Restore the CMS cards before the next frame, not a second later.
- if(current()==='about')restoreAboutAfterRender();
+ if(current()==='management')restoreManagementAfterRender();
  if(current()==='success'&&(insights.length||stories.length)){
   const mount=document.getElementById('an-insights-gallery');
   const storiesMount=document.getElementById('an-success-gallery');
@@ -345,7 +345,7 @@ if(appRoot)new MutationObserver(()=>{
   if(storiesMount&&!storiesMount.querySelector('.an-youtube-card')&&stories.some(x=>x&&x.approved===true))showStories();
  }
 }).observe(appRoot,{childList:true});
-window.addEventListener('hashchange',()=>setTimeout(()=>{apply();restoreAboutAfterRender();void load();},70));
+window.addEventListener('hashchange',()=>setTimeout(()=>{apply();restoreManagementAfterRender();void load();},70));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void load();});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{showCachedGallery();void loadStaticGallery();void load();});else{showCachedGallery();void loadStaticGallery();void load();}
 setInterval(()=>{if(!document.hidden)void load();},60000);
