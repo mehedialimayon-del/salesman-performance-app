@@ -1452,4 +1452,27 @@ function schedule(){if(queued)return;queued=true;requestAnimationFrame(function(
 document.addEventListener('DOMContentLoaded',function(){var app=document.getElementById('app');if(app)new MutationObserver(schedule).observe(app,{childList:true,subtree:false});schedule()});
 window.addEventListener('hashchange',schedule);
 })();
+</script><script id="an-about-exact-readmore-flag-pixels-20261110">
+(function(){
+var source='https://d2ol7oe51mr4n9.cloudfront.net/user_3J7eLpAsZ71YVjJWQaNzcGsV3TY/adcc9b9f-f11c-4a3a-a811-b209ce412fbe.png';
+var bounds=[[104,744,94,56],[213,749,71,50],[293,745,70,55],[381,749,63,52]];
+[810,859,906,954,1001,1048,1094].forEach(function(y){[[102,60],[172,60],[241,62],[312,61],[381,65]].forEach(function(x){bounds.push([x[0],y,x[1],43])})});
+bounds.push([102,1140,61,42],[173,1140,62,42]);
+function run(){
+if(!matchMedia('(max-width:800px)').matches||(location.hash||'').split('?')[0]!=='#/about')return;
+var grid=document.querySelector('#app .an-about-banner .an-banner-flags');if(!grid||grid.dataset.originalReadmorePixels==='yes')return;
+grid.dataset.originalReadmorePixels='yes';
+grid.innerHTML='';
+grid.style.cssText='display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px 4px!important;align-items:center!important;justify-items:center!important;width:100%!important';
+bounds.forEach(function(v,i){
+var x=v[0],y=v[1],w=v[2],h=v[3],tile=document.createElement('span');
+tile.className='an-readmore-exact-cloth-tile';
+tile.style.cssText='display:block!important;position:relative!important;width:100%!important;max-width:42px!important;aspect-ratio:'+w+'/'+h+'!important;background-image:url("'+source+'")!important;background-repeat:no-repeat!important;background-size:'+(864/w*100)+'% '+(1536/h*100)+'%!important;background-position:'+(x/(864-w)*100)+'% '+(y/(1536-h)*100)+'%!important;transform-origin:left center!important;animation:anAboutFlagCloth '+(2.8+i%5*.23)+'s ease-in-out infinite!important;animation-delay:'+(-i%8*.37)+'s!important';
+grid.appendChild(tile);
+});
+}
+var pending=false;function schedule(){if(pending)return;pending=true;requestAnimationFrame(function(){pending=false;run()})}
+document.addEventListener('DOMContentLoaded',function(){var app=document.getElementById('app');if(app)new MutationObserver(schedule).observe(app,{childList:true,subtree:false});schedule()});
+window.addEventListener('hashchange',schedule);
+})();
 </script></body></html>
