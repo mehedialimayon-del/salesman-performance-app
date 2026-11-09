@@ -115,13 +115,13 @@
     return `<article class="an-elig-card"><small>${escape(rule.institution)}</small><h3>${escape(rule.name)}</h3>
       <span class="an-elig-badge">Needs Verification</span>
       <dl><dt>Academic</dt><dd>Your profile: ${result?.grade != null ? escape(result.grade + ' / ' + (result.scale ?? 'scale needed')) : 'Provide the relevant qualification and grade'}.
-        Published: ${rule.minimum}/4 for standard entry. <b>${escape(academic)}</b>.</dd>
+        Published: ${rule.minimum}/4 · ${escape(rule.thresholdScope || 'standard entry')}. <b>${escape(academic)}</b>.</dd>
       <dt>Subject</dt><dd>Your profile: ${escape(result?.subject || 'Provide your subject')}. Published: ${escape(rule.subject)}.</dd>
       <dt>English</dt><dd>Your profile: ${escape([profile.english, profile.englishScore].filter(Boolean).join(' ') || 'Provide your English evidence')}.
         Published: ${escape(englishRule)}. <b>${escape(english)}</b>.</dd>
       <dt>Intake</dt><dd>Check the official application window${profile.intake ? ' for ' + escape(profile.intake) : ''}.</dd></dl>
       <p>${escape(rule.alternative)} ${profile.english === 'MOI' ? escape(rule.moi || '') : ''}</p>
-      ${official(rule.source, 'Official programme requirements')} <small>Reviewed ${escape(rule.checked)}</small></article>`;
+      ${official(rule.source, 'Official programme requirements')}${official(rule.academicSource, 'Graduate school entry policy')} <small>Reviewed ${escape(rule.checked)}</small></article>`;
   }
 
   function institutionCard(entry) {
@@ -162,6 +162,7 @@
     let limit = PAGE_SIZE;
     let search = '';
     let selected = entries.find(entry => entry.id === universityId);
+    const catalogueText = entry => [entry.name, entry.short, entry.country, entry.city, ...(entry.programs || [])].join(' ');
     function refreshCountries() {
       selected ||= entries.find(entry => entry.id === universityId);
       const select = form.elements.country;
@@ -172,11 +173,18 @@
     }
     refreshCountries();
     education.append(educationRow());
-    window.ANWorldDirectory?.loadLocalSnapshot().then(loaded => {
+    function refreshDirectory(ready) {
       if (!form.isConnected) return;
-      catalogueReady = loaded;
+      catalogueReady = ready;
       refreshCountries();
-      if (profile) renderSection();
+      if (profile) renderSection(section !== 'goal');
+    }
+    const directory = window.ANWorldDirectory;
+    directory?.loadLocalSnapshot().then(async loaded => {
+      refreshDirectory(false);
+      await directory.loadPublicDirectory();
+      const supplemented = window.ANWorldDirectoryStatus?.source === 'Hipo open directory';
+      refreshDirectory(loaded || supplemented);
     });
 
     function renderSection(keepSearch = false) {
@@ -193,7 +201,9 @@
       const searching = item => matches(query, item);
       const byProgramme = eligibleRules.filter(rule => (!profile.country || programmeHost(rule)?.country === profile.country)
         && matches(profile.goal, rule.name) && searching(rule.name + ' ' + rule.institution));
-      const byInstitution = institutions.filter(entry => searching([entry.name, entry.short, entry.country, entry.city, ...(entry.programs || [])].join(' ')));
+      const byInstitution = institutions.filter(entry => searching(catalogueText(entry)));
+      const goalInstitutions = profile.goal && !selected
+        ? institutions.filter(entry => matches(profile.goal, catalogueText(entry))).slice(0, 6) : [];
       const byAward = awards.filter(item => inCountry(item) &&
         normalize(item.level).includes(normalize(profile.level)) &&
         searching(item.name + ' ' + item.country + ' ' + (item.universities || []).join(' ')));
@@ -203,7 +213,7 @@
         ? `<h3>${escape(profile.goal || selected?.name || 'Your chosen programme')}</h3>` +
           (goalRules.length ? goalRules.map(rule => programmeCard(rule, profile)).join('')
             : '<p>Search the catalogue for your university and use its official programme link to confirm entry requirements with A&amp;N.</p>') +
-          (selected ? institutionCard(selected) : '')
+          (selected ? institutionCard(selected) : goalInstitutions.map(institutionCard).join(''))
         : `<label class="an-elig-search">${section === 'institutions' ? 'Search universities or programmes' : 'Search scholarships'}
             <input type="search" data-elig-search value="${escape(search)}"></label>
             <div data-elig-list></div>`;
