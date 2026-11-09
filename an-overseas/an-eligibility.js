@@ -119,8 +119,8 @@
       <label>Country of study<select name="educationCountry"></select></label>
       <div data-secondary-group hidden><label>Group<select name="group">${options(bdGroups,'Choose group')}</select></label></div>
       <div data-secondary-board hidden><label>Education board<select name="board">${options(bdBoards,'Choose board')}</select></label></div>
-      <div data-subject-wrap>${picker('subject',secondary?'Subjects or group':'Programme / subject','Search programme','subject')}</div>
-      ${picker('institution',secondary?'School / college / examination board':'Institution / university','Search institution','institution')}
+      ${picker('institution',secondary?'School / college / examination board':'Institution / university','Select or search institution','institution')}
+      <div data-subject-wrap>${picker('subject',secondary?'Subjects or group':'Programme / subject','Search programme or major','subject')}</div>
       <div data-faculty-wrap${secondary?' hidden':''}><label>Faculty<input name="faculty" placeholder="Faculty at selected institution"></label></div>
       <label>Passing or expected year<input name="year" type="number" min="1900" max="2100"></label>
       <label>Status<select name="completion">${options(['Completed','In progress'])}</select></label>
@@ -354,12 +354,19 @@
       const preferred=institutionsByCountry.get(priority) || [];
       const institution=row?.querySelector('[name=institution]')?.value.trim();
       const matchedEntry=row && institution ? entries.find(entry=>normalize(entry.name)===normalize(institution) && entry.country===priority) : null;
-      const verifiedPrograms=matchedEntry && Array.isArray(matchedEntry.programs) ? matchedEntry.programs.filter(p=>typeof p==='string' && p.length<120).map(value=>({value,query:value})) : [];
-      const data=type==='subject' ? (row && ['SSC','HSC'].includes(row.dataset.qualification) && priority==='Bangladesh' ? bdGroups.map(value=>({value,query:value})) : row ? verifiedPrograms : subjectChoices) : type==='institution' ? preferred :
-        [...preferred,...[...institutionsByCountry].filter(([country])=>country!==priority).flatMap(([,list])=>list)];
+      const verifiedPrograms=matchedEntry && Array.isArray(matchedEntry.programs) ? matchedEntry.programs.filter(p=>typeof p==='string' && p.length<120).map(value=>({value,query:value,hint:'Institution catalogue'})) : [];
+      const isSubject=type==='subject';
+      const bangladeshSchool=row && ['SSC','HSC'].includes(row.dataset.qualification) && priority==='Bangladesh';
+      // When a university has no published programme list, allow students to
+      // choose a relevant subject from the broader catalogue, clearly labelled
+      // as a subject suggestion rather than a verified university offering.
+      const suggested=subjectChoices.map(item=>({...item,hint:'Subject suggestion · confirm with university'}));
+      const data=isSubject ? (bangladeshSchool ? bdGroups.map(value=>({value,query:value})) : [...verifiedPrograms,...suggested.filter(item=>!verifiedPrograms.some(p=>normalize(p.value)===normalize(item.value)))]) :
+        type==='institution' ? preferred : [...preferred,...[...institutionsByCountry].filter(([country])=>country!==priority).flatMap(([,list])=>list)];
       const found=data.filter(item=>matches(query,item.query));
-      const shown=found.slice(0,query ? 160 : type==='issuer' ? 120 : found.length);
-      panel.innerHTML=shown.length ? shown.map(item=>`<button type="button" data-pick="${escape(item.value)}">${escape(item.value)}${item.hint ? '<small>'+escape(item.hint)+'</small>' : ''}</button>`).join('') : '<p>No verified programme listed for this institution yet. You may type your programme manually; it will not be treated as verified.</p>';
+      const shown=found.slice(0,query ? 100 : 60);
+      const message=isSubject ? 'No matching subject found. Type your programme manually; confirm availability with the institution.' : 'No matching institution found. Check the spelling or enter the institution manually.';
+      panel.innerHTML=shown.length ? shown.map(item=>`<button type="button" data-pick="${escape(item.value)}">${escape(item.value)}${item.hint ? '<small>'+escape(item.hint)+'</small>' : ''}</button>`).join('') : '<p>'+message+'</p>';
       panel.hidden=false;
       input.setAttribute('aria-expanded','true');
     }
