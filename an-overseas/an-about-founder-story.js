@@ -184,7 +184,7 @@
         '<a href="#/universities">'+cardIcon('M3 9l9-5 9 5H3z M5 19h14 M7 10v7 M12 10v7 M17 10v7')+'<strong data-an-story-university-total>'+uniCount+'</strong><span>Universities</span></a>'+
         '<a href="#/scholarships">'+cardIcon('M3 9l9-5 9 5-9 5-9-5z M7 11v5q5 4 10 0v-5 M21 9v7')+'<strong>'+(window.ANScholarships?.items?.length?.toLocaleString('en-US') ?? '—')+'</strong><span>Scholarships</span></a>'+
         '<a href="#/success">'+cardIcon('M4 5h16v11H9l-5 4z M8 9h8 M8 12h5')+'<strong>Study Abroad Answers</strong><span>Guides and insights</span></a>'+
-        '<a href="#/tracking">'+cardIcon('M3 12h4l3-6 4 12 3-6h4')+'<strong>Live Tracking</strong><span>EMGS stages preview</span></a>'+
+        '<a href="#/tracking">'+cardIcon('M3 12h4l3-6 4 12 3-6h4')+'<strong>Live Tracking</strong><span>EMGS application updates</span></a>'+
       '</div></section>'+
       '<nav class="an2-nav" aria-label="Explore the A&N story">'+
         '<a href="#/aboutdetails" data-an-about-jump="an2-origins">Our Beginning</a><a href="#/aboutdetails" data-an-about-jump="an2-purpose">Why We Began</a><a href="#/aboutdetails" data-an-about-jump="an2-platform">Global Directory</a><a href="#/aboutdetails" data-an-about-jump="an2-services">What We Do</a><a href="#/aboutdetails" data-an-about-jump="an2-future">Our Vision</a>'+
