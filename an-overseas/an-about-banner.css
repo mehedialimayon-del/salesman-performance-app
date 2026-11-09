@@ -292,6 +292,7 @@ html body > header.top #brand-typing > span:first-child { color: #ff6500 !import
 html body > header.top #brand-typing > span:last-child,
 html body > header.top #an-desktop-wordmark { color: #fff !important; }
 
+#app .an-banner-signature,
 .an2-mobile-overview,
 #app .an-management-page .an-manager-pages,
 #app .an-management-page .an-manager-more { display: none; }
@@ -332,10 +333,17 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
   .an-banner-earth { font-size: clamp(24px, 6cqh, 39px); }
   .an-banner-brand p { font-size: clamp(12px, 2.9cqh, 19px); }
   .an-banner-message { gap: clamp(3px, 1cqh, 8px); }
-  .an-banner-message h1 { font-size: clamp(16px, 4cqh, 26px); }
+  .an-banner-message h1 { font-size: clamp(14px, 3.3cqh, 22px); text-align: center; }
   .an-banner-message blockquote {
     padding: clamp(5px, 1.5cqh, 11px);
     font-size: clamp(10px, min(3.55vw, 2.25cqh), 17px);
+  }
+  #app .an-banner-signature {
+    display: block;
+    margin: 3px 2px 0 0;
+    color: #ffc176;
+    font: italic 500 clamp(12px, 2.8cqh, 21px)/1.1 "Segoe Script", "Brush Script MT", cursive;
+    text-align: right;
   }
   .an-banner-destinations { min-height: 0; padding-left: 0; border-left: 0; gap: clamp(2px, .85cqh, 6px); }
   .an-banner-destinations h2 { font-size: clamp(9px, 2.05cqh, 13px); }
@@ -365,20 +373,60 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
     font-size: clamp(10px, 2.2cqh, 13px);
   }
 
+  html:has(body.an-about-details-mode),
+  html body.an-about-details-mode {
+    height: 100dvh !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  html body.an-about-details-mode {
+    display: flex !important;
+    flex-direction: column;
+  }
+  html body.an-about-details-mode > #an-site-header-space { display: none !important; }
+  html body.an-about-details-mode > :is(header.top, #an-global-ticker) {
+    position: relative !important;
+    top: auto !important;
+    flex-shrink: 0;
+  }
+  html body.an-about-details-mode > #app {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    overflow: hidden auto !important;
+    overscroll-behavior: contain;
+    scroll-padding-top: 58px;
+  }
+  html body.an-about-details-mode #app .an2-story > .an2-nav {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 55 !important;
+    padding-block: 7px !important;
+    background: #0b0e13;
+  }
+
   html body.an-about-details-mode #app .an2-story > .an2-founder-hero { display: none !important; }
   #app .an2-mobile-overview {
     display: block;
     margin: 8px 0 4px;
-    padding: 12px 8px;
+    padding: 8px 7px;
     border: 1px solid #ff6500;
     border-radius: 14px;
     background: linear-gradient(165deg, #25150b, #101117 65%);
     text-align: center;
   }
-  .an2-mobile-overview h1 {
-    margin: 0 0 10px;
+  html body.an-about-details-mode #app .an2-mobile-overview h1 {
+    margin: 0 0 4px !important;
     color: #fff;
-    font-size: clamp(16px, 5vw, 23px);
+    font-size: clamp(15px, 4.35vw, 21px) !important;
+    line-height: 1.15 !important;
+  }
+  .an2-mobile-overview h1 em { color: #ff6500; font-style: normal; }
+  html body.an-about-details-mode #app .an2-mobile-overview .an2-overview-intro {
+    margin: 0 auto 7px !important;
+    max-width: 46ch;
+    color: #fff;
+    font-size: clamp(10px, 2.9vw, 13px) !important;
+    line-height: 1.3 !important;
   }
   .an2-overview-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
   .an2-overview-metrics > div {
@@ -386,11 +434,11 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
     justify-items: center;
     align-content: start;
     gap: 3px;
-    padding: 7px 2px;
+    padding: 4px 2px;
     border-radius: 8px;
     background: #090b10;
   }
-  .an2-overview-metrics svg { width: 25px; height: 25px; color: #ff6500; }
+  #app .an2-overview-metrics svg { width: 20px; height: 20px; color: #82caff; }
   .an2-overview-metrics strong { color: #ff6500; font-size: clamp(12px, 4vw, 19px); }
   .an2-overview-metrics span { color: #fff; font-size: clamp(9px, 2.8vw, 12px); line-height: 1.2; }
 
