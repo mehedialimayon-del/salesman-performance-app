@@ -287,6 +287,7 @@ const theRankAdditions={
  'an-h-dir-turkey-wwwbamdirmaedutr':['t','1601–1800','bandirma-onyedi-eylul-university']
 };
 const additionalRankProviders={
+ n:['uniRank 2026','National · web popularity',country=>'https://www.unirank.org/'+country+'/ranking/'],
  t:['THE World 2027','World ranking',ref=>'https://www.timeshighereducation.com/world-university-rankings/'+ref],
  q:['QS World 2027','World ranking',ref=>'https://www.topuniversities.com/universities/'+ref],
  a:['QS 2027','South-Eastern Asia',ref=>'https://www.topuniversities.com/universities/'+ref],
@@ -300,7 +301,9 @@ const additionalRankProviders={
 };
 const additionalRank=u=>{
  const ranks=window.ANAdditionalRanks2026||{};
- const record=Object.hasOwn(ranks,u.id)?ranks[u.id]:Object.hasOwn(theRankAdditions,u.id)?theRankAdditions[u.id]:null;
+ const supplemental=window.ANRankSupplement2026||{};
+ const candidate=Object.hasOwn(supplemental,u.id)?supplemental[u.id]:null;
+ const record=Object.hasOwn(ranks,u.id)?ranks[u.id]:Object.hasOwn(theRankAdditions,u.id)?theRankAdditions[u.id]:candidate?.[3]===u.name?candidate:null;
  if(!record)return null;
  const [key,position,ref,sourceName]=record;
  const [name,scope,source]=additionalRankProviders[key];
@@ -525,5 +528,14 @@ document.addEventListener('error',event=>{
 },true);
 const extended=(u,p)=>'<section class="profile-section an-guide-degrees" id="profile-degree"><h2><span>Degree-wise</span> Application Guide</h2><p>Expand a level for its application preparation, recognised-document checklist and official route.</p><div class="an-guide-degree-grid">'+['Bachelor','Master','PhD'].map((level,i)=>'<details class="an-guide-degree-box"'+(i===0?' open':'')+'><summary>'+e(level)+' <span>⌄</span></summary>'+degree(u,level)+'</details>').join('')+'</div></section>'+support(u);
 const hasPublishedRank=u=>Boolean(verifiedCardFacts[factKey(u)]?.ranking||getRank(u)||leidenRank(u)||additionalRank(u));
-window.ANUniGuide={card,compare,getRank,hasPublishedRank,panel,mount,route,photos,extended,profileFact,institutionLogo,profileData,tuitionRows,leidenRank,isWebsiteIcon};
+const publishedCoverage=(u,p={})=>{
+ const facts=verifiedCardFacts[factKey(u)];
+ const profile=profileData(u,p);
+ return {
+  tuition:tuitionRows(u,profile).some(row=>validUrl(row[3]||profile.feeSource)),
+  intake:Boolean(facts?.intake?.[0]&&validUrl(facts.intake[2])),
+  deadline:Boolean(commonAppDates(u)?.some(Boolean)||(facts?.intake?.[3]&&validUrl(facts.intake[2])))
+ };
+};
+window.ANUniGuide={card,compare,getRank,hasPublishedRank,publishedCoverage,panel,mount,route,photos,extended,profileFact,institutionLogo,profileData,tuitionRows,leidenRank,isWebsiteIcon};
 })();
