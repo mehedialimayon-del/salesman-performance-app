@@ -100,7 +100,7 @@
       </div>`;
   }
 
-  const qualifications = ['SSC','HSC','Foundation','Diploma','Bachelor','Master','PhD','Other'];
+  const qualifications = ['SSC','HSC','O-Level','A-Level','Foundation','Diploma','Bachelor','Master','PhD','Other'];
   const scales = [['4','CGPA out of 4'],['4.33','GPA out of 4.33'],['5','GPA out of 5'],['7','GPA out of 7'],['10','GPA out of 10'],['20','Grade out of 20'],['100','Percentage out of 100'],['other','Other numeric scale']];
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December','Winter semester'];
   function picker(name, label, placeholder, kind, hidden = false) {
@@ -108,22 +108,28 @@
       <label>${label}<input type="search" name="${name}" placeholder="${placeholder}" autocomplete="off" aria-expanded="false"></label>
       <div class="an-elig-suggestions" hidden></div></div>`;
   }
+  const bdBoards = ['Dhaka','Rajshahi','Dinajpur','Cumilla','Chattogram','Jashore','Barishal','Sylhet','Mymensingh','Madrasah','Technical'];
+  const bdGroups = ['Science','Business Studies','Humanities'];
   function educationRow(qualification) {
     const row = document.createElement('section');
+    const secondary = ['SSC','HSC','O-Level','A-Level'].includes(qualification);
     row.className = 'an-elig-education-row';
     row.dataset.qualification = qualification;
     row.innerHTML = `<h3>${escape(qualification)}</h3><div class="an-elig-grid">
-      ${picker('subject','Subject or group','Search or enter subject','subject')}
       <label>Country of study<select name="educationCountry"></select></label>
-      ${picker('institution','Institution or examination board','Search institution, e.g. BAU','institution')}
+      <div data-secondary-group hidden><label>Group<select name="group">${options(bdGroups,'Choose group')}</select></label></div>
+      <div data-secondary-board hidden><label>Education board<select name="board">${options(bdBoards,'Choose board')}</select></label></div>
+      <div data-subject-wrap>${picker('subject',secondary?'Subjects or group':'Programme / subject','Search programme','subject')}</div>
+      ${picker('institution',secondary?'School / college / examination board':'Institution / university','Search institution','institution')}
+      <div data-faculty-wrap${secondary?' hidden':''}><label>Faculty<input name="faculty" placeholder="Faculty at selected institution"></label></div>
       <label>Passing or expected year<input name="year" type="number" min="1900" max="2100"></label>
       <label>Status<select name="completion">${options(['Completed','In progress'])}</select></label>
       <label>Grading scale<select name="gradeScale"><option value="">Choose scale</option>${scales.map(([value,label])=>'<option value="'+value+'">'+label+'</option>').join('')}</select></label>
       <label data-custom-scale hidden>Maximum grade<input name="customScale" type="number" min="0.01" step="any"></label>
       <label>Your grade<input name="grade" type="number" min="0" step="any"></label>
-      <label>Degree stream<select name="stream">${options(['Science','Non-science'], 'If applicable')}</select></label>
-      <label>Honours degree<select name="honours">${options(['Yes','No'], 'If applicable')}</select></label>
-      <label>Fully taught in English?<select name="englishMedium">${options(['Yes','No'], 'Not specified')}</select></label>
+      <label data-tertiary>Degree stream<select name="stream">${options(['Science','Non-science'], 'If applicable')}</select></label>
+      <label data-tertiary>Honours degree<select name="honours">${options(['Yes','No'], 'If applicable')}</select></label>
+      <label data-tertiary>Fully taught in English?<select name="englishMedium">${options(['Yes','No'], 'Not specified')}</select></label>
       <label data-mqa hidden>MQA-recognised institution?<select name="mqa">${options(['Yes','No'], 'Not sure')}</select></label>
       </div>`;
     return row;
@@ -346,7 +352,7 @@
       const type=box.dataset.picker;
       const query=input.value;
       const preferred=institutionsByCountry.get(priority) || [];
-      const data=type==='subject' ? subjectChoices : type==='institution' ? preferred :
+      const data=type==='subject' ? (row && ['SSC','HSC'].includes(row.dataset.qualification) && priority==='Bangladesh' ? bdGroups.map(value=>({value,query:value})) : subjectChoices) : type==='institution' ? preferred :
         [...preferred,...[...institutionsByCountry].filter(([country])=>country!==priority).flatMap(([,list])=>list)];
       const found=data.filter(item=>matches(query,item.query));
       const shown=found.slice(0,query ? 160 : type==='issuer' ? 120 : found.length);
@@ -361,8 +367,19 @@
       form.querySelector('[data-picker=issuer]').hidden=!isMOI;
     }
     function syncEducationCountry(row) {
-      const isMalaysia=row.querySelector('[name=educationCountry]').value==='Malaysia';
-      row.querySelector('[data-mqa]').hidden=!isMalaysia;
+      const country=row.querySelector('[name=educationCountry]').value;
+      const secondary=['SSC','HSC','O-Level','A-Level'].includes(row.dataset.qualification);
+      const bangladesh=country==='Bangladesh' && ['SSC','HSC'].includes(row.dataset.qualification);
+      row.querySelector('[data-secondary-group]').hidden=!bangladesh;
+      row.querySelector('[data-secondary-board]').hidden=!bangladesh;
+      row.querySelector('[data-subject-wrap]').hidden=bangladesh;
+      row.querySelector('[data-faculty-wrap]').hidden=secondary;
+      row.querySelectorAll('[data-tertiary]').forEach(el=>el.hidden=secondary || ['Foundation','Diploma'].includes(row.dataset.qualification));
+      row.querySelector('[data-mqa]').hidden=country!=='Malaysia' || secondary;
+      if(bangladesh) {
+        row.querySelector('[name=gradeScale]').value='5';
+        row.querySelector('[name=subject]').value=row.querySelector('[name=group]').value;
+      }
     }
     refreshCountries();
     rebuildChoices();
@@ -457,6 +474,7 @@
         row.querySelector('[name=institution]').value='';
         syncEducationCountry(row);
       }
+      if (field.name==='group') row.querySelector('[name=subject]').value=field.value;
       if (field.name==='gradeScale') row.querySelector('[data-custom-scale]').hidden=field.value!=='other';
       if (field.name==='confirmed') confirmButton.disabled=!field.checked;
     });
