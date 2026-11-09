@@ -891,7 +891,7 @@ html body > #an-global-ticker {
   body.an-about-details-mode > #an-site-header-space { display: none; }
 }
 </style>
-<style id="an26-contact-mobile">
+<style id="an26-contact-layout">
 @media(max-width:767px){
 html:has(body.an-contact-mode),body.an-contact-mode{overflow:hidden!important;overscroll-behavior:none}
 body.an-contact-mode #app{min-height:0!important}
@@ -900,6 +900,7 @@ body.an-contact-mode .an-contact-head{padding:6px 0!important;margin:0!important
 body.an-contact-mode .an-contact-head .wrap{padding:0 14px!important}
 body.an-contact-mode .an-contact-head h1{font-size:clamp(19px,5vw,26px)!important;margin:2px 0!important;line-height:1.1!important}
 body.an-contact-mode .an-contact-head .bread{font-size:10px!important}
+}
 .an26-contact{position:relative;height:calc(100dvh - var(--an26-contact-top, 140px));background:#000;overflow:hidden}
 .an26-reference{display:block;width:100%;height:100%;max-width:none;object-fit:fill}
 .an26-control{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);box-sizing:border-box;margin:0;border:0;background:transparent;color:transparent;padding:0;border-radius:8px}
@@ -910,6 +911,13 @@ body.an-contact-mode .an-contact-head .bread{font-size:10px!important}
 .an26-contact a:not([href]){cursor:not-allowed}
 .an26-contact button.an26-control{box-shadow:none}
 .an26-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(min-width:768px){
+ html:has(.an26-contact-desktop),body:has(.an26-contact-desktop){overflow:hidden!important}
+ body.an-contact-mode #app:has(.an26-contact-desktop){min-height:0!important;padding-bottom:0!important}
+ .an26-contact-desktop .an26-control:is(a[href],button){cursor:pointer}
+ .an26-contact-desktop .an26-control:is(a[href],button):hover{box-shadow:inset 0 0 0 2px #ffab47}
+ .an26-contact-desktop button:disabled{cursor:wait}
+ .an26-contact-desktop #an-contact-feedback{position:absolute;left:56%;right:4.4%;top:93.2%;margin:0;text-align:center;font-size:clamp(10px,1vw,14px);color:#fff}
 }
 </style><link rel="stylesheet" href="an-eligibility.css?v=20261109-qual-v7">
 <style id="an-about-desktop-layout">
@@ -1084,9 +1092,32 @@ function managementPage(){
  </section>`;
 }
 function aboutDetailsPage(){return typeof window.ANAboutFounderStory==='function' ? window.ANAboutFounderStory() : title('Our Story','A&N Overseas Education & Consultancy — our founding vision and student commitments.')+`<div class="wrap content"><div class="live-panel"><h2>Our Journey</h2><p>Founded in 2024, A&N Overseas supports students exploring international education and realistic study routes.</p><a class="btn outline" href="#/about">← About Us</a></div></div>`;}
-function contactPageDesktop(){return "<section class=\"page-head an-contact-head\"><div class=\"wrap\"><div class=\"bread\">HOME › CONTACT OUR TEAM</div><h1><span>Contact</span> Our Team</h1><p>University admission, visa, accommodation and student support.</p></div></section>\n<div class=\"wrap content an-contact-content\"><div class=\"an-contact-main\">\n<section class=\"an-contact-offices\"><div class=\"an-contact-office-backdrop\"><h2><span>Our</span> Offices</h2>\n<div class=\"an-contact-office-grid\">\n<article class=\"an-contact-office an-contact-office--kl\"><div class=\"an-contact-office-photo\" role=\"img\" aria-label=\"Kuala Lumpur city view\"><span>KUALA LUMPUR · CITY VIEW</span></div><b>🇲🇾 <span>Malaysia</span> Office</b><p data-an-office=\"malaysiaOffice\">Kuala Lumpur, Malaysia</p><a class=\"an-contact-map\" href=\"https://www.google.com/maps/search/?api=1&amp;query=Kuala%20Lumpur%2C%20Malaysia\" data-an-map-office=\"malaysiaOffice\" target=\"_blank\" rel=\"noopener noreferrer\">View location area on Google Maps ↗</a></article>\n<article class=\"an-contact-office an-contact-office--rangpur\"><div class=\"an-contact-office-photo\" role=\"img\" aria-label=\"Rangpur Town Hall city landmark\"><span>RANGPUR · CITY VIEW</span></div><b>🇧🇩 <span>Bangladesh</span> Office</b><p data-an-office=\"bangladeshOffice\">Dhap, Rangpur 5401, Bangladesh</p><a class=\"an-contact-map\" href=\"https://www.google.com/maps/search/?api=1&amp;query=Dhap%2C%20Rangpur%20Bangladesh\" data-an-map-office=\"bangladeshOffice\" target=\"_blank\" rel=\"noopener noreferrer\">View location area on Google Maps ↗</a><small class=\"an-contact-photo-credit\">City photo: Md. Kamrul Hasan · <a href=\"https://commons.wikimedia.org/wiki/File:Rangpur_town_hall.jpg\" target=\"_blank\" rel=\"noopener noreferrer\">CC BY-SA 4.0</a></small></article>\n</div><h3 class=\"an-contact-channels-title\">Contact</h3></div><div class=\"an-contact-social\">\n<a data-an-social=\"email\" href=\"mailto:educationanoverseas@gmail.com\" aria-label=\"Email A&N Overseas\" title=\"Email\">✉<small>Email</small></a>\n<a data-an-social=\"gmail\" href=\"mailto:educationanoverseas@gmail.com\" aria-label=\"Gmail A&N Overseas\" title=\"Gmail\">M<small>Gmail</small></a>\n<a data-an-social=\"facebook\" class=\"an-social-unset\" aria-disabled=\"true\" title=\"Facebook link not published\" tabindex=\"-1\">f<small>Facebook</small></a>\n<a data-an-social=\"tiktok\" class=\"an-social-unset\" aria-disabled=\"true\" title=\"TikTok link not published\" tabindex=\"-1\">♪<small>TikTok</small></a>\n<a data-an-social=\"youtube\" class=\"an-social-unset\" aria-disabled=\"true\" title=\"YouTube link not published\" tabindex=\"-1\">▶<small>YouTube</small></a>\n<a data-an-social=\"linkedin\" class=\"an-social-unset\" aria-disabled=\"true\" title=\"LinkedIn link not published\" tabindex=\"-1\">in<small>LinkedIn</small></a>\n<a data-an-social=\"whatsapp\" class=\"an-social-unset\" aria-disabled=\"true\" title=\"WhatsApp number not published\" tabindex=\"-1\">☎<small>WhatsApp</small></a>\n</div><a class=\"an-contact-email\" href=\"mailto:educationanoverseas@gmail.com\">✉ <span data-an-email>educationanoverseas@gmail.com</span></a></section>\n<section class=\"an-contact-enquiry\"><h2><span>Send an</span> Enquiry</h2><form id=\"contact-form\"><div class=\"an-contact-fields\">\n<label>Your Name<input name=\"name\" autocomplete=\"name\" required placeholder=\"Full name\"></label>\n<label>Email<input name=\"email\" type=\"email\" autocomplete=\"email\" required placeholder=\"you@example.com\"></label>\n<label>Phone (optional)<input name=\"phone\" autocomplete=\"tel\" placeholder=\"+60 ...\"></label>\n<label>Message<textarea name=\"message\" rows=\"3\" required placeholder=\"How can we help?\"></textarea></label></div>\n<button type=\"submit\" class=\"btn\">Send Enquiry ↗</button><p id=\"an-contact-feedback\" class=\"an-contact-feedback\" role=\"status\" aria-live=\"polite\"></p></form></section></div></div>";}
+function contactPageDesktop(){
+ const box=(x,y,w,h)=>`style="--x:${x/16.7}%;--y:${y/8.8}%;--w:${w/16.7}%;--h:${h/8.8}%"`;
+ const socials=[
+  ['facebook','Facebook',84,669],['linkedin','LinkedIn',499,669],
+  ['tiktok','TikTok',84,733],['whatsapp','WhatsApp',499,733],
+  ['youtube','YouTube',84,797],['gmail','Gmail',499,797]
+ ];
+ const links=socials.map(([key,label,x,y])=>`<a class="an26-control" ${box(x,y,348,58)} data-an-social="${key}" aria-label="${label}"></a>`).join('');
+ return `<section class="an26-contact an26-contact-desktop" aria-labelledby="an-desktop-contact-title">
+ <h1 class="an26-sr" id="an-desktop-contact-title">Contact Our Team</h1>
+ <img class="an26-reference" src="assets/contact-desktop-20261110.webp" width="1670" height="880" fetchpriority="high" alt="">
+ <a class="an26-control" ${box(63,13,60,29)} href="#/home" aria-label="Home"></a>
+ <a class="an26-control" ${box(1108,39,507,56)} href="#/management" aria-label="Explore Our Management"></a>
+ <a class="an26-control" ${box(54,550,401,103)} href="https://www.google.com/maps/search/?api=1&amp;query=Kuala%20Lumpur%2C%20Malaysia" target="_blank" rel="noopener noreferrer" aria-label="Malaysia Office, Kuala Lumpur, Malaysia"></a>
+ <a class="an26-control" ${box(468,550,406,103)} href="https://www.google.com/maps/search/?api=1&amp;query=Dhap%2C%20Rangpur%205401%2C%20Bangladesh" target="_blank" rel="noopener noreferrer" aria-label="Bangladesh Office, Dhap, Rangpur 5401, Bangladesh"></a>
+ ${links}
+ <form id="contact-form" aria-label="Send an Enquiry">
+ <input class="an26-control" ${box(943,374,302,37)} name="name" required autocomplete="name" aria-label="Your Name" placeholder=" ">
+ <input class="an26-control" ${box(1282,374,312,37)} name="email" type="email" required autocomplete="email" aria-label="Email" placeholder=" ">
+ <input class="an26-control" ${box(943,470,651,37)} name="phone" type="tel" autocomplete="tel" aria-label="Phone (optional)" placeholder=" ">
+ <textarea class="an26-control" ${box(943,570,651,114)} name="message" required aria-label="Message" placeholder=" "></textarea>
+ <button class="an26-control" ${box(931,726,669,89)} type="submit" aria-label="Send Enquiry"></button>
+ <p id="an-contact-feedback" role="status" aria-live="polite"></p>
+ </form></section>`;
+}
 
-/* Mobile-only contact replacement; desktop implementation is retained unchanged. */
 function contactPage(){
  if(!window.matchMedia('(max-width: 767px)').matches)return contactPageDesktop();
  const box=(x,y,w,h)=>'style="--x:'+x/9.76+'%;--y:'+y/13.91+'%;--w:'+w/9.76+'%;--h:'+h/13.91+'%"';
@@ -1243,7 +1274,7 @@ window.addEventListener('resize',fit);
 const contactViewport=window.matchMedia('(max-width: 767px)');
 contactViewport.addEventListener('change',()=>{if(document.body.classList.contains('an-contact-mode'))render();});
 const contactHeadingObserver=new ResizeObserver(fit);
-const observeHeading=()=>{contactHeadingObserver.disconnect();const heading=document.querySelector('.an-contact-head');if(heading)contactHeadingObserver.observe(heading);};
+const observeHeading=()=>{contactHeadingObserver.disconnect();for(const el of document.querySelectorAll('.an-contact-head, .top, #an-global-ticker'))contactHeadingObserver.observe(el);};
 window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.addEventListener('DOMContentLoaded',()=>{new MutationObserver(()=>{if(document.querySelector('.an26-contact')){fit();observeHeading();syncLinks()}}).observe(document.getElementById('app'),{childList:true});fit();observeHeading();syncLinks()});
 })();
 </script></body></html>
