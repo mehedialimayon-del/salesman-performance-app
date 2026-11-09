@@ -280,7 +280,14 @@ const leidenPanel=u=>{
  e(record[1].toLocaleString('en-US'))+' core publications, 2021–2024, full counting. The displayed ranking uses a minimum of 100 publications.</p>'+
  link(leidenLink(record),'CWTS university profile')+link('https://open.leidenranking.com/resources','Open edition data')+'</div>';
 };
+// THE World University Rankings 2027 table. Unique country/name matches only.
+const theRankAdditions={
+ 'eu-de-university-of-kiel':['t','401–450','university-kiel'],
+ 'an-h-dir-turkey-wwwmuedutr':['t','2001+','mugla-sitki-kocman-university'],
+ 'an-h-dir-turkey-wwwbamdirmaedutr':['t','1601–1800','bandirma-onyedi-eylul-university']
+};
 const additionalRankProviders={
+ t:['THE World 2027','World ranking',ref=>'https://www.timeshighereducation.com/world-university-rankings/'+ref],
  q:['QS World 2027','World ranking',ref=>'https://www.topuniversities.com/universities/'+ref],
  a:['QS 2027','South-Eastern Asia',ref=>'https://www.topuniversities.com/universities/'+ref],
  b:['QS Asia 2026','Asia ranking',ref=>'https://www.topuniversities.com/universities/'+ref],
@@ -293,8 +300,9 @@ const additionalRankProviders={
 };
 const additionalRank=u=>{
  const ranks=window.ANAdditionalRanks2026||{};
- if(!Object.hasOwn(ranks,u.id))return null;
- const [key,position,ref,sourceName]=ranks[u.id];
+ const record=Object.hasOwn(ranks,u.id)?ranks[u.id]:Object.hasOwn(theRankAdditions,u.id)?theRankAdditions[u.id]:null;
+ if(!record)return null;
+ const [key,position,ref,sourceName]=record;
  const [name,scope,source]=additionalRankProviders[key];
  return {name,scope,position,sourceName,url:source(ref)};
 };
@@ -416,7 +424,7 @@ const card=(u,p)=>{
  }else if(key==='amc'){
   rankingFact=fact('rank','ACCREDITATION','MQA register','Programme records',amcRegister);
  }else{
-  rankingFact=fact('rank','WORLD RANKING','');
+  rankingFact=fact('rank','WORLD RANKING','Not verified');
  }
  const facts=rankingFact+fact('programmes','PROGRAMMES',...(verified?.programmes||[programmeText,programmeText?'Published count':'',validUrl(p?.programSource)||official]))
   +fact('tuition',tuitionFact&&key!=='um'?'TUITION EXAMPLE':'TUITION FEE',...(tuitionFact||historicalFact||[firstYear||'',firstYear?'Published fee example':'']))
@@ -516,5 +524,6 @@ document.addEventListener('error',event=>{
  }
 },true);
 const extended=(u,p)=>'<section class="profile-section an-guide-degrees" id="profile-degree"><h2><span>Degree-wise</span> Application Guide</h2><p>Expand a level for its application preparation, recognised-document checklist and official route.</p><div class="an-guide-degree-grid">'+['Bachelor','Master','PhD'].map((level,i)=>'<details class="an-guide-degree-box"'+(i===0?' open':'')+'><summary>'+e(level)+' <span>⌄</span></summary>'+degree(u,level)+'</details>').join('')+'</div></section>'+support(u);
-window.ANUniGuide={card,compare,getRank,panel,mount,route,photos,extended,profileFact,institutionLogo,profileData,tuitionRows,leidenRank,isWebsiteIcon};
+const hasPublishedRank=u=>Boolean(verifiedCardFacts[factKey(u)]?.ranking||getRank(u)||leidenRank(u)||additionalRank(u));
+window.ANUniGuide={card,compare,getRank,hasPublishedRank,panel,mount,route,photos,extended,profileFact,institutionLogo,profileData,tuitionRows,leidenRank,isWebsiteIcon};
 })();

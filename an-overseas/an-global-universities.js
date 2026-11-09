@@ -139,7 +139,7 @@ function coverageReport(target=typeof U!=='undefined'&&Array.isArray(U)?U:[]){
   programmeList:u=>Array.isArray(u.programs)&&u.programs.length>0,
   faculty:u=>usable(u.faculty)||usable(u.faculties),
   tuition:u=>usable(u.tuition)&&usable(u.tuitionSource),
-  ranking:u=>usable(u.ranking)&&usable(u.rankingSource),
+  ranking:u=>Boolean(window.ANUniGuide?.hasPublishedRank(u)||(usable(u.ranking)&&usable(u.rankingSource))),
   intake:u=>usable(u.intake)&&usable(u.intakeSource),
   deadline:u=>usable(u.deadline)&&usable(u.deadlineSource),
   entryRequirements:u=>usable(u.entry)&&usable(u.entrySource)
