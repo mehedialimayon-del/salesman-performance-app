@@ -82,16 +82,19 @@ body.an-community-mode #app{flex:1 1 0;min-height:0;overflow:hidden;display:flex
 }
 
 /* 2026-11-03: Mobile Success button only. Preserve every other website page. */
-@media(max-width:780px){
+@media(max-width:800px){
  body.an-community-mode{height:100vh;height:100dvh;min-height:0;overflow:hidden;display:flex;flex-direction:column}
- body.an-community-mode .top{flex:0 0 auto}
+ html body.an-community-mode > header.top{
+  position:relative!important;inset:auto!important;flex:0 0 auto;
+ }
+ body.an-community-mode > #an-site-header-space{display:none}
+ html body.an-community-mode > #an-global-ticker{
+  position:relative!important;top:auto!important;flex:0 0 auto;
+ }
  body.an-community-mode .an-updates-bar{flex:0 0 auto}
  body.an-community-mode #app{display:flex;flex:1 1 0;min-height:0;overflow:hidden;flex-direction:column}
- body.an-community-mode #app .an-community-page{height:100%;flex:1 1 0;min-height:0;max-height:100%;padding:7px 9px 8px;overflow:hidden;gap:7px}
- body.an-community-mode #app .an-community-intro{display:flex;flex:0 0 auto;flex-direction:row;align-items:center;gap:5px}
- body.an-community-mode #app .an-community-intro h1{font-size:17px;line-height:1.15}
- body.an-community-mode #app .an-community-intro .an-community-eyebrow{font-size:8px;letter-spacing:.6px}
- body.an-community-mode #app .an-community-intro p,body.an-community-mode #app .an-community-intro-pill{display:none}
+ body.an-community-mode #app .an-community-page{height:100%;flex:1 1 0;min-height:0;max-height:100%;padding:4px 9px max(4px, env(safe-area-inset-bottom));overflow:hidden;gap:0}
+ body.an-community-mode #app .an-community-intro{display:none}
  body.an-community-mode #app .an-community-columns{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(2,minmax(0,1fr));gap:8px;flex:1 1 0;min-height:0;overflow:hidden}
  body.an-community-mode #app .an-community-panel{height:100%;min-height:0;flex:initial;border-radius:12px}
  body.an-community-mode #app .an-community-panel-head{padding:7px 9px 6px}
