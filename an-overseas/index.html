@@ -914,8 +914,9 @@ body.an-contact-mode .an-contact-head .bread{font-size:10px!important}
 @media(min-width:768px){
  html:has(.an26-contact-desktop),body:has(.an26-contact-desktop){overflow:hidden!important}
  body.an-contact-mode #app:has(.an26-contact-desktop){min-height:0!important;padding-bottom:0!important}
+ .an26-contact-desktop .an26-reference{filter:url(#an-contact-deep-orange)}
  .an26-contact-desktop .an26-control:is(a[href],button){cursor:pointer}
- .an26-contact-desktop .an26-control:is(a[href],button):hover{box-shadow:inset 0 0 0 2px #ffab47}
+ .an26-contact-desktop .an26-control:is(a[href],button):hover{box-shadow:inset 0 0 0 2px #f36612}
  .an26-contact-desktop button:disabled{cursor:wait}
  .an26-contact-desktop #an-contact-feedback{position:absolute;left:56%;right:4.4%;top:93.2%;margin:0;text-align:center;font-size:clamp(10px,1vw,14px);color:#fff}
 }
@@ -1212,6 +1213,26 @@ function contactPageDesktop(){
  const links=socials.map(([key,label,x,y])=>`<a class="an26-control" ${box(x,y,348,58)} data-an-social="${key}" aria-label="${label}"></a>`).join('');
  return `<section class="an26-contact an26-contact-desktop" aria-labelledby="an-desktop-contact-title">
  <h1 class="an26-sr" id="an-desktop-contact-title">Contact Our Team</h1>
+ <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <filter id="an-contact-deep-orange" x="0" y="0" width="100%" height="100%" primitiveUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+   <!-- Select warm UI accents while keeping white, red, green and blue intact. -->
+   <feColorMatrix in="SourceGraphic" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  3 0 -3 0 -.35" result="warm"/>
+   <feColorMatrix in="SourceGraphic" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 5 -5 0 -.12"/>
+   <feComposite in2="warm" operator="in" result="accent"/>
+   <!-- Preserve the portrait, flags and Gmail mark in the original artwork. -->
+   <feFlood x=".054" y=".145" width=".457" height=".397" result="portrait"/>
+   <feFlood x=".05" y=".634" width=".049" height=".055" result="malaysia"/>
+   <feFlood x=".295" y=".634" width=".052" height=".055" result="bangladesh"/>
+   <feFlood x=".323" y=".909" width=".047" height=".059" result="gmail"/>
+   <feMerge result="protected">
+    <feMergeNode in="portrait"/><feMergeNode in="malaysia"/><feMergeNode in="bangladesh"/><feMergeNode in="gmail"/>
+   </feMerge>
+   <feComposite in="accent" in2="protected" operator="out" result="ui"/>
+   <feColorMatrix in="SourceGraphic" values=".96 0 0 0 0  .25 .12 0 0 0  .025 0 .08 0 0  0 0 0 1 0"/>
+   <feComposite in2="ui" operator="in"/>
+   <feComposite in2="SourceGraphic" operator="over"/>
+  </filter>
+ </svg>
  <img class="an26-reference" src="assets/contact-desktop-20261110.webp" width="1670" height="880" fetchpriority="high" alt="">
  <a class="an26-control" ${box(63,13,60,29)} href="#/home" aria-label="Home"></a>
  <a class="an26-control" ${box(1108,39,507,56)} href="#/management" aria-label="Explore Our Management"></a>
