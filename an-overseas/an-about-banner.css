@@ -563,3 +563,97 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
   #app .an-management-page .an-manager-pages button[aria-current="true"] { background: #ff6500; color: #111; }
 
 }
+
+.an-manager-founder-highlights,
+.an-manager-agriculture-news { display: none; }
+
+@media (max-width: 800px) {
+  html body #app .an-management-page .an-manager-heading {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    text-align: center !important;
+  }
+  html body #app .an-management-page .an-manager-heading .an-about-eyebrow {
+    font-size: 8px !important;
+  }
+  html body #app .an-management-page .an-manager-heading #an-manager-heading {
+    font-size: clamp(15px, 4.1vw, 20px) !important;
+    text-align: center !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-founder-layout {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-founder-layout .an-manager-information {
+    display: contents !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-founder-layout .an-manager-photo-box {
+    grid-area: 1 / 2;
+    border: 0 !important;
+    background: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-founder-layout .an-manager-photo-button {
+    border: 0 !important;
+    background: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-founder-layout .an-manager-photo {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    border: 0 !important;
+    border-radius: 8px !important;
+  }
+  .an-manager-founder-layout .an-manager-identity { grid-area: 1 / 1; min-width: 0; }
+  .an-manager-founder-layout .an-manager-information > :not(.an-manager-identity) { grid-column: 1 / -1; }
+  html body #app .an-management-page .an-manager-founder-layout .an-manager-name-box .an-manager-white-name {
+    font-size: clamp(13px, 4vw, 19px) !important;
+  }
+  html body #app .an-management-page .an-manager-founder-layout .an-manager-standard-career { display: none !important; }
+  .an-manager-founder-highlights { display: block; margin-top: 7px; }
+  .an-manager-academic-logos,
+  .an-manager-designations { list-style: none; margin: 0; padding: 0; }
+  .an-manager-academic-logos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+  .an-manager-academic-logos li {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 2px;
+    padding: 3px 1px;
+    border-radius: 5px;
+    background: #fff;
+    color: #182238;
+    font-size: 8px;
+    font-weight: 850;
+  }
+  .an-manager-academic-logos img { display: block; width: 100%; height: 27px; object-fit: contain; }
+  .an-manager-designations { display: grid; gap: 3px; margin-top: 7px; font-size: 11px; line-height: 1.2; }
+  .an-manager-designations li::before { content: "✦"; color: #ff6500; margin-right: 5px; }
+  #app .an-manager-academic-note { margin: 6px 0 0; font-size: 10px; line-height: 1.2; }
+  .an-manager-agriculture-news {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 9px;
+    border: 1px solid #428660;
+    border-radius: 8px;
+    background: #173b2a;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 750;
+  }
+  html body #app .an-management-page .an-manager-contact.an-manager-email {
+    background: linear-gradient(125deg, #682b30, #30151a) !important;
+    border-color: #ec7777 !important;
+  }
+  html body #app .an-management-page .an-manager-contact.an-manager-whatsapp {
+    background: linear-gradient(125deg, #155542, #102d24) !important;
+    border-color: #43ba87 !important;
+  }
+  html body #app .an-management-page .an-manager-contact .an-mail { color: #ff9393 !important; fill: currentColor; }
+  html body #app .an-management-page .an-manager-contact .an-wa { color: #66e7a9 !important; fill: currentColor; }
+}

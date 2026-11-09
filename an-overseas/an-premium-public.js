@@ -146,10 +146,10 @@ function showTeam(){
   :'<div class="an-manager-photo an-manager-photo-empty"><span>A</span>&amp;<span>N</span></div>';
  const mailIcon='<svg class="an-mail" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4.1-8 5-8-5V6l8 5 8-5v2.1Z"/></svg>';
  const waIcon='<svg class="an-wa" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.52 3.48A11.82 11.82 0 0 0 12.07 0C5.49 0 .13 5.34.12 11.91a11.8 11.8 0 0 0 1.6 5.96L0 24l6.29-1.65a11.95 11.95 0 0 0 5.77 1.47h.01c6.57 0 11.94-5.35 11.94-11.93a11.8 11.8 0 0 0-3.49-8.41ZM12.07 21.8a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.73.98 1-3.64-.24-.38a9.83 9.83 0 0 1-1.52-5.26c0-5.47 4.46-9.92 9.94-9.92a9.88 9.88 0 0 1 7.03 2.91 9.87 9.87 0 0 1 2.9 7.02c0 5.47-4.46 9.92-9.98 9.92Zm5.45-7.44c-.3-.15-1.76-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.14-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.66-1.6-.9-2.18-.23-.56-.47-.48-.66-.49h-.56c-.2 0-.52.08-.79.37s-1.03 1.01-1.03 2.46 1.06 2.86 1.21 3.06c.15.2 2.09 3.18 5.06 4.45.71.31 1.26.49 1.7.63.71.22 1.35.19 1.85.12.56-.08 1.76-.72 2.01-1.42.25-.7.25-1.3.17-1.42-.07-.13-.27-.2-.57-.35Z"/></svg>';
- const emailHtml=validEmail?'<a class="an-manager-contact" href="mailto:'+esc(email)+'" aria-label="Email '+esc(m.name)+'">'+mailIcon+'<span><small>EMAIL</small><b>'+esc(email)+'</b></span></a>':'';
+ const emailHtml=validEmail?'<a class="an-manager-contact an-manager-email" href="mailto:'+esc(email)+'" aria-label="Email '+esc(m.name)+'">'+mailIcon+'<span><small>EMAIL</small><b>'+esc(email)+'</b></span></a>':'';
  const waNumber=phone.replace(/[^0-9]/g,'');
- const whatsappHtml=waNumber.length>=8?'<a class="an-manager-contact" href="https://wa.me/'+waNumber+'" target="_blank" rel="noopener noreferrer" aria-label="Chat with '+esc(m.name)+' on WhatsApp">'+waIcon+'<span><small>WHATSAPP</small><b>Start a conversation ↗</b></span></a>':
- '<span class="an-manager-contact an-contact-unavailable" title="WhatsApp number has not been published">'+waIcon+'<span><small>WHATSAPP</small><b>Contact number not published</b></span></span>';
+ const whatsappHtml=waNumber.length>=8?'<a class="an-manager-contact an-manager-whatsapp" href="https://wa.me/'+waNumber+'" target="_blank" rel="noopener noreferrer" aria-label="Chat with '+esc(m.name)+' on WhatsApp">'+waIcon+'<span><small>WHATSAPP</small><b>Start a conversation ↗</b></span></a>':
+ '<span class="an-manager-contact an-manager-whatsapp an-contact-unavailable" title="WhatsApp number has not been published">'+waIcon+'<span><small>WHATSAPP</small><b>Contact number not published</b></span></span>';
  const displayName=String(m.name||'').trim();const nameParts=displayName.match(/^(AGRICULTURIST)\s+(.+)$/i);
   const coloredName=nameParts?'<span class="an-manager-profession">'+esc(nameParts[1].toUpperCase())+'</span> <span class="an-manager-person-name">'+esc(nameParts[2].toUpperCase())+'</span>':esc(displayName);
   const nameHtml='<div class="an-manager-name-box"><span class="an-manager-label">NAME</span><h3 class="an-manager-white-name">'+coloredName+'</h3></div>';
@@ -163,7 +163,11 @@ function showTeam(){
    .replace(/Universiti Putra Malaysia \(UPM\)/g,'<strong class="an-career-upm">Universiti Putra Malaysia (UPM)</strong>')
    .replace(/MSc Aquaculture/g,'<strong class="an-career-msc">MSc Aquaculture</strong>')
    .replace(/Research Assistant/g,'<strong class="an-career-research">Research Assistant</strong>'):esc(career);
- const careerHtml=career?'<div class="an-manager-career"><span class="an-manager-label">ACADEMIC & PROFESSIONAL JOURNEY</span><p>'+careerDecorated+'</p></div>':'';
+ const founderHighlights=isFounder?'<div class="an-manager-founder-highlights"><ul class="an-manager-academic-logos" aria-label="Universities">'+
+  [['bau','Bangladesh Agricultural University'],['klust','Kuala Lumpur University of Science and Technology'],['upm','Universiti Putra Malaysia']].map(([code,name])=>'<li><img src="assets/universities/'+code+'-logo.png" alt="'+name+'" title="'+name+'"><span aria-hidden="true">'+code.toUpperCase()+'</span></li>').join('')+
+  '</ul><ul class="an-manager-designations" aria-label="Professional designations"><li>Agriculturist</li><li>Aquaculturist</li><li>Researcher</li><li>Head of Marketing</li></ul><p class="an-manager-academic-note">MSc Aquaculture · Research Assistant</p></div>':'';
+ const agricultureNews=isFounder?'<a class="an-manager-agriculture-news" href="https://bau.edu.bd/news" target="_blank" rel="noopener noreferrer">Agriculture News <span aria-hidden="true">↗</span></a>':'';
+ const careerHtml=career?'<div class="an-manager-career'+(isFounder&&career===founderCareer?' an-manager-standard-career':'')+'"><span class="an-manager-label">ACADEMIC & PROFESSIONAL JOURNEY</span><p>'+careerDecorated+'</p></div>':'';
  // The founder's support promise belongs inside her quotation, not in a second card.
  const promiseMatch=isFounder?quote.match(/(?:\band\s+)?\bI am committed to supporting them[\s\S]*$/i):null;
  const displayQuote=promiseMatch
@@ -178,8 +182,8 @@ function showTeam(){
  // A Facebook profile is linked only when published; otherwise the founder card shows an honest search action.
  const facebookTarget=facebook||(isFounder?'https://www.facebook.com/search/people/?q='+encodeURIComponent('Nusrat Nasrin'):'');
  const facebookHtml=facebookTarget?'<a class="an-manager-contact an-manager-facebook" href="'+esc(facebookTarget)+'" target="_blank" rel="noopener noreferrer" aria-label="'+(facebook?'Open Facebook profile of ':'Find on Facebook: ')+esc(m.name)+'"><span class="an-facebook-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" focusable="false"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></span><span><small>FACEBOOK</small><b>'+(facebook?'Open profile ↗':'Find on Facebook ↗')+'</b></span></a>':'';
- panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role,isFounder?m.name:'')+'</div><div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
-  +'<div class="an-manager-information">'+nameHtml+careerHtml+quoteHtml+supportHtml
+ panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role,isFounder?m.name:'')+'</div><div class="an-manager-main'+(isFounder?' an-manager-founder-layout':'')+'"><div class="an-manager-photo-box">'+imageHtml+'</div>'
+  +'<div class="an-manager-information"><div class="an-manager-identity">'+nameHtml+founderHighlights+'</div>'+careerHtml+agricultureNews+quoteHtml+supportHtml
   +'<div class="an-manager-contacts">'+emailHtml+whatsappHtml+linkedInHtml+facebookHtml+'</div>'
   +'<div class="an-manager-actions">'+buttonsHtml+'</div></div></div>';
  if(panel.dataset.profileIndex!==String(teamIndex)){
