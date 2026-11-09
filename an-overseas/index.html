@@ -934,7 +934,7 @@ body.an-contact-mode .an-contact-head .bread{font-size:10px!important}
  html body.an-about-locked #app .an-about-v3 .an-about-intro-panel{justify-content:flex-start!important;overflow-y:auto!important}
 }
 </style>
-<link rel="stylesheet" href="an-about-banner.css?v=20261110-since-2024">
+<link rel="stylesheet" href="an-about-banner.css?v=20261110-stable-chapters">
 <style id="an-desktop-navigation-fit">
 @media (max-width: 800px) {
   #an-desktop-wordmark { display: none; }
@@ -1130,7 +1130,7 @@ body.an-contact-mode .an-contact-head .bread{font-size:10px!important}
 <script src="europe-catalog.js?v=20261101-sourced-525"></script><script src="university-contacts.js?v=20261105-official-contacts-v1"></script><script src="an-ipeds-us-2023.js?v=20261108-v1"></script><script src="an-leiden-ranks-2026.js?v=20261108-v1"></script><script src="an-common-app-deadlines-2027.js?v=20261108-v1"></script><script src="an-catalogue-website-icons.js?v=20261108-v1"></script><script src="an-additional-ranks-2026.js?v=20261108-v2"></script><script src="an-university-profile-batch-1000.js?v=20261109-batch1"></script><script src="an-university-profile-batch-2000.js?v=20261109-batch2and3"></script><script src="an-university-profile-batch-final-103.js?v=20261109-final"></script><script src="an-ranking-supplement-20261109.js?v=1"></script><script src="university-guide.js?v=20261109-admissions-v5"></script><script src="an-asia-verified-media.js?v=20261106-malaysia-three-verified-v2"></script><script src="an-asia-commons-media.js?v=20261106-commons-57-v1"></script><script src="an-asia-supplementary-logos.js?v=20261106-official-421-v1"></script><script src="an-asia-institution-icons.js?v=20261106-identities-106-v1"></script><script src="an-asia-commons-additional.js?v=20261106-commons-13-v2"></script><script src="an-university-media.js?v=20261106-final-asia-v20"></script><script src="an-world-directory-packed.js?v=20261106-snapshot-v1"></script><script src="an-global-universities.js?v=20261109-coverage-v4"></script><script src="an-student-country-data.js?v=20261105-work-family-v4"></script><script src="an-student-guide.js?v=20261105-guide-v3"></script>
 <script src="an-country-cards.js?v=20261108-name-split-v2"></script>
 <script src="an-favorites.js?v=20261106-v1"></script><script src="an-eligibility-picker-data.js?v=4"></script><script src="an-eligibility-rules.js?v=4"></script><script src="an-eligibility.js?v=20261109-qual-v7"></script><script src="an-scholarship-catalogue.js?v=20261109-award-terms-v5"></script><script src="an-epos-deep-guide.js?v=20261106-sept-corrected-v2"></script><script src="an-epos-detailed-view.js?v=20261106-full-a-z-v1"></script><script src="an-scholarships.js?v=20261109-award-terms-v5"></script><script src="an-scholarship-country-guide.js?v=20261106-countries-v1"></script>
-<script src="an-portfolio-2026.js?v=20261108-visa-cost-v2"></script><script src="an-about-founder-story.js?v=20261110-since-2024"></script><script src="an-navigation-continuity.js?v=20261109-about-top"></script>
+<script src="an-portfolio-2026.js?v=20261108-visa-cost-v2"></script><script src="an-about-founder-story.js?v=20261110-since-2024"></script><script src="an-navigation-continuity.js?v=20261110-stable-chapters"></script>
 <script>
 'use strict';
 const U=[
@@ -1405,7 +1405,19 @@ function renderUniversityPanel(){ /* All sections now render together in univers
 
 document.addEventListener('click',e=>{const jump=e.target.closest('[data-profile-jump]');if(jump){document.getElementById('profile-'+jump.dataset.profileJump)?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});document.getElementById('profile-menu')?.removeAttribute('open');}});
 document.addEventListener('input',e=>{if(e.target.id==='profile-course-search'){const q=e.target.value.toLowerCase();let count=0;document.querySelectorAll('.programme-item').forEach(row=>{row.hidden=!row.textContent.toLowerCase().includes(q);if(!row.hidden)count++;});document.getElementById('course-empty').hidden=count>0;}});
-document.addEventListener('click',e=>{const a=e.target.closest('[data-an-about-jump]');if(!a)return;e.preventDefault();if(location.hash.split('?')[0]!=='#/aboutdetails')return;const target=document.getElementById(a.dataset.anAboutJump);if(target)target.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});});window.addEventListener('hashchange',()=>{setMobileMenu(false);render();});document.addEventListener('click',e=>{const h=e.target.closest('#hamb');if(h)setMobileMenu(h.getAttribute('aria-expanded')!=='true');
+document.addEventListener('click',e=>{
+ const link=e.target.closest('[data-an-about-jump]');
+ if(!link||location.hash.split('?')[0]!=='#/aboutdetails')return;
+ e.preventDefault();
+ const target=document.getElementById(link.dataset.anAboutJump);
+ if(!target)return;
+ const behavior=matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth';
+ if(matchMedia('(max-width:800px)').matches){
+  const rail=link.closest('.an2-nav');
+  const top=app.scrollTop+target.getBoundingClientRect().top-app.getBoundingClientRect().top-(rail?.offsetHeight||0)-6;
+  app.scrollTo({top,behavior});
+ }else target.scrollIntoView({behavior,block:'start'});
+});window.addEventListener('hashchange',()=>{setMobileMenu(false);render();});document.addEventListener('click',e=>{const h=e.target.closest('#hamb');if(h)setMobileMenu(h.getAttribute('aria-expanded')!=='true');
 if(e.target.closest('#links a'))setMobileMenu(false);
 const tabBtn=e.target.closest('[data-tab]');if(tabBtn){tab=tabBtn.dataset.tab;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===tabBtn));const id=location.hash.split('/').pop();renderUniversityPanel(id)}const step=e.target.closest('[data-apply-step]');if(step){saveStep();draft.step=Number(step.dataset.applyStep);render()}const nav=e.target.closest('[data-apply-nav]');if(nav){saveStep();if(nav.dataset.applyNav==='finish')toast('Preview completed. No application has been submitted. Secure submission will be enabled with the private backend.');else{draft.step=Math.max(1,Math.min(4,draft.step+(nav.dataset.applyNav==='next'?1:-1)));render()} } });document.addEventListener('change',e=>{if(e.target.id==='f-country'){draft.country=e.target.value;draft.university=U.find(u=>u.country===draft.country)?.id||'upm';draft.programme=U.find(u=>u.id===draft.university)?.programs[0]||'';drawApply()}if(e.target.id==='f-university'){draft.university=e.target.value;draft.programme=U.find(u=>u.id===draft.university)?.programs[0]||'';drawApply()}});document.addEventListener('submit',e=>{if(['auth-form','contact-form','accommodation-form'].includes(e.target.id)){e.preventDefault();if(e.target.id==='auth-form')toast('Student login and signup require secure authentication. No account or password has been stored.');if(e.target.id==='contact-form')toast('Message preview only — not sent. Secure enquiry submission is not yet connected.');if(e.target.id==='accommodation-form')toast('Accommodation request preview only — not submitted.')}});document.getElementById('year').textContent=new Date().getFullYear();render();
 

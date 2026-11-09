@@ -402,6 +402,8 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
     z-index: 55 !important;
     padding-block: 7px !important;
     background: #0b0e13;
+    overscroll-behavior-x: contain;
+    backdrop-filter: none;
   }
 
   html body.an-about-details-mode #app .an2-story > section[id] { scroll-margin-top: 4px; }

@@ -69,8 +69,10 @@ function restoreContainers(state){
  for(const [selector,point] of Object.entries(state.containers)){
   const el=document.querySelector(selector);
   if(!el)continue;
-  if(el.scrollHeight>el.clientHeight+10)el.scrollTop=point.top||0;
-  if(el.scrollWidth>el.clientWidth+10)el.scrollLeft=point.left||0;
+  const position={behavior:'instant'};
+  if(el.scrollHeight>el.clientHeight+10)position.top=point.top||0;
+  if(el.scrollWidth>el.clientWidth+10)position.left=point.left||0;
+  if('top' in position||'left' in position)el.scrollTo(position);
  }
 }
 function positionTarget(state){
