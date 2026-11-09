@@ -129,6 +129,26 @@ function maybeLoad(){
  loadLocalSnapshot();
  loadPublicDirectory();
 }
+/* Live, auditable field coverage. Directory-only rows are not completed profiles. */
+function coverageReport(target=typeof U!=='undefined'&&Array.isArray(U)?U:[]){
+ const total=target.length;
+ const usable=v=>v!==undefined&&v!==null&&v!==''&&(!Array.isArray(v)||v.length>0);
+ const fields={
+  identity:u=>usable(u.name)&&usable(u.country),
+  officialWebsite:u=>/^https:\/\//i.test(String(u.site||'')),
+  programmeList:u=>Array.isArray(u.programs)&&u.programs.length>0,
+  faculty:u=>usable(u.faculty)||usable(u.faculties),
+  tuition:u=>usable(u.tuition)&&usable(u.tuitionSource),
+  ranking:u=>usable(u.ranking)&&usable(u.rankingSource),
+  intake:u=>usable(u.intake)&&usable(u.intakeSource),
+  deadline:u=>usable(u.deadline)&&usable(u.deadlineSource),
+  entryRequirements:u=>usable(u.entry)&&usable(u.entrySource)
+ };
+ const counts=Object.fromEntries(Object.entries(fields).map(([name,test])=>[name,target.filter(test).length]));
+ const complete=target.filter(u=>Object.values(fields).every(test=>test(u))).length;
+ return {target:6210,loaded:total,remainingToTarget:Math.max(0,6210-total),fullyComplete:complete,incomplete:total-complete,fields:counts,updatedAt:new Date().toISOString(),note:'Counts reflect loaded university records, not externally verified university admissions. Directory-only entries are incomplete.'};
+}
+window.ANUniversityCoverageReport=coverageReport;
 window.ANWorldUniCatalogSeeds=seeds;
 window.ANWorldDirectory={addUnique,loadPublicDirectory,loadLocalSnapshot,maybeLoad,enrich};
 window.addEventListener('hashchange',maybeLoad);
