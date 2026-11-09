@@ -171,10 +171,10 @@ body.an-scholarships-mode #app .an-scholarship-content-scroll .an-scholarship-in
 #app .an-scholarship-detail .an-specific-guide article ul{padding-left:18px;margin:6px 0}
 #app .an-scholarship-detail .an-moi-badge{
  display:inline-flex;padding:5px 9px;border-radius:7px;font-size:11px;
- font-weight:900;border:1px solid #81d9af;background:#0b3527;color:#a7f2c8;
+ font-weight:900;border:1px solid #ff9a4a;background:#48250e;color:#fff;
 }
-#app .an-scholarship-detail .an-moi-badge.no{color:#ffc5c5;background:#421e24;border-color:#e07a7a}
-#app .an-scholarship-detail .an-moi-badge.unknown{color:#ffdf9e;background:#38301b;border-color:#a98c48}
+#app .an-scholarship-detail .an-moi-badge.no{color:#fff;background:#582605;border-color:#ff7920}
+#app .an-scholarship-detail .an-moi-badge.unknown{color:#fff;background:#302015;border-color:#c56c32}
 #app .an-scholarship-detail .an-specific-guide a{color:#ffcb82;text-decoration:underline}
 #app .an-scholarship-detail .an-scholarship-help form{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 #app .an-scholarship-detail .an-scholarship-help label{color:#ead4bd;font-size:12px;display:grid;gap:4px}

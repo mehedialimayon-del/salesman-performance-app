@@ -364,3 +364,19 @@
  }
 }
 .an-card-deadline{max-width:calc(100% - 72px)}
+
+/* Keep the date and live timer together immediately above the action buttons. */
+.an-card-timeline{
+ display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+ gap:4px 8px;margin:0 0 8px;padding:6px 8px;
+ border:1px solid #934715;border-radius:8px;background:#24170e;
+ font-size:11px;line-height:1.3;color:#fff
+}
+.an-card-timeline-date{min-width:0;overflow-wrap:anywhere}
+.an-card-timeline-count{
+ margin-inline-start:auto;white-space:nowrap;color:#ff9b4a;font-weight:900;
+ font-variant-numeric:tabular-nums
+}
+.an-card-timeline-route{
+ flex-basis:100%;color:#fff;font-size:10px;overflow-wrap:anywhere
+}

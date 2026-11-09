@@ -32,7 +32,7 @@
 #app .an-scholarship-detail .an-keymark{display:inline!important;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:4px;background:#5c3d194b;color:#ffc887!important;font-weight:900!important;padding:1px 4px!important;line-height:1.65;white-space:normal}
 #app .an-scholarship-detail .an-keymark[data-tone="money"]{background:#123f326f;color:#91efbf!important}
 #app .an-scholarship-detail .an-keymark[data-tone="duration"]{background:#19466175;color:#a4ddff!important}
-#app .an-scholarship-detail .an-keymark[data-tone="english"]{background:#4f284574;color:#f5b5e9!important}
+#app .an-scholarship-detail .an-keymark[data-tone="english"]{background:#6a310f;color:#fff!important}
 #app .an-scholarship-detail .an-keymark[data-tone="deadline"]{background:#55341b7a;color:#ffca90!important}
 #app .an-scholarship-detail .an-keymark[data-tone="documents"]{background:#4033618c;color:#d6bbff!important}
 #app .an-scholarship-detail .an-keymark[data-tone="policy"]{background:#59312678;color:#ffb5ad!important}

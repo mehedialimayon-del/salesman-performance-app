@@ -170,6 +170,7 @@ timeline('chevening','2027/28 closed · Oct 2026','For 2027/28, applications ope
 timeline('commonwealth-masters','Prior call · 20 Oct 2026');
 timeline('australia-awards','Bangladesh · reopens early 2027','The Bangladesh office announces that scholarship applications will reopen in early 2027. The previous round closed on 30 April 2026. Use the Bangladesh office’s new call for the next exact closing date.','https://australiaawardsbangladesh.org/');
 timeline('australia-short','Short-course call dates');
+timeline('australia-awards','2027 study intake closed','For Bangladesh, the 2027 study intake opened on 1 February 2026 at 09:00 AEDT and closed on 30 April 2026 at 14:00 AEST. The next Bangladesh application date is pending.','https://www.dfat.gov.au/people-to-people/australia-awards/australia-awards-scholarships-opening-and-closing-dates');
 timeline('eiffel-master eiffel-phd','Host submission','Campus France receives nominations by 6 January 2027. Applicants first apply to a French host and must meet its earlier internal deadline. The timer tracks the institution’s national submission.','https://www.campusfrance.org/en/france-excellence-eiffel-scholarship-program',['2027-01-06']);
 timeline('great-bd','Cranfield GREAT 2027','Cranfield’s Bangladesh GREAT Scholarship closes on 17 May 2027 at 17:00 UK time. Select a participating course starting September or October 2027 and submit the separate GREAT scholarship form. Other universities set their own cutoffs.','https://www.cranfield.ac.uk/funding/funding-opportunities/cranfield-university-great-scholarship-bangladesh',['2027-05-17T16:00:00Z']);
 timeline('jj-wbgsp','2027 window','2027 applications: Window 1 runs 18 January–26 February and Window 2 runs 29 March–21 May. First obtain unconditional admission to an eligible programme, then apply in that programme’s assigned window.','https://www.worldbank.org/en/programs/scholarships/jj-wbgsp',['2027-02-26','2027-05-21']);
@@ -205,8 +206,8 @@ timeline('it-padua-excellence-ba','Padua BA first admission call','The first 202
 timeline('it-padua-excellence-ma','Padua MSc first admission call','The English-taught Physics of Data master’s programme lists 15 November 2026 as its first international application deadline. Submit the degree application through Apply@Unipd. Eligible applicants are considered under the Excellence rules without a separate scholarship form. Other degrees can have different cutoffs.','https://pod.dfa.unipd.it/the-first-call-for-international-students/',['2026-11-15']);
 timeline('it-padua-fee-waiver','Padua first admission call','The first 2027/28 application window for most programmes closes 15 November 2026. This timer is for degree admission. Fee-waiver consideration is tied to qualifying English-taught degrees and the applicable waiver rules. Check the course-specific date and published funding terms.','https://www.unipd.it/en/ammissione-studenti-internazionali',['2026-11-15']);
 timeline('it-padua-regional','Prior call · 30 Sep 2026');
-timeline('it-cafoscari-honours-ba it-cafoscari-honours-ma','2027/28 award call','The 2027/28 award is listed for eligible first-year students. Apply for degree admission and separately follow the Honours call and its deadlines.','https://www.unive.it/pag/19545');
-timeline('it-cafoscari-college-ba it-cafoscari-college-ma','College and degree dates','Submit the degree application on the university portal first, then answer the separate International College call at the chosen level.','https://www.unive.it/pag/19545');
+timeline('it-cafoscari-honours-ba it-cafoscari-honours-ma','2027/28 Honours dates pending','Ca’ Foscari lists eight bachelor’s and 20 master’s awards, each €10,000 per year for the normal three-year bachelor’s or two-year master’s duration, subject to renewal. CGPA must be at least 85%. Prepare a motivation video and one reference for bachelor’s, or one to two references for master’s. Language certification follows the chosen degree. The 2027/28 closing date is pending on the university’s award page.','https://www.unive.it/pag/19545');
+timeline('it-cafoscari-college-ba it-cafoscari-college-ma','College and degree dates','Submit the degree application first and apply separately for the College. The university lists a flat annual fee of €1,000 for bachelor’s and €1,500 for master’s for admitted College students after vouchers. The next College closing date depends on its separate call.','https://www.unive.it/pag/19545');
 timeline('it-maeci-master','2026/27 call closed');
 timeline('lt-vu-masters-fee','Prior call · 1 Apr 2026');
 timeline('lt-vu-political-ma','Vilnius 2027 degree admission','For the 2027/28 round, non-EU/EFTA applicants generally have until 1 May 2027 to apply for admission. The institute separately lists 15 May for the waiver without specifying the intake year. Follow the faculty instructions for the written waiver request.','https://www.vu.lt/en/admissions',['2027-05-01']);
@@ -219,60 +220,98 @@ timeline('adb-jsp','AIT Master’s','The Asian Institute of Technology lists 31 
 timeline('it-maeci-master','Prior call · 26 Mar 2026','The 2026/27 MAECI call closed 26 March 2026. The next call determines eligible countries, documents and submission dates.','https://studyinitaly.esteri.it/');
 timeline('lt-vu-masters-fee','Prior call · 1 Apr 2026','The 2026 waiver deadline was 1 April. Vilnius University scheduled its award list by 15 May 2026.','https://www.vu.lt/en/students/services-for-students/finance/tuition-fee-waiver-for-full-time-master-degree-studies');
 timeline('my-curtin-pvc-50','Prior call · 20 Feb 2026','The published round opened 19 January and closed 20 February 2026. It applies to that cycle.','https://curtin.edu.my/study/scholarships/internal-scholarships/pro-vice-chancellor-international-scholarship/');
+const deadlineZones={
+ 'Germany':'Europe/Berlin','Türkiye':'Europe/Istanbul','Japan':'Asia/Tokyo','France':'Europe/Paris',
+ 'Europe (multiple countries)':'Europe/Paris','United Kingdom':'Europe/London','Sweden':'Europe/Stockholm','Finland':'Europe/Helsinki','Saudi Arabia':'Asia/Riyadh',
+ 'Hong Kong':'Asia/Hong_Kong','United Arab Emirates':'Asia/Dubai','Malaysia':'Asia/Kuala_Lumpur','Italy':'Europe/Rome','Lithuania':'Europe/Vilnius','Netherlands':'Europe/Amsterdam',
+ 'adb-jsp':'Asia/Bangkok','jj-wbgsp':'America/New_York'
+};
 function scholarshipTimeline(p){
- return timelines.get(p.id)||{label:'Provider schedule',dates:[]};
+ const schedule=timelines.get(p.id)||{label:'Provider schedule',dates:[]};
+ return {...schedule,zone:deadlineZones[p.id]||deadlineZones[p.country]};
 }
-function deadlineStatus(date,now){
- if(date.length===10){
-  const today=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
-  const days=Math.round((Date.parse(date)-today)/86400000);
-  return days<0?'Closed':days===0?'Closes today':days+'d left';
- }
- const seconds=Math.floor((Date.parse(date)-now)/1000);
- if(seconds<0)return 'Closed';
- return Math.floor(seconds/86400)+'d '+Math.floor(seconds/3600)%24+'h '+Math.floor(seconds/60)%60+'m '+seconds%60+'s';
+const dateOnlyClosings=new Map();
+function closingTime(date,zone){
+ if(date.length!==10)return Date.parse(date);
+ if(!zone)return NaN;
+ const key=zone+' '+date;
+ if(dateOnlyClosings.has(key))return dateOnlyClosings.get(key);
+ const localEnd=Date.parse(date+'T23:59:59Z');
+ const parts=new Intl.DateTimeFormat('en-GB',{timeZone:zone,timeZoneName:'longOffset'}).formatToParts(localEnd);
+ const offset=parts.find(p=>p.type==='timeZoneName')?.value.slice(3)||'+00:00';
+ const end=Date.parse(date+'T23:59:59'+offset);
+ dateOnlyClosings.set(key,end);
+ return end;
 }
-function nextClosing({dates,annualDay},now){
+function deadlineStatus(end,now){
+ const seconds=Math.max(0,Math.ceil((end-now)/1000));
+ return [Math.floor(seconds/86400)+'d',String(Math.floor(seconds/3600)%24).padStart(2,'0')+'h',String(Math.floor(seconds/60)%60).padStart(2,'0')+'m',String(seconds%60).padStart(2,'0')+'s'].join(' ');
+}
+function nextClosing({dates,annualDay,zone},now){
+ let candidates=dates;
  if(annualDay){
-  const year=now.getFullYear();
-  const thisYear=year+'-'+annualDay;
-  return deadlineStatus(thisYear,now)==='Closed'?(year+1)+'-'+annualDay:thisYear;
+  const year=Number(new Intl.DateTimeFormat('en',{timeZone:zone,year:'numeric'}).format(now));
+  candidates=[year+'-'+annualDay,(year+1)+'-'+annualDay];
  }
- return dates.find(date=>deadlineStatus(date,now)!=='Closed');
+ for(const date of candidates){
+  const end=closingTime(date,zone);
+  if(end>now)return {date,end};
+ }
 }
-function timelineBadge(schedule,now){
- const date=nextClosing(schedule,now);
- return date ? schedule.label+' · '+deadlineStatus(date,now) : schedule.label+(schedule.dates.length?' · Closed':'');
+function displayedClosingDate(date,zone){
+ return date.length===10?date:new Intl.DateTimeFormat('en-CA',{timeZone:zone||'UTC',year:'numeric',month:'2-digit',day:'2-digit'}).format(Date.parse(date));
+}
+function deadlineDisplay(schedule,now){
+ const next=nextClosing(schedule,now);
+ if(next){
+  const date=displayedClosingDate(next.date,schedule.zone);
+  return {date,status:deadlineStatus(next.end,now),estimate:next.date.length===10};
+ }
+ const label=schedule.label;
+ const status=schedule.dates.length||/closed|prior call/i.test(label)?'Closed':
+  /rolling/i.test(label)?'Rolling':
+  /automatic/i.test(label)?'Automatic':
+  /no Bangladesh/i.test(label)?'Unavailable':
+  /course start/i.test(label)?'Intake-based':'No fixed date';
+ const last=schedule.dates.at(-1);
+ return {date:last?displayedClosingDate(last,schedule.zone):label,status};
 }
 function cardDeadline(p){
  const schedule=scholarshipTimeline(p);
- return '<span class="an-card-deadline" data-timeline-id="'+esc(p.id)+'" title="'+esc(schedule.note||p.deadline)+'">'+esc(timelineBadge(schedule,new Date()))+'</span>';
+ const {date,status,estimate}=deadlineDisplay(schedule,new Date());
+ const tooltip=[schedule.label,schedule.note||p.deadline,estimate?'Closing time estimated at 23:59:59 in the provider time zone.':null].filter(Boolean).join(' · ');
+ return '<div class="an-card-timeline" data-timeline-id="'+esc(p.id)+'" title="'+esc(tooltip)+'"><span class="an-card-timeline-date">'+esc(date)+(estimate?'*':'')+'</span><span class="an-card-timeline-count">'+esc(status)+'</span>'+(schedule.dates.length||schedule.annualDay?'<small class="an-card-timeline-route">'+esc(schedule.label)+'</small>':'')+'</div>';
 }
 function timelineDetail(p){
  const {label,note,source,dates,annualDay}=scholarshipTimeline(p);
  return '<section class="an-scholarship-datecard"><span>Application timeline</span><h3>'+esc(label)+'</h3><p>'+esc(note||p.deadline)+'</p>'+
- ((dates.length||annualDay)?cardDeadline(p).replace('class="an-card-deadline"','class="an-profile-deadline"'):'')+
+ ((dates.length||annualDay)?cardDeadline(p):'')+
  '<p><a href="'+esc(safeUrl(source||p.source))+'" target="_blank" rel="noopener noreferrer">Official timeline and application instructions ↗</a></p></section>';
 }
 let directoryTimer;
 function mountDirectoryDeadlines(){
  clearInterval(directoryTimer);
- const badges=[...document.querySelectorAll('[data-timeline-id]')].map(el=>({el,...timelines.get(el.dataset.timelineId)})).filter(x=>x.dates?.length||x.annualDay);
+ const schedules=new Map(items.map(p=>[p.id,scholarshipTimeline(p)]));
+ const badges=[...document.querySelectorAll('[data-timeline-id]')].map(el=>({el,schedule:schedules.get(el.dataset.timelineId)})).filter(({schedule})=>schedule?.dates.length||schedule?.annualDay);
  const next=document.querySelector('.an-next-scholarship-deadline');
  if(!badges.length&&!next)return;
  function update(){
   const now=new Date();
-  for(const {el,...schedule} of badges){
-   const status=timelineBadge(schedule,now);
-   if(el.textContent!==status)el.textContent=status;
+  for(const {el,schedule} of badges){
+   const {date,status,estimate}=deadlineDisplay(schedule,now);
+   const dateLabel=date+(estimate?'*':'');
+   const dateEl=el.querySelector('.an-card-timeline-date');
+   const countEl=el.querySelector('.an-card-timeline-count');
+   if(dateEl.textContent!==dateLabel)dateEl.textContent=dateLabel;
+   if(countEl.textContent!==status)countEl.textContent=status;
   }
   if(!next)return;
   let upcoming;
   for(const p of items){
-   const date=nextClosing(scholarshipTimeline(p),now);
-   if(date&&(!upcoming||Date.parse(date)<Date.parse(upcoming.date)))upcoming={p,date};
+   const closing=nextClosing(schedules.get(p.id),now);
+   if(closing&&(!upcoming||closing.end<upcoming.end))upcoming={p,end:closing.end};
   }
-  const label=upcoming?'Next · '+deadlineStatus(upcoming.date,now):'No upcoming date listed';
+  const label=upcoming?'Next · '+deadlineStatus(upcoming.end,now):'No upcoming date listed';
   if(next.textContent!==label)next.textContent=label;
   if(upcoming){
    next.href='#/scholarship/'+encodeURIComponent(upcoming.p.id);
@@ -285,7 +324,7 @@ function mountDirectoryDeadlines(){
 function card(p,i){
  let desc=p.coverage.length>120?p.coverage.slice(0,117).replace(/\s+\S*$/,'')+'…':p.coverage;
  const initials=p.name.split(/[ \-·]/).filter(x=>/[A-Za-z]/.test(x)).slice(0,3).map(x=>x[0]).join('').toUpperCase();
- return '<article class="an-scholarship-card"><div class="an-scholarship-cover">'+coverPhoto(p,'an-scholarship-cover-photo')+'<div class="an-scholarship-cover-top"><span class="an-scholarship-number">'+String(i+1).padStart(3,'0')+' / '+items.length+'</span><span class="an-scholarship-country">'+flagPhoto(p)+esc(p.country)+'</span>'+cardDeadline(p)+'</div><span class="an-scholarship-glyph" aria-hidden="true">'+esc(initials)+'</span></div><div class="an-scholarship-body"><small class="an-scholarship-level">'+esc(p.level)+'</small><h3>'+esc(p.name)+'</h3><div class="an-scholarship-money"><strong>'+esc(amountText(p))+'</strong><small>'+esc(approx(p))+'</small></div><p class="an-scholarship-desc">'+esc(desc)+'</p><div class="an-scholarship-actions"><a href="#/scholarship/'+esc(p.id)+'">View full funding & requirements ↗</a><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Official application ↗</a></div></div></article>';
+ return '<article class="an-scholarship-card"><div class="an-scholarship-cover">'+coverPhoto(p,'an-scholarship-cover-photo')+'<div class="an-scholarship-cover-top"><span class="an-scholarship-number">'+String(i+1).padStart(3,'0')+' / '+items.length+'</span><span class="an-scholarship-country">'+flagPhoto(p) +esc(p.country)+'</span></div><span class="an-scholarship-glyph" aria-hidden="true">'+esc(initials)+'</span></div><div class="an-scholarship-body"><small class="an-scholarship-level">'+esc(p.level)+'</small><h3>'+esc(p.name)+'</h3><div class="an-scholarship-money"><strong>'+esc(amountText(p))+'</strong><small>'+esc(approx(p))+'</small></div><p class="an-scholarship-desc">'+esc(desc)+'</p>'+cardDeadline(p)+'<div class="an-scholarship-actions"><a href="#/scholarship/'+esc(p.id)+'">View full funding & requirements ↗</a><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Official application ↗</a></div></div></article>';
 }
 
 function featureCard(p){
@@ -319,7 +358,7 @@ function listPage(){
  '<details class="an-scholarship-about"><summary>About academic funding, eligibility & latest calls <span>⌄</span></summary><p>Scholarships for Bangladeshi applicants, with separate funding levels and programme-specific eligibility. Amounts, deadlines and university choices are controlled by each official annual call. Funding amounts and exchange rates are approximate planning figures.</p><p>🌍 '+(countries.length-1)+' destination groups · 🇧🇩 BDT planning rates dated 05 Nov 2026.</p></details>'+
  '<div class="an-scholarship-meta"><strong id="an-scholarship-count"></strong><span>Official sources in each profile</span></div>'+
  '<div class="an-scholarship-scroll-region">'+scholarshipRail('an-global-rail','International & Research Funding','Government, university and research funding pathways for eligible Bangladeshi applicants.')+scholarshipRail('an-merit-rail','Intake, Semester & Merit Scholarships','University admission awards, CGPA progression, semester results and tuition-fee reductions.')+
- '</div>'+'<p class="an-scholarship-info">Exchange-rate note: <a href="'+BANK+'" target="_blank" rel="noopener noreferrer">Bangladesh Bank, 05 November 2026</a> provides base USD and major currency BDT rates; HUF, TRY, KRW, MYR, RON, AZN, TWD, AED, HKD, QAR and BND use approximate planning estimates. Amount in BDT is a translation of the published award amount, not an extra payment. Exchange rates change, amounts can be revised, and programme funding is not a living-cost guarantee. A source link is not proof that the current application cycle is open.</p></div></main>';
+ '</div>'+'<p class="an-scholarship-info">* A date without a published closing time uses the end of that day in the provider’s time zone as a planning estimate. Exchange-rate note: <a href="'+BANK+'" target="_blank" rel="noopener noreferrer">Bangladesh Bank, 05 November 2026</a> provides base USD and major currency BDT rates; HUF, TRY, KRW, MYR, RON, AZN, TWD, AED, HKD, QAR and BND use approximate planning estimates. Amount in BDT is a translation of the published award amount, not an extra payment. Exchange rates change, amounts can be revised, and programme funding is not a living-cost guarantee. A source link is not proof that the current application cycle is open.</p></div></main>';
 }
 function refreshList(){
  const q=easy(filters.search);
@@ -368,6 +407,29 @@ function countryGuideHtml(p){
  if(!x)return '';
  return '<section class="an-scholarship-section an-scholarship-section-full"><h2><span>✈</span> · Country-specific visa, spouse, work & settlement</h2><p>'+esc(x.text)+'</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(x.url))+'" target="_blank" rel="noopener noreferrer">Official immigration / student guidance ↗</a></div></section>';
 }
+const publishedVisaCosts={
+ 'United Kingdom':[
+  ['Student visa application','£558 per applicant when applying outside the UK (main applicant or eligible dependant).','https://www.gov.uk/government/publications/visa-regulations-revised-table/home-office-immigration-and-nationality-fees-8-october-2026'],
+  ['Immigration Health Surcharge','£776 per year for students and eligible dependants. The total uses the visa length and part-year charging rules.','https://www.gov.uk/healthcare-immigration-application/how-much-pay']
+ ],
+ 'Germany':[
+  ['Financial evidence for a student visa from Bangladesh','The German Embassy in Dhaka lists an accepted scholarship confirmation, a qualifying German sponsor declaration, or a blocked account showing €11,904 (€992 per month). The blocked balance is living money held for release, separate from application charges.','https://dhaka.diplo.de/resource/blob/2685888/8b2e577c56927ada4bfc23db0455a849/p-checklist-student-visa-data.pdf']
+ ],
+ 'Malaysia':[
+  ['EMGS items for new private higher-education students','The published schedule lists RM150 for eVAL processing, RM50 for iKad and RM250 for mandatory new-student medical screening. These are individual items. Base processing, insurance, immigration charges, nationality-specific visa fees and any institutional charges determine the final total.','https://visa.educationmalaysia.gov.my/media/cms_upload/Schedule_fees_for_student_dependant_pass_app_28.10.2025.pdf']
+ ],
+ 'Netherlands':[
+  ['Study residence permit','€254 for a first application or change of purpose.','https://ind.nl/en/fees-costs-of-an-application'],
+  ['2026 university student maintenance requirement','€1,130.77 per month through 31 December 2026. This is evidence of funds for living expenses. The 2027 amount may differ.','https://ind.nl/en/required-amounts-income-requirements']
+ ],
+ 'France':[
+  ['Long-stay student visa financial evidence','France-Visas lists €877.50 per month for applications submitted from 1 August 2026. This is an income threshold. The application charge is separate.','https://france-visas.gouv.fr/en/accueil']
+ ]
+};
+function publishedVisaCostList(country){
+ const rows=publishedVisaCosts[country];
+ return rows?'<ul class="an-verified-visa-costs">'+rows.map(([name,value,source])=>'<li><b>'+esc(name)+':</b> '+esc(value)+' <a href="'+esc(source)+'" target="_blank" rel="noopener noreferrer">Official reference ↗</a></li>').join('')+'</ul>':'';
+}
 /* Verified versus programme-dependent requirements are kept separate.
    Values not published by a provider are NEVER fabricated. */
 function detailPreparation(p){
@@ -386,7 +448,7 @@ function detailPreparation(p){
  '<article><h3>04 · Photograph, recommendations and SOP</h3><ul><li><b>Portrait:</b> provide a recent colour passport-style photo only when required. A 35 × 45 mm photo is NOT universal for university applications; use the exact dimensions, background and pixel/file-size limit published by the chosen portal.</li><li><b>Recommendation:</b> academic/professional referee name, title, official email and signed letter according to the call.</li><li><b>Motivation / SOP:</b> relate your previous training and future goals directly to the host programme. Match its word/page limit.</li><li><b>Research candidates:</b> add supervisor, proposal, writing samples or portfolio only when the degree requires them.</li></ul></article>'+
  '<article><h3>05 · IELTS / TOEFL / MOI eligibility</h3>'+moi+'<p><b>Current language entry description:</b> '+esc(p.language||'Confirm the named programme')+'. Individual programmes may require IELTS Academic, TOEFL iBT, PTE, Duolingo, German or another language test. A scholarship name alone never guarantees a waiver.</p></article>'+
  '<article><h3>06 · When, where and how to apply</h3><p>'+due+'</p><ol><li>Choose the exact course, award level, eligible host and intake.</li><li>Open its official admission/application link and create the account when required.</li><li>Choose the scholarship-funded route or tick the award option if the provider offers it.</li><li>Upload each required document in the format/size shown by that portal.</li><li>Submit by the programme’s closing date and retain the confirmation email, receipt and application/reference number.</li><li>Complete interview, nomination, award and visa steps when formally requested.</li></ol><p><a href="'+esc(safeUrl(p.apply))+'" rel="noopener noreferrer" target="_blank">Official application portal ↗</a></p></article>'+
- '<article><h3>07 · Application fees and visa budget</h3><p><b>Scholarship / university fee:</b> '+esc(p.fee||'Only the provider can confirm')+'</p><p><b>Visa charges:</b> Country, age, visa type and waiver rules vary. Check the applicable embassy before paying; a scholarship can qualify for a waiver in some countries, not all.</p><p><b>Upfront costs:</b> tests, translations, document legalisation, travel, deposit and insurance depend on the selected destination. Never treat an example budget as an official fixed fee.</p></article>'+
+ '<article><h3>07 · Application fees and visa budget</h3><p><b>Scholarship / university fee:</b> '+esc(p.fee||'Only the provider can confirm')+'</p><p><b>Visa charges:</b> Country, age, visa type and waiver rules vary. Published amounts are shown below where available.</p>'+publishedVisaCostList(p.country)+'<p><b>Upfront costs:</b> tests, translations, document legalisation, travel, deposit and insurance depend on the selected destination. Never treat an example budget as an official fixed fee.</p></article>'+
  '<article><h3>08 · Duration, host universities and funding</h3><p><b>General duration:</b> '+esc(p.duration||'Check official degree')+'. A programme-specific duration is authoritative over this summary.</p><p><b>Confirmed host list:</b> use the university/eligible-programme cards on this page. Where no host is confirmed, the scholarship operator’s current course catalogue is the source—not all universities in that country are automatically eligible.</p><p><b>Funding:</b> '+esc(p.coverage||'Refer to award')+'. Each monthly stipend is separate from tuition coverage, housing, travel and visa costs unless expressly included.</p></article>'+
  '</div></section>';
 }
