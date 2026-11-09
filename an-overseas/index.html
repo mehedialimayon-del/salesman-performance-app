@@ -934,7 +934,7 @@ body.an-contact-mode .an-contact-head .bread{font-size:10px!important}
  html body.an-about-locked #app .an-about-v3 .an-about-intro-panel{justify-content:flex-start!important;overflow-y:auto!important}
 }
 </style>
-<link rel="stylesheet" href="an-about-banner.css?v=20261110-stable-chapters">
+<link rel="stylesheet" href="an-about-banner.css?v=20261110-full-management">
 <style id="an-desktop-navigation-fit">
 @media (max-width: 800px) {
   #an-desktop-wordmark { display: none; }
@@ -1273,7 +1273,7 @@ function managementPage(){
      <span class="an-about-eyebrow"><span class="an-accent">PEOPLE</span> <span class="an-light">BEHIND THE PROMISE</span></span>
      <h2 id="an-manager-heading"><span class="an-accent">OUR</span> <span class="an-light">MANAGEMENT</span></h2>
     </header>
-    <div class="an-manager-card" id="an-manager-card" aria-live="polite">
+    <div class="an-manager-card" id="an-manager-card" role="region" aria-label="Management profile" tabindex="0" aria-live="polite">
      <div class="an-manager-empty">Loading published management profile…</div>
     </div>
     <nav class="an-manager-controls" aria-label="Browse management profiles">
@@ -1283,7 +1283,6 @@ function managementPage(){
      <button type="button" data-an-manager="1" aria-label="Next management profile">›</button>
     </nav>
    </article>
-   <dialog class="an-manager-profile-dialog" aria-label="Management profile details"><form method="dialog"><button type="submit">Close</button></form><div class="an-manager-profile-details"></div></dialog>
  </section>`;
 }
 function aboutDetailsPage(){return typeof window.ANAboutFounderStory==='function' ? window.ANAboutFounderStory() : title('Our Story','A&N Overseas Education & Consultancy — our founding vision and student commitments.')+`<div class="wrap content"><div class="live-panel"><h2>Our Journey</h2><p>Founded in 2024, A&N Overseas supports students exploring international education and realistic study routes.</p><a class="btn outline" href="#/about">← About Us</a></div></div>`;}
@@ -1449,7 +1448,7 @@ const tabBtn=e.target.closest('[data-tab]');if(tabBtn){tab=tabBtn.dataset.tab;do
  function start(){clearTimeout(timer);index=0;erasing=false;if(motion.matches){write(name.length);}else{write(0);timer=setTimeout(tick,250);}}
  motion.addEventListener('change',start);start();
 })();
-</script><script src="catalogue-extras.js?v=20261109-official-links-v2"></script><script src="university-expanded.js?v=20261106-malaysia-verified-v2"></script><script src="university-campaigns.js?v=20261105-single-support-v3"></script><script src="service-journey.js?v=20261030-02"></script><script src="admin-service-panel.js?v=20261030-02"></script><script defer src="an-live-content.js?v=20261108-contact-number-v1"></script><script defer src="an-premium-public.js?v=20261110-manager-pages"></script><script>
+</script><script src="catalogue-extras.js?v=20261109-official-links-v2"></script><script src="university-expanded.js?v=20261106-malaysia-verified-v2"></script><script src="university-campaigns.js?v=20261105-single-support-v3"></script><script src="service-journey.js?v=20261030-02"></script><script src="admin-service-panel.js?v=20261030-02"></script><script defer src="an-live-content.js?v=20261108-contact-number-v1"></script><script defer src="an-premium-public.js?v=20261110-full-management"></script><script>
 /* This A&N site uses its OWN scoped worker and install identity, separate from the FieldForce root PWA. */
 if('serviceWorker' in navigator){
  window.addEventListener('load',()=>{

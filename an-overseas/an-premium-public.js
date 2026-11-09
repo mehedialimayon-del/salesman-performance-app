@@ -181,7 +181,11 @@ function showTeam(){
  panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role,isFounder?m.name:'')+'</div><div class="an-manager-main"><div class="an-manager-photo-box">'+imageHtml+'</div>'
   +'<div class="an-manager-information">'+nameHtml+careerHtml+quoteHtml+supportHtml
   +'<div class="an-manager-contacts">'+emailHtml+whatsappHtml+linkedInHtml+facebookHtml+'</div>'
-  +'<div class="an-manager-actions">'+buttonsHtml+'</div><button type="button" class="an-manager-more" data-an-manager-more>Profile details</button></div></div>';
+  +'<div class="an-manager-actions">'+buttonsHtml+'</div></div></div>';
+ if(panel.dataset.profileIndex!==String(teamIndex)){
+  panel.dataset.profileIndex=String(teamIndex);
+  panel.scrollTo({top:0,behavior:'instant'});
+ }
  counter.textContent=(teamIndex+1)+' / '+members.length;
  pages.innerHTML=members.map((member,index)=>'<button type="button" data-an-manager-page="'+index+'" aria-label="Profile '+(index+1)+': '+esc(member.name||'Management')+'"'+(index===teamIndex?' aria-current="true"':'')+'>'+(index+1)+'</button>').join('');
 }
@@ -228,13 +232,6 @@ document.addEventListener('click',e=>{
   teamIndex=Number(page.dataset.anManagerPage);
   showTeam();
   document.querySelector('[data-an-manager-page][aria-current="true"]')?.focus({preventScroll:true});
-  return;
- }
- if(e.target.closest('[data-an-manager-more]')){
-  const dialog=document.querySelector('.an-manager-profile-dialog');
-  const details=dialog.querySelector('.an-manager-profile-details');
-  details.replaceChildren(...Array.from(document.querySelectorAll('#an-manager-card .an-manager-information > :not(.an-manager-more)'),node=>node.cloneNode(true)));
-  dialog.showModal();
   return;
  }
  const arrow=e.target.closest('[data-an-manager]');
