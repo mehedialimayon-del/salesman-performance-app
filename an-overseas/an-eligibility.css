@@ -88,3 +88,12 @@
 .an-elig .an-elig-education-row{overflow:visible;min-width:0}
 .an-elig .an-elig-education-row [data-secondary-group],.an-elig .an-elig-education-row [data-secondary-board]{min-width:0}
 @media(max-width:720px){.an-elig .an-elig-education-row .an-elig-grid{grid-template-columns:1fr}.an-elig .an-elig-suggestions{max-height:42svh}}
+
+/* Each qualification uses a full-width orange or white card. */
+.an-elig #an-elig-education{display:grid;gap:14px}
+.an-elig .an-elig-education-row{--qual-ink:#201007;--qual-edge:#a64e19;--qual-field:#fff8f1;background:#ff9a48;border-color:var(--qual-edge);color:var(--qual-ink);margin:0;padding:clamp(12px,2vw,22px)}
+.an-elig .an-elig-education-row:nth-child(even){--qual-edge:#c4a68e;--qual-field:#fff;background:#fff;color:#24160d}
+.an-elig .an-elig-education-row label{background:var(--qual-field);border:1px solid var(--qual-edge);color:var(--qual-ink);padding:9px;border-radius:10px;line-height:1.35}
+.an-elig .an-elig-education-row input:not([type=checkbox]),.an-elig .an-elig-education-row select{background:#fff;color:var(--qual-ink);color-scheme:light;border-color:var(--qual-edge)}
+.an-elig .an-elig-education-row input::placeholder{color:#6d574a}
+.an-elig .an-elig-education-row .an-elig-suggestions{position:relative;top:auto;margin-top:4px}

@@ -41,7 +41,7 @@
           </fieldset>
           <fieldset class="an-elig-panel an-elig-step"><legend>02 / Qualifications</legend>
             <h2>What have you studied?</h2>
-            <p>Select all qualifications you want to include. Each opens its own form.</p>
+            <p>Select the qualifications relevant to your application. Include your Bachelor’s for Master’s study. Add SSC or HSC when the programme asks for school results.</p>
             <div class="an-elig-qualifications">${qualifications.map(q=>'<label><input type="checkbox" data-credential value="'+escape(q)+'"> '+escape(q)+'</label>').join('')}</div>
             <div id="an-elig-education"></div>
           </fieldset>
@@ -110,6 +110,19 @@
   }
   const bdBoards = ['Dhaka','Rajshahi','Dinajpur','Cumilla','Chattogram','Jashore','Barishal','Sylhet','Mymensingh','Madrasah','Technical'];
   const bdGroups = ['Science','Business Studies','Humanities'];
+  // BAU official Faculty / Institute and Honours Degree table:
+  // https://www.bau.edu.bd/public/file_manager/apa/65646ad205675.pdf
+  const bauBachelor = [
+    ['Faculty of Veterinary Science','Doctor of Veterinary Medicine'],
+    ['Faculty of Agriculture','BSc in Agriculture (Honours)'],
+    ['Faculty of Animal Husbandry','BSc in Animal Husbandry (Honours)'],
+    ['Faculty of Agricultural Economics & Rural Sociology','BSc in Agricultural Economics (Honours)'],
+    ['Faculty of Agricultural Engineering & Technology','BSc in Agricultural Engineering'],
+    ['Faculty of Agricultural Engineering & Technology','BSc in Food Engineering'],
+    ['Faculty of Agricultural Engineering & Technology','BSc in Bioinformatics Engineering'],
+    ['Faculty of Fisheries','BSc in Fisheries (Honours)'],
+    ['Interdisciplinary Institute for Food Security','BSc in Food Safety Management (Honours)']
+  ];
   function educationRow(qualification) {
     const row = document.createElement('section');
     const secondary = ['SSC','HSC','O-Level','A-Level'].includes(qualification);
@@ -120,8 +133,8 @@
       <div data-secondary-group hidden><label>Group<select name="group">${options(bdGroups,'Choose group')}</select></label></div>
       <div data-secondary-board hidden><label>Education board<select name="board">${options(bdBoards,'Choose board')}</select></label></div>
       ${picker('institution',secondary?'School / college / examination board':'Institution / university','Select or search institution','institution')}
-      <div data-subject-wrap>${picker('subject',secondary?'Subjects or group':'Programme / subject','Search programme or major','subject')}</div>
-      <div data-faculty-wrap${secondary?' hidden':''}><label>Faculty<input name="faculty" placeholder="Faculty at selected institution"></label></div>
+      <div data-faculty-wrap${secondary?' hidden':''}>${picker('faculty','Faculty / institute','Select or enter faculty','faculty')}</div>
+      <div data-subject-wrap>${picker('subject',secondary?'Subjects or group':'Programme / subject','Select or enter programme','subject')}</div>
       <label>Passing or expected year<input name="year" type="number" min="1900" max="2100"></label>
       <label>Status<select name="completion">${options(['Completed','In progress'])}</select></label>
       <label>Grading scale<select name="gradeScale"><option value="">Choose scale</option>${scales.map(([value,label])=>'<option value="'+value+'">'+label+'</option>').join('')}</select></label>
@@ -304,7 +317,7 @@
       .concat(['Bangladesh Madrasah Education Board','Bangladesh Technical Education Board']);
     function rebuildChoices() {
       const buckets = new Map();
-      const subjects = new Set(); // Only programmes recorded in the site directory, not generic international subject vocabularies.
+      const subjects = new Set(window.ANEligibilitySubjects || []);
       const add = (country,name,short) => {
         if (!name || !country) return;
         if (!buckets.has(country)) buckets.set(country,new Map());
@@ -314,7 +327,6 @@
       };
       entries.forEach(entry=>{
         add(entry.country,entry.name,entry.short);
-        if (Array.isArray(entry.programs)) entry.programs.forEach(name=>{if(typeof name==='string' && name.length < 120) subjects.add(name);});
       });
       Object.entries(window.ANEligibilityInstitutions || {}).forEach(([country,names])=>names.forEach(name=>add(country,name)));
       Object.keys(aliases).slice(0,4).forEach(name=>add('Bangladesh',name));
@@ -353,19 +365,24 @@
       const query=input.value;
       const preferred=institutionsByCountry.get(priority) || [];
       const institution=row?.querySelector('[name=institution]')?.value.trim();
-      const matchedEntry=row && institution ? entries.find(entry=>normalize(entry.name)===normalize(institution) && entry.country===priority) : null;
-      const verifiedPrograms=matchedEntry && Array.isArray(matchedEntry.programs) ? matchedEntry.programs.filter(p=>typeof p==='string' && p.length<120).map(value=>({value,query:value,hint:'Institution catalogue'})) : [];
-      const isSubject=type==='subject';
-      const bangladeshSchool=row && ['SSC','HSC'].includes(row.dataset.qualification) && priority==='Bangladesh';
-      // When a university has no published programme list, allow students to
-      // choose a relevant subject from the broader catalogue, clearly labelled
-      // as a subject suggestion rather than a verified university offering.
-      const suggested=subjectChoices.map(item=>({...item,hint:'Subject suggestion · confirm with university'}));
-      const data=isSubject ? (bangladeshSchool ? bdGroups.map(value=>({value,query:value})) : [...verifiedPrograms,...suggested.filter(item=>!verifiedPrograms.some(p=>normalize(p.value)===normalize(item.value)))]) :
-        type==='institution' ? preferred : [...preferred,...[...institutionsByCountry].filter(([country])=>country!==priority).flatMap(([,list])=>list)];
+      const faculty=row?.querySelector('[name=faculty]').value.trim();
+      const isBAU=priority==='Bangladesh' && normalize(institution || '')==='bangladesh agricultural university';
+      const facultyPrograms=isBAU && row?.dataset.qualification==='Bachelor' ? bauBachelor : [];
+      const institutionRules=row && institution ? rules.programmes.filter(rule=>
+        normalize(rule.institution)===normalize(institution) && rule.level===row.dataset.qualification &&
+        (rule.country || 'Malaysia')===priority) : [];
+      const makeChoices=values=>[...new Set(values)].map(value=>({value,query:value}));
+      const programNames=facultyPrograms.filter(([name])=>!faculty || name===faculty).map(([,name])=>name);
+      if (!faculty) programNames.push(...institutionRules.map(rule=>rule.name));
+      const data=type==='faculty' ? makeChoices(facultyPrograms.map(([name])=>name))
+        : type==='subject' ? (row ? makeChoices(programNames) : subjectChoices)
+        : type==='institution' ? preferred
+        : [...preferred,...[...institutionsByCountry].filter(([country])=>country!==priority).flatMap(([,list])=>list)];
       const found=data.filter(item=>matches(query,item.query));
       const shown=found.slice(0,query ? 100 : 60);
-      const message=isSubject ? 'No matching subject found. Type your programme manually; confirm availability with the institution.' : 'No matching institution found. Check the spelling or enter the institution manually.';
+      const message=type==='subject' || type==='faculty'
+        ? (row && !institution ? 'Select the institution first.' : 'No recorded match. Enter the exact title from your academic documents.')
+        : 'No matching institution found. You can enter its official name.';
       panel.innerHTML=shown.length ? shown.map(item=>`<button type="button" data-pick="${escape(item.value)}">${escape(item.value)}${item.hint ? '<small>'+escape(item.hint)+'</small>' : ''}</button>`).join('') : '<p>'+message+'</p>';
       panel.hidden=false;
       input.setAttribute('aria-expanded','true');
@@ -383,6 +400,9 @@
       row.querySelector('[data-secondary-group]').hidden=!bangladesh;
       row.querySelector('[data-secondary-board]').hidden=!bangladesh;
       row.querySelector('[data-subject-wrap]').hidden=bangladesh;
+      row.querySelector('[data-picker=institution]').hidden=bangladesh;
+      row.querySelector('[name=gradeScale]').disabled=bangladesh;
+      row.querySelector('[data-custom-scale]').hidden=bangladesh || row.querySelector('[name=gradeScale]').value!=='other';
       row.querySelector('[data-faculty-wrap]').hidden=secondary;
       row.querySelectorAll('[data-tertiary]').forEach(el=>el.hidden=secondary || ['Foundation','Diploma'].includes(row.dataset.qualification));
       row.querySelector('[data-mqa]').hidden=country!=='Malaysia' || secondary;
@@ -481,11 +501,13 @@
       }
       const row=field.closest('[data-qualification]');
       if (field.name==='educationCountry') {
-        row.querySelector('[name=institution]').value='';
+        for (const name of ['institution','faculty','subject','group','board']) row.querySelector('[name='+name+']').value='';
+        row.querySelector('[name=gradeScale]').value='';
         syncEducationCountry(row);
       }
       if (field.name==='group') row.querySelector('[name=subject]').value=field.value;
       if (field.name==='institution' && row) { row.querySelector('[name=subject]').value=''; row.querySelector('[name=faculty]').value=''; }
+      if (field.name==='faculty' && row) row.querySelector('[name=subject]').value='';
       if (field.name==='gradeScale') row.querySelector('[data-custom-scale]').hidden=field.value!=='other';
       if (field.name==='confirmed') confirmButton.disabled=!field.checked;
     });
@@ -520,6 +542,16 @@
         const input=option.closest('[data-picker]').querySelector('input');
         input.value=option.dataset.pick;
         input.focus();
+        input.dispatchEvent(new Event('change',{bubbles:true}));
+        if (input.name==='subject') {
+          const row=input.closest('[data-qualification]');
+          const faculty=row?.querySelector('[name=faculty]');
+          if (faculty && !faculty.value && row.dataset.qualification==='Bachelor' &&
+              row.querySelector('[name=educationCountry]').value==='Bangladesh' &&
+              normalize(row.querySelector('[name=institution]').value)==='bangladesh agricultural university') {
+            faculty.value=bauBachelor.find(([,name])=>name===input.value)?.[0] || '';
+          }
+        }
         input.dispatchEvent(new Event('input',{bubbles:true}));
         closePicker();
         return;
