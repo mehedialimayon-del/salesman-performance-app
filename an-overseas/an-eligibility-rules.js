@@ -17,8 +17,13 @@ window.ANEligibilityRules = {
       english: { IELTS: 6, 'TOEFL iBT': 65, 'PTE Academic': 59, MUET: 4 },
       englishNotes: 'Standard registration scores from the 2026 UPM handbook. IELTS means Academic. TOEFL iBT/Home Edition score is on the 0–120 scale in this handbook. IELTS Academic 5.5 is B2 Entry and IELTS Academic 5.0 is B1, with additional English study required on these pathways.',
       englishSource: 'https://sgs.upm.edu.my/upload/dokumen/20260408095929Postgraduate_Student_Handbook_2026_-_with_cover_compressed.pdf',
-      moi: 'UPM does not accept a Medium of Instruction letter as English evidence for postgraduate entry.',
-      rejectsMoi: true,
+      moi: 'A standalone MOI letter is not accepted in place of a test. A separate exemption can apply to a completed, fully English-taught degree from an MQA-recognised Malaysian institution. Other published exemption categories may also apply.',
+      rejectsMoi: true, malaysiaEnglishDegreeWaiver: true, proposalRequired: true,
+      intakes: ['March','October'],
+      intake: 'UPM’s dual-semester schedule lists March and October. International application deadlines are generally 30 November and 30 June, respectively.',
+      application: 'Submit the postgraduate application through UPM’s online admissions system and include the Faculty of Agriculture research proposal.',
+      documents: 'Degree certificate and transcripts, passport, English test or evidence of a published exemption, and a research proposal.',
+      exemptionSource: 'https://sgs.upm.edu.my/upload/dokumen/20260423002721PG_REGISTRATION_GUIDELINES_10.03.2026.pdf',
       conditionalMinimum: 2.5, experienceMinimum: 2, experienceYears: 5,
       subject: 'Relevant previous qualification and a research proposal aligned with faculty expertise',
       alternative: 'A relevant Bachelor’s CGPA from 2.500 to 2.749 may be considered after a rigorous faculty assessment. CGPA 2.000–2.499 requires five years of relevant work plus a rigorous assessment. The faculty also assesses prerequisite and research proposal requirements.'
@@ -49,6 +54,7 @@ window.ANEligibilityRules = {
       subject: 'Bachelor’s with Honours. Published non-science fields include Business and Economics, Statistics and Mathematics, and Accounting and Finance.',
       english: { IELTS: 6, 'TOEFL iBT': 60, 'TOEFL Essentials': 8.5, 'PTE Academic': 59, MUET: 4, 'Cambridge English': 169 },
       englishNotes: 'IELTS Academic and centre-based TOEFL iBT. Cambridge English applies to B1 Preliminary, B2 First, C1 Advanced or C2 Proficiency.',
+      intakes: ['March','October'],
       intake: 'March and October, subject to programme availability.'
     },
     {
@@ -60,7 +66,24 @@ window.ANEligibilityRules = {
       alternative: 'CGPA 2.50–2.99 requires at least one published alternative: UM graduation, one year of related work, related publications, a scholarship, government agency employment, or passing a faculty interview or special assessment.',
       english: { IELTS: 6, 'TOEFL iBT': 60, 'TOEFL Essentials': 8.5, 'PTE Academic': 59, MUET: 4, 'Cambridge English': 169, OET: 250 },
       englishNotes: 'IELTS Academic and centre-based TOEFL iBT. Cambridge English applies to B1 Preliminary, B2 First, C1 Advanced or C2 Proficiency.',
+      intakes: ['March','October'],
       intake: 'March and October, subject to programme availability.'
+    },
+    {
+      id: 'hohenheim-agecon', institution: 'University of Hohenheim', host: 'uni-hohenheim.de', country: 'Germany',
+      name: 'MSc Agricultural Sciences · Agricultural Economics', level: 'Master', previous: 'Bachelor',
+      source: 'https://dein-studium.uni-hohenheim.de/en/applying-and-enrollment/applying/apply-for-a-masters-degree-in-agricultural-sciences-agricultural-economics-major',
+      checked: '2026-11-09', academicText: 'Above-average related Bachelor’s degree of at least three years or equivalent (180 ECTS). No direct 4-point CGPA conversion is published in the programme summary.',
+      subject: 'Agricultural sciences, business/economics or another accepted related field, plus at least 6 ECTS in microeconomics and statistics as specified by the university.',
+      english: { IELTS: 6.5, 'TOEFL iBT': 90, Duolingo: 125 },
+      englishNotes: 'IELTS must be Academic. TOEFL iBT is stated on the 0–120 scale.',
+      alternative: 'Relevant practical experience, an academic recommendation or a motivation letter may document special aptitude when the degree is below average or its fit is unclear. This is assessed by the university.',
+      intakes: ['Winter semester'],
+      intake: 'First-semester entry is offered for the winter semester only. The published non-EU deadline is 15 March.',
+      application: 'Submit the online application through HohCampus and complete the required AgEcon microeconomics and statistics pre-tests.',
+      documents: 'School-leaving qualification, Bachelor’s certificate and transcript, English evidence and AgEcon pre-test result. Add special-aptitude evidence where applicable.',
+      costs: 'Standard non-EU tuition is €1,500 per semester where the fee applies. Check exemption eligibility and budget separately for semester contributions and living expenses.',
+      costSource: 'https://www.uni-hohenheim.de/en/faq-tuition-fees-international-students'
     },
     {
       id: 'uitm-at750', institution: 'Universiti Teknologi MARA', host: 'uitm.edu.my',

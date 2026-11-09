@@ -35,3 +35,46 @@
 .an-elig [data-elig-list]>p,.an-elig [data-elig-more]{margin:12px 0}
 @media(max-width:720px){.an-elig-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.an-elig-cards{grid-template-columns:1fr}}
 @media(max-width:440px){.an-elig-grid{grid-template-columns:1fr}.an-elig-tabs{align-items:stretch;flex-direction:column}.an-elig-tabs button{align-self:stretch}}
+/* Dedicated application workspace. */
+.an-elig{--elig-line:#65402d;--elig-muted:#e2d5cb;gap:20px}
+.an-elig .an-elig-hero{background:radial-gradient(ellipse at 90% -30%,#783819,transparent 70%),linear-gradient(125deg,#231711,#12100f 65%);border-color:#925733;padding-block:clamp(16px,3vw,28px)}
+.an-elig-hero h1{font-size:clamp(1.8rem,5vw,3.1rem)}
+.an-elig-hero nav{margin-top:12px}
+.an-elig-hero nav a{border:1px solid #915735;border-radius:999px;padding:7px 12px;font-weight:750;font-size:.86rem;text-decoration:none}
+.an-elig #an-elig-profile{display:grid;gap:19px}
+.an-elig .an-elig-step{border:1px solid #714831;border-radius:19px;padding:clamp(14px,3vw,26px);background:linear-gradient(140deg,#211812,#151211 75%);gap:12px;min-width:0}
+.an-elig .an-elig-step legend{padding:3px 10px;border:1px solid #805030;border-radius:999px;background:#2f1d13;color:#ffad75;font-size:.79rem;letter-spacing:.035em}
+.an-elig .an-elig-destination{background:radial-gradient(ellipse at 95% 0%,#4c2a18,transparent 65%),#1c1511}
+.an-elig .an-elig-grid{align-items:start}
+.an-elig .an-elig-grid>label,.an-elig .an-elig-picker>label{background:#281d17;border:1px solid #5e4131;border-radius:12px;padding:8px;min-width:0;line-height:1.25}
+.an-elig input:not([type=checkbox]),.an-elig select{background:#120f0d;border-color:#866047;font-size:.9rem}
+.an-elig .an-elig-education-row{display:grid;gap:10px;background:#171412}
+.an-elig .an-elig-qualifications{display:flex;flex-wrap:wrap;gap:8px}
+.an-elig .an-elig-qualifications label,.an-elig .an-elig-confirm{display:flex;align-items:center;gap:7px;border:1px solid #805438;border-radius:10px;padding:9px;background:#291d16}
+.an-elig input[type=checkbox]{width:17px;height:17px;min-height:0;margin:0;accent-color:#ff853e;flex:none}
+.an-elig-picker{position:relative;min-width:0}
+.an-elig-suggestions{position:absolute;top:calc(100% + 3px);left:0;right:0;z-index:8;max-height:240px;overflow:auto;overscroll-behavior:contain;background:#221710;border:1px solid #a86238;border-radius:11px;box-shadow:0 12px 24px #000a;padding:4px}
+.an-elig-suggestions button{width:100%;text-align:left;color:#fff;background:transparent;border:0;padding:8px;font-size:.86rem;display:grid;gap:3px}
+.an-elig-suggestions button:hover,.an-elig-suggestions button:focus{background:#53301e}
+.an-elig-suggestions small,.an-elig-suggestions p{color:#f1b68d;padding-inline:6px}
+.an-elig [data-review-summary] dl{margin:0}
+.an-elig [data-review-summary] dt{color:#ffab73;font-weight:800}
+.an-elig [data-review-summary] dd{margin:2px 0 12px;overflow-wrap:anywhere}
+.an-elig .an-elig-cards{grid-template-columns:repeat(3,minmax(0,1fr));margin-block:8px}
+.an-elig .an-elig-card{background:linear-gradient(150deg,#2a1d15,#191512 70%);border-color:#70492f}
+.an-elig .an-elig-read{width:100%;margin-top:4px}
+.an-elig .an-elig-read summary{cursor:pointer;list-style:none;color:#ffd3b2;background:#392419;border:1px solid #805337;border-radius:8px;padding:8px;display:flex;justify-content:space-between;gap:4px;font-weight:750}
+.an-elig .an-elig-read summary::-webkit-details-marker{display:none}
+.an-elig .an-elig-read h4{margin:12px 0 3px;color:#ffad75}
+.an-elig .an-elig-read ul{padding-inline-start:18px}
+@media(max-width:760px){
+ .an-elig .an-elig-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .an-elig .an-elig-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .an-elig .an-elig-card{padding:10px;font-size:.84rem}
+ .an-elig .an-elig-card h3{font-size:1rem}
+ .an-elig .an-elig-destination{min-height:min(45svh,390px)}
+ .an-elig .an-elig-destination .an-elig-picker{grid-column:1/-1}
+ .an-elig .an-elig-step h2{font-size:1.2rem}
+ .an-elig .an-elig-grid label{font-size:.78rem}
+ .an-elig .an-elig-tabs{flex-direction:row}
+}
