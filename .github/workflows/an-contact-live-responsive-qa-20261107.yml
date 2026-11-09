@@ -1,8 +1,10 @@
-name: A&N Contact Photo Cards and Enquiry Visual QA
+name: A&N Contact Layout and Enquiry Visual QA
 on:
   push:
     paths:
       - an-overseas/index.html
+      - an-overseas/assets/contact-desktop-20261110.webp
+      - an-overseas/assets/contact-mobile-reference-20261109.svg
       - an-overseas/an-contact-fixed-20261107.css
       - an-overseas/an-contact-photo-cards-20261107.css
       - an-overseas/an-contact-photo-cards-20261107.js
@@ -35,84 +37,61 @@ jobs:
               for(const [name,width,height] of [['phone-small',320,640],['phone-standard',375,812],['desktop',1366,768]]){
                 const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1});
                 await page.goto('http://127.0.0.1:8765/an-overseas/index.html#/contact',{waitUntil:'domcontentloaded',timeout:30000});
-                await page.locator('.an-contact-social[data-an-enhanced="yes"]').waitFor({timeout:18000});
-                await page.waitForTimeout(400);
-                const x=await page.evaluate(()=>{
-                  const rect=selector=>{
-                    const e=document.querySelector(selector);if(!e)return null;
-                    const r=e.getBoundingClientRect();
-                    return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,height:r.height,width:r.width};
-                  };
-                  const c=document.querySelector('.an-contact-social');
+                const contact=page.locator('.an26-contact');
+                await contact.waitFor();
+                await page.waitForFunction(()=>document.querySelector('.an26-reference')?.naturalWidth>0);
+                const layout=await contact.evaluate(el=>{
+                  const box=node=>node.getBoundingClientRect();
                   return {
-                    docWidth:document.documentElement.scrollWidth,
-                    docHeight:document.documentElement.scrollHeight,
-                    vw:innerWidth,vh:innerHeight,
-                    offices:[rect('.an-contact-office--kl'),rect('.an-contact-office--rangpur')],
-                    officePanel:rect('.an-contact-offices'),
-                    contacts:rect('.an-contact-channels-title'),
-                    contactGrid:rect('.an-contact-social'),
-                    socialCards:c?.querySelectorAll('a').length,
-                    phone:!!c?.querySelector('.an-contact-phone'),
-                    gmail:rect('[data-an-social="gmail"]'),
-                    gmailText:c?.querySelector('[data-an-social="gmail"] .an-contact-card-detail')?.textContent||'',
-                    iconCount:c?.querySelectorAll('.an-contact-icon svg').length,
-                    fb:rect('[data-an-social="facebook"]'),
-                    tt:rect('[data-an-social="tiktok"]'),
-                    yt:rect('[data-an-social="youtube"]'),
-                    li:rect('[data-an-social="linkedin"]'),
-                    wa:rect('[data-an-social="whatsapp"]'),
-                    call:rect('.an-contact-phone'),
-                    visiblePhoto:getComputedStyle(document.querySelector('.an-contact-office-photo')).display,
-                    backgroundKL:getComputedStyle(document.querySelector('.an-contact-office--kl .an-contact-office-photo')).backgroundImage,
-                    backgroundBD:getComputedStyle(document.querySelector('.an-contact-office--rangpur .an-contact-office-photo')).backgroundImage,
-                    enquiry:rect('.an-contact-enquiry'),name:rect('#contact-form [name=name]'),
-                    message:rect('#contact-form textarea'),submit:rect('#contact-form button[type=submit]')
+                    top:box(el).top,bottom:box(el).bottom,
+                    ticker:box(document.querySelector('#an-global-ticker')).bottom,
+                    width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight,
+                    socials:el.querySelectorAll('[data-an-social]').length,
+                    submit:box(el.querySelector('button[type=submit]')).bottom,
+                    desktop:el.classList.contains('an26-contact-desktop')
                   };
                 });
-                console.log('RESULT',name,JSON.stringify(x));
-                assert(x.docWidth<=width+3,name+': no horizontal clipping');
-                assert(x.docHeight<=height+3,name+': page fixed in viewport');
-                assert(x.socialCards===7&&x.iconCount===7&&x.phone,name+': six icon contacts + Gmail');
-                assert(x.gmailText.includes('@')&&x.gmailText.length>5,name+': Gmail visibly displays address');
-                assert(x.visiblePhoto!=='none',name+': city image remains on office card');
-                assert(x.backgroundKL.includes('malaysia-skyline'),name+': Malaysia photograph linked');
-                assert(x.backgroundBD.includes('Rangpur_town_hall'),name+': Rangpur photograph linked');
-                assert(x.submit.top>=0&&x.submit.bottom<=height+3,name+': Send Enquiry submit visible');
-                if(width<=800){
-                  assert(Math.abs(x.offices[0].top-x.offices[1].top)<=4,name+': two photo offices side by side');
-                  assert(x.offices[1].right<=width+3,name+': office within screen');
-                  assert(x.contacts.top>x.offices[0].top&&x.contacts.bottom<x.enquiry.top,name+': contacts below office');
-                  assert(x.enquiry.top>x.contactGrid.top,name+': compact form below socials');
-                  assert(x.enquiry.bottom>=height-20,name+': enquiry panel uses the available space');
-                  assert(x.gmail.bottom<=x.officePanel.bottom+3,name+': Gmail card not clipped by contact panel');
-                  assert(Math.abs(x.fb.top-x.yt.top)<4&&Math.abs(x.li.top-x.call.top)<4&&x.li.top>x.fb.top,name+': two rows of three icon cards');
-                  assert(x.gmail.top>x.call.top&&x.gmail.width>=x.fb.width*1.9,name+': centered full-width Gmail last');
-                }else{
-                  assert(x.enquiry.left>x.officePanel.right,name+': form to the right on laptop');
-                  assert(Math.abs(x.enquiry.top-x.officePanel.top)<4,name+': desktop aligned');
-                  assert(x.gmail.bottom<=x.officePanel.bottom+3,name+': desktop Gmail row fits without overflow');
-                }
+                assert(layout.width<=width+2 && layout.height<=height+2,name+': fixed viewport');
+                assert(layout.top>=layout.ticker-2 && Math.abs(layout.bottom-height)<=2,name+': fills space below ticker');
+                assert(layout.socials===6 && layout.submit<=height,name+': contacts and enquiry visible');
+                assert.equal(layout.desktop,width>=768);
                 await page.screenshot({path:'contact-'+name+'.png'});
-                if(name==='phone-standard'){
-                  await page.route('**/rest/v1/an_enquiries',route=>route.fulfill({status:201,contentType:'application/json',body:'{}'}));
+                if(layout.desktop){
+                  await page.getByRole('link',{name:'Explore Our Management'}).click();
+                  await page.waitForURL('**/#/management');
+                  await page.locator('#an-manager-card').waitFor();
+                  await page.goBack();
+                  await contact.waitFor();
+                }
+                if(name!=='phone-small'){
+                  let submitted;
+                  await page.route('**/rest/v1/an_enquiries',async route=>{
+                    const headers={'access-control-allow-origin':'*'};
+                    if(route.request().method()==='OPTIONS'){
+                      await route.fulfill({status:204,headers:{...headers,
+                        'access-control-allow-methods':'POST','access-control-allow-headers':'*'}});
+                      return;
+                    }
+                    submitted=route.request().postDataJSON();
+                    await route.fulfill({status:201,headers});
+                  });
                   await page.locator('#contact-form [name=name]').fill('Visual QA');
                   await page.locator('#contact-form [name=email]').fill('qa@example.invalid');
-                  await page.locator('#contact-form textarea').fill('Intercepted test, no real enquiry created.');
-                  await page.locator('#contact-form button[type=submit]').click();
+                  await page.locator('#contact-form textarea').fill('Intercepted test');
+                  await page.getByRole('button',{name:'Send Enquiry'}).click();
                   await page.locator('#an-contact-feedback').getByText(/submitted successfully/i).waitFor({timeout:10000});
-                  console.log('PASS intercepted enquiry submit, no real enquiry stored');
+                  assert.equal(submitted.full_name,'Visual QA');
                 }
                 await page.close();
               }
             }finally{await browser.close()}
-            console.log('PASS contact layout photos, icons, Gmail, desktop layout, enquiry form');
+            console.log('PASS contact viewport, management navigation and enquiry form');
           })().catch(err=>{console.error(err.stack||err);process.exitCode=1});
           JS
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: an-contact-photo-icons-qa
+          name: an-contact-responsive-qa
           path: contact-*.png
           if-no-files-found: ignore
           retention-days: 7
