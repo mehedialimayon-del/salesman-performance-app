@@ -740,6 +740,15 @@ body.home-view #app .hero .home-shortcuts a:is(:hover,:focus-visible) :is(strong
 #app .an-directory-totals small{color:white!important}
 
 @media(min-width:801px){
+ html body.an-services-mode #app .page-head{
+  padding:3px 0 1px!important;
+  background:radial-gradient(ellipse at 12% 45%,#47230e 0%,transparent 48%),#0c0e14!important;
+ }
+ html body.an-services-mode #app .page-head h1{
+  font-size:clamp(27px,2.45vw,34px)!important;line-height:1.03!important;
+  font-weight:900!important;margin:0!important;color:#fff!important;
+ }
+ html body.an-services-mode #app .page-head h1 span{color:#ff851f!important;}
  html body.an-services-mode #app .an-journey-services{overflow:hidden!important;min-height:0!important;}
  html body.an-services-mode #app .an-journey-services > .grid{
   height:100%!important;min-height:0!important;flex:1 1 0!important;
@@ -752,15 +761,15 @@ body.home-view #app .hero .home-shortcuts a:is(:hover,:focus-visible) :is(strong
  }
  html body.an-services-mode #app .an-journey-services .an-service-card .iconbox{
   display:grid!important;place-items:center!important;margin:0 auto!important;
-  width:clamp(25px,5vh,43px)!important;height:clamp(25px,5vh,43px)!important;
-  font-size:clamp(16px,3vh,25px)!important;flex:none!important;
+  width:clamp(27px,6.1vh,52px)!important;height:clamp(27px,6.1vh,52px)!important;
+  font-size:clamp(18px,3.7vh,31px)!important;flex:none!important;
   background:hsl(24 85% 23% / .92)!important;color:hsl(28 100% 54%)!important;
   border:1px solid hsl(29 100% 57%)!important;
  }
- html body.an-services-mode #app .an-journey-services .an-service-card h3{color:white!important;margin:0!important;}
+ html body.an-services-mode #app .an-journey-services .an-service-card h3{color:white!important;margin:0!important;font-size:clamp(13px,min(1.28vw,2.65vh),19px)!important;line-height:1.1!important;}
  html body.an-services-mode #app .an-journey-services .an-service-card h3 span{color:hsl(28 100% 54%)!important;}
- html body.an-services-mode #app .an-journey-services .an-service-card p{color:white!important;margin:0!important;}
- html body.an-services-mode #app .an-journey-services .an-service-card .an-service-go{width:100%;margin-top:auto!important;text-align:center;}
+ html body.an-services-mode #app .an-journey-services .an-service-card p{color:white!important;margin:0!important;font-weight:650!important;}
+ html body.an-services-mode #app .an-journey-services .an-service-card .an-service-go{width:100%;margin-top:auto!important;text-align:center;font-size:clamp(11px,1.05vw,15px)!important;padding-block:3px!important;}
  #app #an-insights-gallery .an-community-media{height:clamp(165px,30vh,300px)!important;}
  #app #an-insights-gallery .an-community-desc{
   display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:6!important;
