@@ -226,9 +226,26 @@ const deadlineZones={
  'Hong Kong':'Asia/Hong_Kong','United Arab Emirates':'Asia/Dubai','Malaysia':'Asia/Kuala_Lumpur','Italy':'Europe/Rome','Lithuania':'Europe/Vilnius','Netherlands':'Europe/Amsterdam',
  'adb-jsp':'Asia/Bangkok','jj-wbgsp':'America/New_York'
 };
+const bangladeshZone='Asia/Dhaka';
+const bangladeshClock=new Intl.DateTimeFormat('en-GB',{
+ timeZone:bangladeshZone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'
+});
+const applicationHistory={
+ 'hungary-bachelors':'Previous round closed 15 January 2026. Use January as a planning checkpoint.',
+ 'hungary-masters':'Previous round closed 15 January 2026. Use January as a planning checkpoint.',
+ 'hungary-phd-1':'Previous round closed 15 January 2026. Use January as a planning checkpoint.',
+ 'hungary-phd-2':'Previous round closed 15 January 2026. Use January as a planning checkpoint.',
+ 'gks-undergrad':'Bangladesh embassy window: 15–30 September 2026 for 2027 entry. Check around September for a future notice.',
+ 'gks-grad':'Bangladesh embassy window: 12–25 February 2026. Check around February for a future notice.',
+ 'chevening':'The 2027/28 cycle accepted applications August–October 2026. Use August–October as a planning window.',
+ 'australia-awards':'The 2027 study intake accepted Bangladesh applications February–April 2026. Use February–April as a planning window.',
+ 'brunei-foreign':'The 2026/27 call ran 15 December 2025–15 February 2026. Use December–February as a planning window.',
+ 'taiwan-ncku-grad':'February 2027 entry accepted applications July–September 2026. This is the previous schedule for that intake.',
+ 'my-curtin-pvc-50':'The 2026 round ran 19 January–20 February. Use January–February as a planning window.'
+};
 function scholarshipTimeline(p){
  const schedule=timelines.get(p.id)||{label:'Provider schedule',dates:[]};
- return {...schedule,zone:deadlineZones[p.id]||deadlineZones[p.country]};
+ return {...schedule,history:applicationHistory[p.id],zone:deadlineZones[p.id]||deadlineZones[p.country]};
 }
 const dayFormatters=new Map();
 function calendarDate(date,zone){
@@ -251,38 +268,40 @@ function nextClosing({dates,annualDay,zone},now){
    if(date>=today)return {date,days:(Date.parse(date)-Date.parse(today))/86400000};
   }else{
    const end=Date.parse(date);
-   if(end>now)return {date:calendarDate(end,zone),end};
+   if(end>now)return {date:calendarDate(end,bangladeshZone),end};
   }
  }
 }
 function closingLabel(next,now){
  if(next.end)return deadlineStatus(next.end,now);
- return next.days===0?'Due today · time unlisted':next.days+'d left · time unlisted';
+ return next.days===0?'Due today · local closing hour unlisted':next.days+' calendar days left';
 }
 function deadlineDisplay(schedule,now){
  const next=nextClosing(schedule,now);
  if(next){
-  return {date:next.date,status:closingLabel(next,now)};
+  return {date:next.end?next.date+' · '+bangladeshClock.format(next.end)+' Bangladesh time':next.date,status:closingLabel(next,now)};
  }
  const label=schedule.label;
- const status=schedule.dates.length||/closed|prior call/i.test(label)?'Closed':
-  /rolling/i.test(label)?'Rolling':
-  /automatic/i.test(label)?'Automatic':
-  /no Bangladesh/i.test(label)?'Unavailable':
-  /course start/i.test(label)?'Intake-based':'No fixed date';
+ const status=/no Bangladesh/i.test(label)?'Unavailable for Bangladesh':
+  /rolling/i.test(label)?'Apply year-round':
+  /automatic/i.test(label)?'Automatic consideration':
+  /oct–nov/i.test(label)?'Recurring window · exact dates pending':
+  /course start|intake|semester results|admission schedule|programme dates/i.test(label)&&!/closed/i.test(label)?'Intake or programme dependent':
+  schedule.dates.length||/closed|prior call|2027 Embassy/i.test(label)?'Previous round closed · next date pending':
+  'Next date awaiting confirmation';
  const last=schedule.dates.at(-1);
- return {date:last?(last.length===10?last:calendarDate(Date.parse(last),schedule.zone)):label,status};
+ return {date:last?(last.length===10?last:calendarDate(Date.parse(last),bangladeshZone)):label,status};
 }
 function cardDeadline(p){
  const schedule=scholarshipTimeline(p);
  const {date,status}=deadlineDisplay(schedule,new Date());
  const tooltip=[schedule.label,schedule.note||p.deadline].filter(Boolean).join(' · ');
- return '<div class="an-card-timeline" data-timeline-id="'+esc(p.id)+'" title="'+esc(tooltip)+'"><span class="an-card-timeline-date">'+esc(date)+'</span><span class="an-card-timeline-count">'+esc(status)+'</span>'+(schedule.dates.length||schedule.annualDay?'<small class="an-card-timeline-route">'+esc(schedule.label)+'</small>':'')+'</div>';
+ return '<div class="an-card-timeline" data-timeline-id="'+esc(p.id)+'" title="'+esc(tooltip)+'"><span class="an-card-timeline-date">'+esc(date)+'</span><span class="an-card-timeline-count">'+esc(status)+'</span>'+(schedule.dates.length||schedule.annualDay?'<small class="an-card-timeline-route">'+esc(schedule.label)+'</small>':'')+(schedule.history?'<small class="an-card-timeline-route">'+esc(schedule.history)+' Future dates may change.</small>':'')+'</div>';
 }
 function timelineDetail(p){
- const {label,note,source,dates,annualDay}=scholarshipTimeline(p);
+ const {label,note,source}=scholarshipTimeline(p);
  return '<section class="an-scholarship-datecard"><span>Application timeline</span><h3>'+esc(label)+'</h3><p>'+esc(note||p.deadline)+'</p>'+
- ((dates.length||annualDay)?cardDeadline(p):'')+
+ cardDeadline(p)+
  '<p><a href="'+esc(safeUrl(source||p.source))+'" target="_blank" rel="noopener noreferrer">Official timeline and application instructions ↗</a></p></section>';
 }
 let directoryTimer;
@@ -355,7 +374,7 @@ function listPage(){
  '<details class="an-scholarship-about"><summary>About academic funding, eligibility & latest calls <span>⌄</span></summary><p>Scholarships for Bangladeshi applicants, with separate funding levels and programme-specific eligibility. Amounts, deadlines and university choices are controlled by each official annual call. Funding amounts and exchange rates are approximate planning figures.</p><p>🌍 '+(countries.length-1)+' destination groups · 🇧🇩 BDT planning rates dated 05 Nov 2026.</p></details>'+
  '<div class="an-scholarship-meta"><strong id="an-scholarship-count"></strong><span>Official sources in each profile</span></div>'+
  '<div class="an-scholarship-scroll-region">'+scholarshipRail('an-global-rail','International & Research Funding','Government, university and research funding pathways for eligible Bangladeshi applicants.')+scholarshipRail('an-merit-rail','Intake, Semester & Merit Scholarships','University admission awards, CGPA progression, semester results and tuition-fee reductions.')+
- '</div>'+'<p class="an-scholarship-info">When only the date is published, the card shows days remaining in the provider’s local calendar. Seconds appear for a sourced clock time, with indicative times labelled. Exchange-rate note: <a href="'+BANK+'" target="_blank" rel="noopener noreferrer">Bangladesh Bank, 05 November 2026</a> provides base USD and major currency BDT rates; HUF, TRY, KRW, MYR, RON, AZN, TWD, AED, HKD, QAR and BND use approximate planning estimates. Amount in BDT is a translation of the published award amount, not an extra payment. Exchange rates change, amounts can be revised, and programme funding is not a living-cost guarantee. A source link is not proof that the current application cycle is open.</p></div></main>';
+ '</div>'+'<p class="an-scholarship-info">When only the date is published, the card shows days remaining in the provider’s local calendar. Exact deadlines are displayed in Bangladesh time (UTC+06:00), with indicative times labelled. Historical planning windows are shown separately from confirmed dates. Exchange-rate note: <a href="'+BANK+'" target="_blank" rel="noopener noreferrer">Bangladesh Bank, 05 November 2026</a> provides base USD and major currency BDT rates; HUF, TRY, KRW, MYR, RON, AZN, TWD, AED, HKD, QAR and BND use approximate planning estimates. Amount in BDT is a translation of the published award amount, not an extra payment. Exchange rates change, amounts can be revised, and programme funding is not a living-cost guarantee. A source link is not proof that the current application cycle is open.</p></div></main>';
 }
 function refreshList(){
  const q=easy(filters.search);
@@ -493,6 +512,21 @@ function scholarshipSupportCard(p){
  '<p id="an-contact-feedback" class="an-contact-feedback an-help-full" aria-live="polite" role="status"></p></form>'+
  '<p class="an-help-disclaimer">This submits an enquiry to A&N Overseas, NOT an official scholarship application. The university/award provider controls admissions, acceptance and visa decisions. We never guarantee an award. <a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Go to official application portal ↗</a></p></section>';
 }
+function doctorateGuide(p){
+ if(!/\bphd\b|doctorate/i.test(p.level)&&p.id!=='turkiye-research')return '';
+ const route=p.id==='kaust-phd'
+  ?'Direct PhD requires a recognized master’s in a relevant subject. Applicants with a relevant bachelor’s can consider a separate integrated MS/PhD where offered, subject to progression rules.'
+  :p.id==='turkiye-research'
+  ?'This is a short research placement for eligible researchers, including PhD holders and candidates at dissertation stage. The funding is a stipend for the placement.'
+  :p.id==='my-sunway-professional-doctorate-50'
+  ?'This award is for qualifying taught professional doctorate routes. Apply against the entry rules for the specific professional degree.'
+  :'Check the doctoral route on this card. Entry degree, subject match and direct-entry options are set by the named programme. For mixed-level awards, the master’s and doctoral requirements can differ.';
+ const source=p.id==='kaust-phd'?'https://admissions.kaust.edu.sa/how-to-apply/entry-requirements':p.source;
+ return '<section class="an-specific-guide"><h2>Doctoral admission and funding</h2><div class="an-specific-grid">'+
+ '<article><h3>Degree and research fit</h3><ul><li>'+esc(route)+'</li><li>'+esc(p.eligibility)+'</li><li>Explain how your prior degree, thesis or research experience connects to your proposed topic and the host research group.</li></ul></article>'+
+ '<article><h3>Proposal, supervisor and evidence</h3><ul><li>Check whether a research proposal, supervisor’s agreement, references, writing samples or publications are mandatory for this route.</li><li>'+esc(p.documents)+'</li><li>'+esc(p.language)+'</li></ul></article>'+
+ '<article><h3>Scholarship, partial funding or paid position</h3><ul><li>'+esc(p.coverage)+'</li><li>Check whether funding is automatic with admission, a separate application, a nomination or a salaried research vacancy.</li><li>Confirm which tuition, stipend or salary, insurance and family costs the offer covers.</li></ul><p><a href="'+esc(safeUrl(source))+'" target="_blank" rel="noopener noreferrer">Official criteria ↗</a></p></article></div></section>';
+}
 function detailPage(id){
  const p=items.find(x=>x.id===id);
  if(!p)return '<div class="wrap content"><h1>Funding pathway not found</h1><a class="btn" href="#/scholarships">← Back to scholarship directory</a></div>';
@@ -518,7 +552,7 @@ function detailPage(id){
  ['Student work permissions',p.work],
  ['Post-study stay, PR & return duties',p.post]
  ];
- return '<main class="wrap an-scholarship-detail"><div class="an-breadcrumb"><a href="#/home">Home</a> › <a href="#/scholarships">Scholarships</a> › '+esc(p.name)+'</div><div class="an-scholarship-lead"><div class="an-scholarship-intro"><span class="an-type">'+flagCountry(p.country)+' '+esc(p.country)+' · '+esc(p.level)+'</span><h1>'+esc(p.name)+'</h1><p>'+esc(p.coverage)+'</p><p>Last source review: '+esc(p.updated)+' · Bangladesh-oriented application guidance</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Apply at official provider ↗</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Scholarship official details ↗</a></div></div><aside class="an-scholarship-amount-panel"><small>Funding in original currency</small><strong>'+esc(amountText(p))+'</strong><small>Indicative Bangladesh taka conversion</small><em>'+esc(conv)+'</em><p style="line-height:1.6;font-size:11px;color:#dcc7b9;margin-top:15px">Currency figures are not an offer and do not include unfunded tuition, travel, visa or living-cost differences. <a href="'+BANK+'" target="_blank" rel="noopener noreferrer" style="color:#ffd097">FX reference ↗</a></p></aside></div>'+timelineDetail(p)+'<div class="an-scholarship-section-grid">'+sections.map((item,i)=>section(i+1,item[0],item[1])).join('')+'</div>'+countryGuideHtml(p)+'<section class="an-scholarship-universities"><h2>Universities & eligible programmes</h2><p style="font-size:12px;color:#c7c9cd;line-height:1.65">'+esc(p.hostNote)+'</p>'+hostCards(p)+'</section><section class="an-scholarship-section an-scholarship-section-full"><h2><span>13</span> · Official sources, application & reliability</h2><p>Scholarship operator: '+esc(p.name)+'\nApplication window and amounts are subject to the current annual call. Some awards require separate university admission, nomination or an embassy route. A&N can guide preparation but cannot submit an official award decision or guarantee scholarship, visa, family residence or PR.</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Open official application ↗</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Read official award & document list ↗</a><a href="#/scholarships">← All scholarship cards</a></div></section>'+detailPreparation(p)+verifiedCallHtml(p)+scholarshipSupportCard(p)+'</main>';
+ return '<main class="wrap an-scholarship-detail"><div class="an-breadcrumb"><a href="#/home">Home</a> › <a href="#/scholarships">Scholarships</a> › '+esc(p.name)+'</div><div class="an-scholarship-lead"><div class="an-scholarship-intro"><span class="an-type">'+flagCountry(p.country)+' '+esc(p.country)+' · '+esc(p.level)+'</span><h1>'+esc(p.name)+'</h1><p>'+esc(p.coverage)+'</p><p>Last source review: '+esc(p.updated)+' · Bangladesh-oriented application guidance</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Apply at official provider ↗</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Scholarship official details ↗</a></div></div><aside class="an-scholarship-amount-panel"><small>Funding in original currency</small><strong>'+esc(amountText(p))+'</strong><small>Indicative Bangladesh taka conversion</small><em>'+esc(conv)+'</em><p style="line-height:1.6;font-size:11px;color:#dcc7b9;margin-top:15px">Currency figures are not an offer and do not include unfunded tuition, travel, visa or living-cost differences. <a href="'+BANK+'" target="_blank" rel="noopener noreferrer" style="color:#ffd097">FX reference ↗</a></p></aside></div>'+timelineDetail(p)+doctorateGuide(p)+'<div class="an-scholarship-section-grid">'+sections.map((item,i)=>section(i+1,item[0],item[1])).join('')+'</div>'+countryGuideHtml(p)+'<section class="an-scholarship-universities"><h2>Universities & eligible programmes</h2><p style="font-size:12px;color:#c7c9cd;line-height:1.65">'+esc(p.hostNote)+'</p>'+hostCards(p)+'</section><section class="an-scholarship-section an-scholarship-section-full"><h2><span>13</span> · Official sources, application & reliability</h2><p>Scholarship operator: '+esc(p.name)+'\nApplication window and amounts are subject to the current annual call. Some awards require separate university admission, nomination or an embassy route. A&N can guide preparation but cannot submit an official award decision or guarantee scholarship, visa, family residence or PR.</p><div class="an-scholarship-cta"><a href="'+esc(safeUrl(p.apply))+'" target="_blank" rel="noopener noreferrer">Open official application ↗</a><a href="'+esc(safeUrl(p.source))+'" target="_blank" rel="noopener noreferrer">Read official award & document list ↗</a><a href="#/scholarships">← All scholarship cards</a></div></section>'+detailPreparation(p)+verifiedCallHtml(p)+scholarshipSupportCard(p)+'</main>';
 }
 function onRender(page,second){
  if(page!=='scholarships')clearInterval(directoryTimer);
