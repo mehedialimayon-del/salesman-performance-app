@@ -429,7 +429,7 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
     font-size: clamp(10px, 2.9vw, 13px) !important;
     line-height: 1.3 !important;
   }
-  .an2-overview-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+  .an2-overview-metrics { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 5px; }
   .an2-overview-metrics > a {
     display: grid;
     justify-items: center;
@@ -446,6 +446,25 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
   .an2-overview-metrics a:nth-child(n+3) strong { font-size: clamp(11px, 3.3vw, 15px); }
   .an2-overview-metrics a:focus-visible { outline: 2px solid #82caff; outline-offset: -2px; }
   .an2-overview-metrics a:active { background: #20232c; }
+  #app #an2-story .an2-overview-since {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 3px 6px;
+    border: 1px solid #ff6500;
+    border-radius: 999px;
+    background: #11141b;
+    color: #fff;
+    box-shadow: 0 0 8px #ff65004d;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
 
   html body.an-about-details-mode #app #an2-origins { padding: 18px clamp(12px, 4vw, 22px) !important; }
   html body.an-about-details-mode #app #an2-origins h1 {
