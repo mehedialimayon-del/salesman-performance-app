@@ -287,3 +287,212 @@ body.an-about-banner-mode > .footer { display: none; }
     transition: none;
   }
 }
+
+html body > header.top #brand-typing > span:first-child { color: #ff6500 !important; }
+html body > header.top #brand-typing > span:last-child,
+html body > header.top #an-desktop-wordmark { color: #fff !important; }
+
+.an2-mobile-overview,
+#app .an-management-page .an-manager-pages,
+#app .an-management-page .an-manager-more { display: none; }
+
+@media (max-width: 800px) {
+  html:has(body:is(.an-about-banner-mode, .an-management-mode)),
+  body:is(.an-about-banner-mode, .an-management-mode) {
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  body:is(.an-about-banner-mode, .an-management-mode) {
+    display: flex;
+    flex-direction: column;
+  }
+  body:is(.an-about-banner-mode, .an-management-mode) > #an-global-ticker {
+    position: relative !important;
+    top: auto !important;
+    flex-shrink: 0;
+  }
+  body:is(.an-about-banner-mode, .an-management-mode) > #app {
+    flex: 1 1 0;
+    min-height: 0 !important;
+    overflow: hidden;
+    container-type: size;
+  }
+  body.an-management-mode > .footer { display: none; }
+
+  .an-about-art {
+    height: 100%;
+    min-height: 0;
+    grid-template: "brand brand" auto "message message" auto "flags portrait" minmax(0, 1fr) "actions actions" auto / minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: clamp(4px, 1.25cqh, 9px);
+    padding: 0 8px clamp(4px, 1.2cqh, 9px);
+  }
+  .an-banner-globe { width: clamp(31px, 8cqh, 53px); }
+  .an-banner-earth { font-size: clamp(24px, 6cqh, 39px); }
+  .an-banner-brand p { font-size: clamp(12px, 2.9cqh, 19px); }
+  .an-banner-message { gap: clamp(3px, 1cqh, 8px); }
+  .an-banner-message h1 { font-size: clamp(16px, 4cqh, 26px); }
+  .an-banner-message blockquote {
+    padding: clamp(5px, 1.5cqh, 11px);
+    font-size: clamp(10px, min(3.55vw, 2.25cqh), 17px);
+  }
+  .an-banner-destinations { min-height: 0; padding-left: 0; border-left: 0; gap: clamp(2px, .85cqh, 6px); }
+  .an-banner-destinations h2 { font-size: clamp(9px, 2.05cqh, 13px); }
+  .an-banner-destinations small { font-size: clamp(8px, 1.45cqh, 10px); }
+  .an-banner-flags-mobile {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 285px;
+    grid-auto-rows: minmax(0, 1fr);
+    gap: clamp(1px, .65cqh, 4px);
+  }
+  .an-banner-flags-mobile .an2-native-cloth-flag {
+    height: 100%;
+    width: auto;
+    max-width: min(100%, 43px);
+  }
+  .an-banner-founder { min-height: 0; }
+  .an-banner-portrait { min-height: 0; max-height: 100%; }
+  .an-banner-founder figcaption { flex: none; gap: clamp(1px, .6cqh, 4px); }
+  .an-banner-founder figcaption strong { font-size: clamp(9px, 1.9cqh, 13px); }
+  .an-banner-founder figcaption span { font-size: clamp(8px, 1.75cqh, 11px); }
+  .an-banner-portfolio { min-height: clamp(19px, 4.2cqh, 28px); }
+  .an-banner-actions { grid-template-columns: .85fr 1fr; padding-top: clamp(4px, 1.45cqh, 9px); }
+  .an-banner-actions p { display: none; }
+  .an-banner-actions a {
+    min-height: clamp(32px, 7.5cqh, 48px);
+    font-size: clamp(10px, 2.2cqh, 13px);
+  }
+
+  html body.an-about-details-mode #app .an2-story > .an2-founder-hero { display: none !important; }
+  #app .an2-mobile-overview {
+    display: block;
+    margin: 8px 0 4px;
+    padding: 12px 8px;
+    border: 1px solid #ff6500;
+    border-radius: 14px;
+    background: linear-gradient(165deg, #25150b, #101117 65%);
+    text-align: center;
+  }
+  .an2-mobile-overview h1 {
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: clamp(16px, 5vw, 23px);
+  }
+  .an2-overview-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+  .an2-overview-metrics > div {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 3px;
+    padding: 7px 2px;
+    border-radius: 8px;
+    background: #090b10;
+  }
+  .an2-overview-metrics svg { width: 25px; height: 25px; color: #ff6500; }
+  .an2-overview-metrics strong { color: #ff6500; font-size: clamp(12px, 4vw, 19px); }
+  .an2-overview-metrics span { color: #fff; font-size: clamp(9px, 2.8vw, 12px); line-height: 1.2; }
+
+  #app .an-management-page.an-about-v3 {
+    display: flex !important;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0 !important;
+    padding: clamp(4px, 1.3cqh, 10px) 8px;
+  }
+  #app .an-management-page .an-management-back { margin: 0 0 4px; font-size: 12px; }
+  html body #app .an-management-page.an-about-v3 .an-about-management {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    padding: clamp(5px, 1.4cqh, 10px) !important;
+    gap: 3px !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-heading h2 {
+    margin: 0 !important;
+    font-size: clamp(15px, 4cqh, 24px) !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-card {
+    display: flex !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-role-banner {
+    margin: 2px 0 5px !important;
+    min-height: 0 !important;
+    font-size: clamp(10px, 2.1cqh, 14px) !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-main {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr) !important;
+    align-items: center !important;
+    flex: 1 1 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    gap: 8px !important;
+    overflow: hidden !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-photo-box,
+  html body #app .an-management-page.an-about-v3 .an-manager-photo-button,
+  html body #app .an-management-page.an-about-v3 .an-manager-photo {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-photo {
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-information {
+    justify-content: center !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    gap: clamp(3px, 1cqh, 8px) !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-white-name {
+    font-size: clamp(12px, 3.2cqh, 20px) !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-information > :is(.an-manager-quote, .an-manager-career, .an-manager-support, .an-manager-contacts) {
+    display: none !important;
+  }
+  #app .an-management-page .an-manager-more {
+    display: block;
+    padding: 4px;
+    border: 1px solid #ff6500;
+    border-radius: 8px;
+    background: #211207;
+    color: #fff;
+    font-size: 11px;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-controls {
+    min-height: 0 !important;
+    margin: 3px 0 0 !important;
+    padding: 4px 0 0 !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-controls > :is(button, .an-manager-counter) { display: none !important; }
+  #app .an-management-page .an-manager-pages { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+  html body #app .an-management-page.an-about-v3 .an-manager-pages button {
+    width: 33px !important;
+    height: 30px !important;
+    font-size: 14px !important;
+  }
+  #app .an-management-page .an-manager-pages button[aria-current="true"] { background: #ff6500; color: #111; }
+  #app .an-manager-profile-dialog {
+    width: min(92vw, 460px);
+    max-height: 82dvh;
+    padding: 12px;
+    border: 1px solid #ff6500;
+    border-radius: 12px;
+    background: #111;
+    color: #fff;
+  }
+  #app .an-manager-profile-dialog::backdrop { background: #000a; }
+  #app .an-manager-profile-dialog form { text-align: right; margin-bottom: 8px; }
+  #app .an-manager-profile-dialog button { padding: 6px 14px; border-radius: 7px; background: #ff6500; color: #111; }
+}

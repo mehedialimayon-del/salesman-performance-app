@@ -67,18 +67,13 @@
     return {universities: fullyLoaded ? list.length : null, countries: destinations.size};
   }
   function refreshDirectoryMetric() {
-    const number = document.getElementById('an2-directory-entry-count');
-    if (!number) return;
     const total = typeof U !== 'undefined' && Array.isArray(U) ? U.length : 0;
-    const status = window.ANWorldDirectoryStatus;
-    if (['Hipo open directory','Hipo local snapshot'].includes(status?.source)) {
-      number.textContent = total.toLocaleString('en-US');
-      number.title = 'Current complete searchable directory';
-    } else if (status?.source === 'Curated local list') {
-      number.textContent = total.toLocaleString('en-US');
-      number.title = 'Currently available local directory; external university list could not load';
-    } else {
-      number.textContent = 'Loading…';
+    const source = window.ANWorldDirectoryStatus?.source;
+    const complete = ['Hipo open directory','Hipo local snapshot'].includes(source);
+    const local = source === 'Curated local list';
+    for (const number of document.querySelectorAll('[data-an-story-university-total], #an2-directory-entry-count')) {
+      number.textContent = complete || local ? total.toLocaleString('en-US') : 'Loading…';
+      number.title = complete ? 'Current complete searchable directory' : local ? 'Currently available local directory' : '';
     }
   }
   function loadDirectoryCount() {
@@ -185,6 +180,11 @@
     return '<main class="an2-story wrap" id="an2-story">'+
       '<div class="an2-topline"><a href="#/about" class="an2-back">← ABOUT US</a><span>THE PEOPLE · THE PURPOSE · THE PROMISE</span></div>'+
       founderHero()+
+      '<section class="an2-mobile-overview" aria-label="A&N Overseas at a glance"><h1>Explore Global Education</h1><div class="an2-overview-metrics">'+
+        '<div>'+cardIcon('M3 9l9-5 9 5H3z M5 19h14 M7 10v7 M12 10v7 M17 10v7')+'<strong data-an-story-university-total>'+uniCount+'</strong><span>Universities</span></div>'+
+        '<div>'+cardIcon('M3 9l9-5 9 5-9 5-9-5z M7 11v5q5 4 10 0v-5 M21 9v7')+'<strong>'+(window.ANScholarships?.items?.length?.toLocaleString('en-US') ?? '—')+'</strong><span>Scholarships</span></div>'+
+        '<div>'+cardIcon('M3 5h18v14H3z M3 9h18 M7 13h4 M7 16h10')+'<strong>One site</strong><span>Study abroad resources</span></div>'+
+      '</div></section>'+
       '<nav class="an2-nav" aria-label="Explore the A&N story">'+
         '<a href="#/aboutdetails" data-an-about-jump="an2-origins">Our Beginning</a><a href="#/aboutdetails" data-an-about-jump="an2-purpose">Why We Began</a><a href="#/aboutdetails" data-an-about-jump="an2-platform">Global Directory</a><a href="#/aboutdetails" data-an-about-jump="an2-services">What We Do</a><a href="#/aboutdetails" data-an-about-jump="an2-future">Our Vision</a>'+
       '</nav>'+
