@@ -1426,4 +1426,30 @@ const contactHeadingObserver=new ResizeObserver(fit);
 const observeHeading=()=>{contactHeadingObserver.disconnect();for(const el of document.querySelectorAll('.an-contact-head, .top, #an-global-ticker'))contactHeadingObserver.observe(el);};
 window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.addEventListener('DOMContentLoaded',()=>{new MutationObserver(()=>{if(document.querySelector('.an26-contact')){fit();observeHeading();syncLinks()}}).observe(document.getElementById('app'),{childList:true});fit();observeHeading();syncLinks()});
 })();
+</script><script id="an-about-flags-direct-render-20261110">
+(function(){
+function sync(){
+ if((location.hash||'').split('?')[0]!=='#/about')return;
+ var root=document.querySelector('#app .an-about-banner .an-banner-flags');
+ if(!root||typeof window.ANAboutJourneyFlags!=='function')return;
+ var desired=window.ANAboutJourneyFlags();
+ if(!desired||root.dataset.anWaving==='yes')return;
+ root.innerHTML=desired;
+ root.dataset.anWaving='yes';
+ root.style.cssText='display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px 3px!important;align-items:center!important;justify-items:center!important;width:100%!important';
+ root.querySelectorAll('.an2-flag-unit').forEach(function(unit,i){
+  unit.style.cssText='display:flex!important;align-items:center!important;justify-content:center!important;position:relative!important;min-width:0!important;width:100%!important;height:32px!important;overflow:visible!important';
+  var star=unit.querySelector('.an2-static-star');if(star)star.style.display='none';
+  var flag=unit.querySelector('.an2-flag');
+  if(flag){flag.style.cssText='display:block!important;position:relative!important;width:'+(i===0?44:39)+'px!important;height:'+(i===0?29:26)+'px!important;max-width:100%!important;overflow:hidden!important;border-radius:2px!important;transform-origin:left center!important;animation:anAboutFlagCloth 2.7s ease-in-out infinite!important;animation-delay:'+(-i*67)+'ms!important';}
+  var img=unit.querySelector('.an2-flag-image');
+  if(img)img.style.cssText='display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important';
+  var emoji=unit.querySelector('.an2-flag-emoji');if(emoji)emoji.style.display='none';
+ });
+}
+var queued=false;
+function schedule(){if(queued)return;queued=true;requestAnimationFrame(function(){queued=false;sync()})}
+document.addEventListener('DOMContentLoaded',function(){var app=document.getElementById('app');if(app)new MutationObserver(schedule).observe(app,{childList:true,subtree:false});schedule()});
+window.addEventListener('hashchange',schedule);
+})();
 </script></body></html>
