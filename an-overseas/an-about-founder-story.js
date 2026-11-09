@@ -127,33 +127,31 @@
   // SVG displacement creates real ripples within each stationary country flag.
   const wavingFlagFilter='<svg class="an2-wave-filter-defs" aria-hidden="true" width="0" height="0" focusable="false" xmlns="http://www.w3.org/2000/svg"><defs><filter id="an2-flags-fabric-ripple" x="-14%" y="-20%" width="128%" height="140%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.024 0.075" numOctaves="1" seed="8" result="fabricNoise"><animate attributeName="baseFrequency" values="0.024 0.075;0.035 0.095;0.018 0.08;0.024 0.075" dur="3.2s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="fabricNoise" scale="3.8" xChannelSelector="R" yChannelSelector="G"/></filter></defs></svg>';
 
-  /* Approved image supplied in chat, shown without reconstruction on mobile.
-     Source pixels: 864 x 1536; hero crop: x18..846 and y235..1391.
-     Only the country-flag patches are overlaid with moving cloth distortion. */
-  function approvedFounderArtwork(){
-    const src='https://d2ol7oe51mr4n9.cloudfront.net/user_3J7eLpAsZ71YVjJWQaNzcGsV3TY/adcc9b9f-f11c-4a3a-a811-b209ce412fbe.png';
-    // The flags are the ORIGINAL exact pixels from the approved artwork.
-    // Only a subtle moving fabric texture is clipped over them — no replacement flags or poles.
-    const bounds=[
-      [104,744,94,56],[213,749,71,50],[293,745,70,55],[381,749,63,52],
-      ...[810,859,906,954,1001,1048,1094].flatMap(y=>
-        [[102,60],[172,60],[241,62],[312,61],[381,65]].map(([x,w])=>[x,y,w,43])),
-      [102,1140,61,42],[173,1140,62,42]
-    ];
-    const masks=bounds.map(([x,y,w,h])=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="2"/>').join('');
-    const image='<image href="'+src+'" x="0" y="0" width="864" height="1536" />';
-    // Real fabric animation uses CSS on crop windows of the SAME original artwork.
-    // No SVG nested viewBox, no alternate flags, no distorted country designs.
-    const flagTiles=bounds.map(([x,y,w,h],i)=>{
-      const left=((x-18)/828*100).toFixed(5),top=((y-235)/1156*100).toFixed(5);
-      const width=(w/828*100).toFixed(5),height=(h/1156*100).toFixed(5);
+  // The front grid and Read More overlay use the same approved artwork crops.
+  const founderArtworkSource='https://d2ol7oe51mr4n9.cloudfront.net/user_3J7eLpAsZ71YVjJWQaNzcGsV3TY/adcc9b9f-f11c-4a3a-a811-b209ce412fbe.png';
+  const founderFlagBounds=[
+    [104,744,94,56],[213,749,71,50],[293,745,70,55],[381,749,63,52],
+    ...[810,859,906,954,1001,1048,1094].flatMap(y=>
+      [[102,60],[172,60],[241,62],[312,61],[381,65]].map(([x,w])=>[x,y,w,43])),
+    [102,1140,61,42],[173,1140,62,42]
+  ];
+  function founderFlagTiles(inArtwork=false){
+    return founderFlagBounds.map(([x,y,w,h],i)=>{
+      // Read More overlays the crops on an 828 × 1156 window at (18, 235).
+      const position=inArtwork
+        ? `left:${((x-18)/828*100).toFixed(5)}%;top:${((y-235)/1156*100).toFixed(5)}%;width:${(w/828*100).toFixed(5)}%;height:${(h/1156*100).toFixed(5)}%`
+        : `aspect-ratio:${w}/${h}`;
       const bgWidth=(864/w*100).toFixed(5),bgHeight=(1536/h*100).toFixed(5);
       const bgX=(x/(864-w)*100).toFixed(5),bgY=(y/(1536-h)*100).toFixed(5);
       const duration=(2.8+(i%5)*.23).toFixed(2);
       const delay=(-((i%8)*.37)).toFixed(2);
-      return '<span class="an2-native-cloth-flag" style="left:'+left+'%;top:'+top+'%;width:'+width+'%;height:'+height+'%;background-image:url('+src+');background-size:'+bgWidth+'% '+bgHeight+'%;background-position:'+bgX+'% '+bgY+'%;--wave-duration:'+duration+'s;--wave-delay:'+delay+'s"></span>';
+      return `<span class="an2-native-cloth-flag" style="${position};background-image:url(${founderArtworkSource});background-size:${bgWidth}% ${bgHeight}%;background-position:${bgX}% ${bgY}%;--wave-duration:${duration}s;--wave-delay:${delay}s"></span>`;
     }).join('');
-
+  }
+  function approvedFounderArtwork(){
+    const src=founderArtworkSource;
+    const image='<image href="'+src+'" x="0" y="0" width="864" height="1536" />';
+    const flagTiles=founderFlagTiles(true);
     return '<div class="an2-approved-reference-hero" aria-label="A&N Overseas founder message from the approved reference artwork">'
       +'<img class="an2-approved-reference-source" src="'+src+'" alt="A&N Overseas founder artwork with study-destination flags and Nusrat Nasrin" loading="eager" decoding="async">'
       +'<div class="an2-native-cloth-layer" aria-hidden="true">'+flagTiles+'</div>'
@@ -203,6 +201,7 @@
   // Public route renderer: loaded before the SPA router so direct links work on first paint.
   window.ANAboutFounderStory = renderStory;
   window.ANAboutJourneyFlags = journeyFlags;
+  window.ANAboutFounderFlagTiles = founderFlagTiles;
   // Route function is defined in index.html. Replacing it preserves the existing hash router.
   if (typeof aboutDetailsPage === 'function') aboutDetailsPage = renderStory;
   function ensureFounderPage() {

@@ -84,3 +84,10 @@ html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .a
      url('assets/malaysia-skyline-clean.jpg') 68% 42% / auto 112% no-repeat!important;
  }
 }
+
+/* The mobile About globe uses the same horizontal rotation as Read More. */
+@media (max-width: 800px) and (prefers-reduced-motion: no-preference) {
+  #app .an-about-banner .an-banner-earth {
+    animation: an-globe-turn 9s linear infinite;
+  }
+}

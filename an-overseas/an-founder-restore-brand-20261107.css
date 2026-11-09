@@ -585,7 +585,11 @@
     pointer-events:none!important;overflow:hidden!important;
   }
   html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-native-cloth-flag{
-    display:block!important;position:absolute!important;
+    position:absolute!important;
+  }
+  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-native-cloth-flag,
+  #app .an-about-banner .an-banner-flags-mobile .an2-native-cloth-flag{
+    display:block!important;
     background-repeat:no-repeat!important;border-radius:2px!important;
     transform-origin:0% 50%!important;
     will-change:transform,clip-path!important;
@@ -601,6 +605,7 @@
 }
 @media(prefers-reduced-motion:reduce){
  html :is(body.an-about-details-mode #app, body #app .an-about-mobile-opening) .an2-native-cloth-flag,
+ #app .an-about-banner .an-banner-flags-mobile .an2-native-cloth-flag,
  html body.an-about-details-mode #app .an2-founder-header-logo .logo-motion{animation:none!important;transform:none!important}
 }
 
