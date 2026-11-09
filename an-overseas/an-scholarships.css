@@ -380,3 +380,13 @@
 .an-card-timeline-route{
  flex-basis:100%;color:#fff;font-size:10px;overflow-wrap:anywhere
 }
+
+.an-student-question-guide{
+ margin:10px 0;padding:8px 10px;border:1px solid #ad5321;border-radius:10px;background:#1d130e;color:#fff
+}
+.an-student-question-guide summary{cursor:pointer;font-weight:700;padding:4px}
+.an-student-question-guide>summary{color:#ffa15c}
+.an-student-question-list{display:grid;gap:5px;margin-top:6px}
+.an-student-question-list details{border-top:1px solid #623818;padding:4px 0}
+.an-student-question-list p{margin:4px;line-height:1.55;font-size:.9rem}
+.an-student-question-list a{color:#ffa15c;text-decoration:underline}
