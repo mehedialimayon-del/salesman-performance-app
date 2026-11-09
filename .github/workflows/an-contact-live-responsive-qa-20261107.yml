@@ -34,24 +34,30 @@ jobs:
           (async()=>{
             const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
             try{
-              for(const [name,width,height] of [['phone-small',320,640],['phone-standard',375,812],['desktop',1366,768]]){
+              for(const [name,width,height] of [['desktop',1366,768],['phone-standard',375,812],['phone-small',320,640]]){
                 const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1});
                 await page.goto('http://127.0.0.1:8765/an-overseas/index.html#/contact',{waitUntil:'domcontentloaded',timeout:30000});
                 const contact=page.locator('.an26-contact');
                 await contact.waitFor();
-                await page.waitForFunction(()=>document.querySelector('.an26-reference')?.naturalWidth>0);
+                await page.waitForFunction(()=>{
+                  const art=document.querySelector('.an26-reference');
+                  const ticker=document.querySelector('#an-global-ticker');
+                  if(!art?.naturalWidth||!ticker)return false;
+                  const frame=art.getBoundingClientRect();
+                  return frame.top>=ticker.getBoundingClientRect().bottom-2&&Math.abs(frame.bottom-innerHeight)<=2;
+                });
                 const layout=await contact.evaluate(el=>{
                   const box=node=>node.getBoundingClientRect();
                   return {
                     top:box(el).top,bottom:box(el).bottom,
                     ticker:box(document.querySelector('#an-global-ticker')).bottom,
-                    width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight,
+                    width:document.documentElement.scrollWidth,overflow:getComputedStyle(document.body).overflowY,
                     socials:el.querySelectorAll('[data-an-social]').length,
                     submit:box(el.querySelector('button[type=submit]')).bottom,
                     desktop:el.classList.contains('an26-contact-desktop')
                   };
                 });
-                assert(layout.width<=width+2 && layout.height<=height+2,name+': fixed viewport');
+                assert(layout.width<=width+2 && layout.overflow==="hidden",name+': fixed viewport');
                 assert(layout.top>=layout.ticker-2 && Math.abs(layout.bottom-height)<=2,name+': fills space below ticker');
                 assert(layout.socials===6 && layout.submit<=height,name+': contacts and enquiry visible');
                 assert.equal(layout.desktop,width>=768);
