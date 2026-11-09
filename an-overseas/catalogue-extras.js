@@ -304,7 +304,7 @@ function repaintCopy(){
  }
 }
 window.addEventListener('hashchange',function(){queueMicrotask(repaintCopy);});
-fetch('site-content.json?v=20261108-jesselton-v1',{cache:'no-cache'}).then(function(r){if(!r.ok)throw Error('Content not available');return r.json();}).then(function(cfg){
+fetch('site-content.json?v=20261109-official-links-v2',{cache:'no-cache'}).then(function(r){if(!r.ok)throw Error('Content not available');return r.json();}).then(function(cfg){
  siteCopy=cfg;
  (cfg.additionalUniversities||[]).forEach(function(u){
   if(!u||!u.id||!u.name||U.some(function(o){return o.id===u.id;}))return;

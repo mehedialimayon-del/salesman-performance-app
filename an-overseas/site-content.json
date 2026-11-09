@@ -312,7 +312,12 @@
       "programs": [
         "Engineering",
         "Technology",
-        "Business"
+        "Business",
+        "MBA in Energy Management",
+        "MSc in Applied Computing",
+        "MSc in Process Safety",
+        "MSc in Petroleum Engineering",
+        "MSc in Data Science"
       ]
     },
     {
@@ -1015,8 +1020,8 @@
       "kind": "Private",
       "institutionType": "University",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyipts.cfm"
+      "site": "https://uniqsaas.edu.my/soalan-lazim-faq/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=82"
     },
     {
       "id": "my-u-asiametropolitanuniversity",
@@ -1027,8 +1032,8 @@
       "kind": "Private",
       "institutionType": "University",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyipts.cfm"
+      "site": "https://amu.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=630"
     },
     {
       "id": "my-u-asiametropolitanuniversitycyberjayacampus",
@@ -1040,7 +1045,7 @@
       "institutionType": "University",
       "programs": [],
       "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyipts.cfm"
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=85"
     },
     {
       "id": "my-u-asiaschoolofbusinessasb",
@@ -1075,8 +1080,8 @@
       "kind": "Private",
       "institutionType": "University",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyipts.cfm"
+      "site": "https://www.en.dhuautomotive.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=603"
     },
     {
       "id": "my-u-globalnxtuniversity",
@@ -1087,8 +1092,8 @@
       "kind": "Private",
       "institutionType": "University",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyipts.cfm"
+      "site": "https://globalnxt.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=744"
     },
     {
       "id": "my-u-inceifuniversity",
@@ -1110,9 +1115,14 @@
       "city": "Nilai, Negeri Sembilan",
       "kind": "Private",
       "institutionType": "University",
-      "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyipts.cfm"
+      "programs": [
+        "Bachelor of Pharmacy with Honours",
+        "Bachelor of Physiotherapy (Hons)",
+        "Bachelor of Science in Nursing (Honours) – ODL",
+        "Diploma in Healthcare Management"
+      ],
+      "site": "https://kpju.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=346"
     },
     {
       "id": "my-u-limkokwinguniversityofcreativetechnology",
@@ -1147,7 +1157,7 @@
       "kind": "Private",
       "institutionType": "University",
       "programs": [],
-      "site": "",
+      "site": "https://www.ukkm.edu.my/about/",
       "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyipts.cfm"
     },
     {
@@ -1171,7 +1181,7 @@
       "kind": "Private",
       "institutionType": "University",
       "programs": [],
-      "site": "",
+      "site": "https://www.meritus.edu.my/index.php",
       "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyipts.cfm"
     },
     {
@@ -1375,8 +1385,8 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "site": "https://alfa.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=211"
     },
     {
       "id": "my-uc-amcuniversitycollege",
@@ -1387,8 +1397,8 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "site": "https://amc.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=447"
     },
     {
       "id": "my-uc-berjayauniversitycollege",
@@ -1423,8 +1433,8 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "site": "https://www.genovasi.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=1060"
     },
     {
       "id": "my-uc-hanchianguniversitycollegeofcommunication",
@@ -1459,8 +1469,8 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "site": "https://innovative.edu.my/welcome",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=476"
     },
     {
       "id": "my-uc-internationaluniversitycollegeofartsandscienceiucas",
@@ -1471,8 +1481,8 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "site": "https://neg.edu.my/IUCAS-College",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=582"
     },
     {
       "id": "my-uc-internationaluniversitycollegeoftechnologytwintech",
@@ -1482,9 +1492,15 @@
       "city": "Selangor",
       "kind": "Private",
       "institutionType": "University College",
-      "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "programs": [
+        "Bachelor in Business Administration",
+        "Master in Business Administration",
+        "Doctor in Business Administration",
+        "Bachelor in Artificial Intelligence",
+        "Bachelor in Visual Communication"
+      ],
+      "site": "https://newtwintech.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=440"
     },
     {
       "id": "my-uc-jesseltonuniversitycollege",
@@ -1521,8 +1537,8 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "site": "https://ucf.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=912"
     },
     {
       "id": "my-uc-kolejuniversitiijn",
@@ -1533,8 +1549,8 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "site": "https://www.ijn.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=453"
     },
     {
       "id": "my-uc-kolejuniversitisaito",
@@ -1557,8 +1573,8 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "site": "https://vision.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=303"
     },
     {
       "id": "my-uc-lincolnuniversitycollege",
@@ -1582,7 +1598,7 @@
       "institutionType": "University College",
       "programs": [],
       "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=90"
     },
     {
       "id": "my-uc-manipaluniversitycollegemalaysiamucm",
@@ -1593,8 +1609,8 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "site": "https://manipal.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=108"
     },
     {
       "id": "my-uc-netherlandsmaritimeuniversitycollegenmuc",
@@ -1605,8 +1621,8 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "site": "https://nmuc.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=680"
     },
     {
       "id": "my-uc-newerauniversitycollege",
@@ -1629,8 +1645,8 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
-      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
+      "site": "https://nbuc.edu.my/",
+      "registrySource": "https://www.mqa.gov.my/mqr/english/eakrKPList.cfm?IDAkrIPTS=293"
     },
     {
       "id": "my-uc-southernuniversitycollege",
@@ -1653,7 +1669,7 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
+      "site": "https://siuc.edu.my/",
       "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
     },
     {
@@ -1665,7 +1681,7 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
+      "site": "https://www.kias.edu.my/",
       "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
     },
     {
@@ -1677,7 +1693,7 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
+      "site": "https://www.ucbestari.edu.my/",
       "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
     },
     {
@@ -1689,7 +1705,7 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
+      "site": "https://ucam.edu.my/",
       "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
     },
     {
@@ -1701,7 +1717,7 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
+      "site": "https://aviation.edu.my/",
       "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
     },
     {
@@ -1713,7 +1729,7 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
+      "site": "https://www.ucsf.edu.my/contact-us/",
       "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
     },
     {
@@ -1725,7 +1741,7 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
+      "site": "https://www.uctati.edu.my/",
       "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
     },
     {
@@ -1749,7 +1765,7 @@
       "kind": "Private",
       "institutionType": "University College",
       "programs": [],
-      "site": "",
+      "site": "https://www.veritas.edu.my/",
       "registrySource": "https://www.mqa.gov.my/mqr/english/eakrbyiptsku.cfm"
     },
     {

@@ -102,6 +102,19 @@ const manchesterAdmissions='https://www.manchester.ac.uk/study/undergraduate/app
 const uniklEngineering='https://www.unikl.edu.my/programme/bachelor-of-electrical-engineering-with-honours/';
 const klustCalendar='https://klust.edu.my/current-students/academic-calendar/';
 const verifiedCardFacts={
+ utp:{
+  tuition:['RM 37,150','MSc in Applied Computing · conventional · international tuition','https://www.utp.edu.my/admissions/postgraduate/international/fee/'],
+  intake:['January · May · September','International postgraduate research · applications accepted year-round; enrolment intake assigned by UTP','https://www.utp.edu.my/admissions/postgraduate/international/how-to-apply/']
+ },
+ 'scholarship-host-monashuniversitymalaysia':{
+  intake:['25 October 2027','International application deadline 13 August 2027 · courses listed for this intake','https://www.monash.edu.my/study/apply/intake-periods/october-intake','2027-08-13']
+ },
+ 'my-u-kpjhealthcareuniversity':{
+  programmes:['Undergraduate programmes','Selected published programmes in the catalogue','https://kpju.edu.my/undergraduate-programmes/']
+ },
+ 'my-uc-internationaluniversitycollegeoftechnologytwintech':{
+  programmes:['Published programmes','Selected programmes listed by Twintech','https://newtwintech.edu.my/']
+ },
  'scholarship-host-vilniusuniversity':{
   tuition:['EUR 3,250','Politics of Global Challenges BA · annual tuition','https://www.vu.lt/en/studies/bachelor-studies/politics-of-global-challenges'],
   intake:['Autumn 2027','Bachelor’s admission · non-EU/EFTA · 1 May 2027','https://www.vu.lt/en/admissions/admissions-to-bachelor-studies','2027-05-01']
