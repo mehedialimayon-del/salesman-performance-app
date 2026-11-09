@@ -180,16 +180,16 @@ timeline('taiwan-moe-ug taiwan-moe-grad','No Bangladesh application window','The
 timeline('taiwan-ncku-grad','Spring 2027 closed · 15 Sep','The February 2027 international degree round opened 1 July and closed 15 September 2026. Admission and scholarship results are scheduled for 30 November 2026. Register one account, complete the application, pay the published NT$2,000 application fee, and upload the required PDFs before submitting.','https://oia.ncku.edu.tw/p/404-1032-229817.php?Lang=en');
 timeline('taiwan-ncku-elite','Separate Elite call','The February 2027 general degree deadline was 15 September 2026. The Elite award follows its own applicable nomination and award conditions.','https://oia.ncku.edu.tw/p/404-1032-229817.php?Lang=en');
 timeline("si-global","Sweden first admission round","Apply to eligible master’s programmes and rank them by 15 January 2027 for Sweden’s first international admission round. The supporting documents and fee deadline is 1 February. Then submit a separate Swedish Institute scholarship application during the SI window. This countdown tracks university admission.","https://www.universityadmissions.se/en/key-dates-and-deadlines/autumn-semester-dates",["2027-01-15"]);
-timeline('finland-uni','Joint admission','The Finnish autumn 2027 joint application opens 7 January and closes 21 January 2027 for participating programmes. Check whether the selected degree joins this round and whether its tuition waiver is requested with admission.','https://www.studyinfinland.fi/news-events/prepare-for-2027',['2027-01-21']);
+timeline('finland-uni','First joint admission','Finland’s first joint application for autumn 2027 starts on 7 January at 08:00 and closes on 21 January at 15:00 Finland time. This timer tracks degree admission. Tuition waivers and any separate scholarship forms follow the chosen institution’s rules.','https://studyinfo.fi/konfo/',['2027-01-21T13:00:00Z']);
 timeline('finland-phd-paid','Helsinki Food Materials PhD','Funded FAroGels doctoral researcher vacancy in Food Materials Science. The deadline is 9 December 2026, 23:59 Helsinki time. Check the MSCA mobility and doctoral-candidate rules, then prepare one English PDF with a CV, motivation letter, degrees and transcripts, referee information, English evidence where required, and responses to all four research questions. Submit the same documents through both the Helsinki recruitment system and the FAroGels portal. The advertised earliest start is March 2027. This countdown is specific to this vacancy.','https://jobs.helsinki.fi/job/Helsinki-Doctoral-researcher-in-Food-Materials-Science,-MSCA-Doctoral-Network/1374476357/',['2026-12-09T21:59:00Z']);
 timeline('europe-euraxess','INFLUENCE MSCA PhD','The EU-funded INFLUENCE network advertises ten full-time doctoral research positions, with a planned October 2027 start. The listed deadline is 15 December 2026, 23:59 Vilnius time. Select a project, check its host-specific eligibility and mobility rules, prepare a project-aligned proposal and submit using the host procedure linked in the notice. This countdown is specific to this call.','https://euraxess.ec.europa.eu/jobs/472840',['2026-12-15T21:59:00Z']);
 timeline('mbzuai-msc mbzuai-phd','Main graduate round','Most graduate applications close 15 December 2026. Computational Biology MSc and PhD use 22 January 2027. The main-round timer uses the published 17:00 Gulf time.','https://mbzuai.ac.ae/study-artificial-intelligence',['2026-12-15T13:00:00Z']);
-timeline('kaust-master kaust-phd','Fall 2027 · Round 2','Round 2 opened 28 September 2026, closes 3 January 2027 and releases decisions 25 February 2027. Fall semester starts 29 August 2027. Submit the MS, MS/PhD or PhD admission application first. Admitted students normally receive the KAUST Fellowship automatically, except those funded through certain partnerships or external sponsorships.','https://admissions.kaust.edu.sa/how-to-apply/admission-timelines',['2027-01-03']);
+timeline('kaust-master kaust-phd','Fall 2027 · Round 2 (tentative)','Round 2 opened 28 September 2026, closes 3 January 2027 and releases decisions 25 February 2027. Fall semester starts 29 August 2027. Submit the MS, MS/PhD or PhD admission application first. Admitted students normally receive the KAUST Fellowship automatically, except those funded through certain partnerships or external sponsorships.','https://admissions.kaust.edu.sa/how-to-apply/admission-timelines',['2027-01-03']);
 timeline("qatar-qu-international","International dates pending","The international undergraduate award requires a high-school certificate, a minimum school average of 95%, final university acceptance and compliance with the chosen college’s entry criteria. Apply under the relevant international scholarship category. Qatar University has yet to determine the Spring 2027 international application dates.","https://home.qu.edu.qa/en-us/students/admission/scholarships/types");
 timeline("qatar-qu-talent","International dates pending","Talent applicants need a high-school certificate and at least an 80% average, the specified school transcripts, at least two relevant recommendations and a portfolio of recent achievements. Apply under Talent Scholarship when the relevant international window is announced.","https://home.qu.edu.qa/en-us/students/admission/scholarships/types");
 timeline('hku-presidential hku-pgs','HKU admission round','2027/28 main round: 1 September–1 December 2026. Clearing rounds end 30 April and 31 August 2027 at 23:59 Hong Kong time, subject to vacancies.','https://gradsch.hku.hk/prospective_students/application/application_period',['2026-12-01T15:59:00Z','2027-04-30T15:59:00Z','2027-08-31T15:59:00Z']);
 timeline('hku-hkpfs','RGC initial application','Submit the initial RGC application by noon Hong Kong time on 1 December 2026, then use the reference number for the separate HKU admission submission.','https://cerg1.ugc.edu.hk/hkpfs/apply.html',['2026-12-01T04:00:00Z']);
-timeline("brunei-foreign","2026/27 MFA call listed","The Brunei MFA portal lists the 2026/27 Foreign Students Scholarship notice. Start at the Foreign Students (BDGS) entry rather than the notices for Brunei nationals. Check the award intake and its linked instructions before applying. The next closing date is unconfirmed.","https://www.mfa.gov.bn/Pages/scholarship.aspx");
+timeline('brunei-foreign','2026/27 call closed','The Brunei MFA call opened 15 December 2025 and closed 15 February 2026. A deadline for the next cycle has yet to be published in the reviewed notice.','https://www.mfa.gov.bn/pages/online-bdgs.aspx',['2026-02-15']);
 timeline('my-sdckl-excellence-50 my-sdckl-excellence-20','After semester results');
 timeline('my-nilai-has-50 my-nilai-merit-25 my-nilai-application-2000','Nilai admission intake');
 timeline("my-sunway-taught-masters-50","Course start + 7 days","Choose a participating taught master’s and confirm its official start day. Sunway lists Bachelor’s CGPA 3.5/4.0 or First Class Honours and requires a certified degree transcript and certificate. Submit the online scholarship form within one week of programme commencement.","https://scholarship.sunway.edu.my/scholarship/sunway-university-taught-masters-scholarship");
@@ -215,7 +215,7 @@ timeline('lt-vu-political-ba','Vilnius 2027 degree admission','Non-EU/EFTA appli
 timeline('lt-vu-feba-admission','Vilnius programme dates');
 timeline('lt-vtech-ba-full lt-vtech-ba-partial','2027/28 Bachelor award','Apply for an eligible degree and submit the scholarship application by 20 April 2027.','https://vilniustech.lt/en/international-students/full-time-students/scholarships/',['2027-04-20']);
 timeline('daad-helmut','DAAD annual deadline','DAAD publishes 1 June as the opening and 31 July as the deadline each year. Choose one or two eligible courses, complete the DAAD form, then submit it with the required documents directly to each chosen course. The countdown follows the published annual rule.','https://static.daad.de/media/daad_de/pdfs_nicht_barrierefrei/in-deutschland-studieren-forschen-lehren/daad_helmut_schmidt_programme_frequently_asked_questions.pdf',[], '07-31');
-timeline('nl-scholarship','Twente Master’s','For September 2027, the University of Twente NL Scholarship round closes 1 April 2027. Apply for an eligible master’s degree first, then submit the scholarship form with the student number. The provider lists 16:00 CET; follow its portal for the exact local cutoff. Other universities publish their own deadlines.','https://www.utwente.nl/en/education/scholarship-finder/nl-scholarship-university-of-twente/',['2027-04-01']);
+timeline('nl-scholarship','Twente Master’s','For September 2027, the University of Twente NL Scholarship round closes 1 April 2027. Apply for an eligible master’s degree first, then submit the scholarship form with the student number. The NL Scholarship source lists the closing date without a clock time. Other universities publish their own deadlines.','https://www.utwente.nl/en/education/scholarship-finder/nl-scholarship-university-of-twente/',['2027-04-01']);
 timeline('adb-jsp','AIT Master’s','The Asian Institute of Technology lists 31 March 2027 for its ADB–Japan Scholarship Program. Apply through AIT for an eligible master’s degree and submit the ADB–JSP documents. Other partner institutions set their own deadlines.','https://ait.ac.th/financial-aid/',['2027-03-31']);
 timeline('it-maeci-master','Prior call · 26 Mar 2026','The 2026/27 MAECI call closed 26 March 2026. The next call determines eligible countries, documents and submission dates.','https://studyinitaly.esteri.it/');
 timeline('lt-vu-masters-fee','Prior call · 1 Apr 2026','The 2026 waiver deadline was 1 April. Vilnius University scheduled its award list by 15 May 2026.','https://www.vu.lt/en/students/services-for-students/finance/tuition-fee-waiver-for-full-time-master-degree-studies');
@@ -230,42 +230,39 @@ function scholarshipTimeline(p){
  const schedule=timelines.get(p.id)||{label:'Provider schedule',dates:[]};
  return {...schedule,zone:deadlineZones[p.id]||deadlineZones[p.country]};
 }
-const dateOnlyClosings=new Map();
-function closingTime(date,zone){
- if(date.length!==10)return Date.parse(date);
- if(!zone)return NaN;
- const key=zone+' '+date;
- if(dateOnlyClosings.has(key))return dateOnlyClosings.get(key);
- const localEnd=Date.parse(date+'T23:59:59Z');
- const parts=new Intl.DateTimeFormat('en-GB',{timeZone:zone,timeZoneName:'longOffset'}).formatToParts(localEnd);
- const offset=parts.find(p=>p.type==='timeZoneName')?.value.slice(3)||'+00:00';
- const end=Date.parse(date+'T23:59:59'+offset);
- dateOnlyClosings.set(key,end);
- return end;
+const dayFormatters=new Map();
+function calendarDate(date,zone){
+ const key=zone||'UTC';
+ if(!dayFormatters.has(key))dayFormatters.set(key,new Intl.DateTimeFormat('en-CA',{
+  timeZone:key,year:'numeric',month:'2-digit',day:'2-digit'
+ }));
+ return dayFormatters.get(key).format(date);
 }
 function deadlineStatus(end,now){
  const seconds=Math.max(0,Math.ceil((end-now)/1000));
  return [Math.floor(seconds/86400)+'d',String(Math.floor(seconds/3600)%24).padStart(2,'0')+'h',String(Math.floor(seconds/60)%60).padStart(2,'0')+'m',String(seconds%60).padStart(2,'0')+'s'].join(' ');
 }
 function nextClosing({dates,annualDay,zone},now){
- let candidates=dates;
- if(annualDay){
-  const year=Number(new Intl.DateTimeFormat('en',{timeZone:zone,year:'numeric'}).format(now));
-  candidates=[year+'-'+annualDay,(year+1)+'-'+annualDay];
- }
+ const today=calendarDate(now,zone);
+ const year=Number(today.slice(0,4));
+ const candidates=annualDay?[year+'-'+annualDay,(year+1)+'-'+annualDay]:dates;
  for(const date of candidates){
-  const end=closingTime(date,zone);
-  if(end>now)return {date,end};
+  if(date.length===10){
+   if(date>=today)return {date,days:(Date.parse(date)-Date.parse(today))/86400000};
+  }else{
+   const end=Date.parse(date);
+   if(end>now)return {date:calendarDate(end,zone),end};
+  }
  }
 }
-function displayedClosingDate(date,zone){
- return date.length===10?date:new Intl.DateTimeFormat('en-CA',{timeZone:zone||'UTC',year:'numeric',month:'2-digit',day:'2-digit'}).format(Date.parse(date));
+function closingLabel(next,now){
+ if(next.end)return deadlineStatus(next.end,now);
+ return next.days===0?'Due today · time unlisted':next.days+'d left · time unlisted';
 }
 function deadlineDisplay(schedule,now){
  const next=nextClosing(schedule,now);
  if(next){
-  const date=displayedClosingDate(next.date,schedule.zone);
-  return {date,status:deadlineStatus(next.end,now),estimate:next.date.length===10};
+  return {date:next.date,status:closingLabel(next,now)};
  }
  const label=schedule.label;
  const status=schedule.dates.length||/closed|prior call/i.test(label)?'Closed':
@@ -274,13 +271,13 @@ function deadlineDisplay(schedule,now){
   /no Bangladesh/i.test(label)?'Unavailable':
   /course start/i.test(label)?'Intake-based':'No fixed date';
  const last=schedule.dates.at(-1);
- return {date:last?displayedClosingDate(last,schedule.zone):label,status};
+ return {date:last?(last.length===10?last:calendarDate(Date.parse(last),schedule.zone)):label,status};
 }
 function cardDeadline(p){
  const schedule=scholarshipTimeline(p);
- const {date,status,estimate}=deadlineDisplay(schedule,new Date());
- const tooltip=[schedule.label,schedule.note||p.deadline,estimate?'Closing time estimated at 23:59:59 in the provider time zone.':null].filter(Boolean).join(' · ');
- return '<div class="an-card-timeline" data-timeline-id="'+esc(p.id)+'" title="'+esc(tooltip)+'"><span class="an-card-timeline-date">'+esc(date)+(estimate?'*':'')+'</span><span class="an-card-timeline-count">'+esc(status)+'</span>'+(schedule.dates.length||schedule.annualDay?'<small class="an-card-timeline-route">'+esc(schedule.label)+'</small>':'')+'</div>';
+ const {date,status}=deadlineDisplay(schedule,new Date());
+ const tooltip=[schedule.label,schedule.note||p.deadline].filter(Boolean).join(' · ');
+ return '<div class="an-card-timeline" data-timeline-id="'+esc(p.id)+'" title="'+esc(tooltip)+'"><span class="an-card-timeline-date">'+esc(date)+'</span><span class="an-card-timeline-count">'+esc(status)+'</span>'+(schedule.dates.length||schedule.annualDay?'<small class="an-card-timeline-route">'+esc(schedule.label)+'</small>':'')+'</div>';
 }
 function timelineDetail(p){
  const {label,note,source,dates,annualDay}=scholarshipTimeline(p);
@@ -298,20 +295,20 @@ function mountDirectoryDeadlines(){
  function update(){
   const now=new Date();
   for(const {el,schedule} of badges){
-   const {date,status,estimate}=deadlineDisplay(schedule,now);
-   const dateLabel=date+(estimate?'*':'');
+   const {date,status}=deadlineDisplay(schedule,now);
    const dateEl=el.querySelector('.an-card-timeline-date');
    const countEl=el.querySelector('.an-card-timeline-count');
-   if(dateEl.textContent!==dateLabel)dateEl.textContent=dateLabel;
+   if(dateEl.textContent!==date)dateEl.textContent=date;
    if(countEl.textContent!==status)countEl.textContent=status;
   }
   if(!next)return;
   let upcoming;
   for(const p of items){
    const closing=nextClosing(schedules.get(p.id),now);
-   if(closing&&(!upcoming||closing.end<upcoming.end))upcoming={p,end:closing.end};
+   if(closing&&(!upcoming||closing.date<upcoming.date||
+    (closing.date===upcoming.date&&closing.end&&(upcoming.end==null||closing.end<upcoming.end))))upcoming={p,...closing};
   }
-  const label=upcoming?'Next · '+deadlineStatus(upcoming.end,now):'No upcoming date listed';
+  const label=upcoming?'Next · '+closingLabel(upcoming,now):'No upcoming date listed';
   if(next.textContent!==label)next.textContent=label;
   if(upcoming){
    next.href='#/scholarship/'+encodeURIComponent(upcoming.p.id);
@@ -358,7 +355,7 @@ function listPage(){
  '<details class="an-scholarship-about"><summary>About academic funding, eligibility & latest calls <span>⌄</span></summary><p>Scholarships for Bangladeshi applicants, with separate funding levels and programme-specific eligibility. Amounts, deadlines and university choices are controlled by each official annual call. Funding amounts and exchange rates are approximate planning figures.</p><p>🌍 '+(countries.length-1)+' destination groups · 🇧🇩 BDT planning rates dated 05 Nov 2026.</p></details>'+
  '<div class="an-scholarship-meta"><strong id="an-scholarship-count"></strong><span>Official sources in each profile</span></div>'+
  '<div class="an-scholarship-scroll-region">'+scholarshipRail('an-global-rail','International & Research Funding','Government, university and research funding pathways for eligible Bangladeshi applicants.')+scholarshipRail('an-merit-rail','Intake, Semester & Merit Scholarships','University admission awards, CGPA progression, semester results and tuition-fee reductions.')+
- '</div>'+'<p class="an-scholarship-info">* A date without a published closing time uses the end of that day in the provider’s time zone as a planning estimate. Exchange-rate note: <a href="'+BANK+'" target="_blank" rel="noopener noreferrer">Bangladesh Bank, 05 November 2026</a> provides base USD and major currency BDT rates; HUF, TRY, KRW, MYR, RON, AZN, TWD, AED, HKD, QAR and BND use approximate planning estimates. Amount in BDT is a translation of the published award amount, not an extra payment. Exchange rates change, amounts can be revised, and programme funding is not a living-cost guarantee. A source link is not proof that the current application cycle is open.</p></div></main>';
+ '</div>'+'<p class="an-scholarship-info">When only the date is published, the card shows days remaining in the provider’s local calendar. Seconds appear for a sourced clock time, with indicative times labelled. Exchange-rate note: <a href="'+BANK+'" target="_blank" rel="noopener noreferrer">Bangladesh Bank, 05 November 2026</a> provides base USD and major currency BDT rates; HUF, TRY, KRW, MYR, RON, AZN, TWD, AED, HKD, QAR and BND use approximate planning estimates. Amount in BDT is a translation of the published award amount, not an extra payment. Exchange rates change, amounts can be revised, and programme funding is not a living-cost guarantee. A source link is not proof that the current application cycle is open.</p></div></main>';
 }
 function refreshList(){
  const q=easy(filters.search);
@@ -422,6 +419,13 @@ const publishedVisaCosts={
   ['Study residence permit','€254 for a first application or change of purpose.','https://ind.nl/en/fees-costs-of-an-application'],
   ['2026 university student maintenance requirement','€1,130.77 per month through 31 December 2026. This is evidence of funds for living expenses. The 2027 amount may differ.','https://ind.nl/en/required-amounts-income-requirements']
  ],
+ 'Finland':[
+  ['Proof of funds for student residence permit','€800/month. Studies of at least one year require €9,600 at application. Unpaid tuition is additional. Include proof of any scholarship covering living costs.','https://migri.fi/en/income-requirement-for-students'],
+  ['Health insurance','Private insurance is generally required unless the applicant has qualifying existing coverage. Maximum policy excess is €300. Coverage requirements depend on the duration of study.','https://migri.fi/insurance']
+ ],
+ 'Australia':[
+  ['Overseas Student Health Cover','The student and accompanying family must generally hold approved OSHC for the full stay, starting on arrival. The premium varies with provider, visa duration and family cover.','https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500']
+ ],
  'France':[
   ['Long-stay student visa financial evidence','France-Visas lists €877.50 per month for applications submitted from 1 August 2026. This is an income threshold. The application charge is separate.','https://france-visas.gouv.fr/en/accueil']
  ]
@@ -437,7 +441,7 @@ function detailPreparation(p){
  const due=p.deadlineISO
   ?'<b>Deadline in this library:</b> '+esc(p.deadlineISO)+'. Review the named intake and exact portal timezone.'
   :'<b>Deadline:</b> '+esc(p.deadline||'Not yet verified for a specific intake')+'. A precise day/hour cannot be claimed without a specific programme call.';
- const moi=isErasmus?
+ const moi=p.moiStatus==='no'?'<p><span class="an-moi-badge no">MOI NOT ACCEPTED</span></p><p><a href="'+esc(safeUrl(p.languageSource))+'" target="_blank" rel="noopener noreferrer">Published English entry requirements ↗</a></p>':isErasmus?
  '<p><span class="an-moi-badge">MOI ACCEPTED — selected programmes only</span></p><ul><li><b>i-MESC Erasmus Mundus:</b> previous studies taught in English may be evidenced by a university Medium of Instruction certificate, under its current published rules. <a href="https://i-mesc.eu/application/student" target="_blank" rel="noopener noreferrer">Official programme requirements ↗</a></li><li><b>Euroculture Joint Master:</b> an MOI letter or degree record can support an English-test exemption, subject to first-choice university and degree-country conditions. <a href="https://www.euroculturemaster.eu/application-procedure" target="_blank" rel="noopener noreferrer">Official Euroculture conditions ↗</a></li><li><b>Other Erasmus programmes:</b> MOI is NOT automatically accepted merely because they belong to Erasmus Mundus. Check each consortium.</li></ul>':
  isEpos?'<p><span class="an-moi-badge no">MOI NOT ACCEPTED — Hohenheim AgEcon EPOS</span></p><p>The University of Hohenheim explicitly requires an official English test for its DAAD-funded Agricultural Economics MSc: IELTS Academic 6.5 or TOEFL iBT 90 (published old TOEFL scale). An English-medium university letter alone is not sufficient. <a href="https://www.uni-hohenheim.de/agecon-stipendien" target="_blank" rel="noopener noreferrer">Official AgEcon EPOS requirement ↗</a>. Other DAAD EPOS tracks set their own language rules.</p>':
  '<p><span class="an-moi-badge unknown">MOI: NOT VERIFIED FOR THIS SPECIFIC AWARD</span></p><p>An English-medium Bachelor degree does not automatically waive IELTS/TOEFL. Ask the named host programme whether an official MOI letter is an accepted substitute before paying an application fee. <a href="https://www.uni-assist.de/en/how-to-apply/plan-your-application/language-certificates/" target="_blank" rel="noopener noreferrer">Evidence formats described by uni-assist ↗</a>.</p>';
