@@ -166,14 +166,16 @@ function showTeam(){
  const founderHighlights=isFounder?'<div class="an-manager-founder-highlights"><ul class="an-manager-academic-logos" aria-label="Universities">'+
   [['bau','Bangladesh Agricultural University'],['klust','Kuala Lumpur University of Science and Technology'],['upm','Universiti Putra Malaysia']].map(([code,name])=>'<li><img src="assets/universities/'+code+'-logo.png" alt="'+name+'" title="'+name+'"><span aria-hidden="true">'+code.toUpperCase()+'</span></li>').join('')+
   '</ul><ul class="an-manager-designations" aria-label="Professional designations"><li>Agriculturist</li><li>Aquaculturist</li><li>Researcher</li><li>Head of Marketing</li></ul><p class="an-manager-academic-note">MSc Aquaculture · Research Assistant</p></div>':'';
- const agricultureNews=isFounder?'<a class="an-manager-agriculture-news" href="https://bau.edu.bd/news" target="_blank" rel="noopener noreferrer">Agriculture News <span aria-hidden="true">↗</span></a>':'';
  const careerHtml=career?'<div class="an-manager-career'+(isFounder&&career===founderCareer?' an-manager-standard-career':'')+'"><span class="an-manager-label">ACADEMIC & PROFESSIONAL JOURNEY</span><p>'+careerDecorated+'</p></div>':'';
  // The founder's support promise belongs inside her quotation, not in a second card.
  const promiseMatch=isFounder?quote.match(/(?:\band\s+)?\bI am committed to supporting them[\s\S]*$/i):null;
  const displayQuote=promiseMatch
    ?esc(quote.slice(0,promiseMatch.index))+'<strong class="an-manager-quote-emphasis">'+esc(promiseMatch[0])+'</strong>'
    :esc(quote);
- const quoteHtml=quote?'<figure class="an-manager-quote"><span class="an-manager-quote-mark" aria-hidden="true">“</span><blockquote>'+displayQuote+'<span class="an-manager-quote-end" aria-hidden="true">”</span></blockquote></figure>':'';
+ const founderExcerpt=isFounder&&quote===founderQuote
+   ?'<span class="an-manager-quote-excerpt">I am committed to supporting students abroad with clarity, care and first-hand experience.</span>'
+   :'';
+ const quoteHtml=quote?'<figure class="an-manager-quote"><span class="an-manager-quote-mark" aria-hidden="true">“</span><blockquote>'+(founderExcerpt?'<span class="an-manager-quote-full">'+displayQuote+'</span>'+founderExcerpt:displayQuote)+'<span class="an-manager-quote-end" aria-hidden="true">”</span></blockquote></figure>':'';
  const supportHtml=!isFounder&&help?'<div class="an-manager-support"><span class="an-manager-label">HOW I SUPPORT STUDENTS</span><p>'+esc(help)+'</p></div>':'';
  const buttonsHtml=(portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'DISCOVER THE FOUNDER':'VIEW PORTFOLIO')+' ↗</a>':'')+
    (isFounder?'<a class="an-manager-action an-admin-entry" href="#/admin" aria-label="Open secure administration login">ADMIN PANEL ↗</a>':'');
@@ -183,7 +185,7 @@ function showTeam(){
  const facebookTarget=facebook||(isFounder?'https://www.facebook.com/search/people/?q='+encodeURIComponent('Nusrat Nasrin'):'');
  const facebookHtml=facebookTarget?'<a class="an-manager-contact an-manager-facebook" href="'+esc(facebookTarget)+'" target="_blank" rel="noopener noreferrer" aria-label="'+(facebook?'Open Facebook profile of ':'Find on Facebook: ')+esc(m.name)+'"><span class="an-facebook-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" focusable="false"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></span><span><small>FACEBOOK</small><b>'+(facebook?'Open profile ↗':'Find on Facebook ↗')+'</b></span></a>':'';
  panel.innerHTML='<div class="an-manager-role-banner">'+positionHeading(role,isFounder?m.name:'')+'</div><div class="an-manager-main'+(isFounder?' an-manager-founder-layout':'')+'"><div class="an-manager-photo-box">'+imageHtml+'</div>'
-  +'<div class="an-manager-information"><div class="an-manager-identity">'+nameHtml+founderHighlights+'</div>'+careerHtml+agricultureNews+quoteHtml+supportHtml
+  +'<div class="an-manager-information"><div class="an-manager-identity">'+nameHtml+founderHighlights+'</div>'+careerHtml+quoteHtml+supportHtml
   +'<div class="an-manager-contacts">'+emailHtml+whatsappHtml+linkedInHtml+facebookHtml+'</div>'
   +'<div class="an-manager-actions">'+buttonsHtml+'</div></div></div>';
  if(panel.dataset.profileIndex!==String(teamIndex)){

@@ -565,7 +565,7 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
 }
 
 .an-manager-founder-highlights,
-.an-manager-agriculture-news { display: none; }
+.an-manager-quote-excerpt { display: none; }
 
 @media (max-width: 800px) {
   html body #app .an-management-page .an-manager-heading {
@@ -635,17 +635,6 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
   .an-manager-designations { display: grid; gap: 3px; margin-top: 7px; font-size: 11px; line-height: 1.2; }
   .an-manager-designations li::before { content: "✦"; color: #ff6500; margin-right: 5px; }
   #app .an-manager-academic-note { margin: 6px 0 0; font-size: 10px; line-height: 1.2; }
-  .an-manager-agriculture-news {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 9px;
-    border: 1px solid #428660;
-    border-radius: 8px;
-    background: #173b2a;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 750;
-  }
   html body #app .an-management-page .an-manager-contact.an-manager-email {
     background: linear-gradient(125deg, #682b30, #30151a) !important;
     border-color: #ec7777 !important;
@@ -656,4 +645,51 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
   }
   html body #app .an-management-page .an-manager-contact .an-mail { color: #ff9393 !important; fill: currentColor; }
   html body #app .an-management-page .an-manager-contact .an-wa { color: #66e7a9 !important; fill: currentColor; }
+}
+
+@media (max-width: 800px) {
+  html body #app .an-management-page.an-about-v3 .an-manager-founder-layout {
+    gap: clamp(3px, 1cqh, 6px) !important;
+  }
+  html body #app .an-management-page.an-about-v3 .an-manager-founder-layout .an-manager-photo {
+    width: auto !important;
+    max-width: 100% !important;
+    max-height: clamp(95px, 33cqh, 220px) !important;
+    margin-inline: auto 0 !important;
+  }
+  .an-manager-founder-highlights { margin-top: 4px; }
+  .an-manager-academic-logos img { height: clamp(15px, 4.3cqh, 25px); }
+  .an-manager-designations { gap: 1px; margin-top: 4px; }
+  #app .an-manager-academic-note { margin-top: 3px; }
+  html body #app .an-management-page .an-manager-founder-layout .an-manager-quote {
+    margin: 0 !important;
+    padding: 5px 7px 5px 21px !important;
+  }
+  html body #app .an-management-page .an-manager-founder-layout .an-manager-quote blockquote {
+    font-size: clamp(10px, 2.1cqh, 13px) !important;
+    line-height: 1.25 !important;
+  }
+  .an-manager-founder-layout .an-manager-quote-full { display: none; }
+  .an-manager-founder-layout .an-manager-quote-excerpt { display: inline; }
+  html body #app .an-management-page .an-manager-founder-layout .an-manager-contacts {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+    margin: 0 !important;
+  }
+  html body #app .an-management-page .an-manager-founder-layout .an-manager-contact {
+    min-height: clamp(28px, 5.7cqh, 39px) !important;
+    padding: 3px 5px !important;
+    gap: 4px !important;
+  }
+  html body #app .an-management-page .an-manager-founder-layout .an-manager-actions {
+    gap: 4px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  html body #app .an-management-page .an-manager-founder-layout .an-manager-actions .an-manager-action {
+    min-height: clamp(25px, 5.1cqh, 36px) !important;
+    padding: 3px 7px !important;
+    font-size: 9px !important;
+  }
 }
