@@ -1191,7 +1191,7 @@ background:none!important;transform:none!important;
 html body #an-graduates.an-graduates-floating img{
 display:block!important;visibility:visible!important;opacity:1!important;
 position:static!important;width:100%!important;height:100%!important;
-max-width:none!important;object-fit:fill!important;
+max-width:none!important;object-fit:fill!important;transform:scaleY(1.5)!important;transform-origin:bottom center!important;
 }
 }
 </style></head>
@@ -1613,12 +1613,12 @@ window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.ad
    graduates.classList.toggle('an-graduates-floating',!!visible);
    if(!visible)return;
    const rect=home.getBoundingClientRect();
-   const width=rect.width*.92;
-   const height=Math.min(120,Math.max(84,window.innerWidth*.25));
+   const width=rect.width*.98;
+   const height=Math.min(170,Math.max(130,window.innerWidth*.38));
    graduates.style.setProperty('--an-graduates-width',width+'px');
    graduates.style.setProperty('--an-graduates-height',height+'px');
    graduates.style.setProperty('--an-graduates-left',(rect.left+(rect.width-width)/2)+'px');
-   graduates.style.setProperty('--an-graduates-top',(rect.top-height+5)+'px');
+   graduates.style.setProperty('--an-graduates-top',(rect.top-height+8)+'px');
  };
  new MutationObserver(update).observe(nav,{attributes:true,attributeFilter:['class']});
  window.addEventListener('resize',update,{passive:true});
