@@ -841,3 +841,18 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
     outline-offset: 2px;
   }
 }
+
+/* Desktop only: feather the rectangular edges of the founder artwork into the page.
+   Preserve the central portrait and the orange glow around the map flags. */
+@media (min-width: 801px) {
+  .an-banner-founder > .an-banner-portrait {
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, #000 11%, #000 89%, transparent 100%),
+      linear-gradient(to bottom, transparent 0%, #000 9%, #000 94%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0%, #000 11%, #000 89%, transparent 100%),
+      linear-gradient(to bottom, transparent 0%, #000 9%, #000 94%, transparent 100%);
+    mask-composite: intersect;
+  }
+}
