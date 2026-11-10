@@ -809,3 +809,35 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
     animation-delay: var(--wave-delay,0s);
   }
 }
+
+/* Desktop-only founder controls: match the existing mobile labels and blue CTA. */
+@media (min-width: 801px) {
+  .an-banner-founder figcaption .an-banner-founder-role {
+    text-transform: uppercase;
+  }
+  .an-banner-founder figcaption .an-banner-portfolio {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .35em;
+    width: max-content;
+    max-width: 100%;
+    min-height: 32px;
+    margin-top: 3px;
+    padding: 5px 13px;
+    border: 1px solid #559eea;
+    border-radius: 99px;
+    background: linear-gradient(#215fa5,#103669);
+    color: #fff;
+    font-size: clamp(11px,1vw,15px);
+    font-weight: 750;
+    line-height: 1.15;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .an-banner-founder figcaption .an-banner-portfolio i { font-style: normal; }
+  .an-banner-founder figcaption .an-banner-portfolio:focus-visible {
+    outline: 2px solid #a2d7ff;
+    outline-offset: 2px;
+  }
+}
