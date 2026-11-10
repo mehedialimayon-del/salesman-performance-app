@@ -750,3 +750,20 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
  }
  @keyframes an-desktop-earth-round {to{transform:rotate(360deg)}}
 }
+
+/* Desktop About Us recovery: isolate grid and icon from inherited overrides. Phone rules untouched. */
+@media screen and (min-width:801px) {
+ html body.an-about-banner-mode #app .an-about-art {display:grid!important;grid-template-areas:"brand brand portrait" "message flags portrait" "actions actions actions"!important;grid-template-columns:minmax(0,1.9fr) minmax(0,.83fr) minmax(0,.92fr)!important;grid-template-rows:auto minmax(0,1fr) auto!important;align-items:stretch!important;overflow:hidden!important;}
+ html body.an-about-banner-mode #app .an-banner-brand {grid-area:brand!important;min-width:0!important;position:relative!important;}
+ html body.an-about-banner-mode #app .an-banner-message {grid-area:message!important;min-width:0!important;min-height:0!important;position:relative!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;}
+ html body.an-about-banner-mode #app .an-banner-message blockquote {min-width:0!important;max-width:100%!important;overflow:hidden!important;overflow-wrap:break-word!important;}
+ html body.an-about-banner-mode #app .an-banner-destinations {grid-area:flags!important;min-width:0!important;min-height:0!important;position:relative!important;overflow:hidden!important;}
+ html body.an-about-banner-mode #app .an-banner-founder {grid-area:portrait!important;min-width:0!important;min-height:0!important;position:relative!important;overflow:hidden!important;}
+ html body.an-about-banner-mode #app .an-banner-actions {grid-area:actions!important;display:grid!important;grid-template-columns:1fr 1.18fr 1fr!important;min-width:0!important;position:relative!important;}
+ html body.an-about-banner-mode #app .an-banner-actions a.an-banner-team {display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;flex-wrap:nowrap!important;gap:5px!important;white-space:nowrap!important;min-width:0!important;}
+ html body.an-about-banner-mode #app .an-banner-actions a.an-banner-team > svg {display:block!important;position:static!important;inset:auto!important;width:18px!important;height:18px!important;min-width:18px!important;min-height:18px!important;max-width:18px!important;max-height:18px!important;flex:0 0 18px!important;transform:none!important;stroke:#fff!important;}
+ html body.an-about-banner-mode #app .an-banner-actions a.an-banner-team .an-management-label {display:inline-flex!important;flex-direction:row!important;align-items:center!important;flex-wrap:nowrap!important;white-space:nowrap!important;min-width:0!important;font-size:clamp(11px,1.25vw,18px)!important;}
+ html body.an-about-banner-mode #app .an-banner-actions a.an-banner-team .an-management-label span {display:inline!important;font-size:inherit!important;white-space:nowrap!important;}
+ html body.an-about-banner-mode #app .an-banner-actions a.an-banner-team .an-management-orange {color:#ff7900!important;}
+ html body.an-about-banner-mode #app .an-banner-actions a.an-banner-team .an-management-white {color:#fff!important;}
+}
