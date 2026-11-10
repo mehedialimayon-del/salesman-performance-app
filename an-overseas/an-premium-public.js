@@ -172,10 +172,8 @@ function showTeam(){
  const displayQuote=promiseMatch
    ?esc(quote.slice(0,promiseMatch.index))+'<strong class="an-manager-quote-emphasis">'+esc(promiseMatch[0])+'</strong>'
    :esc(quote);
- const founderExcerpt=isFounder&&quote===founderQuote
-   ?'<span class="an-manager-quote-excerpt">I am committed to supporting students abroad with clarity, care and first-hand experience.</span>'
-   :'';
- const quoteHtml=quote?'<figure class="an-manager-quote"><span class="an-manager-quote-mark" aria-hidden="true">“</span><blockquote>'+(founderExcerpt?'<span class="an-manager-quote-full">'+displayQuote+'</span>'+founderExcerpt:displayQuote)+'<span class="an-manager-quote-end" aria-hidden="true">”</span></blockquote></figure>':'';
+ const signature=isFounder?'<figcaption class="an-manager-quote-signature">Nusrat Nasrin</figcaption>':'';
+ const quoteHtml=quote?'<figure class="an-manager-quote"><span class="an-manager-quote-mark" aria-hidden="true">“</span><blockquote>'+displayQuote+'<span class="an-manager-quote-end" aria-hidden="true">”</span></blockquote>'+signature+'</figure>':'';
  const supportHtml=!isFounder&&help?'<div class="an-manager-support"><span class="an-manager-label">HOW I SUPPORT STUDENTS</span><p>'+esc(help)+'</p></div>':'';
  const buttonsHtml=(portfolio?'<a class="an-manager-action an-journey-cta" href="'+esc(portfolio)+'" target="_blank" rel="noopener noreferrer">'+(isFounder?'DISCOVER THE FOUNDER':'VIEW PORTFOLIO')+' ↗</a>':'')+
    (isFounder?'<a class="an-manager-action an-admin-entry" href="#/admin" aria-label="Open secure administration login">ADMIN PANEL ↗</a>':'');
