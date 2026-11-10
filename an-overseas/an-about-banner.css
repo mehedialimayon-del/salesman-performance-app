@@ -779,3 +779,33 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
 @media screen and (min-width:801px){
  html body.an-about-banner-mode #app .an-banner-message blockquote {text-align:center!important;}
 }
+
+/* Desktop About: display the exact mobile artwork flag crops as waving cloth.
+   No mobile selectors or other About elements are changed. */
+@media (min-width: 801px) {
+  .an-banner-destinations .an-banner-flags-desktop {
+    display: grid;
+    grid-template-columns: repeat(5,minmax(0,1fr));
+    grid-auto-rows: auto;
+    align-content: center;
+    justify-items: center;
+    gap: clamp(3px,.55vh,7px) clamp(3px,.4vw,8px);
+  }
+  .an-banner-destinations .an-banner-flags-desktop .an2-native-cloth-flag {
+    display: block;
+    position: relative;
+    width: 100%;
+    max-width: 46px;
+    height: auto;
+    min-height: 12px;
+    background-repeat: no-repeat;
+    transform-origin: left center;
+    border-radius: 2px;
+  }
+}
+@media (min-width: 801px) and (prefers-reduced-motion: no-preference) {
+  .an-banner-destinations .an-banner-flags-desktop .an2-native-cloth-flag {
+    animation: anAboutFlagCloth var(--wave-duration,3s) ease-in-out infinite;
+    animation-delay: var(--wave-delay,0s);
+  }
+}
