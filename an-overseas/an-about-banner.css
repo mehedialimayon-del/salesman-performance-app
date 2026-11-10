@@ -715,3 +715,45 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
     font-size: 9px !important;
   }
 }
+
+/* Surgical desktop About adjustments only; original three-column layout retained. */
+@media screen and (min-width:801px) {
+ body.an-about-banner-mode #app .an-about-art {
+  gap:clamp(5px,.75vh,10px);
+  padding-bottom:clamp(5px,.7vh,9px);
+ }
+ body.an-about-banner-mode #app .an-banner-brand {min-height:0}
+ body.an-about-banner-mode #app .an-banner-message {gap:clamp(4px,.65vh,8px);min-height:0}
+ body.an-about-banner-mode #app .an-banner-message h1 {
+  font-size:clamp(19px,2.25vw,34px);
+  text-align:center;
+  line-height:1.04;
+ }
+ body.an-about-banner-mode #app .an-banner-message blockquote {
+  padding:clamp(9px,1vw,16px);
+  font-size:clamp(14px,min(1.48vw,2.7vh),25px);
+  line-height:1.16;
+ }
+ body.an-about-banner-mode #app .an-banner-signature {
+  display:block;
+  margin:clamp(4px,.8vh,9px) 5px 0 0;
+  color:#ffac68;
+  text-align:right;
+  font:italic 500 clamp(17px,2.3vw,25px)/1.1 "Segoe Script","Brush Script MT",cursive;
+ }
+ body.an-about-banner-mode #app .an-banner-actions {
+  padding-top:clamp(4px,.7vh,8px);
+ }
+ body.an-about-banner-mode #app .an-banner-actions a {
+  min-height:clamp(34px,5.1vh,52px);
+  padding:.3em .6em;
+ }
+ body.an-about-banner-mode #app .an-banner-earth {
+  animation:an-desktop-about-sway 3.6s ease-in-out infinite alternate;
+  transform-origin:50% 50%;
+ }
+ @keyframes an-desktop-about-sway {
+  from {transform:rotate(-14deg) rotateY(-12deg)}
+  to {transform:rotate(14deg) rotateY(12deg)}
+ }
+}
