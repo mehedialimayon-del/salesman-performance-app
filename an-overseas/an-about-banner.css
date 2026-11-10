@@ -715,3 +715,102 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
     font-size: 9px !important;
   }
 }
+
+
+/* Desktop About Us: match the existing mobile design; leave navigation/mobile untouched. */
+@media (min-width: 801px) {
+  html:has(body.an-about-banner-mode), body.an-about-banner-mode {
+    height: 100dvh; min-height: 0; overflow: hidden;
+  }
+  body.an-about-banner-mode { display: flex; flex-direction: column; }
+  body.an-about-banner-mode > #app {
+    flex: 1 1 0; min-height: 0; overflow: hidden; container-type: size;
+  }
+  body.an-about-banner-mode .an-about-banner { height: 100%; min-height: 0; }
+  body.an-about-banner-mode .an-about-art {
+    height: 100%; min-height: 0;
+    grid-template: "brand brand brand" auto
+                   "message message message" minmax(0, .94fr)
+                   "flags portrait portrait" minmax(0, 1fr)
+                   "actions actions actions" auto
+                   / minmax(0, 1fr) minmax(0, .52fr) minmax(0, .52fr);
+    gap: clamp(5px, 1cqh, 11px);
+    padding: 0 clamp(14px, 2vw, 32px) clamp(7px, 1cqh, 12px);
+  }
+  body.an-about-banner-mode .an-banner-brand { min-height: 0; gap: 15px; }
+  body.an-about-banner-mode .an-banner-globe { width: clamp(48px, 8cqh, 74px); }
+  body.an-about-banner-mode .an-banner-earth { font-size: clamp(39px, 7cqh, 63px); }
+  body.an-about-banner-mode .an-banner-brand p { font-size: clamp(20px, 2.5vw, 35px); }
+  body.an-about-banner-mode .an-banner-message { min-height: 0; gap: 4px; }
+  body.an-about-banner-mode .an-banner-message h1 {
+    font-size: clamp(22px, 3.8cqh, 37px); text-align: center; line-height: 1.05;
+  }
+  body.an-about-banner-mode .an-banner-message blockquote {
+    min-height: 0; padding: clamp(9px, 1.5cqh, 18px) clamp(15px, 2vw, 28px);
+    border-radius: 27px; align-content: center;
+    font-size: clamp(15px, min(1.55vw, 2.75cqh), 26px);
+    line-height: 1.2;
+  }
+  body.an-about-banner-mode #app .an-banner-signature {
+    display: block; text-align: right; margin: 4px 5px 0 0;
+    color: #ffac68; font: italic 500 clamp(17px, 2.8cqh, 27px)/1.1 "Segoe Script","Brush Script MT",cursive;
+  }
+  body.an-about-banner-mode .an-banner-destinations {
+    min-height: 0; justify-content: flex-start; border-left: 0;
+    padding-left: 0; gap: clamp(3px, .9cqh, 8px);
+  }
+  body.an-about-banner-mode .an-banner-destinations h2 { font-size: clamp(15px, 2.7cqh, 24px); }
+  body.an-about-banner-mode .an-banner-destinations small { font-size: clamp(11px, 1.8cqh, 15px); }
+  body.an-about-banner-mode .an-banner-flags-desktop { display: none; }
+  body.an-about-banner-mode .an-banner-flags-mobile {
+    display: grid; flex: 1 1 auto; min-height: 0;
+    grid-template-columns: repeat(5,minmax(0,1fr));
+    grid-auto-rows: minmax(0,1fr); gap: 3px 5px;
+    justify-items: center; align-items: center;
+  }
+  body.an-about-banner-mode .an-banner-flags-mobile .an2-native-cloth-flag {
+    display: block; width: auto; height: 100%; max-height: 36px;
+    max-width: min(100%,55px);
+  }
+  body.an-about-banner-mode .an-banner-founder {
+    min-height: 0; justify-content: flex-end;
+  }
+  body.an-about-banner-mode .an-banner-portrait {
+    flex: 1 1 0; min-height: 0; max-height: 100%; width: 100%;
+  }
+  body.an-about-banner-mode .an-banner-founder figcaption { flex: 0 0 auto; gap: 3px; }
+  body.an-about-banner-mode .an-banner-founder figcaption strong { font-size: clamp(12px, 2cqh, 18px); }
+  body.an-about-banner-mode .an-banner-founder figcaption span { background: #c95000; font-size: clamp(11px, 1.85cqh, 16px); }
+  body.an-about-banner-mode .an-banner-portfolio {
+    display: inline-flex; align-items: center; justify-content: center; gap: .4em;
+    padding: 5px 15px; min-height: clamp(29px, 4.5cqh, 42px);
+    border: 1px solid #559eea; border-radius: 99px;
+    background: linear-gradient(#1269c6,#06428c); color: white;
+    font-size: clamp(12px, 1.85cqh, 16px); font-weight: 750;
+  }
+  body.an-about-banner-mode .an-banner-portfolio i { font-style: normal; }
+  body.an-about-banner-mode .an-banner-actions {
+    grid-template-columns: 1fr 1.12fr; padding-top: clamp(5px, 1cqh, 10px);
+  }
+  body.an-about-banner-mode .an-banner-actions p { display: none; }
+  body.an-about-banner-mode .an-banner-actions a {
+    min-height: clamp(39px, 6.5cqh, 58px); font-size: clamp(14px, 2.5cqh, 23px);
+    border-radius: 17px;
+  }
+  body.an-about-banner-mode .an-banner-actions .an-banner-team {
+    background: linear-gradient(180deg,#39332e 0%,#201b18 47%,#100d0b 49%,#050403 100%);
+    box-shadow: inset 0 1px 0 #ffffff47, inset 0 0 9px #ff65001f;
+  }
+  body.an-about-banner-mode .an-banner-team svg {
+    display: block; flex: 0 0 1.25em; width: 1.25em; height: 1.25em; color: #ff8b39;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    body.an-about-banner-mode .an-banner-earth {
+      animation: an-desktop-globe-sway 4.2s ease-in-out infinite alternate;
+    }
+    @keyframes an-desktop-globe-sway {
+      from { transform: rotate(-13deg) rotateY(-13deg); }
+      to { transform: rotate(13deg) rotateY(13deg); }
+    }
+  }
+}
