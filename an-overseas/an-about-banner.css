@@ -767,3 +767,10 @@ html body > header.top #an-desktop-wordmark { color: #fff !important; }
  html body.an-about-banner-mode #app .an-banner-actions a.an-banner-team .an-management-orange {color:#ff7900!important;}
  html body.an-about-banner-mode #app .an-banner-actions a.an-banner-team .an-management-white {color:#fff!important;}
 }
+
+/* Desktop-only founder text and tapered handwritten signature flourish. */
+@media screen and (min-width:801px){
+ html body.an-about-banner-mode #app .an-banner-message blockquote {font-size:clamp(19px,min(1.85vw,3.65cqh),31px)!important;line-height:1.22!important;}
+ html body.an-about-banner-mode #app .an-banner-message .an-banner-signature {display:block!important;position:relative!important;align-self:flex-end!important;width:max-content!important;max-width:95%!important;margin:12px 5px 0 auto!important;padding:0 2px 12px!important;border:0!important;text-decoration:none!important;transform:rotate(-5deg)!important;transform-origin:right center!important;}
+ html body.an-about-banner-mode #app .an-banner-message .an-banner-signature::after {content:""!important;display:block!important;position:absolute!important;left:4%!important;right:0!important;bottom:0!important;height:12px!important;background:#ff8b32!important;clip-path:polygon(0 86%,5% 55%,22% 32%,45% 19%,68% 17%,87% 28%,100% 60%,91% 45%,71% 35%,47% 38%,24% 54%,8% 83%,0 100%)!important;transform:rotate(-2deg)!important;}
+}
