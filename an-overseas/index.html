@@ -986,7 +986,10 @@ body.an-contact-mode .an-contact-head .bread{font-size:10px!important}
     border-left: 1px solid var(--an-nav-orange);
     padding-left: clamp(4px,.55vw,8px);
   }
-  html body > header.top #brand-typing { display: none !important; }
+  html body > header.top #brand-typing { display: inline-block !important; font: 800 clamp(13px,1.28vw,19px)/1.05 system-ui,sans-serif !important; min-height: 0 !important; color: #fff !important; white-space: nowrap; }
+  html body > header.top #brand-typing span:first-child { color: var(--an-nav-orange) !important; }
+  html body > header.top #brand-typing span:last-child { color: #fff !important; }
+  html body > header.top #an-desktop-wordmark { display: none !important; }
   html body > header.top #an-desktop-wordmark {
     font: 800 clamp(13px,1.28vw,19px)/1.05 system-ui,sans-serif !important;
     min-height: 0 !important;
