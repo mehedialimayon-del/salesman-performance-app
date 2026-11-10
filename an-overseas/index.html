@@ -1508,4 +1508,16 @@ const contactHeadingObserver=new ResizeObserver(fit);
 const observeHeading=()=>{contactHeadingObserver.disconnect();for(const el of document.querySelectorAll('.an-contact-head, .top, #an-global-ticker'))contactHeadingObserver.observe(el);};
 window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.addEventListener('DOMContentLoaded',()=>{new MutationObserver(()=>{if(document.querySelector('.an26-contact')){fit();observeHeading();syncLinks()}}).observe(document.getElementById('app'),{childList:true});fit();observeHeading();syncLinks()});
 })();
-</script></body></html>
+</script><style id="an-desktop-brand-typewriter-restore-20261110">
+/* Desktop uses the exact same live typing element and script as mobile. */
+@media (min-width:801px){
+ html body header.top a.brand .brand-copy #brand-typing{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  font:800 clamp(13px,1.28vw,19px)/1.05 system-ui,sans-serif!important;
+  color:#fff!important;white-space:nowrap!important;min-height:0!important;
+ }
+ html body header.top a.brand .brand-copy #brand-typing span:first-child{color:var(--an-nav-orange,#ff791b)!important}
+ html body header.top a.brand .brand-copy #brand-typing span:last-child{color:#fff!important}
+ html body header.top a.brand .brand-copy #an-desktop-wordmark{display:none!important}
+}
+</style></body></html>
