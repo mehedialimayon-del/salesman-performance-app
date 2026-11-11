@@ -113,6 +113,7 @@ async function website(){
  +panel('<h2>Homepage & Company</h2><form id="settings-form"><div class="grid-fields">'
  +field('heroLead','Headline — First Line',content.heroLead||'',true)
  +field('heroAccent','Headline — Highlight',content.heroAccent||'',true)
+ +field('heroTypingCountries','Hero Typing Countries — one country per line',content.heroTypingCountries||'Malaysia\nChina\nAustralia',true,true)
  +field('heroDescription','Homepage Description',content.heroDescription||'',true,true)
  +field('motto','Company Motto',content.motto||'')
  +field('phone','Phone',content.phone||'')
