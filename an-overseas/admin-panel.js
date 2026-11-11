@@ -3,7 +3,7 @@
 const get=()=>window.ANLive, db=()=>get().db, esc=s=>get().ed(s), pretty=s=>get().dt(s);
 const sections=["Overview","Students","Applications","Documents","Enquiries","Messages","Invoices","Latest Updates","Website","Contact","Management","Services","Service Requests","Service Prices","Countries","Universities","University Offers & PDFs","Success Stories","Media"];
 let section="Overview", selectedStudent="",saved={};
-const websiteFields=["ticker","motto","heroLead","heroAccent","heroDescription","heroImage","about","work"];
+const websiteFields=["ticker","motto","heroLead","heroAccent","heroTypingCountries","heroDescription","heroImage","about","work"];
 const panel=s=>'<section class="live-panel">'+s+'</section>';
 const field=(label,key,value="",type="text")=>'<label>'+esc(label)+(type==="textarea"?'<textarea name="'+key+'">'+esc(value)+'</textarea>':'<input name="'+key+'" type="'+type+'" value="'+esc(value)+'">')+'</label>';
 const dropdown=(label,key,values,value)=>'<label>'+esc(label)+'<select name="'+key+'">'+values.map(v=>'<option'+(String(v)===String(value)?' selected':'')+'>'+esc(v)+'</option>').join('')+'</select></label>';
@@ -82,7 +82,7 @@ async function draw(){
  }
  if(section==="Website"){
   saved.settings=await content("settings")||{};
-  html=panel('<h2>Edit Website Settings</h2><form id="admin-settings-form"><div class="live-fieldgrid">'+websiteFields.map(k=>field(k,k,saved.settings[k]||"",/ticker|about|work/.test(k)?"textarea":"text")).join("")+'</div><button class="btn mt" type="submit">Publish Settings</button></form><div class="mt"><h3>Homepage Image Upload</h3><p>Upload your preferred student/graduate photo. It will automatically replace the homepage background.</p><form id="admin-home-image-form"><input type="file" name="image" required accept="image/jpeg,image/png,image/webp"><button type="submit" class="btn mt">Upload & Set Home Image</button></form></div>');
+  html=panel('<h2>Edit Website Settings</h2><form id="admin-settings-form"><div class="live-fieldgrid">'+websiteFields.map(k=>field(k,k,saved.settings[k]||"",/ticker|heroTypingCountries|about|work/.test(k)?"textarea":"text")).join("")+'</div><button class="btn mt" type="submit">Publish Settings</button></form><div class="mt"><h3>Homepage Image Upload</h3><p>Upload your preferred student/graduate photo. It will automatically replace the homepage background.</p><form id="admin-home-image-form"><input type="file" name="image" required accept="image/jpeg,image/png,image/webp"><button type="submit" class="btn mt">Upload & Set Home Image</button></form></div>');
  }
  if(section==="Contact"){
   const settings=await content("settings")||{};
