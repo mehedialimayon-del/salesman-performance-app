@@ -1636,8 +1636,13 @@ window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.ad
    graduates.classList.toggle('an-graduates-floating',!!visible);
    if(!visible)return;
    const rect=home.getBoundingClientRect();
-   const width=rect.width;
-   const height=width*(724/2172);
+   const ticker=document.querySelector('body.home-view .ticker');
+   const header=document.querySelector('header.top');
+   const safeTop=ticker?ticker.getBoundingClientRect().bottom:(header?header.getBoundingClientRect().bottom:0);
+   const naturalHeight=rect.width*(724/2172);
+   // Preserve the existing A07 appearance when space permits; scale only on tighter viewports.
+   const height=Math.min(naturalHeight,Math.max(48,rect.top-safeTop-8));
+   const width=height*(2172/724);
    graduates.style.setProperty('--an-graduates-width',width+'px');
    graduates.style.setProperty('--an-graduates-height',height+'px');
    graduates.style.setProperty('--an-graduates-left',(rect.left+(rect.width-width)/2)+'px');
