@@ -3,7 +3,7 @@
 /* Mobile-only decorative layer. Never move or animate the navigation. */
 @media (max-width:800px) {
  html body #an-graduates.an-graduates-floating {
-   isolation:isolate!important;
+   isolation:auto!important;
    overflow:visible!important;
  }
  html body #an-graduates.an-graduates-floating::before {
@@ -22,8 +22,8 @@
    filter:blur(4px);
    animation:none!important;
  }
- html body #an-graduates.an-graduates-floating img {
-   filter:drop-shadow(0 0 5px rgba(255,170,32,.9)) drop-shadow(0 3px 9px rgba(255,100,0,.65));
+ html body #an-graduates.an-graduates-floating img {\n   mix-blend-mode:screen!important; /* black GIF pixels blend away; retain orange light and animation */
+   filter:none!important;
    animation:none!important;
    transform-origin:50% 85%;
    will-change:transform;
