@@ -98,7 +98,7 @@ setInterval(refreshCms,90000);
 
 // Type and erase only the existing highlighted country text; never replace the hero heading or its PNG.
 const defaultCountries=['Malaysia','China','Australia'];
-const countryNames=()=>{const raw=settings.heroTypingCountries;const names=(Array.isArray(raw)?raw:String(raw||'').split(/[\\n,;]+/)).map(x=>String(x).trim().replace(/\\.+$/,'')).filter(Boolean).slice(0,30);return names.length?names:defaultCountries;};
+const countryNames=()=>{const raw=settings.heroTypingCountries;const names=(Array.isArray(raw)?raw:String(raw||'').split(/\r?\n|[,;]+/)).map(x=>String(x).trim().replace(/\.+$/,'')).filter(Boolean).slice(0,30);return names.length?names:defaultCountries;};
 let countryIndex=0,countryChars=0,countryPhase='type',countryPause=0,countrySignature='';
 function animateCountry(){
  const el=document.querySelector('body.home-view .hero h1 .gradient');
