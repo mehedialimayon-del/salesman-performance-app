@@ -1694,11 +1694,11 @@ window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.ad
    const safeTop=Math.max(ticker?ticker.getBoundingClientRect().bottom:0,header?header.getBoundingClientRect().bottom:0);
    // Use the HOME button as the sole position anchor on every mobile viewport.
    // Scale proportionally to HOME, never to screen height or the ticker gap.
-   const width=rect.width*1.06;
+   const width=rect.width*1.12;
    const height=width*(724/2172);
    // The source GIF's shadows sit just above its lower edge.
    // Align that shadow baseline with HOME's orange top border.
-   const shadowInset=height*0.18;
+   const shadowInset=height*0.135;
    const borderY=rect.top+2;
    graduates.style.visibility='visible';
    graduates.style.setProperty('--an-graduates-width',width+'px');
