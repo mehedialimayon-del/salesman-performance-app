@@ -1638,20 +1638,27 @@ window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.ad
    const rect=home.getBoundingClientRect();
    const ticker=document.querySelector('#app .ticker, .ticker');
    const header=document.querySelector('header.top');
-   const safeTop=ticker?ticker.getBoundingClientRect().bottom:(header?header.getBoundingClientRect().bottom:0);
+   const safeTop=Math.max(ticker?ticker.getBoundingClientRect().bottom:0,header?header.getBoundingClientRect().bottom:0);
    const naturalHeight=rect.width*(724/2172);
-   // Preserve the existing A07 appearance when space permits; scale only on tighter viewports.
-   const height=Math.min(naturalHeight,Math.max(48,rect.top-safeTop-8));
+   // Fit the artwork strictly inside the gap above HOME; never overlap the ticker.
+   const available=Math.max(0,rect.top-safeTop-10);
+   const height=Math.min(naturalHeight,available);
+   if(height<24){graduates.style.visibility='hidden';return;}
+   graduates.style.visibility='visible';
    const width=height*(2172/724);
    graduates.style.setProperty('--an-graduates-width',width+'px');
    graduates.style.setProperty('--an-graduates-height',height+'px');
    graduates.style.setProperty('--an-graduates-left',(rect.left+(rect.width-width)/2)+'px');
    graduates.style.setProperty('--an-graduates-top',(rect.top-height+2)+'px');
  };
- new MutationObserver(update).observe(nav,{attributes:true,attributeFilter:['class']});
- window.addEventListener('resize',update,{passive:true});
- window.addEventListener('hashchange',update);
- document.addEventListener('scroll',update,{passive:true});
- update();
+ let pending=0;
+ const schedule=()=>{cancelAnimationFrame(pending);pending=requestAnimationFrame(()=>requestAnimationFrame(update));};
+ new MutationObserver(schedule).observe(nav,{attributes:true,attributeFilter:['class']});
+ const observer=new ResizeObserver(schedule);
+ observer.observe(nav);
+ window.addEventListener('resize',schedule,{passive:true});
+ window.addEventListener('hashchange',schedule);
+ document.addEventListener('scroll',schedule,{passive:true});
+ schedule();
 })();
 </script></body></html>
