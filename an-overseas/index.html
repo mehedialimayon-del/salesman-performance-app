@@ -1692,17 +1692,19 @@ window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.ad
    const ticker=document.querySelector('#app .ticker, .ticker');
    const header=document.querySelector('header.top');
    const safeTop=Math.max(ticker?ticker.getBoundingClientRect().bottom:0,header?header.getBoundingClientRect().bottom:0);
-   const naturalHeight=rect.width*(724/2172)*1.38;
-   // Fit the artwork strictly inside the gap above HOME; never overlap the ticker.
-   const available=Math.max(0,rect.top-safeTop+18);
-   const height=Math.min(naturalHeight,available);
-   if(height<24){graduates.style.visibility='hidden';return;}
+   // Use the HOME button as the sole position anchor on every mobile viewport.
+   // Scale proportionally to HOME, never to screen height or the ticker gap.
+   const width=rect.width*0.91;
+   const height=width*(724/2172);
+   // The source GIF's shadows sit just above its lower edge.
+   // Align that shadow baseline with HOME's orange top border.
+   const shadowInset=height*0.045;
+   const borderY=rect.top+2;
    graduates.style.visibility='visible';
-   const width=height*(2172/724);
    graduates.style.setProperty('--an-graduates-width',width+'px');
    graduates.style.setProperty('--an-graduates-height',height+'px');
    graduates.style.setProperty('--an-graduates-left',(rect.left+(rect.width-width)/2)+'px');
-   graduates.style.setProperty('--an-graduates-top',(rect.top-height+19)+'px');
+   graduates.style.setProperty('--an-graduates-top',(borderY-height+shadowInset)+'px');
  };
  let pending=0;
  const schedule=()=>{cancelAnimationFrame(pending);pending=requestAnimationFrame(()=>requestAnimationFrame(update));};
