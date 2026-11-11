@@ -1,5 +1,20 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><style id="an-graduates-premium-glow-mobile-20261112">
+<html lang="en"><head><meta charset="utf-8"><style id="an-graduates-clean-single-gif-20261112">
+@media(max-width:800px){
+ html body #an-graduates.an-graduates-floating{isolation:isolate!important}
+ html body #an-graduates.an-graduates-floating::before{
+  z-index:-1!important;left:1%!important;right:1%!important;top:24%!important;bottom:0!important;
+  background:radial-gradient(ellipse at 50% 76%,rgba(255,118,0,.29) 0%,rgba(255,112,0,.14) 44%,transparent 82%)!important;
+  filter:blur(13px)!important
+ }
+ html body #an-graduates.an-graduates-floating::after{
+  z-index:-1!important;left:8%!important;right:8%!important;bottom:0!important;height:8%!important;
+  background:radial-gradient(ellipse,rgba(255,120,0,.20),transparent 75%)!important;
+  filter:blur(5px)!important
+ }
+ html body #an-graduates.an-graduates-floating > img{display:block!important;position:relative!important;z-index:1!important}
+}
+</style><style id="an-graduates-premium-glow-mobile-20261112">
 /* Mobile-only decorative layer. Never move or animate the navigation. */
 @media (max-width:800px) {
  html body #an-graduates.an-graduates-floating {
@@ -36,29 +51,6 @@
  #an-graduates.an-graduates-floating img,
  #an-graduates.an-graduates-floating::before,
  #an-graduates.an-graduates-floating::after {animation:none!important}
-}
-</style><style id="an-graduates-grounded-glow-spacing-20261112">
-@media(max-width:800px){
- html body #an-graduates.an-graduates-floating{isolation:isolate!important}
- html body #an-graduates.an-graduates-floating::before{
-  z-index:0!important;left:0!important;right:0!important;top:20%!important;bottom:-4%!important;
-  background:radial-gradient(ellipse at 50% 76%,rgba(255,119,0,.35) 0%,rgba(255,116,0,.17) 40%,rgba(255,122,0,.055) 68%,transparent 86%)!important;
-  filter:blur(13px)!important;
- }
- html body #an-graduates.an-graduates-floating::after{
-  z-index:0!important;bottom:-2%!important;height:12%!important;
-  background:radial-gradient(ellipse,rgba(255,135,0,.32),rgba(255,115,0,.12) 48%,transparent 78%)!important;
-  filter:blur(6px)!important;
- }
- html body #an-graduates.an-graduates-floating > img{display:none!important}
- html body #an-graduates.an-graduates-floating .an-graduate-slice{
-  position:absolute!important;top:0;bottom:0;width:25%;overflow:visible;pointer-events:none;z-index:1;
- }
- html body #an-graduates.an-graduates-floating .an-graduate-slice img{
-  display:block!important;position:absolute!important;top:0!important;height:100%!important;
-  width:400%!important;max-width:none!important;object-fit:fill!important;
-  mix-blend-mode:normal!important;filter:none!important;
- }
 }
 </style></style><link rel="preload" as="image" href="assets/brand-logo.jpg"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b0d11"><meta name="application-name" content="A&N Overseas"><meta name="apple-mobile-web-app-title" content="A&N Overseas"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="A&N Overseas Education & Consultancy — study abroad guidance, university selection, applications and student portal."><title>A&N Overseas Education & Consultancy</title><link rel="preload" href="assets/malaysia-skyline-clean.jpg" as="image" fetchpriority="high"><link rel="preload" href="assets/hero-nusrat-20261030.webp" as="image" type="image/webp" fetchpriority="high"><link rel="preload" href="assets/hero-ayon-20261030.webp" as="image" type="image/webp" fetchpriority="high">
 <style>
@@ -1690,24 +1682,6 @@ window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.ad
  const nav=document.getElementById('links');
  if(!graduates||!nav)return;
  document.body.appendChild(graduates);
- // Four synchronized views of the same animated GIF, each clipped to one graduate.
- // Keep the original GIF in the DOM as a non-mobile fallback.
- if(!graduates.querySelector('.an-graduate-slice')){
-  const source=graduates.querySelector('img');
-  if(source){
-   for(let i=0;i<4;i++){
-    const panel=document.createElement('span');
-    panel.className='an-graduate-slice';
-    panel.style.left=(i*25)+'%';
-    panel.style.transform='translateX('+([-12,-4,4,12][i])+'px)';
-    const copy=source.cloneNode(false);
-    copy.style.left=(-i*100)+'%';
-    panel.appendChild(copy);
-    graduates.appendChild(panel);
-   }
-  }
- }
-
  const update=()=>{
    const mobile=window.matchMedia('(max-width:800px)').matches;
    const home=nav.querySelector('a[href="#/home"]');
@@ -1718,7 +1692,7 @@ window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.ad
    const ticker=document.querySelector('#app .ticker, .ticker');
    const header=document.querySelector('header.top');
    const safeTop=Math.max(ticker?ticker.getBoundingClientRect().bottom:0,header?header.getBoundingClientRect().bottom:0);
-   const naturalHeight=rect.width*(724/2172);
+   const naturalHeight=rect.width*(724/2172)*1.13;
    // Fit the artwork strictly inside the gap above HOME; never overlap the ticker.
    const available=Math.max(0,rect.top-safeTop-10);
    const height=Math.min(naturalHeight,available);
@@ -1728,7 +1702,7 @@ window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.ad
    graduates.style.setProperty('--an-graduates-width',width+'px');
    graduates.style.setProperty('--an-graduates-height',height+'px');
    graduates.style.setProperty('--an-graduates-left',(rect.left+(rect.width-width)/2)+'px');
-   graduates.style.setProperty('--an-graduates-top',(rect.top-height+7)+'px');
+   graduates.style.setProperty('--an-graduates-top',(rect.top-height+3)+'px');
  };
  let pending=0;
  const schedule=()=>{cancelAnimationFrame(pending);pending=requestAnimationFrame(()=>requestAnimationFrame(update));};
