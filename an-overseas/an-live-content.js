@@ -45,10 +45,13 @@ function applyPage(){
  const text=lines.length?lines.join('  ✦  '):settings.ticker||'';
  if(marquee&&text&&marquee.textContent!==text)marquee.textContent=text;
  const title=document.querySelector('body.home-view .hero h1');
- if(title&&(settings.heroLead||settings.heroAccent)){
-  const h=esc(settings.heroLead||'Study in'),a=esc(settings.heroAccent||'Malaysia.');
-  const html=h+'<br><span class="gradient">'+a+'</span>';
-  if(title.innerHTML!==html)title.innerHTML=html;
+ if(title){
+  const accent=title.querySelector('.gradient');
+  if(accent&&!accent.classList.contains('an-country-typing'))accent.classList.add('an-country-typing');
+  if(settings.heroLead){
+   const first=title.firstChild;
+   if(first&&first.nodeType===3&&first.textContent!==settings.heroLead)first.textContent=settings.heroLead;
+  }
  }
  const d=document.querySelector('body.home-view .home-description');
  if(d&&settings.heroDescription&&d.textContent!==settings.heroDescription)d.textContent=settings.heroDescription;
@@ -92,4 +95,28 @@ window.addEventListener('hashchange',()=>setTimeout(applyPage,20));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshCms();});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refreshCms);else refreshCms();
 setInterval(refreshCms,90000);
+
+// Type and erase only the existing highlighted country text; never replace the hero heading or its PNG.
+const defaultCountries=['Malaysia','China','Australia'];
+const countryNames=()=>{const raw=settings.heroTypingCountries;const names=(Array.isArray(raw)?raw:String(raw||'').split(/[\\n,;]+/)).map(x=>String(x).trim().replace(/\\.+$/,'')).filter(Boolean).slice(0,30);return names.length?names:defaultCountries;};
+let countryIndex=0,countryChars=0,countryPhase='type',countryPause=0,countrySignature='';
+function animateCountry(){
+ const el=document.querySelector('body.home-view .hero h1 .gradient');
+ if(!el)return;
+ const names=countryNames(),signature=names.join('|');
+ if(signature!==countrySignature){countrySignature=signature;countryIndex=0;countryChars=0;countryPhase='type';countryPause=0;}
+ const word=names[countryIndex%names.length]+'.';
+ if(countryPhase==='type'){
+  countryChars=Math.min(word.length,countryChars+1);
+  if(countryChars===word.length){countryPhase='hold';countryPause=13;}
+ }else if(countryPhase==='hold'){
+  if(--countryPause<=0)countryPhase='erase';
+ }else{
+  countryChars=Math.max(0,countryChars-1);
+  if(countryChars===0){countryIndex=(countryIndex+1)%names.length;countryPhase='type';}
+ }
+ el.textContent=word.slice(0,countryChars);
+}
+setInterval(animateCountry,130);
+
 })();
