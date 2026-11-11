@@ -1636,7 +1636,7 @@ window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.ad
    graduates.classList.toggle('an-graduates-floating',!!visible);
    if(!visible)return;
    const rect=home.getBoundingClientRect();
-   const ticker=document.querySelector('body.home-view .ticker');
+   const ticker=document.querySelector('#app .ticker, .ticker');
    const header=document.querySelector('header.top');
    const safeTop=ticker?ticker.getBoundingClientRect().bottom:(header?header.getBoundingClientRect().bottom:0);
    const naturalHeight=rect.width*(724/2172);
