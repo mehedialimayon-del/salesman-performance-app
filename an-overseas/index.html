@@ -1641,7 +1641,7 @@ window.addEventListener('hashchange',()=>requestAnimationFrame(fit));document.ad
    graduates.style.setProperty('--an-graduates-width',width+'px');
    graduates.style.setProperty('--an-graduates-height',height+'px');
    graduates.style.setProperty('--an-graduates-left',(rect.left+(rect.width-width)/2)+'px');
-   graduates.style.setProperty('--an-graduates-top',(rect.top-height+2)+'px');
+   graduates.style.setProperty('--an-graduates-top',(rect.top-height+14)+'px');
  };
  new MutationObserver(update).observe(nav,{attributes:true,attributeFilter:['class']});
  window.addEventListener('resize',update,{passive:true});
