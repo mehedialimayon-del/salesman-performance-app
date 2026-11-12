@@ -1285,12 +1285,14 @@ body.home-view .hero h1 .gradient.an-country-typing{
 /* Mobile homepage only: stabilize portrait-to-copy proportions across aspect ratios.
    Preserve navigation, animations, other pages and desktop. */
 @media (max-width:520px){
+ /* Size the portrait stage by phone WIDTH rather than variable hero height. */
  body.home-view .hero .hero-portraits{
-  height:62%!important;
+  height:clamp(370px,112vw,510px)!important;
+  top:clamp(40px,6.5dvh,85px)!important;
   bottom:auto!important;
  }
- body.home-view .hero .hero-portrait--nusrat{height:82%!important}
- body.home-view .hero .hero-portrait--ayon{height:81%!important}
+ body.home-view .hero .hero-portrait--nusrat{height:86%!important}
+ body.home-view .hero .hero-portrait--ayon{height:85%!important}
  body.home-view .hero .wrap{
   padding-bottom:clamp(8px,1.2dvh,16px)!important;
  }
