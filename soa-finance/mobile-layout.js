@@ -10,16 +10,16 @@ const editButtons=ledger.querySelector('#rows');editButtons?.addEventListener('c
 const watch=new MutationObserver(()=>{if(importBox&&!importBox.hidden)select('ledger')});if(importBox)watch.observe(importBox,{attributes:true,attributeFilter:['hidden']});
 const style=document.createElement('style');style.textContent=`
 @media(max-width:850px){
-html,body{height:auto!important;min-height:100%;overflow-x:hidden!important;overflow-y:auto!important}
-body{display:block;min-height:100vh}
+html,body{height:100%!important;max-height:100%!important;overflow:hidden!important}
+body{display:flex;flex-direction:column;min-height:0}
 body>header{flex:0 0 auto;padding:9px 14px}
 body>header h1{font-size:15px}body>header small{font-size:10px}
-main{width:100%;max-width:100%;min-height:0;display:block;overflow:visible;padding:7px!important}
-#soaMobileTabs{position:sticky;top:0;z-index:10;background:#edf3fa;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding-bottom:6px}
+main{width:100%;max-width:100%;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;padding:7px!important}
+#soaMobileTabs{flex:0 0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding-bottom:6px}
 #soaMobileTabs button{margin:0;padding:10px 3px;font-size:12px;background:#e2eaf4;color:#173456;font-weight:700}
 #soaMobileTabs button[aria-selected=true]{background:#1262b5;color:white}
-#soaMobilePanels{min-height:0;overflow:visible}
-.soaMobilePanel{display:none;height:auto;min-height:0;overflow:visible;padding:2px 3px 18px}
+#soaMobilePanels{flex:1;min-height:0;overflow:hidden}
+.soaMobilePanel{display:none;height:100%;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 3px 10px}
 .soaMobilePanel.soaPanelActive{display:block}
 .soaMobilePanel .card{padding:11px;margin-bottom:8px;border-radius:10px}
 .soaMobilePanel h3{font-size:15px;margin:3px 0 7px}
