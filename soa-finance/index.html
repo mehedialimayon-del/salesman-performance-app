@@ -24,4 +24,4 @@ $('file').onchange=async e=>{pending=[];$('import').disabled=true;const file=e.t
 $('import').onclick=()=>{if(!confirm('Add '+pending.length+' rows? Check the source values first.'))return;state.entries.push(...pending);pending=[];$('import').disabled=true;$('importStatus').textContent='Imported';render()};
 $('export').onclick=()=>{const lines=['Date,Description,Debit,Credit,Balance',...calculated().map(e=>[e.date,'"'+e.doc.replaceAll('"','""')+'"',e.debit,e.credit,e.balance].join(','))];const url=URL.createObjectURL(new Blob([lines.join('\r\n')],{type:'text/csv'}));const a=document.createElement('a');a.href=url;a.download='PINNACLE-SOA.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 $('print').onclick=()=>window.print();render();
-</script><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script><script src="distributor-master.js?v=1"></script></html>
+</script><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script><script src="distributor-master.js?v=20261112-menu-3"></script></html>
