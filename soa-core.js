@@ -19,6 +19,6 @@ function statement(entries,{from,to,opening='0.00'}={}){
  }
  return {openingBalance:rm(openingBalance),closingBalance:rm(balance),rows,totalDebit:rm(rows.reduce((a,r)=>a+cents(r.debit),0)),totalCredit:rm(rows.reduce((a,r)=>a+cents(r.credit),0))};
 }
-function csv(rows){const quote=v=>'"'+String(v??'').replace(/"/g,'""')+'"';return '\ufeff'+[['Date','Description','Reference','Debit','Credit','Balance'],...rows.map(r=>[r.date,r.description,r.reference,r.debit,r.credit,r.balance])].map(row=>row.map(quote).join(',')).join('\r\n');}
+function csv(rows){const quote=v=>{let value=String(v??'');if(/^[\t\r\n ]*[=+@]/.test(value)||/^[\t\r\n ]*-(?!\d+(?:\.\d+)?$)/.test(value))value="'"+value;return '"'+value.replace(/"/g,'""')+'"';};return '\ufeff'+[['Date','Description','Reference','Debit','Credit','Balance'],...rows.map(r=>[r.date,r.description,r.reference,r.debit,r.credit,r.balance])].map(row=>row.map(quote).join(',')).join('\r\n');}
 root.FFH_SOA_CORE=Object.freeze({cents,rm,dateKey,statement,csv});
 })(typeof window!=='undefined'?window:globalThis);
