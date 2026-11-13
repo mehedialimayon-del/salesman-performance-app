@@ -15,7 +15,7 @@ function statement(entries,{from,to,opening='0.00'}={}){
   if(e._date>end)continue;
   balance+=debit-credit;if(!Number.isSafeInteger(balance))throw Error('Balance exceeds safe range');
   if(e._date<start){openingBalance=balance;continue;}
-  rows.push({date:e.date,description:String(e.description||''),reference:String(e.reference||''),debit:rm(debit),credit:rm(credit),balance:rm(balance),balanceCents:balance,sourceIndex:e._i});
+  rows.push({id:e.id||'',date:e.date,description:String(e.description||''),reference:String(e.reference||''),debit:rm(debit),credit:rm(credit),balance:rm(balance),balanceCents:balance,sourceIndex:e._i});
  }
  return {openingBalance:rm(openingBalance),closingBalance:rm(balance),rows,totalDebit:rm(rows.reduce((a,r)=>a+cents(r.debit),0)),totalCredit:rm(rows.reduce((a,r)=>a+cents(r.credit),0))};
 }
