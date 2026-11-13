@@ -71,36 +71,44 @@ let opening=false,soaHistory=false;
 async function open(){if(visible||opening)return;opening=true;try{await loadPermissions();await loadCloud();visible=true;remember();const root=document.createElement('div');root.id='ffhSoaRoot';document.body.appendChild(root);history.pushState({...history.state,ffhSoaOverlay:true},'',location.href);soaHistory=true;render();}catch(e){alert(e.message);}finally{opening=false;}}
 function close(fromHistory=false){if(!visible)return;visible=false;remember();byId('ffhSoaRoot')?.remove();if(!fromHistory&&soaHistory&&history.state?.ffhSoaOverlay){soaHistory=false;history.back();}else soaHistory=false;}
 window.addEventListener('popstate',()=>{if(visible&&!history.state?.ffhSoaOverlay)close(true);});
-let accessAction=null;
+let pendingAccessTile=null;
 function install(){
- const visibleText=el=>(el?.textContent||'').replace(/\s+/g,' ').trim();
- const findTile=(pattern)=>[...document.querySelectorAll('button,a,[role="button"],[onclick],.home-card,.menu-card,.dashboard-card')].find(el=>!el.closest('#ffhSoaRoot')&&!el.dataset.ffhSoaOriginal&&!el.dataset.ffhSoaHome&&pattern.test(visibleText(el))&&el.getClientRects().length>0);
- const access=findTile(/access\s*requests/i);
- if(access&&!byId('ffhSoaLaunch')){
-  const replacement=access.cloneNode(true);
-  replacement.id='ffhSoaLaunch';replacement.dataset.ffhSoaHome='true';
-  replacement.removeAttribute('onclick');replacement.removeAttribute('href');
-  replacement.querySelectorAll('[onclick],a').forEach(n=>{n.removeAttribute('onclick');n.removeAttribute('href');});
-  const label=[...replacement.querySelectorAll('*')].filter(n=>n.children.length===0&&/access\s*requests/i.test(visibleText(n))).pop();
-  if(label)label.textContent='SOA';else replacement.textContent='SOA';
-  const icon=label?.parentElement?.querySelector('svg,i,.icon')||replacement.querySelector('svg,i,.icon');
-  if(icon){icon.outerHTML='<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px;line-height:1">▤</span>';}
-  else if(label)label.insertAdjacentHTML('beforebegin','<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px;margin-bottom:5px">▤</span>');else replacement.insertAdjacentHTML('afterbegin','<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px;margin-bottom:5px">▤</span>');
-  replacement.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();open();},true);
-  access.replaceWith(replacement);
-  access.dataset.ffhSoaOriginal='true';
-  accessAction=()=>access.click();
+ const textOf=el=>(el?.textContent||'').replace(/\s+/g,' ').trim();
+ const nodes=()=>[...document.querySelectorAll('button,a,[role="button"],[onclick],.home-card,.menu-card,.dashboard-card')];
+ const homeAccess=nodes().find(el=>!el.closest('#ffhSoaRoot')&&!el.closest('#ffhSoaManagerAccess')&&!el.dataset.ffhSoaHome&&!el.dataset.ffhSoaOriginal&&/^access requests$/i.test(textOf(el))&&el.getClientRects().length);
+ if(homeAccess&&!document.getElementById('ffhSoaLaunch')){
+  const soa=homeAccess.cloneNode(true);
+  soa.id='ffhSoaLaunch';soa.dataset.ffhSoaHome='true';
+  soa.removeAttribute('onclick');soa.removeAttribute('href');
+  soa.querySelectorAll('[onclick],[href]').forEach(el=>{el.removeAttribute('onclick');el.removeAttribute('href');});
+  const leaf=[...soa.querySelectorAll('*')].find(el=>!el.children.length&&/access requests/i.test(textOf(el)));
+  if(leaf)leaf.textContent='SOA';else soa.textContent='SOA';
+  const icon=soa.querySelector('svg,i,.icon');
+  if(icon)icon.outerHTML='<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px">▤</span>';
+  else if(leaf)leaf.insertAdjacentHTML('beforebegin','<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px">▤</span>');
+  else soa.insertAdjacentHTML('afterbegin','<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px">▤</span>');
+  soa.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();open();},true);
+  homeAccess.replaceWith(soa);
+  homeAccess.dataset.ffhSoaOriginal='true';
+  pendingAccessTile=homeAccess;
  }
- // Remove any stale home Access Requests tile left by an earlier render.\n if(byId('ffhSoaLaunch')){for(const node of document.querySelectorAll('[data-ffh-soa-original]'))node.remove();}\n if(access&&byId('ffhSoaLaunch')&&access!==byId('ffhSoaLaunch')){accessAction=()=>access.click();access.remove();}
- const staffRow=findTile(/staff,?\s*zones,?\s*access\s*&\s*trash/i);
- if(staffRow&&accessAction&&!byId('ffhSoaManagerAccess')){
-  const button=staffRow.cloneNode(true);
-  button.id='ffhSoaManagerAccess';button.removeAttribute('onclick');button.removeAttribute('href');
-  button.querySelectorAll('[onclick],a').forEach(n=>{n.removeAttribute('onclick');n.removeAttribute('href');});
-  const leaf=[...button.querySelectorAll('*')].filter(n=>n.children.length===0&&/staff,?\s*zones,?\s*access\s*&\s*trash/i.test(visibleText(n))).pop();
-  if(leaf)leaf.textContent='Staff Access / Access Requests';else button.textContent='🔐 Staff Access / Access Requests';
-  button.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();accessAction();},true);
-  staffRow.insertAdjacentElement('afterend',button);
+ const staffRow=nodes().find(el=>!el.closest('#ffhSoaRoot')&&/staff,?\s*zones,?\s*access\s*&\s*trash/i.test(textOf(el))&&el.getClientRects().length);
+ if(staffRow){
+  // The real Access Requests element retains its original click handler; no fake proxy button.
+  for(const el of document.querySelectorAll('#ffhSoaManagerAccess'))if(el!==pendingAccessTile)el.remove();
+  if(pendingAccessTile&&!document.getElementById('ffhSoaManagerAccess')){
+   const tile=pendingAccessTile;
+   tile.id='ffhSoaManagerAccess';tile.className=staffRow.className;
+   tile.style.cssText=staffRow.style.cssText;
+   const label=[...tile.querySelectorAll('*')].find(el=>!el.children.length&&/access requests/i.test(textOf(el)));
+   if(label)label.textContent='Staff Access / Access Requests';
+   staffRow.insertAdjacentElement('afterend',tile);
+   pendingAccessTile=null;
+  }
+ }
+ // Remove duplicated, obsolete access tiles from earlier dynamic injections.
+ if(document.getElementById('ffhSoaLaunch')){
+  for(const el of nodes())if(el.id!=='ffhSoaManagerAccess'&&el.id!=='ffhSoaLaunch'&&!el.closest('#ffhSoaManagerAccess')&&/^access requests$/i.test(textOf(el))&&el.getClientRects().length)el.remove();
  }
 }
 const style=document.createElement('style');style.textContent='#ffhSoaRoot{position:fixed;inset:0;z-index:999999;background:#080b0e;color:#fff;overflow:auto;padding:14px;box-sizing:border-box}#ffhSoaRoot .soaPanel{max-width:1100px;margin:auto}#ffhSoaRoot header{display:flex;justify-content:space-between;align-items:center;color:#ff6900}#ffhSoaRoot button{background:#f60;color:#fff;border:0;border-radius:8px;padding:10px;cursor:pointer}#ffhSoaRoot input,#ffhSoaRoot select{display:block;width:100%;box-sizing:border-box;padding:9px;background:#14181c;color:white;border:1px solid #777;border-radius:6px}#ffhSoaRoot label{display:block}#ffhSoaRoot details{border:1px solid #555;border-radius:9px;padding:12px;margin:12px 0}#ffhSoaRoot summary{color:#ff6900;font-weight:bold;cursor:pointer}#ffhSoaRoot .soaGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:12px}#ffhSoaRoot .soaControls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:15px}#ffhSoaRoot .soaActions,#ffhSoaRoot .soaPageControls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}#ffhSoaRoot .soaPageControls input{max-width:260px}#ffhSoaRoot button:disabled{opacity:.4;cursor:not-allowed}#ffhSoaRoot .soaNotice{font-size:12px;color:#ffb889}#soaPrint{background:white;color:black;padding:18px;margin:18px auto;overflow:auto}#soaPrint .soaTitle{text-align:center;margin-bottom:30px}#soaPrint .soaMeta{border:1px dashed #555;padding:9px}#soaPrint table{border-collapse:collapse;width:100%;font-size:10px}#soaPrint td,#soaPrint th{border:1px dashed #666;padding:5px}#soaPrint td:nth-child(n+3){text-align:right}';document.head.appendChild(style);
