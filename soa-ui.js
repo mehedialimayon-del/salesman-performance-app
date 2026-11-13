@@ -2,7 +2,7 @@
 'use strict';
 const CORE=window.FFH_SOA_CORE;if(!CORE)return;
 let db={outlets:[],entries:[]},current='',visible=false;
-const sb=()=>window.FFH_SUPABASE?.from?window.FFH_SUPABASE:window.supabaseClient?.from?window.supabaseClient:null;
+const sb=()=>window.FFH_SUPABASE?.from?window.FFH_SUPABASE:null;
 const requireCloud=()=>{if(!sb()?.from)throw Error('Secure cloud connection unavailable. No changes saved.');return sb();};
 const loadCloud=async()=>{const client=requireCloud();const [a,b]=await Promise.all([client.from('ffh_soa_distributors').select('*').order('customer_name'),client.from('ffh_soa_transactions').select('*').order('transaction_date').order('created_at')]);if(a.error)throw Error('Distributor access denied: '+a.error.message);if(b.error)throw Error('SOA transaction access denied: '+b.error.message);db={outlets:(a.data||[]).map(o=>({id:o.distributor_id,name:o.customer_name,address:o.address,zone:o.zone,phone:o.phone,mobile:o.mobile,limit:o.credit_limit,opening:o.opening_balance})),entries:(b.data||[]).map(t=>({id:t.id,outletId:t.distributor_id,date:t.transaction_date,description:t.document_no,reference:t.description,debit:['invoice','debit','debit_note','dn'].includes(String(t.transaction_type).toLowerCase())?t.amount:0,credit:['payment','credit','credit_note','cn','return','sales_return'].includes(String(t.transaction_type).toLowerCase())?t.amount:0}))};};
 
@@ -36,13 +36,13 @@ function parseCsv(text){let rows=[],row=[],v='',quoted=false;for(let i=0;i<text.
 function buildPrintPages(){
  const o=db.outlets.find(x=>x.id===current)||{},statement=ledger();
  const chunks=[];for(let i=0;i<statement.rows.length;i+=31)chunks.push(statement.rows.slice(i,i+31));if(!chunks.length)chunks.push([]);
- const total=chunks.length+1;
+ const total=chunks.length;
  const dateDisplay=d=>{const [y,m,day]=String(d).split('-');return day+'/'+m+'/'+y;};
  const meta='<div class="soaMeta"><div>Distributor ID　:　'+esc(o.id)+'　　 Credit Limit　 '+esc(o.limit||'0.00')+'</div><div>Name　:　'+esc(o.name)+'</div><div>Address　:　'+esc(o.address)+'</div><div>Sales Zone　:　'+esc(o.zone)+'</div><div>Phone　:　'+esc(o.phone)+'</div><div>Mobile　:　'+esc(o.mobile)+'</div></div>';
  const header='<div class="soaTitle"><b>PINNACLE FOODS (M) SDN BHD</b><div>Statement of Account</div><p>From Date　'+dateDisplay(byId('soaFrom').value)+'　　 To　'+dateDisplay(byId('soaTo').value)+'</p></div>'+meta;
  const page=(body,n)=>'<article class="soaPage">'+header+'<table><thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead><tbody>'+body+'</tbody></table><footer>Printed by : FieldForce Hub <span>Page '+n+' of '+total+'</span></footer></article>';
  const pages=chunks.map((part,i)=>page(part.map(r=>'<tr><td>'+esc(dateDisplay(CORE.dateKey(r.date)))+'</td><td>'+esc(r.description+' '+r.reference)+'</td><td>'+r.debit+'</td><td>'+r.credit+'</td><td>'+r.balance+'</td></tr>').join(''),i+1));
- pages.push(page('<tr><td colspan="4" style="text-align:right">Closing Balance</td><td>'+statement.closingBalance+'</td></tr>',total).replace('</table>','</table><div class="soaNotes">Note:<p>1. All cheques should be crossed and made payable to PINNACLE FOODS (M) SDN BHD</p><p>2. Any discrepancy should be notified within 7 days otherwise all details will be deemed correct.</p><p>3. We reserve the right to charge an interest rate of 1.5% p.m. on overdue accounts.</p></div>'));
+ pages[pages.length-1]=pages[pages.length-1].replace('</table>','<tbody><tr><td colspan="4" style="text-align:right">Closing Balance</td><td>'+statement.closingBalance+'</td></tr></tbody></table><div class="soaNotes">Statement generated from FieldForce Hub.</div>');
  return pages.join('');
 }
 function refresh(){
