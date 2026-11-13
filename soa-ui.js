@@ -168,21 +168,27 @@ window.addEventListener('popstate',()=>{
  showSoaExitPrompt();
 });
 function install(){
+ // Home tiles may be rendered outside #app and use nonstandard classes.
  const candidates=new Set(document.querySelectorAll('[data-page="access"],[data-page="soa"],#ffhSoaLaunch'));
- // Match actual rendered Home tile text, regardless of the CSS class used by app.js.
- for(const leaf of document.querySelectorAll('#app span,#app div,#app strong,#app p,#app small,#app button')){
+ for(const leaf of document.querySelectorAll('body *')){
   if(leaf.children.length||!/^(Access Requests|SOA)$/i.test((leaf.textContent||'').trim()))continue;
-  const tile=leaf.closest('[data-page],button,[role="button"],.moduleCard,.module-card,.moduleTile,.module-tile,.card');
-  if(tile)candidates.add(tile);
+  if(leaf.closest('#ffhSoaRoot,#ffhSoaManagerAccess'))continue;
+  let tile=leaf;
+  for(let n=0;n<5&&tile.parentElement;n++){
+   if(tile.matches('[data-page],button,[role="button"],[onclick]'))break;
+   tile=tile.parentElement;
+   if(tile.matches('[data-page],button,[role="button"],[onclick]'))break;
+  }
+  if(tile===document.body||tile===document.documentElement)continue;
+  candidates.add(tile);
  }
  for(const tile of candidates){
-  if(tile.closest('#ffhSoaRoot,#ffhSoaManagerAccess')||tile.closest('[data-page="manager"],[data-page="manager-control"]'))continue;
+  if(tile.closest('#ffhSoaRoot,#ffhSoaManagerAccess'))continue;
   const leaf=[...tile.querySelectorAll('*')].find(el=>!el.children.length&&/^(Access Requests|SOA)$/i.test((el.textContent||'').trim()));
   if(!leaf&&tile.dataset.page!=='access'&&tile.dataset.page!=='soa')continue;
-  if(leaf)leaf.textContent='SOA';
-  tile.dataset.page='soa';
-  tile.id='ffhSoaLaunch';
-  const icon=tile.querySelector('.mi');if(icon){icon.textContent='▤';icon.style.color='#ff6900';}
+  if(leaf&&leaf.textContent!=='SOA')leaf.textContent='SOA';
+  if(tile.dataset.page!=='soa')tile.dataset.page='soa';
+  if(tile.id!=='ffhSoaLaunch')tile.id='ffhSoaLaunch';
   if(!tile.dataset.ffhSoaBound){
    tile.dataset.ffhSoaBound='1';
    tile.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();open();},true);
