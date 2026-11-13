@@ -73,30 +73,34 @@ function close(fromHistory=false){if(!visible)return;visible=false;remember();by
 window.addEventListener('popstate',()=>{if(visible&&!history.state?.ffhSoaOverlay)close(true);});
 let accessAction=null;
 function install(){
- const candidates=[...document.querySelectorAll('button,a,[role="button"]')];
- const access=candidates.find(x=>!x.closest('#ffhSoaRoot')&&/^(?:access requests|staff access|access management)$/i.test((x.textContent||'').trim())&&!x.dataset.ffhSoaHome&&!x.dataset.ffhSoaOriginal);
- if(access&&access.id!=='ffhSoaManagerAccess'){
-  accessAction=accessAction||(()=>access.click());
+ const visibleText=el=>(el?.textContent||'').replace(/\\s+/g,' ').trim();
+ const findTile=(pattern)=>[...document.querySelectorAll('button,a,[role="button"],[onclick],.home-card,.menu-card,.dashboard-card')].find(el=>!el.closest('#ffhSoaRoot')&&!el.dataset.ffhSoaOriginal&&!el.dataset.ffhSoaHome&&pattern.test(visibleText(el))&&el.getClientRects().length>0);
+ const access=findTile(/access\\s*requests/i);
+ if(access&&!byId('ffhSoaLaunch')){
   const replacement=access.cloneNode(true);
   replacement.id='ffhSoaLaunch';replacement.dataset.ffhSoaHome='true';
   replacement.removeAttribute('onclick');replacement.removeAttribute('href');
-  replacement.innerHTML='<span aria-hidden="true" style="display:block;font-size:25px;line-height:1.25;color:#ff6900">▤</span><span>SOA</span>';
-  replacement.setAttribute('aria-label','Statement of Account');
+  replacement.querySelectorAll('[onclick],a').forEach(n=>{n.removeAttribute('onclick');n.removeAttribute('href');});
+  const label=[...replacement.querySelectorAll('*')].filter(n=>n.children.length===0&&/access\\s*requests/i.test(visibleText(n))).pop();
+  if(label)label.textContent='SOA';else replacement.textContent='SOA';
+  const icon=label?.parentElement?.querySelector('svg,i,.icon')||replacement.querySelector('svg,i,.icon');
+  if(icon){icon.outerHTML='<span aria-hidden="true" style="color:#ff6900;font-size:27px;line-height:1">▤</span>';}
+  else if(label)label.insertAdjacentHTML('beforebegin','<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px">▤</span>');
   replacement.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();open();},true);
   access.replaceWith(replacement);
-  access.dataset.ffhSoaOriginal='true';access.hidden=true;access.style.display='none';replacement.insertAdjacentElement('afterend',access);
+  access.dataset.ffhSoaOriginal='true';access.style.display='none';replacement.insertAdjacentElement('afterend',access);
   accessAction=()=>access.click();
  }
- // The manager panel is identified by its own heading, never by the home tile.
- const managerHeading=[...document.querySelectorAll('h1,h2,h3,header strong,.page-title')].find(x=>/manager control/i.test((x.textContent||'').trim())&&!x.closest('#ffhSoaRoot'));
- if(managerHeading&&accessAction&&!byId('ffhSoaManagerAccess')){
-  const panel=managerHeading.closest('main,section,.page,.screen,.panel')||managerHeading.parentElement;
-  if(panel&&panel.querySelectorAll('button,a,[role="button"]').length>1){
-   const button=document.createElement('button');button.id='ffhSoaManagerAccess';button.type='button';button.className=panel.querySelector('button')?.className||'';
-   button.textContent='🔐 Staff Access / Access Management';
-   button.addEventListener('click',()=>accessAction());
-   panel.appendChild(button);
-  }
+ if(!accessAction){const hidden=document.querySelector('[data-ffh-soa-original]');if(hidden)accessAction=()=>hidden.click();}
+ const staffRow=findTile(/staff,?\\s*zones,?\\s*access\\s*&\\s*trash/i);
+ if(staffRow&&accessAction&&!byId('ffhSoaManagerAccess')){
+  const button=staffRow.cloneNode(true);
+  button.id='ffhSoaManagerAccess';button.removeAttribute('onclick');button.removeAttribute('href');
+  button.querySelectorAll('[onclick],a').forEach(n=>{n.removeAttribute('onclick');n.removeAttribute('href');});
+  const leaf=[...button.querySelectorAll('*')].filter(n=>n.children.length===0&&/staff,?\\s*zones,?\\s*access\\s*&\\s*trash/i.test(visibleText(n))).pop();
+  if(leaf)leaf.textContent='Staff Access / Access Requests';else button.textContent='🔐 Staff Access / Access Requests';
+  button.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();accessAction();},true);
+  staffRow.insertAdjacentElement('afterend',button);
  }
 }
 const style=document.createElement('style');style.textContent='#ffhSoaRoot{position:fixed;inset:0;z-index:999999;background:#080b0e;color:#fff;overflow:auto;padding:14px;box-sizing:border-box}#ffhSoaRoot .soaPanel{max-width:1100px;margin:auto}#ffhSoaRoot header{display:flex;justify-content:space-between;align-items:center;color:#ff6900}#ffhSoaRoot button{background:#f60;color:#fff;border:0;border-radius:8px;padding:10px;cursor:pointer}#ffhSoaRoot input,#ffhSoaRoot select{display:block;width:100%;box-sizing:border-box;padding:9px;background:#14181c;color:white;border:1px solid #777;border-radius:6px}#ffhSoaRoot label{display:block}#ffhSoaRoot details{border:1px solid #555;border-radius:9px;padding:12px;margin:12px 0}#ffhSoaRoot summary{color:#ff6900;font-weight:bold;cursor:pointer}#ffhSoaRoot .soaGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:12px}#ffhSoaRoot .soaControls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:15px}#ffhSoaRoot .soaActions,#ffhSoaRoot .soaPageControls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}#ffhSoaRoot .soaPageControls input{max-width:260px}#ffhSoaRoot button:disabled{opacity:.4;cursor:not-allowed}#ffhSoaRoot .soaNotice{font-size:12px;color:#ffb889}#soaPrint{background:white;color:black;padding:18px;margin:18px auto;overflow:auto}#soaPrint .soaTitle{text-align:center;margin-bottom:30px}#soaPrint .soaMeta{border:1px dashed #555;padding:9px}#soaPrint table{border-collapse:collapse;width:100%;font-size:10px}#soaPrint td,#soaPrint th{border:1px dashed #666;padding:5px}#soaPrint td:nth-child(n+3){text-align:right}';document.head.appendChild(style);
