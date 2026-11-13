@@ -71,45 +71,25 @@ let opening=false,soaHistory=false;
 async function open(){if(visible||opening)return;opening=true;try{await loadPermissions();await loadCloud();visible=true;remember();const root=document.createElement('div');root.id='ffhSoaRoot';document.body.appendChild(root);history.pushState({...history.state,ffhSoaOverlay:true},'',location.href);soaHistory=true;render();}catch(e){alert(e.message);}finally{opening=false;}}
 function close(fromHistory=false){if(!visible)return;visible=false;remember();byId('ffhSoaRoot')?.remove();if(!fromHistory&&soaHistory&&history.state?.ffhSoaOverlay){soaHistory=false;history.back();}else soaHistory=false;}
 window.addEventListener('popstate',()=>{if(visible&&!history.state?.ffhSoaOverlay)close(true);});
-let pendingAccessTile=null;
 function install(){
+ // Use the existing home tile, not a clone. This survives dashboard re-renders.
+ const candidates=[...document.querySelectorAll('button,a,[role="button"],[onclick],.home-card,.menu-card,.dashboard-card')];
  const textOf=el=>(el?.textContent||'').replace(/\s+/g,' ').trim();
- const nodes=()=>[...document.querySelectorAll('button,a,[role="button"],[onclick],.home-card,.menu-card,.dashboard-card')];
- const homeAccess=nodes().find(el=>!el.closest('#ffhSoaRoot')&&!el.closest('#ffhSoaManagerAccess')&&!el.dataset.ffhSoaHome&&!el.dataset.ffhSoaOriginal&&/^access requests$/i.test(textOf(el))&&el.getClientRects().length);
- if(homeAccess&&!document.getElementById('ffhSoaLaunch')){
-  const soa=homeAccess.cloneNode(true);
-  soa.id='ffhSoaLaunch';soa.dataset.ffhSoaHome='true';
-  soa.removeAttribute('onclick');soa.removeAttribute('href');
-  soa.querySelectorAll('[onclick],[href]').forEach(el=>{el.removeAttribute('onclick');el.removeAttribute('href');});
-  const leaf=[...soa.querySelectorAll('*')].find(el=>!el.children.length&&/access requests/i.test(textOf(el)));
-  if(leaf)leaf.textContent='SOA';else soa.textContent='SOA';
-  const icon=soa.querySelector('svg,i,.icon');
-  if(icon)icon.outerHTML='<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px">▤</span>';
-  else if(leaf)leaf.insertAdjacentHTML('beforebegin','<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px">▤</span>');
-  else soa.insertAdjacentHTML('afterbegin','<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px">▤</span>');
-  soa.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();open();},true);
-  homeAccess.replaceWith(soa);
-  homeAccess.dataset.ffhSoaOriginal='true';
-  pendingAccessTile=homeAccess;
+ const home=candidates.find(el=>!el.closest('#ffhSoaRoot')&&!el.closest('#ffhSoaManagerAccess')&&!el.dataset.ffhSoaHome&&/^access requests$/i.test(textOf(el))&&el.getClientRects().length);
+ if(home){
+  home.dataset.ffhSoaHome='true';home.id='ffhSoaLaunch';
+  const leaves=[...home.querySelectorAll('*')].filter(el=>!el.children.length&&/access requests/i.test(textOf(el)));
+  const label=leaves[leaves.length-1];
+  if(label)label.textContent='SOA';else home.textContent='SOA';
+  const icon=home.querySelector('svg,i,.icon,[class*="icon"]');
+  if(icon){icon.textContent='▤';icon.style.color='#ff6900';icon.style.fontSize='26px';}
+  else if(label)label.insertAdjacentHTML('beforebegin','<span aria-hidden="true" style="display:block;font-size:26px;color:#ff6900">▤</span>');
+  else home.insertAdjacentHTML('afterbegin','<span aria-hidden="true" style="display:block;font-size:26px;color:#ff6900">▤</span>');
+  home.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();open();},true);
  }
- const staffRow=nodes().find(el=>!el.closest('#ffhSoaRoot')&&/staff,?\s*zones,?\s*access\s*&\s*trash/i.test(textOf(el))&&el.getClientRects().length);
- if(staffRow){
-  // The real Access Requests element retains its original click handler; no fake proxy button.
-  for(const el of document.querySelectorAll('#ffhSoaManagerAccess'))if(el!==pendingAccessTile)el.remove();
-  if(pendingAccessTile&&!document.getElementById('ffhSoaManagerAccess')){
-   const tile=pendingAccessTile;
-   tile.id='ffhSoaManagerAccess';tile.className=staffRow.className;
-   tile.style.cssText=staffRow.style.cssText;
-   const label=[...tile.querySelectorAll('*')].find(el=>!el.children.length&&/access requests/i.test(textOf(el)));
-   if(label)label.textContent='Staff Access / Access Requests';
-   staffRow.insertAdjacentElement('afterend',tile);
-   pendingAccessTile=null;
-  }
- }
- // Remove duplicated, obsolete access tiles from earlier dynamic injections.
- if(document.getElementById('ffhSoaLaunch')){
-  for(const el of nodes())if(el.id!=='ffhSoaManagerAccess'&&el.id!=='ffhSoaLaunch'&&!el.closest('#ffhSoaManagerAccess')&&/^access requests$/i.test(textOf(el))&&el.getClientRects().length)el.remove();
- }
+ // The original Staff, Zones, Access & Trash row already opens access management.
+ // Remove only the extra rows previously injected by the SOA script.
+ document.querySelectorAll('#ffhSoaManagerAccess').forEach(el=>el.remove());
 }
 const style=document.createElement('style');style.textContent='#ffhSoaRoot{position:fixed;inset:0;z-index:999999;background:#080b0e;color:#fff;overflow:auto;padding:14px;box-sizing:border-box}#ffhSoaRoot .soaPanel{max-width:1100px;margin:auto}#ffhSoaRoot header{display:flex;justify-content:space-between;align-items:center;color:#ff6900}#ffhSoaRoot button{background:#f60;color:#fff;border:0;border-radius:8px;padding:10px;cursor:pointer}#ffhSoaRoot input,#ffhSoaRoot select{display:block;width:100%;box-sizing:border-box;padding:9px;background:#14181c;color:white;border:1px solid #777;border-radius:6px}#ffhSoaRoot label{display:block}#ffhSoaRoot details{border:1px solid #555;border-radius:9px;padding:12px;margin:12px 0}#ffhSoaRoot summary{color:#ff6900;font-weight:bold;cursor:pointer}#ffhSoaRoot .soaGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:12px}#ffhSoaRoot .soaControls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:15px}#ffhSoaRoot .soaActions,#ffhSoaRoot .soaPageControls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}#ffhSoaRoot .soaPageControls input{max-width:260px}#ffhSoaRoot button:disabled{opacity:.4;cursor:not-allowed}#ffhSoaRoot .soaNotice{font-size:12px;color:#ffb889}#soaPrint{background:white;color:black;padding:18px;margin:18px auto;overflow:auto}#soaPrint .soaTitle{text-align:center;margin-bottom:30px}#soaPrint .soaMeta{border:1px dashed #555;padding:9px}#soaPrint table{border-collapse:collapse;width:100%;font-size:10px}#soaPrint td,#soaPrint th{border:1px dashed #666;padding:5px}#soaPrint td:nth-child(n+3){text-align:right}';style.textContent+='#ffhSoaRoot{padding:0 10px 16px!important;font-size:13px!important}#ffhSoaRoot .soaPanel{max-width:1100px;margin:auto}#ffhSoaRoot header{position:sticky;top:0;z-index:5;background:#080b0e;padding:12px 4px 9px;border-bottom:1px solid #ff6900;min-height:36px}#ffhSoaRoot header strong{font-size:clamp(14px,3.4vw,20px);color:#fff}#ffhSoaRoot header strong span,#ffhSoaRoot summary span{color:#ff6900}#ffhSoaRoot .soaFilters{position:sticky;top:57px;z-index:4;background:#080b0e;padding:8px 2px;border-bottom:1px solid #44352d;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr);gap:6px;margin:0}#ffhSoaRoot .soaFilters label{font-size:10px;min-width:0;color:#ff6900}#ffhSoaRoot .soaFilters select,#ffhSoaRoot .soaFilters input{height:35px;min-width:0;font-size:12px;padding:4px 5px;margin-top:3px}#ffhSoaRoot details{padding:9px;margin:8px 0}#ffhSoaRoot summary{font-size:13px;color:#fff;font-weight:700}#ffhSoaRoot .soaGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#ffhSoaRoot .soaGrid label{font-size:11px;min-width:0}#ffhSoaRoot .soaGrid input{padding:7px;font-size:12px}#ffhSoaRoot .soaControls:not(.soaFilters){margin-top:7px;grid-template-columns:1fr}#ffhSoaRoot .soaControls:not(.soaFilters) label{font-size:11px}#ffhSoaRoot .soaActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}#ffhSoaRoot .soaActions button{font-size:10px;padding:8px 3px;min-height:43px}#ffhSoaRoot .soaPageControls{gap:5px}#ffhSoaRoot .soaPageControls input{max-width:135px}@media(max-width:420px){#ffhSoaRoot .soaFilters{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr)}#ffhSoaRoot .soaFilters label{font-size:9px}#ffhSoaRoot .soaFilters select,#ffhSoaRoot .soaFilters input{font-size:11px}}';document.head.appendChild(style);
 let scheduled=false;const observer=new MutationObserver(()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;install();});});observer.observe(document.body,{childList:true,subtree:true});install();try{if(JSON.parse(sessionStorage.getItem('ffh-soa-view')||'{}').open)setTimeout(open,100);}catch(e){}window.FFH_SOA_OPEN=open;
