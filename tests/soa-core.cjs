@@ -20,3 +20,6 @@ assert.throws(()=>core.cents('1.234'),/Invalid RM amount/);
 assert.throws(()=>core.cents('Infinity'),/Invalid RM amount/);
 assert.throws(()=>core.dateKey('31/04/2026'),/Invalid calendar date/);
 assert.ok(core.csv([{date:'2026-01-01',description:'PO "A", New',reference:'X',debit:'1.00',credit:'0.00',balance:'1.00'}]).includes('"PO ""A"", New"'));
+
+assert.ok(core.csv([{date:'2026-01-01',description:'=HYPERLINK("https://example.invalid")',reference:'',debit:'0.00',credit:'0.00',balance:'0.00'}]).includes('"\'=HYPERLINK('));
+assert.ok(core.csv([{date:'2026-01-01',description:'@SUM(1,1)',reference:'',debit:'0.00',credit:'0.00',balance:'0.00'}]).includes('"\'@SUM('));
