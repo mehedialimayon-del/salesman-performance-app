@@ -71,7 +71,33 @@ let opening=false,soaHistory=false;
 async function open(){if(visible||opening)return;opening=true;try{await loadPermissions();await loadCloud();visible=true;remember();const root=document.createElement('div');root.id='ffhSoaRoot';document.body.appendChild(root);history.pushState({...history.state,ffhSoaOverlay:true},'',location.href);soaHistory=true;render();}catch(e){alert(e.message);}finally{opening=false;}}
 function close(fromHistory=false){if(!visible)return;visible=false;remember();byId('ffhSoaRoot')?.remove();if(!fromHistory&&soaHistory&&history.state?.ffhSoaOverlay){soaHistory=false;history.back();}else soaHistory=false;}
 window.addEventListener('popstate',()=>{if(visible&&!history.state?.ffhSoaOverlay)close(true);});
-function install(){if(byId('ffhSoaLaunch'))return;const candidates=[...document.querySelectorAll('button,a,[role="button"]')];const meeting=candidates.find(x=>/meeting\s*(?:\/|&|and)\s*notice/i.test((x.textContent||'').trim()));if(!meeting)return;const b=document.createElement('button');b.id='ffhSoaLaunch';b.type='button';b.textContent='SOA';b.className=meeting.className;b.onclick=e=>{e.preventDefault();e.stopPropagation();open();};meeting.insertAdjacentElement('afterend',b);}
+let accessAction=null;
+function install(){
+ const candidates=[...document.querySelectorAll('button,a,[role="button"]')];
+ const access=candidates.find(x=>!x.closest('#ffhSoaRoot')&&/^(?:access requests|staff access|access management)$/i.test((x.textContent||'').trim())&&!x.dataset.ffhSoaHome);
+ if(access&&access.id!=='ffhSoaManagerAccess'){
+  accessAction=accessAction||(()=>access.click());
+  const replacement=access.cloneNode(true);
+  replacement.id='ffhSoaLaunch';replacement.dataset.ffhSoaHome='true';
+  replacement.removeAttribute('onclick');replacement.removeAttribute('href');
+  replacement.innerHTML='<span aria-hidden="true" style="display:block;font-size:25px;line-height:1.25;color:#ff6900">▤</span><span>SOA</span>';
+  replacement.setAttribute('aria-label','Statement of Account');
+  replacement.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();open();},true);
+  access.replaceWith(replacement);
+  accessAction=()=>access.click();
+ }
+ // The manager panel is identified by its own heading, never by the home tile.
+ const managerHeading=[...document.querySelectorAll('h1,h2,h3,header strong,.page-title')].find(x=>/manager control/i.test((x.textContent||'').trim())&&!x.closest('#ffhSoaRoot'));
+ if(managerHeading&&accessAction&&!byId('ffhSoaManagerAccess')){
+  const panel=managerHeading.closest('main,section,.page,.screen,.panel')||managerHeading.parentElement;
+  if(panel&&panel.querySelectorAll('button,a,[role="button"]').length>1){
+   const button=document.createElement('button');button.id='ffhSoaManagerAccess';button.type='button';button.className=panel.querySelector('button')?.className||'';
+   button.textContent='🔐 Staff Access / Access Management';
+   button.addEventListener('click',()=>accessAction());
+   panel.appendChild(button);
+  }
+ }
+}
 const style=document.createElement('style');style.textContent='#ffhSoaRoot{position:fixed;inset:0;z-index:999999;background:#080b0e;color:#fff;overflow:auto;padding:14px;box-sizing:border-box}#ffhSoaRoot .soaPanel{max-width:1100px;margin:auto}#ffhSoaRoot header{display:flex;justify-content:space-between;align-items:center;color:#ff6900}#ffhSoaRoot button{background:#f60;color:#fff;border:0;border-radius:8px;padding:10px;cursor:pointer}#ffhSoaRoot input,#ffhSoaRoot select{display:block;width:100%;box-sizing:border-box;padding:9px;background:#14181c;color:white;border:1px solid #777;border-radius:6px}#ffhSoaRoot label{display:block}#ffhSoaRoot details{border:1px solid #555;border-radius:9px;padding:12px;margin:12px 0}#ffhSoaRoot summary{color:#ff6900;font-weight:bold;cursor:pointer}#ffhSoaRoot .soaGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:12px}#ffhSoaRoot .soaControls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:15px}#ffhSoaRoot .soaActions,#ffhSoaRoot .soaPageControls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}#ffhSoaRoot .soaPageControls input{max-width:260px}#ffhSoaRoot button:disabled{opacity:.4;cursor:not-allowed}#ffhSoaRoot .soaNotice{font-size:12px;color:#ffb889}#soaPrint{background:white;color:black;padding:18px;margin:18px auto;overflow:auto}#soaPrint .soaTitle{text-align:center;margin-bottom:30px}#soaPrint .soaMeta{border:1px dashed #555;padding:9px}#soaPrint table{border-collapse:collapse;width:100%;font-size:10px}#soaPrint td,#soaPrint th{border:1px dashed #666;padding:5px}#soaPrint td:nth-child(n+3){text-align:right}';document.head.appendChild(style);
 let scheduled=false;const observer=new MutationObserver(()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;install();});});observer.observe(document.body,{childList:true,subtree:true});install();try{if(JSON.parse(sessionStorage.getItem('ffh-soa-view')||'{}').open)setTimeout(open,100);}catch(e){}window.FFH_SOA_OPEN=open;
 })();
