@@ -74,7 +74,7 @@ window.addEventListener('popstate',()=>{if(visible&&!history.state?.ffhSoaOverla
 let accessAction=null;
 function install(){
  const candidates=[...document.querySelectorAll('button,a,[role="button"]')];
- const access=candidates.find(x=>!x.closest('#ffhSoaRoot')&&/^(?:access requests|staff access|access management)$/i.test((x.textContent||'').trim())&&!x.dataset.ffhSoaHome);
+ const access=candidates.find(x=>!x.closest('#ffhSoaRoot')&&/^(?:access requests|staff access|access management)$/i.test((x.textContent||'').trim())&&!x.dataset.ffhSoaHome&&!x.dataset.ffhSoaOriginal);
  if(access&&access.id!=='ffhSoaManagerAccess'){
   accessAction=accessAction||(()=>access.click());
   const replacement=access.cloneNode(true);
@@ -84,6 +84,7 @@ function install(){
   replacement.setAttribute('aria-label','Statement of Account');
   replacement.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();open();},true);
   access.replaceWith(replacement);
+  access.dataset.ffhSoaOriginal='true';access.hidden=true;access.style.display='none';replacement.insertAdjacentElement('afterend',access);
   accessAction=()=>access.click();
  }
  // The manager panel is identified by its own heading, never by the home tile.
