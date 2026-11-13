@@ -4,7 +4,7 @@
 'use strict';
 const cents=v=>{if(v===null||v===undefined||v==='')return 0;const s=String(v).trim().replace(/,/g,'');if(!/^-?\d+(\.\d{1,2})?$/.test(s))throw Error('Invalid RM amount: '+v);const neg=s.startsWith('-');const [whole,fraction='']=s.replace('-','').split('.');const amount=Number(whole)*100+Number((fraction+'00').slice(0,2));if(!Number.isSafeInteger(amount))throw Error('Amount exceeds safe range');return neg?-amount:amount;};
 const rm=v=>(v/100).toFixed(2);
-const dateKey=s=>{const v=String(s||'');if(/^\d{4}-\d{2}-\d{2}$/.test(v))return v;const m=v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);if(m)return m[3]+'-'+m[2]+'-'+m[1];throw Error('Invalid date: '+v);};
+const dateKey=s=>{const v=String(s||'').trim();let iso=v;if(/^\d{2}\/\d{2}\/\d{4}$/.test(v)){const [d,m,y]=v.split('/');iso=y+'-'+m+'-'+d;}if(!/^\d{4}-\d{2}-\d{2}$/.test(iso))throw Error('Invalid date: '+v);const [y,m,d]=iso.split('-').map(Number);const days=new Date(Date.UTC(y,m,0)).getUTCDate();if(y<1900||y>9999||m<1||m>12||d<1||d>days)throw Error('Invalid calendar date: '+v);return iso;};
 function statement(entries,{from,to,opening='0.00'}={}){
  const start=from?dateKey(from):'0000-01-01',end=to?dateKey(to):'9999-12-31';
  if(start>end)throw Error('From Date must not exceed To Date');
