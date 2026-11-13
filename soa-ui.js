@@ -37,7 +37,7 @@ function render(){
 function parseCsv(text){let rows=[],row=[],v='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(quoted&&text[i+1]==='"'){v+='"';i++;}else quoted=!quoted;}else if(c===','&&!quoted){row.push(v);v='';}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&text[i+1]==='\n')i++;row.push(v);if(row.some(Boolean))rows.push(row);row=[];v='';}else v+=c;}row.push(v);if(row.some(Boolean))rows.push(row);return rows;}
 function buildPrintPages(){
  const o=db.outlets.find(x=>x.id===current)||{},statement=ledger();
- const chunks=[];for(let i=0;i<statement.rows.length;i+=31)chunks.push(statement.rows.slice(i,i+31));if(!chunks.length)chunks.push([]);
+ const chunks=[];let pageRows=[],units=0;for(const row of statement.rows){const description=String(row.description||'')+' '+String(row.reference||'');const weight=Math.max(1,Math.ceil(description.length/75));if(pageRows.length&&units+weight>31){chunks.push(pageRows);pageRows=[];units=0;}pageRows.push(row);units+=weight;}if(pageRows.length||!chunks.length)chunks.push(pageRows);
  const total=chunks.length;
  const dateDisplay=d=>{const [y,m,day]=String(d).split('-');return day+'/'+m+'/'+y;};
  const meta='<div class="soaMeta"><div>Printed on : '+esc(new Date().toLocaleString('en-GB',{hour12:true}))+'</div><div>Distributor ID　:　'+esc(o.id)+'　　 Credit Limit　 '+esc(o.limit||'0.00')+'</div><div>Name　:　'+esc(o.name)+'</div><div>Address　:　'+esc(o.address)+'</div><div>Sales Zone　:　'+esc(o.zone)+'</div><div>Phone　:　'+esc(o.phone)+'</div><div>Mobile　:　'+esc(o.mobile)+'</div></div>';
@@ -60,7 +60,7 @@ function refresh(){
   if(!record)return alert('Transaction not found. Refresh statement.');
   const client=requireCloud();
   if(b.dataset.delete!==undefined){return alert('Delete requires an approved SOA database permission. No record was changed.');}
-  else{const description=prompt('Description / Voucher',record.description||'');if(description===null)return;const reference=prompt('Reference / Details',record.reference||'');if(reference===null)return;const amount=prompt('Amount (RM)',record.debit&&Number(record.debit)>0?record.debit:record.credit);if(amount===null)return;let value;try{value=CORE.rm(CORE.cents(amount));}catch(e){return alert(e.message)}const {error}=await client.from('ffh_soa_transactions').update({document_no:description,description:reference,amount:value}).eq('id',record.id);if(error)return alert('Update denied: '+error.message);}
+  else{const description=prompt('Description / Voucher',record.description||'');if(description===null)return;const reference=prompt('Reference / Details',record.reference||'');if(reference===null)return;const amount=prompt('Amount (RM)',record.debit&&Number(record.debit)>0?record.debit:record.credit);if(amount===null)return;let value;try{value=CORE.rm(CORE.cents(amount));}catch(e){return alert(e.message)}if(CORE.cents(value)<=0)return alert('Amount must be positive');const {error}=await client.from('ffh_soa_transactions').update({document_no:description,description:reference,amount:value}).eq('id',record.id);if(error)return alert('Update denied: '+error.message);}
   await loadCloud();render();
  });
 }
