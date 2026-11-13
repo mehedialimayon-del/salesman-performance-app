@@ -52,11 +52,11 @@ function refresh(){
  if(!current){el.innerHTML='<p>Select or create a distributor to view the statement.</p>';return;}
  let s;try{s=ledger();}catch(e){el.textContent=e.message;return;}
  const o=db.outlets.find(x=>x.id===current)||{};
- const rows=s.rows.map(r=>'<tr><td>'+esc(r.date)+'</td><td>'+esc(r.description+' '+r.reference)+'</td><td>'+r.debit+'</td><td>'+r.credit+'</td><td>'+r.balance+'</td><td class="soaEditCell"><button type="button" data-edit="'+esc(r.sourceIndex)+'">EDIT</button><button type="button" data-delete="'+esc(r.sourceIndex)+'">DELETE</button></td></tr>').join('');
+ const rows=s.rows.map(r=>'<tr><td>'+esc(r.date)+'</td><td>'+esc(r.description+' '+r.reference)+'</td><td>'+r.debit+'</td><td>'+r.credit+'</td><td>'+r.balance+'</td><td class="soaEditCell"><button type="button" data-edit="'+esc(r.id)+'">EDIT</button><button type="button" data-delete="'+esc(r.id)+'">DELETE</button></td></tr>').join('');
  const report='<section id="soaPrint"><div class="soaTitle"><b>PINNACLE FOODS (M) SDN BHD</b><div>Statement of Account</div><p>From Date　'+esc(byId('soaFrom').value)+'　 To　'+esc(byId('soaTo').value)+'</p></div><div class="soaMeta"><div>Distributor ID　:　<b>'+esc(o.id)+'</b>　　　　 Credit Limit　 '+esc(o.limit)+'</div><div>Name　:　<b>'+esc(o.name)+'</b></div><div>Address　:　'+esc(o.address)+'</div><div>Sales Zone　:　'+esc(o.zone)+'</div><div>Phone　:　'+esc(o.phone)+'</div><div>Mobile　:　'+esc(o.mobile)+'</div></div><table><thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead><tbody>'+rows+'</tbody></table><p>Opening Balance: '+s.openingBalance+' · Closing Balance: '+s.closingBalance+'</p><footer>Printed by: FieldForce Hub</footer></section>';
  el.innerHTML='<p>'+s.rows.length+' transactions · Closing Balance RM '+s.closingBalance+'</p>'+report;
  el.querySelectorAll('[data-edit],[data-delete]').forEach(b=>b.onclick=async()=>{
-  const record=db.entries.filter(e=>e.outletId===current)[Number(b.dataset.edit??b.dataset.delete)];
+  const record=db.entries.find(e=>e.outletId===current&&e.id===(b.dataset.edit??b.dataset.delete));
   if(!record)return alert('Transaction not found. Refresh statement.');
   const client=requireCloud();
   if(b.dataset.delete!==undefined){return alert('Delete requires an approved SOA database permission. No record was changed.');}
