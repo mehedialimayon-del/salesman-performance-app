@@ -1,0 +1,56 @@
+/* SOA reference skin: screen only; print/PDF output remains untouched */
+@media screen {
+#ffhSoaRoot .soaPanel{background:#050505!important;color:#fff!important;border:0!important;display:flex;flex-direction:column;gap:9px;min-height:0}
+#ffhSoaRoot .soaPanel>header{background:linear-gradient(115deg,#1b1009,#111 70%,#5d2500)!important;border-bottom:3px solid #ff7900!important;border-radius:12px!important;padding:12px!important;color:#fff!important;box-shadow:0 2px 14px #ff79004a}
+#ffhSoaRoot .soaPanel>header strong{color:#fff!important;font-weight:900!important}
+#ffhSoaRoot .soaPanel>header span{color:#ff7900!important}
+#ffhSoaRoot .soaFilters{display:grid!important;grid-template-columns:1.5fr 1fr 1fr 45px!important;gap:7px!important;background:transparent!important;padding:0!important}
+#ffhSoaRoot .soaFilters label{min-width:0;font-size:11px!important;color:#fff!important;font-weight:700}
+#ffhSoaRoot .soaFilters input,#ffhSoaRoot .soaFilters select{width:100%!important;min-width:0!important;background:#111!important;color:#fff!important;border:1px solid #ff8200!important;border-radius:12px!important;min-height:43px!important;padding:8px!important;box-shadow:0 0 8px #ff79003b}
+#ffhSoaRoot #soaMore{background:linear-gradient(#ff9b1d,#bb3e00)!important;color:white!important;border:1px solid #ffb04a!important;border-radius:12px!important;margin-top:auto!important;min-height:43px!important}
+#ffhSoaRoot .soaProfile{display:grid!important;grid-template-columns:52px minmax(0,1fr) minmax(95px,30%)!important;align-items:center!important;gap:9px!important;background:linear-gradient(110deg,#2b1007,#0b0908 64%,#5c2300)!important;border:2px solid #ff7d00!important;border-radius:19px!important;padding:11px!important;box-shadow:0 0 16px #ff71007a!important;min-height:125px!important}
+#ffhSoaRoot .soaProfileIcon{background:linear-gradient(#ff9d20,#cf4100)!important;border:2px solid #ffbc58!important;border-radius:15px!important;width:49px!important;height:55px!important;display:grid!important;place-items:center!important;font-size:27px!important;color:white!important}
+#ffhSoaRoot .soaProfileMain{min-width:0!important;color:#fff!important;font-size:11px!important;line-height:1.4!important;overflow-wrap:anywhere}
+#ffhSoaRoot .soaProfileMain strong{display:block!important;font-size:13px!important;line-height:1.25!important;margin-bottom:4px!important;color:white!important}
+#ffhSoaRoot .soaProfileMain>div{margin-top:3px!important}
+#ffhSoaRoot .soaProfileExtra{border-left:1px solid #e77d1b!important;padding-left:8px!important;display:flex!important;flex-direction:column!important;gap:2px!important}
+#ffhSoaRoot .soaProfileExtra small{color:#ff9c2a!important;font-size:10px!important}
+#ffhSoaRoot .soaProfileExtra b{color:white!important;font-size:12px!important;margin-bottom:5px!important}
+#ffhSoaRoot .soaDashboard{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important}
+#ffhSoaRoot .soaMetric{min-width:0!important;border-radius:15px!important;padding:10px 3px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:5px!important;min-height:100px!important;color:white!important;background:linear-gradient(140deg,#250900,#100505)!important;border:2px solid #ff4b19!important;box-shadow:0 0 10px #ff4b1966!important;text-align:center!important}
+#ffhSoaRoot .soaMetric:nth-child(2){background:linear-gradient(140deg,#06223b,#050e1c)!important;border-color:#11c8ff!important;box-shadow:0 0 10px #11c8ff66!important}
+#ffhSoaRoot .soaMetric:nth-child(3){background:linear-gradient(140deg,#063b20,#05130c)!important;border-color:#1be77c!important;box-shadow:0 0 10px #1be77c66!important}
+#ffhSoaRoot .soaMetric:nth-child(4){background:linear-gradient(140deg,#38113a,#160718)!important;border-color:#e85cf5!important;box-shadow:0 0 10px #e85cf566!important}
+#ffhSoaRoot .soaMetric:nth-child(5){background:linear-gradient(140deg,#3d2704,#151006)!important;border-color:#ffbf31!important;box-shadow:0 0 10px #ffbf3166!important}
+#ffhSoaRoot .soaMetricIcon{font-size:23px!important;color:#fff!important}
+#ffhSoaRoot .soaMetric small{font-size:9px!important;font-weight:800!important;line-height:1.1!important;color:#fff!important}
+#ffhSoaRoot .soaMetric strong{font-size:clamp(10px,2.6vw,16px)!important;line-height:1.15!important;overflow-wrap:anywhere!important;color:#fff!important}
+#ffhSoaRoot .soaQuickActions{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+#ffhSoaRoot .soaQuickActions button{min-width:0!important;min-height:65px!important;padding:7px 3px!important;background:linear-gradient(#fff,#e7e7e7)!important;color:#090909!important;border:3px solid #ff8500!important;border-radius:16px!important;box-shadow:0 0 9px #ff8500a8!important;font-size:10px!important;font-weight:900!important;line-height:1.2!important}
+#ffhSoaRoot #soaResults{min-height:230px!important;flex:1 1 auto!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;background:linear-gradient(130deg,#211107,#090909 25%,#090909)!important;border:2px solid #ff8200!important;border-radius:17px!important;padding:9px!important;box-shadow:0 0 12px #ff850083!important}
+#ffhSoaRoot .soaTableHeading{display:flex!important;align-items:center!important;gap:6px!important;color:white!important;font-size:16px!important;font-weight:900!important;padding:4px 0!important}
+#ffhSoaRoot .soaTableHeading span{margin-left:auto!important;font-size:10px!important;color:#fff!important;background:linear-gradient(#ff9800,#bc3c00)!important;border-radius:16px!important;padding:6px!important;white-space:nowrap!important}
+#ffhSoaRoot .soaPageControls{display:flex!important;gap:5px!important;align-items:center!important;padding:4px 0!important}
+#ffhSoaRoot .soaPageControls label{flex:1!important;min-width:0!important;font-size:0!important}
+#ffhSoaRoot .soaPageControls input{font-size:12px!important;color:#fff!important;background:#151515!important;border:1px solid #ff8000!important;border-radius:9px!important;width:100%!important;padding:7px!important}
+#ffhSoaRoot .soaPageControls button{padding:6px!important;font-size:10px!important;background:#ff7900!important;color:#111!important}
+#ffhSoaRoot .soaPageControls span{font-size:9px!important;color:#fff!important}
+#ffhSoaRoot #soaPrint{flex:1!important;min-height:180px!important;overflow:auto!important;scrollbar-width:thin!important;scrollbar-color:#ff7900 #111!important}
+#ffhSoaRoot #soaPrint .soaTitle,#ffhSoaRoot #soaPrint .soaMeta,#ffhSoaRoot #soaPrint footer{display:none!important}
+#ffhSoaRoot #soaPrint table{width:100%!important;border-collapse:collapse!important;color:#fff!important;font-size:11px!important}
+#ffhSoaRoot #soaPrint th{position:sticky!important;top:0!important;background:linear-gradient(#ff9900,#e65300)!important;color:#fff!important;z-index:1!important}
+#ffhSoaRoot #soaPrint th,#ffhSoaRoot #soaPrint td{border:1px solid #5d4b3d!important;padding:10px 5px!important}
+#ffhSoaRoot .soaActions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+#ffhSoaRoot .soaActions button{background:linear-gradient(#3c220e,#090909)!important;border:2px solid #ff8500!important;border-radius:13px!important;color:white!important;box-shadow:0 0 11px #ff79007a!important;padding:12px 4px!important;font-size:10px!important;font-weight:800!important}
+.soaModalOverlay,.soaAppNotice{background:#000b!important}
+.soaModalShell,.soaAppNoticePanel{background:linear-gradient(145deg,#251207,#090909)!important;border:2px solid #ff8500!important;border-radius:18px!important;box-shadow:0 0 26px #ff790080!important;color:white!important}
+.soaModalHeader{background:linear-gradient(90deg,#ff8000,#582200)!important;color:white!important}
+.soaModalShell input,.soaModalShell select{background:#101010!important;color:white!important;border:1px solid #ff8500!important;border-radius:10px!important}
+#app .ffAppAnnouncements .ffTicker{background:linear-gradient(100deg,#211006,#080808 55%,#522408)!important;border:1px solid #ff8c17!important;border-radius:12px!important;box-shadow:0 0 9px #ff790063!important}
+#app .ffAppAnnouncements .ffTickerLabel{background:linear-gradient(#ff9e20,#d94a00)!important;color:white!important;border-radius:7px!important;padding:3px 6px!important;font-weight:900!important}
+#app .ffAppAnnouncements .ffTickerTrack{color:#ffb24e!important;font-weight:800!important}
+#app .bottom,#app .bottomSix{background:linear-gradient(#15100b,#050505)!important;border:1px solid #ff7900!important;border-radius:14px!important;box-shadow:0 0 10px #ff790055!important}
+#app .bottom button,#app .bottomSix button{color:#ff8c16!important}
+#app .bottom button.active,#app .bottomSix button.active,#app .bottom [aria-current=page],#app .bottomSix [aria-current=page]{background:linear-gradient(140deg,#ff79005c,#170c05)!important;box-shadow:inset 0 0 13px #ff7900,0 0 10px #ff7900!important;border-radius:11px!important}
+@media(max-width:600px){#ffhSoaRoot .soaPanel{gap:7px!important}#ffhSoaRoot .soaProfile{min-height:116px!important;padding:8px!important;grid-template-columns:42px minmax(0,1fr) 91px!important}#ffhSoaRoot .soaProfileIcon{width:39px!important;height:48px!important}#ffhSoaRoot .soaProfileMain{font-size:10px!important}#ffhSoaRoot .soaProfileMain strong{font-size:12px!important}#ffhSoaRoot .soaDashboard .soaMetric{min-height:88px!important}#ffhSoaRoot .soaQuickActions button{min-height:57px!important}#ffhSoaRoot #soaResults{min-height:225px!important}}
+}
