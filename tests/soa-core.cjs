@@ -7,3 +7,7 @@ assert.throws(()=>core.statement([{date:'2026-01-01',debit:1,credit:2}]),/both D
 assert.throws(()=>core.statement([], {from:'2026-02-01',to:'2026-01-01'}),/From Date/);
 assert.match(core.csv(result.rows),/Date.*Description.*Reference/);
 console.log('SOA core tests passed');
+assert.equal(core.dateKey('29/02/2024'),'2024-02-29');
+assert.throws(()=>core.dateKey('2025-02-29'),/Invalid calendar date/);
+assert.throws(()=>core.dateKey('2026-13-01'),/Invalid calendar date/);
+assert.equal(core.statement([{date:'2026-01-01',debit:'0.10'},{date:'2026-01-02',credit:'0.03'}],{opening:'0.02'}).closingBalance,'0.09');
