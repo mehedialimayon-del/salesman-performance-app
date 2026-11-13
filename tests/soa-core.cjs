@@ -1,0 +1,9 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');const vm=require('node:vm');const ctx={};vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../soa-core.js'),'utf8'),ctx);const core=ctx.FFH_SOA_CORE;
+const rows=[{date:'2026-01-01',description:'Invoice',debit:'1657.12',credit:0},{date:'2026-01-03',description:'Payment',credit:'1657.12'},{date:'2026-01-02',description:'Invoice',debit:'1171.00'}];
+const result=core.statement(rows,{from:'2026-01-02',to:'2026-01-03'});
+assert.equal(result.openingBalance,'1657.12');assert.equal(result.closingBalance,'1171.00');assert.equal(result.rows.length,2);assert.equal(result.rows[0].balance,'2828.12');assert.equal(result.rows[1].balance,'1171.00');
+assert.equal(core.statement([]).closingBalance,'0.00');
+assert.throws(()=>core.statement([{date:'2026-01-01',debit:1,credit:2}]),/both Debit and Credit/);
+assert.throws(()=>core.statement([], {from:'2026-02-01',to:'2026-01-01'}),/From Date/);
+assert.match(core.csv(result.rows),/Date.*Description.*Reference/);
+console.log('SOA core tests passed');
