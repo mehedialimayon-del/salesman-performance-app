@@ -34,7 +34,25 @@ function refresh(){
   }
  }
 }
-function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;refresh();});}
+function fixLastHomeTile(){
+ const app=document.getElementById('app');if(!app)return;
+ const elements=[...app.querySelectorAll('*')].filter(e=>e.children.length===0&&/access\s*requests/i.test((e.textContent||'').replace(/\s+/g,' ')));
+ for(const leaf of elements){
+  const rect=leaf.getBoundingClientRect();
+  if(rect.top<innerHeight*.42||rect.top>innerHeight*.94)continue;
+  let tile=leaf;
+  for(let n=0;n<6&&tile.parentElement;n++){
+   const p=tile.parentElement,r=p.getBoundingClientRect();
+   if(r.width>=100&&r.width<=innerWidth*.32&&r.height>=95&&r.height<=240){tile=p;break;}
+   tile=p;
+  }
+  if(tile.id==='app'||tile.textContent.includes('Manager Control'))continue;
+  leaf.textContent='SOA';
+  tile.dataset.ffhSoaHome='1';
+  tile.setAttribute('aria-label','SOA');
+ }
+}
+function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;refresh();fixLastHomeTile();});}
 document.addEventListener('click',e=>{
  const tile=e.target.closest('[data-ffh-soa-home="1"]');
  if(!tile)return;
