@@ -73,15 +73,15 @@ function close(fromHistory=false){if(!visible)return;visible=false;remember();by
 window.addEventListener('popstate',()=>{if(visible&&!history.state?.ffhSoaOverlay)close(true);});
 let accessAction=null;
 function install(){
- const visibleText=el=>(el?.textContent||'').replace(/\\s+/g,' ').trim();
+ const visibleText=el=>(el?.textContent||'').replace(/\s+/g,' ').trim();
  const findTile=(pattern)=>[...document.querySelectorAll('button,a,[role="button"],[onclick],.home-card,.menu-card,.dashboard-card')].find(el=>!el.closest('#ffhSoaRoot')&&!el.dataset.ffhSoaOriginal&&!el.dataset.ffhSoaHome&&pattern.test(visibleText(el))&&el.getClientRects().length>0);
- const access=findTile(/access\\s*requests/i);
+ const access=findTile(/access\s*requests/i);
  if(access&&!byId('ffhSoaLaunch')){
   const replacement=access.cloneNode(true);
   replacement.id='ffhSoaLaunch';replacement.dataset.ffhSoaHome='true';
   replacement.removeAttribute('onclick');replacement.removeAttribute('href');
   replacement.querySelectorAll('[onclick],a').forEach(n=>{n.removeAttribute('onclick');n.removeAttribute('href');});
-  const label=[...replacement.querySelectorAll('*')].filter(n=>n.children.length===0&&/access\\s*requests/i.test(visibleText(n))).pop();
+  const label=[...replacement.querySelectorAll('*')].filter(n=>n.children.length===0&&/access\s*requests/i.test(visibleText(n))).pop();
   if(label)label.textContent='SOA';else replacement.textContent='SOA';
   const icon=label?.parentElement?.querySelector('svg,i,.icon')||replacement.querySelector('svg,i,.icon');
   if(icon){icon.outerHTML='<span aria-hidden="true" style="color:#ff6900;font-size:27px;line-height:1">▤</span>';}
@@ -92,12 +92,12 @@ function install(){
   accessAction=()=>access.click();
  }
  if(!accessAction){const hidden=document.querySelector('[data-ffh-soa-original]');if(hidden)accessAction=()=>hidden.click();}
- const staffRow=findTile(/staff,?\\s*zones,?\\s*access\\s*&\\s*trash/i);
+ const staffRow=findTile(/staff,?\s*zones,?\s*access\s*&\s*trash/i);
  if(staffRow&&accessAction&&!byId('ffhSoaManagerAccess')){
   const button=staffRow.cloneNode(true);
   button.id='ffhSoaManagerAccess';button.removeAttribute('onclick');button.removeAttribute('href');
   button.querySelectorAll('[onclick],a').forEach(n=>{n.removeAttribute('onclick');n.removeAttribute('href');});
-  const leaf=[...button.querySelectorAll('*')].filter(n=>n.children.length===0&&/staff,?\\s*zones,?\\s*access\\s*&\\s*trash/i.test(visibleText(n))).pop();
+  const leaf=[...button.querySelectorAll('*')].filter(n=>n.children.length===0&&/staff,?\s*zones,?\s*access\s*&\s*trash/i.test(visibleText(n))).pop();
   if(leaf)leaf.textContent='Staff Access / Access Requests';else button.textContent='🔐 Staff Access / Access Requests';
   button.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();accessAction();},true);
   staffRow.insertAdjacentElement('afterend',button);
