@@ -84,14 +84,14 @@ function install(){
   const label=[...replacement.querySelectorAll('*')].filter(n=>n.children.length===0&&/access\s*requests/i.test(visibleText(n))).pop();
   if(label)label.textContent='SOA';else replacement.textContent='SOA';
   const icon=label?.parentElement?.querySelector('svg,i,.icon')||replacement.querySelector('svg,i,.icon');
-  if(icon){icon.outerHTML='<span aria-hidden="true" style="color:#ff6900;font-size:27px;line-height:1">▤</span>';}
-  else if(label)label.insertAdjacentHTML('beforebegin','<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px">▤</span>');
+  if(icon){icon.outerHTML='<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px;line-height:1">▤</span>';}
+  else if(label)label.insertAdjacentHTML('beforebegin','<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px;margin-bottom:5px">▤</span>');else replacement.insertAdjacentHTML('afterbegin','<span aria-hidden="true" style="display:block;color:#ff6900;font-size:27px;margin-bottom:5px">▤</span>');
   replacement.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();open();},true);
   access.replaceWith(replacement);
-  access.dataset.ffhSoaOriginal='true';access.style.display='none';replacement.insertAdjacentElement('afterend',access);
+  access.dataset.ffhSoaOriginal='true';
   accessAction=()=>access.click();
  }
- if(!accessAction){const hidden=document.querySelector('[data-ffh-soa-original]');if(hidden)accessAction=()=>hidden.click();}
+ // Remove any stale home Access Requests tile left by an earlier render.\n if(byId('ffhSoaLaunch')){for(const node of document.querySelectorAll('[data-ffh-soa-original]'))node.remove();}\n if(access&&byId('ffhSoaLaunch')&&access!==byId('ffhSoaLaunch')){accessAction=()=>access.click();access.remove();}
  const staffRow=findTile(/staff,?\s*zones,?\s*access\s*&\s*trash/i);
  if(staffRow&&accessAction&&!byId('ffhSoaManagerAccess')){
   const button=staffRow.cloneNode(true);
