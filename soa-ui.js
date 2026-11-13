@@ -169,12 +169,15 @@ window.addEventListener('popstate',()=>{
 });
 function install(){
  // Home tiles are rendered by app.js from the modules list; target the stable page key.
- for(const tile of document.querySelectorAll('[data-page="access"]')){
+ for(const tile of document.querySelectorAll('[data-page="access"],[data-page="soa"],#ffhSoaLaunch, .moduleCard, .module-card, .moduleTile, .module-tile')){
+  const title=tile.querySelector('.moduleTitle,.module-title')||tile;
+  const text=(title.textContent||'').trim();
+  if(!['access','soa'].includes(tile.dataset.page)&&!/^(access requests|soa)$/i.test(text))continue;
   if(tile.closest('#ffhSoaRoot')||tile.closest('#ffhSoaManagerAccess'))continue;
   tile.dataset.page='soa';
   tile.id='ffhSoaLaunch';
   const label=tile.querySelector('.moduleTitle')||[...tile.querySelectorAll('*')].find(el=>!el.children.length&&/access requests/i.test(el.textContent||''));
-  if(label)label.textContent='SOA';
+  if(label)label.textContent='SOA';else if(/^access requests$/i.test(tile.textContent.trim())){const leaf=[...tile.querySelectorAll('*')].reverse().find(el=>!el.children.length&&/access requests/i.test(el.textContent.trim()));if(leaf)leaf.textContent='SOA';}
   const icon=tile.querySelector('.mi');
   if(icon){icon.textContent='▤';icon.style.color='#ff6900';}
   if(!tile.dataset.ffhSoaBound){
