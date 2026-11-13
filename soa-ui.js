@@ -39,11 +39,11 @@ function refresh(){
  if(!current){el.innerHTML='<p>Select or create a distributor to view the statement.</p>';return;}
  let s;try{s=ledger();}catch(e){el.textContent=e.message;return;}
  const o=db.outlets.find(x=>x.id===current)||{};
- const rows=s.rows.map(r=>'<tr><td>'+esc(r.date)+'</td><td>'+esc(r.description+' '+r.reference)+'</td><td>'+r.debit+'</td><td>'+r.credit+'</td><td>'+r.balance+'</td><td><button type="button" data-edit="'+esc(r.sourceIndex)+'">EDIT</button><button type="button" data-delete="'+esc(r.sourceIndex)+'">DELETE</button></td></tr>').join('');
+ const rows=s.rows.map(r=>'<tr><td>'+esc(r.date)+'</td><td>'+esc(r.description+' '+r.reference)+'</td><td>'+r.debit+'</td><td>'+r.credit+'</td><td>'+r.balance+'</td><td class="soaEditCell"><button type="button" data-edit="'+esc(r.sourceIndex)+'">EDIT</button><button type="button" data-delete="'+esc(r.sourceIndex)+'">DELETE</button></td></tr>').join('');
  const report='<section id="soaPrint"><div class="soaTitle"><b>PINNACLE FOODS (M) SDN BHD</b><div>Statement of Account</div><p>From Date　'+esc(byId('soaFrom').value)+'　 To　'+esc(byId('soaTo').value)+'</p></div><div class="soaMeta"><div>Distributor ID　:　<b>'+esc(o.id)+'</b>　　　　 Credit Limit　 '+esc(o.limit)+'</div><div>Name　:　<b>'+esc(o.name)+'</b></div><div>Address　:　'+esc(o.address)+'</div><div>Sales Zone　:　'+esc(o.zone)+'</div><div>Phone　:　'+esc(o.phone)+'</div><div>Mobile　:　'+esc(o.mobile)+'</div></div><table><thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead><tbody>'+rows+'</tbody></table><p>Opening Balance: '+s.openingBalance+' · Closing Balance: '+s.closingBalance+'</p><footer>Printed by: FieldForce Hub</footer></section>';
  el.innerHTML='<p>'+s.rows.length+' transactions · Closing Balance RM '+s.closingBalance+'</p>'+report;
  el.querySelectorAll('[data-edit],[data-delete]').forEach(b=>b.onclick=async()=>{
-  const record=db.entries.filter(e=>e.outletId===current)[Number(b.dataset.edit??b.dataset.delete)];
+  const record=db.entries[Number(b.dataset.edit??b.dataset.delete)];
   if(!record)return alert('Transaction not found. Refresh statement.');
   const client=requireCloud();
   if(b.dataset.delete!==undefined){if(!confirm('Delete transaction '+record.id+'? This change will be audited.'))return;const {error}=await client.from('ffh_soa_transactions').delete().eq('id',record.id);if(error)return alert('Delete denied: '+error.message);}
@@ -51,7 +51,7 @@ function refresh(){
   await loadCloud();render();
  });
 }
-const printCss='@page{size:letter;margin:12mm}body{font-family:Arial,sans-serif;font-size:9px;color:#000}.soaTitle{text-align:center;margin-bottom:35px}.soaTitle b{font-size:13px}.soaTitle p{margin-top:12px}.soaMeta{border:1px dashed #555;padding:8px;line-height:2}table{border-collapse:collapse;width:100%;margin-top:5px}th,td{border:1px dashed #666;padding:5px;text-align:right}td:nth-child(1),td:nth-child(2),th:nth-child(1),th:nth-child(2){text-align:left}thead{display:table-header-group}tr{break-inside:avoid}footer{margin-top:20px}';
+const printCss='@page{size:letter;margin:12mm}body{font-family:Arial,sans-serif;font-size:9px;color:#000}.soaTitle{text-align:center;margin-bottom:35px}.soaTitle b{font-size:13px}.soaTitle p{margin-top:12px}.soaMeta{border:1px dashed #555;padding:8px;line-height:2}table{border-collapse:collapse;width:100%;margin-top:5px}th,td{border:1px dashed #666;padding:5px;text-align:right}td:nth-child(1),td:nth-child(2),th:nth-child(1),th:nth-child(2){text-align:left}thead{display:table-header-group}tr{break-inside:avoid}.soaEditCell{display:none!important}footer{margin-top:20px}';
 async function open(){if(visible)return;try{await loadCloud();}catch(e){alert(e.message);return;}visible=true;let root=document.createElement('div');root.id='ffhSoaRoot';document.body.appendChild(root);render();}
 function close(){visible=false;byId('ffhSoaRoot')?.remove();}
 function install(){if(byId('ffhSoaLaunch'))return;const candidates=[...document.querySelectorAll('button,a,[role="button"]')];const meeting=candidates.find(x=>/^(meeting|meeting\s*\/\s*notice|meeting & notice)$/i.test((x.textContent||'').trim()));if(!meeting)return;const b=document.createElement('button');b.id='ffhSoaLaunch';b.type='button';b.textContent='SOA';b.className=meeting.className;b.onclick=e=>{e.preventDefault();e.stopPropagation();open();};meeting.insertAdjacentElement('afterend',b);}
