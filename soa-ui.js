@@ -59,7 +59,7 @@ function refresh(){
   const record=db.entries.find(e=>e.outletId===current&&e.id===(b.dataset.edit??b.dataset.delete));
   if(!record)return alert('Transaction not found. Refresh statement.');
   const client=requireCloud();
-  if(b.dataset.delete!==undefined){return alert('Delete requires an approved SOA database permission. No record was changed.');}
+  if(b.dataset.delete!==undefined){if(!confirm('Delete this transaction? This action is audited and cannot be undone.'))return;const {data,error}=await client.from('ffh_soa_transactions').delete().eq('id',record.id).select('id');if(error)return alert('Delete denied: '+error.message);if(!data?.length)return alert('Delete was not authorized or record was not found.');}
   else{const description=prompt('Description / Voucher',record.description||'');if(description===null)return;const reference=prompt('Reference / Details',record.reference||'');if(reference===null)return;const amount=prompt('Amount (RM)',record.debit&&Number(record.debit)>0?record.debit:record.credit);if(amount===null)return;let value;try{value=CORE.rm(CORE.cents(amount));}catch(e){return alert(e.message)}if(CORE.cents(value)<=0)return alert('Amount must be positive');const {error}=await client.from('ffh_soa_transactions').update({document_no:description,description:reference,amount:value}).eq('id',record.id);if(error)return alert('Update denied: '+error.message);}
   await loadCloud();render();
  });
