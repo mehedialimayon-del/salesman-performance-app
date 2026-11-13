@@ -43,7 +43,7 @@ function refresh(){
  const report='<section id="soaPrint"><div class="soaTitle"><b>PINNACLE FOODS (M) SDN BHD</b><div>Statement of Account</div><p>From Date　'+esc(byId('soaFrom').value)+'　 To　'+esc(byId('soaTo').value)+'</p></div><div class="soaMeta"><div>Distributor ID　:　<b>'+esc(o.id)+'</b>　　　　 Credit Limit　 '+esc(o.limit)+'</div><div>Name　:　<b>'+esc(o.name)+'</b></div><div>Address　:　'+esc(o.address)+'</div><div>Sales Zone　:　'+esc(o.zone)+'</div><div>Phone　:　'+esc(o.phone)+'</div><div>Mobile　:　'+esc(o.mobile)+'</div></div><table><thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead><tbody>'+rows+'</tbody></table><p>Opening Balance: '+s.openingBalance+' · Closing Balance: '+s.closingBalance+'</p><footer>Printed by: FieldForce Hub</footer></section>';
  el.innerHTML='<p>'+s.rows.length+' transactions · Closing Balance RM '+s.closingBalance+'</p>'+report;
  el.querySelectorAll('[data-edit],[data-delete]').forEach(b=>b.onclick=async()=>{
-  const record=db.entries.filter(e=>e.outletId===current).sort((a,z)=>CORE.dateKey(a.date).localeCompare(CORE.dateKey(z.date)))[Number(b.dataset.edit??b.dataset.delete)];
+  const record=db.entries.filter(e=>e.outletId===current)[Number(b.dataset.edit??b.dataset.delete)];
   if(!record)return alert('Transaction not found. Refresh statement.');
   const client=requireCloud();
   if(b.dataset.delete!==undefined){if(!confirm('Delete transaction '+record.id+'? This change will be audited.'))return;const {error}=await client.from('ffh_soa_transactions').delete().eq('id',record.id);if(error)return alert('Delete denied: '+error.message);}
