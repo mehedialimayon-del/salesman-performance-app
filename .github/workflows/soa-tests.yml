@@ -1,0 +1,29 @@
+name: SOA regression tests
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'soa-core.js'
+      - 'soa-ui.js'
+      - 'tests/soa-core.cjs'
+      - '.github/workflows/soa-tests.yml'
+  pull_request:
+    paths:
+      - 'soa-core.js'
+      - 'soa-ui.js'
+      - 'tests/soa-core.cjs'
+      - '.github/workflows/soa-tests.yml'
+jobs:
+  soa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify SOA accounting regression tests
+        run: node tests/soa-core.cjs
+      - name: Verify browser script syntax
+        run: |
+          node --check soa-core.js
+          node --check soa-ui.js
