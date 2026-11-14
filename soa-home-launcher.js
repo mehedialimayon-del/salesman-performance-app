@@ -74,7 +74,19 @@ function fixLastHomeTile(){
   }
  }
 }
-function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;refresh();fixLastHomeTile();});}
+function fixGridSoa(){
+ const grid=document.querySelector('#app .homeGrid');
+ if(!grid)return;
+ const tile=[...grid.querySelectorAll('.module')].find(t=>/access\s*requests/i.test(t.textContent||''));
+ if(!tile)return;
+ const leaf=[...tile.querySelectorAll('*')].find(e=>e.children.length===0&&/access\s*requests/i.test(e.textContent||''));
+ if(leaf)leaf.textContent='SOA';
+ tile.dataset.ffhSoaHome='1';
+ tile.setAttribute('aria-label','SOA');
+ const icon=tile.querySelector('.mi');
+ if(icon){icon.textContent='▤';icon.style.cssText+=';font-style:normal;color:#ff9c20;';}
+}
+function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;refresh();fixLastHomeTile();fixGridSoa();});}
 document.addEventListener('click',e=>{
  const tile=e.target.closest('[data-ffh-soa-home="1"]');
  if(!tile)return;
