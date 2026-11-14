@@ -610,3 +610,21 @@ html body #app .bottom>button,html body #app .bottomSix>button{
   height:calc(100% + 6px)!important;
  }
 }
+
+/* 17:55: keep card widths and icons intact. Recover bottom-row visibility
+   without enlarging cards; expose nav gold bottom line by lifting frame only. */
+@media(max-width:800px){
+ html body #app .homeGrid,html body .homeGrid{
+   row-gap:1px!important;
+   padding-bottom:155px!important;
+ }
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+   transform:translateY(58px)!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+   top:-53px!important;
+   height:calc(100% + 28px)!important;
+ }
+}
