@@ -252,6 +252,52 @@ const style=document.createElement('style');style.textContent='#ffhSoaRoot{posit
 .soaModalShell summary,.soaModalShell label,.soaModalShell strong,.soaModalShell h2{color:#ff852b!important}
 .soaModalShell button{color:white!important}
 `;document.head.appendChild(compact);
+
+// Final reference layout override. Injected after legacy SOA styles to prevent cascade regressions.
+// All selectors are scoped to SOA; never affect FieldForce Tasks, global navigation or exports.
+const referenceLayout=document.createElement('style');
+referenceLayout.id='ffhSoaReferenceLayoutFinal';
+referenceLayout.textContent=`
+#ffhSoaRoot{padding:3px 8px 0!important;background:#000!important;overflow:hidden!important}
+#ffhSoaRoot .soaPanel{height:100%!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;gap:5px!important;padding:2px 4px 55px!important}
+#ffhSoaRoot .soaPanel>header{flex:0 0 auto!important;min-height:39px!important;margin:0!important;padding:7px 10px!important;background:linear-gradient(112deg,#ec6b00 0%,#101010 9%,#101010 90%,#ff8a00 100%)!important;border:2px solid #ff8a00!important;border-radius:12px!important;box-shadow:0 0 10px #ff8a00b0!important}
+#ffhSoaRoot .soaFilters{flex:0 0 auto!important;position:relative!important;top:auto!important;padding:1px 0 3px!important;margin:0!important;gap:5px!important;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr) 38px!important}
+#ffhSoaRoot .soaFilters input,#ffhSoaRoot .soaFilters select{height:39px!important;min-height:39px!important;border:2px solid #ff8a00!important;box-shadow:0 0 8px #ff800088!important;border-radius:10px!important}
+#ffhSoaRoot #soaMore{height:39px!important;background:linear-gradient(#ffb21a,#e84a00)!important;border:2px solid #ffac36!important}
+#ffhSoaRoot .soaProfile{flex:0 0 auto!important;display:grid!important;grid-template-columns:43px minmax(0,1fr) minmax(85px,27%)!important;align-items:center!important;min-height:102px!important;max-height:123px!important;height:auto!important;margin:0!important;padding:7px 9px!important;gap:7px!important;border:2px solid #ff8b00!important;border-radius:17px!important;background:linear-gradient(120deg,#2d1307,#0a0807 60%,#7d2c00)!important;box-shadow:0 0 12px #ff8b00b0!important}
+#ffhSoaRoot .soaProfileIcon{width:39px!important;height:46px!important;background:linear-gradient(#ffb323,#ed4800)!important;border:2px solid #ffbc4c!important;box-shadow:0 0 9px #ff8900!important}
+#ffhSoaRoot .soaProfileMain strong{font-size:clamp(10px,2.8vw,14px)!important;line-height:1.12!important;max-height:61px!important;overflow:hidden!important;margin:0 0 3px!important}
+#ffhSoaRoot .soaProfileMain div{font-size:10px!important;line-height:1.15!important;white-space:normal!important;overflow-wrap:anywhere!important;max-height:39px!important;overflow:hidden!important}
+#ffhSoaRoot .soaProfileExtra{min-width:0!important;max-width:none!important;padding-left:6px!important}
+#ffhSoaRoot .soaDashboard{flex:0 0 auto!important;margin:0!important;gap:5px!important}
+#ffhSoaRoot .soaMetric,#ffhSoaRoot .soaMetric:first-child{min-height:74px!important;height:74px!important;padding:4px 2px!important;border:2px solid currentColor!important;box-shadow:0 0 9px currentColor!important}
+#ffhSoaRoot .soaMetric:nth-child(1){color:#ff3434!important;background:linear-gradient(#420606,#120000)!important}
+#ffhSoaRoot .soaMetric:nth-child(2){color:#00c6ff!important;background:linear-gradient(#003b5a,#000d20)!important}
+#ffhSoaRoot .soaMetric:nth-child(3){color:#00ee62!important;background:linear-gradient(#003c24,#001309)!important}
+#ffhSoaRoot .soaMetric:nth-child(4){color:#f352ff!important;background:linear-gradient(#4c0c53,#170019)!important}
+#ffhSoaRoot .soaMetric:nth-child(5){color:#ffc629!important;background:linear-gradient(#503600,#1c1000)!important}
+#ffhSoaRoot .soaMetricIcon,#ffhSoaRoot .soaMetric small,#ffhSoaRoot .soaMetric strong{color:#fff!important}
+#ffhSoaRoot .soaQuickActions{flex:0 0 auto!important;margin:0!important;gap:5px!important}
+#ffhSoaRoot .soaQuickActions button{height:52px!important;min-height:52px!important;background:linear-gradient(#fff,#f9f9f9 65%,#ddd)!important;color:#0a0a0a!important;text-shadow:none!important;border:2px solid #ff7d00!important;border-radius:13px!important;box-shadow:0 0 11px #ff8000c0!important;font-weight:900!important;padding:5px 2px!important;font-size:clamp(8px,2vw,11px)!important}
+#ffhSoaRoot #soaResults{flex:1 1 0!important;min-height:205px!important;height:auto!important;max-height:none!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:5px 7px!important;margin:0!important;border:2px solid #ff9300!important;border-radius:15px!important;background:linear-gradient(#1d0e06,#080808 35%)!important;box-shadow:0 0 12px #ff8400bb!important}
+#ffhSoaRoot .soaTableHeading{flex:0 0 auto!important;padding:3px 0!important;gap:4px!important;flex-wrap:wrap!important;font-size:11px!important;line-height:1.2!important}
+#ffhSoaRoot .soaTableHeading span{font-size:9px!important;padding:4px 6px!important;background:linear-gradient(#ffad15,#d94b00)!important;color:white!important;border-radius:11px!important}
+#ffhSoaRoot .soaHistoryExpand{font-size:10px!important;padding:4px 7px!important;min-width:0!important;background:linear-gradient(#ff8a0d,#8c3000)!important;border:1px solid #ffac3e!important}
+#ffhSoaRoot .soaTableTools{flex:0 0 auto!important;position:relative!important;top:auto!important;z-index:2!important;margin:3px 0!important;padding:0!important;gap:4px!important}
+#ffhSoaRoot .soaTableTools input{height:27px!important;min-height:27px!important}
+#ffhSoaRoot .soaTableWrap{flex:1 1 0!important;display:block!important;min-height:110px!important;max-height:none!important;height:auto!important;overflow:auto!important;overscroll-behavior:contain!important}
+#ffhSoaRoot .soaPremiumTable{width:100%!important;min-width:450px!important;font-size:10px!important;border-collapse:collapse!important}
+#ffhSoaRoot .soaPremiumTable th{background:linear-gradient(#ff9b00,#e64a00)!important;color:#fff!important;position:sticky!important;top:0!important;z-index:2!important}
+#ffhSoaRoot .soaPremiumTable td{background:#090909!important;color:white!important;padding:6px 4px!important;border:1px solid #555!important}
+#ffhSoaRoot .soaActions{flex:0 0 auto!important;position:absolute!important;bottom:0!important;left:0!important;right:0!important;z-index:10!important;padding:4px 7px!important;margin:0!important;background:#080504!important}
+#ffhSoaRoot .soaActions button{height:39px!important;min-height:39px!important;background:linear-gradient(#1b1109,#050505)!important;border:2px solid #ff9100!important;color:white!important;box-shadow:0 0 9px #ff8300!important;border-radius:11px!important;font-size:clamp(8px,1.8vw,11px)!important;padding:4px 2px!important}
+#ffhSoaRoot.soaHistoryFull .soaPanel{padding:8px!important}
+#ffhSoaRoot.soaHistoryFull #soaResults{height:100%!important;min-height:0!important;flex:1 1 auto!important}
+#ffhSoaRoot.soaHistoryFull .soaTableWrap{min-height:0!important}
+@media(max-height:720px){#ffhSoaRoot .soaProfile{min-height:88px!important;max-height:100px!important}#ffhSoaRoot .soaMetric,#ffhSoaRoot .soaMetric:first-child{height:64px!important;min-height:64px!important}#ffhSoaRoot .soaQuickActions button{height:44px!important;min-height:44px!important}#ffhSoaRoot #soaResults{min-height:160px!important}}
+`;
+document.head.appendChild(referenceLayout);
+
 function addHistoryExpand(){
  const root=document.getElementById('ffhSoaRoot'),result=document.getElementById('soaResults');
  if(!root||!result)return;
