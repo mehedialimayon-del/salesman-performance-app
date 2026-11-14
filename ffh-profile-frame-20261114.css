@@ -1,19 +1,28 @@
-/* Profile-card artwork only. No changes to module buttons, navigation or app behavior. */
+/* Home identity-card PNG frame ONLY. No sizing, text, portrait, clock,
+   action, grid or navigation rules are changed. */
 @media (max-width:800px){
-  body #app .homeHero {
+  #app .app:has(.homeGrid) .ffIdentityHero{
     position:relative!important;
-    background:#000!important;
-    border:0!important;
-    box-shadow:none!important;
     isolation:isolate;
+    border-color:transparent!important;
+    border-image:none!important;
+    box-shadow:none!important;
+    background-color:#000!important;
+    background-image:none!important;
   }
-  body #app .homeHero::before {
+  #app .app:has(.homeGrid) .ffIdentityHero::before{
     content:"";
     position:absolute;
     inset:0;
     z-index:0;
     pointer-events:none;
-    background:url("fieldforce-profile-frame.png") center center / 100% 100% no-repeat;
+    background-image:url("fieldforce-profile-frame.png");
+    background-repeat:no-repeat;
+    background-position:center;
+    background-size:100% 100%;
   }
-  body #app .homeHero > * {position:relative;z-index:1;}
+  #app .app:has(.homeGrid) .ffIdentityHero > *{
+    position:relative;
+    z-index:1;
+  }
 }
