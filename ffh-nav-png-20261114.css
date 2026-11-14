@@ -428,3 +428,22 @@ html body #app .bottom>button,html body #app .bottomSix>button{
   z-index:1!important;
  }
 }
+
+/* Extend the ONE existing PNG vertically, without changing its width or adding layers.
+   Bar controls remain at their current positions. */
+@media(max-width:800px){
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+  inset:auto!important;
+  top:-15px!important;
+  bottom:auto!important;
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+  height:calc(100% + 30px)!important;
+  background-image:url("./fieldforce-nav-border.png")!important;
+  background-size:100% 100%!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+ }
+}
