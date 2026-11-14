@@ -117,3 +117,68 @@ html body #app .app:has(.homeGrid) .homeGrid>.module .mi{
 html body #app .app:has(.homeGrid) .homeGrid>.module .moduleTitle{
  color:#fff!important;-webkit-text-fill-color:#fff!important;
 }
+
+/* Full-height, image-only artwork; all real UI remains interactive. */
+html,body,#app{min-height:100%;margin:0}
+#app .app:has(.homeGrid){
+ height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;
+ overflow:hidden!important;display:flex!important;flex-direction:column!important;
+ background-image:url("./fieldforce-theme.png")!important;
+ background-size:100% 100%!important;background-position:center center!important;
+ background-repeat:no-repeat!important;
+}
+#app .app:has(.homeGrid) .wrap{
+ flex:1 1 auto!important;min-height:0!important;
+ display:flex!important;flex-direction:column!important;
+ overflow:hidden!important;background:transparent!important;
+}
+#app .app:has(.homeGrid) .homeGrid{
+ flex:1 1 auto!important;min-height:0!important;height:auto!important;
+ margin:0!important;padding:0 clamp(8px,2.2vw,16px)!important;
+ grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ grid-template-rows:repeat(5,minmax(0,1fr))!important;
+ gap:clamp(7px,2.4vw,14px)!important;
+ align-content:stretch!important;
+}
+#app .app:has(.homeGrid) .homeGrid>.module{
+ min-height:0!important;height:100%!important;width:100%!important;
+ display:flex!important;flex-direction:column!important;
+ justify-content:center!important;align-items:center!important;
+ gap:clamp(5px,1.5vw,10px)!important;
+ padding:3px!important;margin:0!important;
+ background:transparent!important;background-image:none!important;
+ border:0!important;box-shadow:none!important;
+}
+#app .app:has(.homeGrid) .homeGrid>.module .mi,
+#app .app:has(.homeGrid) .homeGrid>.module .moduleTitle{
+ position:relative!important;inset:auto!important;transform:none!important;
+ margin:0!important;flex:0 0 auto!important;
+}
+#app .app:has(.homeGrid) .homeGrid>.module .moduleTitle{
+ text-align:center!important;font-size:clamp(10px,2.4vw,13px)!important;
+ line-height:1.12!important;max-width:100%!important;
+ overflow-wrap:break-word!important;color:#fff!important;
+}
+#app .app:has(.homeGrid) .ffIdentityHero,
+#app .app:has(.homeGrid) .ffIdentityHero :is(.ffIdentityText,.ffIdentityDetails){
+ background:transparent!important;background-image:none!important;
+ border:0!important;box-shadow:none!important;
+}
+#app .app:has(.homeGrid) .ffIdentityHero{
+ flex:0 0 auto!important;margin-bottom:clamp(5px,1.5vw,11px)!important;
+}
+#app .app:has(.homeGrid) .bottom{
+ flex:0 0 auto!important;
+ background:transparent!important;background-image:none!important;
+ border:0!important;border-radius:0!important;
+ box-shadow:none!important;overflow:visible!important;
+}
+#app .app:has(.homeGrid) .bottom :is(button,a){
+ background:transparent!important;background-image:none!important;
+ border:0!important;box-shadow:none!important;
+}
+#app .app:has(.homeGrid) .bottom button:active,
+#app .app:has(.homeGrid) .bottom button.active{
+ background:#ff8c001c!important;
+ box-shadow:inset 0 0 16px #ff850070!important;
+}
