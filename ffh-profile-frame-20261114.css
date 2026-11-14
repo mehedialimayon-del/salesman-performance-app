@@ -39,7 +39,7 @@
  }
  html body #app .ffIdentityHero>*{position:relative;z-index:1;}
  html body #app .ffIdentityHero .editableAvatar{
-   transform:translate(-7px,3px)!important;
+   transform:translate(32px,-43px)!important;\n   width:clamp(54px,10vw,78px)!important;height:clamp(54px,10vw,78px)!important;\n   object-fit:cover!important;border-radius:50%!important;
    border-color:transparent!important;outline:none!important;box-shadow:none!important;
  }
 }
