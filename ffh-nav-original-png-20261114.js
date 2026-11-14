@@ -9,13 +9,13 @@ function apply(){
   if(buttons.length!==7)continue;
   const labels=buttons.map(x=>(x.textContent||'').trim().toLowerCase());
   if(!labels.some(x=>x.includes('home'))||!labels.some(x=>x.includes('chat')))continue;
-  if(el.dataset.ffhOriginalNavPng==='1')return;
+  
   el.dataset.ffhOriginalNavPng='1';
-  el.style.setProperty('background-image',image,'important');
+  el.style.setProperty('background-image','none','important');
   el.style.setProperty('background-size','100% 100%','important');
   el.style.setProperty('background-position','center','important');
   el.style.setProperty('background-repeat','no-repeat','important');
-  el.style.setProperty('background-color','#090807','important');
+  el.style.setProperty('background-color','transparent','important');
   el.style.setProperty('border','0','important');
   el.style.setProperty('border-radius','0','important');
   el.style.setProperty('box-shadow','none','important');
