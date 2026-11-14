@@ -178,23 +178,30 @@ function askSoaReturnHome(){
  overlay.querySelector('[data-no]').onclick=()=>{overlay.remove();soaExitDialog=null;};
  overlay.querySelector('[data-yes]').onclick=()=>{
   overlay.remove();soaExitDialog=null;close(true);
-  const home=document.querySelector('nav.bottom [data-page="home"]');
+  // Restore the actual app UI and navigate through its existing Home control.
+  const nav=document.querySelector('nav.bottom');
+  const home=[...(nav?.querySelectorAll('button,a,[role="button"]')||[])].find(el=>/^(home|⌂\s*home)$/i.test((el.innerText||el.textContent||'').trim())||/home/i.test(el.getAttribute('aria-label')||''));
   if(home)home.click();
   history.replaceState({...history.state,ffhSoaOverlay:false,ffhSoaHistoryFull:false},'',location.href);
  };
 }
-window.addEventListener('popstate',()=>{
+window.addEventListener('popstate',event=>{
  if(!visible)return;
+ // Capture before the host app's exit handler so it cannot show an exit modal over SOA.
+ event.stopImmediatePropagation();
  const root=byId('ffhSoaRoot');
  if(root?.classList.contains('soaHistoryFull')){
   root.classList.remove('soaHistoryFull');
-  const fullButton=root.querySelector('.soaHistoryExpand');if(fullButton){fullButton.textContent='⛶';fullButton.setAttribute('aria-label','Full screen transactions');}
+  const fullButton=root.querySelector('.soaHistoryExpand');if(fullButton){fullButton.textContent='⛶';fullButton.setAttribute('aria-label','Full screen transactions');fullButton.title='Full screen transactions';}
+  // Re-establish the SOA history entry; next Back must confirm Home, not exit the app.
+  history.pushState({...history.state,ffhSoaOverlay:true,ffhSoaHistoryFull:false},'',location.href);
+  requestAnimationFrame(()=>positionSoa());
   return;
  }
  if(soaModalOpen()){dismissSoaModal();history.pushState({...history.state,ffhSoaOverlay:true},'',location.href);return;}
  history.pushState({...history.state,ffhSoaOverlay:true,ffhSoaHistoryFull:false},'',location.href);
  askSoaReturnHome();
-});
+},true);
 function install(){
  // Replace the actual Home Access Requests tile with a dedicated SOA tile.
  // Leave Manager Control's own Access Requests feature untouched.
