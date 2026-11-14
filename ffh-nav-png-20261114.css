@@ -1,55 +1,41 @@
-/* Seven-slot glass: artwork is a transparent foreground overlay, not a hidden background. */
-html body #app .bottom,
-html body #app .bottomSix,
-html body .bottom,
-html body .bottomSix {
-  position: fixed !important;
-  background: linear-gradient(180deg,#1b110a 0%,#090807 18%,#050505 83%,#190c05 100%) !important;
-  border: 0 !important;
-  border-radius: 24px !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  overflow: visible !important;
-  isolation: isolate !important;
+/* Uploaded user artwork only. Preserve all existing functionality. */
+html body .bottom,html body .bottomSix,html body #app .bottom,html body #app .bottomSix{
+ background:#090807 !important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ overflow:visible!important;isolation:isolate!important;
+ display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;
 }
-html body #app .bottom::before,
-html body #app .bottomSix::before,
-html body .bottom::before,
-html body .bottomSix::before {
-  content: "" !important;
-  display: block !important;
-  position: absolute !important;
-  inset: 0 !important;
-  background: url("./ffh-seven-slot-gloss.svg") center / 100% 100% no-repeat !important;
-  pointer-events: none !important;
-  z-index: 2 !important;
+html body .bottom::before,html body .bottomSix::before,
+html body #app .bottom::before,html body #app .bottomSix::before{
+ content:""!important;display:block!important;position:absolute!important;inset:0!important;
+ background:url("./fieldforce-nav-border.png") center center / 100% 100% no-repeat!important;
+ pointer-events:none!important;z-index:4!important;
 }
-html body #app .bottom::after,
-html body #app .bottomSix::after,
-html body .bottom::after,
-html body .bottomSix::after {
-  content: none !important;
-  display: none !important;
+html body .bottom::after,html body .bottomSix::after,
+html body #app .bottom::after,html body #app .bottomSix::after{content:none!important;display:none!important}
+html body .bottom>button,html body .bottomSix>button,
+html body #app .bottom>button,html body #app .bottomSix>button{
+ background:transparent!important;background-image:none!important;
+ border:0!important;box-shadow:none!important;border-radius:0!important;
+ position:relative!important;z-index:5!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+ min-width:0!important;text-align:center!important;
 }
-html body #app .bottom > button,
-html body #app .bottomSix > button,
-html body .bottom > button,
-html body .bottomSix > button,
-html body #app .bottom > button.active,
-html body #app .bottomSix > button.active {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  position: relative !important;
-  z-index: 3 !important;
+html body .bottom>button *,html body .bottomSix>button *{position:relative!important;z-index:6!important}
+html body .homeGrid .module{
+ background-color:#090807!important;
+ background-image:url("./fieldforce-card-border.png")!important;
+ background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important;
+ border:0!important;box-shadow:none!important;border-radius:0!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+ text-align:center!important;min-width:0!important;
 }
-
-/* Keep all existing nav labels/icons visible above the glossy dividers. */
-html body .bottom > button *, html body .bottomSix > button * {position: relative; z-index: 4 !important; visibility: visible !important; opacity: 1 !important;}
-html body .bottom, html body .bottomSix {display: grid !important; grid-template-columns: repeat(7,minmax(0,1fr)) !important;}
+html body .homeGrid .module:first-child,
+html body .homeGrid .module:hover,
+html body .homeGrid .module:focus,
+html body .homeGrid .module.active{
+ background-image:url("./fieldforce-card-border.png")!important;
+ border:0!important;box-shadow:none!important;
+}
+html body .homeGrid .module .mi{flex-shrink:0!important}
