@@ -1,6 +1,7 @@
-/* Uploaded user artwork only. Preserve all existing functionality. */
+/* User-uploaded PNG borders only; their checkerboard backgrounds are opaque,
+   so invert + screen blend hides white/grey and retains illuminated strokes. */
 html body .bottom,html body .bottomSix,html body #app .bottom,html body #app .bottomSix{
- background:#090807 !important;
+ background:#090807!important;background-image:none!important;
  border:0!important;border-radius:0!important;box-shadow:none!important;
  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
  overflow:visible!important;isolation:isolate!important;
@@ -9,33 +10,44 @@ html body .bottom,html body .bottomSix,html body #app .bottom,html body #app .bo
 html body .bottom::before,html body .bottomSix::before,
 html body #app .bottom::before,html body #app .bottomSix::before{
  content:""!important;display:block!important;position:absolute!important;inset:0!important;
- background:url("./fieldforce-nav-border.png") center center / 100% 100% no-repeat!important;
- pointer-events:none!important;z-index:4!important;
+ background:url("./fieldforce-nav-border.png") center / 100% 100% no-repeat!important;
+ filter:invert(1) hue-rotate(180deg)!important;
+ mix-blend-mode:screen!important;
+ pointer-events:none!important;z-index:3!important;
 }
 html body .bottom::after,html body .bottomSix::after,
-html body #app .bottom::after,html body #app .bottomSix::after{content:none!important;display:none!important}
+html body #app .bottom::after,html body #app .bottomSix::after{
+ content:none!important;display:none!important;
+}
 html body .bottom>button,html body .bottomSix>button,
 html body #app .bottom>button,html body #app .bottomSix>button{
  background:transparent!important;background-image:none!important;
  border:0!important;box-shadow:none!important;border-radius:0!important;
- position:relative!important;z-index:5!important;
- display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
- min-width:0!important;text-align:center!important;
+ position:relative!important;z-index:4!important;
+ display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:center!important;text-align:center!important;
+ min-width:0!important;
 }
-html body .bottom>button *,html body .bottomSix>button *{position:relative!important;z-index:6!important}
 html body .homeGrid .module{
- background-color:#090807!important;
- background-image:url("./fieldforce-card-border.png")!important;
- background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important;
+ position:relative!important;isolation:isolate!important;
+ background:#090807!important;background-image:none!important;
  border:0!important;box-shadow:none!important;border-radius:0!important;
- display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
- text-align:center!important;min-width:0!important;
+ display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:center!important;text-align:center!important;
+ min-width:0!important;overflow:visible!important;
 }
+html body .homeGrid .module::before{
+ content:""!important;display:block!important;position:absolute!important;inset:0!important;
+ background:url("./fieldforce-card-border.png") center / 100% 100% no-repeat!important;
+ filter:invert(1) hue-rotate(180deg)!important;
+ mix-blend-mode:screen!important;
+ pointer-events:none!important;z-index:1!important;
+}
+html body .homeGrid .module>*{position:relative!important;z-index:2!important}
 html body .homeGrid .module:first-child,
 html body .homeGrid .module:hover,
 html body .homeGrid .module:focus,
 html body .homeGrid .module.active{
- background-image:url("./fieldforce-card-border.png")!important;
+ background:#090807!important;background-image:none!important;
  border:0!important;box-shadow:none!important;
 }
-html body .homeGrid .module .mi{flex-shrink:0!important}
