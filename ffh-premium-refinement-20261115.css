@@ -209,7 +209,8 @@
  html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText{
   grid-column:2!important;align-self:center!important;
   padding:0 2px!important;overflow:visible!important;
-  transform:translate(-2in, -2px)!important;
+  transform:translateY(-2px)!important;
+  position:relative!important;left:calc(-1 * (25vw - 90px))!important;
  }
  html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText>small,
  html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText>strong{
