@@ -871,3 +871,18 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    transform:translateY(-12px)!important;
  }
 }
+
+/* Approved v62 geometry: keep bottom four home tiles and the entire seven-slot
+   navigation EXACTLY fixed. Close the gaps between the four rows above by
+   moving those rows progressively downward, without resizing any tile. */
+@media(max-width:800px){
+ html body #app .homeGrid > .module:nth-child(-n+4),
+ html body .homeGrid > .module:nth-child(-n+4){transform:translateY(0px)!important;}
+ html body #app .homeGrid > .module:nth-child(n+5):nth-child(-n+8),
+ html body .homeGrid > .module:nth-child(n+5):nth-child(-n+8){transform:translateY(-3px)!important;}
+ html body #app .homeGrid > .module:nth-child(n+9):nth-child(-n+12),
+ html body .homeGrid > .module:nth-child(n+9):nth-child(-n+12){transform:translateY(-6px)!important;}
+ html body #app .homeGrid > .module:nth-child(n+13):nth-child(-n+16),
+ html body .homeGrid > .module:nth-child(n+13):nth-child(-n+16){transform:translateY(-9px)!important;}
+ /* Final row 17-20 retains the existing -12px transform from v62. */
+}
