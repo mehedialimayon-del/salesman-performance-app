@@ -365,3 +365,29 @@ html body #app .bottom>button,html body #app .bottomSix>button{
   z-index:1!important;
  }
 }
+
+/* Fix: one image layer only; extend its visible outline beyond the badge. */
+@media(max-width:800px){
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+  background:transparent!important;
+  background-image:none!important;
+  overflow:visible!important;
+  isolation:isolate!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+  content:""!important;display:block!important;
+  position:absolute!important;
+  top:-38px!important;bottom:-38px!important;
+  left:0!important;right:0!important;
+  width:100%!important;
+  height:calc(100% + 76px)!important;
+  background-image:url("./fieldforce-nav-border.png")!important;
+  background-size:100% 100%!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  z-index:0!important;
+  pointer-events:none!important;
+ }
+}
