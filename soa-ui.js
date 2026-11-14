@@ -175,11 +175,13 @@ function soaHomeControl(){
  return [...(nav?.querySelectorAll('button,a,[role="button"]')||[])].find(el=>/\bhome\b/i.test((el.innerText||el.textContent||'').trim())||/home/i.test(el.getAttribute('aria-label')||''))||null;
 }
 function soaRestoreAppChrome(){
- const home=soaHomeControl();
- // The native app can unmount its header/nav on Back. Re-enter Home via the real SPA control.
- if(home)home.click();
+ // Full-screen Back must never navigate the underlying SPA to Home.
  const root=byId('ffhSoaRoot');
- if(root){root.classList.remove('soaHistoryFull');root.style.removeProperty('top');root.style.removeProperty('bottom');}
+ if(!root)return;
+ root.classList.remove('soaHistoryFull');
+ root.style.setProperty('top',lastSoaTop+'px','important');
+ root.style.setProperty('bottom',lastSoaBottom+'px','important');
+ root.style.setProperty('--soa-actions-bottom',lastSoaBottom+'px');
  requestAnimationFrame(()=>{if(visible)positionSoa();});
 }
 function soaDismissHostExit(){
@@ -202,9 +204,9 @@ function askSoaReturnHome(){
  overlay.querySelector('[data-yes]').onclick=()=>{
   overlay.remove();soaExitDialog=null;
   soaDismissHostExit();
-  // Navigate while SOA is still open so the app is restored before removing its overlay.
-  const home=soaHomeControl();if(home)home.click();
+  // Leave the SOA overlay before activating the underlying SPA Home navigation.
   close(true);
+  const home=soaHomeControl();if(home)home.click();
   history.replaceState({...history.state,ffhSoaOverlay:false,ffhSoaHistoryFull:false},'',location.href);
  };
 }
