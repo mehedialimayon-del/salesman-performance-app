@@ -50,11 +50,11 @@
  html body #app .ffIdentityHero .editableAvatar{
    position:absolute!important;
    grid-column:auto!important;grid-row:auto!important;
-   left:24px!important;top:39px!important;right:auto!important;bottom:auto!important;
+   left:0px!important;top:-12px!important;right:auto!important;bottom:auto!important;
    transform:none!important;
    margin:0!important;padding:0!important;
-   width:70px!important;height:78px!important;min-width:0!important;
-   max-width:70px!important;max-height:78px!important;
+   width:86px!important;height:94px!important;min-width:0!important;
+   max-width:86px!important;max-height:94px!important;
    object-fit:cover!important;object-position:center top!important;
    border-radius:50%!important;border:0!important;outline:0!important;
    box-shadow:none!important;z-index:3!important;
