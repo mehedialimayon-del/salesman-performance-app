@@ -85,14 +85,16 @@
  }
  html body #app .ffIdentityHero .heroDate{
    position:absolute!important;
-   right:13px!important;top:86px!important;bottom:auto!important;left:auto!important;\n   z-index:5!important;display:block!important;visibility:visible!important;opacity:1!important;
+   right:13px!important;top:86px!important;bottom:auto!important;left:auto!important;
+   z-index:5!important;display:block!important;visibility:visible!important;opacity:1!important;
    width:calc(33% - 10px)!important;max-width:none!important;
    margin:0!important;transform:none!important;
    text-align:center!important;
  }
  html body #app .ffIdentityHero .ffIdentityCredit{
    position:absolute!important;
-   right:13px!important;bottom:8px!important;top:auto!important;left:auto!important;\n   z-index:4!important;
+   right:13px!important;bottom:8px!important;top:auto!important;left:auto!important;
+   z-index:4!important;
    width:calc(33% - 10px)!important;max-width:none!important;
    margin:0!important;transform:none!important;
    display:flex!important;justify-content:center!important;
