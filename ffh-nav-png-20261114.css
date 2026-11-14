@@ -711,3 +711,15 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    top:0!important;bottom:0!important;height:100%!important;
  }
 }
+
+/* 18:29: fill the empty band above the fixed nav by extending only its
+   existing PNG frame upward 55px. Bottom edge and all seven controls stay put. */
+@media(max-width:800px){
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+   top:-55px!important;
+   bottom:0!important;
+   height:calc(100% + 55px)!important;
+   background-size:100% 100%!important;
+ }
+}
