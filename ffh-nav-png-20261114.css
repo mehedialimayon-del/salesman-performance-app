@@ -334,3 +334,34 @@ html body #app .bottom>button,html body #app .bottomSix>button{
   overflow:visible!important;
  }
 }
+
+/* Equal upward/downward extension of existing 7-slot PNG border.
+   Keep icon positions fixed while expanding only the artwork. */
+@media(max-width:800px){
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+  background-image:none!important;
+  background-color:transparent!important;
+  overflow:visible!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  top:-24px!important;
+  bottom:-24px!important;
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+  height:calc(100% + 48px)!important;
+  background:transparent url("./fieldforce-nav-border.png") center / 100% 100% no-repeat!important;
+  pointer-events:none!important;
+  z-index:0!important;
+ }
+ html body #app .bottom>button,html body #app .bottomSix>button,
+ html body .bottom>button,html body .bottomSix>button{
+  position:relative!important;
+  z-index:1!important;
+ }
+}
