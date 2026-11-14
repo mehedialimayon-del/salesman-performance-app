@@ -1,0 +1,60 @@
+/* One intact uploaded theme image; live controls are transparent overlays.
+   No image cropping, per-card backgrounds, or app behavior changes. */
+#app .app:has(.homeGrid){
+  background-image:url("./fieldforce-theme.png")!important;
+  background-repeat:no-repeat!important;
+  background-size:100% 100%!important;
+  background-position:center center!important;
+  background-color:#030303!important;
+}
+#app .app:has(.homeGrid) .wrap,
+#app .app:has(.homeGrid) .homeGrid{background:transparent!important}
+#app .app:has(.homeGrid) .homeGrid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-template-rows:repeat(5,minmax(0,1fr))!important;
+  gap:clamp(7px,2.4vw,14px)!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module{
+  background:transparent!important;background-image:none!important;
+  border:0!important;box-shadow:none!important;
+  border-radius:18px!important;overflow:visible!important;
+  transform:none!important;filter:none!important;
+  position:relative!important;isolation:isolate!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module::before,
+#app .app:has(.homeGrid) .homeGrid .module::after{
+  display:none!important;content:none!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module .mi{
+  background:transparent!important;background-image:none!important;
+  box-shadow:none!important;opacity:1!important;visibility:visible!important;
+  color:#ff9b21!important;filter:drop-shadow(0 0 4px #ff8200)!important;
+  position:relative!important;z-index:1!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module .mi>*{opacity:1!important;visibility:visible!important}
+#app .app:has(.homeGrid) .homeGrid .module .moduleTitle{
+  color:#fff!important;-webkit-text-fill-color:#fff!important;
+  text-shadow:0 2px 4px #000!important;position:relative!important;z-index:1!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module:active,
+#app .app:has(.homeGrid) .homeGrid .module.moduleActive{
+  background:#ff82001a!important;box-shadow:inset 0 0 17px #ff81005c!important;
+}
+#app .app:has(.homeGrid) .ffIdentityHero{
+  background:transparent!important;background-image:none!important;
+  border:0!important;box-shadow:none!important;
+}
+#app .app:has(.homeGrid) .ffIdentityHero::before,
+#app .app:has(.homeGrid) .ffIdentityHero::after{
+  display:none!important;content:none!important;
+}
+#app .app:has(.homeGrid) .bottom{
+  background:transparent!important;background-image:none!important;
+  border:0!important;box-shadow:none!important;
+}
+#app .app:has(.homeGrid) .bottom button{
+  background:transparent!important;box-shadow:none!important;border:0!important;
+}
+#app .app:has(.homeGrid) .bottom button.active{
+  background:#ff820020!important;box-shadow:inset 0 0 13px #ff850060!important;
+}
