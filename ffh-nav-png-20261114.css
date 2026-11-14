@@ -676,3 +676,21 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    background-size:100% 100%!important;
  }
 }
+
+/* 18:05: anchor the existing navigation to the bottom edge of the app viewport.
+   No changes to its seven buttons, sizes, or other screens/modules. */
+@media (max-width:800px){
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+   position:fixed!important;
+   top:auto!important;
+   bottom:0!important;
+   transform:none!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+   top:0!important;
+   bottom:0!important;
+   height:100%!important;
+ }
+}
