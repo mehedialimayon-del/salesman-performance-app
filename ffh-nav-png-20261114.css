@@ -11,8 +11,8 @@ html body .bottom::before,html body .bottomSix::before,
 html body #app .bottom::before,html body #app .bottomSix::before{
  content:""!important;display:block!important;position:absolute!important;inset:0!important;
  background:url("./fieldforce-nav-border.png") center / 100% 100% no-repeat!important;
- filter:invert(1) hue-rotate(180deg)!important;
- mix-blend-mode:screen!important;
+ filter:none!important;
+ mix-blend-mode:normal!important;
  pointer-events:none!important;z-index:3!important;
 }
 html body .bottom::after,html body .bottomSix::after,
@@ -39,8 +39,8 @@ html body .homeGrid .module{
 html body .homeGrid .module::before{
  content:""!important;display:block!important;position:absolute!important;inset:0!important;
  background:url("./fieldforce-card-border.png") center / 100% 100% no-repeat!important;
- filter:invert(1) hue-rotate(180deg)!important;
- mix-blend-mode:screen!important;
+ filter:none!important;
+ mix-blend-mode:normal!important;
  pointer-events:none!important;z-index:1!important;
 }
 html body .homeGrid .module>*{position:relative!important;z-index:2!important}
@@ -51,3 +51,50 @@ html body .homeGrid .module.active{
  background:#090807!important;background-image:none!important;
  border:0!important;box-shadow:none!important;
 }
+
+/* Exact full-card PNG, replacing rather than nesting inside the old border. */
+html body #app .homeGrid .module,
+html body .homeGrid .module,
+html body #app .homeGrid .module:hover,
+html body #app .homeGrid .module.active,
+html body #app .homeGrid .module:focus{
+ background:transparent!important;
+ background-image:none!important;
+ border:0!important;
+ outline:0!important;
+ box-shadow:none!important;
+ border-radius:0!important;
+ overflow:visible!important;
+ isolation:isolate!important;
+}
+html body #app .homeGrid .module::before,
+html body .homeGrid .module::before{
+ content:""!important;
+ display:block!important;
+ position:absolute!important;
+ inset:0!important;
+ width:100%!important;
+ height:100%!important;
+ margin:0!important;
+ padding:0!important;
+ border:0!important;
+ border-radius:0!important;
+ background-image:url("./fieldforce-card-border.png")!important;
+ background-position:center center!important;
+ background-size:100% 100%!important;
+ background-repeat:no-repeat!important;
+ background-color:transparent!important;
+ opacity:1!important;
+ filter:none!important;
+ mix-blend-mode:normal!important;
+ transform:none!important;
+ box-shadow:none!important;
+ pointer-events:none!important;
+ z-index:0!important;
+}
+html body #app .homeGrid .module::after,
+html body .homeGrid .module::after{content:none!important;display:none!important}
+html body #app .homeGrid .module>*,
+html body .homeGrid .module>*{position:relative!important;z-index:1!important}
+html body #app .homeGrid .module .mi,
+html body .homeGrid .module .mi{margin-left:auto!important;margin-right:auto!important}
