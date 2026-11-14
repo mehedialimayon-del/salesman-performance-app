@@ -154,3 +154,40 @@
   display:none!important;
  }
 }
+
+
+/* Approved final order: 1 clock, 2 date, 3 developer credit.
+   Reuse the three printed PNG slots; never paint extra rectangles. */
+@media(max-width:800px){
+ html body #app .app:has(.homeGrid) .ffIdentityHero .heroClock{
+  top:23px!important;bottom:auto!important;right:12px!important;
+  width:calc(31% - 10px)!important;z-index:12!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .heroDate{
+  top:68px!important;bottom:auto!important;right:12px!important;
+  width:calc(31% - 10px)!important;z-index:12!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  background:transparent!important;border:0!important;box-shadow:none!important;
+  font-size:clamp(8px,2.1vw,11px)!important;white-space:nowrap!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityCredit{
+  display:flex!important;top:105px!important;bottom:auto!important;
+  right:12px!important;width:calc(31% - 10px)!important;
+  height:19px!important;min-height:0!important;padding:0!important;
+  align-items:center!important;justify-content:center!important;
+  background:transparent!important;border:0!important;box-shadow:none!important;
+  font-size:clamp(7px,1.7vw,9px)!important;z-index:12!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero::after{
+  content:none!important;display:none!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero:not(:has(.ffIdentityCredit))::after{
+  content:"Developed by KAM AYON"!important;display:flex!important;
+  position:absolute!important;top:105px!important;bottom:auto!important;
+  right:12px!important;width:calc(31% - 10px)!important;height:19px!important;
+  align-items:center!important;justify-content:center!important;
+  color:#fff!important;background:transparent!important;border:0!important;
+  box-shadow:none!important;font-size:clamp(7px,1.7vw,9px)!important;
+  white-space:nowrap!important;z-index:12!important;
+ }
+}
