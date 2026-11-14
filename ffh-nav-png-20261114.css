@@ -847,3 +847,18 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    transform:translateY(-12px)!important;
  }
 }
+
+/* 20:27 screenshot: tiny optical alignment of the existing seven-slot nav.
+   Keep frame width/height, container position and button sizes unchanged. */
+@media(max-width:800px){
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+   left:-8.25px!important;
+   right:-7.75px!important;
+   width:calc(100% + 16px)!important;
+ }
+ html body #app .bottom>button,html body #app .bottomSix>button,
+ html body .bottom>button,html body .bottomSix>button{
+   transform:translateY(-18.2px)!important;
+ }
+}
