@@ -1,0 +1,38 @@
+/* Field Force bottom navigation: original uploaded PNG artwork only.
+   No changes to buttons, handlers, routes or page state. */
+.bottomSix {
+  position: relative !important;
+  isolation: isolate;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+.bottomSix::before {
+  content: "" !important;
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: url("./nav-box.png") center center / 100% 100% no-repeat !important;
+  pointer-events: none;
+}
+.bottomSix::after {
+  content: "" !important;
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  bottom: calc(100% - 3px);
+  height: 32px;
+  background: url("./nav-light.png") center bottom / 100% 100% no-repeat !important;
+  pointer-events: none;
+}
+.bottomSix > button {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+  position: relative;
+  z-index: 1;
+}
