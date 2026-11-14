@@ -1,10 +1,19 @@
 /* Profile frame: same full-size ::before PNG method as approved home buttons.
    Strictly isolated to the identity banner; no button/nav/logic changes. */
 @media(max-width:800px){
+ /* Parent row was retaining its old fixed box, so increasing the child alone
+    did not necessarily create more visible vertical room. */
+ html body #app .profile:has(.ffIdentityHero){
+   height:auto!important;min-height:138px!important;max-height:none!important;
+   overflow:visible!important;
+   padding-top:0!important;padding-bottom:0!important;
+   margin-top:0!important;margin-bottom:0!important;
+ }
  html body #app .ffIdentityHero{
    position:relative!important;
-   height:124px!important;min-height:124px!important;
-   margin-top:4px!important;margin-bottom:4px!important;
+   height:132px!important;min-height:132px!important;max-height:none!important;
+   flex-shrink:0!important;
+   margin-top:3px!important;margin-bottom:3px!important;
    box-sizing:border-box!important;
    width:100vw!important;min-width:100vw!important;max-width:100vw!important;
    left:50%!important;right:auto!important;
