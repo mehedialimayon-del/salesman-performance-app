@@ -218,7 +218,8 @@ window.addEventListener('popstate',event=>{
   root.classList.remove('soaHistoryFull');
   const btn=root.querySelector('.soaHistoryExpand');
   if(btn){btn.textContent='⛶';btn.setAttribute('aria-label','Full screen transactions');btn.title='Full screen transactions';}
-  history.pushState({...history.state,ffhSoaOverlay:true,ffhSoaHistoryFull:false},'',location.href);
+  // Browser Back already returned to the existing SOA history entry.
+  // Do not push a duplicate entry: that caused extra Back presses and exit prompts.
   soaDismissHostExit();
   soaRestoreAppChrome();
   return;
@@ -494,7 +495,7 @@ function addHistoryExpand(){
  }
  // The original search input stays bound to the ledger filter.
  const button=document.createElement('button');button.type='button';button.className='soaHistoryExpand';button.textContent=root.classList.contains('soaHistoryFull')?'↙':'⛶';button.setAttribute('aria-label',root.classList.contains('soaHistoryFull')?'Exit full screen':'Full screen transactions');button.title=button.getAttribute('aria-label');
- button.onclick=()=>{const entering=!root.classList.contains('soaHistoryFull');if(entering){history.pushState({...history.state,ffhSoaOverlay:true,ffhSoaHistoryFull:true},'',location.href);root.classList.add('soaHistoryFull');}else{root.classList.remove('soaHistoryFull');if(history.state?.ffhSoaHistoryFull)history.back();else soaRestoreAppChrome();}button.textContent=entering?'↙':'⛶';button.setAttribute('aria-label',entering?'Exit full screen':'Full screen transactions');button.title=button.getAttribute('aria-label');};
+ button.onclick=()=>{const entering=!root.classList.contains('soaHistoryFull');if(entering){history.pushState({...history.state,ffhSoaOverlay:true,ffhSoaHistoryFull:true},'',location.href);root.classList.add('soaHistoryFull');button.textContent='↙';button.setAttribute('aria-label','Exit full screen');}else if(history.state?.ffhSoaHistoryFull){history.back();return;}else{soaRestoreAppChrome();button.textContent='⛶';button.setAttribute('aria-label','Full screen transactions');}button.title=button.getAttribute('aria-label');};
  heading.appendChild(button);
 }
 const historyObserver=new MutationObserver(()=>{if(document.getElementById('soaResults'))addHistoryExpand();});
