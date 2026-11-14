@@ -1,7 +1,12 @@
-/* Exact uploaded PNGs on the existing fixed bottom nav. No markup or handlers modified. */
-#app .bottom, #app .bottomSix, .bottom, .bottomSix {
-  background: url("./nav-box.png") center center / 100% 100% no-repeat !important;
-  background-color: transparent !important;
+/* Glass bottom navigation: uploaded art, no changes to routing or button events.
+   Screen blend removes black pixels from PNG while preserving orange glow. */
+html body #app .bottom,
+html body #app .bottomSix,
+html body .bottom,
+html body .bottomSix {
+  position: fixed !important;
+  background: transparent !important;
+  background-image: none !important;
   border: 0 !important;
   border-top: 0 !important;
   box-shadow: none !important;
@@ -10,23 +15,40 @@
   overflow: visible !important;
   isolation: isolate !important;
 }
-#app .bottom::before, #app .bottomSix::before, .bottom::before, .bottomSix::before {
+html body .bottom::before,
+html body .bottomSix::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: url("./nav-box.png") center / 100% 100% no-repeat !important;
+  mix-blend-mode: screen !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+html body .bottom::after,
+html body .bottomSix::after {
   content: "" !important;
   position: absolute !important;
   left: 0 !important;
   right: 0 !important;
-  bottom: calc(100% - 3px) !important;
+  top: -35px !important;
   height: 35px !important;
   background: url("./nav-light.png") center bottom / 100% 100% no-repeat !important;
+  mix-blend-mode: screen !important;
   pointer-events: none !important;
   z-index: 0 !important;
 }
-#app .bottom::after, #app .bottomSix::after, .bottom::after, .bottomSix::after {content: none !important;}
-#app .bottom > button, #app .bottomSix > button, .bottom > button, .bottomSix > button {
+html body .bottom > button,
+html body .bottomSix > button,
+html body .bottom > button.active,
+html body .bottomSix > button.active {
   background: transparent !important;
+  background-color: transparent !important;
   background-image: none !important;
-  border-color: transparent !important;
+  border: 0 !important;
   box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   position: relative !important;
   z-index: 1 !important;
 }
