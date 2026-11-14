@@ -1,0 +1,19 @@
+/* Profile-card artwork only. No changes to module buttons, navigation or app behavior. */
+@media (max-width:800px){
+  body #app .homeHero {
+    position:relative!important;
+    background:#000!important;
+    border:0!important;
+    box-shadow:none!important;
+    isolation:isolate;
+  }
+  body #app .homeHero::before {
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:url("fieldforce-profile-frame.png") center center / 100% 100% no-repeat;
+  }
+  body #app .homeHero > * {position:relative;z-index:1;}
+}
