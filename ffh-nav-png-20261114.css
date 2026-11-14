@@ -825,13 +825,14 @@ html body #app .bottom>button,html body #app .bottomSix>button{
  }
 }
 
-/* 2026-11-14: remove the 55px PNG overhang that covered home cards.
-   Keep the actual navigation bar and its seven buttons unchanged. */
+/* 2026-11-14: make the dark PNG backing visibly shorter while
+   keeping the seven nav controls and the navigation container fixed. */
 @media(max-width:800px){
  html body #app .bottom::before,html body #app .bottomSix::before,
  html body .bottom::before,html body .bottomSix::before{
-   top:0!important;
+   top:auto!important;
    bottom:0!important;
-   height:100%!important;
+   height:80%!important;
+   background-size:100% 100%!important;
  }
 }
