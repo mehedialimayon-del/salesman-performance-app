@@ -152,3 +152,60 @@ html body .homeGrid .module::before{
  opacity:1!important;
  filter:brightness(1.12) saturate(1.06)!important;
 }
+
+/* Navigation only: zoom out old seven cell surfaces and fit uploaded
+   seven-slot border PNG exactly across the existing bottom bar. */
+html body #app .bottom,
+html body #app .bottomSix,
+html body .bottom,
+html body .bottomSix{
+ position:fixed!important;
+ isolation:isolate!important;
+ background:#090807!important;
+ background-image:none!important;
+ border:0!important;
+ box-shadow:none!important;
+ border-radius:0!important;
+ padding:0!important;
+ display:grid!important;
+ grid-template-columns:repeat(7,minmax(0,1fr))!important;
+ gap:0!important;
+}
+html body #app .bottom::before,
+html body #app .bottomSix::before,
+html body .bottom::before,
+html body .bottomSix::before{
+ inset:0!important;
+ width:100%!important;height:100%!important;
+ background-image:url("./fieldforce-nav-border.png")!important;
+ background-size:100% 100%!important;
+ background-position:center!important;
+ background-repeat:no-repeat!important;
+ opacity:1!important;filter:none!important;
+ mix-blend-mode:normal!important;
+ z-index:1!important;pointer-events:none!important;
+}
+html body #app .bottom button,
+html body #app .bottomSix button,
+html body .bottom button,
+html body .bottomSix button{
+ background:transparent!important;
+ background-image:none!important;
+ border:0!important;
+ border-left:0!important;border-right:0!important;
+ box-shadow:none!important;
+ outline:0!important;
+ border-radius:0!important;
+ padding:3px 1px!important;
+ margin:0!important;
+ min-width:0!important;
+ transform:none!important;
+ position:relative!important;z-index:2!important;
+ display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:center!important;
+ text-align:center!important;
+}
+html body .bottom button::before,html body .bottomSix button::before,
+html body .bottom button::after,html body .bottomSix button::after{
+ box-shadow:none!important;
+}
