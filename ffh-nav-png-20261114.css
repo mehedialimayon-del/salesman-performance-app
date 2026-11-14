@@ -809,3 +809,18 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    background-image:none!important;
  }
 }
+
+/* 2026-11-14: inspected overlapping nav PNG. The 55px overhang is
+   part of the approved illuminated frame; its opaque black pixels must
+   not cover the last home-card row. Screen compositing makes black neutral
+   while retaining orange/gold pixels. No dimensions or positions changed. */
+@media(max-width:800px){
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+   isolation:auto!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+   mix-blend-mode:screen!important;
+ }
+}
