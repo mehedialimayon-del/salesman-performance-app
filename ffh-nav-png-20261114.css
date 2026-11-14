@@ -614,10 +614,6 @@ html body #app .bottom>button,html body #app .bottomSix>button{
 /* 17:55: keep card widths and icons intact. Recover bottom-row visibility
    without enlarging cards; expose nav gold bottom line by lifting frame only. */
 @media(max-width:800px){
- html body #app .homeGrid,html body .homeGrid{
-   row-gap:1px!important;
-   padding-bottom:155px!important;
- }
  html body #app .bottom,html body #app .bottomSix,
  html body .bottom,html body .bottomSix{
    transform:translateY(58px)!important;
@@ -647,5 +643,18 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    height:calc(100% + 28px)!important;
    background-image:url("./fieldforce-nav-border.png")!important;
    background-size:100% 100%!important;
+ }
+}
+
+/* 17:59 correction: restore original full-height home tiles.
+   Only move the complete seven-slot navigation up slightly. */
+@media(max-width:800px){
+ html body #app .homeGrid,html body .homeGrid{
+   row-gap:4px!important;
+   padding-bottom:0!important;
+ }
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+   transform:translateY(-6px)!important;
  }
 }
