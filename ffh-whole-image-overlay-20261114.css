@@ -58,3 +58,42 @@
 #app .app:has(.homeGrid) .bottom button.active{
   background:#ff820020!important;box-shadow:inset 0 0 13px #ff850060!important;
 }
+
+/* Preserve the single full PNG as the only visible skin: make legacy
+   structural surfaces transparent, while retaining live content. */
+#app .app:has(.homeGrid) > header,
+#app .app:has(.homeGrid) > .topbar,
+#app .app:has(.homeGrid) .topbar,
+#app .app:has(.homeGrid) .header,
+#app .app:has(.homeGrid) .profile,
+#app .app:has(.homeGrid) .ffIdentityHero,
+#app .app:has(.homeGrid) .homeGrid .module,
+#app .app:has(.homeGrid) .bottom{
+ background-color:transparent!important;
+ background-image:none!important;
+ box-shadow:none!important;
+}
+#app .app:has(.homeGrid) .ffIdentityHero{
+ border:0!important;outline:0!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module{
+ border:0!important;outline:0!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module .moduleTitle,
+#app .app:has(.homeGrid) .homeGrid .module small{
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+ text-shadow:0 2px 3px #000!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module .mi{
+ background-image:none!important;
+ background-color:transparent!important;
+ border:0!important;box-shadow:none!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module .mi>*{
+ opacity:1!important;visibility:visible!important;
+}
+#app .app:has(.homeGrid) .bottom button{
+ background-color:transparent!important;
+ background-image:none!important;
+ box-shadow:none!important;
+}
