@@ -825,13 +825,15 @@ html body #app .bottom>button,html body #app .bottomSix>button{
  }
 }
 
-/* Restore the approved full-size PNG frame: do not shrink or move it. */
+/* Restore the original approved navigation PNG geometry (before v55-v58).
+   The bar and its seven buttons stay fixed; only the artwork extends above it. */
 @media(max-width:800px){
  html body #app .bottom::before,html body #app .bottomSix::before,
  html body .bottom::before,html body .bottomSix::before{
-   top:0!important;
+   top:-55px!important;
    bottom:0!important;
-   height:100%!important;
+   height:calc(100% + 55px)!important;
    background-size:100% 100%!important;
+   mix-blend-mode:screen!important;
  }
 }
