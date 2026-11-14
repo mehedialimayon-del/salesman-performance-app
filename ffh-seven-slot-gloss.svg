@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 140" preserveAspectRatio="none">
+<defs><linearGradient id="edge" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffac1e"/><stop offset=".12" stop-color="#ffe272"/><stop offset=".3" stop-color="#ff8a05"/><stop offset=".72" stop-color="#ff6500"/><stop offset="1" stop-color="#ffc038"/></linearGradient><linearGradient id="glass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#23140b"/><stop offset=".17" stop-color="#0b0a09"/><stop offset=".8" stop-color="#060606"/><stop offset="1" stop-color="#1b0b04"/></linearGradient><linearGradient id="sep" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffb24d" stop-opacity=".65"/><stop offset=".45" stop-color="#ff9b34" stop-opacity=".3"/><stop offset="1" stop-color="#ff6d0a" stop-opacity=".8"/></linearGradient><filter id="glow" x="-20%" y="-30%" width="140%" height="160%"><feGaussianBlur stdDeviation="4"/></filter></defs>
+<rect x="8" y="9" width="684" height="122" rx="37" fill="none" stroke="#ff7200" stroke-width="10" opacity=".85" filter="url(#glow)"/>
+<rect x="7" y="8" width="686" height="124" rx="38" fill="url(#glass)" stroke="url(#edge)" stroke-width="5"/>
+<path d="M45 12 H655" stroke="#ffd75a" stroke-width="2.2" opacity=".8"/>
+<path d="M45 128 H655" stroke="#ff9b0e" stroke-width="2.3" opacity=".9"/>
+<g stroke="url(#sep)" stroke-width="1.4"><path d="M100 11V129"/><path d="M200 11V129"/><path d="M300 11V129"/><path d="M400 11V129"/><path d="M500 11V129"/><path d="M600 11V129"/></g></svg>
