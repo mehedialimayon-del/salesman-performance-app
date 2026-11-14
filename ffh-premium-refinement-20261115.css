@@ -1,0 +1,42 @@
+/* FieldForce Hub premium visual refinement — home only, no behavior changes. */
+@media(max-width:800px){
+ html body #app .app:has(.homeGrid) .ffIdentityHero{
+  grid-template-columns:minmax(100px,25%) minmax(0,1fr) minmax(118px,31%)!important;
+  padding:0 10px!important;gap:5px!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .editableAvatar{
+  left:8px!important;top:12px!important;width:88px!important;height:100px!important;
+  max-width:88px!important;max-height:100px!important;object-fit:cover!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText{
+  grid-column:2!important;min-width:0!important;overflow:visible!important;
+  padding-left:0!important;z-index:5!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText>small{
+  font-size:clamp(11px,3vw,15px)!important;line-height:1.15!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText>strong{
+  font-size:clamp(10px,2.65vw,13px)!important;line-height:1.2!important;
+  overflow-wrap:anywhere!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityRole{
+  flex-wrap:wrap!important;line-height:1.2!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .heroClock,
+ html body #app .app:has(.homeGrid) .ffIdentityHero .heroDate,
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityCredit{
+  right:10px!important;width:calc(31% - 8px)!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .heroClock{top:22px!important}
+ html body #app .app:has(.homeGrid) .ffIdentityHero .heroDate{top:70px!important}
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityCredit{bottom:10px!important}
+ html body #app .app:has(.homeGrid) .homeGrid .module{
+  color:#fff!important;text-shadow:0 1px 3px #000!important;
+ }
+ html body #app .app:has(.homeGrid) .homeGrid .module .mi{
+  filter:drop-shadow(0 0 4px rgba(255,115,0,.35))!important;
+ }
+ html body #app .app:has(.homeGrid) .homeGrid .module:focus-visible{
+  outline:2px solid #fff!important;outline-offset:-7px!important;
+ }
+}
