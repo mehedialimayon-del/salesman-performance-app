@@ -500,3 +500,40 @@ html body #app .bottom>button,html body #app .bottomSix>button{
   transform:translateY(0px)!important;
  }
 }
+
+/* 2026-11-14: align nav to viewport bottom; preserve one supplied PNG and center content. */
+@media(max-width:800px){
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+  position:fixed!important;
+  bottom:0!important;
+  top:auto!important;
+  transform:none!important;
+  height:112px!important;
+  min-height:112px!important;
+  padding:0 7px!important;
+  box-sizing:border-box!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+  top:0!important;bottom:0!important;
+  height:100%!important;
+ }
+ html body #app .bottom>button,html body #app .bottomSix>button,
+ html body .bottom>button,html body .bottomSix>button{
+  transform:translateY(-7px)!important;
+  justify-content:center!important;
+  align-items:center!important;
+  padding:0 0 9px!important;
+ }
+ /* Larger original card artwork, narrow gaps, no additional border layer. */
+ html body #app .homeGrid,html body .homeGrid{
+  gap:2px 1px!important;
+ }
+ html body #app .homeGrid .module::before,html body .homeGrid .module::before{
+  inset:-6px!important;
+  width:calc(100% + 12px)!important;
+  height:calc(100% + 12px)!important;
+  background-size:100% 100%!important;
+ }
+}
