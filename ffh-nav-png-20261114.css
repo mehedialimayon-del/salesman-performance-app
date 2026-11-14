@@ -704,7 +704,7 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    position:fixed!important;
    top:auto!important;
    bottom:env(safe-area-inset-bottom,0px)!important;
-   transform:translateY(40px)!important;
+   transform:translateY(100px)!important;
  }
  html body #app .bottom::before,html body #app .bottomSix::before,
  html body .bottom::before,html body .bottomSix::before{
