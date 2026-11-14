@@ -1,10 +1,14 @@
 /* Home profile card only: uploaded gold artwork with live content intact. */
 @media(max-width:800px){
+ /* The existing home wrapper has side padding; permit the identity artwork
+    to extend past that padding without clipping it. */
+ #app .app:has(.homeGrid) main.wrap{overflow-x:clip;}
+
  #app .app:has(.homeGrid) .ffIdentityHero{
    position:relative!important;isolation:isolate!important;
-   width:100vw!important;max-width:100vw!important;
-   margin-left:calc(50% - 50vw)!important;
-   margin-right:calc(50% - 50vw)!important;
+   width:100vw!important;max-width:none!important;
+   left:50%!important;transform:translateX(-50%)!important;
+   margin-left:0!important;margin-right:0!important;
    box-sizing:border-box!important;
    border:0!important;box-shadow:none!important;
    background:#000!important;background-image:none!important;
