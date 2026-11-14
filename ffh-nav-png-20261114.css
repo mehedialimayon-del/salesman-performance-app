@@ -447,3 +447,33 @@ html body #app .bottom>button,html body #app .bottomSix>button{
   background-position:center!important;
  }
 }
+
+/* Requested 0.40in bar height relative to prior 0.36in; 0.120in²
+   button footprint relative to prior 0.144in². Keep seven slots and bar width. */
+@media(max-width:800px){
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+  height:129px!important;
+  min-height:129px!important;
+  bottom:0!important;
+  padding:21px 7px 0!important;
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+  top:0!important;
+  height:100%!important;
+  width:100%!important;
+ }
+ html body #app .bottom>button,html body #app .bottomSix>button,
+ html body .bottom>button,html body .bottomSix>button{
+  width:83.333%!important;
+  max-width:83.333%!important;
+  justify-self:center!important;
+  height:100%!important;
+  transform:translateY(6px)!important;
+  justify-content:center!important;
+  align-items:center!important;
+  text-align:center!important;
+ }
+}
