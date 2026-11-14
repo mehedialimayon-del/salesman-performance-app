@@ -766,14 +766,20 @@ html body #app .bottom>button,html body #app .bottomSix>button{
  }
 }
 
-/* User request: match the dark backing of navigation under home module cards.
-   This changes only the card backing, not PNG borders, text, sizing or nav. */
+/* Dark backing belongs BEHIND the entire home card grid, never on each
+   card surface. The existing PNG and icon layers remain above it.
+   Navigation frame, placement and buttons are intentionally untouched. */
 @media(max-width:800px){
+ html body .app:has(.homeGrid) .homeGrid,
+ html body #app .homeGrid,
+ html body .homeGrid{
+   background-color:#090807!important;
+   background-image:none!important;
+ }
  html body .app:has(.homeGrid) .homeGrid .module,
  html body #app .homeGrid .module,
  html body .homeGrid .module{
-   background-color:rgba(9,8,7,.96)!important;
+   background-color:transparent!important;
    background-image:none!important;
-   border-radius:18px!important;
  }
 }
