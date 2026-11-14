@@ -35,3 +35,24 @@ html body #app .app:has(.homeGrid) .bottom{border-radius:20px!important;border:1
 html body #app .app:has(.homeGrid) .bottom button{color:#fff!important;-webkit-text-fill-color:#fff!important}
 html body #app .app:has(.homeGrid) .bottom button i{color:#ff9a0b!important;-webkit-text-fill-color:#ff9a0b!important}
 html body #app .app:has(.homeGrid) .bottom button.active{border:1px solid #ffac33!important;border-radius:13px!important;background:linear-gradient(145deg,#783109,#1d0d08)!important;box-shadow:0 0 13px #ff7200a8,inset 0 0 12px #ffae004a!important}
+
+/* v3: finish reference's header, identity wave, card typography and navigation. */
+#app .app:has(.homeGrid) .top{background:linear-gradient(180deg,#080808,#0d0a09)!important;border-bottom:1px solid #ff8c2047!important}
+#app .app:has(.homeGrid) .topBtns .iconBtn{border:1px solid #ff922d!important;border-radius:17px!important;background:linear-gradient(145deg,#17120f,#050505)!important;color:#fff!important;-webkit-text-fill-color:#fff!important;box-shadow:inset 0 1px 2px #ffb75a2b,0 0 8px #ff79004d!important}
+#app .app:has(.homeGrid) .topBtns .iconBtn:active{box-shadow:0 0 16px #ff7b00a8!important}
+#app .app:has(.homeGrid) .ffAppAnnouncements .ffTicker{border:1px solid #ff7e1b90!important;border-radius:10px!important;background:linear-gradient(105deg,#25150d,#050505 60%,#1d1009)!important;box-shadow:inset 0 1px 3px #ff8a0050,0 0 8px #ff6d0028!important}
+#app .app:has(.homeGrid) .ffAppAnnouncements .ffTickerCopy{color:#fff!important;font-weight:800!important}
+#app .app:has(.homeGrid) .ffIdentityHero{position:relative!important;isolation:isolate!important;overflow:hidden!important}
+#app .app:has(.homeGrid) .ffIdentityHero:before{content:""!important;position:absolute!important;inset:auto -12% -60% 7%!important;height:100%!important;z-index:-1!important;transform:rotate(-11deg)!important;background:radial-gradient(ellipse at 65% 55%,#ff7d003e,transparent 58%),repeating-radial-gradient(ellipse at 75% 100%,transparent 0 6px,#ff8e122c 7px,transparent 8px 12px)!important;filter:none!important;pointer-events:none!important}
+#app .app:has(.homeGrid) .ffIdentityHero:after{content:""!important;position:absolute!important;inset:auto -5% 0 38%!important;height:35%!important;z-index:-1!important;pointer-events:none!important;background:linear-gradient(165deg,transparent 24%,#ffac304a 28%,transparent 31%,#ff77004f 36%,transparent 41%,#ff8c002a 45%,transparent 50%)!important;filter:drop-shadow(0 0 6px #ff74008a)!important}
+#app .app:has(.homeGrid) .ffIdentityHero .heroClock,#app .app:has(.homeGrid) .ffIdentityHero .heroDate{border:1px solid #ff842ba8!important;border-radius:24px!important;background:linear-gradient(140deg,#17110f,#070707)!important;color:#fff!important;box-shadow:inset 0 1px 2px #ffb44324!important}
+#app .app:has(.homeGrid) .ffIdentityHero .ffIdentityCredit{border:1px solid #ff8d278a!important;border-radius:22px!important;background:#0b0807cc!important;color:#fff!important;font-size:clamp(8px,2.2vw,11px)!important}
+#app .app:has(.homeGrid) .ffIdentityHero .ffIdentityCredit b{color:#ff991a!important}
+#app .app:has(.homeGrid) .homeGrid .module{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;gap:6px!important}
+#app .app:has(.homeGrid) .homeGrid .moduleTitle{display:block!important;line-height:1.15!important;font-size:clamp(10px,2.7vw,14px)!important;letter-spacing:-.025em!important;overflow-wrap:normal!important}
+#app .app:has(.homeGrid) .homeGrid .module .mi{display:grid!important;place-items:center!important;flex:none!important}
+#app .app:has(.homeGrid) .homeGrid .module .mi svg{stroke-width:2.1!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+#app .app:has(.homeGrid) .bottom{margin-bottom:0!important;background:linear-gradient(180deg,#171310,#050505)!important}
+#app .app:has(.homeGrid) .bottom button{font-size:clamp(9px,2.4vw,12px)!important;font-weight:800!important;text-align:center!important}
+#app .app:has(.homeGrid) .bottom button i{filter:drop-shadow(0 0 3px #ff790080)!important}
+@media(max-width:380px){#app .app:has(.homeGrid) .homeGrid .moduleTitle{font-size:10px!important}#app .app:has(.homeGrid) .homeGrid{gap:7px!important}}
