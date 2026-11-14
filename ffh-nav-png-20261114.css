@@ -391,3 +391,40 @@ html body #app .bottom>button,html body #app .bottomSix>button{
   pointer-events:none!important;
  }
 }
+
+/* Single-border correction: remove the extra stretched artwork and all legacy layers. */
+@media(max-width:800px){
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+  background:none!important;
+  background-image:none!important;
+  border:0!important;
+  box-shadow:none!important;
+  outline:0!important;
+  isolation:isolate!important;
+ }
+ html body #app .bottom::after,html body #app .bottomSix::after,
+ html body .bottom::after,html body .bottomSix::after{
+  content:none!important;display:none!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+  content:""!important;display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  top:0!important;bottom:0!important;
+  width:100%!important;height:100%!important;
+  background:url("./fieldforce-nav-border.png") center/100% 100% no-repeat!important;
+  box-shadow:none!important;
+  transform:none!important;
+  filter:none!important;
+  z-index:0!important;
+  pointer-events:none!important;
+ }
+ html body #app .bottom>button,html body #app .bottomSix>button,
+ html body .bottom>button,html body .bottomSix>button{
+  background:none!important;background-image:none!important;
+  border:0!important;box-shadow:none!important;
+  z-index:1!important;
+ }
+}
