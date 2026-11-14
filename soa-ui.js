@@ -169,15 +169,31 @@ function close(fromHistory=false){
  if(!fromHistory&&soaHistory&&history.state?.ffhSoaOverlay){soaHistory=false;history.back();}
  else soaHistory=false;
 }
+let soaExitDialog=null;
+function askSoaReturnHome(){
+ if(soaExitDialog)return;
+ const overlay=document.createElement('div');overlay.className='soaAppNotice';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');
+ overlay.innerHTML='<section class="soaAppNoticePanel"><strong>RETURN TO HOME?</strong><p>Do you want to leave SOA and return to Home?</p><div style="display:flex;gap:12px;justify-content:flex-end"><button type="button" data-no>NO</button><button type="button" data-yes>YES</button></div></section>';
+ document.body.appendChild(overlay);soaExitDialog=overlay;
+ overlay.querySelector('[data-no]').onclick=()=>{overlay.remove();soaExitDialog=null;};
+ overlay.querySelector('[data-yes]').onclick=()=>{
+  overlay.remove();soaExitDialog=null;close(true);
+  const home=document.querySelector('nav.bottom [data-page="home"]');
+  if(home)home.click();
+  history.replaceState({...history.state,ffhSoaOverlay:false,ffhSoaHistoryFull:false},'',location.href);
+ };
+}
 window.addEventListener('popstate',()=>{
  if(!visible)return;
- if(soaModalOpen()){
-  dismissSoaModal();
-  history.pushState({...history.state,ffhSoaOverlay:true},'',location.href);
+ const root=byId('ffhSoaRoot');
+ if(root?.classList.contains('soaHistoryFull')){
+  root.classList.remove('soaHistoryFull');
+  const fullButton=root.querySelector('.soaHistoryExpand');if(fullButton){fullButton.textContent='⛶';fullButton.setAttribute('aria-label','Full screen transactions');}
   return;
  }
- // The first Back returns to the page that launched SOA, not an exit dialog.
- close(true);
+ if(soaModalOpen()){dismissSoaModal();history.pushState({...history.state,ffhSoaOverlay:true},'',location.href);return;}
+ history.pushState({...history.state,ffhSoaOverlay:true,ffhSoaHistoryFull:false},'',location.href);
+ askSoaReturnHome();
 });
 function install(){
  // Replace the actual Home Access Requests tile with a dedicated SOA tile.
@@ -403,6 +419,23 @@ soaLastLayout.textContent=`
 }`;
 document.head.appendChild(soaLastLayout);
 
+const soaFinalCorrection=document.createElement('style');
+soaFinalCorrection.id='soaFinalCorrection';
+soaFinalCorrection.textContent=`
+@media screen{
+#ffhSoaRoot .soaDashboard{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px!important}
+#ffhSoaRoot .soaDashboard .soaMetric,#ffhSoaRoot .soaDashboard .soaMetric:first-child{min-width:0!important;width:100%!important;height:57px!important;min-height:57px!important;max-height:57px!important;padding:3px 2px!important;overflow:hidden!important;box-sizing:border-box!important}
+#ffhSoaRoot .soaDashboard .soaMetricIcon{font-size:14px!important;line-height:1!important}
+#ffhSoaRoot .soaDashboard .soaMetric small{font-size:clamp(7px,1.7vw,9px)!important;line-height:1.07!important;white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important;text-align:center!important;letter-spacing:-.35px!important}
+#ffhSoaRoot .soaDashboard .soaMetric strong{font-size:clamp(9px,2.15vw,12px)!important;line-height:1.06!important;white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important;text-align:center!important;letter-spacing:-.25px!important}
+#ffhSoaRoot .soaPageControls{justify-content:space-between!important}
+#ffhSoaRoot .soaPageControls .soaOpeningBalancePill{display:inline-block!important;order:-1!important;flex:0 0 auto!important;margin-right:auto!important;color:#ffb353!important;background:#0b0b0b!important;border:1px solid #a95a19!important;border-radius:7px!important;padding:3px 5px!important;font-size:9px!important;font-weight:800!important;white-space:nowrap!important}
+#ffhSoaRoot #soaPrint>p{display:none!important}
+#ffhSoaRoot #soaPrint{min-height:185px!important}
+@media(max-width:390px){#ffhSoaRoot .soaPageControls .soaOpeningBalancePill{font-size:8px!important;padding:2px!important}#ffhSoaRoot .soaPageControls button{font-size:8px!important}}
+}`;
+document.head.appendChild(soaFinalCorrection);
+
 function addHistoryExpand(){
  const root=document.getElementById('ffhSoaRoot'),result=document.getElementById('soaResults');
  if(!root||!result)return;
@@ -417,9 +450,18 @@ function addHistoryExpand(){
   const label=searchInput.closest('label');
   if(label){label.classList.add('soaInlineHistorySearch');heading.appendChild(label);}
  }
+ // Display opening balance beside pagination, while preserving the PDF report text.
+ const pagination=result.querySelector('.soaPageControls');
+ if(pagination&&document.getElementById('soaPrint')){
+  try{
+   const opening=ledger().openingBalance;
+   const pill=document.createElement('span');pill.className='soaOpeningBalancePill';pill.textContent='Opening: RM '+opening;
+   pagination.prepend(pill);
+  }catch(e){}
+ }
  // The original search input stays bound to the ledger filter.
  const button=document.createElement('button');button.type='button';button.className='soaHistoryExpand';button.textContent=root.classList.contains('soaHistoryFull')?'↙':'⛶';button.setAttribute('aria-label',root.classList.contains('soaHistoryFull')?'Exit full screen':'Full screen transactions');button.title=button.getAttribute('aria-label');
- button.onclick=()=>{root.classList.toggle('soaHistoryFull');button.textContent=root.classList.contains('soaHistoryFull')?'↙':'⛶';button.setAttribute('aria-label',root.classList.contains('soaHistoryFull')?'Exit full screen':'Full screen transactions');button.title=button.getAttribute('aria-label');};
+ button.onclick=()=>{const entering=!root.classList.contains('soaHistoryFull');if(entering){history.pushState({...history.state,ffhSoaOverlay:true,ffhSoaHistoryFull:true},'',location.href);root.classList.add('soaHistoryFull');}else{root.classList.remove('soaHistoryFull');if(history.state?.ffhSoaHistoryFull)history.back();}button.textContent=entering?'↙':'⛶';button.setAttribute('aria-label',entering?'Exit full screen':'Full screen transactions');button.title=button.getAttribute('aria-label');};
  heading.appendChild(button);
 }
 const historyObserver=new MutationObserver(()=>{if(document.getElementById('soaResults'))addHistoryExpand();});
