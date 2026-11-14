@@ -218,16 +218,18 @@ window.addEventListener('popstate',event=>{
   root.classList.remove('soaHistoryFull');
   const btn=root.querySelector('.soaHistoryExpand');
   if(btn){btn.textContent='⛶';btn.setAttribute('aria-label','Full screen transactions');btn.title='Full screen transactions';}
-  // Browser Back already returned to the existing SOA history entry.
-  // Do not push a duplicate entry: that caused extra Back presses and exit prompts.
+  // Full-screen Back restores the normal SOA page without changing its ledger.
   soaDismissHostExit();
   soaRestoreAppChrome();
   return;
  }
  if(soaModalOpen()){dismissSoaModal();history.pushState({...history.state,ffhSoaOverlay:true},'',location.href);return;}
- history.pushState({...history.state,ffhSoaOverlay:true,ffhSoaHistoryFull:false},'',location.href);
+ // The SOA entry has already been popped: reveal the original Home screen.
+ // Never push the overlay back onto history or open the app-exit dialog.
  soaDismissHostExit();
- askSoaReturnHome();
+ close(true);
+ const home=soaHomeControl();
+ if(home)home.click();
 },true);
 function install(){
  // Replace the actual Home Access Requests tile with a dedicated SOA tile.
