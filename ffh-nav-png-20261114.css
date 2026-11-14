@@ -783,3 +783,17 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    background-image:none!important;
  }
 }
+
+/* Keep approved nav dimensions and position. The home card grid must paint
+   ABOVE the nav's opaque backing where their rectangles overlap; the nav
+   artwork and buttons themselves remain exactly as configured. */
+@media(max-width:800px){
+ html body #app .homeGrid,html body .homeGrid{
+   position:relative!important;
+   z-index:20!important;
+ }
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+   z-index:10!important;
+ }
+}
