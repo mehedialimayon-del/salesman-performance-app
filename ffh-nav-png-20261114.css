@@ -98,3 +98,29 @@ html body #app .homeGrid .module>*,
 html body .homeGrid .module>*{position:relative!important;z-index:1!important}
 html body #app .homeGrid .module .mi,
 html body .homeGrid .module .mi{margin-left:auto!important;margin-right:auto!important}
+
+/* FINAL CARD FIT: remove the original outer orange border (including high-specificity
+   app:has() rules), and enlarge the supplied PNG to the actual card edges. */
+html body .app:has(.homeGrid) .homeGrid .module,
+html body .app:has(.homeGrid) .homeGrid .module:first-child,
+html body .app:has(.homeGrid) .homeGrid .module.active,
+html body #app .homeGrid .module,
+html body #app .homeGrid .module:first-child,
+html body .homeGrid .module{
+ border:0!important;border-color:transparent!important;
+ outline:0!important;outline-offset:0!important;
+ box-shadow:none!important;
+ background:transparent!important;background-image:none!important;
+ border-radius:0!important;
+}
+html body .app:has(.homeGrid) .homeGrid .module::before,
+html body #app .homeGrid .module::before,
+html body .homeGrid .module::before{
+ inset:0!important;
+ background-image:url("./fieldforce-card-border.png")!important;
+ background-position:center!important;
+ background-size:115% 115%!important;
+ background-repeat:no-repeat!important;
+ filter:none!important;mix-blend-mode:normal!important;
+ opacity:1!important;
+}
