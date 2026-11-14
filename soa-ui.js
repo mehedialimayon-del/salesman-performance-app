@@ -339,14 +339,47 @@ compactHistoryStyle.textContent=`
 }`;
 document.head.appendChild(compactHistoryStyle);
 
+
+// SOA finishing adjustments: only the SOA overlay, no global application selectors.
+const finalFineTune=document.createElement('style');
+finalFineTune.id='ffhSoaFineTune';
+finalFineTune.textContent=`
+@media screen{
+#ffhSoaRoot .soaDashboard{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important}
+#ffhSoaRoot .soaMetric,#ffhSoaRoot .soaMetric:first-child{box-sizing:border-box!important;min-width:0!important;width:100%!important;height:62px!important;min-height:62px!important;padding:3px 1px!important;gap:1px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}
+#ffhSoaRoot .soaMetricIcon{font-size:16px!important;line-height:1!important;flex:0 0 auto!important}
+#ffhSoaRoot .soaMetric small{font-size:clamp(7px,1.9vw,10px)!important;line-height:1.05!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important;text-align:center!important;flex:0 0 auto!important}
+#ffhSoaRoot .soaMetric strong{font-size:clamp(10px,2.65vw,13px)!important;line-height:1.06!important;max-width:100%!important;overflow-wrap:anywhere!important;text-align:center!important;flex:0 0 auto!important}
+#ffhSoaRoot .soaQuickActions{margin-top:0!important;gap:5px!important}
+#ffhSoaRoot .soaQuickActions button{height:36px!important;min-height:36px!important;padding:2px!important;border-radius:10px!important;font-size:clamp(7px,1.9vw,10px)!important;line-height:1.08!important}
+#ffhSoaRoot #soaResults{min-height:260px!important;gap:0!important;padding:4px 6px!important}
+#ffhSoaRoot .soaTableHeading{display:flex!important;align-items:center!important;flex-wrap:wrap!important;min-height:0!important;padding:1px 0!important;font-size:11px!important;line-height:1.1!important}
+#ffhSoaRoot .soaTableHeading span{order:1!important;margin-left:0!important;margin-right:auto!important;padding:2px 5px!important;font-size:9px!important}
+#ffhSoaRoot .soaHistoryExpand{order:2!important;margin-left:auto!important;min-width:34px!important;width:34px!important;height:28px!important;padding:0!important;font-size:23px!important;line-height:1!important;font-weight:800!important;display:grid!important;place-items:center!important}
+#ffhSoaRoot .soaPageControls{flex:0 0 auto!important;gap:3px!important;padding:0!important;margin:2px 0!important;min-height:0!important}
+#ffhSoaRoot .soaPageControls input{height:25px!important;min-height:25px!important;font-size:10px!important;padding:3px 5px!important}
+#ffhSoaRoot .soaPageControls button{padding:3px 4px!important;font-size:9px!important;min-height:24px!important}
+#ffhSoaRoot .soaPageControls span{font-size:9px!important}
+#ffhSoaRoot #soaPrint{display:block!important;flex:1 1 0!important;min-height:165px!important;max-height:none!important;height:auto!important;overflow:auto!important;margin:0!important;padding:0!important;scrollbar-width:thin!important;scrollbar-color:#ff8500 #111!important}
+#ffhSoaRoot #soaPrint table{width:100%!important;min-width:0!important;border-collapse:collapse!important;table-layout:fixed!important;font-size:10px!important}
+#ffhSoaRoot #soaPrint th{position:sticky!important;top:0!important;z-index:3!important;background:linear-gradient(#ff9c00,#e54c00)!important;padding:5px 2px!important;font-size:10px!important}
+#ffhSoaRoot #soaPrint td{padding:5px 3px!important;font-size:10px!important;line-height:1.12!important;overflow-wrap:anywhere!important}
+#ffhSoaRoot #soaPrint th:last-child,#ffhSoaRoot #soaPrint td:last-child{width:67px!important}
+#ffhSoaRoot #soaPrint .soaEditCell button{display:block!important;min-height:25px!important;padding:3px!important;margin:2px 0!important;width:100%!important;font-size:10px!important}
+#ffhSoaRoot #soaMore{display:grid!important;place-items:center!important;align-self:end!important;height:35px!important;min-height:35px!important;line-height:1!important;position:relative!important;top:0!important;transform:none!important}
+#ffhSoaRoot.soaHistoryFull #soaPrint{min-height:0!important;flex:1 1 auto!important}
+@media(max-height:720px){#ffhSoaRoot #soaResults{min-height:190px!important}#ffhSoaRoot #soaPrint{min-height:100px!important}}
+}`;
+document.head.appendChild(finalFineTune);
+
 function addHistoryExpand(){
  const root=document.getElementById('ffhSoaRoot'),result=document.getElementById('soaResults');
  if(!root||!result)return;
  const heading=result.querySelector('.soaTableHeading');
  if(!heading||heading.querySelector('.soaHistoryExpand'))return;
- const search=document.createElement('button');search.type='button';search.className='soaHistoryExpand';search.textContent='⌕';search.setAttribute('aria-label','Search invoice or outlet');search.title='Search transactions';search.onclick=()=>{const input=result.querySelector('#soaSearch');if(input){input.focus();input.select();}};heading.appendChild(search);
- const button=document.createElement('button');button.type='button';button.className='soaHistoryExpand';button.textContent=root.classList.contains('soaHistoryFull')?'EXIT FULL':'FULL SCREEN';
- button.onclick=()=>{root.classList.toggle('soaHistoryFull');button.textContent=root.classList.contains('soaHistoryFull')?'EXIT FULL':'FULL SCREEN';};
+ // Search is already available in the transaction filter row.
+ const button=document.createElement('button');button.type='button';button.className='soaHistoryExpand';button.textContent=root.classList.contains('soaHistoryFull')?'↙':'⛶';button.setAttribute('aria-label',root.classList.contains('soaHistoryFull')?'Exit full screen':'Full screen transactions');button.title=button.getAttribute('aria-label');
+ button.onclick=()=>{root.classList.toggle('soaHistoryFull');button.textContent=root.classList.contains('soaHistoryFull')?'↙':'⛶';button.setAttribute('aria-label',root.classList.contains('soaHistoryFull')?'Exit full screen':'Full screen transactions');button.title=button.getAttribute('aria-label');};
  heading.appendChild(button);
 }
 const historyObserver=new MutationObserver(()=>{if(document.getElementById('soaResults'))addHistoryExpand();});
