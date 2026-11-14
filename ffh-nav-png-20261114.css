@@ -242,3 +242,61 @@ html body #app .bottom>button,html body #app .bottomSix>button{
  flex:1 1 0!important;
  min-width:0!important;
 }
+
+/* 2026-11-14 final sizing: 7 icons/labels centered INSIDE the original PNG. */
+@media(max-width:800px){
+ html body #app .bottomSix,html body #app .bottom,
+ html body .bottomSix,html body .bottom{
+  height:102px!important;
+  bottom:8px!important;
+  left:0!important;
+  transform:none!important;
+  width:100%!important;
+  max-width:none!important;
+  min-height:102px!important;
+  padding:9px 7px!important;
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  overflow:visible!important;
+ }
+ html body #app .bottomSix>button,html body #app .bottom>button,
+ html body .bottomSix>button,html body .bottom>button{
+  height:100%!important;
+  min-height:0!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  padding:6px 0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+  font-size:clamp(8px,1.9vw,11px)!important;
+  line-height:1.05!important;
+  white-space:normal!important;
+  text-align:center!important;
+ }
+ html body .bottomSix>button i,html body .bottom>button i{
+  display:block!important;
+  font-size:clamp(19px,4.5vw,29px)!important;
+  margin:0 auto 2px!important;
+  flex-shrink:0!important;
+ }
+ html body #app .homeGrid,html body .homeGrid{
+  column-gap:2px!important;
+  row-gap:3px!important;
+  gap:3px 2px!important;
+ }
+ html body #app .homeGrid .module,html body .homeGrid .module{
+  padding-left:0!important;
+  padding-right:0!important;
+ }
+ html body #app .homeGrid .module::before,html body .homeGrid .module::before{
+  inset:-4px!important;
+  width:calc(100% + 8px)!important;
+  height:calc(100% + 8px)!important;
+  background-size:100% 100%!important;
+ }
+}
