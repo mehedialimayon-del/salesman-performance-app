@@ -723,12 +723,3 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    background-size:100% 100%!important;
  }
 }
-
-/* 18:17 user request: move the entire current-size navigation 2 CSS inches down.
-   Do not alter dimensions, seven buttons, or frame artwork. */
-@media(max-width:800px){
- html body #app .bottom,html body #app .bottomSix,
- html body .bottom,html body .bottomSix{
-   transform:translateY(calc(24px + 2in))!important;
- }
-}
