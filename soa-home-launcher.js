@@ -21,6 +21,17 @@ function refresh(){
   if(!norm(tile.textContent).includes('access requests')&&!norm(tile.textContent).includes('soa'))continue;
   tile.dataset.ffhSoaHome='1';
   tile.setAttribute('aria-label','SOA');
+  // Update the home tile icon only; preserve the original tile click target.
+  const icon=tile.querySelector('svg, i, [class*="icon"], [class*="Icon"]');
+  if(icon && !icon.dataset.ffhSoaIcon){
+   icon.dataset.ffhSoaIcon='1';
+   if(icon.tagName.toLowerCase()==='svg'){
+    icon.innerHTML='<rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 8h10M7 12h10M7 16h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+    icon.setAttribute('viewBox','0 0 24 24');
+   }else if(icon.tagName.toLowerCase()==='i'){
+    icon.className='';icon.textContent='▤';icon.style.fontStyle='normal';
+   }
+  }
   const walker=document.createTreeWalker(tile,NodeFilter.SHOW_TEXT);
   const changes=[];
   while(walker.nextNode()){
@@ -50,6 +61,17 @@ function fixLastHomeTile(){
   leaf.textContent='SOA';
   tile.dataset.ffhSoaHome='1';
   tile.setAttribute('aria-label','SOA');
+  // Update the home tile icon only; preserve the original tile click target.
+  const icon=tile.querySelector('svg, i, [class*="icon"], [class*="Icon"]');
+  if(icon && !icon.dataset.ffhSoaIcon){
+   icon.dataset.ffhSoaIcon='1';
+   if(icon.tagName.toLowerCase()==='svg'){
+    icon.innerHTML='<rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 8h10M7 12h10M7 16h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+    icon.setAttribute('viewBox','0 0 24 24');
+   }else if(icon.tagName.toLowerCase()==='i'){
+    icon.className='';icon.textContent='▤';icon.style.fontStyle='normal';
+   }
+  }
  }
 }
 function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;refresh();fixLastHomeTile();});}
