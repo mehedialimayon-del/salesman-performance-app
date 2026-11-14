@@ -599,3 +599,14 @@ html body #app .bottom>button,html body #app .bottomSix>button{
   height:calc(100% + 28px)!important;
  }
 }
+
+/* Correction from 17:53 screenshot: previous -12px was still an enlargement.
+   Restore intended modest border expansion: 4px -> 3px per side. */
+@media(max-width:800px){
+ html body #app .homeGrid .module::before,
+ html body .homeGrid .module::before{
+  inset:-3px!important;
+  width:calc(100% + 6px)!important;
+  height:calc(100% + 6px)!important;
+ }
+}
