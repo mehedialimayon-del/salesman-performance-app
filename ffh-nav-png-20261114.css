@@ -562,3 +562,23 @@ html body #app .bottom>button,html body #app .bottomSix>button{
   transform:translateY(-13px)!important;
  }
 }
+
+/* 2026-11-14 final adjustment: grow artwork in place, not card positions.
+   Keep navigation visible above Android system controls. */
+@media(max-width:800px){
+ html body #app .homeGrid .module::before,
+ html body .homeGrid .module::before{
+  inset:-13px!important;
+  width:calc(100% + 26px)!important;
+  height:calc(100% + 26px)!important;
+ }
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+  transform:translateY(72px)!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+  top:-28px!important;
+  height:calc(100% + 28px)!important;
+ }
+}
