@@ -216,20 +216,20 @@ const style=document.createElement('style');style.textContent='#ffhSoaRoot{posit
 #ffhSoaRoot .soaPanel{padding:3px 9px 68px!important}
 #ffhSoaRoot .soaPanel>header{padding:2px 0 4px!important;margin-bottom:3px!important}
 #ffhSoaRoot .soaFilters{padding:3px 0 5px!important}
-#ffhSoaRoot .soaProfile{min-height:0!important;padding:6px 9px!important;gap:7px!important;border-radius:10px!important}
-#ffhSoaRoot .soaProfileIcon{width:35px!important;height:35px!important;font-size:21px!important;border-radius:9px!important}
-#ffhSoaRoot .soaProfileMain strong{font-size:clamp(11px,2.8vw,16px)!important;line-height:1.13!important;margin-bottom:2px!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
+#ffhSoaRoot .soaProfile{min-height:112px!important;padding:9px!important;gap:9px!important;border-radius:16px!important}
+#ffhSoaRoot .soaProfileIcon{width:42px!important;height:48px!important;font-size:21px!important;border-radius:11px!important}
+#ffhSoaRoot .soaProfileMain strong{font-size:clamp(11px,2.8vw,16px)!important;line-height:1.13!important;margin-bottom:2px!important;display:-webkit-box!important;-webkit-line-clamp:4!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
 #ffhSoaRoot .soaProfileMain div{font-size:10px!important;line-height:1.2!important}
 #ffhSoaRoot .soaProfileExtra{min-width:72px!important;padding-left:6px!important}
 #ffhSoaRoot .soaProfileExtra small{font-size:9px!important}
 #ffhSoaRoot .soaProfileExtra b{font-size:10px!important}
 #ffhSoaRoot .soaDashboard{margin:4px 0!important;gap:4px!important}
-#ffhSoaRoot .soaMetric,#ffhSoaRoot .soaMetric:first-child{min-height:54px!important;padding:3px 2px!important;gap:1px!important;border-radius:9px!important}
+#ffhSoaRoot .soaMetric,#ffhSoaRoot .soaMetric:first-child{min-height:78px!important;padding:6px 2px!important;gap:3px!important;border-radius:12px!important}
 #ffhSoaRoot .soaMetricIcon{font-size:15px!important}
 #ffhSoaRoot .soaMetric small{font-size:clamp(7px,1.65vw,10px)!important}
 #ffhSoaRoot .soaMetric strong{font-size:clamp(10px,2.4vw,14px)!important}
 #ffhSoaRoot .soaQuickActions{gap:4px!important;margin:3px 0 4px!important}
-#ffhSoaRoot .soaQuickActions button{min-height:32px!important;padding:4px 2px!important;font-size:clamp(8px,1.8vw,11px)!important;line-height:1.1!important}
+#ffhSoaRoot .soaQuickActions button{min-height:54px!important;padding:5px 3px!important;font-size:clamp(8px,1.8vw,11px)!important;line-height:1.1!important}
 #ffhSoaRoot #soaResults{display:flex!important;flex-direction:column!important;min-height:0!important;flex:1 1 auto!important;overflow:hidden!important}
 #ffhSoaRoot .soaTableHeading{flex:none!important;padding:4px 0!important;font-size:clamp(10px,2.5vw,14px)!important}
 #ffhSoaRoot .soaTableHeading span{font-size:10px!important}
