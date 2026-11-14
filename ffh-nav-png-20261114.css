@@ -837,3 +837,13 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    mix-blend-mode:screen!important;
  }
 }
+
+/* 20:25: lift only the final four home tiles to expose their lower orange
+   rounded corners above the fixed navigation. Do not move or resize the
+   seven-slot nav, the other home tiles, or any application controls. */
+@media(max-width:800px){
+ html body #app .homeGrid > .module:nth-last-child(-n+4),
+ html body .homeGrid > .module:nth-last-child(-n+4){
+   transform:translateY(-12px)!important;
+ }
+}
