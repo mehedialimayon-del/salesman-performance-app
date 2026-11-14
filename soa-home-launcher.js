@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const norm=s=>String(s||'').replace(/\\s+/g,' ').trim().toLowerCase();
+const norm=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase();
 let queued=false;
 function refresh(){
  const nodes=document.querySelectorAll('#app *');
@@ -25,9 +25,9 @@ function refresh(){
   const changes=[];
   while(walker.nextNode()){
    const t=walker.currentNode;
-   if(/access\\s*requests/i.test(t.nodeValue||''))changes.push(t);
+   if(/access\s*requests/i.test(t.nodeValue||''))changes.push(t);
   }
-  for(const t of changes)t.nodeValue=t.nodeValue.replace(/access\\s*requests/ig,'SOA');
+  for(const t of changes)t.nodeValue=t.nodeValue.replace(/access\s*requests/ig,'SOA');
   if(!changes.length){
    const leaf=[...tile.querySelectorAll('*')].find(x=>!x.children.length&&norm(x.textContent)==='access requests');
    if(leaf)leaf.textContent='SOA';
