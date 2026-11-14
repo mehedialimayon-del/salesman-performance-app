@@ -1,28 +1,22 @@
-/* Home identity-card PNG frame ONLY. No sizing, text, portrait, clock,
-   action, grid or navigation rules are changed. */
-@media (max-width:800px){
-  #app .app:has(.homeGrid) .ffIdentityHero{
-    position:relative!important;
-    isolation:isolate;
-    border-color:transparent!important;
-    border-image:none!important;
-    box-shadow:none!important;
-    background-color:#000!important;
-    background-image:none!important;
-  }
-  #app .app:has(.homeGrid) .ffIdentityHero::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    z-index:0;
-    pointer-events:none;
-    background-image:url("fieldforce-profile-frame.png");
-    background-repeat:no-repeat;
-    background-position:center;
-    background-size:100% 100%;
-  }
-  #app .app:has(.homeGrid) .ffIdentityHero > *{
-    position:relative;
-    z-index:1;
-  }
+/* Home profile card only: uploaded gold artwork with live content intact. */
+@media(max-width:800px){
+ #app .app:has(.homeGrid) .ffIdentityHero{
+   position:relative!important;isolation:isolate!important;
+   border:0!important;box-shadow:none!important;
+   background:#000!important;background-image:none!important;
+ }
+ #app .app:has(.homeGrid) .ffIdentityHero::before{
+   content:""!important;display:block!important;position:absolute!important;
+   inset:0!important;z-index:0!important;pointer-events:none!important;
+   background:url("fieldforce-profile-frame.png") center / 100% 100% no-repeat!important;
+ }
+ #app .app:has(.homeGrid) .ffIdentityHero>*{z-index:1;position:relative;}
+ /* Position portrait inside the artwork's left circular aperture. */
+ #app .app:has(.homeGrid) .ffIdentityHero .editableAvatar{
+   position:relative!important;transform:translate(-7px,3px)!important;
+   border-color:transparent!important;box-shadow:none!important;
+ }
+ /* The PNG supplies the orange circle; suppress redundant portrait ring. */
+ #app .app:has(.homeGrid) .ffIdentityHero :is(.avatar,.editableAvatar){outline:none!important;}
+ /* Keep live clock/date/credit typography and interaction untouched. */
 }
