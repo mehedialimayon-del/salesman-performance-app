@@ -537,3 +537,28 @@ html body #app .bottom>button,html body #app .bottomSix>button{
   background-size:100% 100%!important;
  }
 }
+
+/* Screenshot 17:48 adjustment: enlarge only existing PNG artwork; lower whole
+   nav into the unused black band and extend its top edge, not duplicate it. */
+@media(max-width:800px){
+ html body #app .homeGrid .module::before,
+ html body .homeGrid .module::before{
+  inset:-9px!important;
+  width:calc(100% + 18px)!important;
+  height:calc(100% + 18px)!important;
+ }
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+  transform:translateY(53px)!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+  top:-28px!important;
+  bottom:0!important;
+  height:calc(100% + 28px)!important;
+ }
+ html body #app .bottom>button,html body #app .bottomSix>button,
+ html body .bottom>button,html body .bottomSix>button{
+  transform:translateY(-13px)!important;
+ }
+}
