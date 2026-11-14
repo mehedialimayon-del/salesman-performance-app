@@ -773,7 +773,7 @@ html body #app .bottom>button,html body #app .bottomSix>button{
  html body .app:has(.homeGrid) .homeGrid,
  html body #app .homeGrid,
  html body .homeGrid{
-   background-color:#090807!important;
+   background-color:transparent!important;
    background-image:none!important;
  }
  html body .app:has(.homeGrid) .homeGrid .module,
