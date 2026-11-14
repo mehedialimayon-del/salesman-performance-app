@@ -17,3 +17,21 @@
 #app .app:has(.homeGrid) .bottom button.active{border:1px solid #ffac3c!important;border-radius:12px!important;background:radial-gradient(ellipse at 50% 100%,#ff710079,transparent 80%),linear-gradient(150deg,#71300a,#130b08)!important;box-shadow:0 0 11px #ff7900a8,inset 0 0 13px #ffb02a54!important}
 #app .app:has(.homeGrid) .bottom button.active i{filter:drop-shadow(0 0 5px #ff8b00)!important}
 @media(prefers-reduced-motion:reduce){#app .app:has(.homeGrid) .homeGrid .module{transition:none!important}}
+
+/* v2: corrective pass against 12:24 device screenshot. Stronger than legacy orange-text rules. */
+html body #app .app:has(.homeGrid) .homeGrid button.module,
+html body #app .app:has(.homeGrid) .homeGrid .module{border-width:1px!important;border-color:#ff8c2a!important;border-radius:20px!important;background:radial-gradient(ellipse 75% 55% at 75% 105%,#7e290a75,transparent 70%),linear-gradient(145deg,#302a27 0%,#111111 45%,#050505 90%)!important;box-shadow:inset 0 1px 1px #ffffff50,0 0 5px #ff7c003d,0 6px 12px #000!important}
+html body #app .app:has(.homeGrid) .homeGrid .module:before{height:24%!important;bottom:-7%!important;background:radial-gradient(ellipse at 70% 100%,#ff8b007d,transparent 67%),repeating-linear-gradient(164deg,transparent 0 8px,#ff8a081e 9px,transparent 10px 15px)!important;filter:blur(4px)!important}
+html body #app .app:has(.homeGrid) .homeGrid .module:after{height:2px!important;box-shadow:0 0 7px #ff8100a0!important}
+html body #app .app:has(.homeGrid) .homeGrid .module .moduleTitle,
+html body #app .app:has(.homeGrid) .homeGrid .module .moduleTitle *,
+html body #app .app:has(.homeGrid) .homeGrid .module small,
+html body #app .app:has(.homeGrid) .homeGrid .module strong{color:#fff!important;-webkit-text-fill-color:#fff!important;text-shadow:0 1px 2px #000!important;font-weight:800!important}
+html body #app .app:has(.homeGrid) .homeGrid .module .mi,
+html body #app .app:has(.homeGrid) .homeGrid .module .mi svg{color:#ff9a0c!important;stroke:#ff9a0c!important;filter:drop-shadow(0 0 3px #ff810080)!important}
+html body #app .app:has(.homeGrid) .homeGrid .module.moduleActive,
+html body #app .app:has(.homeGrid) .homeGrid .module:active{background:radial-gradient(ellipse at 50% 100%,#ff6b00d1,transparent 76%),linear-gradient(145deg,#602209,#190d08)!important;border:2px solid #ffc05b!important;box-shadow:0 0 0 1px #ff9818,0 0 14px 2px #ff7800c4,inset 0 0 20px #ff720066!important}
+html body #app .app:has(.homeGrid) .bottom{border-radius:20px!important;border:1px solid #f48c2b!important;box-shadow:0 0 12px #ff720058!important}
+html body #app .app:has(.homeGrid) .bottom button{color:#fff!important;-webkit-text-fill-color:#fff!important}
+html body #app .app:has(.homeGrid) .bottom button i{color:#ff9a0b!important;-webkit-text-fill-color:#ff9a0b!important}
+html body #app .app:has(.homeGrid) .bottom button.active{border:1px solid #ffac33!important;border-radius:13px!important;background:linear-gradient(145deg,#783109,#1d0d08)!important;box-shadow:0 0 13px #ff7200a8,inset 0 0 12px #ffae004a!important}
