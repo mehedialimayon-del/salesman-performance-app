@@ -477,3 +477,18 @@ html body #app .bottom>button,html body #app .bottomSix>button{
   text-align:center!important;
  }
 }
+
+/* 2026-11-14: move the complete single-PNG nav lower into unused black
+   space, preserving icon/badge alignment. Adjust footprint 0.120 -> 0.130. */
+@media(max-width:800px){
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+   transform:translateY(35px)!important;
+ }
+ html body #app .bottom>button,html body #app .bottomSix>button,
+ html body .bottom>button,html body .bottomSix>button{
+   width:90.2778%!important;
+   max-width:90.2778%!important;
+   justify-self:center!important;
+ }
+}
