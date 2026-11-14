@@ -1,13 +1,19 @@
-/* Single clean rounded nav. Suppress all previous light-wave pseudo-elements. */
+/* Glossy amber-gold navigation finish matching supplied reference; no light wave. */
 html body #app .bottom,
 html body #app .bottomSix,
 html body .bottom,
 html body .bottomSix {
-  background: rgba(8,8,8,.16) !important;
-  background-image: none !important;
-  border: 2px solid #ff821b !important;
-  border-radius: 22px !important;
-  box-shadow: 0 0 7px rgba(255,116,23,.55), inset 0 0 6px rgba(255,116,23,.18) !important;
+  background: linear-gradient(180deg,rgba(28,19,11,.94) 0%,rgba(7,7,7,.98) 19%,#050505 79%,rgba(25,13,5,.95) 100%) !important;
+  border: 2px solid #ffae27 !important;
+  border-radius: 24px !important;
+  box-shadow:
+    0 0 2px 1px #ffe36e,
+    0 0 7px 2px #ff9b11,
+    0 0 16px 3px rgba(255,91,0,.65),
+    inset 0 2px 2px rgba(255,237,138,.95),
+    inset 0 5px 9px rgba(255,129,0,.42),
+    inset 0 -2px 2px #ffdd65,
+    inset 0 -6px 11px rgba(255,107,0,.5) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   overflow: hidden !important;
@@ -24,7 +30,6 @@ html body .bottom::after,
 html body .bottomSix::after {
   content: none !important;
   display: none !important;
-  background: none !important;
 }
 html body #app .bottom > button,
 html body #app .bottomSix > button,
@@ -33,9 +38,9 @@ html body .bottomSix > button {
   background: transparent !important;
   background-image: none !important;
   border: 0 !important;
-  border-right: 1px solid rgba(255,125,35,.42) !important;
+  border-right: 1px solid rgba(255,187,95,.52) !important;
   border-radius: 0 !important;
-  box-shadow: none !important;
+  box-shadow: inset -1px 0 1px rgba(255,121,12,.18) !important;
   position: relative !important;
   z-index: 1 !important;
 }
