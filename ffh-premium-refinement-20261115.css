@@ -113,3 +113,44 @@
   opacity:.92!important;
  }
 }
+
+
+/* Profile card: three non-overlapping zones; preserve the approved PNG and portrait. */
+@media(max-width:800px){
+ html body #app .app:has(.homeGrid) .ffIdentityHero .editableAvatar{
+  left:8px!important;top:12px!important;width:88px!important;height:100px!important;
+  object-fit:cover!important;object-position:center top!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText{
+  align-self:center!important;grid-column:2!important;
+  padding:0 3px!important;line-height:1.15!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .heroClock{
+  top:22px!important;right:12px!important;width:calc(31% - 10px)!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .heroDate{
+  top:113px!important;bottom:auto!important;right:12px!important;
+  width:calc(31% - 10px)!important;z-index:12!important;
+ }
+ /* The existing credit element can be absent or styled by older sheets.
+    Render one dependable credit in the reserved middle frame. */
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityCredit{
+  display:none!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero::after{
+  content:"Developed by KAM AYON"!important;
+  position:absolute!important;top:79px!important;bottom:auto!important;
+  right:12px!important;width:calc(31% - 10px)!important;height:22px!important;
+  box-sizing:border-box!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  background:rgba(4,4,4,.93)!important;color:#fff!important;
+  border:1px solid #fa8728!important;border-radius:9px!important;
+  font-size:clamp(7px,1.75vw,9px)!important;font-weight:700!important;
+  white-space:nowrap!important;z-index:15!important;pointer-events:none!important;
+ }
+ /* On home, the AI shortcut covers card content even at 32px.
+    Keep assistant functionality on its own screens, not over the card grid. */
+ html body #app .app:has(.homeGrid) .aiOrb{
+  display:none!important;
+ }
+}
