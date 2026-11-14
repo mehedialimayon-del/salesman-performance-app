@@ -628,3 +628,24 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    height:calc(100% + 28px)!important;
  }
 }
+
+/* 17:57 screenshot: the lower part of the seven shortcuts was clipped by
+   the black bottom overlay. Raise the complete bar (art, icons and labels)
+   and make its surrounding surface transparent; keep one original PNG. */
+@media(max-width:800px){
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+   transform:translateY(14px)!important;
+   background-color:transparent!important;
+   background-image:none!important;
+   overflow:visible!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+   top:-28px!important;
+   bottom:auto!important;
+   height:calc(100% + 28px)!important;
+   background-image:url("./fieldforce-nav-border.png")!important;
+   background-size:100% 100%!important;
+ }
+}
