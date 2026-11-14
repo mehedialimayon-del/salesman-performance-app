@@ -65,3 +65,27 @@
   outline:2px solid white!important;outline-offset:2px!important;
  }
 }
+
+
+/* 04:27 screenshot corrections: unclutter the home card grid. */
+@media(max-width:800px){
+ html body #app .app:has(.homeGrid) .aiNudge,
+ html body #app .app:has(.homeGrid) [class*="aiNudge"]:not(.aiOrb){
+  display:none!important;
+ }
+ html body #app .app:has(.homeGrid) .aiOrb{
+  width:42px!important;height:42px!important;
+  right:4px!important;bottom:calc(116px + env(safe-area-inset-bottom,0px))!important;
+  opacity:.95!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityCredit{
+  position:absolute!important;right:11px!important;top:auto!important;
+  bottom:5px!important;width:calc(31% - 9px)!important;
+  min-height:22px!important;padding:2px 3px!important;
+  background:rgba(5,5,5,.92)!important;border:1px solid #f78320!important;
+  border-radius:9px!important;color:#fff!important;
+  box-shadow:0 0 7px rgba(255,115,0,.4)!important;
+  visibility:visible!important;opacity:1!important;z-index:20!important;
+  font-size:clamp(7px,1.65vw,9px)!important;
+ }
+}
