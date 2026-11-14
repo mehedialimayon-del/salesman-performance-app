@@ -20,24 +20,16 @@ html body .bottomSix::before {
   position: absolute !important;
   inset: 0 !important;
   border: 2px solid #ff821b !important;
-  border-radius: 16px !important;
+  border-radius: 22px !important;
   background: linear-gradient(180deg,rgba(10,9,8,.12),rgba(10,9,8,.04)) !important;
-  box-shadow: 0 0 8px #ff7417bb, inset 0 0 9px #ff741744 !important;
+  box-shadow: 0 0 7px #ff741788, inset 0 0 8px #ff741744 !important;
   pointer-events: none !important;
   z-index: 0 !important;
 }
 html body .bottom::after,
 html body .bottomSix::after {
-  content: "" !important;
-  position: absolute !important;
-  left: 2% !important;
-  width: 96% !important;
-  top: -8px !important;
-  height: 23px !important;
-  background: url("./nav-light.png") center center / 100% 100% no-repeat !important;
-  mix-blend-mode: screen !important;
-  pointer-events: none !important;
-  z-index: 2 !important;
+  content: none !important;
+  display: none !important;
 }
 html body .bottom > button,
 html body .bottomSix > button,
@@ -58,3 +50,8 @@ html body .bottom > button:last-child,
 html body .bottomSix > button:last-child {
   border-right: 0 !important;
 }
+
+/* Align frame and internal dividers with the seven existing button columns. */
+html body .bottom, html body .bottomSix { border-radius: 22px !important; }
+html body .bottom > button:first-child, html body .bottomSix > button:first-child { border-top-left-radius: 22px !important; border-bottom-left-radius: 22px !important; }
+html body .bottom > button:last-child, html body .bottomSix > button:last-child { border-top-right-radius: 22px !important; border-bottom-right-radius: 22px !important; }
