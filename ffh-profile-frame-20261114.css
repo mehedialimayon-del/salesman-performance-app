@@ -3,6 +3,8 @@
 @media(max-width:800px){
  html body #app .ffIdentityHero{
    position:relative!important;
+   height:106px!important;min-height:106px!important;
+   margin-top:-5px!important;margin-bottom:-7px!important;
    box-sizing:border-box!important;
    width:100vw!important;min-width:100vw!important;max-width:100vw!important;
    left:50%!important;right:auto!important;
