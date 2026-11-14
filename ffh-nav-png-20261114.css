@@ -765,3 +765,15 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    background-color:transparent!important;
  }
 }
+
+/* User request: match the dark backing of navigation under home module cards.
+   This changes only the card backing, not PNG borders, text, sizing or nav. */
+@media(max-width:800px){
+ html body .app:has(.homeGrid) .homeGrid .module,
+ html body #app .homeGrid .module,
+ html body .homeGrid .module{
+   background-color:rgba(9,8,7,.96)!important;
+   background-image:none!important;
+   border-radius:18px!important;
+ }
+}
