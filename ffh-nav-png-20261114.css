@@ -694,3 +694,12 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    height:100%!important;
  }
 }
+
+/* 18:06 screenshot: lower the existing fixed navigation by 32px only.
+   Preserve its size, all seven buttons, artwork and every other module. */
+@media(max-width:800px){
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix{
+   transform:translateY(32px)!important;
+ }
+}
