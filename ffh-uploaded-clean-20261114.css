@@ -1,0 +1,33 @@
+/* Home-only clean skin. Uses the uploaded artwork as the actual card surface.
+No changes to event handlers, data, page navigation, or other pages. */
+#app .app:has(.homeGrid) .homeGrid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:clamp(7px,2.4vw,14px)!important;background:none!important}
+#app .app:has(.homeGrid) .homeGrid .module{position:relative!important;isolation:isolate!important;overflow:hidden!important;border:0!important;border-radius:clamp(15px,3.5vw,22px)!important;background:transparent!important;box-shadow:none!important;transform:none!important}
+#app .app:has(.homeGrid) .homeGrid .module::before{content:""!important;display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;background-image:url("./fieldforce-theme.png")!important;background-repeat:no-repeat!important;background-size:460% 977%!important;opacity:1!important;z-index:-1!important;pointer-events:none!important;transform:none!important;filter:none!important;border:0!important;border-radius:inherit!important;box-shadow:none!important}
+#app .app:has(.homeGrid) .homeGrid .module::after{content:none!important;display:none!important}
+#app .app:has(.homeGrid) .homeGrid .module .mi{position:relative!important;z-index:2!important;background-image:none!important;background-color:transparent!important;color:#ff9c20!important;opacity:1!important;visibility:visible!important;filter:drop-shadow(0 0 3px #ff8000)!important}
+#app .app:has(.homeGrid) .homeGrid .module .mi>*{opacity:1!important;visibility:visible!important}
+#app .app:has(.homeGrid) .homeGrid .module .moduleTitle{position:relative!important;z-index:2!important;color:#fff!important;-webkit-text-fill-color:#fff!important;text-shadow:0 2px 3px #000!important}
+#app .app:has(.homeGrid) .homeGrid .module:active,#app .app:has(.homeGrid) .homeGrid .module.moduleActive{filter:brightness(1.13)!important;box-shadow:0 0 15px #ff820087!important}
+#app .app:has(.homeGrid) .homeGrid .module:focus-visible{outline:2px solid #ffba54!important;outline-offset:2px!important}
+#app .app:has(.homeGrid) .ffIdentityHero{background:linear-gradient(145deg,#090706,#140a03)!important;border:2px solid #ff891c!important;box-shadow:0 0 14px #ff790047!important}
+#app .app:has(.homeGrid) .ffIdentityHero::before{background-image:url("./fieldforce-theme.png")!important;background-repeat:no-repeat!important;background-size:100% 510%!important;background-position:center 12%!important;opacity:.55!important;pointer-events:none!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(1)::before{background-position:2.7% 30.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(2)::before{background-position:35.1% 30.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(3)::before{background-position:67.6% 30.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(4)::before{background-position:100% 30.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(5)::before{background-position:2.7% 42.7%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(6)::before{background-position:35.1% 42.7%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(7)::before{background-position:67.6% 42.7%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(8)::before{background-position:100% 42.7%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(9)::before{background-position:2.7% 55.3%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(10)::before{background-position:35.1% 55.3%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(11)::before{background-position:67.6% 55.3%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(12)::before{background-position:100% 55.3%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(13)::before{background-position:2.7% 67.8%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(14)::before{background-position:35.1% 67.8%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(15)::before{background-position:67.6% 67.8%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(16)::before{background-position:100% 67.8%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(17)::before{background-position:2.7% 80.2%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(18)::before{background-position:35.1% 80.2%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(19)::before{background-position:67.6% 80.2%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(20)::before{background-position:100% 80.2%!important}
