@@ -862,3 +862,12 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    transform:translateY(-18.2px)!important;
  }
 }
+
+/* 20:30 correction: raise ALL twenty home modules uniformly, not just
+   the final row. Preserve the 4-column grid, card dimensions and nav. */
+@media(max-width:800px){
+ html body #app .homeGrid > .module,
+ html body .homeGrid > .module{
+   transform:translateY(-12px)!important;
+ }
+}
