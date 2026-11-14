@@ -97,3 +97,23 @@
  background-image:none!important;
  box-shadow:none!important;
 }
+
+/* Screenshot-verified: do not draw a second black card over PNG cards. */
+html body #app .app:has(.homeGrid) .homeGrid>.module,
+html body #app .app:has(.homeGrid) .homeGrid>.module:hover,
+html body #app .app:has(.homeGrid) .homeGrid>.module.moduleActive{
+ background:transparent!important;background-color:transparent!important;
+ background-image:none!important;border:0!important;outline:0!important;
+ box-shadow:none!important;filter:none!important;backdrop-filter:none!important;
+ -webkit-backdrop-filter:none!important;
+}
+html body #app .app:has(.homeGrid) .homeGrid>.module::before,
+html body #app .app:has(.homeGrid) .homeGrid>.module::after{
+ content:none!important;display:none!important;
+}
+html body #app .app:has(.homeGrid) .homeGrid>.module .mi{
+ background:transparent!important;border:0!important;box-shadow:none!important;
+}
+html body #app .app:has(.homeGrid) .homeGrid>.module .moduleTitle{
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+}
