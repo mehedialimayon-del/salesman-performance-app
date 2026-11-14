@@ -209,3 +209,36 @@ html body .bottom button::before,html body .bottomSix button::before,
 html body .bottom button::after,html body .bottomSix button::after{
  box-shadow:none!important;
 }
+
+/* Bottom navigation PNG: paint on the actual bar, not a pseudo-element
+   that may be obscured by existing navigation layers. */
+html body .bottom,html body .bottomSix,
+html body #app .bottom,html body #app .bottomSix,
+html body .app .bottom,html body .app .bottomSix{
+ background-color:#090807!important;
+ background-image:url("./fieldforce-nav-border.png")!important;
+ background-repeat:no-repeat!important;
+ background-position:center center!important;
+ background-size:100% 100%!important;
+ border:0!important;
+ box-shadow:none!important;
+ border-radius:0!important;
+ overflow:visible!important;
+ padding:0!important;
+ grid-template-columns:repeat(7,minmax(0,1fr))!important;
+}
+html body .bottom::before,html body .bottomSix::before,
+html body #app .bottom::before,html body #app .bottomSix::before{
+ content:none!important;display:none!important;
+}
+html body .bottom>button,html body .bottomSix>button,
+html body #app .bottom>button,html body #app .bottomSix>button{
+ background:transparent!important;
+ background-image:none!important;
+ border:0!important;
+ box-shadow:none!important;
+ border-radius:0!important;
+ padding:3px 0!important;
+ flex:1 1 0!important;
+ min-width:0!important;
+}
