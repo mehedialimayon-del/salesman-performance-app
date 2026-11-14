@@ -40,3 +40,28 @@
   outline:2px solid #fff!important;outline-offset:-7px!important;
  }
 }
+
+
+/* Screenshot follow-up: keep all three profile information zones visible. */
+@media(max-width:800px){
+ html body #app .app:has(.homeGrid) .ffIdentityHero .heroClock{
+  top:15px!important;min-height:30px!important;z-index:6!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .heroDate{
+  top:56px!important;z-index:6!important;font-size:clamp(8px,2.15vw,11px)!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityCredit{
+  top:97px!important;bottom:auto!important;min-height:19px!important;
+  display:flex!important;visibility:visible!important;opacity:1!important;
+  z-index:8!important;align-items:center!important;white-space:nowrap!important;
+  font-size:clamp(7px,1.75vw,10px)!important;
+ }
+ /* Assistant remains usable but no longer obscures as much card text. */
+ html body #app .app:has(.homeGrid) .aiOrb{
+  width:44px!important;height:44px!important;right:3px!important;
+  opacity:.88!important;
+ }
+ html body #app .app:has(.homeGrid) .aiOrb:focus-visible{
+  outline:2px solid white!important;outline-offset:2px!important;
+ }
+}
