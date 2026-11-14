@@ -695,11 +695,19 @@ html body #app .bottom>button,html body #app .bottomSix>button{
  }
 }
 
-/* 18:06 screenshot: lower the existing fixed navigation by 32px only.
-   Preserve its size, all seven buttons, artwork and every other module. */
+
+/* Device-relative bottom alignment. Keep the existing 112px seven-slot design,
+   move the complete bar into the unused lower viewport area; no other modules. */
 @media(max-width:800px){
  html body #app .bottom,html body #app .bottomSix,
  html body .bottom,html body .bottomSix{
-   transform:translateY(32px)!important;
+   position:fixed!important;
+   top:auto!important;
+   bottom:env(safe-area-inset-bottom,0px)!important;
+   transform:translateY(24px)!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+   top:0!important;bottom:0!important;height:100%!important;
  }
 }
