@@ -13,3 +13,16 @@
 #app .app:has(.homeGrid) .homeGrid .module.moduleActive,#app .app:has(.homeGrid) .homeGrid .module:active{border:2px solid #ffb25b!important;background:radial-gradient(ellipse at 50% 100%,#fc64004d,transparent 70%),linear-gradient(150deg,#55220c,#1d0e09 70%)!important;box-shadow:0 0 0 1px #ff7b16,0 0 19px #ff75118a,inset 0 0 22px #ff6c0045!important}
 #app .app:has(.homeGrid) .homeGrid .module:focus-visible{outline:2px solid #ffd49a!important;outline-offset:2px!important}
 @media(prefers-reduced-motion:reduce){#app .app:has(.homeGrid) .homeGrid .module{transition:none!important}}
+
+/* v2: luminous reference treatment; avoid the distracting concentric arcs. */
+#app .app:has(.homeGrid) .homeGrid .module:before{inset:auto -12% -7% -10%!important;height:39%!important;transform:none!important;opacity:1!important;background:radial-gradient(ellipse 60% 40% at 55% 100%,#ffb133bd 0%,#ff6b0088 24%,#e94a002a 57%,transparent 85%),repeating-linear-gradient(166deg,transparent 0 7px,#ff8c0922 8px,transparent 9px 13px)!important;filter:blur(3px)!important}
+#app .app:has(.homeGrid) .homeGrid .module:after{left:10%!important;right:0!important;height:4px!important;background:linear-gradient(90deg,transparent,#ffb847,#ff7000,#ffb847,transparent)!important;filter:blur(2px)!important;box-shadow:0 0 12px 3px #ff7800c9!important}
+#app .app:has(.homeGrid) .homeGrid .module:not(.moduleActive){border-color:#ff922e!important;box-shadow:inset 0 1px 2px #ffffff38,inset 0 -14px 22px #ff640012,0 0 7px #ff740066,0 5px 16px #000!important}
+#app .app:has(.homeGrid) .homeGrid .module{background:radial-gradient(ellipse at 60% 100%,#7c2d164d,transparent 52%),linear-gradient(150deg,#292728 0%,#101012 42%,#070708 80%)!important}
+#app .app:has(.homeGrid) .homeGrid .module.moduleActive{border-color:#ffbb65!important;box-shadow:0 0 0 1px #ff982b,0 0 18px 2px #ff7a00ad,inset 0 0 25px #ff791b52!important}
+#app .app:has(.homeGrid) .ffIdentityHero:before{background:radial-gradient(ellipse at 68% 100%,#f76c0052,transparent 60%),repeating-linear-gradient(167deg,transparent 0 8px,#ff8b1424 9px,transparent 10px 16px)!important;inset:auto -8% -25% 12%!important;height:65%!important;transform:none!important;filter:blur(2px)}
+#app .app:has(.homeGrid) .ffIdentityHero{border-color:#ff912b!important;box-shadow:0 0 0 1px #ff7b1850,0 0 17px #ff710057,inset 0 0 12px #ff83131f!important}
+#app .app:has(.homeGrid) .bottom{border-top:1px solid #ff8d22!important;background:linear-gradient(180deg,#171310,#070707)!important;box-shadow:0 -5px 19px #ff69002d!important}
+#app .app:has(.homeGrid) .bottom button{color:#fff!important;border-right:1px solid #ff8a1824!important}
+#app .app:has(.homeGrid) .bottom button.active{color:#fff!important;background:radial-gradient(ellipse at 50% 100%,#f768004d,transparent 80%),linear-gradient(145deg,#48200c,#140d0a)!important;border:1px solid #ffa13b!important;border-radius:12px!important;box-shadow:inset 0 0 13px #ff86134a,0 0 12px #ff6e008c!important}
+#app .app:has(.homeGrid) .bottom button.active i{filter:drop-shadow(0 0 5px #ff8200)!important}
