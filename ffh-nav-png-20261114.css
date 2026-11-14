@@ -23,7 +23,7 @@ html body .bottomSix::before {
   inset: 0 !important;
   background: url("./ffh-seven-slot-gloss.svg") center / 100% 100% no-repeat !important;
   pointer-events: none !important;
-  z-index: 10 !important;
+  z-index: 2 !important;
 }
 html body #app .bottom::after,
 html body #app .bottomSix::after,
@@ -47,5 +47,9 @@ html body #app .bottomSix > button.active {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   position: relative !important;
-  z-index: 1 !important;
+  z-index: 3 !important;
 }
+
+/* Keep all existing nav labels/icons visible above the glossy dividers. */
+html body .bottom > button *, html body .bottomSix > button * {position: relative; z-index: 4 !important; visibility: visible !important; opacity: 1 !important;}
+html body .bottom, html body .bottomSix {display: grid !important; grid-template-columns: repeat(7,minmax(0,1fr)) !important;}
