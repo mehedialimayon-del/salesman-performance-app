@@ -1,0 +1,42 @@
+/* One image on the grid, never 20 independently positioned tile crops.
+   All original button DOM nodes, event handlers, role permissions, counters and navigation remain. */
+#app .app:has(.homeGrid) .homeGrid{
+ position:relative!important;
+ isolation:isolate!important;
+ grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ grid-template-rows:repeat(5,minmax(0,1fr))!important;
+ gap:clamp(7px,2.4vw,13px)!important;
+ background-image:url("./fieldforce-reference.png")!important;
+ background-repeat:no-repeat!important;
+ background-size:100% 185%!important;
+ background-position:center 59%!important;
+ background-color:#050505!important;
+ border:0!important;
+ border-radius:0!important;
+ overflow:visible!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module{
+ position:relative!important;
+ z-index:1!important;
+ border:0!important;
+ background:transparent!important;
+ box-shadow:none!important;
+ outline:0!important;
+ filter:none!important;
+ transform:none!important;
+ border-radius:clamp(15px,3vw,22px)!important;
+ transition:box-shadow .14s ease,background-color .14s ease!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module::before,
+#app .app:has(.homeGrid) .homeGrid .module::after{content:none!important;display:none!important}
+#app .app:has(.homeGrid) .homeGrid .module .mi,
+#app .app:has(.homeGrid) .homeGrid .module .moduleTitle{visibility:hidden!important}
+#app .app:has(.homeGrid) .homeGrid .module.moduleActive,
+#app .app:has(.homeGrid) .homeGrid .module:active{
+ background:linear-gradient(150deg,#ff8a0030,#ff69004d)!important;
+ box-shadow:inset 0 0 0 2px #ffca67,0 0 13px 3px #ff7800,inset 0 0 18px #ff8a006b!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module:focus-visible{outline:2px solid #fff!important}
+#app .app:has(.homeGrid) .homeGrid .module [class*="badge"],
+#app .app:has(.homeGrid) .homeGrid .module [class*="Badge"]{visibility:visible!important}
+@media(prefers-reduced-motion:reduce){#app .app:has(.homeGrid) .homeGrid .module{transition:none!important}}
