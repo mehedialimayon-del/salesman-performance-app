@@ -1,0 +1,31 @@
+/* Uploaded theme applied to each existing module, not to the whole grid.
+   Crucially, do NOT hide icons, labels, badges, or change click handlers.
+   This is an isolated review build until verified on the target device. */
+#app .app:has(.homeGrid) .homeGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(5,minmax(0,1fr))!important;gap:clamp(7px,2.4vw,14px)!important;background:transparent!important}
+#app .app:has(.homeGrid) .homeGrid .module{position:relative!important;isolation:isolate!important;overflow:hidden!important;border:0!important;border-radius:clamp(16px,3.7vw,23px)!important;background-color:#0b0a09!important;background-image:url("./fieldforce-theme.png")!important;background-repeat:no-repeat!important;background-size:470% 960%!important;box-shadow:0 2px 9px #000a!important;transform:none!important;filter:none!important;transition:box-shadow .15s ease,filter .15s ease!important}
+#app .app:has(.homeGrid) .homeGrid .module:before,#app .app:has(.homeGrid) .homeGrid .module:after{display:none!important;content:none!important}
+#app .app:has(.homeGrid) .homeGrid .module .mi{visibility:visible!important;opacity:1!important;position:relative!important;z-index:1!important}
+#app .app:has(.homeGrid) .homeGrid .module .moduleTitle{visibility:visible!important;opacity:1!important;position:relative!important;z-index:1!important;color:white!important;-webkit-text-fill-color:white!important;text-shadow:0 2px 4px #000!important}
+#app .app:has(.homeGrid) .homeGrid .module:active,#app .app:has(.homeGrid) .homeGrid .module.moduleActive{box-shadow:0 0 0 2px #ffbf5b,0 0 16px 3px #ff7800,inset 0 0 18px #ff7c0080!important;filter:brightness(1.1)!important}
+#app .app:has(.homeGrid) .homeGrid .module:focus-visible{outline:2px solid #ffe2a1!important;outline-offset:2px!important}
+#app .app:has(.homeGrid) .homeGrid .module [class*="badge"],#app .app:has(.homeGrid) .homeGrid .module [class*="Badge"]{visibility:visible!important;opacity:1!important;z-index:3!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(1){background-position:2.9% 29.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(2){background-position:33.7% 29.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(3){background-position:64.5% 29.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(4){background-position:95% 29.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(5){background-position:2.9% 42.5%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(6){background-position:33.7% 42.5%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(7){background-position:64.5% 42.5%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(8){background-position:95% 42.5%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(9){background-position:2.9% 54.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(10){background-position:33.7% 54.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(11){background-position:64.5% 54.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(12){background-position:95% 54.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(13){background-position:2.9% 67.3%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(14){background-position:33.7% 67.3%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(15){background-position:64.5% 67.3%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(16){background-position:95% 67.3%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(17){background-position:2.9% 79.4%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(18){background-position:33.7% 79.4%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(19){background-position:64.5% 79.4%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(20){background-position:95% 79.4%!important}
