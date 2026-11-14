@@ -298,6 +298,47 @@ referenceLayout.textContent=`
 `;
 document.head.appendChild(referenceLayout);
 
+
+// Compact SOA-only layout: reserve room for at least three visible ledger rows.
+// Keeps the actual transaction records, edit/delete permissions, and export logic unchanged.
+const compactHistoryStyle=document.createElement('style');
+compactHistoryStyle.id='ffhSoaCompactThreeRows';
+compactHistoryStyle.textContent=`
+@media screen {
+#ffhSoaRoot .soaPanel{gap:4px!important;padding-top:1px!important;padding-bottom:48px!important}
+#ffhSoaRoot .soaPanel>header{min-height:34px!important;padding:5px 9px!important;font-size:17px!important}
+#ffhSoaRoot .soaFilters{padding:0 0 2px!important;gap:4px!important}
+#ffhSoaRoot .soaFilters input,#ffhSoaRoot .soaFilters select,#ffhSoaRoot #soaMore{height:35px!important;min-height:35px!important;padding:5px!important}
+#ffhSoaRoot .soaProfile{min-height:82px!important;max-height:98px!important;padding:5px 7px!important;gap:6px!important;grid-template-columns:38px minmax(0,1fr) minmax(80px,25%)!important}
+#ffhSoaRoot .soaProfileIcon{width:35px!important;height:40px!important}
+#ffhSoaRoot .soaProfileMain strong{font-size:11px!important;line-height:1.1!important;max-height:49px!important;margin-bottom:2px!important}
+#ffhSoaRoot .soaProfileMain div{font-size:9px!important;line-height:1.1!important;max-height:31px!important}
+#ffhSoaRoot .soaProfileExtra small{font-size:9px!important}
+#ffhSoaRoot .soaProfileExtra b{font-size:11px!important}
+#ffhSoaRoot .soaMetric,#ffhSoaRoot .soaMetric:first-child{height:62px!important;min-height:62px!important;padding:3px 2px!important;gap:2px!important;border-radius:11px!important}
+#ffhSoaRoot .soaMetricIcon{font-size:17px!important}
+#ffhSoaRoot .soaMetric small{font-size:9px!important}
+#ffhSoaRoot .soaMetric strong{font-size:clamp(10px,2.6vw,13px)!important}
+#ffhSoaRoot .soaQuickActions button{height:43px!important;min-height:43px!important;padding:3px 2px!important;border-radius:11px!important;line-height:1.1!important}
+#ffhSoaRoot #soaResults{flex:1 1 0!important;min-height:225px!important;padding:5px 6px!important;overflow:hidden!important}
+#ffhSoaRoot .soaTableHeading{font-size:11px!important;line-height:1.1!important;padding:2px 0!important;gap:3px!important}
+#ffhSoaRoot .soaTableHeading span{padding:3px 5px!important}
+#ffhSoaRoot .soaHistoryExpand{padding:3px 6px!important;font-size:10px!important}
+#ffhSoaRoot .soaTableTools{flex:0 0 auto!important;margin:2px 0!important;gap:3px!important}
+#ffhSoaRoot .soaTableTools input{height:25px!important;min-height:25px!important;padding:3px 5px!important;font-size:10px!important}
+#ffhSoaRoot .soaTableTools button{padding:3px 5px!important;font-size:9px!important}
+#ffhSoaRoot .soaTableWrap{flex:1 1 0!important;min-height:160px!important;max-height:none!important;overflow:auto!important;scrollbar-width:thin!important;scrollbar-color:#ff8500 #111!important}
+#ffhSoaRoot .soaPremiumTable{min-width:450px!important;font-size:10px!important}
+#ffhSoaRoot .soaPremiumTable th{padding:5px 3px!important}
+#ffhSoaRoot .soaPremiumTable td{padding:6px 3px!important;line-height:1.15!important}
+#ffhSoaRoot .soaActions{padding:3px 7px!important}
+#ffhSoaRoot .soaActions button{height:35px!important;min-height:35px!important;padding:3px 2px!important}
+#ffhSoaRoot.soaHistoryFull #soaResults{min-height:0!important}
+#ffhSoaRoot.soaHistoryFull .soaTableWrap{min-height:0!important}
+@media(max-height:720px){#ffhSoaRoot .soaProfile{min-height:72px!important;max-height:84px!important}#ffhSoaRoot .soaMetric,#ffhSoaRoot .soaMetric:first-child{height:55px!important;min-height:55px!important}#ffhSoaRoot .soaQuickActions button{height:38px!important;min-height:38px!important}#ffhSoaRoot #soaResults{min-height:180px!important}}
+}`;
+document.head.appendChild(compactHistoryStyle);
+
 function addHistoryExpand(){
  const root=document.getElementById('ffhSoaRoot'),result=document.getElementById('soaResults');
  if(!root||!result)return;
