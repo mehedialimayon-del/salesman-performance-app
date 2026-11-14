@@ -29,3 +29,8 @@
 #app .app:has(.homeGrid) .homeGrid .module:nth-child(18){background-position:33.7% 79.4%!important}
 #app .app:has(.homeGrid) .homeGrid .module:nth-child(19){background-position:64.5% 79.4%!important}
 #app .app:has(.homeGrid) .homeGrid .module:nth-child(20){background-position:95% 79.4%!important}
+
+/* Screenshot fix 2026-11-14: restore native icon glyphs hidden by earlier screenshot-match stylesheet. */
+#app .app:has(.homeGrid) .homeGrid .module .mi>*{opacity:1!important;visibility:visible!important;display:initial!important}
+#app .app:has(.homeGrid) .homeGrid .module .mi{background-image:none!important;color:#ff971b!important;-webkit-text-fill-color:#ff971b!important}
+#app .app:has(.homeGrid) .homeGrid .module .mi svg{stroke:#ff971b!important;opacity:1!important;visibility:visible!important}
