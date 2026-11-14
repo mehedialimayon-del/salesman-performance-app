@@ -238,3 +238,61 @@ html,body,#app{min-height:100%;margin:0}
   max-height:100%!important;
  }
 }
+
+/* v6: restore proper bottom navigation stacking and center icon+label in
+   the actual artwork cells. Override inherited module flex sizing. */
+@media(max-width:700px){
+ #app .app:has(.homeGrid){position:relative!important;display:flex!important;flex-direction:column!important;height:100dvh!important;min-height:0!important}
+ #app .app:has(.homeGrid) .wrap{
+  display:flex!important;flex-direction:column!important;flex:1 1 0!important;
+  min-height:0!important;height:auto!important;overflow:hidden!important;
+  padding-bottom:0!important;margin-bottom:0!important;
+ }
+ #app .app:has(.homeGrid) .homeGrid{
+  flex:1 1 0!important;min-height:0!important;height:100%!important;
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-template-rows:repeat(5,minmax(0,1fr))!important;
+  align-content:stretch!important;align-items:stretch!important;
+  gap:clamp(6px,2vw,11px)!important;
+ }
+ #app .app:has(.homeGrid) .homeGrid>.module{
+  position:relative!important;display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;
+  min-height:0!important;height:100%!important;max-height:100%!important;
+  gap:5px!important;overflow:hidden!important;
+ }
+ #app .app:has(.homeGrid) .homeGrid>.module .mi{
+  position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+  transform:none!important;flex:0 0 auto!important;
+  width:clamp(22px,6.5vw,34px)!important;height:clamp(22px,6.5vw,34px)!important;
+  min-width:0!important;min-height:0!important;max-height:34px!important;
+  margin:0!important;padding:0!important;
+  background:transparent!important;box-shadow:none!important;border:0!important;
+ }
+ #app .app:has(.homeGrid) .homeGrid>.module .mi svg{
+  width:100%!important;height:100%!important;max-height:34px!important;
+ }
+ #app .app:has(.homeGrid) .homeGrid>.module .moduleTitle{
+  position:relative!important;top:auto!important;left:auto!important;
+  transform:none!important;flex:0 0 auto!important;
+  margin:0!important;padding:0!important;font-size:clamp(9px,2.15vw,12px)!important;
+  line-height:1.12!important;text-align:center!important;max-width:100%!important;
+  color:#fff!important;-webkit-text-fill-color:#fff!important;
+ }
+ #app .app:has(.homeGrid) .bottom{
+  position:relative!important;bottom:auto!important;top:auto!important;
+  left:auto!important;right:auto!important;inset:auto!important;
+  transform:none!important;order:999!important;z-index:10!important;
+  flex:0 0 clamp(65px,8.5dvh,90px)!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  height:clamp(65px,8.5dvh,90px)!important;min-height:0!important;
+  display:flex!important;align-items:stretch!important;
+  margin:0!important;padding:0!important;overflow:hidden!important;
+  background:rgba(5,5,5,.09)!important;
+  backdrop-filter:blur(2px)!important;-webkit-backdrop-filter:blur(2px)!important;
+ }
+ #app .app:has(.homeGrid) .bottom :is(button,a){
+  flex:1 1 0!important;min-width:0!important;max-width:none!important;
+  background:transparent!important;box-shadow:none!important;border:0!important;
+ }
+}
