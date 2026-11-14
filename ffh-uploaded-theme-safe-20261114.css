@@ -34,3 +34,49 @@
 #app .app:has(.homeGrid) .homeGrid .module .mi>*{opacity:1!important;visibility:visible!important;display:initial!important}
 #app .app:has(.homeGrid) .homeGrid .module .mi{background-image:none!important;color:#ff971b!important;-webkit-text-fill-color:#ff971b!important}
 #app .app:has(.homeGrid) .homeGrid .module .mi svg{stroke:#ff971b!important;opacity:1!important;visibility:visible!important}
+
+/* Exact artwork overlay: earlier shorthand background declarations otherwise
+   reset background-image, leaving the old black CSS tile visible. */
+#app .app:has(.homeGrid) .homeGrid .module{
+  background:url("./fieldforce-theme.png") no-repeat!important;
+  background-size:445% 958%!important;
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:18px!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module .mi{
+  background-color:transparent!important;
+  box-shadow:none!important;
+}
+#app .app:has(.homeGrid) .ffIdentityHero{
+  background:url("./fieldforce-theme.png") center 21% / 100% 790% no-repeat!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+#app .app:has(.homeGrid) .ffIdentityHero:before{
+  content:none!important;
+  display:none!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module.moduleActive{
+  box-shadow:inset 0 0 12px #ff830050,0 0 14px #ff7b0060!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(1){background-position:2.8% 31%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(2){background-position:35% 31%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(3){background-position:67.4% 31%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(4){background-position:97.7% 31%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(5){background-position:2.8% 43.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(6){background-position:35% 43.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(7){background-position:67.4% 43.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(8){background-position:97.7% 43.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(9){background-position:2.8% 56.7%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(10){background-position:35% 56.7%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(11){background-position:67.4% 56.7%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(12){background-position:97.7% 56.7%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(13){background-position:2.8% 69.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(14){background-position:35% 69.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(15){background-position:67.4% 69.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(16){background-position:97.7% 69.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(17){background-position:2.8% 81.5%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(18){background-position:35% 81.5%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(19){background-position:67.4% 81.5%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(20){background-position:97.7% 81.5%!important}
