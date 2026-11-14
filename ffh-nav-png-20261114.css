@@ -483,12 +483,20 @@ html body #app .bottom>button,html body #app .bottomSix>button{
 @media(max-width:800px){
  html body #app .bottom,html body #app .bottomSix,
  html body .bottom,html body .bottomSix{
-   transform:translateY(35px)!important;
+   transform:translateY(55px)!important;
  }
  html body #app .bottom>button,html body #app .bottomSix>button,
  html body .bottom>button,html body .bottomSix>button{
    width:90.2778%!important;
    max-width:90.2778%!important;
    justify-self:center!important;
+ }
+}
+
+/* Keep artwork and seven shortcut labels together while lowering their contents. */
+@media(max-width:800px){
+ html body #app .bottom>button,html body #app .bottomSix>button,
+ html body .bottom>button,html body .bottomSix>button{
+  transform:translateY(13px)!important;
  }
 }
