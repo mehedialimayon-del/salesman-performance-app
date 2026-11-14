@@ -658,3 +658,21 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    transform:translateY(-6px)!important;
  }
 }
+
+/* 18:01: restore full-size square home buttons without changing their grid positions.
+   Keep navigation container and icons fixed; extend only the original PNG frame
+   equally above and below its current footprint. */
+@media(max-width:800px){
+ html body #app .homeGrid .module,html body .homeGrid .module{
+   aspect-ratio:1 / 1!important;
+   height:auto!important;
+   min-height:0!important;
+ }
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+   top:-25px!important;
+   bottom:-25px!important;
+   height:calc(100% + 50px)!important;
+   background-size:100% 100%!important;
+ }
+}
