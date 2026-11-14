@@ -215,3 +215,11 @@
   white-space:normal!important;overflow-wrap:normal!important;
  }
 }
+
+
+/* Requested portrait-only upward shift; no other element changes. */
+@media(max-width:800px){
+ html body #app .app:has(.homeGrid) .ffIdentityHero .editableAvatar{
+  top:calc(5px - 2in)!important;
+ }
+}
