@@ -743,3 +743,25 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    width:calc(100% + 16px)!important;
  }
 }
+
+/* 18:41: keep the approved fixed bar geometry exactly unchanged.
+   Clear residual dark tile overlays and keep icon/label content inside the
+   illuminated seven-cell frame without touching button dimensions. */
+@media(max-width:800px){
+ html body #app .bottom>button,html body #app .bottomSix>button,
+ html body .bottom>button,html body .bottomSix>button{
+   transform:translateY(-32px)!important;
+   background:transparent!important;
+   background-image:none!important;
+   box-shadow:none!important;
+   outline:0!important;
+   border:0!important;
+ }
+ html body #app .bottom>button::before,html body #app .bottom>button::after,
+ html body #app .bottomSix>button::before,html body #app .bottomSix>button::after,
+ html body .bottom>button::before,html body .bottom>button::after,
+ html body .bottomSix>button::before,html body .bottomSix>button::after{
+   box-shadow:none!important;
+   background-color:transparent!important;
+ }
+}
