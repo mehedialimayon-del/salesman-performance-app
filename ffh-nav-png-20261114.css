@@ -824,3 +824,14 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    mix-blend-mode:screen!important;
  }
 }
+
+/* 2026-11-14: remove the 55px PNG overhang that covered home cards.
+   Keep the actual navigation bar and its seven buttons unchanged. */
+@media(max-width:800px){
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+   top:0!important;
+   bottom:0!important;
+   height:100%!important;
+ }
+}
