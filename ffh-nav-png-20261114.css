@@ -750,7 +750,7 @@ html body #app .bottom>button,html body #app .bottomSix>button{
 @media(max-width:800px){
  html body #app .bottom>button,html body #app .bottomSix>button,
  html body .bottom>button,html body .bottomSix>button{
-   transform:translateY(-32px)!important;
+   transform:translateY(-18px)!important;
    background:transparent!important;
    background-image:none!important;
    box-shadow:none!important;
