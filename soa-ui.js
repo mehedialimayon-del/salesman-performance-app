@@ -372,12 +372,52 @@ finalFineTune.textContent=`
 }`;
 document.head.appendChild(finalFineTune);
 
+// SOA history space optimisation: equal-size KPI cards and inline search.
+const soaLastLayout=document.createElement('style');
+soaLastLayout.id='ffhSoaLastLayout';
+soaLastLayout.textContent=`
+@media screen{
+#ffhSoaRoot .soaDashboard{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;align-items:stretch!important;gap:5px!important}
+#ffhSoaRoot .soaDashboard>.soaMetric,#ffhSoaRoot .soaDashboard>.soaMetric:first-child{height:53px!important;min-height:53px!important;max-height:53px!important;min-width:0!important;padding:2px 1px!important;border-radius:10px!important;align-self:stretch!important;box-sizing:border-box!important;overflow:hidden!important}
+#ffhSoaRoot .soaDashboard .soaMetricIcon{font-size:13px!important;line-height:1!important}
+#ffhSoaRoot .soaDashboard .soaMetric small{font-size:clamp(7px,1.75vw,9px)!important;line-height:1.04!important;letter-spacing:-.25px!important}
+#ffhSoaRoot .soaDashboard .soaMetric strong{font-size:clamp(9px,2.45vw,12px)!important;line-height:1.02!important}
+#ffhSoaRoot .soaQuickActions button{height:33px!important;min-height:33px!important;padding:1px 2px!important}
+#ffhSoaRoot #soaResults{min-height:280px!important;flex:1 1 0!important;padding:3px 5px!important}
+#ffhSoaRoot .soaTableHeading{display:flex!important;flex-wrap:wrap!important;align-items:center!important;column-gap:4px!important;row-gap:2px!important;font-size:10px!important;line-height:1.08!important;padding:1px 0!important;min-height:0!important}
+#ffhSoaRoot .soaTableHeading .soaHistoryTitle{flex:0 0 100%!important;min-width:0!important;max-height:24px!important;overflow:hidden!important;white-space:normal!important;font-size:10px!important;line-height:1.1!important;font-weight:800!important}
+#ffhSoaRoot .soaTableHeading>span{order:1!important;flex:0 0 auto!important;margin:0!important;padding:2px 4px!important;font-size:9px!important;white-space:nowrap!important}
+#ffhSoaRoot .soaInlineHistorySearch{order:2!important;display:flex!important;flex:1 1 65px!important;min-width:45px!important;max-width:none!important;margin:0!important;padding:0!important;font-size:0!important;line-height:0!important}
+#ffhSoaRoot .soaInlineHistorySearch input{display:block!important;width:100%!important;min-width:0!important;height:27px!important;min-height:27px!important;max-height:27px!important;padding:3px 5px!important;background:#090909!important;border:1px solid #ff8500!important;border-radius:7px!important;color:#fff!important;font-size:10px!important;box-sizing:border-box!important}
+#ffhSoaRoot .soaHistoryExpand{order:3!important;flex:0 0 31px!important;margin:0!important;width:31px!important;height:27px!important;min-width:31px!important;border-radius:7px!important;font-size:20px!important}
+#ffhSoaRoot .soaPageControls{display:flex!important;flex-wrap:nowrap!important;justify-content:flex-end!important;min-height:23px!important;gap:3px!important;margin:1px 0!important;padding:0!important}
+#ffhSoaRoot .soaPageControls>label{display:none!important}
+#ffhSoaRoot .soaPageControls button{height:22px!important;min-height:22px!important;padding:2px 4px!important;font-size:9px!important}
+#ffhSoaRoot .soaPageControls span{font-size:9px!important;white-space:nowrap!important}
+#ffhSoaRoot #soaPrint{min-height:180px!important;flex:1 1 0!important;overflow:auto!important}
+#ffhSoaRoot #soaPrint th{padding:3px 2px!important;font-size:9px!important;line-height:1.1!important}
+#ffhSoaRoot #soaPrint td{padding:3px 2px!important;font-size:10px!important;line-height:1.1!important}
+#ffhSoaRoot #soaPrint .soaEditCell button{min-height:21px!important;padding:2px!important;margin:1px 0!important}
+#ffhSoaRoot.soaHistoryFull #soaPrint{min-height:0!important}
+@media(max-height:730px){#ffhSoaRoot #soaResults{min-height:200px!important}#ffhSoaRoot #soaPrint{min-height:100px!important}}
+}`;
+document.head.appendChild(soaLastLayout);
+
 function addHistoryExpand(){
  const root=document.getElementById('ffhSoaRoot'),result=document.getElementById('soaResults');
  if(!root||!result)return;
  const heading=result.querySelector('.soaTableHeading');
  if(!heading||heading.querySelector('.soaHistoryExpand'))return;
- // Search is already available in the transaction filter row.
+ // Convert the long heading text into a compact title line without changing its content.
+ const textNodes=[...heading.childNodes].filter(n=>n.nodeType===3&&n.textContent.trim());
+ if(textNodes.length){const title=document.createElement('div');title.className='soaHistoryTitle';title.textContent=textNodes.map(n=>n.textContent).join(' ').trim();textNodes.forEach(n=>n.remove());heading.prepend(title);}
+ // Keep the existing live-bound search input; move its label beside balance and fullscreen.
+ const searchInput=result.querySelector('#soaSearch');
+ if(searchInput){
+  const label=searchInput.closest('label');
+  if(label){label.classList.add('soaInlineHistorySearch');heading.appendChild(label);}
+ }
+ // The original search input stays bound to the ledger filter.
  const button=document.createElement('button');button.type='button';button.className='soaHistoryExpand';button.textContent=root.classList.contains('soaHistoryFull')?'↙':'⛶';button.setAttribute('aria-label',root.classList.contains('soaHistoryFull')?'Exit full screen':'Full screen transactions');button.title=button.getAttribute('aria-label');
  button.onclick=()=>{root.classList.toggle('soaHistoryFull');button.textContent=root.classList.contains('soaHistoryFull')?'↙':'⛶';button.setAttribute('aria-label',root.classList.contains('soaHistoryFull')?'Exit full screen':'Full screen transactions');button.title=button.getAttribute('aria-label');};
  heading.appendChild(button);
