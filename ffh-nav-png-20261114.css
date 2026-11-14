@@ -723,3 +723,12 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    background-size:100% 100%!important;
  }
 }
+
+/* 18:32: align existing seven controls within the unchanged PNG frame.
+   The frame and button dimensions stay untouched; lift labels away from bottom stroke. */
+@media(max-width:800px){
+ html body #app .bottom>button,html body #app .bottomSix>button,
+ html body .bottom>button,html body .bottomSix>button{
+   transform:translateY(-26px)!important;
+ }
+}
