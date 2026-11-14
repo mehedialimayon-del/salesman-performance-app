@@ -1,31 +1,21 @@
-/* Reference-inspired restrained orange/amber glass; seven equal slots, no separate light ray. */
+/* Use the user's uploaded original PNG as the ONLY nav artwork.
+   Seven existing clickable buttons stay in place; no drawn cards, borders or glow. */
 html body #app .bottom,
 html body #app .bottomSix,
 html body .bottom,
 html body .bottomSix {
-  background:
-    linear-gradient(180deg,
-      rgba(255,135,22,.13) 0%,
-      rgba(22,15,9,.85) 5%,
-      #080808 19%,
-      #050505 75%,
-      rgba(28,13,5,.88) 95%,
-      rgba(255,105,12,.17) 100%) !important;
-  border: 2px solid #ff8815 !important;
-  border-radius: 25px !important;
-  box-shadow:
-    0 0 3px rgba(255,166,40,.8),
-    0 0 9px rgba(255,105,5,.48),
-    0 0 15px rgba(255,83,0,.22),
-    inset 0 1px 0 rgba(255,207,90,.85),
-    inset 0 3px 4px rgba(255,127,14,.48),
-    inset 0 -1px 0 rgba(255,195,70,.9),
-    inset 0 -4px 5px rgba(255,105,0,.43) !important;
+  background-color: transparent !important;
+  background-image: url("./nav-box.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   isolation: isolate !important;
-  box-sizing: border-box !important;
 }
 html body #app .bottom::before,
 html body #app .bottomSix::before,
@@ -41,17 +31,17 @@ html body .bottomSix::after {
 html body #app .bottom > button,
 html body #app .bottomSix > button,
 html body .bottom > button,
-html body .bottomSix > button {
+html body .bottomSix > button,
+html body #app .bottom > button.active,
+html body #app .bottomSix > button.active {
   background: transparent !important;
+  background-color: transparent !important;
   background-image: none !important;
   border: 0 !important;
-  border-right: 1px solid rgba(255,153,64,.43) !important;
   border-radius: 0 !important;
-  box-shadow: inset -1px 0 0 rgba(255,205,130,.12) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   position: relative !important;
   z-index: 1 !important;
 }
-html body #app .bottom > button:last-child,
-html body #app .bottomSix > button:last-child,
-html body .bottom > button:last-child,
-html body .bottomSix > button:last-child {border-right:0 !important;}
