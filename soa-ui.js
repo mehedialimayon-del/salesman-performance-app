@@ -162,21 +162,22 @@ function positionSoa(){
  root.style.setProperty('--soa-actions-bottom',lastSoaBottom+'px');
 }
 window.addEventListener('resize',()=>{if(visible)positionSoa();});
-function close(fromHistory=false){if(soaExitPrompt){soaExitPrompt.remove();soaExitPrompt=null;}dismissSoaModal();if(!visible)return;visible=false;remember();byId('ffhSoaRoot')?.remove();if(!fromHistory&&soaHistory&&history.state?.ffhSoaOverlay){soaHistory=false;history.back();}else soaHistory=false;}
-let soaExitPrompt=null;
-function showSoaExitPrompt(){
- if(soaExitPrompt)return;
- const overlay=document.createElement('div');overlay.className='soaExitOverlay';
- overlay.innerHTML='<section class="soaExitDialog" role="dialog" aria-modal="true" aria-labelledby="soaExitTitle"><div class="soaExitSymbol">!</div><h2 id="soaExitTitle">EXIT SOA?</h2><p>Are you sure you want to exit SOA and return to Home?</p><div class="soaExitButtons"><button type="button" id="soaExitCancel">CANCEL</button><button type="button" id="soaExitYes">YES, EXIT</button></div></section>';
- document.body.appendChild(overlay);soaExitPrompt=overlay;
- overlay.querySelector('#soaExitCancel').onclick=()=>{overlay.remove();soaExitPrompt=null;};
- overlay.querySelector('#soaExitYes').onclick=()=>{overlay.remove();soaExitPrompt=null;close(true);history.replaceState({...history.state,ffhSoaOverlay:false},'',location.href);const home=document.querySelector('nav.bottom [data-page="home"]');if(home)home.click();};
+function close(fromHistory=false){
+ dismissSoaModal();
+ if(!visible)return;
+ visible=false;remember();byId('ffhSoaRoot')?.remove();
+ if(!fromHistory&&soaHistory&&history.state?.ffhSoaOverlay){soaHistory=false;history.back();}
+ else soaHistory=false;
 }
 window.addEventListener('popstate',()=>{
  if(!visible)return;
- history.pushState({...history.state,ffhSoaOverlay:true},'',location.href);
- if(soaModalOpen())return;
- showSoaExitPrompt();
+ if(soaModalOpen()){
+  dismissSoaModal();
+  history.pushState({...history.state,ffhSoaOverlay:true},'',location.href);
+  return;
+ }
+ // The first Back returns to the page that launched SOA, not an exit dialog.
+ close(true);
 });
 function install(){
  // Replace the actual Home Access Requests tile with a dedicated SOA tile.
@@ -256,6 +257,7 @@ function addHistoryExpand(){
  if(!root||!result)return;
  const heading=result.querySelector('.soaTableHeading');
  if(!heading||heading.querySelector('.soaHistoryExpand'))return;
+ const search=document.createElement('button');search.type='button';search.className='soaHistoryExpand';search.textContent='⌕';search.setAttribute('aria-label','Search invoice or outlet');search.title='Search transactions';search.onclick=()=>{const input=result.querySelector('#soaSearch');if(input){input.focus();input.select();}};heading.appendChild(search);
  const button=document.createElement('button');button.type='button';button.className='soaHistoryExpand';button.textContent=root.classList.contains('soaHistoryFull')?'EXIT FULL':'FULL SCREEN';
  button.onclick=()=>{root.classList.toggle('soaHistoryFull');button.textContent=root.classList.contains('soaHistoryFull')?'EXIT FULL':'FULL SCREEN';};
  heading.appendChild(button);
