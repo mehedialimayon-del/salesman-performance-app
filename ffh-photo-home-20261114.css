@@ -1,0 +1,33 @@
+/* Actual user-uploaded reference PNG as the home-module artwork.
+   Visual-only: original interactive DOM, events, counters, navigation and all JS untouched.
+   Source PNG 856x1836, module artwork is cropped into 4x5 interactive cards. */
+#app .app:has(.homeGrid) .homeGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(5,minmax(0,1fr))!important;gap:clamp(7px,2.5vw,14px)!important}
+#app .app:has(.homeGrid) .homeGrid .module{position:relative!important;isolation:isolate!important;border:0!important;border-radius:clamp(15px,3.8vw,23px)!important;overflow:hidden!important;background-image:url("./fieldforce-reference.png")!important;background-repeat:no-repeat!important;background-size:468% 1000%!important;box-shadow:none!important;filter:none!important;transform:none!important;transition:box-shadow .12s ease,filter .12s ease!important}
+#app .app:has(.homeGrid) .homeGrid .module::before,#app .app:has(.homeGrid) .homeGrid .module::after{display:none!important;content:none!important}
+#app .app:has(.homeGrid) .homeGrid .module .mi,#app .app:has(.homeGrid) .homeGrid .module .moduleTitle{visibility:hidden!important}
+#app .app:has(.homeGrid) .homeGrid .module.moduleActive,#app .app:has(.homeGrid) .homeGrid .module:active{box-shadow:inset 0 0 0 2px #ffd07c,0 0 12px 3px #ff8200,inset 0 0 25px #ff7a0090!important;filter:brightness(1.16)!important}
+#app .app:has(.homeGrid) .homeGrid .module:focus-visible{outline:2px solid #ffe6a8!important;outline-offset:2px!important}
+#app .app:has(.homeGrid) .homeGrid .module [class*="badge"],#app .app:has(.homeGrid) .homeGrid .module [class*="Badge"]{visibility:visible!important;z-index:2!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(1){background-position:2.8% 30.2%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(2){background-position:33.5% 30.2%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(3){background-position:63.6% 30.2%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(4){background-position:93.1% 30.2%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(5){background-position:2.8% 42.8%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(6){background-position:33.5% 42.8%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(7){background-position:63.6% 42.8%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(8){background-position:93.1% 42.8%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(9){background-position:2.8% 55.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(10){background-position:33.5% 55.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(11){background-position:63.6% 55.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(12){background-position:93.1% 55.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(13){background-position:2.8% 67.3%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(14){background-position:33.5% 67.3%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(15){background-position:63.6% 67.3%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(16){background-position:93.1% 67.3%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(17){background-position:2.8% 79.4%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(18){background-position:33.5% 79.4%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(19){background-position:63.6% 79.4%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(20){background-position:93.1% 79.4%!important}
+/* Keep header typing, live ticker, dynamic profile, clock, notifications and bottom navigation as real DOM. */
+#app .app:has(.homeGrid) .bottom button.active{box-shadow:0 0 13px #ff7a00,inset 0 0 18px #ff8a0088!important}
+@media(prefers-reduced-motion:reduce){#app .app:has(.homeGrid) .homeGrid .module{transition:none!important}}
