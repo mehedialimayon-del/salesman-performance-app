@@ -80,3 +80,37 @@
 #app .app:has(.homeGrid) .homeGrid .module:nth-child(18){background-position:35% 81.5%!important}
 #app .app:has(.homeGrid) .homeGrid .module:nth-child(19){background-position:67.4% 81.5%!important}
 #app .app:has(.homeGrid) .homeGrid .module:nth-child(20){background-position:97.7% 81.5%!important}
+
+/* Final explicit artwork layer, independent of shorthand backgrounds. */
+#app .app:has(.homeGrid) .homeGrid .module{background:#070707!important;overflow:hidden!important}
+#app .app:has(.homeGrid) .homeGrid .module::before{
+ content:""!important;display:block!important;position:absolute!important;
+ inset:0!important;width:100%!important;height:100%!important;
+ background-image:url("./fieldforce-theme.png")!important;
+ background-repeat:no-repeat!important;background-size:445% 958%!important;
+ pointer-events:none!important;z-index:0!important;opacity:1!important;
+ filter:none!important;transform:none!important;border:0!important;
+}
+#app .app:has(.homeGrid) .homeGrid .module .mi,
+#app .app:has(.homeGrid) .homeGrid .module .moduleTitle{z-index:2!important;position:relative!important}
+#app .app:has(.homeGrid) .homeGrid .module::after{display:none!important;content:none!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(1)::before{background-position:2.8% 31%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(2)::before{background-position:35% 31%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(3)::before{background-position:67.4% 31%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(4)::before{background-position:97.7% 31%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(5)::before{background-position:2.8% 43.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(6)::before{background-position:35% 43.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(7)::before{background-position:67.4% 43.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(8)::before{background-position:97.7% 43.9%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(9)::before{background-position:2.8% 56.7%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(10)::before{background-position:35% 56.7%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(11)::before{background-position:67.4% 56.7%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(12)::before{background-position:97.7% 56.7%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(13)::before{background-position:2.8% 69.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(14)::before{background-position:35% 69.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(15)::before{background-position:67.4% 69.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(16)::before{background-position:97.7% 69.1%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(17)::before{background-position:2.8% 81.5%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(18)::before{background-position:35% 81.5%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(19)::before{background-position:67.4% 81.5%!important}
+#app .app:has(.homeGrid) .homeGrid .module:nth-child(20)::before{background-position:97.7% 81.5%!important}
