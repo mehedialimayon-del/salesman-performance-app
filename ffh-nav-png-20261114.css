@@ -732,3 +732,14 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    transform:translateY(-26px)!important;
  }
 }
+
+/* 18:35: widen only the PNG frame 8px on each side to reduce edge gaps.
+   Preserve exact fixed vertical placement, frame height, and all seven buttons. */
+@media(max-width:800px){
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+   left:-8px!important;
+   right:-8px!important;
+   width:calc(100% + 16px)!important;
+ }
+}
