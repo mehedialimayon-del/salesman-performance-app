@@ -170,36 +170,60 @@ function close(fromHistory=false){
  else soaHistory=false;
 }
 let soaExitDialog=null;
+function soaHomeControl(){
+ const nav=document.querySelector('#app nav.bottom,nav.bottom');
+ return [...(nav?.querySelectorAll('button,a,[role="button"]')||[])].find(el=>/\bhome\b/i.test((el.innerText||el.textContent||'').trim())||/home/i.test(el.getAttribute('aria-label')||''))||null;
+}
+function soaRestoreAppChrome(){
+ const home=soaHomeControl();
+ // The native app can unmount its header/nav on Back. Re-enter Home via the real SPA control.
+ if(home)home.click();
+ const root=byId('ffhSoaRoot');
+ if(root){root.classList.remove('soaHistoryFull');root.style.removeProperty('top');root.style.removeProperty('bottom');}
+ requestAnimationFrame(()=>{if(visible)positionSoa();});
+}
+function soaDismissHostExit(){
+ // Close only the host app's unintended Exit dialog; do not touch SOA transaction popups.
+ const nodes=[...document.querySelectorAll('body *')].filter(el=>el.children.length===0&&/Exit FieldForce Hub\?/i.test(el.textContent||''));
+ for(const title of nodes){
+  const panel=title.closest('[role="dialog"],[role="alertdialog"]');
+  if(panel){
+   const no=[...panel.querySelectorAll('button')].find(b=>/^NO$/i.test((b.textContent||'').trim()));
+   if(no)no.click();
+  }
+ }
+}
 function askSoaReturnHome(){
  if(soaExitDialog)return;
  const overlay=document.createElement('div');overlay.className='soaAppNotice';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');
- overlay.innerHTML='<section class="soaAppNoticePanel"><strong>RETURN TO HOME?</strong><p>Do you want to leave SOA and return to Home?</p><div style="display:flex;gap:12px;justify-content:flex-end"><button type="button" data-no>NO</button><button type="button" data-yes>YES</button></div></section>';
+ overlay.innerHTML='<section class="soaAppNoticePanel"><strong>RETURN TO HOME?</strong><p>Leave SOA and return to the FieldForce Hub Home page?</p><div style="display:flex;gap:12px;justify-content:flex-end"><button type="button" data-no>NO</button><button type="button" data-yes>YES</button></div></section>';
  document.body.appendChild(overlay);soaExitDialog=overlay;
  overlay.querySelector('[data-no]').onclick=()=>{overlay.remove();soaExitDialog=null;};
  overlay.querySelector('[data-yes]').onclick=()=>{
-  overlay.remove();soaExitDialog=null;close(true);
-  // Restore the actual app UI and navigate through its existing Home control.
-  const nav=document.querySelector('nav.bottom');
-  const home=[...(nav?.querySelectorAll('button,a,[role="button"]')||[])].find(el=>/^(home|⌂\s*home)$/i.test((el.innerText||el.textContent||'').trim())||/home/i.test(el.getAttribute('aria-label')||''));
-  if(home)home.click();
+  overlay.remove();soaExitDialog=null;
+  soaDismissHostExit();
+  // Navigate while SOA is still open so the app is restored before removing its overlay.
+  const home=soaHomeControl();if(home)home.click();
+  close(true);
   history.replaceState({...history.state,ffhSoaOverlay:false,ffhSoaHistoryFull:false},'',location.href);
  };
 }
 window.addEventListener('popstate',event=>{
  if(!visible)return;
- // Capture before the host app's exit handler so it cannot show an exit modal over SOA.
  event.stopImmediatePropagation();
  const root=byId('ffhSoaRoot');
  if(root?.classList.contains('soaHistoryFull')){
   root.classList.remove('soaHistoryFull');
-  const fullButton=root.querySelector('.soaHistoryExpand');if(fullButton){fullButton.textContent='⛶';fullButton.setAttribute('aria-label','Full screen transactions');fullButton.title='Full screen transactions';}
-  // Re-establish the SOA history entry; next Back must confirm Home, not exit the app.
+  const btn=root.querySelector('.soaHistoryExpand');
+  if(btn){btn.textContent='⛶';btn.setAttribute('aria-label','Full screen transactions');btn.title='Full screen transactions';}
   history.pushState({...history.state,ffhSoaOverlay:true,ffhSoaHistoryFull:false},'',location.href);
-  requestAnimationFrame(()=>positionSoa());
+  soaDismissHostExit();
+  soaRestoreAppChrome();
   return;
  }
  if(soaModalOpen()){dismissSoaModal();history.pushState({...history.state,ffhSoaOverlay:true},'',location.href);return;}
  history.pushState({...history.state,ffhSoaOverlay:true,ffhSoaHistoryFull:false},'',location.href);
+ soaDismissHostExit();
  askSoaReturnHome();
 },true);
 function install(){
@@ -468,7 +492,7 @@ function addHistoryExpand(){
  }
  // The original search input stays bound to the ledger filter.
  const button=document.createElement('button');button.type='button';button.className='soaHistoryExpand';button.textContent=root.classList.contains('soaHistoryFull')?'↙':'⛶';button.setAttribute('aria-label',root.classList.contains('soaHistoryFull')?'Exit full screen':'Full screen transactions');button.title=button.getAttribute('aria-label');
- button.onclick=()=>{const entering=!root.classList.contains('soaHistoryFull');if(entering){history.pushState({...history.state,ffhSoaOverlay:true,ffhSoaHistoryFull:true},'',location.href);root.classList.add('soaHistoryFull');}else{root.classList.remove('soaHistoryFull');if(history.state?.ffhSoaHistoryFull)history.back();}button.textContent=entering?'↙':'⛶';button.setAttribute('aria-label',entering?'Exit full screen':'Full screen transactions');button.title=button.getAttribute('aria-label');};
+ button.onclick=()=>{const entering=!root.classList.contains('soaHistoryFull');if(entering){history.pushState({...history.state,ffhSoaOverlay:true,ffhSoaHistoryFull:true},'',location.href);root.classList.add('soaHistoryFull');}else{root.classList.remove('soaHistoryFull');if(history.state?.ffhSoaHistoryFull)history.back();else soaRestoreAppChrome();}button.textContent=entering?'↙':'⛶';button.setAttribute('aria-label',entering?'Exit full screen':'Full screen transactions');button.title=button.getAttribute('aria-label');};
  heading.appendChild(button);
 }
 const historyObserver=new MutationObserver(()=>{if(document.getElementById('soaResults'))addHistoryExpand();});
