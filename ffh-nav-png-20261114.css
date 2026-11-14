@@ -797,3 +797,15 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    z-index:10!important;
  }
 }
+
+/* Fix the actual opaque rectangle covering the bottom row of home cards.
+   Keep nav position, height, width, PNG frame and seven controls unchanged.
+   The navigation container must NOT paint a black rectangle over the grid. */
+@media(max-width:800px){
+ html body #app .bottom,html body #app .bottomSix,
+ html body .bottom,html body .bottomSix,
+ html body .app .bottom,html body .app .bottomSix{
+   background-color:transparent!important;
+   background-image:none!important;
+ }
+}
