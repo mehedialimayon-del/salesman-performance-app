@@ -886,3 +886,19 @@ html body #app .bottom>button,html body #app .bottomSix>button{
  html body .homeGrid > .module:nth-child(n+13):nth-child(-n+16){transform:translateY(-9px)!important;}
  /* Final row 17-20 retains the existing -12px transform from v62. */
 }
+
+/* 2026-11-14: horizontal-only enlargement of the 20 home tile PNGs.
+   Keep tile boxes, height, vertical placement, navigation and all functions fixed. */
+@media(max-width:800px){
+ html body #app .homeGrid,html body .homeGrid{
+   column-gap:1px!important;
+ }
+ html body #app .homeGrid .module::before,
+ html body .homeGrid .module::before{
+   left:-5px!important;right:-5px!important;
+   width:calc(100% + 10px)!important;
+   /* Preserve the previously approved vertical geometry. */
+   top:-3px!important;bottom:-3px!important;
+   height:calc(100% + 6px)!important;
+ }
+}
