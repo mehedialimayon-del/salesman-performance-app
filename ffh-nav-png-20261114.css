@@ -711,3 +711,15 @@ html body #app .bottom>button,html body #app .bottomSix>button{
    top:0!important;bottom:0!important;height:100%!important;
  }
 }
+
+/* 18:14 requested: extend ONLY the top of the existing PNG frame by ~1 inch.
+   Keep nav container, buttons and bottom border anchored exactly as they are. */
+@media(max-width:800px){
+ html body #app .bottom::before,html body #app .bottomSix::before,
+ html body .bottom::before,html body .bottomSix::before{
+   top:-96px!important;
+   bottom:0!important;
+   height:calc(100% + 96px)!important;
+   background-size:100% 100%!important;
+ }
+}
