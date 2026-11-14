@@ -191,3 +191,27 @@
   white-space:nowrap!important;z-index:12!important;
  }
 }
+
+
+/* Portrait seated inside the actual orange circular PNG ring, with ring visible. */
+@media(max-width:800px){
+ html body #app .app:has(.homeGrid) .ffIdentityHero .editableAvatar{
+  position:absolute!important;left:18px!important;top:5px!important;
+  width:calc(25vw - 8px)!important;height:calc(25vw - 8px)!important;
+  max-width:112px!important;max-height:112px!important;
+  aspect-ratio:1/1!important;border-radius:50%!important;
+  object-fit:cover!important;object-position:center 18%!important;
+  clip-path:circle(49% at 50% 50%)!important;
+  background:#050505!important;border:0!important;box-shadow:none!important;
+  z-index:3!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText{
+  grid-column:2!important;align-self:center!important;
+  padding:0 2px!important;overflow:visible!important;
+  transform:translateY(-2px)!important;
+ }
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText>small,
+ html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText>strong{
+  white-space:normal!important;overflow-wrap:normal!important;
+ }
+}
