@@ -1,0 +1,110 @@
+@media (max-width: 800px) {
+  html body #app .app:has(.homeGrid) > header.top .topBtns {
+    --ffh-header-frame: url("./fieldforce-home-header-frame.webp");
+  }
+
+  /* Use the four tiles in the uploaded artwork on the existing controls. */
+  html body #app .app:has(.homeGrid) > header.top .topBtns :is(#bell, #globalSearchBtn, #refresh, #dots) {
+    background: var(--ffh-header-frame) var(--ffh-icon-x) 24% / 1010% 350% no-repeat !important;
+    border-font-size: 0 !important;
+    box-shadow: none !important;
+    font-size: 0 !important;
+  }
+
+  #app .app:has(.homeGrid) .topBtns #bell { --ffh-icon-x: 65.6%; }
+  #app .app:has(.homeGrid) .topBtns #globalSearchBtn { --ffh-icon-x: 76.5%; }
+  #app .app:has(.homeGrid) .topBtns #refresh { --ffh-icon-x: 87.5%; }
+  #app .app:has(.homeGrid) .topBtns #dots { --ffh-icon-x: 98.6%; }
+
+  #app .app:has(.homeGrid) .topBtns #bell .topBellSvg {
+    visibility: hidden;
+  }
+
+  html body #app .app:has(.homeGrid) > header.top .topBtns .iconBtn:focus-visible {
+    outline: 2px solid #fff !important;
+    outline-offset: 1px;
+  }
+
+  /* Register the long frame with the LIVE strip below the notification controls. */
+  html body #app .app:has(.homeGrid) > .ffAppAnnouncements #ffTicker {
+    background: url("./fieldforce-home-header-frame.webp") center 69.7% / 100% 443% no-repeat #080605 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding-inline: clamp(7px, 2.5vw, 18px) !important;
+  }
+
+  html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText {
+    position: absolute !important;
+    grid-area: auto !important;
+    inset: 48% 34% auto 86px !important;
+    transform: translateY(-50%) !important;
+    padding: 0 !important;
+    background: #030303;
+  }
+
+  html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText > small {
+    font-size: clamp(11px, 3.3vw, 16px) !important;
+  }
+
+  html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityRole {
+    gap: 2px 4px !important;
+  }
+
+  /* Align each label to the center of its printed slot. */
+  html body #app .app:has(.homeGrid) .ffIdentityHero :is(.heroClock, .heroDate, .ffIdentityCredit, #ffHomeAlarm) {
+    position: absolute !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    left: auto !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    white-space: nowrap !important;
+    line-height: 1.2 !important;
+    z-index: 12 !important;
+  }
+
+  html body #app .app:has(.homeGrid) .ffIdentityHero .heroClock {
+    top: 15px !important;
+    right: 9% !important;
+    width: 16% !important;
+    font-size: clamp(9px, 3vw, 17px) !important;
+  }
+
+  html body #app .app:has(.homeGrid) .ffIdentityHero #ffHomeAlarm {
+    top: 15px !important;
+    right: 3.5% !important;
+    width: 6% !important;
+    min-width: 0 !important;
+    height: 22px !important;
+    font-size: clamp(11px, 3vw, 16px) !important;
+  }
+
+  html body #app .app:has(.homeGrid) .ffIdentityHero .heroDate {
+    top: 44px !important;
+    right: 4% !important;
+    width: 20% !important;
+    font-size: clamp(7px, 2vw, 12px) !important;
+  }
+
+  html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityCredit {
+    top: 69px !important;
+    right: 4% !important;
+    width: 27% !important;
+    gap: 3px;
+    color: #fff !important;
+    font-size: clamp(7px, 2vw, 12px) !important;
+  }
+
+  #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityCredit small {
+    font-size: inherit;
+  }
+}
