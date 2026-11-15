@@ -32,6 +32,7 @@ window.FFH_REFERENCE_TASKS = (() => {
     const status = task => overdue(task) ? 'Overdue' : completed(task) ? 'Completed' :
       task.status === 'Open' || !task.status ? 'In Progress' : task.status;
     const state = lastViews.get(viewerId) || {scope:'team',kind:null,selected:null,from:'',to:'',status:'',query:''};
+    if (state.scope !== 'mine' && state.scope !== 'team') state.scope = 'team';
     lastViews.set(viewerId,state);
 
     // Coordinates map directly to the supplied 934 × 1610 px Tasks body.
@@ -202,9 +203,10 @@ window.FFH_REFERENCE_TASKS = (() => {
       const dateText = [shortDate(state.from),shortDate(state.to)].filter(Boolean).join(' – ');
       find('#ffTaskArtDate').textContent = dateText || 'All dates';
       showScope();
+      const mineIds = new Set([String(viewerId), String(context.viewer?.id || ''), String(context.selected || '')].filter(Boolean));
       const scoped = tasks.filter(task=>{
         const day = task.due || String(task.created || '').slice(0,10);
-        return (state.scope === 'team' || [viewerId,'ALL'].includes(task.to)) &&
+        return (state.scope === 'team' || mineIds.has(String(task.to)) || String(task.to).toLowerCase() === 'all') &&
           (!state.from || day >= state.from) && (!state.to || day <= state.to);
       });
       const counters = [scoped.length,scoped.filter(completed).length,scoped.filter(progress).length,scoped.filter(overdue).length];
@@ -323,6 +325,8 @@ window.FFH_REFERENCE_TASKS = (() => {
     panel.querySelectorAll('[data-task-scope]').forEach(button=>{
       button.onclick = () => {
         state.scope = button.dataset.taskScope;
+        state.kind = null;
+        highlight('[data-task-category]',()=>false);
         highlight('[data-task-scope]',b=>b===button);draw();
       };
     });
