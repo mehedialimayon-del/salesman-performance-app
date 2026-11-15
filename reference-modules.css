@@ -480,3 +480,28 @@ body:has(.ffRefTasks,.ffRefOutlet,.ffRefSync,.ffApprovalControls) #orb { display
     box-shadow:inset 0 0 9px #ff9900,0 0 4px #ffab26!important;
   }
 }
+/* List actions read as table cells, with the full record in the details panel. */
+#app .ffRefOutletViewport table { table-layout:fixed; }
+#app .ffRefOutletViewport :is(th,td) { overflow-wrap:anywhere; }
+#app .ffRefOutletViewport [data-ref-outlet] small { font-size:.83em!important; }
+html body.ffGlowOn #app .app.ffBlackGlow .ffRefOutletViewport :is([data-ref-outlet],[data-task-row]) {
+  width:100%;
+  min-height:0!important;
+  border:0!important;
+  border-radius:0!important;
+  padding:.15em 0!important;
+  text-align:left!important;
+  background:none!important;
+  box-shadow:none!important;
+  font:700 1em/1.13 var(--ff-ref-font)!important;
+}
+#app .ffRefOutletViewport :is([data-ref-outlet],[data-task-row]):focus-visible { outline:1px solid #ffb033; outline-offset:1px; }
+#app .ffRefOutletViewport :is([data-ref-outlet],[data-task-row]) :is(.ffGlowButtonLabel,.ffGlowButtonLabel>span) { display:inline!important; }
+#app .ffRefOutletViewport [data-ref-outlet] .ffGlowButtonLabel>small { display:block; }
+#app .ffRefOutletViewport [data-ref-outlet] { color:white; }
+#app .ffRefOutletViewport:has([data-ref-outlet]) th:first-child { width:29%; }
+#app .ffRefOutletViewport:has([data-ref-outlet]) th:nth-child(2) { width:12%; }
+#app .ffRefOutletViewport:has([data-ref-outlet]) th:nth-child(3) { width:22%; }
+#app .ffRefTasks .ffRefOutletViewport th:first-child { width:5%; }
+#app .ffRefTasks .ffRefOutletViewport th:nth-child(2) { width:26%; }
+#app .ffRefTasks .ffRefOutletViewport th:nth-child(4) { width:19%; }
