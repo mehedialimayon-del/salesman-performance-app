@@ -13,6 +13,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
  const page=(name,title,body)=>{ctx.setPage(name);ctx.shell(ctx.back(title)+body);ctx.bindBack();};
  const stamp=s=>{const d=new Date(s);return !s?'Time not recorded':Number.isNaN(d.getTime())?s:d.toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur'});};
  const safePhoto=url=>/^https:\/\//i.test(url||'')?`<button class="secondary ffPerformancePhoto" data-photo="${E(url)}">VIEW PROOF PHOTO</button>`:'';
+ const metric=(icon,label,color,value)=>`<div class="ffRefMetric" data-color="${color}"><i aria-hidden="true">${icon}</i><span>${label}</span><strong>${E(value)}</strong></div>`;
  const bindPhotos=()=>document.querySelectorAll('.ffPerformancePhoto').forEach(b=>b.onclick=()=>window.FFH_OPEN_IMAGE?.(b.dataset.photo));
  const rpc=async(name,action,payload={})=>{const {data,error}=await sb.rpc(name,{action,payload});if(error)throw Error(error.message);return data;};
  async function rows(table,order) {
@@ -59,7 +60,11 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   const id=me();if(!id)return;let list;
   try{list=read(id);}catch(e){return page('offlineSync','Offline Sync',`<div class="card" role="alert">${E(e.message)}</div>`);}
   const last=localStorage.getItem('ffh_order_sync_time_'+id);
-  page('offlineSync','Offline Sync',`<div class="card ffPerformanceIntro"><div class="cardTitle">${online()?'Connection available':'Offline · saved on this phone'}</div><p>New orders are saved here before sending. Only cloud-confirmed orders enter Sales. Delivery confirmation, attendance, photo proof and approvals require a connection.</p><p>Sign in online first. This screen does not enable offline sign-in. Keep app data until pending orders are sent.</p><b>${list.length} order(s) waiting</b><p class="miniStat">Last order sent: ${last?E(stamp(last)):'No confirmed send on this phone'}</p><button id="ffSyncRetry" class="primary" ${flushing||!online()?'disabled':''}>${flushing?'SENDING…':'RETRY / SEND SAVED ORDERS'}</button><p id="ffSyncMessage" role="status"></p></div>${list.map(x=>`<article class="card"><div class="row"><b>${E(x.order.outletName)}</b><span class="ffPerformanceStatus">${E(x.state==='Blocked'?'Needs attention':'Saved · waiting to send')}</span></div><p>${E(x.order.sku)} · ${E(x.order.qty)} cartons · ${ctx.rm(x.order.orderAmount)}</p><p>${E(who(x.order.sr))} · ${E(x.order.date)}</p><p class="miniStat">Saved ${E(stamp(x.queuedAt))} · ${E(x.id)}</p>${x.error?`<p role="status">${E(x.error)}</p>`:''}</article>`).join('')||'<div class="card empty">No new orders waiting to send on this phone.</div>'}`);
+  page('offlineSync','Offline Sync',`<div class="ffRefSync"><div class="card ffPerformanceIntro"><div class="cardTitle">${online()?'Connection available':'Offline · saved on this phone'}</div><p>New orders are saved here before sending. Only cloud-confirmed orders enter Sales. Delivery confirmation, attendance, photo proof and approvals require a connection.</p><p>Sign in online first. This screen does not enable offline sign-in. Keep app data until pending orders are sent.</p><div class="ffRefExports">
+   ${metric('⇅','Connection',online()?'green':'red',online()?'Online':'Offline')}
+   ${metric('◷','Waiting to Send','gold',list.filter(x=>x.state!=='Blocked').length)}
+   ${metric('⚠','Needs Attention','red',list.filter(x=>x.state==='Blocked').length)}
+  </div><p class="miniStat">${list.length} order(s) waiting · Last order sent: ${last?E(stamp(last)):'No confirmed send on this phone'}</p><button id="ffSyncRetry" class="primary" ${flushing||!online()?'disabled':''}>${flushing?'SENDING…':'RETRY / SEND SAVED ORDERS'}</button><p id="ffSyncMessage" role="status"></p></div>${list.map(x=>`<article class="card"><div class="row"><b>${E(x.order.outletName)}</b><span class="ffPerformanceStatus">${E(x.state==='Blocked'?'Needs attention':'Saved · waiting to send')}</span></div><p>${E(x.order.sku)} · ${E(x.order.qty)} cartons · ${ctx.rm(x.order.orderAmount)}</p><p>${E(who(x.order.sr))} · ${E(x.order.date)}</p><p class="miniStat">Saved ${E(stamp(x.queuedAt))} · ${E(x.id)}</p>${x.error?`<p role="status">${E(x.error)}</p>`:''}</article>`).join('')||'<div class="card empty">No new orders waiting to send on this phone.</div>'}</div>`);
   if(window.ffDaily){const main=document.querySelector('#app main');if(main){main.insertAdjacentHTML('beforeend',window.ffDaily.outboxHtml());window.ffDaily.bindOutbox();}}
   $('#ffSyncRetry').onclick=async e=>{e.target.disabled=true;try{await ctx.refreshStaff();await flush(true);}catch(err){if($('#ffSyncMessage'))$('#ffSyncMessage').textContent=err.message;}finally{if(e.target.isConnected)e.target.disabled=false;}};
  }
@@ -79,8 +84,17 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   (claims.claims||[]).forEach(x=>items.push({kind:'Existing claim',id:x.id,staff:x.owner_staff_id,title:x.title,detail:x.kind,status:x.status,date:x.created_at,reviewer:x.reviewer_staff_id,reviewedAt:x.reviewed_at,can:false,open:'claim:'+x.id,raw:x}));
   const errors=results.map((x,i)=>x.status==='rejected'?['Tasks','Access requests','Income requests','Claims','Permissions'][i]+': '+x.reason.message:'').filter(Boolean);
   page('approvals','Approval Inbox',`<div class="card ffPerformanceIntro ffApprovalControls"><div class="two"><label>Status<select id="ffApprovalStatus"><option value="pending">Waiting for review</option><option value="all">All history</option></select></label><label>Search<input id="ffApprovalSearch" placeholder="Staff, outlet, task or request"></label></div><button class="secondary" id="ffApprovalReload">REFRESH INBOX</button>${id==='M21954'?'<button class="secondary" id="ffApprovalPermissions">STAFF / TASK ACCESS SETTINGS</button><button class="secondary" id="ffIncomeApprovalPermissions">INCOME APPROVAL SETTINGS</button>':''}${errors.map(s=>`<p role="alert">${E(s)} · Some requests could not load.</p>`).join('')}</div><p id="ffApprovalCount" role="status"></p><div id="ffApprovalList"></div><div class="ffApprovalHelp"><p>You see only requests allowed by your existing access. SRs can follow their submissions. Task review needs Manager access plus Tasks Edit; income review needs separate approval permission. Claims keep their assigned reviewer. Access decisions stay with the owner / delegated administrator.</p><p>Approving an access request records a decision. An authorized administrator must separately change the actual permissions.</p></div>`);
-  const draw=()=>{const term=$('#ffApprovalSearch').value.trim().toLowerCase(),pending=$('#ffApprovalStatus').value==='pending';const shown=items.filter(x=>!pending||['Pending','Pending Review','Submitted'].includes(x.status)).filter(x=>!term||[x.kind,x.title,x.detail,who(x.staff),x.staff].join(' ').toLowerCase().includes(term)).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));$('#ffApprovalCount').textContent=shown.length+' request(s)';$('#ffApprovalList').innerHTML=shown.map((x,i)=>`<article class="card"><div class="row"><b>${E(x.title)}</b><span class="ffPerformanceStatus">${E(x.status)}</span></div><p>${E(x.kind)} · ${E(who(x.staff))}</p><p>${E(x.detail)}</p><p class="miniStat">Submitted / updated ${E(stamp(x.date))}</p>${x.reviewedAt?`<p class="miniStat">Reviewed ${E(stamp(x.reviewedAt))} · ${E(who(x.reviewer))}</p>`:x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${safePhoto(x.photo)}${x.location?`<p class="miniStat">Location proof: ${E(x.location.latitude)}, ${E(x.location.longitude)} · ${E(stamp(x.location.capturedAt))}</p>`:''}${x.can?`<button class="primary ffInboxDecision" data-index="${i}" data-status="Done">APPROVE TASK</button><button class="secondary ffInboxDecision" data-index="${i}" data-status="Rejected">RETURN TASK</button>`:''}${x.open?`<button class="secondary ffInboxOpen" data-index="${i}">OPEN REQUEST / REVIEW</button>`:''}</article>`).join('')||'<div class="card empty">No requests match this selection.</div>';bindPhotos();document.querySelectorAll('.ffInboxOpen').forEach(b=>b.onclick=()=>{const x=shown[+b.dataset.index];ctx.open(x.open,x.raw);});document.querySelectorAll('.ffInboxDecision').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await ctx.reviewTask(shown[+b.dataset.index].id,b.dataset.status);await approvals();}catch(e){alert(e.message);b.disabled=false;}});};
-  $('#ffApprovalStatus').onchange=draw;$('#ffApprovalSearch').oninput=draw;$('#ffApprovalReload').onclick=approvals;
+  const inbox=$('.ffApprovalControls');
+  inbox.insertAdjacentHTML('afterend',`<div class="ffRefReportKpis" id="ffApprovalMetrics">
+   ${metric('▤','All Requests','blue',items.length)}
+   ${metric('◷','Waiting','gold',items.filter(x=>['Pending','Pending Review','Submitted'].includes(x.status)).length)}
+   ${metric('✓','Approved','green',items.filter(x=>['Approved','Done'].includes(x.status)).length)}
+   ${metric('↩','Returned / Rejected','red',items.filter(x=>['Returned','Rejected'].includes(x.status)).length)}
+  </div>`);
+  const categories=[...new Set(items.map(x=>x.kind))];
+  inbox.querySelector('.two').insertAdjacentHTML('beforeend',`<label>Request Type<select id="ffApprovalType"><option value="">All request types</option>${categories.map(kind=>`<option>${E(kind)}</option>`).join('')}</select></label>`);
+  const draw=()=>{const kind=$('#ffApprovalType').value,term=$('#ffApprovalSearch').value.trim().toLowerCase(),pending=$('#ffApprovalStatus').value==='pending';const shown=items.filter(x=>(!kind||x.kind===kind)&&(!pending||['Pending','Pending Review','Submitted'].includes(x.status))).filter(x=>!term||[x.kind,x.title,x.detail,who(x.staff),x.staff].join(' ').toLowerCase().includes(term)).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));$('#ffApprovalCount').textContent=shown.length+' request(s)';$('#ffApprovalList').innerHTML=shown.map((x,i)=>`<article class="card"><div class="row"><b>${E(x.title)}</b><span class="ffPerformanceStatus">${E(x.status)}</span></div><p>${E(x.kind)} · ${E(who(x.staff))}</p><p>${E(x.detail)}</p><p class="miniStat">Submitted / updated ${E(stamp(x.date))}</p>${x.reviewedAt?`<p class="miniStat">Reviewed ${E(stamp(x.reviewedAt))} · ${E(who(x.reviewer))}</p>`:x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${safePhoto(x.photo)}${x.location?`<p class="miniStat">Location proof: ${E(x.location.latitude)}, ${E(x.location.longitude)} · ${E(stamp(x.location.capturedAt))}</p>`:''}${x.can?`<button class="primary ffInboxDecision" data-index="${i}" data-status="Done">APPROVE TASK</button><button class="secondary ffInboxDecision" data-index="${i}" data-status="Rejected">RETURN TASK</button>`:''}${x.open?`<button class="secondary ffInboxOpen" data-index="${i}">OPEN REQUEST / REVIEW</button>`:''}</article>`).join('')||'<div class="card empty">No requests match this selection.</div>';bindPhotos();document.querySelectorAll('.ffInboxOpen').forEach(b=>b.onclick=()=>{const x=shown[+b.dataset.index];ctx.open(x.open,x.raw);});document.querySelectorAll('.ffInboxDecision').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await ctx.reviewTask(shown[+b.dataset.index].id,b.dataset.status);await approvals();}catch(e){alert(e.message);b.disabled=false;}});};
+  $('#ffApprovalType').onchange=draw;$('#ffApprovalStatus').onchange=draw;$('#ffApprovalSearch').oninput=draw;$('#ffApprovalReload').onclick=approvals;
   if($('#ffApprovalPermissions'))$('#ffApprovalPermissions').onclick=()=>ctx.open('access');if($('#ffIncomeApprovalPermissions'))$('#ffIncomeApprovalPermissions').onclick=()=>ctx.open('incomeLedger');draw();
  }
  async function historyPage(){
@@ -101,52 +115,81 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    r.payload?.outlet_staff_id===o.sr&&(!r.recipients?.length||r.recipients.some(sid=>r.states?.[sid]?.status!=='Done')));
   const canEdit=ctx.may('outlets');
   const state=o=>!o.active?'Inactive':onIssue(o)?'Issue':'Active';
-  const outletMetric=(icon,label,color,n)=>`<div class="ffRefMetric" data-color="${color}"><i aria-hidden="true">${icon}</i><span>${label}</span><strong>${n}</strong></div>`;
   if(globalThis.ffDaily&&window.FFH_DAILY_CORE){const source=data[0].map(s=>({id:s.id,sr:s.sr_id,date:s.sale_date,status:s.status,outletCode:s.outlet_code,outletName:s.outlet_name,sku:s.sku,qty:s.qty,orderAmount:s.order_amount,deliveredAmount:s.delivered_amount,deliveredAt:s.delivered_at,remarks:s.remarks}));data[0]=window.FFH_DAILY_CORE.coverageRows({...globalThis.ffDaily.data(),sales:source},ids).map(s=>({id:s.id,sr_id:s.sr,sale_date:s.date,status:s.status,outlet_code:s.outletCode,outlet_name:s.outletName,sku:s.sku,qty:s.qty,order_amount:s.orderAmount,delivered_amount:s.deliveredAmount,remarks:s.remarks}));}
   const zones=[...new Set(outlets.map(o=>ctx.staff(o.sr)?.zone).filter(Boolean))].sort();
   const chains=[...new Set(outlets.map(o=>o.category).filter(Boolean))].sort();
   const selectOptions=(values,label)=>'<option value="">'+label+'</option>'+values.map(([value,text])=>`<option value="${E(value)}">${E(text)}</option>`).join('');
   page('outletHistory','Outlet Management',`<section class="ffRefOutlet">
    <div class="ffRefPanel ffRefFields">
-     <label><span>From<input id="ffOutletHistoryFrom" type="date"></span></label>
-     <label><span>To<input id="ffOutletHistoryTo" type="date"></span></label>
+     <div class="ffRefOutletDates"><span>Date Range</span>
+      <div><input id="ffOutletHistoryFrom" type="date" aria-label="From date"><input id="ffOutletHistoryTo" type="date" aria-label="To date"></div>
+     </div>
      <label><span>Zone<select id="ffOutletZone">${selectOptions(zones.map(z=>[z,z]),'All permitted zones')}</select></span></label>
      <label><span>Sales Representative<select id="ffOutletStaff">${selectOptions(ids.map(id=>[id,who(id)]),'All SRs')}</select></span></label>
      <label><span>Chain / Channel<select id="ffOutletChain">${selectOptions(chains.map(c=>[c,c]),'All chains')}</select></span></label>
    </div>
    <div class="ffRefReportKpis">
-    ${outletMetric('▣','Total Outlets','green',outlets.length)}
-    ${outletMetric('✓','Active Outlets','blue',outlets.filter(o=>o.active).length)}
-    ${outletMetric('Ⅱ','Inactive','gold',outlets.filter(o=>!o.active).length)}
-    ${outletMetric('⚠','With Issues','red',outlets.filter(onIssue).length)}
+    ${metric('▣','Total Outlets','green',outlets.length)}
+    ${metric('✓','Active Outlets','blue',outlets.filter(o=>o.active).length)}
+    ${metric('Ⅱ','Inactive','gold',outlets.filter(o=>!o.active).length)}
+    ${metric('⚠','With Issues','red',outlets.filter(onIssue).length)}
    </div>
-   <div class="ffRefExports">
-    <button class="ffRefButton" type="button" id="ffOutletHistoryReload">Refresh History</button>
-    <button class="ffRefButton" type="button" id="ffOutletVisitReport">Outlet Report</button>
-    ${canEdit?'<button class="ffRefButton" type="button" id="ffOutletManage">Add New Outlet</button>':'<button class="ffRefButton" type="button" id="ffOutletRequest">New Outlet Request</button>'}
+   <div class="ffRefOutletTools">
+    ${[
+      ['▣','Outlet List','ffOutletJumpList'],['▥','Listing / SKU','ffOutletListing'],['⌖','Outlet Visit','ffOutletVisits'],
+      ['⚠','Outlet Issue','ffOutletTopIssue'],['⊕','New Outlet Request','ffOutletRequest'],
+      ['♙','Outlet Assignment','ffOutletAssignment'],['▥','Outlet Performance','ffOutletPerformance'],
+      ['⊖','Outlet Closure / Inactive','ffOutletTopClosure'],['⌖','Outlet Mapping','ffOutletMap'],['◷','Outlet History','ffOutletJumpHistory']
+    ].map(([icon,label,id])=>`<button type="button" class="ffRefButton" id="${id}"><i aria-hidden="true">${icon}</i><span>${label}</span></button>`).join('')}
    </div>
    <section class="ffRefPanel">
-    <div class="ffRefZeroTitle"><h2 id="ffOutletCount">Outlet List</h2></div>
-    <label class="ffRefSearch"><i aria-hidden="true">⌕</i><input type="search" id="ffOutletHistorySearch" aria-label="Search outlets" placeholder="Search outlet (name / code / chain)…"></label>
+    <header class="ffRefListHead"><h2 id="ffOutletCount">Outlet List</h2>
+     <label class="ffRefSearch"><i aria-hidden="true">⌕</i><input type="search" id="ffOutletHistorySearch" aria-label="Search outlets" placeholder="Search outlet / code / chain"></label>
+    </header>
+    <details class="ffRefOutletFilters ffRefManage"><summary>Outlet status / select by name</summary>
     <label class="ffRefSearch">Outlet status<select id="ffOutletStatus"><option value="">All statuses</option><option>Active</option><option>Inactive</option><option>Issue</option></select></label>
-    <label class="ffRefSearch">Assigned Outlet<select id="ffOutletHistorySelect"></select></label>
-    <div class="ffRefOutletViewport"><table><thead><tr><th>Outlet</th><th>Chain</th><th>SR</th><th>Listing</th><th>Status</th></tr></thead><tbody id="ffOutletHistoryRows"></tbody></table></div>
+    <label class="ffRefSearch">Assigned Outlet<select id="ffOutletHistorySelect"></select></label></details>
+    <div class="ffRefOutletViewport"><table><thead><tr><th>Outlet</th><th>Chain</th><th>SR</th><th>Listing</th><th>Last Proof</th><th>Status</th></tr></thead><tbody id="ffOutletHistoryRows"></tbody></table></div>
    </section>
    ${errors.map(e=>`<p role="alert">${E(e)} · History is incomplete.</p>`).join('')}
    <div id="ffOutletHistoryDetail"></div>
+   <section class="ffRefPanel ffRefQuickActions"><h2>⚡ Quick Actions</h2>
+    <div class="ffRefReportKpis">
+     ${canEdit?'<button type="button" class="ffRefButton" data-color="green" id="ffOutletManage">＋ Add New Outlet</button>':'<button type="button" class="ffRefButton" data-color="green" id="ffOutletQuickRequest">＋ New Outlet Request</button>'}
+     ${canEdit?'<button type="button" class="ffRefButton" data-color="blue" id="ffOutletImport">⇧ Bulk Import (Excel)</button>':'<button type="button" class="ffRefButton" data-color="blue" id="ffOutletExcel" data-outlet-export="xlsx">⇩ Outlet List (Excel)</button>'}
+     <button type="button" class="ffRefButton" data-color="red" id="ffOutletPdf" data-outlet-export="pdf">⇩ Outlet List (PDF)</button>
+     <button type="button" class="ffRefButton" data-color="purple" id="ffOutletVisitReport">▤ Outlet Summary Report</button>
+    </div>
+    <p id="ffOutletActionStatus" class="ffRefHint" role="status"></p>
+   </section>
+   <div class="ffRefOutletSecondary">
+    ${canEdit?'<button type="button" class="secondary" id="ffOutletExcel" data-outlet-export="xlsx">⇩ Export Outlet List (Excel)</button>':''}
+    <button type="button" class="secondary" id="ffOutletHistoryReload">↻ Refresh History</button>
+   </div>
   </section>`);
-  const select=$('#ffOutletHistorySelect');
+  const select=$('#ffOutletHistorySelect'),previousOutlet=lastHistory;
+  const visits=new Map();
+  for(const row of data[2]){
+   if(!row.outlet_code)continue;
+   const key=JSON.stringify([row.sr_id,String(row.outlet_code)]),date=row.execution_date;
+   if(date&&date>(visits.get(key)||''))visits.set(key,date);
+  }
+  const lastVisit=o=>visits.get(JSON.stringify([o.sr,String(o.code)]))||'—';
+  let filtered=[];
   const fill=()=>{
    const term=$('#ffOutletHistorySearch').value.trim().toLowerCase(),old=select.value;
    const zone=$('#ffOutletZone').value,staff=$('#ffOutletStaff').value,chain=$('#ffOutletChain').value,status=$('#ffOutletStatus').value;
    const list=outlets.map((o,i)=>({o,i})).filter(({o})=>(!zone||ctx.staff(o.sr)?.zone===zone)&&(!staff||staff===o.sr)&&(!chain||chain===o.category)&&(!status||status===state(o))&&
     (!term||[o.name,o.code,o.category,who(o.sr)].join(' ').toLowerCase().includes(term)));
+   filtered=list;
+   const counts=[list.length,list.filter(({o})=>o.active).length,list.filter(({o})=>!o.active).length,list.filter(({o})=>onIssue(o)).length];
+   document.querySelectorAll('.ffRefOutlet > .ffRefReportKpis .ffRefMetric strong').forEach((el,i)=>{el.textContent=counts[i];});
    $('#ffOutletCount').textContent='Outlet List ('+list.length+')';
    select.innerHTML=selectOptions(list.map(({o,i})=>[i,o.name+' ('+o.code+') · '+who(o.sr)]),'Choose an outlet');
-   select.value=list.some(v=>String(v.i)===old)?old:'';
-   if(!select.value)$('#ffOutletHistoryDetail').innerHTML='';
-   $('#ffOutletHistoryRows').innerHTML=list.map(({o,i})=>`<tr><td><button class="secondary" type="button" data-ref-outlet="${i}">${E(o.name)}<small>${E(o.code)}</small></button></td><td>${E(o.category||'—')}</td><td>${E(who(o.sr))}</td><td>${E(o.totalSku||'—')}</td><td><span class="${o.active&&!onIssue(o)?'green':'red'}">${state(o)}</span></td></tr>`).join('')||
-     '<tr><td colspan="5">No outlets match this selection.</td></tr>';
+   select.value=list.some(v=>String(v.i)===old)?old:list.length?String(list[0].i):'';
+   if(select.value)draw();else $('#ffOutletHistoryDetail').innerHTML='<section class="ffRefPanel"><h2>Outlet Details</h2><p class="ffRefHint">No outlet selected.</p></section>';
+   $('#ffOutletHistoryRows').innerHTML=list.map(({o,i})=>`<tr><td><button class="secondary" type="button" data-ref-outlet="${i}">${E(o.name)}<small>${E(o.code)}</small></button></td><td>${E(o.category||'—')}</td><td>${E(who(o.sr))}</td><td>${E(o.totalSku??'—')}</td><td>${E(lastVisit(o))}</td><td><span class="ffRefStatus" data-status="${state(o)}">${state(o)}</span></td></tr>`).join('')||
+     '<tr><td colspan="6">No outlets match this selection.</td></tr>';
    document.querySelectorAll('[data-ref-outlet]').forEach(button=>button.onclick=()=>{
      select.value=button.dataset.refOutlet;
      draw();
@@ -199,17 +242,62 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    data[2].filter(match).filter(r=>range(r.execution_date)).forEach(r=>events.push({date:r.execution_date,title:'CPO / Promotion · '+r.status,detail:r.remarks,photo:r.photo_url}));
    data[5].filter(r=>String(r.payload?.outlet_code)===String(o.code)&&r.payload?.outlet_staff_id===o.sr&&range(r.created_at)).forEach(r=>events.push({date:r.created_at.slice(0,10),title:r.category+' · '+r.title,detail:r.payload.description,photo:r.payload.photo}));
    events.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
-   $('#ffOutletHistoryDetail').innerHTML=`<div class="card"><div class="cardTitle">${E(o.name)}</div><p>${E(o.code)} · ${E(who(o.sr))} · ${state(o)}</p><div class="ffRefExports">
+   $('#ffOutletHistoryDetail').innerHTML=`<section class="card ffRefPanel">
+    <header class="ffRefListHead"><h2>▣ Outlet Details</h2><div><span class="ffRefStatus" data-status="${state(o)}">${state(o)}</span></div></header>
+    <div class="ffRefOutletDetailBody"><div>
+     <h3>${E(o.name)}</h3><dl>
+      <div><dt>Chain</dt><dd>${E(o.category||'—')}</dd></div>
+      <div><dt>Outlet Code</dt><dd>${E(o.code)}</dd></div>
+      <div><dt>Assigned SR</dt><dd>${E(who(o.sr))}</dd></div>
+      <div><dt>Listing / SKU</dt><dd>${E(o.totalSku??'—')}</dd></div>
+      <div><dt>Last Proof</dt><dd>${E(lastVisit(o))}</dd></div>
+      <div><dt>Delivered</dt><dd>${ctx.rm(total)}</dd></div>
+      <div><dt>Pending Order</dt><dd>${ctx.rm(pending)}</dd></div>
+     </dl>
+    </div><div class="ffRefOutletDetailsActions">
     ${canEdit?'<button type="button" class="ffRefButton" id="ffOutletEdit">Edit / Update Listing</button>':''}
     <button type="button" class="ffRefButton" id="ffOutletIssue">Report Issue</button>
     ${canEdit?'':'<button type="button" class="ffRefButton" id="ffOutletClosure">Request Closure</button>'}
-   </div><div class="two"><div>Delivered<b class="green ffPerformanceAmount">${ctx.rm(total)}</b></div><div>Pending order<b class="ffPerformanceAmount">${ctx.rm(pending)}</b></div></div><p>${skus.size} delivered SKU(s) in selected dates</p>${[...skus].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([sku,amount])=>`<p>${E(sku)} · ${ctx.rm(amount)}</p>`).join('')}</div>${events.map(x=>`<article class="card"><b>${E(x.title)}</b><p class="miniStat">${E(x.date)}</p><p>${E(x.detail||'')}</p>${x.remarks?`<p>${E(x.remarks)}</p>`:''}${safePhoto(x.photo)}</article>`).join('')||'<div class="card empty">No recorded activity in this selection.</div>'}`;bindPhotos();
+   <button type="button" class="ffRefButton" id="ffOutletViewActivity">◷ Visit / Activity History</button>
+   </div></div></section><details id="ffOutletActivity" class="ffRefPanel ffRefManage"><summary>Outlet Activity (${events.length})</summary>
+   <p>${skus.size} delivered SKU(s) in selected dates</p>${[...skus].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([sku,amount])=>`<p>${E(sku)} · ${ctx.rm(amount)}</p>`).join('')}
+   ${events.map(x=>`<article class="card"><b>${E(x.title)}</b><p class="miniStat">${E(x.date)}</p><p>${E(x.detail||'')}</p>${x.remarks?`<p>${E(x.remarks)}</p>`:''}${safePhoto(x.photo)}</article>`).join('')||'<div class="card empty">No recorded activity in this selection.</div>'}</details>`;bindPhotos();
+   $('#ffOutletViewActivity').onclick=()=>{const activity=$('#ffOutletActivity');activity.open=!activity.open;if(activity.open)activity.scrollIntoView({block:'nearest'});};
    $('#ffOutletEdit')?.addEventListener('click',()=>edit(o));
    $('#ffOutletIssue').onclick=()=>window.ffFindings?.outletFinding('Outlet issue',o);
    $('#ffOutletClosure')?.addEventListener('click',()=>window.ffFindings?.outletFinding('Outlet closure',o));
   };
   $('#ffOutletHistorySearch').oninput=fill;for(const id of ['ffOutletZone','ffOutletStaff','ffOutletChain','ffOutletStatus'])$('#'+id).onchange=fill;select.onchange=draw;$('#ffOutletHistoryFrom').onchange=draw;$('#ffOutletHistoryTo').onchange=draw;$('#ffOutletHistoryReload').onclick=historyPage;$('#ffOutletVisitReport').onclick=()=>ctx.open?.('reports');$('#ffOutletManage')?.addEventListener('click',()=>edit(null));$('#ffOutletRequest')?.addEventListener('click',()=>window.ffFindings?.outletFinding('New outlet'));fill();
-  if(lastHistory){const i=outlets.findIndex(o=>o.sr===lastHistory.sr&&o.code===lastHistory.code);if(i>=0){select.value=String(i);draw();}}
+  const jump=(selector)=>$(selector)?.scrollIntoView({block:'start'});
+  const selected=()=>select.value===''?null:outlets[Number(select.value)];
+  const requireOutlet=action=>()=>{
+   const outlet=selected();
+   if(outlet)action(outlet);
+   else {$('#ffOutletActionStatus').textContent='Select an outlet first.';jump('#ffOutletCount');}
+  };
+  $('#ffOutletJumpList').onclick=()=>{jump('#ffOutletCount');$('#ffOutletHistorySearch').focus({preventScroll:true});};
+  $('#ffOutletListing').onclick=requireOutlet(o=>canEdit?edit(o):jump('#ffOutletHistoryDetail'));
+  const openActivity=()=>{const activity=$('#ffOutletActivity');if(activity){activity.open=true;jump('#ffOutletActivity');}else jump('#ffOutletHistoryDetail');};
+  $('#ffOutletVisits').onclick=requireOutlet(openActivity);
+  $('#ffOutletTopIssue').onclick=requireOutlet(o=>window.ffFindings?.outletFinding('Outlet issue',o));
+  $('#ffOutletAssignment').onclick=()=>{if(canEdit)ctx.manageOutlets();else{select.closest('details').open=true;select.focus();}};
+  $('#ffOutletImport')?.addEventListener('click',()=>ctx.manageOutlets());
+  $('#ffOutletPerformance').onclick=requireOutlet(()=>jump('#ffOutletHistoryDetail'));
+  $('#ffOutletTopClosure').onclick=requireOutlet(o=>canEdit?edit(o):window.ffFindings?.outletFinding('Outlet closure',o));
+  $('#ffOutletMap').onclick=requireOutlet(o=>{
+   const query=encodeURIComponent([o.name,o.category,'Malaysia'].filter(Boolean).join(' '));
+   window.open('https://www.google.com/maps/search/?api=1&query='+query,'_blank','noopener');
+  });
+  $('#ffOutletJumpHistory').onclick=requireOutlet(openActivity);
+  $('#ffOutletQuickRequest')?.addEventListener('click',()=>$('#ffOutletRequest').click());
+  for(const button of document.querySelectorAll('[data-outlet-export]')){
+   button.onclick=()=>ctx.exportFile(button,'Outlet List',[
+    ['Outlet','Code','Chain','Sales Representative','Listing / SKU','Last Proof','Status'],
+    ...filtered.map(({o})=>[o.name,o.code,o.category,who(o.sr),o.totalSku,lastVisit(o),state(o)])
+   ],$('#ffOutletActionStatus'));
+  }
+  const requested=previousOutlet;
+  if(requested){const i=outlets.findIndex(o=>o.sr===requested.sr&&o.code===requested.code);if(i>=0){select.value=String(i);draw();}}
  }
  window.addEventListener('online',()=>flush().catch(console.warn));
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)flush().catch(console.warn);});
