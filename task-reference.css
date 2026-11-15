@@ -184,3 +184,46 @@ html body #app .app>main.wrap.ffTaskPage:has(.ffTaskArtwork)>:is(.ffTaskRefHisto
   text-overflow:ellipsis!important;
 }
 #app .ffTaskArtDialog {overflow-y:auto;overscroll-behavior:contain;}
+
+/* Task category buttons: artwork's orange first tile is not a default selection.
+   Cover each baked tile with a real interactive, state-driven surface. */
+html body #app .app main.wrap .ffTaskArtwork button[data-task-category] {
+  opacity:1!important;
+  overflow:visible!important;
+  isolation:isolate;
+  outline:none!important;
+}
+html body #app .app main.wrap .ffTaskArtwork button[data-task-category]::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  border-radius:1.5cqw;
+  background:linear-gradient(160deg,#241307 0%,#080604 55%,#030303 100%);
+  border:1px solid #f7a341;
+  box-shadow:inset 0 0 1.3cqw #ff7c1733,0 0 .8cqw #ff9a294d;
+}
+html body #app .app main.wrap .ffTaskArtwork button[data-task-category]::after {
+  content:attr(aria-label);
+  position:absolute;
+  z-index:2;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:.3cqw;
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+  white-space:normal;
+  font:750 2.3cqw/1.1 Arial,Roboto,sans-serif;
+}
+html body #app .app main.wrap .ffTaskArtwork button[data-task-category][aria-pressed="true"]::before {
+  background:linear-gradient(155deg,#ffb326,#ff7500 65%,#b94400);
+  border-color:#ffe58d;
+  box-shadow:inset 0 0 1.5cqw #fff7a4aa,0 0 2cqw #ff9b24;
+}
+html body #app .app main.wrap .ffTaskArtwork button[data-task-category]:focus-visible::before {
+  outline:2px solid #fff0b0;
+  outline-offset:1px;
+}
