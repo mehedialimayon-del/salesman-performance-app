@@ -21,3 +21,5 @@
 .ffTaskModalBody,.ffTaskModalBody form{min-width:0}
 .ffTaskModalBody{overflow-y:auto!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;max-height:min(76dvh,760px)}
 .ffTaskModalBody form{padding-bottom:24px}
+
+.ffTaskAssignAttachment{display:grid;gap:8px;padding:12px;border:1px solid #ff932b;border-radius:12px;background:#160c06;color:#fff}.ffTaskAssignAttachment label{display:grid;gap:7px;color:#ff9c3e;font-weight:750}.ffTaskAssignAttachment input{max-width:100%;color:white}.ffTaskAssignAttachment small{color:#e8d5c3;line-height:1.4}.ffTaskAssignAttachment [role=status]{margin:0;color:#fff;font-size:12px}.ffTaskArtDescription a{color:#ffb14d;text-decoration:underline}
