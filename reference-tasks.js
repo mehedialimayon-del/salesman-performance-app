@@ -38,7 +38,7 @@ window.FFH_REFERENCE_TASKS = (() => {
     const slot = (tag, attrs, body, x,y,w,h) =>
       `<${tag} ${attrs} style="left:${100*x/716}%;top:${100*(y-157)/1223}%;width:${100*w/716}%;height:${100*h/1223}%">${body}</${tag}>`;
     const tap = (attributes,label,x,y,w,h) =>
-      slot('button',`type="button" class="ffTaskArtSlot ffTaskArtTap" ${attributes}`,label,x,y,w,h);
+      slot('button',`type="button" class="ffTaskArtSlot ffTaskArtTap" aria-label="${esc(label)}" ${attributes}`,label,x,y,w,h);
     const value = (id,label,x,y,w,h) =>
       slot('button',`type="button" id="${id}" aria-label="${label}" class="ffTaskArtSlot ffTaskArtValue"`,'',x,y,w,h);
 
@@ -67,6 +67,9 @@ window.FFH_REFERENCE_TASKS = (() => {
     ].join('');
     history.before(panel,drawer);
     drawer.append(history);
+    const navigation = {bh:'Home',bs:'Sales',bo:'Dashboard',bt:'Tasks',bnotice:'Notice',bn:'Notification',br:'Live Chat'};
+    for (const [id,label] of Object.entries(navigation)) root.parentElement.querySelector('#'+id)?.setAttribute('aria-label',label);
+    root.parentElement.querySelector('#bt')?.setAttribute('aria-current','page');
 
     const find = selector => panel.querySelector(selector);
     const originals = new Map(Array.from(history.querySelectorAll('.taskRow'), row => [row.querySelector('.taskDone')?.dataset.id,row]));
