@@ -415,9 +415,39 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     box-shadow: none !important;
   }
 
+  /* Cover the complete ring in the card artwork, then draw the open arc over
+     the original editable portrait. Both layers leave its tap target intact. */
   html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero::before,
   html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero::after {
-    content: none !important;
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    box-sizing: border-box;
+    inset: auto;
+    border: 0;
+    border-radius: 50%;
+    transform: none;
+    box-shadow: none;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero::before {
+    left: 2%;
+    top: 11%;
+    width: 19.8%;
+    height: 77%;
+    background: radial-gradient(ellipse closest-side, #080605 88%, #080605e8 94%, transparent);
+    z-index: 1;
+    filter: none;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero::after {
+    left: 2.9%;
+    top: 14.4%;
+    width: 17.6%;
+    height: 66%;
+    background: conic-gradient(from 224deg, transparent, #ff911e 14deg, #ffbc64 85deg, #ff9c27 156deg, #ff7f12 190deg, transparent 207deg);
+    mask-image: radial-gradient(ellipse closest-side, transparent 84%, #000 88% 95%, transparent 100%);
+    z-index: 3;
   }
 
   html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero .editableAvatar {
@@ -427,10 +457,12 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     width: 14.8% !important;
     height: 57.4% !important;
     margin: 0 !important;
-    clip-path: circle(49.5%) !important;
+    clip-path: ellipse(49.5% 50%) !important;
     border: 0 !important;
     border-radius: 50% !important;
     box-shadow: none !important;
+    mask-image: linear-gradient(#000 0% 76%, #000b 87%, transparent);
+    z-index: 2;
   }
 
   html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero .ffIdentityText {
@@ -585,21 +617,9 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     display: none !important;
   }
 
-  html body #app .app[data-neon-ready] .homeGrid > .module:is(:active, .moduleActive)::after {
-    content: "";
-    position: absolute;
-    z-index: 1;
-    pointer-events: none;
-    inset: 6% 6.5%;
-    border: 1px solid #ffb94f;
-    border-radius: clamp(10px, 4.1vw, 23px);
-    background: radial-gradient(ellipse at 50% 100%, #ff790a59, transparent 66%);
-    box-shadow: 0 0 7px #ff8c18, inset 0 0 10px #ff8c18a3;
-  }
-
-  html body #app .app[data-neon-ready] .homeGrid > .module:active::after {
-    border-color: #ffdf9e;
-    box-shadow: 0 0 11px #ffa029, inset 0 0 15px #ff9807cf;
+  html body #app .app[data-neon-ready] .homeGrid > .module {
+    --ff-selection-inset: 6% 6.5%;
+    --ff-selection-radius: clamp(10px, 4.1vw, 23px);
   }
 
   html body #app .app[data-neon-ready] > nav.bottom {
@@ -672,12 +692,37 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     opacity: 1;
   }
 
-  html body #app .app[data-neon-ready]:not(:has(.homeGrid)) > nav.bottom > button[aria-current="page"] {
-    box-shadow: inset 0 0 12px #ff840fb0 !important;
-    border-radius: clamp(6px, 2.6vw, 15px) !important;
+  html body #app .app[data-neon-ready] > nav.bottom > button {
+    position: relative;
+    --ff-selection-inset: 8% 4% 10%;
+    --ff-selection-radius: clamp(6px, 2.6vw, 15px);
   }
 
-  html body #app .app[data-neon-ready] :is(nav.bottom button, header.top .iconBtn):active {
-    box-shadow: inset 0 0 9px #ff940b !important;
+  html body #app .app[data-neon-ready] > header.top .topBtns .iconBtn {
+    position: relative;
+    --ff-selection-inset: 2%;
+    --ff-selection-radius: 30%;
+  }
+
+  html body #app .app[data-neon-ready] :is(
+    .homeGrid > .module:is(:active, .moduleActive),
+    nav.bottom > button:is(:active, [aria-current="page"]:not(:where(#bh))),
+    header.top .topBtns .iconBtn:active
+  )::after {
+    content: "" !important;
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    inset: var(--ff-selection-inset);
+    opacity: 1 !important;
+    border: 1px solid #ffb349;
+    border-radius: var(--ff-selection-radius);
+    background: radial-gradient(ellipse at 50% 100%, #ff780a63, #ff790a20 49%, transparent 78%);
+    box-shadow: 0 0 clamp(4px, 1.65vw, 8px) #ff8c18d9, inset 0 0 clamp(5px, 2.7vw, 13px) #ff8c18b3;
+  }
+
+  html body #app .app[data-neon-ready] :is(.homeGrid > .module, nav.bottom > button, header.top .topBtns .iconBtn):active::after {
+    border-color: #ffdf9e;
+    box-shadow: 0 0 clamp(5px, 2.6vw, 13px) #ffa029, inset 0 0 clamp(6px, 3.8vw, 18px) #ff9807cf;
   }
 }
