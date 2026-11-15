@@ -156,7 +156,11 @@ function positionSoa(){
  const topRect=visibleRect(top),annRect=visibleRect(ann),bottomRect=visibleRect(bottom);
  const measuredTop=Math.max(topRect?.bottom||0,annRect?.bottom||0);
  if(measuredTop>40&&measuredTop<window.innerHeight*.6)lastSoaTop=Math.round(measuredTop);
- if(bottomRect&&bottomRect.top>window.innerHeight*.4)lastSoaBottom=Math.max(0,Math.round(window.innerHeight-bottomRect.top));
+ if(bottomRect&&bottomRect.top>window.innerHeight*.4){
+  const wave=getComputedStyle(bottom).getPropertyValue('--ffh-module-footer-wave');
+  const gap=wave ? parseFloat(getComputedStyle(bottom).marginTop)||0 : 0;
+  lastSoaBottom=Math.max(0,Math.round(window.innerHeight-bottomRect.top+gap));
+ }
  root.style.setProperty('top',(lastSoaTop||0)+'px','important');
  root.style.setProperty('bottom',lastSoaBottom+'px','important');
  root.style.setProperty('--soa-actions-bottom',lastSoaBottom+'px');

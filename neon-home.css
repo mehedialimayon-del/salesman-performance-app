@@ -622,6 +622,11 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     --ff-selection-radius: clamp(10px, 4.1vw, 23px);
   }
 
+  html body #app .app[data-neon-ready]:not(:has(.homeGrid)),
+  html body:has(#ffhSoaRoot) #app .app[data-neon-ready] {
+    --ffh-module-footer-wave: min(1.8vw, 1.1dvh);
+  }
+
   html body #app .app[data-neon-ready] > nav.bottom {
     position: relative !important;
     inset: auto !important;
@@ -632,7 +637,7 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     isolation: auto;
     height: min(15.55vw, 10dvh) !important;
     min-height: 0 !important;
-    margin: min(7.01vw, 4dvh) 0 var(--neon-safe-bottom) !important;
+    margin: var(--ffh-module-footer-wave, min(7.01vw, 4dvh)) 0 var(--neon-safe-bottom) !important;
     padding: 0 !important;
     border: 0 !important;
     border-radius: 0 !important;
@@ -645,7 +650,7 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
   }
 
   html body #app .app[data-neon-ready] > nav.bottom::after {
-    height: 45.11% !important;
+    height: var(--ffh-module-footer-wave, 45.11%) !important;
     border-radius: 0 !important;
     background: url('home-assets/bottom.webp') center top / 100% 321.69% no-repeat !important;
     position: absolute;
