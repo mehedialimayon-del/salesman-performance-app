@@ -162,6 +162,7 @@ window.FFH_REFERENCE_TASKS = (() => {
       state.selected = task?.id ?? null;
       for (const row of rows.querySelectorAll('[data-task-id]')) row.setAttribute('aria-selected',String(row.dataset.taskId === String(state.selected)));
       const photo = taskPhoto(task);
+      const assignmentUrl = (()=>{try{const u=new URL(task?.assignmentAttachmentUrl);return u.protocol==='https:'?u.href:'';}catch{return '';}})();
       const photoMarkup = photo ? `<img src="${esc(photo)}" alt="Saved proof for ${esc(task.title)}">` : '<span>No saved photo</span>';
       detail.innerHTML = [
         slot(photo?'button':'div',`class="ffTaskArtSlot ffTaskArtPhoto" ${photo?'type="button" data-proof-view aria-label="View saved proof"':''}`,photoMarkup,29,1158,286,186),
@@ -171,7 +172,7 @@ window.FFH_REFERENCE_TASKS = (() => {
           ['Due Date',task?.due],['Priority',task ? task.priority || 'Normal' : '']
         ].map(([label,v])=>`<div><dt>${label}</dt><dd title="${esc(v || '')}">${esc(v || '—')}</dd></div>`).join(''),339,1189,326,143),
         slot('span','class="ffTaskArtSlot ffTaskArtBadge"',esc(task ? status(task) : '—'),720,1098,185,36),
-        slot('div','class="ffTaskArtSlot ffTaskArtDescription"',esc(task?.description || ''),29,1368,662,129),
+        slot('div','class="ffTaskArtSlot ffTaskArtDescription"',esc(task?.description || '')+(assignmentUrl?'<p><a href="'+esc(assignmentUrl)+'" target="_blank" rel="noopener noreferrer">View assignment attachment ↗</a></p>':''),29,1368,662,129),
         tap('data-task-status','Update Status',697,1156,212,46),
         tap('data-task-proof','Add Photo / Proof',697,1205,212,45),
         tap('data-task-comment','Add Comment',697,1255,212,43),
