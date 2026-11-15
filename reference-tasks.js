@@ -162,7 +162,7 @@ window.FFH_REFERENCE_TASKS = (() => {
       state.selected = task?.id ?? null;
       for (const row of rows.querySelectorAll('[data-task-id]')) row.setAttribute('aria-selected',String(row.dataset.taskId === String(state.selected)));
       const photo = taskPhoto(task);
-      const assignmentUrl = (()=>{try{const u=new URL(task?.assignmentAttachmentUrl);return u.protocol==='https:'?u.href:'';}catch{return '';}})();
+      const assignmentUrl = (()=>{try{const match=String(task?.description||'').match(/(?:^|\\n)Assignment attachment:\\s*(https:\/\/\\S+)/);const u=new URL(task?.assignmentAttachmentUrl||match?.[1]);return u.protocol==='https:'?u.href:'';}catch{return '';}})();
       const photoMarkup = photo ? `<img src="${esc(photo)}" alt="Saved proof for ${esc(task.title)}">` : '<span>No saved photo</span>';
       detail.innerHTML = [
         slot(photo?'button':'div',`class="ffTaskArtSlot ffTaskArtPhoto" ${photo?'type="button" data-proof-view aria-label="View saved proof"':''}`,photoMarkup,29,1158,286,186),
