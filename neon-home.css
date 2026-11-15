@@ -256,9 +256,10 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     display: none !important;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) {
+  html body #app .app[data-neon-ready] {
     --home-safe-top: var(--ffh-safe-top, env(safe-area-inset-top, 0px));
     --neon-edge: 1.15vw;
+    --neon-safe-bottom: var(--ffh-safe-bottom, env(safe-area-inset-bottom, 0px));
     --neon-gap: .6vw;
     display: flex !important;
     flex-direction: column !important;
@@ -266,28 +267,32 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     max-width: none !important;
     height: 100dvh !important;
     min-height: 0 !important;
-    overflow: clip !important;
+    padding-bottom: 0 !important;
+    overflow: hidden !important;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > header.top {
-    --home-header-height: min(15.42vw, 10dvh);
+  html body #app .app[data-neon-ready] > header.top {
+    --home-header-height: min(16.8vw, 11dvh);
     position: relative !important;
     top: auto !important;
+    flex: none !important;
+    border: 0 !important;
+    isolation: isolate;
     height: calc(var(--home-header-height) + var(--home-safe-top)) !important;
     min-height: 0 !important;
     padding: var(--home-safe-top) 0 0 !important;
     background: #050505 url('home-assets/header.webp') center bottom / 100% var(--home-header-height) no-repeat !important;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > header.top::after {
+  html body #app .app[data-neon-ready] > header.top::after {
     content: none !important;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > header.top .logo {
+  html body #app .app[data-neon-ready] > header.top .logo {
     opacity: 0;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > header.top .topBtns {
+  html body #app .app[data-neon-ready] > header.top .topBtns {
     position: absolute !important;
     top: calc(var(--home-safe-top) + var(--home-header-height) * .14) !important;
     right: 2.1vw !important;
@@ -297,7 +302,7 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     gap: 1.3vw !important;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > header.top .topBtns .iconBtn {
+  html body #app .app[data-neon-ready] > header.top .topBtns .iconBtn {
     width: 100% !important;
     min-width: 0 !important;
     height: calc(var(--home-header-height) * .63) !important;
@@ -306,24 +311,37 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     box-shadow: none !important;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > header.top .topBtns .iconBtn > .ffNeonIcon {
+  html body #app .app[data-neon-ready] > header.top .topBtns .iconBtn > .ffNeonIcon {
     opacity: 0;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > .ffAppAnnouncements {
+  html body #app .app[data-neon-ready] > .ffAppAnnouncements {
     position: relative !important;
     inset: auto !important;
     height: min(6.9vw, 5dvh) !important;
+    padding: 0 .55vw !important;
+    border: 0 !important;
+    background: #050505 !important;
     min-height: 0 !important;
     flex: none !important;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > .ffAppAnnouncements #ffTicker {
+  html body #app .app[data-neon-ready] > .ffAppAnnouncements #ffTicker {
     height: 100% !important;
     min-height: 0 !important;
+    border: 1px solid #ff920d !important;
+    border-radius: clamp(6px, 2vw, 12px) !important;
+    background: #080706 !important;
     padding-inline: .8vw !important;
-    border-color: #ff920d !important;
     box-shadow: inset 0 0 5px #ff8a084f, 0 0 4px #e66b005c !important;
+  }
+
+  html body #app .app[data-neon-ready] > .ffAppAnnouncements #ffTicker .ffTickerLabel {
+    border-radius: 5px !important;
+    padding: 2px 5px !important;
+    background: linear-gradient(#a7500a, #e06e10) !important;
+    color: #ffe541 !important;
+    font-size: clamp(8px, 2.5vw, 14px) !important;
   }
 
   html body #app .app[data-neon-ready]:has(.homeGrid) > main.wrap {
@@ -337,7 +355,7 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
   }
 
   html body #app .app[data-neon-ready]:has(.homeGrid) > main.wrap > .ffIdentityHero {
-    height: min(26.2vw, 16dvh) !important;
+    height: min(28.1vw, 17dvh) !important;
     min-height: 0 !important;
     margin: 0 0 min(2.1vw, 1.5dvh) !important;
     grid-template-columns: minmax(0, 1fr) 41% !important;
@@ -354,18 +372,40 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     left: 3.2vw !important;
     top: 50% !important;
     transform: translateY(-55%) !important;
-    width: 15.2% !important;
-    height: 67% !important;
+    width: min(15.4vw, 10.8dvh) !important;
+    height: min(15.4vw, 10.8dvh) !important;
     margin: 0 !important;
     clip-path: none !important;
     border: 1px solid #ffad45 !important;
-    border-radius: 44% 44% 25% 25% / 40% 40% 15% 15% !important;
+    border-radius: 50% !important;
     box-shadow: 0 0 7px #ff8217b0 !important;
-    mask-image: linear-gradient(#000 78%, #0000 100%);
   }
 
   html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero::after {
     content: none !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero #ffHomeGreeting {
+    font-size: clamp(10px, 3.9vw, 24px) !important;
+  }
+
+  #app #ffHomeGreeting .ffGreetingTime:not(:empty)::after,
+  #app #ffHomeGreeting .ffGreetingGood:has(+ .ffGreetingTime:empty)::after {
+    content: ",";
+  }
+
+  #app #ffHomeGreeting .ffGreetingTime:empty {
+    display: none;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero .ffGreetingSir {
+    font-size: clamp(10px, 3.45vw, 22px);
+    white-space: nowrap;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero .ffIdentityText > strong {
+    font-size: clamp(9px, 3.5vw, 21px) !important;
+    font-weight: 850 !important;
   }
 
   html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero .ffIdentityRole {
@@ -380,6 +420,23 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     min-height: min(4.6vw, 3dvh) !important;
     padding-block: 0 !important;
     border-color: #f68b0e !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffNeonInfo > :is(.ffNeonTime, .heroDate) {
+    min-height: min(5.65vw, 3.55dvh) !important;
+    box-sizing: border-box;
+    align-items: center !important;
+    padding-inline: 3px !important;
+  }
+
+  html body #app .app.ffBlackGlow[data-neon-ready]:has(.homeGrid) main.wrap .ffNeonInfo #ffHomeClock {
+    font-size: clamp(11px, min(3.6vw, 2.45dvh), 22px) !important;
+    letter-spacing: .03em;
+    white-space: nowrap;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffNeonInfo .heroDate {
+    font-size: clamp(8px, min(2.2vw, 1.55dvh), 14px) !important;
   }
 
   html body #app .app[data-neon-ready]:has(.homeGrid) > main.wrap > .homeGrid {
@@ -414,7 +471,13 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     box-shadow: inset 0 0 10px #ff9a24, 0 0 9px #ff7d10;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > nav.bottom {
+  html body #app .app[data-neon-ready] > nav.bottom {
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    flex: none !important;
     isolation: auto;
     height: min(15.55vw, 10dvh) !important;
     min-height: 0 !important;
@@ -426,17 +489,21 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     box-shadow: none !important;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > nav.bottom::before {
+  html body #app .app[data-neon-ready] > nav.bottom::before {
     content: none !important;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > nav.bottom::after {
+  html body #app .app[data-neon-ready] > nav.bottom::after {
     height: 45.11% !important;
     border-radius: 0 !important;
     background: url('home-assets/bottom.webp') center top / 100% 321.69% no-repeat !important;
+    position: absolute;
+    inset: auto 0 100%;
+    content: "";
+    pointer-events: none;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > nav.bottom > :is(button, #bh) {
+  html body #app .app[data-neon-ready] > nav.bottom > :is(button, #bh) {
     border: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
@@ -444,16 +511,42 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     -webkit-text-fill-color: transparent !important;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > nav.bottom > button > :is(i, .ffGlowButtonLabel) {
+  html body #app .app[data-neon-ready] > nav.bottom > button > :is(i, .ffGlowButtonLabel) {
     opacity: 0;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) > nav.bottom > button .navBadge {
+  html body #app .app[data-neon-ready] > nav.bottom .navBadge,
+  html body #app .app[data-neon-ready] > header.top .topNotifyBadge {
+    white-space: nowrap;
+    line-height: 1 !important;
+  }
+
+  html body #app .app[data-neon-ready] > nav.bottom > button .navBadge {
     color: white !important;
     -webkit-text-fill-color: white !important;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) :is(nav.bottom button, header.top .iconBtn):active {
+  html body #app .app[data-neon-ready]:not(:has(.homeGrid)) > nav.bottom > #bh {
+    /* Cover the reference's selected Home tile while another page is open. */
+    background: linear-gradient(#181513, #060606 65%) !important;
+    border-radius: clamp(6px, 2.6vw, 15px) !important;
+    width: calc(100% + .7vw) !important;
+    transform: translateX(.25vw);
+    align-self: center;
+    height: 86% !important;
+    min-height: 0 !important;
+  }
+
+  html body #app .app[data-neon-ready]:not(:has(.homeGrid)) > nav.bottom > #bh > :is(i, .ffGlowButtonLabel) {
+    opacity: 1;
+  }
+
+  html body #app .app[data-neon-ready]:not(:has(.homeGrid)) > nav.bottom > button[aria-current="page"] {
+    box-shadow: inset 0 0 12px #ff840fb0 !important;
+    border-radius: clamp(6px, 2.6vw, 15px) !important;
+  }
+
+  html body #app .app[data-neon-ready] :is(nav.bottom button, header.top .iconBtn):active {
     box-shadow: inset 0 0 9px #ff940b !important;
   }
 }

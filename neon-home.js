@@ -52,6 +52,26 @@
       const glyph = app.querySelector(`#${id} > i`);
       if (glyph) glyph.innerHTML = icon(name);
     }
+    const buttons = {bell:'bell',globalSearchBtn:'search',refresh:'refresh',dots:'dots'};
+    for (const [id, name] of Object.entries(buttons)) {
+      const button = app.querySelector(`#${id}`);
+      if (!button) continue;
+      for (const node of [...button.childNodes]) {
+        if (node.nodeType === Node.TEXT_NODE || node.matches?.('.topBellSvg')) node.remove();
+      }
+      button.insertAdjacentHTML('afterbegin',icon(name));
+      if (id === 'dots') button.setAttribute('aria-label','More options');
+    }
+    const logo = app.querySelector('.ffMiniLogo');
+    if (logo) logo.innerHTML = icon('logo');
+
+    const navPage = localStorage.getItem('ffh_last_page');
+    const navId = {
+      home:'bh', sales:'bs', dashboard:'bo', tasks:'bt', notices:'bnotice',
+      notifications:'bn', communication:'br'
+    }[navPage];
+    if (navId) app.querySelector(`nav.bottom > #${navId}`)?.setAttribute('aria-current','page');
+
     const grid = app.querySelector('.homeGrid');
     if (!grid) return;
 
@@ -77,19 +97,6 @@
       tile.dataset.homeArtwork = '';
     }
 
-    const buttons = {bell:'bell',globalSearchBtn:'search',refresh:'refresh',dots:'dots'};
-    for (const [id, name] of Object.entries(buttons)) {
-      const button = app.querySelector(`#${id}`);
-      if (!button) continue;
-      for (const node of [...button.childNodes]) {
-        if (node.nodeType === Node.TEXT_NODE || node.matches?.('.topBellSvg')) node.remove();
-      }
-      button.insertAdjacentHTML('afterbegin',icon(name));
-      if (id === 'dots') button.setAttribute('aria-label','More options');
-    }
-    const logo = app.querySelector('.ffMiniLogo');
-    if (logo) logo.innerHTML = icon('logo');
-
     const ai = document.createElement('button');
     ai.type = 'button';
     ai.id = 'ffHomeAskAI';
@@ -107,6 +114,7 @@
         const info = document.createElement('div');
         info.className = 'ffNeonInfo';
         const time = document.createElement('div');
+        time.className = 'ffNeonTime';
         alarm.innerHTML = icon('clock');
         time.append(alarm,clock);
         info.append(time,date,credit);

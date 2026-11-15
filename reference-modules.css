@@ -470,16 +470,6 @@ body:has(.ffRefTasks,.ffRefOutlet,.ffReports,.ffRefSync,.ffApprovalControls) :is
 #app .ffRefOutletDetailsActions { display:grid; gap:.38em; }
 #app .ffRefOutletDetailsActions button { min-height:2.65em!important; }
 body:has(.ffRefTasks,.ffRefOutlet,.ffRefSync,.ffApprovalControls) #orb { display:none!important; }
-@media (max-width:640px) {
-  html body #app .app:has(main.wrap :is(.ffRefIncome,.ffRefZero,.ffRefTasks,.ffRefOutlet,.ffRefRoute,.ffReports,.ffRefIncentives,.ffCampaignPage,.ffTrackingCard,.ffWorkBoard,.ffApprovalControls,.ffRefSync)) nav.bottom {
-    border:1px solid #ffb038!important;
-    box-shadow:inset 0 0 9px #ff7c00,0 -1px 6px #ff7b00b3!important;
-    background:#050302!important;
-  }
-  html body #app .app:has(main.wrap :is(.ffRefIncome,.ffRefZero,.ffRefTasks,.ffRefOutlet,.ffRefRoute,.ffReports,.ffRefIncentives,.ffCampaignPage,.ffTrackingCard,.ffWorkBoard,.ffApprovalControls,.ffRefSync)) nav.bottom :is(button,a)[aria-current="page"] {
-    box-shadow:inset 0 0 9px #ff9900,0 0 4px #ffab26!important;
-  }
-}
 /* List actions read as table cells, with the full record in the details panel. */
 #app .ffRefOutletViewport table { table-layout:fixed; }
 #app .ffRefOutletViewport :is(th,td) { overflow-wrap:anywhere; }
