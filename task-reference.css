@@ -143,3 +143,44 @@ html body #app .app>main.wrap.ffTaskPage:has(.ffTaskArtwork)>:is(.ffTaskRefHisto
 #app .ffTaskArtFull article h2 {overflow-wrap:anywhere;}
 #app .ffTaskArtFull article dl {display:grid;grid-template-columns:max-content 1fr;gap:.3em .8em;}
 #app .ffTaskArtFull article dd {margin:0;}
+
+/* 2026-11-16: Tasks viewport and picker readability repair. */
+#app .app > main.wrap.ffTaskPage:has(.ffTaskArtwork) {
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+#app .ffTaskArtwork {
+  flex:1 1 auto;
+  min-height:0;
+  height:100%!important;
+  max-height:100%;
+}
+.ffTaskArtworkPicker .ffPickerOption:has(.ffTaskPickerAvatar) {
+  grid-template-columns:44px minmax(0,1fr)!important;
+  align-items:center!important;
+  min-width:0!important;
+}
+.ffTaskArtworkPicker .ffTaskPickerOptionText,
+.ffTaskArtworkPicker .ffTaskPickerIdentity,
+.ffTaskArtworkPicker .ffPickerOption > :not(.ffTaskPickerAvatar) {
+  min-width:0!important;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+}
+#app .ffTaskArtwork .ffTaskArtRows {
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  min-height:0!important;
+}
+#app .ffTaskArtwork .ffTaskArtRow {
+  grid-template-columns:5% 29% 20% 17% 11% 18%;
+}
+#app .ffTaskArtwork .ffTaskArtRow > * {
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#app .ffTaskArtDialog {overflow-y:auto;overscroll-behavior:contain;}
