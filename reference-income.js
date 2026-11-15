@@ -13,9 +13,9 @@ window.FFH_REFERENCE_INCOME = (() => {
     ];
   }
 
-  function render({model, month, monthLabel, people, rule, earned, pending, campaignImages, canEdit, request, esc, money}) {
+  function render({model, performance = model, salesScopes = [], month, monthLabel, people, rule, earned, pending, campaignImages, canEdit, request, esc, money}) {
     const rows = breakdown(model);
-    const percent = model.t > 0 ? Math.round(100 * model.d / model.t) : null;
+    const percent = performance.t > 0 ? Math.round(100 * performance.d / performance.t) : null;
     const metric = (icon, label, value, color) => `<div class="ffRefMetric" data-color="${color}"><i aria-hidden="true">${icon}</i><span>${label}</span><strong>${money(value)}</strong></div>`;
     const button = (id, icon, label, color = 'gold') => `<button type="button" id="${id}" class="ffRefButton" data-color="${color}"><i aria-hidden="true">${icon}</i><span>${label}</span></button>`;
     const stat = (key, value) => `<div><dt>${key}</dt><dd>${value}</dd></div>`;
@@ -23,7 +23,7 @@ window.FFH_REFERENCE_INCOME = (() => {
     return `<section class="ffRefIncome" aria-label="Personal Income">
       <div class="ffRefPanel ffRefFields">
         <label><i aria-hidden="true">▦</i><span>Month &amp; Year<input id="ffIncomeMonth" type="month" required value="${esc(month)}"></span></label>
-        <label><i aria-hidden="true">▱</i><span>SR / Staff<select id="ffReferenceIncomeStaff">${people.map(p => `<option value="${esc(p.id)}" ${p.id === model.id ? 'selected' : ''}>${esc(p.display||p.name)} (${esc(p.id)})</option>`).join('')}</select></span></label>
+        <label><i aria-hidden="true">▱</i><span>SR / Staff<select id="ffReferenceIncomeStaff" data-ff-picker="native" data-ff-staff-label="compact">${people.map(p => `<option value="${esc(p.id)}" ${p.id === model.id ? 'selected' : ''}>${esc(p.name)} (${esc(p.id)})</option>`).join('')}</select></span></label>
       </div>
       <div class="ffRefFive">
         ${metric('▣', 'Total Income', model.total, 'green')}
@@ -51,9 +51,10 @@ window.FFH_REFERENCE_INCOME = (() => {
       <div class="ffRefIncomeSplit">
         <section class="ffRefPanel">
           <h2><i aria-hidden="true">◎</i> <em>Sales</em> vs Target</h2>
+          ${salesScopes.length>1?`<label class="ffRefIncomeScope"><span>Sales scope</span><select id="ffIncomeSalesScope" data-ff-picker="native">${salesScopes.map(scope=>`<option value="${esc(scope.id)}" ${scope.id===performance.id?'selected':''}>${esc(scope.label)}</option>`).join('')}</select></label>`:''}
           <div class="ffRefProgress">
             <div class="ffRefRing" style="--ffh-progress:${Math.min(100, Math.max(0, percent ?? 0))}%"><b>${percent === null ? '—' : percent + '%'}</b></div>
-            <dl>${stat('Target', money(model.t))}${stat('Achievement', money(model.d))}${stat('Balance', money(Math.max(0, model.t - model.d)))}</dl>
+            <dl>${stat('Target', performance.t>0?money(performance.t):'Not set')}${stat('Achievement', money(performance.d))}${stat('Balance', performance.t>0?money(Math.max(0, performance.t - performance.d)):'—')}</dl>
           </div>
         </section>
         <section class="ffRefPanel" id="ffIncomeRate">

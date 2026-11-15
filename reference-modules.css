@@ -239,3 +239,30 @@ body:has(.ffRefZero) :is(#orb,#nudge,#aiHello) { display:none!important; }
 #app .ffRefExports .ffRefButton { font-size:clamp(9px,2.5vw,14px); }
 #app .ffRefIncome .ffSelectTrigger { min-height:28px; max-width:100%; min-width:0; padding:.28em .5em!important; font:700 1em/1.16 var(--ff-ref-font)!important; }
 .ffRefRewards>.ffRefHint { grid-column:1/-1; }
+
+#app .ffRefIncome .ffRefActions .ffRefButton {
+  min-width:0!important;
+  min-height:5.25em!important;
+  padding:.42em .24em!important;
+  font-size:clamp(8px,2.42vw,13px)!important;
+  overflow-wrap:normal;
+  white-space:normal!important;
+}
+#app .ffRefIncome .ffRefActions .ffRefButton span {
+  display:block;
+  width:100%;
+  min-width:0;
+  overflow-wrap:break-word;
+  line-height:1.15;
+}
+#app .ffRefIncome .ffRefActions #ffClaimsIncome { font-size:clamp(7.8px,2.18vw,12px)!important; }
+#app .ffRefIncome .ffRefFields label i { flex:0 0 auto; }
+#app .ffRefIncome .ffRefFields input,#app .ffRefIncome .ffRefFields select { min-height:2.35em!important; }
+.ffRefIncomeScope { display:flex; align-items:center; gap:.4em; margin:0 .48em .35em; }
+.ffRefIncomeScope span { flex:0 0 auto; font-size:.82em; }
+#app .ffRefIncomeScope select { flex:1; min-width:0; width:0; color:#fff; font:700 .88em/1.15 var(--ff-ref-font); border:1px solid var(--ff-ref-line); border-radius:1em; padding:.3em .35em; background:#0a0601; }
+#app .ffRefIncome .ffRefFields+.ffRefFive strong { white-space:nowrap; font-size:clamp(7.8px,2.3vw,14px); }
+.ffRefTrackRoster [data-tracking-staff] small { display:block; opacity:.82; margin-top:.2em; }
+.ffRefTrackRoster [data-tracking-staff] b { overflow-wrap:anywhere; }
+.ffRecentReports,.ffReportFooter { margin-top:.65em; }
+.ffRecentReports #ffRecentAll { margin:.5em; }

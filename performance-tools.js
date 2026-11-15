@@ -90,9 +90,18 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   if(me()!==id||turn!==ticket||ctx.page()!=='outletHistory')return;
   // Permission/assignment failure never falls back to another person's cached history.
   if(errors.length)return page('outletHistory','Outlet Management',`<div class="card" role="alert">${E(errors.join(' '))}<button id="ffHistoryRetry" class="primary">RETRY</button></div>`),$('#ffHistoryRetry').onclick=historyPage;
-  const result=await Promise.allSettled([rows('ffh_sales','created_at'),rows('ffh_tasks','created_at'),rows('ffh_campaign_executions','created_at'),globalThis.ffDaily?.refresh()]);
+  const result=await Promise.allSettled([
+   rows('ffh_sales','created_at'),rows('ffh_tasks','created_at'),rows('ffh_campaign_executions','created_at'),
+   globalThis.ffDaily?.refresh(),rows('ffh_outlets','id'),rows('ffh_findings','updated_at')
+  ]);
   if(me()!==id||turn!==ticket||ctx.page()!=='outletHistory')return;
-  const ids=scopedIds(), outlets=ids.flatMap(sid=>ctx.outlets(sid).map(o=>({...o,sr:sid}))),data=result.map((r,i)=>{if(r.status==='fulfilled')return r.value;errors.push(['Sales','Task proof','CPO / Promotion'][i]+': '+r.reason.message);return []});
+  const ids=scopedIds(), data=result.map((r,i)=>{if(r.status==='fulfilled')return r.value;errors.push(['Sales','Task proof','CPO / Promotion','Daily sales','Outlet directory','Outlet issues'][i]+': '+r.reason.message);return [];});
+  const outlets=data[4].filter(o=>ids.includes(o.sr_id)).map(o=>({id:o.id,sr:o.sr_id,code:o.outlet_code,name:o.outlet_name,category:o.category,totalSku:o.total_sku,active:o.active!==false,updated:o.updated_at}));
+  const onIssue=o=>data[5].some(r=>r.kind==='route'&&r.category==='Outlet issue'&&String(r.payload?.outlet_code)===String(o.code)&&
+   r.payload?.outlet_staff_id===o.sr&&(!r.recipients?.length||r.recipients.some(sid=>r.states?.[sid]?.status!=='Done')));
+  const canEdit=ctx.may('outlets');
+  const state=o=>!o.active?'Inactive':onIssue(o)?'Issue':'Active';
+  const outletMetric=(icon,label,color,n)=>`<div class="ffRefMetric" data-color="${color}"><i aria-hidden="true">${icon}</i><span>${label}</span><strong>${n}</strong></div>`;
   if(globalThis.ffDaily&&window.FFH_DAILY_CORE){const source=data[0].map(s=>({id:s.id,sr:s.sr_id,date:s.sale_date,status:s.status,outletCode:s.outlet_code,outletName:s.outlet_name,sku:s.sku,qty:s.qty,orderAmount:s.order_amount,deliveredAmount:s.delivered_amount,deliveredAt:s.delivered_at,remarks:s.remarks}));data[0]=window.FFH_DAILY_CORE.coverageRows({...globalThis.ffDaily.data(),sales:source},ids).map(s=>({id:s.id,sr_id:s.sr,sale_date:s.date,status:s.status,outlet_code:s.outletCode,outlet_name:s.outletName,sku:s.sku,qty:s.qty,order_amount:s.orderAmount,delivered_amount:s.deliveredAmount,remarks:s.remarks}));}
   const zones=[...new Set(outlets.map(o=>ctx.staff(o.sr)?.zone).filter(Boolean))].sort();
   const chains=[...new Set(outlets.map(o=>o.category).filter(Boolean))].sort();
@@ -105,14 +114,21 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
      <label><span>Sales Representative<select id="ffOutletStaff">${selectOptions(ids.map(id=>[id,who(id)]),'All SRs')}</select></span></label>
      <label><span>Chain / Channel<select id="ffOutletChain">${selectOptions(chains.map(c=>[c,c]),'All chains')}</select></span></label>
    </div>
+   <div class="ffRefReportKpis">
+    ${outletMetric('▣','Total Outlets','green',outlets.length)}
+    ${outletMetric('✓','Active Outlets','blue',outlets.filter(o=>o.active).length)}
+    ${outletMetric('Ⅱ','Inactive','gold',outlets.filter(o=>!o.active).length)}
+    ${outletMetric('⚠','With Issues','red',outlets.filter(onIssue).length)}
+   </div>
    <div class="ffRefExports">
     <button class="ffRefButton" type="button" id="ffOutletHistoryReload">Refresh History</button>
     <button class="ffRefButton" type="button" id="ffOutletVisitReport">Outlet Report</button>
-    ${ctx.isMgr()?'<button class="ffRefButton" type="button" id="ffOutletManage">Outlet Assignment</button>':''}
+    ${canEdit?'<button class="ffRefButton" type="button" id="ffOutletManage">Add New Outlet</button>':'<button class="ffRefButton" type="button" id="ffOutletRequest">New Outlet Request</button>'}
    </div>
    <section class="ffRefPanel">
     <div class="ffRefZeroTitle"><h2 id="ffOutletCount">Outlet List</h2></div>
     <label class="ffRefSearch"><i aria-hidden="true">⌕</i><input type="search" id="ffOutletHistorySearch" aria-label="Search outlets" placeholder="Search outlet (name / code / chain)…"></label>
+    <label class="ffRefSearch">Outlet status<select id="ffOutletStatus"><option value="">All statuses</option><option>Active</option><option>Inactive</option><option>Issue</option></select></label>
     <label class="ffRefSearch">Assigned Outlet<select id="ffOutletHistorySelect"></select></label>
     <div class="ffRefOutletViewport"><table><thead><tr><th>Outlet</th><th>Chain</th><th>SR</th><th>Listing</th><th>Status</th></tr></thead><tbody id="ffOutletHistoryRows"></tbody></table></div>
    </section>
@@ -122,14 +138,14 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   const select=$('#ffOutletHistorySelect');
   const fill=()=>{
    const term=$('#ffOutletHistorySearch').value.trim().toLowerCase(),old=select.value;
-   const zone=$('#ffOutletZone').value,staff=$('#ffOutletStaff').value,chain=$('#ffOutletChain').value;
-   const list=outlets.map((o,i)=>({o,i})).filter(({o})=>(!zone||ctx.staff(o.sr)?.zone===zone)&&(!staff||staff===o.sr)&&(!chain||chain===o.category)&&
+   const zone=$('#ffOutletZone').value,staff=$('#ffOutletStaff').value,chain=$('#ffOutletChain').value,status=$('#ffOutletStatus').value;
+   const list=outlets.map((o,i)=>({o,i})).filter(({o})=>(!zone||ctx.staff(o.sr)?.zone===zone)&&(!staff||staff===o.sr)&&(!chain||chain===o.category)&&(!status||status===state(o))&&
     (!term||[o.name,o.code,o.category,who(o.sr)].join(' ').toLowerCase().includes(term)));
    $('#ffOutletCount').textContent='Outlet List ('+list.length+')';
    select.innerHTML=selectOptions(list.map(({o,i})=>[i,o.name+' ('+o.code+') · '+who(o.sr)]),'Choose an outlet');
    select.value=list.some(v=>String(v.i)===old)?old:'';
    if(!select.value)$('#ffOutletHistoryDetail').innerHTML='';
-   $('#ffOutletHistoryRows').innerHTML=list.map(({o,i})=>`<tr><td><button class="secondary" type="button" data-ref-outlet="${i}">${E(o.name)}<small>${E(o.code)}</small></button></td><td>${E(o.category||'—')}</td><td>${E(who(o.sr))}</td><td>${E(o.totalSku||'—')}</td><td><span class="green">Active</span></td></tr>`).join('')||
+   $('#ffOutletHistoryRows').innerHTML=list.map(({o,i})=>`<tr><td><button class="secondary" type="button" data-ref-outlet="${i}">${E(o.name)}<small>${E(o.code)}</small></button></td><td>${E(o.category||'—')}</td><td>${E(who(o.sr))}</td><td>${E(o.totalSku||'—')}</td><td><span class="${o.active&&!onIssue(o)?'green':'red'}">${state(o)}</span></td></tr>`).join('')||
      '<tr><td colspan="5">No outlets match this selection.</td></tr>';
    document.querySelectorAll('[data-ref-outlet]').forEach(button=>button.onclick=()=>{
      select.value=button.dataset.refOutlet;
@@ -137,6 +153,39 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
      $('#ffOutletHistoryDetail').scrollIntoView({block:'nearest',behavior:'smooth'});
    });
   };
+  function edit(o){
+   const overlay=document.createElement('div');
+   overlay.className='globalSearchOverlay ffInsetDialog';
+   overlay.innerHTML=`<section class="globalSearchBox" role="dialog" aria-modal="true" aria-label="Outlet assignment"><form class="form">
+    <div class="row"><h2>${o?'Edit Outlet':'Add New Outlet'}</h2><button type="button" data-close>Close</button></div>
+    ${o?'<p>'+E(who(o.sr))+' · '+E(o.code)+'</p>':`<label>Sales Representative<select name="sr" required>${selectOptions(ids.map(sid=>[sid,who(sid)]),'Choose SR')}</select></label><label>Outlet code<input name="code" required maxlength="120"></label>`}
+    <label>Outlet name<input name="name" value="${E(o?.name||'')}" required maxlength="250"></label>
+    <label>Chain / Channel<input name="category" value="${E(o?.category||'')}" required maxlength="160"></label>
+    <label>Listing / SKU count<input name="sku" type="number" min="0" max="999999" required value="${Number(o?.totalSku)||0}"></label>
+    <label>Status<select name="active"><option value="yes" ${o?.active===false?'':'selected'}>Active</option><option value="no" ${o?.active===false?'selected':''}>Inactive</option></select></label>
+    <button type="submit" class="primary">Save Outlet</button><p role="status"></p>
+   </form></section>`;
+   document.body.append(overlay);
+   const close=window.FFH_OVERLAY?.(overlay,()=>overlay.remove())||(()=>overlay.remove());
+   overlay.querySelector('[data-close]').onclick=close;
+   overlay.querySelector('form').onsubmit=async e=>{
+     e.preventDefault();
+     if(me()!==id)return close();
+     const values=Object.fromEntries(new FormData(e.currentTarget)), button=e.submitter;
+     const patch={outlet_name:values.name.trim(),category:values.category.trim(),total_sku:Number(values.sku),active:values.active==='yes',updated_at:new Date().toISOString()};
+     if(o?.active&&!patch.active&&!confirm('Mark '+o.name+' inactive?'))return;
+     if(!patch.outlet_name||!patch.category)return;
+     button.disabled=true;
+     try{
+       let query=o?sb.from('ffh_outlets').update(patch).eq('id',o.id):sb.from('ffh_outlets').insert({...patch,sr_id:values.sr,outlet_code:values.code.trim()});
+       if(o?.updated)query=query.eq('updated_at',o.updated);
+       const {data,error}=await query.select('id');
+       if(error||!data?.length)throw Error(error?.message||'The outlet changed or you no longer have edit access. Refresh and retry.');
+       close();
+       if(ctx.page()==='outletHistory')await historyPage();
+     }catch(err){overlay.querySelector('[role=status]').textContent=err.message;button.disabled=false;}
+   };
+  }
   const draw=()=>{
    const o=outlets[+select.value];if(select.value===''||!o)return;
    lastHistory={sr:o.sr,code:o.code};const from=$('#ffOutletHistoryFrom').value,to=$('#ffOutletHistoryTo').value;
@@ -148,10 +197,18 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    sales.forEach(r=>{if(r.status==='Delivered'){total+=+r.delivered_amount||0;if(r.sku)skus.set(r.sku,(skus.get(r.sku)||0)+(+r.delivered_amount||0));}else if(r.status==='Pending Delivery')pending+=+r.order_amount||0;events.push({date:r.sale_date,title:r.status+' · '+(r.sku||'Daily outlet summary'),detail:(+r.qty||0)+' cartons · Order '+ctx.rm(r.order_amount)+' · Delivered '+ctx.rm(r.delivered_amount),remarks:r.remarks});});
    data[1].filter(r=>r.assigned_to===o.sr&&r.outlet_name===o.name&&outlets.filter(v=>v.sr===o.sr&&v.name===o.name).length===1).filter(r=>range(r.created_date||r.created_at)).forEach(r=>events.push({date:r.created_date||r.created_at,title:'Task · '+r.title+' · '+r.status,detail:r.description,remarks:r.reviewed_at?'Reviewed '+stamp(r.reviewed_at):'',photo:r.proof_photo_url}));
    data[2].filter(match).filter(r=>range(r.execution_date)).forEach(r=>events.push({date:r.execution_date,title:'CPO / Promotion · '+r.status,detail:r.remarks,photo:r.photo_url}));
+   data[5].filter(r=>String(r.payload?.outlet_code)===String(o.code)&&r.payload?.outlet_staff_id===o.sr&&range(r.created_at)).forEach(r=>events.push({date:r.created_at.slice(0,10),title:r.category+' · '+r.title,detail:r.payload.description,photo:r.payload.photo}));
    events.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
-   $('#ffOutletHistoryDetail').innerHTML=`<div class="card"><div class="cardTitle">${E(o.name)}</div><p>${E(o.code)} · ${E(who(o.sr))}</p><div class="two"><div>Delivered<b class="green ffPerformanceAmount">${ctx.rm(total)}</b></div><div>Pending order<b class="ffPerformanceAmount">${ctx.rm(pending)}</b></div></div><p>${skus.size} delivered SKU(s) in selected dates</p>${[...skus].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([sku,amount])=>`<p>${E(sku)} · ${ctx.rm(amount)}</p>`).join('')}</div>${events.map(x=>`<article class="card"><b>${E(x.title)}</b><p class="miniStat">${E(x.date)}</p><p>${E(x.detail||'')}</p>${x.remarks?`<p>${E(x.remarks)}</p>`:''}${safePhoto(x.photo)}</article>`).join('')||'<div class="card empty">No recorded activity in this selection.</div>'}`;bindPhotos();
+   $('#ffOutletHistoryDetail').innerHTML=`<div class="card"><div class="cardTitle">${E(o.name)}</div><p>${E(o.code)} · ${E(who(o.sr))} · ${state(o)}</p><div class="ffRefExports">
+    ${canEdit?'<button type="button" class="ffRefButton" id="ffOutletEdit">Edit / Update Listing</button>':''}
+    <button type="button" class="ffRefButton" id="ffOutletIssue">Report Issue</button>
+    ${canEdit?'':'<button type="button" class="ffRefButton" id="ffOutletClosure">Request Closure</button>'}
+   </div><div class="two"><div>Delivered<b class="green ffPerformanceAmount">${ctx.rm(total)}</b></div><div>Pending order<b class="ffPerformanceAmount">${ctx.rm(pending)}</b></div></div><p>${skus.size} delivered SKU(s) in selected dates</p>${[...skus].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([sku,amount])=>`<p>${E(sku)} · ${ctx.rm(amount)}</p>`).join('')}</div>${events.map(x=>`<article class="card"><b>${E(x.title)}</b><p class="miniStat">${E(x.date)}</p><p>${E(x.detail||'')}</p>${x.remarks?`<p>${E(x.remarks)}</p>`:''}${safePhoto(x.photo)}</article>`).join('')||'<div class="card empty">No recorded activity in this selection.</div>'}`;bindPhotos();
+   $('#ffOutletEdit')?.addEventListener('click',()=>edit(o));
+   $('#ffOutletIssue').onclick=()=>window.ffFindings?.outletFinding('Outlet issue',o);
+   $('#ffOutletClosure')?.addEventListener('click',()=>window.ffFindings?.outletFinding('Outlet closure',o));
   };
-  $('#ffOutletHistorySearch').oninput=fill;for(const id of ['ffOutletZone','ffOutletStaff','ffOutletChain'])$('#'+id).onchange=fill;select.onchange=draw;$('#ffOutletHistoryFrom').onchange=draw;$('#ffOutletHistoryTo').onchange=draw;$('#ffOutletHistoryReload').onclick=historyPage;$('#ffOutletVisitReport').onclick=()=>ctx.open?.('reports');$('#ffOutletManage')?.addEventListener('click',()=>ctx.manageOutlets?.());fill();
+  $('#ffOutletHistorySearch').oninput=fill;for(const id of ['ffOutletZone','ffOutletStaff','ffOutletChain','ffOutletStatus'])$('#'+id).onchange=fill;select.onchange=draw;$('#ffOutletHistoryFrom').onchange=draw;$('#ffOutletHistoryTo').onchange=draw;$('#ffOutletHistoryReload').onclick=historyPage;$('#ffOutletVisitReport').onclick=()=>ctx.open?.('reports');$('#ffOutletManage')?.addEventListener('click',()=>edit(null));$('#ffOutletRequest')?.addEventListener('click',()=>window.ffFindings?.outletFinding('New outlet'));fill();
   if(lastHistory){const i=outlets.findIndex(o=>o.sr===lastHistory.sr&&o.code===lastHistory.code);if(i>=0){select.value=String(i);draw();}}
  }
  window.addEventListener('online',()=>flush().catch(console.warn));

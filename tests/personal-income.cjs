@@ -19,3 +19,21 @@ const combined=P.build(c,'M','2026-10');
 assert.equal(combined.fuel+combined.house+combined.food+combined.fixed,0,'combined Basic does not double-count allowances');
 assert.equal(combined.total,combined.basic+combined.comm+combined.pos+combined.bonus-combined.pen);
 console.log('PASS combined Basic and net income without duplicate food, fuel, rent or fixed amounts');
+
+const scopedPeople=[
+ {id:'M21954',name:'Owner',role:'MANAGER',zone:'PRIMARY'},
+ {id:'A',role:'SR',zone:'PRIMARY',manager_id:'M21954'},
+ {id:'B',role:'SR',zone:'PRIMARY',manager_id:'OTHER'},
+ {id:'C',role:'SR',zone:'OTHER',manager_id:'OTHER'},
+ {id:'D',role:'SR',zone:'PRIMARY',manager_id:'M21954',active:false}
+];
+const scopeInput={people:scopedPeople,viewerId:'M21954',db:{sales:scopedPeople.map((p,i)=>({sr:p.id,date:'2026-11-14',status:'Delivered',deliveredAmount:(i+1)*100}))},target:()=>50000};
+const salesScopes=P.performanceScopes(scopeInput,'M21954','2026-11','2026-11-15');
+assert.deepEqual(salesScopes.map(({id,ids,d,t})=>({id,ids,d,t})),[
+ {id:'own',ids:['M21954'],d:100,t:50000},
+ {id:'assigned',ids:['A'],d:200,t:50000},
+ {id:'company',ids:['A','B','C'],d:900,t:150000}
+]);
+assert.deepEqual(P.performanceScopes({...scopeInput,viewerId:'A'},'A','2026-11','2026-11-15').map(x=>x.id),['own']);
+assert.deepEqual(P.performanceScopes({...scopeInput,viewerId:'A'},'B','2026-11','2026-11-15'),[]);
+console.log('PASS personal, assigned-SR and company targets use distinct scopes; no cross-SR income access');

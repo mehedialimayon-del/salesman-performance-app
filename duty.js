@@ -2,7 +2,7 @@
 window.FFH_CREATE_DUTY=function(ctx){
 'use strict';
 const sb=window.FFH_SUPABASE,core=window.FFH_DUTY_CORE;
-let closeFullMap=null;
+let closeFullMap=null, refreshTeamMap=null;
 let state=null,people=[],channel=null,watch=null,watchSession=null,lastSent=0,map=null,mapLayer=null,peer=null,messages=[],generation=0,poll=null,lastUnread=0;
 const $=s=>document.querySelector(s),E=ctx.esc,user=()=>ctx.user(),date=()=>ctx.today(),page=()=>ctx.page(),native=()=>window.FieldForceNative||null;
 async function rpc(action,payload={}){const {data,error}=await sb.rpc('ffh_duty',{action,payload});if(error)throw Error(error.message);return data;}
@@ -48,7 +48,7 @@ function attendanceHistory(){
  $('#ffAttendanceMonth').onchange=e=>{attendanceMonth=e.target.value;attendanceDay='';$('#ffAttendanceDay').value='';void load()};$('#ffAttendanceDay').onchange=e=>{attendanceDay=e.target.value;void load()};$('#ffAttendanceMore').onclick=()=>load(true);void load();
 }
 async function compress(file){const img=await createImageBitmap(file);const scale=Math.min(1,640/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);img.close();const b=await new Promise(r=>c.toBlob(r,'image/jpeg',.65));if(!b||b.size>250000)throw Error('Photo is too large; choose a smaller image');return b;}
-function disposeMap(){closeFullMap?.();generation++;if(map){map.remove();map=null;}mapLayer=null;}
+function disposeMap(){closeFullMap?.();refreshTeamMap=null;generation++;if(map){map.remove();map=null;}mapLayer=null;}
 function openTrackingFullscreen(){
  if(closeFullMap){closeFullMap();return;}if(!map)return;const target=$('#ffDutyMap'),marker=document.createComment('tracking-map'),overlay=document.createElement('div');target.before(marker);overlay.className='ffMapFullOverlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Full screen tracking map');overlay.innerHTML='<button class="ffMapFullClose" type="button">× Back to tracking</button>';document.body.append(overlay);overlay.append(target);const close=window.FFH_OVERLAY(overlay,()=>{marker.replaceWith(target);overlay.remove();closeFullMap=null;map?.invalidateSize();});closeFullMap=close;overlay.querySelector('button').onclick=close;requestAnimationFrame(()=>map?.invalidateSize());
 }
@@ -61,42 +61,99 @@ async function renderTracking(){await refresh();if(!state?.can_track)return rend
  const filtered=()=>roster.filter(p=>!zone.value||group(p)===zone.value);
  function fillStaff(){
    const before=staff.value;
-   staff.innerHTML=filtered().map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name)}</option>`).join('');
+   staff.innerHTML='<option value="">All permitted SRs</option>'+filtered().map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name)}</option>`).join('');
    if(filtered().some(p=>p.staff_id===before))staff.value=before;
    staff.dispatchEvent(new Event('change'));
  }
- let teamRequest=0;
- async function teamStatus(){
+ let teamRequest=0, lastTeamLoad=0;
+ async function teamStatus(fit=false){
    const ticket=++teamRequest, day=$('#ffTrackDate').value, selected=filtered();
-   const {data,error}=await sb.from('ffh_attendance').select('staff_id,check_in,check_out,shift_end').eq('duty_date',day);
+   const {data,error:attendanceError}=await sb.from('ffh_attendance').select('id,staff_id,check_in,check_out,shift_end').eq('duty_date',day);
    if(ticket!==teamRequest||!staff.isConnected)return;
-   if(error){$('#ffTrackRoster').textContent=error.message;return;}
-   const byId=new Map((data||[]).map(a=>[a.staff_id,a]));
-   const state=p=>{const a=byId.get(p.staff_id);return !a?'Not Started':a.check_out||Date.parse(a.shift_end)<=Date.now()?'Shift Ended':'On Field';};
-   const labels=[['⌖','Total SR','gold',selected.length],['●','On Field','green',selected.filter(p=>state(p)==='On Field').length],['Ⅱ','Not Started','gold',selected.filter(p=>state(p)==='Not Started').length],['✓','Shift Ended','blue',selected.filter(p=>state(p)==='Shift Ended').length]];
+   if(attendanceError)throw Error(attendanceError.message);
+   const byId=new Map((data||[]).map(a=>[a.staff_id,a])), latest=new Map(), attended=selected.filter(p=>byId.has(p.staff_id));
+   let incomplete=false;
+   for(let start=0;start<attended.length;start+=8){
+     if(ticket!==teamRequest||!staff.isConnected)return;
+     const items=await Promise.all(attended.slice(start,start+8).map(async p=>{
+       const result=await sb.from('ffh_location_points').select('latitude,longitude,accuracy_m,captured_at')
+         .eq('attendance_id',byId.get(p.staff_id).id).order('captured_at',{ascending:false}).limit(1);
+       if(result.error)incomplete=true;
+       return [p.staff_id,result.data?.[0]];
+     }));
+     items.forEach(([id,point])=>{if(point)latest.set(id,point);});
+   }
+   if(ticket!==teamRequest||!staff.isConnected)return;
+   const state=p=>{
+     const a=byId.get(p.staff_id),point=latest.get(p.staff_id);
+     if(!a)return 'Not Started';
+     if(a.check_out||Date.parse(a.shift_end)<=Date.now())return 'Shift Ended';
+     if(!point||Date.now()-Date.parse(point.captured_at)>180000)return 'No Location';
+     return 'On Field';
+   };
+   const labels=[['⌖','Total SR','gold',selected.length],['●','On Field','green',selected.filter(p=>state(p)==='On Field').length],['Ⅱ','Not Started','gold',selected.filter(p=>state(p)==='Not Started').length],['⚠','No Location','red',selected.filter(p=>state(p)==='No Location').length]];
    $('#ffTrackSummary').innerHTML=labels.map(([icon,label,color,n])=>`<div class="ffRefMetric" data-color="${color}"><i aria-hidden="true">${icon}</i><strong>${n}</strong><span>${label}</span></div>`).join('');
-   $('#ffTrackRoster').innerHTML=selected.map(p=>`<button type="button" class="ffRefRouteAssignment" data-tracking-staff="${E(p.staff_id)}"><b>${E(p.full_name)}</b><span>${E(state(p))}</span><span aria-hidden="true">›</span></button>`).join('')||'<p class="ffRefHint">No staff in this selection.</p>';
+   $('#ffTrackRoster').innerHTML=selected.map(p=>{
+     const point=latest.get(p.staff_id);
+     return `<button type="button" class="ffRefRouteAssignment" data-tracking-staff="${E(p.staff_id)}"><b>${E(p.full_name)}${point?`<small>Last update: ${E(new Date(point.captured_at).toLocaleTimeString('en-MY',{timeZone:'Asia/Kuala_Lumpur',hour:'2-digit',minute:'2-digit'}))}</small>`:''}</b><span>${E(state(p))}</span><span aria-hidden="true">›</span></button>`;
+   }).join('')||'<p class="ffRefHint">No staff in this selection.</p>';
    document.querySelectorAll('[data-tracking-staff]').forEach(button=>button.onclick=()=>{
      staff.value=button.dataset.trackingStaff;
      staff.dispatchEvent(new Event('change'));
    });
+   if(!staff.value&&mapLayer){
+     mapLayer.clearLayers();
+     const coordinates=[];
+     for(const p of selected){
+       const point=latest.get(p.staff_id);
+       if(!point||!Number.isFinite(point.latitude)||!Number.isFinite(point.longitude))continue;
+       const coordinate=[point.latitude,point.longitude], color=state(p)==='On Field'?'#58fa21':state(p)==='Shift Ended'?'#ffb025':'#ff4848';
+       coordinates.push(coordinate);
+       const label=document.createElement('span');
+       label.textContent=p.full_name+' · '+state(p);
+       L.circleMarker(coordinate,{radius:9,color,weight:3,fillOpacity:.85}).bindTooltip(label).addTo(mapLayer)
+         .on('click',()=>{staff.value=p.staff_id;staff.dispatchEvent(new Event('change'));});
+     }
+     if(fit&&coordinates.length)map.fitBounds(L.latLngBounds(coordinates),{padding:[24,24],maxZoom:15});
+     $('#ffDutyStatus').textContent=incomplete?'Some location records could not load.':coordinates.length?
+       coordinates.length+' recorded locations. Select a pin or staff member for their route.':'No location records for this team and date.';
+   }
  }
+ refreshTeamMap=async fit=>{
+   if(!fit&&Date.now()-lastTeamLoad<12000)return;
+   lastTeamLoad=Date.now();
+   await teamStatus(fit);
+ };
  fillStaff();
- zone.onchange=()=>{fillStaff();teamStatus().catch(error);};
+ zone.onchange=()=>{fillStaff();if(staff.value)refreshTeamMap(true).catch(error);};
  document.querySelectorAll('[data-track-open]').forEach(button=>button.onclick=()=>ctx.open?.(button.dataset.trackOpen));
  if(!window.L){$('#ffDutyStatus').textContent='Map library could not load. Check your internet connection.';return;}
  map=L.map('ffDutyMap').setView([3.139,101.6869],11);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19}).addTo(map);mapLayer=L.layerGroup().addTo(map);const full=L.control({position:'topright'});full.onAdd=()=>{const button=L.DomUtil.create('button','ffMapFullscreen');button.type='button';button.id='ffMapFullscreen';button.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>';button.title='Full screen map';button.setAttribute('aria-label','Full screen map');L.DomEvent.disableClickPropagation(button);button.onclick=openTrackingFullscreen;return button;};full.addTo(map);setTimeout(()=>map?.invalidateSize(),100);
- $('#ffTrackStaff').onchange=()=>loadMap(true).catch(error);$('#ffTrackDate').onchange=()=>{loadMap(true).catch(error);teamStatus().catch(error);};
+ function showSelection(){
+   currentLocation=null;
+   const selected=!!staff.value;
+   $('#ffMapMessage').disabled=$('#ffMapTask').disabled=!selected;
+   if(!selected){$('#ffStopList').replaceChildren();$('#ffAttendanceProof').replaceChildren();}
+   loadMap(true).catch(error);
+ }
+ staff.onchange=showSelection;
+ $('#ffTrackDate').onchange=()=>{showSelection();if(staff.value)refreshTeamMap(true).catch(error);};
  $('#ffMapMessage').onclick=()=>{const to=$('#ffTrackStaff').value;const text=prompt('Message this SR about this location:','ভাই, আপনি এই জায়গায় কী কাজ করছেন?');if(text?.trim())send(to,text,{date:$('#ffTrackDate').value,...(currentLocation||{})}).then(()=>{$('#ffDutyStatus').textContent='Message saved and notification queued.'}).catch(error)};
  $('#ffMapTask').onclick=()=>ctx.task($('#ffTrackStaff').value,$('#ffTrackDate').value,currentLocation);
  if($('#ffShareTracking'))$('#ffShareTracking').onchange=async e=>{try{await rpc('access',{shared:e.target.checked});await refresh();$('#ffDutyStatus').textContent='Viewing access updated.';}catch(err){e.target.checked=!e.target.checked;error(err)}};
  if($('#ffTrackingGrant'))$('#ffTrackingGrant').onsubmit=async e=>{e.preventDefault();try{const f=new FormData(e.target);await rpc('access',{shared:$('#ffShareTracking').checked,viewer:f.get('viewer'),targets:f.getAll('targets')});$('#ffDutyStatus').textContent='Viewer assignment saved.';}catch(err){error(err)}};
  if($('#ffTrackingGrant')){const form=$('#ffTrackingGrant');const fill=async()=>{const selected=form.elements.viewer.value;const {data,error:err}=await sb.from('ffh_tracking_grants').select('target_staff_ids').eq('viewer_staff_id',selected).maybeSingle();if(!form.isConnected||form.elements.viewer.value!==selected)return;if(err)return error(err);const targets=new Set(data?.target_staff_ids||[]);for(const option of form.elements.targets.options)option.selected=targets.has(option.value);form.elements.targets.dispatchEvent(new Event('change',{bubbles:true}));};form.elements.viewer.onchange=()=>fill().catch(error);await fill();}
  window.FFH_STYLE_SELECT?.($('#ffTrackStaff'),{title:'Choose SR'});window.FFH_STYLE_SELECT?.($('#ffTrackingGrant [name=viewer]'),{title:'Choose viewer'});window.FFH_STYLE_MULTI_SELECT?.($('#ffTrackingGrant [name=targets]'),{title:'SRs this viewer can see'});
- await Promise.all([loadMap(true),teamStatus()]);
+ showSelection();
 }
-let mapLoading=false,currentLocation=null;
-async function loadMap(fit=false){if(mapLoading||!map||page()!=='tracking')return;mapLoading=true;const gen=generation,staff=$('#ffTrackStaff').value,day=$('#ffTrackDate').value;try{
+let mapLoading=false,pendingMap=false,currentLocation=null;
+async function loadMap(fit=false){
+ if(!map||page()!=='tracking')return;
+ const staff=$('#ffTrackStaff').value,day=$('#ffTrackDate').value;
+ if(!staff)return refreshTeamMap?.(fit);
+ if(mapLoading){if(fit)pendingMap=true;return;}
+ mapLoading=true;const gen=generation;
+ try{
  const {data:a,error:ae}=await sb.from('ffh_attendance').select('*').eq('staff_id',staff).eq('duty_date',day).maybeSingle();if(ae)throw ae;
  let points=[];if(a){for(let offset=0;offset<10000;offset+=1000){const {data,error}=await sb.from('ffh_location_points').select('latitude,longitude,accuracy_m,speed_mps,captured_at,source').eq('attendance_id',a.id).order('captured_at').range(offset,offset+999);if(error)throw error;points.push(...(data||[]));if(!data||data.length<1000)break;}}
  if(gen!==generation||!map||page()!=='tracking'||$('#ffTrackStaff').value!==staff||$('#ffTrackDate').value!==day)return;
@@ -106,7 +163,7 @@ async function loadMap(fit=false){if(mapLoading||!map||page()!=='tracking')retur
  $('#ffDutyStatus').textContent=!a?'No attendance on this date.':!last?'Attendance saved; no route points received.':`${a.check_out?'Checked out':'Shift ends '+new Date(a.shift_end).toLocaleTimeString('en-MY')} · Last GPS ${new Date(last.captured_at).toLocaleString('en-MY')} · ±${Math.round(last.accuracy_m)} m${Date.now()-Date.parse(last.captured_at)>180000?' · LOCATION STALE / TRACKING GAP':''}`;
  $('#ffStopList').innerHTML='<div class="cardTitle">Estimated Stops</div>'+stopRows.map(s=>`<div class="row"><span>${E(new Date(s.start).toLocaleTimeString('en-MY'))}</span><b>${s.minutes} min</b></div>`).join('');
  const proof=$('#ffAttendanceProof');proof.innerHTML=a?`<div class="miniStat">Daily starting point: ${a.latitude.toFixed(5)}, ${a.longitude.toFixed(5)} · ${a.daily_home_residence?'Manager-marked home area':'Attendance area; residence unconfirmed'}</div>${user().id==='M21954'||user().ownerAccess||user().mode==='MANAGER'?`<label><input type="checkbox" id="ffDayReturnAlert" ${a.daily_home_enabled?'checked':''}> Alert on return to this area today</label><label><input type="checkbox" id="ffDayHome" ${a.daily_home_residence?'checked':''}> Mark this as home for ${E(day)}</label><button class="secondary" id="ffSaveDayHome">SAVE DAILY AREA</button>`:''}`:'';if(a&&$('#ffSaveDayHome')){$('#ffSaveDayHome').onclick=async()=>{try{await rpc('daily_home',{attendance_id:a.id,enabled:$('#ffDayReturnAlert').checked,residence:$('#ffDayHome').checked});$('#ffDutyStatus').textContent='Daily reference saved for '+day;}catch(e){error(e)}};}if(a?.photo_path){const {data,error}=await sb.storage.from('ffh-attendance').createSignedUrl(a.photo_path,60);if(!error&&gen===generation&&proof.isConnected){const img=document.createElement('img');img.src=data.signedUrl;img.alt='Attendance photo';img.style.cssText='max-width:180px;border-radius:12px';proof.appendChild(img);}}
- }finally{mapLoading=false;}}
+ }finally{mapLoading=false;if(pendingMap){pendingMap=false;loadMap(true).catch(error);}}}
 let contactZone='',chatAttachment=null;
 const chatMedia=window.FFH_CREATE_CHAT_MEDIA?.({sb,user,download:(...args)=>ctx.download(...args),error});
 async function chatRpc(action,payload={}){const {data,error}=await sb.rpc('ffh_chat',{action,payload});if(error)throw Error(error.message);return data;}

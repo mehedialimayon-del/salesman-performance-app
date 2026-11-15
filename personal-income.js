@@ -20,5 +20,31 @@ function build(c,id,m,from=m+'-01',to=m+'-31'){
  const rewards=daily?D.rewards(daily,offers,id,m,E):E.rewards(db.sales||[],offers.filter(x=>!x.audience||D.audience(x,id,people)),id,m),bonus=money(rewards.filter(x=>!x.earnedDate||x.earnedDate>=from&&x.earnedDate<=to).reduce((a,x)=>a+n(x.amount),0)+(manager&&n(rule.targetQty)>0&&qty>=n(rule.targetQty)?n(rule.reward):0)),comm=money(ownCommission+salesCommission+n(growthCommission)),total=money(basic+fuel+house+food+fixed+comm+pos+bonus-pen);
  return {id,manager,seller,ids,setupMissing:!monthly&&!Object.keys(setup).length,basic,fuel,house,food,fixed,comm,pos,pen,bonus,total,d:delivered,t:target,qty,ownCommission,salesCommission,growthCommission,previous,growth,salesRate,growthRate,growthPending:manager&&previous===null&&growthRate>0,rewards};
 }
-const api={build};if(typeof module==='object')module.exports=api;else root.FFH_PERSONAL_INCOME=api;
+/* Sales views do not change the rules or amounts used in a payslip. */
+function performanceScopes(c,id,m,to){
+ const people=c.people.map(p=>({...p,id:p.id||p.staff_id,zone:p.zone||p.zone_id}));
+ const person=people.find(p=>p.id===id), viewer=people.find(p=>p.id===c.viewerId);
+ if(!person||!viewer||!H.visibleIncome(viewer,person))return [];
+ const manager=person.can_manage===true||['MANAGER','MANAGER+SR'].includes(person.role);
+ const salesPeople=people.filter(p=>p.active!==false&&D.seller(p));
+ const zones=new Set((c.teams||[]).filter(team=>team.active!==false&&team.manager_staff_id===id).map(team=>team.zone_id));
+ const assigned=salesPeople.filter(p=>p.id!==id&&(p.manager_id===id||(!p.manager_id&&zones.has(p.zone))));
+ const companyAccess=viewer.id===id&&(viewer.id==='M21954'||viewer.ownerAccess||viewer.accessAll||viewer.accessibleZones?.includes('*'));
+ const scopes=[{id:'own',label:'My Sales',ids:[id]}];
+ if(id!==viewer.id)scopes[0].label='Individual Sales';
+ if(manager)scopes.push({id:'assigned',label:id===viewer.id?'My Assigned SRs':'Assigned SRs',ids:assigned.map(p=>p.id)});
+ if(manager&&companyAccess)scopes.push({id:'company',label:'Company Sales',ids:salesPeople.map(p=>p.id)});
+ const sales=c.db.sales||[],daily=c.daily?{...c.daily,people,sales}:null,from=m+'-01';
+ return scopes.map(scope=>{
+   const ids=new Set(scope.ids);
+   const rows=daily?D.rows(daily,scope.ids,{combine:scope.id==='company'}):sales.filter(row=>ids.has(row.sr));
+   const delivered=money(rows.filter(row=>{
+     const day=D.deliveryDay(row);
+     return row.status==='Delivered'&&day>=from&&day<=to;
+   }).reduce((total,row)=>total+n(row.deliveredAmount),0));
+   const target=money(scope.ids.reduce((total,staffId)=>total+n(c.target(staffId,m)),0));
+   return {...scope,d:delivered,t:target};
+ });
+}
+const api={build,performanceScopes};if(typeof module==='object')module.exports=api;else root.FFH_PERSONAL_INCOME=api;
 })(typeof window==='undefined'?globalThis:window);

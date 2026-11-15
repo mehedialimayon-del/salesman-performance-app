@@ -11,7 +11,7 @@
   const managerName=manager?[displayId(manager),manager.full_name||manager.name].filter(Boolean).join(' · '):p.managerLabel||managerId||'Not assigned';
   return (displayId(p)||'Staff ID pending')+' · '+name+' (Manager: '+managerName+') · '+role;
  };
- const update=()=>{if(!window.document)return;for(const option of document.querySelectorAll('select option')){const p=find(option.value);if(!p)continue;const text=window.FFH_STAFF_LABEL(p);if(option.textContent!==text)option.textContent=text;}};
+ const update=()=>{if(!window.document)return;for(const option of document.querySelectorAll('select:not([data-ff-staff-label=compact]) option')){const p=find(option.value);if(!p)continue;const text=window.FFH_STAFF_LABEL(p);if(option.textContent!==text)option.textContent=text;}};
  window.FFH_SET_STAFF=rows=>{people=rows||[];update();document.dispatchEvent(new Event('ffh-staff-updated'));};
  window.FFH_STAFF_PROFILE=value=>find(value);
  window.FFH_STAFF_ITEM=item=>{const p=find(item.value);return p?{...item,label:window.FFH_STAFF_LABEL(p),detail:item.detail||p.zone_id||p.zone||''}:item;};

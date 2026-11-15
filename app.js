@@ -115,7 +115,7 @@ function updateTaskBadges(){
 function shell(body){setTimeout(ffhEntryPermissionGate,0);document.querySelectorAll("[data-ff-briefing-editor]").forEach(el=>el.remove());if(user&&currentPage&&currentPage!=='login')try{localStorage.setItem('ffh_last_page',currentPage)}catch(e){console.warn('Page cache full:',e)}A.innerHTML=`<div class="app"><header class="top"><div class="logo"><div class="ffMiniLogo"><span><i></i><i></i><i></i><b>↗</b></span></div><div>FieldForce <span class="orange">Hub</span><small class="brandTag">Sales | Delivery | Performance | Growth</small></div></div><div class="topBtns"><button class="iconBtn bellBtn" id="bell" aria-label="Notifications"><svg class="topBellSvg" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 33h24l-3-5V19c0-6-4-11-9-11s-9 5-9 11v9z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 38c1 3 7 3 8 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg><span class="topNotifyBadge" id="topNotifyBadge"></span></button><button class="iconBtn" id="globalSearchBtn" aria-label="Search">⌕</button><button class="iconBtn" id="refresh" aria-label="Refresh">↻</button><div class="dropWrap"><button class="iconBtn" id="dots">⋮</button><div class="drop" id="drop"><button id="lang">🌐 বাংলা / English</button><button id="profile">◉ Profile</button><button id="logout">↪ Logout</button></div></div></div></header><div class="ffAppAnnouncements">${ffHomeStatus.html()}</div><main class="wrap">${body}</main><nav class="bottom bottomSeven"><button id="bh"><i>⌂</i>Home</button><button id="bs"><i>▥</i>Sales</button><button id="bo"><i>▥</i>Dashboard</button><button id="bt"><i>✓</i>Tasks</button><button id="bnotice"><i>▤</i>Notice</button><button id="bn"><i class="bellGlyph">♢</i>Notification<span class="navBadge" id="notifyNavBadge"></span></button><button id="br"><i>☏</i>Live Chat</button></nav><div class="aiNudge" id="nudge">স্যার, আমি AYON AI। দরকার হলে ট্যাপ করুন।</div><button class="aiOrb" id="orb" aria-label="AYON AI"><img src="ayon-ai.png?v=20260927" alt="AYON AI" onerror="this.style.display='none';this.parentElement.textContent='AI'"></button></div>`;
 ffhSyncBrowserHistory();
 q('#dots').onclick=()=>q('#drop').classList.toggle('show');
-q('#logout').onclick=async()=>{await ffDuty.shutdown();window.FieldForceNative?.logout();try{await FFH_SUPABASE.auth.signOut({scope:'local'})}catch(e){}localStorage.removeItem('ffh_session');user=null;ffhIncomePerson='';ffhSelectedIncomeMonth='';navStack=[];login()};
+q('#logout').onclick=async()=>{await ffDuty.shutdown();window.FieldForceNative?.logout();try{await FFH_SUPABASE.auth.signOut({scope:'local'})}catch(e){}localStorage.removeItem('ffh_session');user=null;ffhIncomePerson='';ffhIncomeSalesScope='';ffhSelectedIncomeMonth='';navStack=[];login()};
 q('#lang').onclick=()=>{lang=lang==='bn'?'en':'bn';localStorage.setItem('ffh_lang',lang);home(true)};
 q('#profile').onclick=()=>navigate('profile',profile);
 q('#bh').onclick=()=>{navStack=[];home(true)};
@@ -256,15 +256,19 @@ let ffhSelectedIncomeMonth='';const incomeMonth=()=>ffhSelectedIncomeMonth||mont
 function income(){if(window.FFH_PERSONAL_INCOME)return ffhPersonalIncomePage();if(isMgr()&&(view==='ALL'||currentSr()===user.id))return managerIncome();let id=currentSr()||user.id,setup=db.incomeMonthlySetup?.[incomeMonth()]?.[id]||(incomeMonth()===month()?db.incomeSetup[id]:null)||{},basic=+(setup.basic??rules.basic??0),fuel=+(setup.fuel??rules.fuel??0),house=+(setup.houseRent??rules.houseRent??0),d=delivered(id,incomeMonth()),t=target(id,incomeMonth()),a=t?d/t:0,comm=FFH_EARNINGS_CORE.commission(d,t),adj=db.adjustments.filter(x=>x.sr===id&&x.month===incomeMonth()),campaignBonuses=[...ffhCampaignIncome(id,incomeMonth()),...ffhProductIncome(id,incomeMonth())],pos=adj.filter(x=>x.kind!=='Penalty').reduce((s,x)=>s+(+x.amount||0),0)+campaignBonuses.reduce((s,x)=>s+x.amount,0),pen=adj.filter(x=>x.kind==='Penalty').reduce((s,x)=>s+(+x.amount||0),0),food=d>=rules.foodThreshold?rules.foodHigh:rules.foodLow,fixed=basic+fuel+house+(+food||0),total=fixed+comm+pos-pen;
 shell(back('Income & Earnings')+incomePeriodToolbar()+(isMgr()?scopeBar():'')+`<div class="kpis"><div class="kpi wide"><span>Net Estimated Income</span><strong class="green">${rm(total)}</strong></div><div class="kpi"><span>Total Incentives</span><strong class="blue">${rm(pos)}</strong></div><div class="kpi"><span>Penalties</span><strong class="red">-${rm(pen)}</strong></div></div><div class="card"><div class="cardTitle">Income Breakdown</div>${[['Basic',basic],['Fuel Allowance',fuel],['House Rent',house],['Food Allowance',food],['Sales Commission',comm]].map(x=>`<div class="row"><span>${x[0]}</span><b>${rm(x[1])}</b></div>`).join('')}${campaignBonuses.map(x=>`<div class="row"><div><span>Campaign Incentive · ${esc(x.title)}</span><div class="miniStat">${x.qty} / ${x.target||1} ${x.unit||"cartons"} · Manager edits the campaign in CPO/Promotion</div></div><b class="green">+${rm(x.amount)}</b></div>`).join('')}${adj.map(x=>`<div class="row"><div><span>${x.kind}</span><div class="miniStat">${esc(x.reason||'')} · ${esc(x.by||'')}</div></div><b class="${x.kind==='Penalty'?'red':'green'}">${x.kind==='Penalty'?'-':'+'}${rm(x.amount)}</b></div>`).join('')}</div>${isMgr()?adjustmentForm(id):''}`);bindBack();bindScope(income);bindIncomePeriod();bindAdjustment(id)}
 function ffhManagerExtraIncome(st,m){const allowed=new Set(srIds()),sales=(db.sales||[]).filter(x=>allowed.has(x.sr)).map(x=>({...x,sr:user.id})),offers=(st.groups||[]).map((g,i)=>({id:'manager-group-'+i,sr:user.id,name:g.name,startDate:g.startDate,endDate:g.endDate,active:true,groups:[g]}));return globalThis.ffDaily?globalThis.ffDaily.rewards(offers.map(x=>({...x,audience:{kind:'team',staff_ids:[user.id],zone_ids:'ALL'}})),user.id,m):FFH_EARNINGS_CORE.rewards(sales,offers,user.id,m)}
-let ffhIncomePerson = '';
+let ffhIncomePerson = '', ffhIncomeSalesScope = '';
 function ffhPersonalIncomePage(){
  const people = U.filter(p => p.active !== false && FFH_HOME_CORE.visibleIncome(user, p));
- const selected = ffhIncomePerson || (isMgr() && view !== 'ALL' ? currentSr() : null);
+ const selected = ffhIncomePerson || user.id;
  const person = people.find(p => p.id === selected) || people.find(p => p.id === user.id);
  if (!person) return alert('This income is private.');
  const id = person.id, m = incomeMonth(), asOf = incomePeriodEnd();
  const monthLabel = new Date(m+'-01T00:00:00').toLocaleDateString('en-MY',{month:'long',year:'numeric'});
- const model = FFH_PERSONAL_INCOME.build({people:U,viewerId:user.id,db,daily:globalThis.ffDaily?.data(),baselines:ffComparison?.getBaselines()||[],baselineError:ffComparison&&!ffComparison.hasLoaded()?'History not loaded':'',rules,target,currentMonth:month(),today:today()},id,m,m+'-01',asOf);
+ const context = {people:U,viewerId:user.id,db,daily:globalThis.ffDaily?.data(),baselines:ffComparison?.getBaselines()||[],baselineError:ffComparison&&!ffComparison.hasLoaded()?'History not loaded':'',rules,target,currentMonth:month(),today:today(),teams:db.companyRoster?.teams||[]};
+ const model = FFH_PERSONAL_INCOME.build(context,id,m,m+'-01',asOf);
+ const salesScopes = FFH_PERSONAL_INCOME.performanceScopes({...context,target:(staffId,period)=>db.incomeMonthlySetup?.[period]?.[staffId] ? (db.targets?.[period]?.[staffId]??0) : target(staffId,period)},id,m,asOf);
+ const performance = salesScopes.find(scope=>scope.id===ffhIncomeSalesScope) || salesScopes.find(scope=>scope.id==='assigned') || salesScopes[0] || {id:'own',d:0,t:0};
+
  const settings = db.managerMonthlyRules?.[m]?.[id] || (id === user.id && m === month() ? db.managerIncome : null) || {};
  const {lowerLimit = 80, upperLimit = 100, lowerRate = .5, middleRate = 1, upperRate = 2} = settings.commission || {};
  const rule = model.manager && settings.commissionMode !== 'tiers'
@@ -280,13 +284,20 @@ function ffhPersonalIncomePage(){
      left:Math.max(0,(+g.target || 0) - ffhIncentiveProgress({...x,progressDay:today()},g,id)),
      reward:+g.reward || 0,unit:g.mode==='sales'?'RM':g.mode==='orders'?'POs':g.mode==='outlets'?'outlets':'CTN',deadline:x.endDate})))
    .filter(x => x.left > 0 && x.reward > 0);
- shell(back('Income (Personal Income)') + source.render({model,month:m,monthLabel,people,rule,earned,pending,campaignImages,canEdit,request:adjustmentForm(id),esc,money:rm}));
+ shell(back('Income (Personal Income)') + source.render({model,performance,salesScopes,month:m,monthLabel,people,rule,earned,pending,campaignImages,canEdit,request:adjustmentForm(id),esc,money:rm}));
  bindBack();
  ffEarnings.bindRequest(income);
  ffEarnings.bindActions(income);
  q('#ffReferenceIncomeStaff').onchange = e => {
    ffhIncomePerson = people.find(p => p.id === e.target.value)?.id || user.id;
+   ffhIncomeSalesScope = '';
    income();
+ };
+ if(q('#ffIncomeSalesScope'))q('#ffIncomeSalesScope').onchange = e => {
+   ffhIncomeSalesScope = e.currentTarget.value;
+   const top=q('main.wrap').scrollTop;
+   income();
+   q('main.wrap').scrollTop=top;
  };
  q('#ffIncomeMonth').onchange = async e => {
    const input = e.currentTarget, viewer = user.id, openedPage = currentPage;

@@ -3,6 +3,72 @@ window.FFH_CREATE_REPORTS=function(ctx){'use strict';
 const {q,qa,esc,month,today,currentSr,shell,back,bindBack,outlets,db,rules,FFH_SUPABASE,ffhSharedGet,ffEarnings,ffhEnsureXlsx,ffhSafeDownload}=ctx;
 const R=window.FFH_REPORTS_CORE;let filters=null,owner=null,context=null,request=0,detail=null,loaded='',filtersOpen=false;
 const defaults=()=>({from:month()+'-01',to:today(),zone:ctx.zone()==='ALL'?'':ctx.zone(),manager:'',sr:currentSr()||'',chain:'',outlet:'',product:'',incomeStaff:ctx.user()?.id||''});
+const reportKey=id=>'ffh_recent_reports_'+id;
+function recent(){
+ try {const rows=JSON.parse(localStorage.getItem(reportKey(owner))||'[]');return Array.isArray(rows)?rows.filter(x=>R.names.includes(x?.name)&&x.filters).slice(0,20):[];}
+ catch {return [];}
+}
+function openReport(name,range){
+ if(!R.names.includes(name))return;
+ const prior=filters;
+ if(range)filters={...defaults(),...range};
+ try{model();}catch(e){filters=prior;status(e.message);return;}
+ detail=name;
+ const record={name,filters:{...filters}}, remaining=recent().filter(x=>JSON.stringify(x)!==JSON.stringify(record));
+ try{localStorage.setItem(reportKey(owner),JSON.stringify([record,...remaining].slice(0,20)));}catch{}
+ ctx.pushHistory();
+ ctx.setPage('report:'+R.names.indexOf(name));
+ render();
+}
+function bindRecent(){
+ const field=q('#ffRecentSearch');
+ if(!field)return;
+ const data=recent();let all=false;
+ function draw(){
+   const matches=data.map((r,i)=>({r,i})).filter(({r})=>r.name.toLowerCase().includes(field.value.trim().toLowerCase()));
+   q('#ffRecentRows').innerHTML=matches.slice(0,all?20:5).map(({r,i})=>`<tr><td>${esc(r.name)}</td><td>${esc(r.filters.from)} – ${esc(r.filters.to)}</td><td><button type="button" class="secondary" data-recent-report="${i}">View ›</button></td></tr>`).join('')||'<tr><td colspan="3">No recent reports match.</td></tr>';
+   qa('[data-recent-report]').forEach(b=>b.onclick=()=>{const row=data[Number(b.dataset.recentReport)];if(row)openReport(row.name,row.filters);});
+   q('#ffRecentAll').hidden=matches.length<=5;
+   q('#ffRecentAll').textContent=all?'Show Latest Five':'View All Reports';
+ }
+ field.oninput=draw;
+ q('#ffRecentAll').onclick=()=>{all=!all;draw();};
+ draw();
+}
+function scheduleReport(){
+ remember();
+ try{model();}catch(e){status(e.message);return;}
+ const recipient=ctx.user()?.id, range={...filters}, requestId=crypto.randomUUID();
+ const overlay=document.createElement('div');
+ overlay.className='globalSearchOverlay ffInsetDialog';
+ overlay.innerHTML=`<section class="globalSearchBox" role="dialog" aria-modal="true" aria-label="Schedule report reminder"><form class="form">
+  <div class="row"><h2>Schedule Report</h2><button type="button" data-close>Close</button></div>
+  <label>Report<select name="report">${R.names.map(n=>`<option value="${esc(n)}" ${n===detail?'selected':''}>${esc(n)}</option>`).join('')}</select></label>
+  <label>Reminder date and time (Malaysia)<input name="when" type="datetime-local" required></label>
+  <p>FieldForce will send a reminder to your inbox. Open Reports to generate the selected report with fresh data.</p>
+  <button type="submit" class="primary">Schedule Reminder</button><p role="status"></p>
+ </form></section>`;
+ document.body.append(overlay);
+ const close=window.FFH_OVERLAY?.(overlay,()=>overlay.remove())||(()=>overlay.remove());
+ overlay.querySelector('[data-close]').onclick=close;
+ const form=overlay.querySelector('form'), feedback=overlay.querySelector('[role=status]');
+ form.onsubmit=async e=>{
+   e.preventDefault();
+   const {report,when}=Object.fromEntries(new FormData(form)), target=Date.parse(when+'+08:00');
+   if(recipient!==ctx.user()?.id){feedback.textContent='Sign in again to continue.';return;}
+   if(!R.names.includes(report)||!Number.isFinite(target)||target<Date.now()+60000){feedback.textContent='Choose a report and a time at least one minute from now.';return;}
+   const button=e.submitter;button.disabled=true;
+   try{
+     const {error}=await FFH_SUPABASE.from('ffh_notification_jobs').insert({
+       recipient,created_by:recipient,type:'personal',status:'scheduled',source_key:'report-reminder:'+requestId,
+       scheduled_at:new Date(target).toISOString(),title:'Report reminder · '+report,
+       body:'Open FieldForce Reports for '+report+' ('+range.from+' to '+range.to+').'
+     });
+     if(error&&error.code!=='23505')throw error;
+     feedback.textContent='Reminder scheduled for '+when.replace('T',' ')+' MYT.';
+   }catch(err){feedback.textContent=err.message;button.disabled=false;}
+ };
+}
 const status=t=>{const el=q('#ffReportStatus');if(el)el.textContent=t;};
 async function rowsFrom(table,columns='*'){const all=[];for(let offset=0;;offset+=1000){const {data,error}=await FFH_SUPABASE.from(table).select(columns).order('id',{ascending:true}).range(offset,offset+999);if(error)throw Error(table+': '+error.message);all.push(...(data||[]));if((data||[]).length<1000)return all;}}
 async function baselineRows(){try{const all=[];for(let offset=0;;offset+=1000){const {data,error}=await FFH_SUPABASE.from('ffh_sales_baselines').select('*').order('staff_id').order('month').range(offset,offset+999);if(error)throw error;all.push(...(data||[]));if((data||[]).length<1000)return {rows:all,error:''};}}catch(e){return {rows:[],error:'Previous-month history could not load. '+e.message};}}
@@ -48,7 +114,11 @@ function render(){
    <label class="ffRefSearch">Report type<select id="ffReportType"><option value="">All reports</option>${R.names.map((name,i)=>`<option value="${i}">${esc(name)}</option>`).join('')}</select></label>
    <div class="ffRefReportGrid">${R.names.map((name,i)=>`<div class="ffRefReportTile" data-report-tile="${i}"><button type="button" class="ffRefButton reportBtn" data-r="${i}" aria-label="View ${esc(name)}"><i aria-hidden="true">${reportIcons[i]}</i><span>${esc(name)}</span></button><button type="button" class="secondary" data-report-export="${esc(name)}" aria-label="Download ${esc(name)} Excel">Excel</button></div>`).join('')}</div>
  </section>`;
- shell(back(detail||'Reports')+`<section class="ffReports"><header class="ffReportControls">${quick}<details class="card ffReportFilterPanel" id="ffReportFilterPanel" ${filtersOpen?'open':''}><summary class="cardTitle"><span class="ffReportFilterLabel">REPORT SETTINGS · DATE / OUTLET</span><small>${esc(filters.from)} → ${esc(filters.to)}</small></summary><div class="notice">${esc(scopeLabel)} · ${detail?'This Excel contains only this report · 1 sheet':'Each EXCEL button downloads only its named report'}</div>${fields}<small>Cloud snapshot · ${esc(loaded)} MYT</small></details><button class="secondary ffReportRefreshIcon" id="ffReportReload" aria-label="Refresh cloud data" title="Refresh cloud data">↻</button><div id="ffReportStatus" role="status" aria-live="polite"></div></header><div class="ffReportBody">${figures}${detail?`<div class="two ffReportNavigation"><button class="secondary" id="ffReportAll">ALL REPORTS</button><button class="secondary" data-report-export="${esc(detail)}" aria-label="Download ${esc(detail)} Excel">EXCEL ↓</button><button type="button" class="secondary" id="ffReportPdf">PDF ↓</button></div>${window.FFH_REPORT_PRESENTATION?window.FFH_REPORT_PRESENTATION.render(detail,m,scopeLabel):`<div class="card reportTable"><table>${table.map((row,i)=>`<tr>${row.map(v=>i?`<td>${esc(v)}</td>`:`<th>${esc(v)}</th>`).join('')}</tr>`).join('')}</table>${table.length===1?'<p class="empty">No matching records.</p>':''}</div>`}`:choices}${detail?'':'<details class="card"><summary>Combined workbook · all 15 reports</summary><p>Use the individual EXCEL buttons above for one report.</p><button class="primary premiumBtn" id="xls">DOWNLOAD FULL FINAL EXCEL · 15 REPORTS</button></details>'}</div></section>`);bindBack();
+ const recentPanel=`<section class="ffRefPanel ffRefOutlet ffRecentReports"><div class="ffRefZeroTitle"><h2>Recent Reports</h2></div>
+  <label class="ffRefSearch"><i aria-hidden="true">⌕</i><input id="ffRecentSearch" type="search" placeholder="Search report by name…" aria-label="Search recent reports"></label>
+  <div class="ffRefOutletViewport"><table><thead><tr><th>Report Name</th><th>Period</th><th>Action</th></tr></thead><tbody id="ffRecentRows"></tbody></table></div>
+  <button type="button" class="secondary" id="ffRecentAll">View All Reports</button></section>`;
+ shell(back(detail||'Reports')+`<section class="ffReports"><header class="ffReportControls">${quick}<details class="card ffReportFilterPanel" id="ffReportFilterPanel" ${filtersOpen?'open':''}><summary class="cardTitle"><span class="ffReportFilterLabel">REPORT SETTINGS · DATE / OUTLET</span><small>${esc(filters.from)} → ${esc(filters.to)}</small></summary><div class="notice">${esc(scopeLabel)} · ${detail?'This Excel contains only this report · 1 sheet':'Each EXCEL button downloads only its named report'}</div>${fields}<small>Cloud snapshot · ${esc(loaded)} MYT</small></details><button class="secondary ffReportRefreshIcon" id="ffReportReload" aria-label="Refresh cloud data" title="Refresh cloud data">↻</button><div id="ffReportStatus" role="status" aria-live="polite"></div></header><div class="ffReportBody">${figures}${detail?`<div class="two ffReportNavigation"><button class="secondary" id="ffReportAll">ALL REPORTS</button><button class="secondary" data-report-export="${esc(detail)}" aria-label="Download ${esc(detail)} Excel">EXCEL ↓</button><button type="button" class="secondary" id="ffReportPdf">PDF ↓</button></div>${window.FFH_REPORT_PRESENTATION?window.FFH_REPORT_PRESENTATION.render(detail,m,scopeLabel):`<div class="card reportTable"><table>${table.map((row,i)=>`<tr>${row.map(v=>i?`<td>${esc(v)}</td>`:`<th>${esc(v)}</th>`).join('')}</tr>`).join('')}</table>${table.length===1?'<p class="empty">No matching records.</p>':''}</div>`}`:choices}${detail?'':recentPanel}${detail?'':'<details class="card"><summary>Combined workbook · all 15 reports</summary><p>Use the individual EXCEL buttons above for one report.</p><button class="primary premiumBtn" id="xls">DOWNLOAD FULL FINAL EXCEL · 15 REPORTS</button></details>'}<div class="ffRefExports ffReportFooter"><button type="button" class="ffRefButton" data-color="green" id="ffReportExportBottom">Export to Excel</button><button type="button" class="ffRefButton" data-color="red" id="ffReportPdfBottom">Export to PDF</button><button type="button" class="ffRefButton" data-color="blue" id="ffReportSchedule">Schedule Report</button></div></div></section>`);bindBack();
  q('#ffReportFilterPanel').ontoggle=e=>{filtersOpen=e.currentTarget.open;};
  q('#ffReportFilters').onsubmit=e=>{e.preventDefault();remember();try{model();filtersOpen=false;render();}catch(err){status(err.message);}};
  for(const key of ['zone','manager'])q('[data-report-filter="'+key+'"]').onchange=()=>{remember();filters.sr='';if(key==='zone')filters.manager='';filtersOpen=false;render();};
@@ -58,8 +128,8 @@ function render(){
  if(q('#ffReportType'))q('#ffReportType').onchange=e=>{
    qa('[data-report-tile]').forEach(tile=>tile.hidden=!!e.target.value && tile.dataset.reportTile!==e.target.value);
  };
- if(q('#ffReportPdf'))q('#ffReportPdf').onclick=async e=>{
-   const button=e.currentTarget, name=detail, period={...filters};
+ async function pdf(button,name){
+   const period={...filters};
    button.disabled=true;
    try {
      const [head,...data]=model().rows(name), articles=[], pageSize=30;
@@ -73,8 +143,13 @@ function render(){
      await window.FFH_EXPORT_PDF({title:name,filename:'FieldForce-'+name.replace(/[^a-z0-9]+/gi,'-')+'-'+period.from+'-to-'+period.to+'.pdf',
        download:ffhSafeDownload,articles});
    } catch(err) {status('PDF download failed: '+err.message);} finally {button.disabled=false;}
- };
- qa('.reportBtn').forEach(b=>b.onclick=()=>{remember();try{model();detail=R.names[+b.dataset.r];ctx.pushHistory();ctx.setPage('report:'+b.dataset.r);render();}catch(err){status(err.message);}});
+ }
+ if(q('#ffReportPdf'))q('#ffReportPdf').onclick=e=>pdf(e.currentTarget,detail);
+ q('#ffReportPdfBottom').onclick=e=>{remember();return pdf(e.currentTarget,detail||R.names[0]);};
+ q('#ffReportExportBottom').onclick=e=>download(detail,e.currentTarget);
+ q('#ffReportSchedule').onclick=scheduleReport;
+ bindRecent();
+ qa('.reportBtn').forEach(b=>b.onclick=()=>{remember();openReport(R.names[+b.dataset.r]);});
  if(q('#ffReportAll'))q('#ffReportAll').onclick=()=>{remember();detail=null;ctx.setPage('reports');render();};
  qa('[data-report-export]').forEach(b=>b.onclick=()=>download(b.dataset.reportExport,b));if(q('#xls'))q('#xls').onclick=e=>download(null,e.target);
  window.FFH_REPORT_PRESENTATION?.bind?.(q('.ffReports'));
