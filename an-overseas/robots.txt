@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://anoverseaseducation.com/sitemap.xml
