@@ -3,7 +3,73 @@ const E=ctx.esc,C=window.FFH_DAILY_CORE,$=s=>document.querySelector(s),people=()
 const safeImage=url=>/^https:\/\//i.test(url||'')?`<img src="${E(url)}" alt="Campaign cover">`:'';
 async function refresh(){await Promise.all([ctx.earnings.refresh(),ctx.daily.refresh(),ctx.refreshPeople?.()]);}
 async function open(){ctx.setPage('incentive');ctx.shell(ctx.back('CPO / Promotion · Incentives')+'<div class="card" role="status">Loading assigned incentive campaigns…</div>');ctx.bindBack();try{await refresh();list();}catch(e){ctx.shell(ctx.back('Incentives')+'<div class="card" role="status">'+E(e.message)+'</div>');ctx.bindBack();}}
-function list(){chosen=null;ctx.setPage('incentive');const rr=offers().filter(x=>tab==='All'||status(x)===tab);ctx.shell(ctx.back('CPO / Promotion · Incentives')+`<section class="ffRewardDetail"><div class="tabs">${['Active','Upcoming','Expired','All'].map(t=>`<button data-reward-tab="${t}" class="${t===tab?'on':''}">${t}</button>`).join('')}</div>${may()?'<button class="primary" id="ffRewardCreate">+ CREATE INCENTIVE CAMPAIGN</button>':''}${rr.map(x=>`<button class="ffRewardCover" data-reward="${E(x.id)}">${safeImage(x.image)}<h2>★ ${E(x.name)}</h2><p>${E(status(x))} · ${E(x.startDate)} → ${E(x.endDate)}</p><p>${x.audience?.kind==='team'?'MANAGER TEAM TARGET':'INDIVIDUAL SR TARGET'} · ${(x.groups||[]).length} incentive rule(s)</p></button>`).join('')||'<div class="card empty">No assigned campaigns in this section.</div>'}</section>`);ctx.bindBack();document.querySelectorAll('[data-reward-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.rewardTab;list();});document.querySelectorAll('[data-reward]').forEach(b=>b.onclick=()=>{chosen=b.dataset.reward;recipient=null;detail();});if($('#ffRewardCreate'))$('#ffRewardCreate').onclick=()=>editor();}
+function list(){
+ chosen=null;
+ ctx.setPage('incentive');
+ const directory=people(), viewer=ctx.user(), allowed=directory.some(p=>p.id===viewer.id)?directory:[...directory,viewer];
+ const staff=viewer.mode==='MANAGER'?allowed:[viewer];
+ const zones=[...new Set(staff.map(p=>p.zone).filter(Boolean))].sort();
+ const options=(values,all)=>'<option value="">'+all+'</option>'+values.map(([value,label])=>`<option value="${E(value)}">${E(label)}</option>`).join('');
+ const modeGroups = x => (x.groups||[]).filter(g=>g.skus?.length);
+ ctx.shell(ctx.back('Incentives')+`<section class="ffRewardDetail ffRefIncentives">
+   <div class="ffRefPanel ffRefFields">
+    <label><span>Month<input id="ffRewardMonth" type="month" value="${ctx.today().slice(0,7)}"></span></label>
+    <label><span>Zone<select id="ffRewardZone">${options(zones.map(z=>[z,z]),'All permitted zones')}</select></span></label>
+    <label><span>Sales Representative<select id="ffRewardStaff"></select></span></label>
+    <label><span>Product / Scheme<select id="ffRewardProduct"></select></span></label>
+   </div>
+   <div class="ffRefRouteTabs">${[['staff','SR Incentive'],['product','Product Incentive'],['rules','Scheme & Rules']].map(([id,label])=>`<button type="button" class="secondary" data-reward-view="${id}" aria-pressed="${id==='product'}">${label}</button>`).join('')}</div>
+   <label class="ffRefPanel ffRefSearch"><i aria-hidden="true">⌕</i><input id="ffRewardSearch" type="search" aria-label="Search incentive" placeholder="Search product (SKU / name / category)…"></label>
+   <div class="tabs">${['Active','Upcoming','Expired','All'].map(t=>`<button data-reward-tab="${t}" class="${t===tab?'on':''}">${t}</button>`).join('')}</div>
+   <div class="ffRefZeroTitle"><h2 id="ffRewardHeading"></h2>${may()?'<button class="primary" id="ffRewardCreate">＋ Add Scheme</button>':''}</div>
+   <div id="ffRewardRows"></div>
+ </section>`);
+ ctx.bindBack();
+ const $month=$('#ffRewardMonth'),$zone=$('#ffRewardZone'),$staff=$('#ffRewardStaff'),$product=$('#ffRewardProduct'),$search=$('#ffRewardSearch');
+ let screen='product';
+ const inZone=()=>staff.filter(p=>!$zone.value||p.zone===$zone.value);
+ function fillStaff(){
+   $staff.innerHTML=options(inZone().map(p=>[p.id,p.name]),'All visible staff');
+ }
+ function eligible(){
+   return offers().filter(x=>(!$month.value||(!x.startDate||x.startDate.slice(0,7)<=$month.value)&&(!x.endDate||x.endDate.slice(0,7)>=$month.value))&&
+     (tab==='All'||status(x)===tab)&&inZone().some(p=>(!$staff.value||p.id===$staff.value)&&C.audience(x,p.id,allowed)));
+ }
+ function fillProducts(){
+   const previous=$product.value,skus=[...new Set(eligible().flatMap(x=>modeGroups(x).flatMap(g=>g.skus)))].sort();
+   $product.innerHTML=options(skus.map(x=>[x,x]),'All products');
+   if(skus.includes(previous))$product.value=previous;
+ }
+ function render(){
+   const search=$search.value.toLowerCase().trim();
+   const rr=eligible().filter(x=>(screen!=='product'||modeGroups(x).length)&&(!$product.value||modeGroups(x).some(g=>g.skus.includes($product.value)))&&[x.name,x.description,...(x.groups||[]).flatMap(g=>[g.name,...(g.skus||[])])].join(' ').toLowerCase().includes(search));
+   $('#ffRewardHeading').textContent=(screen==='product'?'Product-wise Incentive Scheme':screen==='staff'?'SR Incentive':'Scheme & Rules')+' ('+rr.length+')';
+   $('#ffRewardRows').innerHTML=rr.map(x=>`<button class="ffRefPanel ffRewardCover ffRefScheme" data-reward="${E(x.id)}">
+    ${safeImage(x.image)}
+    <span><b>${E(x.name)}</b><small>${E(x.startDate)} → ${E(x.endDate)}</small>
+      ${(screen==='product'?modeGroups(x):(x.groups||[])).map(g=>`<small>${E(g.name||'Rule')} · ${E(g.target)} ${E(g.mode==='sales'?'RM':g.mode==='orders'?'POs':g.mode==='outlets'?'outlets':'cartons')} · Reward RM ${E((+g.reward||0).toFixed(2))}</small>`).join('')}</span>
+    <strong>${E(status(x))} ›</strong></button>`).join('')||'<div class="ffRefPanel"><p class="ffRefHint">No assigned campaigns match these filters.</p></div>';
+   document.querySelectorAll('[data-reward]').forEach(button=>button.onclick=()=>{chosen=button.dataset.reward;recipient=$staff.value||null;detail();});
+ }
+ function update(){fillProducts();render();}
+ $zone.onchange=()=>{fillStaff();update();};
+ $month.onchange=$staff.onchange=update;
+ $product.onchange=$search.oninput=render;
+ document.querySelectorAll('[data-reward-tab]').forEach(button=>button.onclick=()=>{
+   tab=button.dataset.rewardTab;
+   document.querySelectorAll('[data-reward-tab]').forEach(b=>b.classList.toggle('on',b===button));
+   update();
+ });
+ document.querySelectorAll('[data-reward-view]').forEach(button=>button.onclick=()=>{
+   screen=button.dataset.rewardView;
+   document.querySelectorAll('[data-reward-view]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+   if(screen!=='product')$product.value='';
+   render();
+ });
+ if($('#ffRewardCreate'))$('#ffRewardCreate').onclick=()=>editor();
+ fillStaff();
+ update();
+}
 function pendingHtml(x,id){const data=ctx.daily.data(),ids=C.teamIds(x,id,data),selection=C.selected(data,ids,x.audience?.kind==='team'),controls=new Set(selection.controls.map(r=>r.zone_id+'|'+r.sale_date)),records=[...selection.staff.filter(r=>!controls.has(r.zone_id+'|'+r.sale_date)),...selection.controls].filter(r=>r.sale_date>=x.startDate&&r.sale_date<=x.endDate),skus=new Set((x.groups||[]).flatMap(g=>g.skus||[])),rows=[];for(const r of records)for(const p of r.product_lines||[]){if(skus.size&&!skus.has(p.sku))continue;for(const o of p.outlets?.length?p.outlets:[p])rows.push([r.sale_date,r.staff_id?name(r.staff_id):r.zone_id,o.outlet_name||'Daily total',p.sku,C.num(o.order_qty),C.num(o.delivered_qty),Math.max(0,C.round(o.order_qty-o.delivered_qty)),r.delivery_completed?'Completed':C.num(o.delivered_qty)>0?'Part delivered':'Pending']);}const table=(heads,rows)=>'<div class="ffDailyTable"><table><thead><tr>'+heads.map(h=>'<th>'+E(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(v=>'<td>'+E(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';return `<section class="ffDaily"><h3>Orders &amp; delivery by date / outlet</h3><p class="ffDailySmall">Ordered cartons remain pending. Only actual confirmed delivery contributes to delivery-based incentives. Confirm quantities in Daily Sales → Delivery follow-up.</p>${rows.length?table(['Order date','SR / Zone','Outlet','SKU','Ordered CTN','Delivered CTN','Unfulfilled CTN','Status'],rows):'<p class="ffDailySmall">No incentive SKU orders recorded in this campaign’s dates.</p>'}${(x.groups||[]).some(g=>!['single','combo'].includes(g.mode))?table(['Order date','SR / Zone','Ordered RM','Delivered RM','Status'],records.map(r=>[r.sale_date,r.staff_id?name(r.staff_id):r.zone_id,C.num(r.order_amount),C.num(r.delivered_amount),r.delivery_completed?'Completed':'Pending / part delivered'])):''}</section>`;}
 function detail(){const x=offers().find(x=>x.id===chosen);if(!x)return list();const recipients=people().filter(p=>C.audience(x,p.id,people()));if(!recipients.some(p=>p.id===recipient))recipient=recipients.find(p=>p.id===ctx.user().id)?.id||recipients[0]?.id;if(!recipient)return list();const month=ctx.today().slice(0,7),earned=ctx.daily.rewards([x],recipient,month).reduce((n,r)=>n+r.amount,0);
 ctx.shell(ctx.back('Incentive Details')+`<section class="ffRewardDetail"><div class="card">${safeImage(x.image)}<h2>${E(x.name)}</h2><p>${E(status(x))} · ${E(x.startDate)} → ${E(x.endDate)}</p><p style="white-space:pre-wrap">${E(x.description||'')}</p><p class="ffDailySmall">${x.audience?.kind==='team'?'Manager progress combines the permitted SR routes. A zone total replaces the SR sum for that day.':'This incentive belongs to each assigned SR separately.'}</p><label>Progress for<select id="ffRewardRecipient">${recipients.map(p=>`<option value="${E(p.id)}" ${recipient===p.id?'selected':''}>${E(p.name)} · ${E(p.id)}</option>`).join('')}</select></label><p><b class="green">Earned this month: RM ${earned.toFixed(2)}</b></p>${(x.groups||[]).map(g=>{const got=ctx.daily.progress({...x,progressDay:g.period==='daily'&&status(x)==='Active'?ctx.today():undefined},g,recipient),target=+g.target||0,unit=g.mode==='sales'?'RM':g.mode==='orders'?'POs':g.mode==='outlets'?'outlets':'cartons';return `<div class="incGroup"><b>${E(g.name||'Incentive target')}</b><p>${g.basis==='order'?'KEYED SALES':'CONFIRMED DELIVERY'} · ${g.period==='daily'?'EACH DAY':'WHOLE DATE RANGE'}</p><p>${(g.skus||[]).map(E).join(' + ')||'All products'}</p><div class="row"><span>Achieved</span><strong>${C.round(got)} / ${target} ${unit}</strong></div><div class="progress"><span style="width:${Math.max(0,Math.min(100,got/target*100))}%"></span></div><div class="row"><span>Remaining</span><b>${Math.max(0,C.round(target-got))} ${unit}</b></div><div class="row"><span>Reward when target is reached</span><b class="green">RM ${(+g.reward).toFixed(2)}</b></div><p class="ffDailySmall">${g.period==='daily'&&status(x)==='Active'?'Today’s progress. ':''}Entries received after expiry do not earn this reward. Late delivery qualifies only if its delivery time is inside this campaign’s dates.</p></div>`;}).join('')}${pendingHtml(x,recipient)}<button class="secondary" id="ffRewardBack">ALL CAMPAIGNS</button>${may()?'<button class="secondary" id="ffRewardEdit">EDIT CAMPAIGN</button>':''}</div></section>`);ctx.bindBack();$('#ffRewardRecipient').onchange=e=>{recipient=e.target.value;detail();};$('#ffRewardBack').onclick=list;if($('#ffRewardEdit'))$('#ffRewardEdit').onclick=()=>editor(x);}

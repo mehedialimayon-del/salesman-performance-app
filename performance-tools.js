@@ -85,18 +85,58 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
  }
  async function historyPage(){
   const id=me(), turn=++ticket;
-  page('outletHistory','Outlet Performance History','<div class="card" role="status">Loading assigned outlets and history…</div>');
+  page('outletHistory','Outlet Management','<div class="card" role="status">Loading assigned outlets and history…</div>');
   let errors=[];try{await ctx.refreshStaff();await ctx.refreshOutlets();}catch(e){errors.push('Outlet access: '+e.message);}
   if(me()!==id||turn!==ticket||ctx.page()!=='outletHistory')return;
   // Permission/assignment failure never falls back to another person's cached history.
-  if(errors.length)return page('outletHistory','Outlet Performance History',`<div class="card" role="alert">${E(errors.join(' '))}<button id="ffHistoryRetry" class="primary">RETRY</button></div>`),$('#ffHistoryRetry').onclick=historyPage;
+  if(errors.length)return page('outletHistory','Outlet Management',`<div class="card" role="alert">${E(errors.join(' '))}<button id="ffHistoryRetry" class="primary">RETRY</button></div>`),$('#ffHistoryRetry').onclick=historyPage;
   const result=await Promise.allSettled([rows('ffh_sales','created_at'),rows('ffh_tasks','created_at'),rows('ffh_campaign_executions','created_at'),globalThis.ffDaily?.refresh()]);
   if(me()!==id||turn!==ticket||ctx.page()!=='outletHistory')return;
   const ids=scopedIds(), outlets=ids.flatMap(sid=>ctx.outlets(sid).map(o=>({...o,sr:sid}))),data=result.map((r,i)=>{if(r.status==='fulfilled')return r.value;errors.push(['Sales','Task proof','CPO / Promotion'][i]+': '+r.reason.message);return []});
   if(globalThis.ffDaily&&window.FFH_DAILY_CORE){const source=data[0].map(s=>({id:s.id,sr:s.sr_id,date:s.sale_date,status:s.status,outletCode:s.outlet_code,outletName:s.outlet_name,sku:s.sku,qty:s.qty,orderAmount:s.order_amount,deliveredAmount:s.delivered_amount,deliveredAt:s.delivered_at,remarks:s.remarks}));data[0]=window.FFH_DAILY_CORE.coverageRows({...globalThis.ffDaily.data(),sales:source},ids).map(s=>({id:s.id,sr_id:s.sr,sale_date:s.date,status:s.status,outlet_code:s.outletCode,outlet_name:s.outletName,sku:s.sku,qty:s.qty,order_amount:s.orderAmount,delivered_amount:s.deliveredAmount,remarks:s.remarks}));}
-  page('outletHistory','Outlet Performance History',`<div class="card ffPerformanceIntro"><p>Order, delivery and recorded outlet tasks / campaign proof in one place. No additional daily form. Missing history is not treated as a completed visit.</p><label>Search outlet / code / SR<input id="ffOutletHistorySearch" placeholder="e.g. KK or outlet code"></label><label>Assigned outlet<select id="ffOutletHistorySelect"><option value="">Choose an outlet</option></select></label><div class="two"><label>From<input id="ffOutletHistoryFrom" type="date"></label><label>To<input id="ffOutletHistoryTo" type="date"></label></div><button id="ffOutletHistoryReload" class="secondary">REFRESH HISTORY</button>${errors.map(e=>`<p role="alert">${E(e)} · History is incomplete.</p>`).join('')}</div><div id="ffOutletHistoryDetail"></div>`);
+  const zones=[...new Set(outlets.map(o=>ctx.staff(o.sr)?.zone).filter(Boolean))].sort();
+  const chains=[...new Set(outlets.map(o=>o.category).filter(Boolean))].sort();
+  const selectOptions=(values,label)=>'<option value="">'+label+'</option>'+values.map(([value,text])=>`<option value="${E(value)}">${E(text)}</option>`).join('');
+  page('outletHistory','Outlet Management',`<section class="ffRefOutlet">
+   <div class="ffRefPanel ffRefFields">
+     <label><span>From<input id="ffOutletHistoryFrom" type="date"></span></label>
+     <label><span>To<input id="ffOutletHistoryTo" type="date"></span></label>
+     <label><span>Zone<select id="ffOutletZone">${selectOptions(zones.map(z=>[z,z]),'All permitted zones')}</select></span></label>
+     <label><span>Sales Representative<select id="ffOutletStaff">${selectOptions(ids.map(id=>[id,who(id)]),'All SRs')}</select></span></label>
+     <label><span>Chain / Channel<select id="ffOutletChain">${selectOptions(chains.map(c=>[c,c]),'All chains')}</select></span></label>
+   </div>
+   <div class="ffRefExports">
+    <button class="ffRefButton" type="button" id="ffOutletHistoryReload">Refresh History</button>
+    <button class="ffRefButton" type="button" id="ffOutletVisitReport">Outlet Report</button>
+    ${ctx.isMgr()?'<button class="ffRefButton" type="button" id="ffOutletManage">Outlet Assignment</button>':''}
+   </div>
+   <section class="ffRefPanel">
+    <div class="ffRefZeroTitle"><h2 id="ffOutletCount">Outlet List</h2></div>
+    <label class="ffRefSearch"><i aria-hidden="true">⌕</i><input type="search" id="ffOutletHistorySearch" aria-label="Search outlets" placeholder="Search outlet (name / code / chain)…"></label>
+    <label class="ffRefSearch">Assigned Outlet<select id="ffOutletHistorySelect"></select></label>
+    <div class="ffRefOutletViewport"><table><thead><tr><th>Outlet</th><th>Chain</th><th>SR</th><th>Listing</th><th>Status</th></tr></thead><tbody id="ffOutletHistoryRows"></tbody></table></div>
+   </section>
+   ${errors.map(e=>`<p role="alert">${E(e)} · History is incomplete.</p>`).join('')}
+   <div id="ffOutletHistoryDetail"></div>
+  </section>`);
   const select=$('#ffOutletHistorySelect');
-  const fill=()=>{const term=$('#ffOutletHistorySearch').value.trim().toLowerCase(),old=select.value;select.innerHTML='<option value="">Choose an outlet</option>'+outlets.map((o,i)=>({o,i})).filter(({o})=>!term||[o.name,o.code,o.category,who(o.sr)].join(' ').toLowerCase().includes(term)).map(({o,i})=>`<option value="${i}">${E(o.name)} (${E(o.code)}) · ${E(who(o.sr))}</option>`).join('');select.value=old;if(!select.value)$('#ffOutletHistoryDetail').innerHTML='';};
+  const fill=()=>{
+   const term=$('#ffOutletHistorySearch').value.trim().toLowerCase(),old=select.value;
+   const zone=$('#ffOutletZone').value,staff=$('#ffOutletStaff').value,chain=$('#ffOutletChain').value;
+   const list=outlets.map((o,i)=>({o,i})).filter(({o})=>(!zone||ctx.staff(o.sr)?.zone===zone)&&(!staff||staff===o.sr)&&(!chain||chain===o.category)&&
+    (!term||[o.name,o.code,o.category,who(o.sr)].join(' ').toLowerCase().includes(term)));
+   $('#ffOutletCount').textContent='Outlet List ('+list.length+')';
+   select.innerHTML=selectOptions(list.map(({o,i})=>[i,o.name+' ('+o.code+') · '+who(o.sr)]),'Choose an outlet');
+   select.value=list.some(v=>String(v.i)===old)?old:'';
+   if(!select.value)$('#ffOutletHistoryDetail').innerHTML='';
+   $('#ffOutletHistoryRows').innerHTML=list.map(({o,i})=>`<tr><td><button class="secondary" type="button" data-ref-outlet="${i}">${E(o.name)}<small>${E(o.code)}</small></button></td><td>${E(o.category||'—')}</td><td>${E(who(o.sr))}</td><td>${E(o.totalSku||'—')}</td><td><span class="green">Active</span></td></tr>`).join('')||
+     '<tr><td colspan="5">No outlets match this selection.</td></tr>';
+   document.querySelectorAll('[data-ref-outlet]').forEach(button=>button.onclick=()=>{
+     select.value=button.dataset.refOutlet;
+     draw();
+     $('#ffOutletHistoryDetail').scrollIntoView({block:'nearest',behavior:'smooth'});
+   });
+  };
   const draw=()=>{
    const o=outlets[+select.value];if(select.value===''||!o)return;
    lastHistory={sr:o.sr,code:o.code};const from=$('#ffOutletHistoryFrom').value,to=$('#ffOutletHistoryTo').value;
@@ -111,7 +151,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    events.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
    $('#ffOutletHistoryDetail').innerHTML=`<div class="card"><div class="cardTitle">${E(o.name)}</div><p>${E(o.code)} · ${E(who(o.sr))}</p><div class="two"><div>Delivered<b class="green ffPerformanceAmount">${ctx.rm(total)}</b></div><div>Pending order<b class="ffPerformanceAmount">${ctx.rm(pending)}</b></div></div><p>${skus.size} delivered SKU(s) in selected dates</p>${[...skus].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([sku,amount])=>`<p>${E(sku)} · ${ctx.rm(amount)}</p>`).join('')}</div>${events.map(x=>`<article class="card"><b>${E(x.title)}</b><p class="miniStat">${E(x.date)}</p><p>${E(x.detail||'')}</p>${x.remarks?`<p>${E(x.remarks)}</p>`:''}${safePhoto(x.photo)}</article>`).join('')||'<div class="card empty">No recorded activity in this selection.</div>'}`;bindPhotos();
   };
-  $('#ffOutletHistorySearch').oninput=fill;select.onchange=draw;$('#ffOutletHistoryFrom').onchange=draw;$('#ffOutletHistoryTo').onchange=draw;$('#ffOutletHistoryReload').onclick=historyPage;fill();
+  $('#ffOutletHistorySearch').oninput=fill;for(const id of ['ffOutletZone','ffOutletStaff','ffOutletChain'])$('#'+id).onchange=fill;select.onchange=draw;$('#ffOutletHistoryFrom').onchange=draw;$('#ffOutletHistoryTo').onchange=draw;$('#ffOutletHistoryReload').onclick=historyPage;$('#ffOutletVisitReport').onclick=()=>ctx.open?.('reports');$('#ffOutletManage')?.addEventListener('click',()=>ctx.manageOutlets?.());fill();
   if(lastHistory){const i=outlets.findIndex(o=>o.sr===lastHistory.sr&&o.code===lastHistory.code);if(i>=0){select.value=String(i);draw();}}
  }
  window.addEventListener('online',()=>flush().catch(console.warn));

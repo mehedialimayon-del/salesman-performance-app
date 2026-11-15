@@ -35,13 +35,45 @@ function render(){
   +(quickSrs.length?'<optgroup label="SALES REPRESENTATIVES">'+quickSrs.map(p=>'<option value="'+esc(p.id)+'" '+(filters.sr===p.id?'selected':'')+'>'+esc(p.name)+' · '+esc(p.id)+' · '+esc(p.zone||'')+'</option>').join('')+'</optgroup>':'')
   +'</select></label></div>';
  const table=detail?m.rows(detail):null;const scopeLabel=['Income Breakdown','Sales Commission'].includes(detail)?m.incomeScope:filters.sr?(context.people.find(p=>p.id===filters.sr)?.name||filters.sr)+' · '+filters.sr:m.ids.length+' selected SR(s)';
- shell(back(detail||'Reports & Full Export')+`<section class="ffReports"><header class="ffReportControls">${quick}<details class="card ffReportFilterPanel" id="ffReportFilterPanel" ${filtersOpen?'open':''}><summary class="cardTitle"><span class="ffReportFilterLabel">REPORT SETTINGS · DATE / OUTLET</span><small>${esc(filters.from)} → ${esc(filters.to)}</small></summary><div class="notice">${esc(scopeLabel)} · ${detail?'This Excel contains only this report · 1 sheet':'Each EXCEL button downloads only its named report'}</div>${fields}<small>Cloud snapshot · ${esc(loaded)} MYT</small></details><button class="secondary ffReportRefreshIcon" id="ffReportReload" aria-label="Refresh cloud data" title="Refresh cloud data">↻</button><div id="ffReportStatus" role="status" aria-live="polite"></div></header><div class="ffReportBody">${detail?`<div class="two ffReportNavigation"><button class="secondary" id="ffReportAll">ALL REPORTS</button><button class="secondary" data-report-export="${esc(detail)}" aria-label="Download ${esc(detail)} Excel">EXCEL ↓</button></div>${window.FFH_REPORT_PRESENTATION?window.FFH_REPORT_PRESENTATION.render(detail,m,scopeLabel):`<div class="card reportTable"><table>${table.map((row,i)=>`<tr>${row.map(v=>i?`<td>${esc(v)}</td>`:`<th>${esc(v)}</th>`).join('')}</tr>`).join('')}</table>${table.length===1?'<p class="empty">No matching records.</p>':''}</div>`}`:`<div class="card">${R.names.map((name,i)=>`<div class="ffReportRow ffReportSegment-${i%5}"><h3>${esc(name)}</h3><button class="secondary ffReportAction reportBtn" data-r="${i}" aria-label="View ${esc(name)}">VIEW ›</button><button class="secondary ffReportAction" data-report-export="${esc(name)}" aria-label="Download ${esc(name)} Excel">EXCEL ↓</button></div>`).join('')}</div>`}${detail?'':'<details class="card"><summary>Combined workbook · all 15 reports</summary><p>Use the individual EXCEL buttons above for one report.</p><button class="primary premiumBtn" id="xls">DOWNLOAD FULL FINAL EXCEL · 15 REPORTS</button></details>'}</div></section>`);bindBack();
+ const stat = (icon,label,value,color) => `<div class="ffRefMetric" data-color="${color}"><i aria-hidden="true">${icon}</i><span>${label}</span><strong>${esc(value)}</strong></div>`;
+ const money = value => 'RM ' + value.toLocaleString('en-MY',{maximumFractionDigits:2});
+ const figures = detail ? '' : `<div class="ffRefReportKpis">
+   ${stat('▥','Total Sales',money(m.summary.delivered),'green')}
+   ${stat('◎','Target',money(m.summary.target),'gold')}
+   ${stat('%','Achievement',m.summary.achievement+'%','blue')}
+   ${stat('▣','Total Outlets',m.summary.assignedOutlets,'red')}
+ </div>`;
+ const reportIcons = ['◕','◉','▥','▧','▣','▦','◎','▤','%','◆','★','⊘','⚑','⚑','⌖'];
+ const choices = `<section class="ffRefPanel ffRefReportChoices"><h2>Generate Report</h2>
+   <label class="ffRefSearch">Report type<select id="ffReportType"><option value="">All reports</option>${R.names.map((name,i)=>`<option value="${i}">${esc(name)}</option>`).join('')}</select></label>
+   <div class="ffRefReportGrid">${R.names.map((name,i)=>`<div class="ffRefReportTile" data-report-tile="${i}"><button type="button" class="ffRefButton reportBtn" data-r="${i}" aria-label="View ${esc(name)}"><i aria-hidden="true">${reportIcons[i]}</i><span>${esc(name)}</span></button><button type="button" class="secondary" data-report-export="${esc(name)}" aria-label="Download ${esc(name)} Excel">Excel</button></div>`).join('')}</div>
+ </section>`;
+ shell(back(detail||'Reports')+`<section class="ffReports"><header class="ffReportControls">${quick}<details class="card ffReportFilterPanel" id="ffReportFilterPanel" ${filtersOpen?'open':''}><summary class="cardTitle"><span class="ffReportFilterLabel">REPORT SETTINGS · DATE / OUTLET</span><small>${esc(filters.from)} → ${esc(filters.to)}</small></summary><div class="notice">${esc(scopeLabel)} · ${detail?'This Excel contains only this report · 1 sheet':'Each EXCEL button downloads only its named report'}</div>${fields}<small>Cloud snapshot · ${esc(loaded)} MYT</small></details><button class="secondary ffReportRefreshIcon" id="ffReportReload" aria-label="Refresh cloud data" title="Refresh cloud data">↻</button><div id="ffReportStatus" role="status" aria-live="polite"></div></header><div class="ffReportBody">${figures}${detail?`<div class="two ffReportNavigation"><button class="secondary" id="ffReportAll">ALL REPORTS</button><button class="secondary" data-report-export="${esc(detail)}" aria-label="Download ${esc(detail)} Excel">EXCEL ↓</button><button type="button" class="secondary" id="ffReportPdf">PDF ↓</button></div>${window.FFH_REPORT_PRESENTATION?window.FFH_REPORT_PRESENTATION.render(detail,m,scopeLabel):`<div class="card reportTable"><table>${table.map((row,i)=>`<tr>${row.map(v=>i?`<td>${esc(v)}</td>`:`<th>${esc(v)}</th>`).join('')}</tr>`).join('')}</table>${table.length===1?'<p class="empty">No matching records.</p>':''}</div>`}`:choices}${detail?'':'<details class="card"><summary>Combined workbook · all 15 reports</summary><p>Use the individual EXCEL buttons above for one report.</p><button class="primary premiumBtn" id="xls">DOWNLOAD FULL FINAL EXCEL · 15 REPORTS</button></details>'}</div></section>`);bindBack();
  q('#ffReportFilterPanel').ontoggle=e=>{filtersOpen=e.currentTarget.open;};
  q('#ffReportFilters').onsubmit=e=>{e.preventDefault();remember();try{model();filtersOpen=false;render();}catch(err){status(err.message);}};
  for(const key of ['zone','manager'])q('[data-report-filter="'+key+'"]').onchange=()=>{remember();filters.sr='';if(key==='zone')filters.manager='';filtersOpen=false;render();};
  q('[data-report-filter="sr"]').onchange=()=>{if(!q('[data-report-filter="sr"]').value)q('[data-report-filter="manager"]').value='';remember();filtersOpen=false;render();};
  q('#ffReportReset').onclick=()=>{filters={...defaults(),zone:'',sr:''};render();};
  q('#ffReportReload').onclick=async e=>{e.target.disabled=true;status('Loading authenticated cloud records…');try{remember();if(await refresh())render();}catch(err){status('Refresh failed: '+err.message+' · Previous snapshot remains dated above.');if(e.target.isConnected)e.target.disabled=false;}};
+ if(q('#ffReportType'))q('#ffReportType').onchange=e=>{
+   qa('[data-report-tile]').forEach(tile=>tile.hidden=!!e.target.value && tile.dataset.reportTile!==e.target.value);
+ };
+ if(q('#ffReportPdf'))q('#ffReportPdf').onclick=async e=>{
+   const button=e.currentTarget, name=detail, period={...filters};
+   button.disabled=true;
+   try {
+     const [head,...data]=model().rows(name), articles=[], pageSize=30;
+     for(let i=0;i<Math.max(1,data.length);i+=pageSize){
+       const table=[head,...data.slice(i,i+pageSize)].map((row,r)=>'<tr>'+row.map(value=>{
+         const tag=r?'td':'th';
+         return '<'+tag+'>'+esc(value??'')+'</'+tag+'>';
+       }).join('')+'</tr>').join('');
+       articles.push('<h1>'+esc(name)+'</h1><p>'+esc(scopeLabel)+' · '+esc(period.from)+' → '+esc(period.to)+'</p><table border="1" cellspacing="0" cellpadding="5">'+table+'</table>');
+     }
+     await window.FFH_EXPORT_PDF({title:name,filename:'FieldForce-'+name.replace(/[^a-z0-9]+/gi,'-')+'-'+period.from+'-to-'+period.to+'.pdf',
+       download:ffhSafeDownload,articles});
+   } catch(err) {status('PDF download failed: '+err.message);} finally {button.disabled=false;}
+ };
  qa('.reportBtn').forEach(b=>b.onclick=()=>{remember();try{model();detail=R.names[+b.dataset.r];ctx.pushHistory();ctx.setPage('report:'+b.dataset.r);render();}catch(err){status(err.message);}});
  if(q('#ffReportAll'))q('#ffReportAll').onclick=()=>{remember();detail=null;ctx.setPage('reports');render();};
  qa('[data-report-export]').forEach(b=>b.onclick=()=>download(b.dataset.reportExport,b));if(q('#xls'))q('#xls').onclick=e=>download(null,e.target);

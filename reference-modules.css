@@ -1,0 +1,241 @@
+#app .app:has(.ffRefIncome) {
+  --ff-ref-gold: #ffad27;
+  --ff-ref-orange: #ff820a;
+  --ff-ref-line: #e7831c;
+  --ff-ref-font: 'Roboto Condensed', 'Arial Narrow', Roboto, Arial, sans-serif;
+}
+#app .app>main.wrap:has(.ffRefIncome) {
+  min-width: 0;
+  background: #000;
+  font-family: var(--ff-ref-font);
+}
+#app main.wrap:has(.ffRefIncome)>.head { margin: 0 0 .45rem!important; }
+#app main.wrap:has(.ffRefIncome)>.head h1 {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  font: 800 clamp(20px, 5.15vw, 36px)/1.18 var(--ff-ref-font)!important;
+  padding-block: .28em!important;
+}
+#app main.wrap:has(.ffRefIncome)>.head h1::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  right: 2%;
+  bottom: .32em;
+  width: 34%;
+  height: .18em;
+  border-radius: 50%;
+  background: linear-gradient(90deg, transparent, #ff8712 35%, #fff1a1 70%, #ff6311 97%);
+  box-shadow: 0 0 9px #ff7300;
+  transform: skewY(-8deg);
+}
+#app .ffRefIncome {
+  display: grid;
+  gap: .65em;
+  color: white;
+  font: 500 clamp(10px, 2.65vw, 15px)/1.25 var(--ff-ref-font);
+  min-width: 0;
+}
+.ffRefIncome *, .ffRefIncome *::before, .ffRefIncome *::after { box-sizing: border-box; }
+.ffRefIncome i { font-style: normal; color: var(--ff-ref-gold); font-weight: 850; }
+.ffRefIncome em { color: var(--ff-ref-orange); font-style: normal; }
+.ffRefPanel, .ffRefButton, .ffRefMetric {
+  border: 1px solid var(--ff-ref-line);
+  border-radius: .95em;
+  background: #060504;
+  box-shadow: inset 0 0 .63em #d969202f, 0 0 .3em #f779294d;
+  min-width: 0;
+}
+.ffRefIncome .ffRefPanel h2 {
+  margin: 0;
+  padding: .42em .55em;
+  font: 750 1.3em/1.2 var(--ff-ref-font);
+}
+.ffRefFields, .ffRefIncomeSplit, .ffRefRewards, .ffRefFive, .ffRefExports { display:grid; gap:.55em; min-width:0; }
+.ffRefFields { grid-template-columns: repeat(2,minmax(0,1fr)); padding: .6em .75em; }
+.ffRefFields label { display: flex; align-items: center; gap: .48em; min-width: 0; margin: 0!important; }
+.ffRefFields label i { font-size: 1.85em; }
+.ffRefFields label span { flex: 1; min-width: 0; }
+#app .ffRefFields :is(input,select) {
+  width: 100%;
+  min-width: 0;
+  min-height: 28px;
+  padding: .28em .48em!important;
+  margin: 0!important;
+  font: 700 1em/1.15 var(--ff-ref-font)!important;
+  color: white!important;
+  color-scheme: dark;
+  background: #090601!important;
+  border: 1px solid var(--ff-ref-line)!important;
+  border-radius: 1em!important;
+}
+.ffRefFive { grid-template-columns: repeat(5,minmax(0,1fr)); }
+#app :is(.ffRefMetric,.ffRefButton) {
+  --ff-ref-card: #ffa62d;
+  --ff-ref-tint: #441700;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  gap: .2em;
+  color: #fff;
+  min-width: 0;
+  min-height: 4.6em;
+  padding: .35em .12em;
+  font: 700 1em/1.14 var(--ff-ref-font);
+  border: 1px solid var(--ff-ref-card);
+  border-radius: .95em;
+  box-shadow: inset 0 0 .65em var(--ff-ref-card), 0 0 .38em var(--ff-ref-card);
+  background: linear-gradient(175deg,var(--ff-ref-tint),#050301 80%);
+}
+#app :is(.ffRefMetric,.ffRefButton)[data-color="green"] { --ff-ref-card:#7aff27; --ff-ref-tint:#073b0b; }
+#app :is(.ffRefMetric,.ffRefButton)[data-color="blue"] { --ff-ref-card:#1ccaff; --ff-ref-tint:#023b6a; }
+#app :is(.ffRefMetric,.ffRefButton)[data-color="red"] { --ff-ref-card:#ff4b46; --ff-ref-tint:#540700; }
+#app :is(.ffRefMetric,.ffRefButton)[data-color="purple"] { --ff-ref-card:#e448ff; --ff-ref-tint:#3c0057; }
+#app :is(.ffRefMetric,.ffRefButton) i { color: var(--ff-ref-card); font-size: 1.8em; line-height: 1; }
+#app .ffRefMetric strong { font-size: 1.05em; overflow-wrap: anywhere; }
+#app .ffRefButton { cursor: pointer; overflow-wrap:anywhere; }
+#app .ffRefButton:focus-visible { outline: 2px solid white; outline-offset: 2px; }
+.ffRefIncome table { width: calc(100% - .8em); margin: 0 .4em .4em; border-collapse: separate; border-spacing: 0; font-size: .96em; }
+.ffRefIncome :is(th,td) { padding: .33em .45em; text-align: left; border: 0; }
+.ffRefIncome tr>:last-child { text-align:right; white-space: nowrap; }
+.ffRefIncome tbody :is(th,td) { border-bottom: 1px solid #f7a74a39; }
+.ffRefIncome :is(thead,tfoot) { background: linear-gradient(#ffad1d,#e86600); }
+.ffRefIncome tfoot { color:#130800; font-size:1.09em; font-weight: 850; }
+.ffRefIncome :is(thead,tfoot) tr>:first-child { border-radius: .6em 0 0 .6em; }
+.ffRefIncome :is(thead,tfoot) tr>:last-child { border-radius: 0 .6em .6em 0; }
+.ffRefIncomeSplit { grid-template-columns: 1.42fr 1fr; }
+.ffRefProgress { display:flex; align-items:center; gap:.75em; padding: .15em .48em .55em; }
+.ffRefRing { display:grid; flex: 0 0 4.7em; aspect-ratio:1; place-items:center; border-radius:50%; background:radial-gradient(closest-side,#080a02 76%,transparent 77%),conic-gradient(#60f80b var(--ffh-progress),#223816 0); color:#6afc2a; }
+.ffRefRing b { font-size:1.28em; }
+.ffRefIncome dl { margin:0; flex:1; min-width:0; }
+.ffRefIncome dl>div { display:flex; justify-content:space-between; gap:.25em; padding:.26em .13em; border-bottom:1px solid #f7a74a39; }
+.ffRefIncome dd { margin:0; text-align:right; font-weight:750; }
+.ffRefIncome .ffRefTiers { padding: .2em .55em .55em; }
+.ffRefIncome .ffRefTiers>div { border:1px solid var(--ff-ref-line); border-radius: 1em; margin-bottom:.3em; padding-inline:.5em; }
+.ffRefRewards { grid-template-columns:repeat(2,minmax(0,1fr)); padding:0 .45em .5em; }
+.ffRefReward { display:flex; gap:.45em; padding:.4em; }
+.ffRefReward img { width:34%; align-self:start; max-height:8em; object-fit:cover; border-radius:.5em; }
+.ffRefReward>div { flex:1; min-width:0; }
+.ffRefExports { grid-template-columns:repeat(3,minmax(0,1fr)); }
+#app .ffRefExports .ffRefButton { display:flex; align-items:center; justify-content:center; gap:.32em; min-height:3em; }
+.ffRefManage { padding:.4em .6em; }
+.ffRefManage summary { cursor:pointer; }
+.ffRefManage #ffIncomeExtras { margin-top:.6em; }
+.ffRefHint { margin:.35em .55em; }
+.ffRefHint:empty { display:none; }
+
+#app .app:has(.ffRefZero) {
+  --ff-ref-gold: #ffad27;
+  --ff-ref-orange: #ff820a;
+  --ff-ref-line: #e7831c;
+  --ff-ref-font: 'Roboto Condensed', 'Arial Narrow', Roboto, Arial, sans-serif;
+}
+#app .ffRefZero { display:grid; gap:.85em; color:white; font:500 clamp(12px,3.1vw,17px)/1.25 var(--ff-ref-font); }
+.ffRefZero i { color:var(--ff-ref-gold); font-style:normal; font-weight:850; }
+.ffRefZero em { color:var(--ff-ref-orange); font-style:normal; }
+#app .ffRefZero>.ffRefExports .ffRefMetric { min-height:5.65em; }
+#app .ffRefZero>.ffRefExports strong { font-size:1.58em; }
+.ffRefZeroTitle { display:flex; justify-content:space-between; align-items:center; gap:.6em; }
+.ffRefZeroTitle h2 { margin:0; color:var(--ff-ref-orange); font-size:1.35em; }
+#app .ffRefZeroTitle button { display:flex; align-items:center; gap:.45em; min-height:2.6em; padding:.4em .7em; }
+.ffRefSearch { display:flex; align-items:center; gap:.6em; padding:.25em .75em; margin:0; }
+.ffRefSearch i { font-size:1.8em; }
+#app .ffRefSearch input { margin:0; background:transparent; border:0; padding:.35em 0; }
+.ffRefZeroOutlet { padding-inline:.55em; }
+.ffRefZeroOutlet+.ffRefZeroOutlet { border-top:1px solid #a95a22; }
+.ffRefZeroOutlet summary { list-style:none; display:grid; grid-template-columns:2em minmax(0,1fr) auto 1em; align-items:center; gap:.45em; min-height:3.6em; cursor:pointer; }
+.ffRefZeroOutlet summary::-webkit-details-marker { display:none; }
+.ffRefZeroOutlet summary i { font-size:1.36em; }
+.ffRefZeroOutlet summary small { display:block; color:#fff; }
+.ffRefZeroOutlet dl { margin:0 0 .5em 2.4em; }
+.ffRefZeroOutlet dl div { display:flex; justify-content:space-between; gap:.45em; border-bottom:1px solid #f7a74a39; }
+.ffRefZeroOutlet dd { margin:0; text-align:right; }
+
+/* Keep the app's own navigation and module controls while applying the shared screen frame. */
+#app .app:has(.ffReports,.ffRewardDetail,.ffFindings,.ffWorkBoard,.ffTrackingCard,.ffTaskList,.ffCompactCpo,#ffOutletHistorySelect) {
+  --ff-ref-gold: #ffad27;
+  --ff-ref-orange: #ff820a;
+  --ff-ref-line: #e7831c;
+  --ff-ref-font: 'Roboto Condensed', 'Arial Narrow', Roboto, Arial, sans-serif;
+}
+#app .app:has(.ffRefIncome,.ffRefZero,.ffReports,.ffRewardDetail,.ffFindings,.ffWorkBoard,.ffTrackingCard,.ffTaskList,.ffCompactCpo,#ffOutletHistorySelect)>main.wrap>.head h1 {
+  color:white!important;
+  text-shadow:0 0 .35em #fc9a3836;
+}
+#app main.wrap:has(.ffReports,.ffRewardDetail,.ffFindings,.ffWorkBoard,.ffTrackingCard,.ffTaskList,.ffCompactCpo,#ffOutletHistorySelect) :is(.ffRefPanel,.ffRewardDetail .card,.ffFindings .card,.ffWorkBoard .card,.ffTrackingCard,.ffTaskList,.ffReportFilterPanel) {
+  border-color:var(--ff-ref-line)!important;
+  box-shadow:inset 0 0 10px #da6c2237,0 0 6px #f3963b44!important;
+}
+.ffReports { font-family:var(--ff-ref-font); }
+.ffRefReportKpis,.ffRefReportGrid { display:grid; gap:7px; grid-template-columns:repeat(4,minmax(0,1fr)); }
+.ffRefReportKpis { margin-bottom:9px; font-size:clamp(10px,2.6vw,15px); }
+.ffRefReportChoices { padding:8px; }
+.ffRefReportChoices h2 { color:var(--ff-ref-orange); margin:0 0 7px; font-size:1.2rem; }
+.ffRefReportChoices .ffRefSearch { padding:0; margin:0 0 8px; }
+.ffRefReportChoices .ffRefSearch select { min-width:0; flex:1; }
+.ffRefReportTile { min-width:0; display:grid; gap:4px; grid-template-rows:1fr auto; }
+.ffRefReportTile[hidden] { display:none; }
+#app .ffRefReportTile .ffRefButton { font-size:clamp(10px,2.65vw,15px); }
+#app .ffRefReportTile .secondary { padding:3px; min-height:25px; font-size:.82rem; }
+#app .ffReportNavigation:has(#ffReportPdf) { grid-template-columns:repeat(3,minmax(0,1fr)); }
+
+.ffRefRoute { display:grid; gap:.75em; color:white; font:500 clamp(11px,2.8vw,15px)/1.25 var(--ff-ref-font); }
+.ffRefRoute i { color:var(--ff-ref-gold); font-style:normal; }
+.ffRefRouteTabs { display:grid!important; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.35em; }
+#app .ffRefRouteTabs button { min-width:0; padding:.6em .28em; font-size:inherit; }
+#app .ffRefRouteTabs button[aria-pressed="true"] { color:white!important; background:linear-gradient(#ffac22,#ee6300)!important; }
+#app .ffRefRoute .ffFindingCard { margin:0; padding:0 .5em; }
+#app .ffRefRoute .ffFindingCard button { width:100%; border:0; border-radius:0; border-bottom:1px solid #d77e3266; }
+#app .ffRefRoute .ffRefRouteAssignment { display:grid; grid-template-columns:1.35fr 1fr 1fr auto; text-align:left; width:100%; border:0; border-radius:0; border-bottom:1px solid #d77e3266; background:transparent; padding:.7em; font-size:inherit; gap:.45em; }
+.ffRefRouteAssignment :last-child { color:var(--ff-ref-orange); }
+#app .ffRefIncentives { display:grid; gap:.65em; min-width:0; color:white; font:500 clamp(11px,2.8vw,15px)/1.25 var(--ff-ref-font); }
+.ffRefIncentives .ffRefRouteTabs { grid-template-columns:repeat(3,minmax(0,1fr)); }
+#app .ffRefIncentives .ffRefScheme { display:flex!important; align-items:center; gap:.7em; width:100%; text-align:left; padding:.55em; margin-bottom:.4em; overflow-wrap:anywhere; }
+#app .ffRefScheme img { width:23%; max-height:8em; object-fit:cover; border-radius:.55em; }
+.ffRefScheme>span { flex:1; min-width:0; }
+.ffRefScheme b { display:block; color:#fff; font-size:1.17em; }
+.ffRefScheme small { display:block; margin:.22em 0; color:#fff; }
+.ffRefScheme strong { color:var(--ff-ref-gold); text-align:right; }
+.ffRefTasks { display:grid; gap:.6em; margin-bottom:.75em; font:600 clamp(10px,2.75vw,15px)/1.2 var(--ff-ref-font); }
+.ffRefTasks .ffRefReportKpis { margin-bottom:0; }
+#app .ffRefTasks .ffRefButton { padding-inline:.4em; }
+#app .ffRefTasks .ffRefButton[aria-pressed="true"],#app .ffRefTasks .ffRefButton[data-task-assign] { background:linear-gradient(#ffaa1c,#e96900); }
+#app .ffRefTasks+.ffTaskList .taskRow { border-color:#bc722a; }
+.ffTrackingCard .ffRefTrackingFields { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.ffTrackingCard { font-family:var(--ff-ref-font); }
+.ffTrackingCard #ffTrackSummary { margin-top:9px; }
+.ffTrackingCard #ffDutyMap { border:1px solid var(--ff-ref-line); box-shadow:0 0 8px #f3963b70; height:clamp(200px,33vh,380px)!important; }
+.ffRefTrackRoster h2 { margin:.4em .55em; font-size:1.16rem; color:var(--ff-ref-orange); }
+#app .ffRefTrackRoster [data-tracking-staff] { display:grid; grid-template-columns:minmax(0,1fr) auto 1em; text-align:left; width:100%; border:0; border-radius:0; background:transparent; padding:.55em; gap:.7em; border-top:1px solid #d77e3266; }
+.ffRefTrackActions { margin-block:.55em; }
+
+.ffRefOutlet { display:grid; gap:.65em; min-width:0; font:500 clamp(10px,2.75vw,15px)/1.25 var(--ff-ref-font); }
+.ffRefOutlet .ffRefZeroTitle { margin:.5em; }
+.ffRefOutlet .ffRefSearch select { flex:1; min-width:0; }
+.ffRefOutletViewport { max-height:25em; overflow:auto; }
+.ffRefOutlet table { width:100%; border-collapse:collapse; text-align:left; }
+.ffRefOutlet thead { background:linear-gradient(#ffac20,#e46a00); position:sticky; top:0; z-index:1; }
+.ffRefOutlet :is(th,td) { padding:.4em; border-bottom:1px solid #c67936; }
+#app .ffRefOutlet [data-ref-outlet] { min-width:0; border:0; background:none; box-shadow:none; border-radius:0; text-align:left; padding:.2em; }
+.ffRefOutlet [data-ref-outlet] small { display:block; color:var(--ff-ref-orange); }
+#app .app:has(.ffCampaignPage) { --ff-ref-gold:#ffad27; --ff-ref-orange:#ff820a; --ff-ref-line:#e7831c; --ff-ref-font:'Roboto Condensed','Arial Narrow',Roboto,Arial,sans-serif; }
+.ffRefCampaignTools { display:grid; gap:.55em; min-width:0; font:500 clamp(10px,2.75vw,15px)/1.25 var(--ff-ref-font); }
+.ffRefCampaignTools .ffRefReportKpis { margin-bottom:0; }
+#app :is(.ffRefTaskFiltered,.ffRefCampaignFiltered) { display:none!important; }
+#app .ffCampaignBody>.ffRefPanel { margin-bottom:.65em; }
+#app .ffRefNoticeAll { width:100%; color:var(--ff-ref-orange); min-height:2.7em; margin-top:.5em; border:1px solid var(--ff-ref-line); }
+
+body:has(.ffRefIncome) :is(#orb,#nudge,#aiHello),
+body:has(.ffRefZero) :is(#orb,#nudge,#aiHello) { display:none!important; }
+#app .ffRefActions .ffRefButton {
+  min-height:5.7em;
+  font-size:clamp(9px,2.5vw,14px);
+  overflow-wrap:normal;
+  word-break:normal;
+}
+#app .ffRefActions #ffClaimsIncome { font-size:clamp(8px,2.2vw,12.5px); }
+#app .ffRefExports .ffRefButton { font-size:clamp(9px,2.5vw,14px); }
+#app .ffRefIncome .ffSelectTrigger { min-height:28px; max-width:100%; min-width:0; padding:.28em .5em!important; font:700 1em/1.16 var(--ff-ref-font)!important; }
+.ffRefRewards>.ffRefHint { grid-column:1/-1; }
