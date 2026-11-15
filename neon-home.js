@@ -2,6 +2,7 @@
   'use strict';
 
   const root = document.getElementById('app');
+  let refreshing = false;
   const vectors = {
     sync: 'M6 18a4 4 0 0 1-.8-7.9 6 6 0 0 1 11.6-1.4A4.7 4.7 0 0 1 18 18M9 19v-6m-2 2 2-2 2 2m4-1v7m-2-2 2 2 2-2',
     approval: 'M13 5H5a2 2 0 0 0-2 2v13a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1v-8M7 12l4 4L22 4',
@@ -45,6 +46,14 @@
   const navigation = {bh:'home',bs:'bars',bo:'dashboard',bt:'check',bnotice:'notice',bn:'bell',br:'headset'};
   const icon = name => `<svg class="ffNeonIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${vectors[name]}" fill="${name === 'logo' || name === 'home' ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
+  function syncRefreshButton() {
+    const button = root.querySelector('#refresh');
+    if (!button) return;
+    button.setAttribute('aria-label', refreshing ? 'Refreshing' : 'Refresh');
+    if (refreshing) button.setAttribute('aria-busy', 'true');
+    else button.removeAttribute('aria-busy');
+  }
+
   function paint() {
     const app = root.querySelector(':scope > .app');
     if (!app || app.dataset.neonReady) return;
@@ -63,6 +72,7 @@
       button.insertAdjacentHTML('afterbegin',icon(name));
       if (id === 'dots') button.setAttribute('aria-label','More options');
     }
+    syncRefreshButton();
     const logo = app.querySelector('.ffMiniLogo');
     if (logo) logo.innerHTML = icon('logo');
 
@@ -146,31 +156,43 @@
     .map(el => el.getAttribute('src') || el.getAttribute('href'))
     .filter(path => path && !/^(?:[a-z]+:|\/\/)/i.test(path)).join('|');
   const loadedResources = shellResources(document);
-  let refreshing = false;
+
+  async function shellUpdateAvailable() {
+    const response = await fetch(location.pathname,{cache:'no-store',signal:AbortSignal.timeout(7000)});
+    if (!response.ok) return false;
+    const latest = new DOMParser().parseFromString(await response.text(),'text/html');
+    return latest.title === document.title && shellResources(latest) !== loadedResources;
+  }
+
   root.addEventListener('click',async event => {
     const button = event.target.closest('#refresh');
     if (!button) return;
     event.stopImmediatePropagation();
     if (refreshing) return;
     refreshing = true;
-    button.setAttribute('aria-busy','true');
+    syncRefreshButton();
     const onHome = !!root.querySelector('.homeGrid');
+    let reloading = false;
     try {
-      ffhRefreshCloudData();
-      const announcements = root.querySelector('#ffTicker');
-      if (announcements) ffHomeStatus.refresh().catch(console.warn);
-      if (onHome) {
-        const response = await fetch(location.pathname,{cache:'no-store',signal:AbortSignal.timeout(7000)});
-        if (response.ok && root.querySelector('.homeGrid')) {
-          const latest = new DOMParser().parseFromString(await response.text(),'text/html');
-          if (latest.title === document.title && shellResources(latest) !== loadedResources) location.reload();
-        }
+      const results = await Promise.allSettled([
+        onHome && shellUpdateAvailable(),
+        window.FFH_REFRESH_CURRENT_VIEW(),
+      ]);
+      for (const result of results) {
+        if (result.status === 'rejected') console.warn('FieldForce refresh:', result.reason);
+      }
+      const [shell] = results;
+      if (shell.value && root.querySelector('.homeGrid')) {
+        location.reload();
+        reloading = true;
       }
     } catch (error) {
       console.warn('FieldForce refresh:',error);
     } finally {
-      refreshing = false;
-      button.removeAttribute('aria-busy');
+      if (!reloading) {
+        refreshing = false;
+        syncRefreshButton();
+      }
     }
   },true);
 })();

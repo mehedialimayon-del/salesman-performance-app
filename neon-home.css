@@ -26,6 +26,37 @@ html body #app .app[data-neon-ready] > nav.bottom > button > i {
 }
 .ffNeonIcon {display:block;width:100%;height:100%;overflow:visible}
 .heroDate .ffNeonIcon {display:inline-block;width:1em;height:1em;vertical-align:middle}
+
+/* Some screens draw the resting icon into the header artwork. Cover only the
+   center of that button while the same shared control is busy. */
+html body #app .app[data-neon-ready] > header.top .topBtns #refresh[aria-busy="true"] {
+  position: relative;
+}
+html body #app .app[data-neon-ready] > header.top .topBtns #refresh[aria-busy="true"] > .ffNeonIcon {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: min(74%, 34px);
+  height: auto;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  padding: 2px;
+  border-radius: 50%;
+  background: #0a0806;
+  color: #fff;
+  visibility: visible;
+  opacity: 1;
+  animation: ffRefreshSpin .8s linear infinite;
+}
+@keyframes ffRefreshSpin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body #app .app[data-neon-ready] > header.top .topBtns #refresh[aria-busy="true"] > .ffNeonIcon {
+    animation: none;
+    box-shadow: 0 0 0 1px #ff9f29;
+  }
+}
 html body #app .app:has(.homeGrid) > nav.bottom > #bh {
   border:1px solid #ffa62e!important;border-radius:clamp(9px,2.5vw,13px)!important;
   background:radial-gradient(ellipse at 32% 15%,#ac531f,#190d06 68%)!important;

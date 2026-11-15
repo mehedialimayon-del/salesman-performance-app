@@ -1404,7 +1404,43 @@ function ffhBuildReportNotice(type,to){
 }
 let ffhRealtimeChannel=null,ffhRefreshTimer=null,ffhLiveDebounce=null;
 function ffhKeepView(draw){const page=currentPage;return window.FFH_KEEP_VIEW?window.FFH_KEEP_VIEW(draw,()=>currentPage===page):draw();}
-function ffhRefreshCloudData(){ffPerformance?.flush().catch(console.warn);ffContacts.refresh();if(!user?.id||!window.FFH_SUPABASE)return;Promise.allSettled([ffhLoadInbox(),ffhLoadTasksCloud(),ffhLoadSalesCloud(),ffhCloudNoticeSync(),ffEarnings.refresh(),ffAssistant.refresh(),window.FFH_ALARM_SYNC?.(),ffhLoadStaff(),ffComparison?.refresh(),globalThis.ffDaily?.refresh(),globalThis.ffDaily?.flush()]).then(results=>{updateTaskBadges();ffhRefreshHomeStatuses();if((results[2]?.value||results[4]?.value||results[8]?.value||results[9]?.value)&&currentPage==='dashboard')ffhKeepView(dashboard);if((results[2]?.value||results[4]?.value||results[8]?.value)&&currentPage==='sales'&&!globalThis.ffDaily)ffComparison?.attach(today());if(results[1]?.status==='fulfilled'&&results[1].value&&currentPage==='tasks')ffhKeepView(tasks);if(results[4]?.status==='fulfilled'&&results[4].value){if(currentPage==='income')ffhKeepView(income);else if(currentPage==='incomeLedger')ffhKeepView(()=>ffEarnings.ledger());else if(currentPage==='incentive')ffhKeepView(incentive)}})}
+function ffhRefreshCloudData(includeAnnouncements = false) {
+  const staffId = user?.id;
+  const pending = [ffPerformance?.flush().catch(console.warn), ffContacts.refresh()];
+  if (!staffId || !window.FFH_SUPABASE) return Promise.allSettled(pending);
+  if (includeAnnouncements) pending.push(ffHomeStatus.refresh().catch(console.warn));
+
+  const inbox = ffhLoadInbox();
+  const taskSync = ffhLoadTasksCloud();
+  const salesSync = ffhLoadSalesCloud();
+  const notices = ffhCloudNoticeSync();
+  const earnings = ffEarnings.refresh();
+  const assistant = ffAssistant.refresh();
+  const alarms = window.FFH_ALARM_SYNC?.();
+  const staff = ffhLoadStaff();
+  const comparisons = ffComparison?.refresh();
+  const daily = globalThis.ffDaily?.refresh();
+  const dailyOutbox = globalThis.ffDaily?.flush();
+
+  return Promise.allSettled([
+    taskSync, salesSync, earnings, comparisons, daily,
+    inbox, notices, assistant, alarms, staff, dailyOutbox, ...pending
+  ]).then(([taskResult, salesResult, earningsResult, comparisonResult, dailyResult]) => {
+    if (user?.id !== staffId) return;
+    updateTaskBadges();
+    ffhRefreshHomeStatuses();
+    const salesChanged = salesResult.value || earningsResult.value || comparisonResult.value;
+    if ((salesChanged || dailyResult.value) && currentPage === 'dashboard') ffhKeepView(dashboard);
+    if (salesChanged && currentPage === 'sales' && !globalThis.ffDaily) ffComparison?.attach(today());
+    if (taskResult.value && currentPage === 'tasks') ffhKeepView(tasks);
+    if (earningsResult.value) {
+      if (currentPage === 'income') ffhKeepView(income);
+      else if (currentPage === 'incomeLedger') ffhKeepView(() => ffEarnings.ledger());
+      else if (currentPage === 'incentive') ffhKeepView(incentive);
+    }
+  });
+}
+window.FFH_REFRESH_CURRENT_VIEW = () => ffhRefreshCloudData(true);
 function ffhStartCloudNotices(){
  if(ffhNoticeTimer)clearInterval(ffhNoticeTimer);if(ffhRefreshTimer)clearInterval(ffhRefreshTimer);
  if(ffhRealtimeChannel){FFH_SUPABASE.removeChannel(ffhRealtimeChannel);ffhRealtimeChannel=null}
