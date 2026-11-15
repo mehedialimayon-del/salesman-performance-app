@@ -102,6 +102,26 @@ window.FFH_REFERENCE_TASKS = (() => {
           if (proof) {
             proof.required = true;
             proof.closest('label')?.setAttribute('title','Choose whether the assigned SR must upload a photo, location, or both before completion.');
+            if (!form.querySelector('[data-ff-task-proof-shortcut]')) {
+              const section = document.createElement('section');
+              section.className = 'ffTaskProofShortcut';
+              section.setAttribute('data-ff-task-proof-shortcut','');
+              section.innerHTML = '<b>Required completion proof</b><p>Select what the SR must submit when completing this task.</p><div class="ffTaskProofOptions"></div><small>Photo proof is uploaded by the assigned SR after the task is created. This setting does not upload an assignment attachment.</small>';
+              const options = section.querySelector('.ffTaskProofOptions');
+              for (const [value,label] of [['none','None'],['photo','Photo'],['location','GPS'],['both','Photo + GPS']]) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.dataset.proof = value;
+                button.textContent = label;
+                button.onclick = () => { proof.value = value; proof.dispatchEvent(new Event('change',{bubbles:true})); sync(); };
+                options.append(button);
+              }
+              const sync = () => options.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.proof === proof.value)));
+              proof.addEventListener('change',sync);
+              const title = form.querySelector('input[name="title"]')?.closest('label');
+              (title || form.firstElementChild)?.insertAdjacentElement('afterend',section);
+              sync();
+            }
           }
           const reminder = form.elements.remindAt;
           if (reminder) reminder.title = 'Optional reminder for the assigned task';
