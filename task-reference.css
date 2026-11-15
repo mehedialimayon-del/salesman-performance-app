@@ -3,7 +3,6 @@
   --task-image:url('task-assets/tasks-reference.webp');
   --task-width:min(100vw,760px);
   --task-top:calc(var(--task-width) * 103 / 716);
-  --task-ticker:calc(var(--task-width) * 54 / 716);
   --task-nav:calc(var(--task-width) * 125 / 716);
   --task-bottom:var(--ffh-safe-bottom,env(safe-area-inset-bottom,0px));
   --task-safe-top:var(--ffh-safe-top,env(safe-area-inset-top,0px));
@@ -52,45 +51,6 @@ html body #app .app:has(.ffTaskArtwork) > header.top #bell .badge {
   color:white!important;
   -webkit-text-fill-color:white!important;
 }
-html body #app .app:has(.ffTaskArtwork) > .ffAppAnnouncements {
-  height:var(--task-ticker);
-  width:var(--task-width);
-  margin:0 auto;
-  border:0!important;
-  padding:0!important;
-  background:var(--task-image) center calc(-1 * var(--task-top)) / 100% auto no-repeat!important;
-}
-html body #app .app:has(.ffTaskArtwork) #ffTicker {
-  display:block!important;
-  height:100%!important;
-  position:relative!important;
-  padding:0!important;
-  background:none!important;
-  margin:0!important;
-  border:0!important;
-  box-shadow:none!important;
-}
-#app .app:has(.ffTaskArtwork) #ffTicker .ffTickerLabel {visibility:hidden;}
-#app .app:has(.ffTaskArtwork) #ffTicker .ffTickerViewport {
-  display:block!important;
-  position:absolute!important;
-  top:10%;bottom:10%;left:12%;right:17%;
-  overflow:hidden;
-}
-#app .app:has(.ffTaskArtwork) #ffTicker .ffTickerTrack {
-  font-size:calc(var(--task-width) * .028)!important;
-  line-height:calc(var(--task-ticker) * .8)!important;
-}
-html body #app .app:has(.ffTaskArtwork) #ffTicker :is(#ffTickerPause,#ffTickerManage) {
-  position:absolute!important;
-  top:12%;bottom:10%;width:8%!important;
-  min-height:0!important;height:auto!important;padding:0!important;
-  border:0!important;box-shadow:none!important;background:transparent!important;
-  color:transparent!important;-webkit-text-fill-color:transparent!important;
-}
-#app .app:has(.ffTaskArtwork) #ffTickerPause {right:8%;}
-#app .app:has(.ffTaskArtwork) #ffTickerManage {right:0;}
-
 html body #app .app:has(.ffTaskArtwork) > nav.bottom {
   width:var(--task-width)!important;
   left:50%!important;right:auto!important;
@@ -234,13 +194,6 @@ html body #app .app:has(.ffTaskArtwork)>header.top #topNotifyBadge {
 }
 html body #app .app:has(.ffTaskArtwork)>header.top #topNotifyBadge {right:22%;top:10%;}
 html body #app .app:has(.ffTaskArtwork)>nav.bottom>button #notifyNavBadge {right:26%;top:0;}
-#app .app:has(.ffTaskArtwork) #ffTicker .ffTickerWindow {
-  display:block!important;position:absolute!important;inset:10% 17% 10% 12%;overflow:hidden;
-}
-html body #app .app:has(.ffTaskArtwork) #ffTicker #ffTickerExpand {
-  position:absolute!important;top:9%;right:8%;width:8%!important;height:82%!important;padding:0!important;
-  color:transparent!important;-webkit-text-fill-color:transparent!important;background:transparent!important;box-shadow:none!important;border:0!important;
-}
 #app .ffTaskArtwork .ffTaskArtMetric {color:#fff!important;-webkit-text-fill-color:#fff!important;}
 .ffTaskArtworkPicker .ffPickerOption {
   background:linear-gradient(145deg,#1a0d02,#050403)!important;

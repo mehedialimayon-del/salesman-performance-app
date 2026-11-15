@@ -33,6 +33,7 @@
     refresh: 'M20 9a8 8 0 1 0 0 7m1-13v7h-7',
     dots: 'M12 5h.1M12 12h.1M12 19h.1',
     clock: 'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0ZM12 6v6l4 3',
+    date: 'M3 6h18v15H3zM3 10h18M7 3v5m10-5v5M7 14h1m3 0h1m3 0h1m-9 3h1m3 0h1m3 0h1',
     logo: 'M2 21v-6h3v6zm5 0V11h3v10zm5 0V6h3v15zm5-12 5-6m-4 0h4v4'
   };
   const modules = {
@@ -84,9 +85,11 @@
     }
 
     const english = localStorage.getItem('ffh_lang') !== 'bn';
+    const lastTile = localStorage.getItem('ffh_last_home_tile') || localStorage.getItem('ffh_last_module');
     const artworkOrder = Object.keys(modules);
     for (const tile of grid.querySelectorAll('.module')) {
       const page = tile.dataset.page;
+      tile.classList.toggle('moduleActive', page === lastTile);
       const name = modules[page];
       if (!name || (page === 'access' && tile.id !== 'ffhSoaLaunch')) continue;
       tile.querySelector('.mi').innerHTML = icon(name);
@@ -116,6 +119,10 @@
         const time = document.createElement('div');
         time.className = 'ffNeonTime';
         alarm.innerHTML = icon('clock');
+        const dateLabel = document.createElement('span');
+        dateLabel.textContent = date.textContent.replace(/^▣\s*/, '');
+        date.innerHTML = icon('date');
+        date.append(dateLabel);
         time.append(alarm,clock);
         info.append(time,date,credit);
         hero.append(info);
@@ -124,6 +131,14 @@
   }
   new MutationObserver(paint).observe(root,{childList:true});
   paint();
+
+  root.addEventListener('click', event => {
+    const tile = event.target.closest('.homeGrid > .module[data-page]');
+    if (!tile) return;
+    tile.parentElement.querySelector('.moduleActive')?.classList.remove('moduleActive');
+    tile.classList.add('moduleActive');
+    localStorage.setItem('ffh_last_home_tile', tile.dataset.page);
+  }, true);
 
   // Leave the current DOM and any in-progress form on screen during a refresh.
   // A newly published shell still gets picked up when refreshing from Home.
