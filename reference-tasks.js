@@ -319,7 +319,7 @@ window.FFH_REFERENCE_TASKS = (() => {
       panel.querySelectorAll(selector).forEach(button=>button.setAttribute('aria-pressed',String(isCurrent(button))));
     }
     highlight('[data-task-scope]',button=>button.dataset.taskScope===state.scope);
-    highlight('[data-task-category]',button=>Number(button.dataset.taskCategory)===state.kind);
+    highlight('[data-task-category]',button=>state.kind !== null && Number(button.dataset.taskCategory)===state.kind);
     panel.querySelectorAll('[data-task-scope]').forEach(button=>{
       button.onclick = () => {
         state.scope = button.dataset.taskScope;
@@ -330,7 +330,7 @@ window.FFH_REFERENCE_TASKS = (() => {
       button.onclick = () => {
         const index = Number(button.dataset.taskCategory);
         state.kind = state.kind === index ? null : index;
-        highlight('[data-task-category]',b=>Number(b.dataset.taskCategory)===state.kind);draw();
+        highlight('[data-task-category]',b=>state.kind !== null && Number(b.dataset.taskCategory)===state.kind);draw();
       };
     });
     find('[data-task-assign]').onclick = ()=>openEditor('.ffTaskComposer',form=>form.elements.title.focus());
