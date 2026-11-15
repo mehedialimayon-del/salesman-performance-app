@@ -203,7 +203,7 @@ window.FFH_REFERENCE_TASKS = (() => {
       const dateText = [shortDate(state.from),shortDate(state.to)].filter(Boolean).join(' – ');
       find('#ffTaskArtDate').textContent = dateText || 'All dates';
       showScope();
-      const mineIds = new Set([String(viewerId), String(context.viewer?.id || ''), String(context.selected || '')].filter(Boolean));
+      const mineIds = new Set([String(viewerId), String(context.viewer?.id || ''), String(context.viewer?.staffId || '')].filter(Boolean));
       const scoped = tasks.filter(task=>{
         const day = task.due || String(task.created || '').slice(0,10);
         return (state.scope === 'team' || mineIds.has(String(task.to)) || String(task.to).toLowerCase() === 'all') &&
