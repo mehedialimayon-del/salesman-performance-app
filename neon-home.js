@@ -54,10 +54,6 @@
     }
     const grid = app.querySelector('.homeGrid');
     if (!grid) return;
-    for (const tile of grid.querySelectorAll('.module')) {
-      const name = modules[tile.dataset.page];
-      if (name) tile.querySelector('.mi').innerHTML = icon(name);
-    }
 
     const soa = grid.querySelector('[data-page="access"]');
     if (soa && typeof window.FFH_SOA_OPEN === 'function') {
@@ -65,6 +61,20 @@
       soa.dataset.ffhSoaReplaced = '1';
       soa.querySelector('.moduleTitle').textContent = 'SOA';
       soa.onclick = () => window.FFH_SOA_OPEN();
+    }
+
+    const english = localStorage.getItem('ffh_lang') !== 'bn';
+    const artworkOrder = Object.keys(modules);
+    for (const tile of grid.querySelectorAll('.module')) {
+      const page = tile.dataset.page;
+      const name = modules[page];
+      if (!name || (page === 'access' && tile.id !== 'ffhSoaLaunch')) continue;
+      tile.querySelector('.mi').innerHTML = icon(name);
+      if (!english) continue;
+      const slot = artworkOrder.indexOf(page);
+      tile.style.setProperty('--home-art-x', `${(slot % 4) / 3 * 100}%`);
+      tile.style.setProperty('--home-art-y', `${Math.floor(slot / 4) * 25}%`);
+      tile.dataset.homeArtwork = '';
     }
 
     const buttons = {bell:'bell',globalSearchBtn:'search',refresh:'refresh',dots:'dots'};
@@ -79,6 +89,16 @@
     }
     const logo = app.querySelector('.ffMiniLogo');
     if (logo) logo.innerHTML = icon('logo');
+
+    const ai = document.createElement('button');
+    ai.type = 'button';
+    ai.id = 'ffHomeAskAI';
+    ai.textContent = 'AYON AI';
+    ai.onclick = () => {
+      app.querySelector('#drop').classList.remove('show');
+      app.querySelector('#orb').click();
+    };
+    app.querySelector('#drop')?.prepend(ai);
 
     const hero = app.querySelector('.ffIdentityHero');
     if (hero) {

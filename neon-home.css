@@ -248,3 +248,212 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
 @media(min-width:801px) {
   .ffNeonInfo, .ffNeonInfo > div:first-child {display:contents}
 }
+
+/* The reference artwork is a skin for the existing controls. The same buttons
+   still own their click handlers, accessible labels, badges and focus states. */
+@media (max-width: 800px) {
+  html body:has(#app .homeGrid) #aiHello {
+    display: none !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) {
+    --home-safe-top: var(--ffh-safe-top, env(safe-area-inset-top, 0px));
+    --neon-edge: 1.15vw;
+    --neon-gap: .6vw;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    overflow: clip !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > header.top {
+    --home-header-height: min(15.42vw, 10dvh);
+    position: relative !important;
+    top: auto !important;
+    height: calc(var(--home-header-height) + var(--home-safe-top)) !important;
+    min-height: 0 !important;
+    padding: var(--home-safe-top) 0 0 !important;
+    background: #050505 url('home-assets/header.webp') center bottom / 100% var(--home-header-height) no-repeat !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > header.top::after {
+    content: none !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > header.top .logo {
+    opacity: 0;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > header.top .topBtns {
+    position: absolute !important;
+    top: calc(var(--home-safe-top) + var(--home-header-height) * .14) !important;
+    right: 2.1vw !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: 39.4vw !important;
+    gap: 1.3vw !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > header.top .topBtns .iconBtn {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: calc(var(--home-header-height) * .63) !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > header.top .topBtns .iconBtn > .ffNeonIcon {
+    opacity: 0;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > .ffAppAnnouncements {
+    position: relative !important;
+    inset: auto !important;
+    height: min(6.9vw, 5dvh) !important;
+    min-height: 0 !important;
+    flex: none !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > .ffAppAnnouncements #ffTicker {
+    height: 100% !important;
+    min-height: 0 !important;
+    padding-inline: .8vw !important;
+    border-color: #ff920d !important;
+    box-shadow: inset 0 0 5px #ff8a084f, 0 0 4px #e66b005c !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > main.wrap {
+    position: relative !important;
+    inset: auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    flex: 1 1 0 !important;
+    padding: min(1.9vw, 1.4dvh) var(--neon-edge) 0 !important;
+    overflow: clip !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > main.wrap > .ffIdentityHero {
+    height: min(26.2vw, 16dvh) !important;
+    min-height: 0 !important;
+    margin: 0 0 min(2.1vw, 1.5dvh) !important;
+    grid-template-columns: minmax(0, 1fr) 41% !important;
+    padding: 0 2.1vw 1.2vw 20.4vw !important;
+    border: 1px solid #ff971b !important;
+    background:
+      url('home-assets/profile-edge.webp') center bottom / 100% 15% no-repeat,
+      radial-gradient(ellipse at 64% 115%, #ff800a88, transparent 36%),
+      linear-gradient(155deg, #352516, #060504 28%) !important;
+    box-shadow: 0 0 6px #ff750094, inset 0 0 5px #ff8c29 !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero .editableAvatar {
+    left: 3.2vw !important;
+    top: 50% !important;
+    transform: translateY(-55%) !important;
+    width: 15.2% !important;
+    height: 67% !important;
+    margin: 0 !important;
+    clip-path: none !important;
+    border: 1px solid #ffad45 !important;
+    border-radius: 44% 44% 25% 25% / 40% 40% 15% 15% !important;
+    box-shadow: 0 0 7px #ff8217b0 !important;
+    mask-image: linear-gradient(#000 78%, #0000 100%);
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero::after {
+    content: none !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero .ffIdentityRole {
+    flex-wrap: wrap !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffNeonInfo {
+    gap: min(1.3vw, 1dvh);
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffNeonInfo > * {
+    min-height: min(4.6vw, 3dvh) !important;
+    padding-block: 0 !important;
+    border-color: #f68b0e !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > main.wrap > .homeGrid {
+    flex: 1 1 0 !important;
+    grid-template-rows: repeat(5, minmax(0, 1fr)) !important;
+    gap: var(--neon-gap) !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .homeGrid > .module[data-home-artwork] {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: url('home-assets/modules.webp') var(--home-art-x) var(--home-art-y) / 400% 500% no-repeat !important;
+    box-shadow: none !important;
+    outline: 0;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .homeGrid > .module[data-home-artwork] > :is(.mi, .moduleTitle) {
+    opacity: 0;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .homeGrid > .module:has(.taskCornerBadge) > .moduleBadge {
+    display: none !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) .homeGrid > .module:active::before {
+    z-index: 1;
+    inset: 4%;
+    border: 1px solid #ffcd83;
+    border-radius: 20%;
+    background: radial-gradient(ellipse at 50% 82%, #ff720049, transparent 75%);
+    mask-image: none;
+    box-shadow: inset 0 0 10px #ff9a24, 0 0 9px #ff7d10;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > nav.bottom {
+    isolation: auto;
+    height: min(15.55vw, 10dvh) !important;
+    min-height: 0 !important;
+    margin: min(7.01vw, 4dvh) 0 var(--neon-safe-bottom) !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: url('home-assets/bottom.webp') center bottom / 100% 145.11% no-repeat !important;
+    box-shadow: none !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > nav.bottom::before {
+    content: none !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > nav.bottom::after {
+    height: 45.11% !important;
+    border-radius: 0 !important;
+    background: url('home-assets/bottom.webp') center top / 100% 321.69% no-repeat !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > nav.bottom > :is(button, #bh) {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > nav.bottom > button > :is(i, .ffGlowButtonLabel) {
+    opacity: 0;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) > nav.bottom > button .navBadge {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+  }
+
+  html body #app .app[data-neon-ready]:has(.homeGrid) :is(nav.bottom button, header.top .iconBtn):active {
+    box-shadow: inset 0 0 9px #ff940b !important;
+  }
+}
