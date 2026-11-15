@@ -204,7 +204,7 @@ const ffEditedImages=new WeakMap();
 function fileData(file,max=1800000){return new Promise((res,rej)=>{if(!file)return res('');let edited=ffEditedImages.get(file);if(edited)return res(edited);if(file.size>max)return rej(new Error('File too large. Keep under '+Math.round(max/1000000*10)/10+' MB.'));let r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file)})}
 function installUniversalImageEditor(){
  if(window.__ffImageEditorInstalled)return;window.__ffImageEditorInstalled=true;
- document.addEventListener('change',e=>{let input=e.target;if(!(input instanceof HTMLInputElement)||input.type!=='file'||!String(input.accept||'').includes('image')||input.id==='ffChatPhoto')return;let file=input.files&&input.files[0];if(!file||!file.type.startsWith('image/'))return;openUniversalImageEditor(file,input)},true)
+ document.addEventListener('change',e=>{let input=e.target;if(!(input instanceof HTMLInputElement)||input.type!=='file'||!String(input.accept||'').includes('image')||input.id==='ffChatPhoto'||input.dataset.ffOriginalImage==='1')return;let file=input.files&&input.files[0];if(!file||!file.type.startsWith('image/'))return;openUniversalImageEditor(file,input)},true)
 }
 function openUniversalImageEditor(file,input){
  let rd=new FileReader();rd.onload=()=>{let img=new Image();img.onload=()=>{
@@ -601,7 +601,7 @@ function reportRows(name){let id=currentSr(),f=q('#rf')?.value||month()+'-01',t=
 }
 function reportView(name){let rows=reportRows(name);shell(back(name)+`<div class="card reportTable"><table>${rows.map((r,i)=>`<tr>${r.map(c=>i?`<td>${esc(c)}</td>`:`<th>${esc(c)}</th>`).join('')}</tr>`).join('')}</table></div>`);bindBack()}
 async function ffhReferenceExport(button, title, rows, status) {
- const kind = button.dataset.taskExport || button.dataset.outletExport;
+ const kind = button.dataset.taskExport || button.dataset.outletExport || button.dataset.rewardExport;
  const filename = 'FieldForce-' + title.replace(/[^a-z0-9]+/gi,'-') + '-' + today();
  button.disabled = true;
  status.textContent = '';
@@ -1285,7 +1285,7 @@ window.ffFindings=window.FFH_CREATE_FINDINGS?.({changed:()=>{updateTaskBadges();
 const ffWorkBoard=window.FFH_CREATE_WORK_BOARD({sb:FFH_SUPABASE,user:()=>user,people:()=>U,esc,today,shell,back,bindBack,navigate,setPage:p=>currentPage=p,may:ffhMay,page:()=>currentPage,rows:()=>ffBriefingRows,refresh:ffhBriefingRefresh,unread:ffNoticeUnread,read:ffhNoticeRead,editor:ffhBriefingEditor,save:ffhBriefingSave,task:item=>ffhTaskFromBriefing(item,item.description),incentive:item=>navigate('incomeLedger',async()=>{await ffEarnings.ledger();const f=q('#ffEntryForm');if(f){f.elements.kind.value='Incentive';f.elements.reason.value='Notice: '+item.id+' · '+item.description;f.closest('details').open=true;}}),penalty:item=>navigate('incomeLedger',async()=>{await ffEarnings.ledger();const f=q('#ffEntryForm');if(f){f.elements.kind.value='Penalty';f.elements.reason.value='Notice: '+item.id+' · '+item.description;f.closest('details').open=true;}})});
 
 globalThis.ffDaily=window.FFH_CREATE_DAILY?.({sb:FFH_SUPABASE,db,outlets,user:()=>user,people:()=>U,staff:sr,isMgr,may:ffhMay,today,esc,shell,back,bindBack,page:()=>currentPage,setPage:p=>{currentPage=p},navigate,refreshPeople:ffhLoadStaff,refreshEarnings:()=>ffEarnings.refresh(),xlsx:ffhEnsureXlsx,download:(...args)=>ffhSafeDownload(...args),legacy:()=>{ffhLegacySales();q('#newTab').hidden=true;renderPending(currentSr());},syncPage:()=>ffPerformance.syncPage()});
-window.ffRewardCampaigns=window.FFH_CREATE_REWARD_CAMPAIGNS?.({sb:FFH_SUPABASE,db,user:()=>user,people:()=>U,may:ffhMay,today,esc,shell,back,bindBack,setPage:p=>{currentPage=p},refreshPeople:ffhLoadStaff,earnings:ffEarnings,daily:globalThis.ffDaily,catalogue:catalogueProducts,upload:(file,folder)=>ffModuleContext.ffhUploadPublicFile(file,folder)});
+window.ffRewardCampaigns=window.FFH_CREATE_REWARD_CAMPAIGNS?.({sb:FFH_SUPABASE,db,user:()=>user,people:()=>U,may:ffhMay,today,esc,shell,back,bindBack,setPage:p=>{currentPage=p},page:()=>currentPage,target,exportFile:ffhReferenceExport,productList:ffhCatalogueRows,refreshPeople:ffhLoadStaff,earnings:ffEarnings,daily:globalThis.ffDaily,catalogue:catalogueProducts,upload:(file,folder)=>ffModuleContext.ffhUploadPublicFile(file,folder)});
 const ffComparison=window.FFH_CREATE_COMPARISON?.({sb:FFH_SUPABASE,db,user:()=>user,people:()=>U,ids:srIds,currentSr,today,target,planning:planningTarget,rm,esc,may:ffhMay,setRange:dashboardRange,sales:ids=>ffhScopedSales(ids),redraw:()=>currentPage==='dashboard'?dashboard():currentPage==='sales'?sales():null});
 const ffReports=window.FFH_CREATE_REPORTS?.({...ffModuleContext,db,rules,month,today,currentSr,outlets,zone:()=>ffhSelectedZone,page:()=>currentPage,pushHistory:()=>navStack.push({name:'reports',view}),ffhSharedGet,ffEarnings,ffhEnsureXlsx,ffhSafeDownload,daily:globalThis.ffDaily});
 if(ffReports){reports=ffReports.reports;reportRows=ffReports.rows;reportView=ffReports.view;exportWorkbook=ffReports.exportWorkbook;}

@@ -11,3 +11,15 @@ const keyed={...offer,groups:[{name:'Keyed sales',mode:'sales',target:5000,rewar
 const keyedSales=[{sr:'S1',status:'Pending Delivery',date:'2026-10-21',orderAmount:5000,deliveredAmount:0},{sr:'S1',status:'Cancelled',date:'2026-10-21',orderAmount:99999},{sr:'S1',status:'Pending Delivery',date:'2026-10-28',orderAmount:99999}];
 assert.equal(C.progress(keyedSales,keyed,keyed.groups[0],'S1'),5000);assert.equal(C.rewards(keyedSales,[keyed],'S1','2026-10')[0].amount,50);assert.equal(C.progress(keyedSales,offer,offer.groups[0],'S1'),0);
 console.log('PASS keyed-order incentive option; delivered default, cancelled and out-of-window orders excluded');
+
+// A rate-based combo accrues once per qualifying carton in its delivery month.
+{
+ const engine=require('../earnings-core');
+ const offer={id:'rate',name:'Combo poster',sr:'SR1',startDate:'2026-10-01',endDate:'2026-11-30',
+  groups:[{name:'Mango combo',mode:'combo',skus:['M1','M2'],target:200,reward:2,payout:'per-carton',basis:'delivered',period:'window'}]};
+ const sale=(id,date,sku,qty,status='Delivered')=>({id,sr:'SR1',date,sku,qty,status});
+ const sales=[sale('1','2026-10-30','M1',4),sale('2','2026-11-01','M2',8),
+  sale('3','2026-11-02','M1',7),sale('4','2026-11-02','M3',500),sale('5','2026-11-03','M1',900,'Pending Delivery')];
+ assert.deepEqual(engine.rewards(sales,[offer],'SR1','2026-10').map(r=>r.amount),[8]);
+ assert.deepEqual(engine.rewards(sales,[offer],'SR1','2026-11').map(r=>r.amount),[30]);
+}
