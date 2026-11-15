@@ -1,0 +1,250 @@
+/* Shared navigation and the mobile Home layout, drawn without raster decoration. */
+html body #app .app > nav.bottom {
+  display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  gap:0!important;padding:2px!important;box-sizing:border-box!important;
+  border:1px solid #ff8b12!important;border-radius:clamp(12px,3.4vw,21px)!important;
+  background:linear-gradient(#151210,#050505 64%)!important;
+  box-shadow:0 1px 5px #ff7300aa,inset 0 -2px 5px #ef690068!important;
+  overflow:visible!important;
+}
+html body #app .app[data-neon-ready] > nav.bottom > button {
+  display:flex!important;flex-direction:column!important;align-items:center!important;
+  justify-content:center!important;min-width:0!important;gap:4px!important;padding:2px 0!important;
+  border:0!important;border-right:1px solid #fff2!important;border-radius:0!important;
+  background:none!important;box-shadow:none!important;color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  font-size:clamp(8px,2.3vw,12px)!important;line-height:1.05!important;font-weight:750!important;
+}
+html body #app .app[data-neon-ready] > nav.bottom > button :is(.ffGlowOrange,.ffGlowWhite) {
+  color:#fff!important;-webkit-text-fill-color:#fff!important;
+}
+html body #app .app[data-neon-ready] > nav.bottom > button:last-child {border-right:0!important}
+html body #app .app[data-neon-ready] > nav.bottom > button > i {
+  display:grid!important;place-items:center!important;
+  width:clamp(16px,5vw,27px)!important;height:clamp(16px,5vw,27px)!important;
+  margin:0!important;color:#ffab17!important;font-style:normal;
+}
+.ffNeonIcon {display:block;width:100%;height:100%;overflow:visible}
+html body #app .app:has(.homeGrid) > nav.bottom > #bh {
+  border:1px solid #ffa62e!important;border-radius:clamp(9px,2.5vw,13px)!important;
+  background:radial-gradient(ellipse at 32% 15%,#ac531f,#190d06 68%)!important;
+  box-shadow:inset 0 0 5px #ff8b13,0 0 3px #ff791d!important;
+}
+html body #app .app > nav.bottom button:focus-visible,
+html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentityCredit):focus-visible {
+  outline:2px solid #fff!important;outline-offset:-3px!important;
+}
+
+@media(max-width:800px) {
+  html body #app .app:has(.homeGrid) {
+    --neon-nav:clamp(48px,15vw,76px);
+    --neon-edge:clamp(5px,1.9vw,12px);
+    --neon-gap:clamp(5px,2.4vw,13px);
+    --neon-safe-bottom:var(--ffh-safe-bottom,env(safe-area-inset-bottom,0px));
+    height:100dvh!important;padding-bottom:0!important;background:#050505!important;
+  }
+  html body #app .app:has(.homeGrid) > header.top {
+    height:calc(clamp(52px,15.4vw,90px) + var(--ffh-safe-top,env(safe-area-inset-top,0px)))!important;
+    flex:none!important;padding-inline:var(--neon-edge)!important;
+    background:#070605!important;border:0!important;isolation:isolate;
+  }
+  html body #app .app:has(.homeGrid) > header.top::after,
+  html body #app .app:has(.homeGrid) > nav.bottom::before {
+    content:"";position:absolute;z-index:-1;pointer-events:none;height:clamp(8px,3.9vw,22px);
+    left:0;right:0;background:radial-gradient(ellipse at 31% 100%,#ffb400e0 0%,#fe6f0088 13%,transparent 45%),
+      radial-gradient(ellipse at 76% 115%,#ff9a0070 0%,transparent 42%);
+    border-radius:70% 36% 0 0 / 90% 75% 0 0;
+  }
+  html body #app .app:has(.homeGrid) > header.top::after {
+    bottom:0;right:42%;transform:scaleX(-1) skewX(17deg);
+    box-shadow:inset 0 -1px 2px #ff922b7a;
+  }
+  html body #app .app:has(.homeGrid) > nav.bottom::before {
+    bottom:100%;z-index:0;
+  }
+  html body #app .app:has(.homeGrid) > :is(header.top,nav.bottom)::after {
+    pointer-events:none;
+  }
+  html body #app .app:has(.homeGrid) > nav.bottom::after {
+    content:"";position:absolute;bottom:100%;inset-inline:0;height:clamp(12px,5.5vw,30px);
+    background:center bottom / 100% 100% no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 430 40' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='g'%3E%3Cstop stop-color='%23ff7b12' stop-opacity='.08'/%3E%3Cstop offset='.31' stop-color='%23ff9323'/%3E%3Cstop offset='.56' stop-color='%23ec6106' stop-opacity='.23'/%3E%3Cstop offset='.82' stop-color='%23ff9d21'/%3E%3Cstop offset='1' stop-color='%23e65d0b' stop-opacity='.06'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath fill='url(%23g)' d='M0 36C48 4 83 2 135 23s89 18 142-2 104-23 153 9v10H0z'/%3E%3Cpath stroke='url(%23g)' stroke-width='2' fill='none' d='M0 35C62 11 82 9 135 25s91 15 142-2 107-16 153 9'/%3E%3C/svg%3E");
+  }
+  html body #app .app:has(.homeGrid) > header.top .logo {
+    font-size:clamp(13px,4.4vw,25px)!important;line-height:1.04!important;
+    gap:clamp(4px,1.6vw,10px)!important;flex:1;min-width:0;
+  }
+  html body #app .app:has(.homeGrid) .ffMiniLogo {
+    width:clamp(24px,11vw,60px)!important;height:clamp(23px,9vw,52px)!important;
+    border:0!important;background:none!important;box-shadow:none!important;
+    color:#ff8014!important;flex:none!important;
+  }
+  html body #app .app:has(.homeGrid) .brandTag {
+    font-size:clamp(6.5px,2.05vw,12px)!important;line-height:1.15!important;
+  }
+  html body #app .app:has(.homeGrid) > header.top .topBtns {
+    gap:clamp(3px,1.3vw,8px)!important;flex:none;
+  }
+  html body #app .app:has(.homeGrid) > header.top .topBtns .iconBtn {
+    display:grid!important;place-items:center!important;
+    width:clamp(30px,8.9vw,49px)!important;min-width:clamp(30px,8.9vw,49px)!important;
+    height:clamp(30px,8.9vw,49px)!important;padding:clamp(5px,1.8vw,10px)!important;
+    border:1px solid #ed840e!important;border-radius:30%!important;
+    background:radial-gradient(ellipse at 10% 0%,#34241a,#080606 65%)!important;
+    box-shadow:inset -1px -2px 4px #ff790077!important;color:#fff!important;
+  }
+  html body #app .app:has(.homeGrid) > .ffAppAnnouncements {
+    padding:0 calc(var(--neon-edge) / 2)!important;border:0!important;background:#050505!important;
+  }
+  html body #app .app:has(.homeGrid) > .ffAppAnnouncements #ffTicker {
+    height:clamp(24px,6.3vw,40px)!important;
+    border:1px solid #e97a13!important;border-radius:clamp(6px,2vw,12px)!important;
+    background:#080706!important;box-shadow:0 0 4px #e66b005c!important;
+    padding-inline:4px!important;
+  }
+  html body #app .app:has(.homeGrid) #ffTicker .ffTickerLabel {
+    border-radius:5px!important;padding:2px 5px!important;background:linear-gradient(#a7500a,#e06e10)!important;
+    color:#ffe541!important;font-size:clamp(8px,2.5vw,14px)!important;
+  }
+  html body #app .app:has(.homeGrid) > main.wrap {
+    display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+    gap:0!important;padding:var(--neon-edge)!important;margin:0!important;
+    width:100%!important;max-width:none!important;overflow-y:auto!important;
+  }
+  html body #app .app[data-neon-ready]:has(.homeGrid) > main.wrap > .ffIdentityHero {
+    position:relative!important;display:grid!important;align-items:center!important;
+    grid-template-columns:minmax(0,1fr) 34%!important;gap:3px!important;
+    width:100%!important;height:clamp(90px,25vw,156px)!important;
+    min-height:clamp(90px,25vw,156px)!important;flex:none!important;margin:0 0 var(--neon-gap)!important;
+    padding:4px 6px 4px clamp(78px,21vw,138px)!important;
+    border:1px solid #ff991f!important;border-radius:clamp(13px,4.6vw,27px)!important;
+    background:radial-gradient(ellipse at 64% 128%,#ff8b18 1%,#b64b15 10%,transparent 35%),#070605!important;
+    box-shadow:0 0 7px #ff7600aa,inset 0 0 6px #ff921f8a!important;
+    isolation:isolate;
+  }
+  html body #app .app:has(.homeGrid) .ffIdentityHero::before {
+    content:"";position:absolute;inset:8% 22% 0 4%;z-index:-1;pointer-events:none;
+    border-radius:0 0 74% 32%;border-bottom:2px solid #ff9826af;
+    background:radial-gradient(ellipse at 95% 72%,#a64b1366,transparent 54%);
+    transform:skewX(-18deg);filter:drop-shadow(0 2px 4px #ff7200aa);
+  }
+  html body #app .app:has(.homeGrid) .ffIdentityHero .editableAvatar {
+    position:absolute!important;left:clamp(5px,2.1vw,13px)!important;top:8px!important;
+    width:clamp(60px,17.5vw,110px)!important;height:clamp(60px,17.5vw,110px)!important;
+    min-width:0!important;max-width:none!important;max-height:none!important;
+    border:0!important;border-radius:50%!important;box-shadow:none!important;
+    clip-path:circle(49% at 50% 50%)!important;object-fit:cover!important;object-position:center 18%!important;
+    background:#050505!important;z-index:2;
+  }
+  html body #app .app:has(.homeGrid) .ffIdentityHero::after {
+    content:"";position:absolute;left:clamp(4px,1.85vw,12px);top:7px;
+    width:clamp(62px,18vw,113px);aspect-ratio:1;
+    border:1px solid #ffa92e;border-left-color:#ff85297a;border-radius:50%;
+    box-shadow:0 1px 3px #ff7900aa;pointer-events:none;box-sizing:border-box;
+  }
+  html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText {
+    grid-column:1!important;grid-row:1!important;min-width:0!important;
+    margin:0!important;padding:0!important;transform:none!important;
+  }
+  html body #app .app:has(.homeGrid) .ffIdentityText > small {
+    font-size:clamp(10px,3.45vw,22px)!important;line-height:1.12!important;color:#fff!important;
+  }
+  html body #app .app:has(.homeGrid) .ffIdentityText > strong {
+    font-size:clamp(9px,3.1vw,19px)!important;margin:4px 0!important;line-height:1.1!important;
+  }
+  html body #app .app:has(.homeGrid) .ffIdentityText .ffIdentityRole,
+  html body #app .app:has(.homeGrid) .ffIdentityText .ffIdentityStaffId {
+    font-size:clamp(7px,2.1vw,13px)!important;gap:2px 3px!important;line-height:1.1!important;
+  }
+  html body #app .app:has(.homeGrid) .ffIdentityHero .ffNeonInfo {
+    grid-column:2;grid-row:1;display:grid;gap:clamp(3px,1vw,6px);min-width:0;
+  }
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffNeonInfo > *,
+  html body #app .app:has(.homeGrid) .ffNeonInfo #ffHomeAlarm,
+  html body #app .app:has(.homeGrid) .ffNeonInfo #ffHomeClock {
+    position:static!important;inset:auto!important;margin:0!important;
+    width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;
+    transform:none!important;min-height:0!important;
+  }
+  html body #app .app[data-neon-ready]:has(.homeGrid) .ffNeonInfo > * {
+    display:flex!important;gap:3px;justify-content:center;align-items:center!important;
+    padding:clamp(2px,.85vw,6px) 2px!important;white-space:nowrap;
+    border:1px solid #d97b19!important;border-radius:99px!important;
+    box-shadow:inset 0 0 5px #f4770038!important;background:#090705!important;
+    color:#fff!important;line-height:1.1!important;font-size:clamp(6.5px,1.85vw,12px)!important;
+  }
+  html body #app .app.ffBlackGlow:has(.homeGrid) main.wrap .ffNeonInfo #ffHomeClock,
+  html body #app .app:has(.homeGrid) .ffNeonInfo #ffHomeAlarm {
+    padding:0!important;border:0!important;background:none!important;box-shadow:none!important;
+    font-size:clamp(9px,3.05vw,20px)!important;line-height:1.05!important;
+  }
+  html body #app .app:has(.homeGrid) .ffNeonInfo #ffHomeAlarm {
+    display:grid;place-items:center;width:clamp(13px,3.8vw,21px)!important;aspect-ratio:1;
+    color:#ffb20c!important;
+  }
+  html body #app .app:has(.homeGrid) .ffNeonInfo .ffIdentityCredit small {font-size:inherit}
+  html body #app .app:has(.homeGrid) > main.wrap > .homeGrid {
+    display:grid!important;flex:1 0 auto!important;
+    width:100%!important;height:auto!important;min-height:0!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    grid-template-rows:repeat(5,minmax(clamp(53px,15vw,93px),1fr))!important;
+    gap:var(--neon-gap)!important;margin:0!important;padding:0!important;
+  }
+  html body #app .app[data-neon-ready]:has(.homeGrid) .homeGrid > .module {
+    position:relative!important;display:flex!important;flex-direction:column!important;justify-content:center!important;
+    align-items:center!important;text-align:center!important;gap:clamp(3px,1vw,6px)!important;
+    min-width:0!important;min-height:0!important;height:100%!important;padding:3px 2px!important;
+    border:1px solid #f58c13!important;border-top-color:#ffc97e!important;
+    border-radius:clamp(10px,4.3vw,24px)!important;
+    background:radial-gradient(ellipse at 0% 0%,#68615a 0%,#24211d 27%,transparent 69%),
+      radial-gradient(ellipse at 99% 105%,#f18a20 0%,#552308 15%,transparent 41%),#070605!important;
+    box-shadow:0 2px 5px #ff800082,inset -1px -1px 3px #ff82006b!important;
+  }
+  html body #app .app[data-neon-ready]:has(.homeGrid) .homeGrid > .module::before {
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
+    background:radial-gradient(circle,#ffae3b84 .5px,transparent .9px) 0 0 / 4px 4px;
+    mask-image:radial-gradient(ellipse at 98% 100%,#000,transparent 36%);
+    outline:0;
+    color:#fff!important;-webkit-text-fill-color:#fff!important;isolation:isolate;
+  }
+  html body #app .app[data-neon-ready]:has(.homeGrid) .homeGrid > .module > .mi {
+    color:#ffae17!important;display:grid!important;place-items:center!important;
+    width:clamp(21px,8.2vw,46px)!important;height:clamp(21px,8.2vw,46px)!important;
+    margin:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important;
+    filter:drop-shadow(0 0 2px #ff8900aa);flex:none!important;
+  }
+  html body #app .app[data-neon-ready] .homeGrid .module .mi .ffNeonIcon {
+    width:100%!important;height:100%!important;
+    color:#ffb919!important;
+  }
+  html body #app .app[data-neon-ready] .homeGrid .module .mi::before {
+    content:none!important;
+  }
+  html body #app .app:has(.homeGrid) .homeGrid .moduleTitle {
+    color:#fff!important;-webkit-text-fill-color:#fff!important;
+    font-size:clamp(8px,2.75vw,16px)!important;line-height:1.08!important;
+    font-weight:750!important;white-space:normal!important;text-wrap:balance;
+  }
+  html body #app .app:has(.homeGrid) .homeGrid [data-page="approvals"] .moduleTitle {max-width:70%}
+  html body #app .app:has(.homeGrid) .homeGrid [data-page="route"] .moduleTitle {max-width:75%}
+  html body #app .app:has(.homeGrid) .homeGrid .moduleTitle * {
+    color:inherit!important;-webkit-text-fill-color:inherit!important;
+  }
+  html body #app .app:has(.homeGrid) .homeGrid .module > :is(small,.moduleArrow),
+  html body #app .app:has(.homeGrid) :is(.ffHomeBottomSpace,.aiNudge,.aiOrb) {display:none!important}
+  html body #app .app:has(.homeGrid) .homeGrid .module > :is(.moduleBadge,.ffStatusBadge) {
+    position:absolute!important;top:3px!important;right:3px!important;bottom:auto!important;left:auto!important;
+    font-size:clamp(6px,1.65vw,10px)!important;max-width:60%;overflow:hidden;
+    min-height:0!important;line-height:1!important;
+  }
+  html body #app .app:has(.homeGrid) > nav.bottom {
+    position:relative!important;inset:auto!important;transform:none!important;
+    margin:clamp(11px,5.5vw,32px) calc(var(--neon-edge) / 2) var(--neon-safe-bottom)!important;
+    width:auto!important;max-width:none!important;
+    height:var(--neon-nav)!important;min-height:var(--neon-nav)!important;flex:none!important;
+    isolation:isolate;
+  }
+}
+
+@media(min-width:801px) {
+  .ffNeonInfo, .ffNeonInfo > div:first-child {display:contents}
+}
