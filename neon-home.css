@@ -463,10 +463,16 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     padding-left: 0 !important;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-transform: uppercase;
   }
 
   html body #app .app[data-neon-ready] .ffIdentityRole > :not(:first-child):not(:empty) {
     border-left: 1px solid #dc892f !important;
+  }
+
+  html body.ffGlowOn #app .app.ffBlackGlow[data-neon-ready] .ffIdentityRole .ffNumber {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
   }
 
   html body #app .app[data-neon-ready]:has(.homeGrid) .ffIdentityHero .ffNeonInfo {
