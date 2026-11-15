@@ -37,6 +37,10 @@ document.addEventListener('submit',async e=>{
   let hidden=form.querySelector('input[name="assignmentAttachmentUrl"]');
   if(!hidden){hidden=document.createElement('input');hidden.type='hidden';hidden.name='assignmentAttachmentUrl';form.append(hidden);}
   hidden.value=url;
+  // Persist via the existing description column: ffh_tasks has no attachment URL column.
+  const description=form.elements.description;
+  if(!description)throw Error('Task instructions field is missing.');
+  description.value=(description.value.trim()+'\n\nAssignment attachment: '+url).trim();
   const fileInput=form.querySelector('input[name="ffAssignmentFile"]');
   if(fileInput)fileInput.disabled=true;
   status.textContent='Attachment uploaded. Saving task…';
