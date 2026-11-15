@@ -37,6 +37,8 @@ document.addEventListener('submit',async e=>{
   let hidden=form.querySelector('input[name="assignmentAttachmentUrl"]');
   if(!hidden){hidden=document.createElement('input');hidden.type='hidden';hidden.name='assignmentAttachmentUrl';form.append(hidden);}
   hidden.value=url;
+  const fileInput=form.querySelector('input[name="ffAssignmentFile"]');
+  if(fileInput)fileInput.disabled=true;
   status.textContent='Attachment uploaded. Saving task…';
   bypass.add(form);
   form.requestSubmit();
