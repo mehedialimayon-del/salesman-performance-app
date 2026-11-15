@@ -1,0 +1,271 @@
+/* FieldForce task graphics are the original reference. Live controls occupy its data slots. */
+#app .app:has(.ffTaskArtwork) {
+  --task-image:url('task-assets/tasks-reference.webp');
+  --task-width:min(100vw,760px);
+  --task-top:calc(var(--task-width) * 103 / 716);
+  --task-ticker:calc(var(--task-width) * 54 / 716);
+  --task-nav:calc(var(--task-width) * 125 / 716);
+  --task-bottom:var(--ffh-safe-bottom,env(safe-area-inset-bottom,0px));
+  --task-safe-top:var(--ffh-safe-top,env(safe-area-inset-top,0px));
+  padding-bottom:calc(var(--task-nav) + var(--task-bottom))!important;
+  background:#000!important;
+}
+html body #app .app:has(.ffTaskArtwork) > header.top {
+  height:calc(var(--task-top) + var(--task-safe-top))!important;
+  min-height:0!important;
+  width:var(--task-width);
+  margin:0 auto;
+  flex:none!important;
+  display:block!important;
+  border:0!important;
+  padding:0!important;
+  background:#000 var(--task-image) center var(--task-safe-top) / 100% auto no-repeat!important;
+  position:relative!important;
+}
+html body #app .app:has(.ffTaskArtwork) > header.top .logo {visibility:hidden;}
+html body #app .app:has(.ffTaskArtwork) > header.top .topBtns {
+  position:absolute;
+  inset:calc(var(--task-safe-top) + var(--task-top) * .11) 2.2% 15% 55.4%;
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:2%;
+}
+html body #app .app:has(.ffTaskArtwork) > header.top .topBtns .iconBtn {
+  display:block!important;
+  position:relative;
+  width:100%!important;
+  height:100%!important;
+  padding:0!important;
+  min-width:0!important;
+  min-height:0!important;
+  color:transparent!important;
+  -webkit-text-fill-color:transparent!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+#app .app:has(.ffTaskArtwork) > header.top .topBtns .iconBtn > :not(.badge) {visibility:hidden;}
+html body #app .app:has(.ffTaskArtwork) > header.top #bell .badge {
+  position:absolute!important;
+  inset:9% 16% auto!important;
+  font-size:calc(var(--task-width) * .022)!important;
+  color:white!important;
+  -webkit-text-fill-color:white!important;
+}
+html body #app .app:has(.ffTaskArtwork) > .ffAppAnnouncements {
+  height:var(--task-ticker);
+  width:var(--task-width);
+  margin:0 auto;
+  border:0!important;
+  padding:0!important;
+  background:var(--task-image) center calc(-1 * var(--task-top)) / 100% auto no-repeat!important;
+}
+html body #app .app:has(.ffTaskArtwork) #ffTicker {
+  display:block!important;
+  height:100%!important;
+  position:relative!important;
+  padding:0!important;
+  background:none!important;
+  margin:0!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+#app .app:has(.ffTaskArtwork) #ffTicker .ffTickerLabel {visibility:hidden;}
+#app .app:has(.ffTaskArtwork) #ffTicker .ffTickerViewport {
+  display:block!important;
+  position:absolute!important;
+  top:10%;bottom:10%;left:12%;right:17%;
+  overflow:hidden;
+}
+#app .app:has(.ffTaskArtwork) #ffTicker .ffTickerTrack {
+  font-size:calc(var(--task-width) * .028)!important;
+  line-height:calc(var(--task-ticker) * .8)!important;
+}
+html body #app .app:has(.ffTaskArtwork) #ffTicker :is(#ffTickerPause,#ffTickerManage) {
+  position:absolute!important;
+  top:12%;bottom:10%;width:8%!important;
+  min-height:0!important;height:auto!important;padding:0!important;
+  border:0!important;box-shadow:none!important;background:transparent!important;
+  color:transparent!important;-webkit-text-fill-color:transparent!important;
+}
+#app .app:has(.ffTaskArtwork) #ffTickerPause {right:8%;}
+#app .app:has(.ffTaskArtwork) #ffTickerManage {right:0;}
+
+html body #app .app:has(.ffTaskArtwork) > nav.bottom {
+  width:var(--task-width)!important;
+  left:50%!important;right:auto!important;
+  transform:translateX(-50%)!important;
+  bottom:var(--task-bottom)!important;
+  height:var(--task-nav)!important;
+  min-height:0!important;
+  padding:0!important;
+  gap:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:var(--task-image) center bottom / 100% auto no-repeat!important;
+}
+html body #app .app:has(.ffTaskArtwork) > nav.bottom > button {
+  position:relative;
+  border:0!important;
+  border-radius:0!important;
+  background:none!important;
+  color:transparent!important;
+  -webkit-text-fill-color:transparent!important;
+  box-shadow:none!important;
+}
+html body #app .app:has(.ffTaskArtwork) > nav.bottom > button > :not(.badge) {visibility:hidden;}
+html body #app .app:has(.ffTaskArtwork) > nav.bottom > button > .badge {
+  color:white!important;
+  -webkit-text-fill-color:white!important;
+}
+
+html body #app .app > main.wrap.ffTaskPage:has(.ffTaskArtwork) {
+  display:block!important;
+  height:auto!important;
+  min-height:0!important;
+  padding:0!important;
+  width:var(--task-width)!important;
+  max-width:100%!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  container-type:inline-size;
+}
+#app main.ffTaskPage:has(.ffTaskArtwork) > :is(.head,.ffTaskScope) {
+  position:absolute!important;
+  width:1px!important;height:1px!important;min-height:0!important;
+  overflow:hidden!important;clip-path:inset(50%);margin:0!important;padding:0!important;
+}
+#app .ffTaskArtwork {
+  position:relative;
+  width:100%;
+  aspect-ratio:716 / 1223;
+  background:#020100 var(--task-image) center calc(-100cqw * 157 / 716) / 100% auto no-repeat;
+  color:#fff;
+  font:650 2.43cqw/1.14 'Arial Narrow',Roboto,Arial,sans-serif;
+  overflow:hidden;
+}
+html body #app .app main.wrap .ffTaskArtwork :is(button,input,select) {
+  margin:0!important;padding:0 .2em!important;min-width:0!important;
+  min-height:0!important;max-width:none!important;
+  background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+  font:inherit!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
+}
+#app .ffTaskArtwork input::placeholder {color:#ddd!important;}
+#app .ffTaskArtwork select {appearance:none;}
+#app .ffTaskArtwork select option {background:#130c02;color:white;}
+#app .ffTaskArtwork .ffTaskArtSlot {position:absolute;box-sizing:border-box;}
+#app .ffTaskArtwork .ffTaskArtValue {
+  display:flex;align-items:center;justify-content:flex-start;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#app .ffTaskArtwork button.ffTaskArtValue {text-align:left;}
+#app .ffTaskArtwork .ffTaskArtMetric {
+  display:grid;place-items:center;font-size:5cqw;font-weight:850;line-height:1;
+}
+#app .ffTaskArtwork .ffTaskArtTap {opacity:0;}
+#app .ffTaskArtwork .ffTaskArtTap:is(:focus-visible,:active,[aria-pressed="true"][data-task-category]) {
+  opacity:1;color:transparent!important;-webkit-text-fill-color:transparent!important;
+  background:#ff9a271c!important;
+  border:1px solid #ffeaa2!important;border-radius:2cqw!important;
+  box-shadow:inset 0 0 1.4cqw #ffae34!important;
+}
+#app .ffTaskArtwork :is(button,input,select):focus-visible {outline:2px solid #ffd082;outline-offset:-2px;}
+#app .ffTaskArtwork .ffTaskArtRows {
+  overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#f69d38 #070504;
+}
+#app .ffTaskArtwork .ffTaskArtRow {
+  display:grid;
+  grid-template-columns:5.5% 28% 19.5% 15.5% 12% 19.5%;
+  align-items:center;
+  min-height:4.67cqw;
+  border-bottom:1px solid #9c5a27;
+  font-size:2.14cqw;
+}
+#app .ffTaskArtwork .ffTaskArtRow > * {min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+#app .ffTaskArtwork .ffTaskArtRow button {text-align:left;line-height:inherit;}
+#app .ffTaskArtwork .ffTaskArtRow[aria-selected="true"] {background:#37270b;}
+#app .ffTaskArtwork .ffTaskArtRow:first-child > span:first-child {text-align:center;}
+#app .ffTaskArtwork .ffRefStatus {padding:.12em .26em;}
+#app .ffTaskArtwork .ffTaskArtPhoto {display:grid;place-items:center;overflow:hidden;border-radius:1.55cqw;}
+#app .ffTaskArtwork img {width:100%;height:100%;object-fit:cover;}
+#app .ffTaskArtwork .ffTaskArtTitle {font-size:2.92cqw;font-weight:850;}
+#app .ffTaskArtwork .ffTaskArtDetails {margin:0;overflow:hidden;}
+#app .ffTaskArtwork .ffTaskArtDetails div {display:grid;grid-template-columns:38% 1fr;line-height:1.48;border-bottom:1px solid #845227;}
+#app .ffTaskArtwork .ffTaskArtDetails dd {margin:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+#app .ffTaskArtwork .ffTaskArtDetails dt {color:#ffc761;}
+#app .ffTaskArtwork .ffTaskArtBadge {display:grid;place-items:center;font-size:2.3cqw;}
+#app .ffTaskArtwork .ffTaskArtDescription {overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:.6em;border-radius:1cqw;}
+#app .ffTaskArtwork .ffTaskArtEmpty {padding:.7em;text-align:center;}
+#app .ffTaskArtwork .ffTaskArtHint {position:absolute;bottom:0;left:2%;right:2%;margin:0;font-size:2cqw;color:#ffb55b;}
+#app .ffTaskArtwork .ffTaskArtHint:empty {display:none;}
+body:has(.ffTaskArtwork) :is(#orb,#nudge,#aiHello) {display:none!important;}
+#app .ffTaskArtwork #ffRefTaskDetailsBody {display:contents;}
+#app .ffTaskArtwork [data-task-scope][aria-pressed="true"]:not([data-task-scope="team"]) {opacity:1;color:transparent!important;-webkit-text-fill-color:transparent!important;background:#ff9a2726!important;border:1px solid #ffeaa2!important;border-radius:2cqw!important;}
+#app .ffTaskArtDialog {
+  position:fixed;inset:0;margin:auto;
+  padding:1em;width:min(440px,calc(100vw - 24px));max-height:75dvh;
+  color:#fff;border:1px solid #ff9a25;border-radius:12px;background:#100a04;
+}
+#app .ffTaskArtDialog::backdrop {background:#000a;}
+#app .ffTaskArtDialog header {display:flex;justify-content:space-between;align-items:center;margin-bottom:.55em;}
+#app .ffTaskArtDialog label {display:block;margin-bottom:.45em;}
+#app .ffTaskArtDialog label input {display:block;width:100%;color-scheme:dark;}
+/* Keep live controls transparent so the supplied icons and borders show through. */
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffTaskArtwork :is(button,input,select) {
+  position:absolute!important;
+  background:transparent!important;border:0!important;box-shadow:none!important;
+}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffTaskArtwork .ffTaskArtRow button {position:static!important;}
+html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffTaskArtwork .ffTaskArtTap {
+  color:transparent!important;-webkit-text-fill-color:transparent!important;
+}
+html body #app .app:has(.ffTaskArtwork) > nav.bottom {margin:0!important;}
+html body.ffGlowOn #app .app.ffBlackGlow:has(.ffTaskArtwork)>nav.bottom > button {
+  background:transparent!important;border:0!important;box-shadow:none!important;
+  color:transparent!important;-webkit-text-fill-color:transparent!important;
+}
+html body #app .app:has(.ffTaskArtwork)>nav.bottom>button #notifyNavBadge,
+html body #app .app:has(.ffTaskArtwork)>header.top #topNotifyBadge {
+  visibility:visible;
+  color:white!important;-webkit-text-fill-color:white!important;
+}
+html body #app .app:has(.ffTaskArtwork)>header.top #topNotifyBadge {right:22%;top:10%;}
+html body #app .app:has(.ffTaskArtwork)>nav.bottom>button #notifyNavBadge {right:26%;top:0;}
+#app .app:has(.ffTaskArtwork) #ffTicker .ffTickerWindow {
+  display:block!important;position:absolute!important;inset:10% 17% 10% 12%;overflow:hidden;
+}
+html body #app .app:has(.ffTaskArtwork) #ffTicker #ffTickerExpand {
+  position:absolute!important;top:9%;right:8%;width:8%!important;height:82%!important;padding:0!important;
+  color:transparent!important;-webkit-text-fill-color:transparent!important;background:transparent!important;box-shadow:none!important;border:0!important;
+}
+#app .ffTaskArtwork .ffTaskArtMetric {color:#fff!important;-webkit-text-fill-color:#fff!important;}
+.ffTaskArtworkPicker .ffPickerOption {
+  background:linear-gradient(145deg,#1a0d02,#050403)!important;
+  border:1px solid #ed8a22!important;
+  box-shadow:inset 0 0 7px #ea721c45,0 0 4px #ff9d324d!important;
+  border-radius:11px!important;
+}
+.ffTaskArtworkPicker .ffPickerOption.selected {border-color:#ffda74!important;}
+.ffTaskArtworkPicker .ffScopeStaffManager {
+  border:1px solid #ad571f;
+  border-radius:7px;
+  color:#ffbd61!important;
+  padding:3px 6px;
+}
+html body #app .app>main.wrap.ffTaskPage:has(.ffTaskArtwork) > :is(.head,.ffTaskScope) {display:none!important;}
+html body #app .app>main.wrap.ffTaskPage:has(.ffTaskArtwork)>.ffTaskComposer:not([open]) {display:none!important;}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap {font-size:0!important;}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap>* {visibility:hidden!important;}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtRows button {color:#fff!important;-webkit-text-fill-color:#fff!important;}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtMetric,
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtMetric * {color:#fff!important;-webkit-text-fill-color:#fff!important;}
+#app .ffTaskArtwork .ffTaskArtDetails div {grid-template-columns:42% 1fr;}
+#app .ffTaskArtwork .ffTaskArtDetails dt {white-space:nowrap;}
+.ffTaskArtworkPicker.ffScopeStaffPicker .ffPickerOption:has(.ffTaskPickerAvatar) {display:grid!important;grid-template-columns:44px minmax(0,1fr);gap:9px;}
+.ffTaskPickerAvatar {display:grid;place-items:center;position:relative;overflow:hidden;background:#271104;color:#ffb555;border:1px solid #ff9a30;border-radius:10px;width:42px;height:42px;}
+.ffTaskPickerAvatar img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.ffTaskPickerIdentity {color:#ffbf7c!important;}
+html body #app .app>main.wrap.ffTaskPage:has(.ffTaskArtwork)>:is(.ffTaskRefHistory,.ffRefTaskHistory,.ffPrivateNoteDrawer):not([open]) {display:none!important;}

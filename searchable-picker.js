@@ -20,12 +20,12 @@ const ffhZoneManagers=async()=>{
  })().finally(()=>{FFH_ZONE_PICKER_CACHE.inflight=null;});
  return FFH_ZONE_PICKER_CACHE.inflight;
 };
-window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect}){
+window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect,taskArtwork=false}){
  items=items.map(item=>window.FFH_STAFF_ITEM?.(item)||item);
  const isZonePicker=/\bzone\b/i.test(String(title)) && !/assig(n|nee)/i.test(String(title));
  const isScopeStaffPicker=/select\s*(sr|staff)|sales representative/i.test(String(title));
  let managers=new Map();
- const ov=document.createElement('div');ov.className='globalSearchOverlay ffItemPicker'+(isZonePicker?' ffZoneManagerPicker':'')+(isScopeStaffPicker?' ffScopeStaffPicker':'');
+ const ov=document.createElement('div');ov.className='globalSearchOverlay ffItemPicker'+(isZonePicker?' ffZoneManagerPicker':'')+(isScopeStaffPicker?' ffScopeStaffPicker':'')+(taskArtwork?' ffTaskArtworkPicker':'');
  ov.innerHTML='<section class="globalSearchBox"><div class="row"><h2></h2><button type="button" class="secondary">CLOSE</button></div><input class="ffPickerSearch" placeholder="Search name, code or zone…"><div class="ffPickerRows"></div></section>';
  ov.querySelector('h2').textContent=title;
  document.body.append(ov);
@@ -70,7 +70,25 @@ window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect}){
      const route=String(staff.route||staff.route_name||'Not assigned');
      const zone=String(staff.zone||staff.zone_id||'Not assigned');
      fine.textContent=staff.can_manage?'ZONE · '+(zone.toUpperCase()==='PRIMARY'?'KL ZONE':zone):'──────────  ROUTE · '+route+'  ·  ZONE · '+(zone.toUpperCase()==='PRIMARY'?'KL ZONE':zone);
-     body.append(detail,fine);
+     if(taskArtwork){
+      const identity=document.createElement('small');
+      identity.className='ffTaskPickerIdentity';
+      const staffId=displayId(staff);
+      label.textContent=staff.name||staff.full_name||item.label;
+      identity.textContent=[staffId,zone.toUpperCase()==='PRIMARY'?'KL Zone':zone,staff.can_sell&&staff.can_manage?'Own Route / Manager':route==='Not assigned'?'':route].filter(Boolean).join(' · ');
+      const avatar=document.createElement('span');
+      avatar.className='ffTaskPickerAvatar';
+      avatar.textContent=label.textContent.trim().charAt(0)||'?';
+      const url=ffhZonePhotoUrl(staff.photo||staff.photo_url);
+      if(url){
+       const img=document.createElement('img');
+       img.alt='';img.loading='lazy';img.src=url;
+       img.onerror=()=>img.remove();
+       avatar.append(img);
+      }
+      button.append(avatar);
+      body.append(identity,detail);
+     }else body.append(detail,fine);
     }
    }
    if(isZonePicker&&String(item.value).toUpperCase()!=='ALL'){
