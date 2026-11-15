@@ -1,94 +1,13 @@
 /* FieldForce task graphics are the original reference. Live controls occupy its data slots. */
-#app .app:has(.ffTaskArtwork) {
-  --task-image:url('task-assets/tasks-reference.webp');
-  --task-width:min(100vw,760px);
-  --task-top:calc(var(--task-width) * 103 / 716);
-  --task-nav:calc(var(--task-width) * 125 / 716);
-  --task-bottom:var(--ffh-safe-bottom,env(safe-area-inset-bottom,0px));
-  --task-safe-top:var(--ffh-safe-top,env(safe-area-inset-top,0px));
-  padding-bottom:calc(var(--task-nav) + var(--task-bottom))!important;
-  background:#000!important;
-}
-html body #app .app:has(.ffTaskArtwork) > header.top {
-  height:calc(var(--task-top) + var(--task-safe-top))!important;
-  min-height:0!important;
-  width:var(--task-width);
-  margin:0 auto;
-  flex:none!important;
-  display:block!important;
-  border:0!important;
-  padding:0!important;
-  background:#000 var(--task-image) center var(--task-safe-top) / 100% auto no-repeat!important;
-  position:relative!important;
-}
-html body #app .app:has(.ffTaskArtwork) > header.top .logo {visibility:hidden;}
-html body #app .app:has(.ffTaskArtwork) > header.top .topBtns {
-  position:absolute;
-  inset:calc(var(--task-safe-top) + var(--task-top) * .11) 2.2% 15% 55.4%;
-  display:grid!important;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:2%;
-}
-html body #app .app:has(.ffTaskArtwork) > header.top .topBtns .iconBtn {
-  display:block!important;
-  position:relative;
-  width:100%!important;
-  height:100%!important;
-  padding:0!important;
-  min-width:0!important;
-  min-height:0!important;
-  color:transparent!important;
-  -webkit-text-fill-color:transparent!important;
-  background:transparent!important;
-  border:0!important;
-  box-shadow:none!important;
-}
-#app .app:has(.ffTaskArtwork) > header.top .topBtns .iconBtn > :not(.badge) {visibility:hidden;}
-html body #app .app:has(.ffTaskArtwork) > header.top #bell .badge {
-  position:absolute!important;
-  inset:9% 16% auto!important;
-  font-size:calc(var(--task-width) * .022)!important;
-  color:white!important;
-  -webkit-text-fill-color:white!important;
-}
-html body #app .app:has(.ffTaskArtwork) > nav.bottom {
-  width:var(--task-width)!important;
-  left:50%!important;right:auto!important;
-  transform:translateX(-50%)!important;
-  bottom:var(--task-bottom)!important;
-  height:var(--task-nav)!important;
-  min-height:0!important;
-  padding:0!important;
-  gap:0!important;
-  display:grid!important;
-  grid-template-columns:repeat(7,minmax(0,1fr))!important;
-  border:0!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  background:var(--task-image) center bottom / 100% auto no-repeat!important;
-}
-html body #app .app:has(.ffTaskArtwork) > nav.bottom > button {
-  position:relative;
-  border:0!important;
-  border-radius:0!important;
-  background:none!important;
-  color:transparent!important;
-  -webkit-text-fill-color:transparent!important;
-  box-shadow:none!important;
-}
-html body #app .app:has(.ffTaskArtwork) > nav.bottom > button > :not(.badge) {visibility:hidden;}
-html body #app .app:has(.ffTaskArtwork) > nav.bottom > button > .badge {
-  color:white!important;
-  -webkit-text-fill-color:white!important;
-}
-
 html body #app .app > main.wrap.ffTaskPage:has(.ffTaskArtwork) {
   display:block!important;
+  flex:1 1 0!important;
   height:auto!important;
+  margin-block:0!important;
   min-height:0!important;
   padding:0!important;
-  width:var(--task-width)!important;
-  max-width:100%!important;
+  width:100%!important;
+  max-width:760px!important;
   overflow-x:hidden!important;
   overflow-y:auto!important;
   container-type:inline-size;
@@ -101,8 +20,8 @@ html body #app .app > main.wrap.ffTaskPage:has(.ffTaskArtwork) {
 #app .ffTaskArtwork {
   position:relative;
   width:100%;
-  aspect-ratio:716 / 1223;
-  background:#020100 var(--task-image) center calc(-100cqw * 157 / 716) / 100% auto no-repeat;
+  height:100%;
+  background:#020100 url("task-assets/tasks-body-reference.webp") center top / 100% 100% no-repeat;
   color:#fff;
   font:650 2.43cqw/1.14 'Arial Narrow',Roboto,Arial,sans-serif;
   overflow:hidden;
@@ -138,16 +57,16 @@ html body #app .app main.wrap .ffTaskArtwork :is(button,input,select) {
 }
 #app .ffTaskArtwork .ffTaskArtRow {
   display:grid;
-  grid-template-columns:5.5% 28% 19.5% 15.5% 12% 19.5%;
+  grid-template-columns:6% 29% 19% 15% 12% 19%;
   align-items:center;
-  min-height:4.67cqw;
+  min-height:5.48cqw;
   border-bottom:1px solid #9c5a27;
   font-size:2.14cqw;
 }
 #app .ffTaskArtwork .ffTaskArtRow > * {min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 #app .ffTaskArtwork .ffTaskArtRow button {text-align:left;line-height:inherit;}
 #app .ffTaskArtwork .ffTaskArtRow[aria-selected="true"] {background:#37270b;}
-#app .ffTaskArtwork .ffTaskArtRow:first-child > span:first-child {text-align:center;}
+#app .ffTaskArtwork .ffTaskArtRow > span:first-child {text-align:center;}
 #app .ffTaskArtwork .ffRefStatus {padding:.12em .26em;}
 #app .ffTaskArtwork .ffTaskArtPhoto {display:grid;place-items:center;overflow:hidden;border-radius:1.55cqw;}
 #app .ffTaskArtwork img {width:100%;height:100%;object-fit:cover;}
@@ -182,18 +101,6 @@ html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffTaskArtwork .ffTaskArtRow 
 html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffTaskArtwork .ffTaskArtTap {
   color:transparent!important;-webkit-text-fill-color:transparent!important;
 }
-html body #app .app:has(.ffTaskArtwork) > nav.bottom {margin:0!important;}
-html body.ffGlowOn #app .app.ffBlackGlow:has(.ffTaskArtwork)>nav.bottom > button {
-  background:transparent!important;border:0!important;box-shadow:none!important;
-  color:transparent!important;-webkit-text-fill-color:transparent!important;
-}
-html body #app .app:has(.ffTaskArtwork)>nav.bottom>button #notifyNavBadge,
-html body #app .app:has(.ffTaskArtwork)>header.top #topNotifyBadge {
-  visibility:visible;
-  color:white!important;-webkit-text-fill-color:white!important;
-}
-html body #app .app:has(.ffTaskArtwork)>header.top #topNotifyBadge {right:22%;top:10%;}
-html body #app .app:has(.ffTaskArtwork)>nav.bottom>button #notifyNavBadge {right:26%;top:0;}
 #app .ffTaskArtwork .ffTaskArtMetric {color:#fff!important;-webkit-text-fill-color:#fff!important;}
 .ffTaskArtworkPicker .ffPickerOption {
   background:linear-gradient(145deg,#1a0d02,#050403)!important;
@@ -222,3 +129,17 @@ html body #app .app main.wrap .ffTaskArtwork .ffTaskArtMetric * {color:#fff!impo
 .ffTaskPickerAvatar img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .ffTaskPickerIdentity {color:#ffbf7c!important;}
 html body #app .app>main.wrap.ffTaskPage:has(.ffTaskArtwork)>:is(.ffTaskRefHistory,.ffRefTaskHistory,.ffPrivateNoteDrawer):not([open]) {display:none!important;}
+#app .ffTaskArtwork .ffTaskArtCount {font-size:3.8cqw;font-weight:850;}
+#app .ffTaskArtwork .ffTaskArtRow:nth-child(odd) {background:#160b06;}
+#app .ffTaskArtwork .ffTaskArtRow:nth-child(even) {background:#061213;}
+#app .ffTaskArtwork .ffTaskArtRow[aria-selected=true] {background:#382407;}
+#app .ffTaskArtwork [data-task-scope][aria-pressed=true] {opacity:1;outline:1px solid #ffcd51;outline-offset:-1px;}
+#app .ffTaskArtFull {width:min(720px,calc(100vw - 16px));max-height:calc(100dvh - 20px);height:calc(100dvh - 20px);overflow:auto;}
+#app .ffTaskArtFull :is(.ffTaskFullCategories,.ffTaskFullActions) {display:flex;flex-wrap:wrap;gap:.35em;margin-bottom:.6em;}
+#app .ffTaskArtFull button {color:white;background:#171005;border:1px solid #d07b22;border-radius:7px;padding:.4em;}
+#app .ffTaskArtFull button[aria-pressed=true] {background:#663000;border-color:#ffb52d;}
+#app .ffTaskFullRows {display:grid;gap:.35em;max-height:42dvh;overflow:auto;}
+#app .ffTaskFullRows button {display:grid;gap:.2em;text-align:left;}
+#app .ffTaskArtFull article h2 {overflow-wrap:anywhere;}
+#app .ffTaskArtFull article dl {display:grid;grid-template-columns:max-content 1fr;gap:.3em .8em;}
+#app .ffTaskArtFull article dd {margin:0;}

@@ -34,35 +34,40 @@ window.FFH_REFERENCE_TASKS = (() => {
     const state = lastViews.get(viewerId) || {scope:'team',kind:null,selected:null,from:'',to:'',status:'',query:''};
     lastViews.set(viewerId,state);
 
-    // The coordinates are pixel bounds on the original 716-pixel reference.
+    // Coordinates map directly to the supplied 934 × 1610 px Tasks body.
     const slot = (tag, attrs, body, x,y,w,h) =>
-      `<${tag} ${attrs} style="left:${100*x/716}%;top:${100*(y-157)/1223}%;width:${100*w/716}%;height:${100*h/1223}%">${body}</${tag}>`;
+      `<${tag} ${attrs} style="left:${100*x/934}%;top:${100*y/1610}%;width:${100*w/934}%;height:${100*h/1610}%">${body}</${tag}>`;
+    const search = (id, label, x,y,w) =>
+      `<input id="${id}" class="ffTaskArtSlot" type="search" aria-label="${label}" placeholder="Search task, outlet or SR…" style="left:${100*x/934}%;top:${100*y/1610}%;width:${100*w/934}%;height:${100*34/1610}%">`;
     const tap = (attributes,label,x,y,w,h) =>
       slot('button',`type="button" class="ffTaskArtSlot ffTaskArtTap" aria-label="${esc(label)}" ${attributes}`,label,x,y,w,h);
     const value = (id,label,x,y,w,h) =>
       slot('button',`type="button" id="${id}" aria-label="${label}" class="ffTaskArtSlot ffTaskArtValue"`,'',x,y,w,h);
 
     panel.innerHTML = [
-      value('ffTaskArtDate','Date Range',102,258,249,31),
-      value('ffTaskArtZone','Zone',455,258,224,31),
-      value('ffTaskArtAssignee','Assigned To',102,323,248,32),
+      value('ffTaskArtDate','Date Range',170,134,249,38),
+      value('ffTaskArtZone','Zone',604,134,255,38),
+      value('ffTaskArtAssignee','Assigned To',146,214,272,38),
       slot('select','id="ffRefTasksStatus" data-ff-picker="native" class="ffTaskArtSlot" aria-label="Task Status"',[
         '<option value="">All Status</option><option value="done">Completed</option>',
         '<option value="progress">In Progress</option><option value="overdue">Overdue</option>'
-      ].join(''),456,322,220,33),
-      ...[97,277,452,623].map((x,i)=>slot('strong',
-        `class="ffTaskArtSlot ffTaskArtMetric" aria-label="${['Total Tasks','Completed','In Progress','Overdue'][i]}"`,'',x-40,440,80,38)),
-      tap('data-task-assign','Assign New Task',10,493,285,51),
-      tap('data-task-scope="mine"','My Tasks',307,493,189,51),
-      tap('data-task-scope="team"','Team Tasks',508,493,197,51),
-      ...categories.map((name,i)=>tap(`data-task-category="${i}"`,name,[20,126,231,330,430,529,628][i],596,[101,100,95,96,95,96,69][i],87)),
-      slot('span','id="ffRefTasksCount" class="ffTaskArtSlot ffTaskArtValue" aria-live="polite"','',177,712,77,29),
-      `<input id="ffRefTasksSearch" class="ffTaskArtSlot" type="search" aria-label="Search task, outlet or SR" placeholder="Search task, outlet or SR…" style="left:64.6%;top:${100*(714-157)/1223}%;width:31.5%;height:${100*26/1223}%">`,
-      slot('div','class="ffTaskArtSlot ffTaskArtRows" role="list" aria-label="Task List" tabindex="0"','',17,787,683,171),
-      slot('div','id="ffRefTaskDetailsBody"','',0,157,716,1223),
-      tap('data-task-export="pdf"','Download (PDF)',10,1311,228,55),
-      tap('data-task-export="xlsx"','Export (Excel)',251,1311,222,55),
-      tap('data-task-history','Task History',484,1311,223,55),
+      ].join(''),605,214,261,40),
+      ...[130,357,580,803].map((x,i)=>slot('strong',
+        `class="ffTaskArtSlot ffTaskArtMetric" aria-label="${['Total Tasks','Completed','In Progress','Overdue'][i]}"`,'',x-55,360,110,47)),
+      tap('data-task-assign','Assign New Task',16,425,374,64),
+      tap('data-task-scope="mine"','My Tasks',403,426,244,59),
+      tap('data-task-scope="team"','Team Tasks',661,426,257,59),
+      search('ffTaskCategorySearch','Search task categories',578,514,250),
+      tap('data-task-expand="categories"','Expand task categories and details',851,507,52,48),
+      ...categories.map((name,i)=>tap(`data-task-category="${i}"`,name,[24,169,307,435,561,686,806][i],561,[137,129,120,118,119,113,104][i],112)),
+      slot('span','id="ffRefTasksCount" class="ffTaskArtSlot ffTaskArtValue ffTaskArtCount" aria-live="polite"','',224,703,120,48),
+      search('ffRefTasksSearch','Search task, outlet or SR',579,713,252),
+      tap('data-task-expand="list"','Expand task list and details',851,706,52,48),
+      slot('div','class="ffTaskArtSlot ffTaskArtRows" role="list" aria-label="Task List" tabindex="0"','',21,806,891,258),
+      '<div id="ffRefTaskDetailsBody"></div>',
+      tap('data-task-export="pdf"','Download (PDF)',25,1516,305,71),
+      tap('data-task-export="xlsx"','Export (Excel)',342,1516,269,71),
+      tap('data-task-history','Task History',623,1516,288,71),
       '<p class="ffTaskArtHint" role="status"></p>'
     ].join('');
     history.before(panel,drawer);
@@ -76,11 +81,12 @@ window.FFH_REFERENCE_TASKS = (() => {
     const rows = find('.ffTaskArtRows');
     const detail = find('#ffRefTaskDetailsBody');
     const query = find('#ffRefTasksSearch');
+    const categoryQuery = find('#ffTaskCategorySearch');
     const taskStatus = find('#ffRefTasksStatus');
     const hint = find('[role="status"]');
     const compactName = id => window.FFH_STAFF_PROFILE?.(id)?.name || staffName(id).split(' (Manager:')[0];
     let shown = [];
-    query.value = state.query;
+    query.value = categoryQuery.value = state.query;
     taskStatus.value = state.status;
 
     function openEditor(selector, prepare) {
@@ -126,19 +132,19 @@ window.FFH_REFERENCE_TASKS = (() => {
       const photo = taskPhoto(task);
       const photoMarkup = photo ? `<img src="${esc(photo)}" alt="Saved proof for ${esc(task.title)}">` : '<span>No saved photo</span>';
       detail.innerHTML = [
-        slot(photo?'button':'div',`class="ffTaskArtSlot ffTaskArtPhoto" ${photo?'type="button" data-proof-view aria-label="View saved proof"':''}`,photoMarkup,23,1030,214,138),
-        slot('b','class="ffTaskArtSlot ffTaskArtValue ffTaskArtTitle"',esc(task?.title || 'No task selected'),252,1027,265,24),
+        slot(photo?'button':'div',`class="ffTaskArtSlot ffTaskArtPhoto" ${photo?'type="button" data-proof-view aria-label="View saved proof"':''}`,photoMarkup,29,1158,286,186),
+        slot('b','class="ffTaskArtSlot ffTaskArtValue ffTaskArtTitle"',esc(task?.title || 'No task selected'),334,1151,344,37),
         slot('dl','class="ffTaskArtSlot ffTaskArtDetails"',[
           ['Outlet',task?.outletName],['Assigned To',task ? compactName(task.to) : ''],
           ['Due Date',task?.due],['Priority',task ? task.priority || 'Normal' : '']
-        ].map(([label,v])=>`<div><dt>${label}</dt><dd title="${esc(v || '')}">${esc(v || '—')}</dd></div>`).join(''),252,1055,268,111),
-        slot('span','class="ffTaskArtSlot ffTaskArtBadge"',esc(task ? status(task) : '—'),555,986,132,28),
-        slot('div','class="ffTaskArtSlot ffTaskArtDescription"',esc(task?.description || ''),22,1181,506,110),
-        tap('data-task-status','Update Status',538,1026,157,34),
-        tap('data-task-proof','Add Photo / Proof',538,1060,157,36),
-        tap('data-task-comment','Add Comment',538,1096,157,38),
-        tap('data-task-open','View History',538,1135,157,36),
-        tap('data-task-proof','Add Photo / Proof',532,1181,162,109)
+        ].map(([label,v])=>`<div><dt>${label}</dt><dd title="${esc(v || '')}">${esc(v || '—')}</dd></div>`).join(''),339,1189,326,143),
+        slot('span','class="ffTaskArtSlot ffTaskArtBadge"',esc(task ? status(task) : '—'),720,1098,185,36),
+        slot('div','class="ffTaskArtSlot ffTaskArtDescription"',esc(task?.description || ''),29,1368,662,129),
+        tap('data-task-status','Update Status',697,1156,212,46),
+        tap('data-task-proof','Add Photo / Proof',697,1205,212,45),
+        tap('data-task-comment','Add Comment',697,1255,212,43),
+        tap('data-task-open','View History',697,1303,212,45),
+        tap('data-task-proof','Add Photo / Proof',704,1362,204,141)
       ].join('');
       for (const button of detail.querySelectorAll('button')) button.disabled = !task;
       if (!task) return;
@@ -249,7 +255,61 @@ window.FFH_REFERENCE_TASKS = (() => {
       dialog.addEventListener('close',()=>dialog.remove(),{once:true});
       dialog.showModal();
     };
-    query.addEventListener('input',draw);
+    for (const input of [query,categoryQuery]) input.addEventListener('input',() => {
+      query.value = categoryQuery.value = input.value;
+      draw();
+    });
+    panel.querySelectorAll('[data-task-expand]').forEach(trigger => {
+      trigger.onclick = () => {
+        const dialog = document.createElement('dialog');
+        dialog.className = 'ffTaskArtDialog ffTaskArtFull ffInsetDialog';
+        dialog.setAttribute('aria-label','Task List and Details');
+        dialog.innerHTML = `<header><b>Task List and Details</b><button type="button" aria-label="Close">×</button></header>
+          <label>Search task, outlet or SR<input type="search"></label><div class="ffTaskFullCategories"></div>
+          <div class="ffTaskFullRows"></div><article></article>`;
+        const input = dialog.querySelector('input'), list = dialog.querySelector('.ffTaskFullRows');
+        const info = dialog.querySelector('article'), categoryBar = dialog.querySelector('.ffTaskFullCategories');
+        const controls = [...panel.querySelectorAll('[data-task-category]')];
+        input.value = query.value;
+        function renderFull() {
+          categoryBar.replaceChildren(...controls.map((control,i) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = categories[i];
+            button.setAttribute('aria-pressed',String(i === state.kind));
+            button.onclick = () => {control.click();renderFull();};
+            return button;
+          }));
+          list.innerHTML = shown.map(task=>`<button type="button" data-full-task="${esc(task.id)}" aria-pressed="${task.id===state.selected}">
+            <b>${esc(task.title)}</b><span>${esc([task.outletName,compactName(task.to),task.due,status(task)].filter(Boolean).join(' · '))}</span></button>`).join('') ||
+            '<p>No tasks match this selection.</p>';
+          for (const button of list.querySelectorAll('button')) button.onclick = () => {
+            showDetails(shown.find(task=>String(task.id)===button.dataset.fullTask));
+            renderFull();
+          };
+          const task = shown.find(task=>task.id===state.selected);
+          info.innerHTML = task ? `<h2>${esc(task.title)}</h2><p>${esc(task.description || '')}</p>
+            <dl><dt>Outlet</dt><dd>${esc(task.outletName || '—')}</dd><dt>Assignee</dt><dd>${esc(compactName(task.to))}</dd>
+            <dt>Due</dt><dd>${esc(task.due || '—')}</dd><dt>Status</dt><dd>${esc(status(task))}</dd></dl>
+            <div class="ffTaskFullActions"></div>` : '';
+          const actions = info.querySelector('.ffTaskFullActions');
+          if (actions) for (const action of ['status','proof','comment','open']) {
+            const original = find('[data-task-'+action+']'), button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = original.getAttribute('aria-label');
+            button.onclick = () => {dialog.close();original.click();};
+            actions.append(button);
+          }
+        }
+        input.oninput = () => {query.value = categoryQuery.value = input.value;draw();renderFull();};
+        dialog.querySelector('header button').onclick = () => dialog.close();
+        dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+        root.append(dialog);
+        renderFull();
+        dialog.showModal();
+        if (trigger.dataset.taskExpand === 'categories') categoryBar.querySelector('button')?.focus();
+      };
+    });
     taskStatus.addEventListener('change',draw);
     rows.onclick = event=>{
       const row = event.target.closest('[data-task-id]');
