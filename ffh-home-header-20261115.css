@@ -39,7 +39,7 @@
     inset: 48% 34% auto 86px !important;
     transform: translateY(-50%) !important;
     padding: 0 !important;
-    background: #030303;
+    background: linear-gradient(90deg, #030303 68%, transparent);
   }
 
   html body #app .app:has(.homeGrid) .ffIdentityHero .ffIdentityText > small {
