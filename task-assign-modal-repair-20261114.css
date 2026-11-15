@@ -9,3 +9,15 @@
 .ffTaskRecipientScope select[aria-label="Filter task recipient zone"]{min-width:130px!important;max-width:100%!important;width:auto!important;flex:1 1 160px!important;background:#0c0b09!important;color:#fff!important;border:1px solid #f07a22!important;border-radius:9px!important}
 .ffTaskRecipientScope input[type="search"]{width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
 @media(max-width:500px){.ffTaskRecipientScope .ffTaskRecipientManagerIdentity{flex-basis:100%!important}.ffTaskRecipientScope .ffTaskRecipientManagerText{font-size:11px!important}}
+
+
+/* Task proof controls: use the existing proofMode field and preserve form submission. */
+.ffTaskProofShortcut{display:grid;gap:8px;padding:12px;border:1px solid #ff8a25;border-radius:14px;background:linear-gradient(135deg,#271307,#100b08);color:white;min-width:0}
+.ffTaskProofShortcut b{color:#ff9a36;font-weight:800}
+.ffTaskProofShortcut p,.ffTaskProofShortcut small{margin:0;color:#e9d6c4;font-size:12px;line-height:1.4}
+.ffTaskProofOptions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.ffTaskProofOptions button{min-width:0;min-height:42px;border:1px solid #ff922c;border-radius:10px;background:#090706;color:#fff;font-weight:700}
+.ffTaskProofOptions button[aria-pressed="true"]{background:linear-gradient(130deg,#ffad28,#ff7100);color:#100800;border-color:#ffe6a4;box-shadow:0 0 10px #ff891966}
+.ffTaskModalBody,.ffTaskModalBody form{min-width:0}
+.ffTaskModalBody{overflow-y:auto!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;max-height:min(76dvh,760px)}
+.ffTaskModalBody form{padding-bottom:24px}
