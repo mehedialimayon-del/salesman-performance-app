@@ -92,10 +92,21 @@ window.FFH_REFERENCE_TASKS = (() => {
 
     function openEditor(selector, prepare) {
       const composer = root.querySelector(selector);
-      if (!composer) return;
+      if (!composer) { window.alert('This feature is not available for your current account.'); return; }
       if (!composer.open) composer.querySelector('summary').click();
       const form = document.querySelector('.ffTaskModalBody form') || composer.querySelector('form');
-      if (form) prepare(form);
+      if (form) {
+        prepare(form);
+        if (selector === '.ffTaskComposer') {
+          const proof = form.elements.proofMode;
+          if (proof) {
+            proof.required = true;
+            proof.closest('label')?.setAttribute('title','Choose whether the assigned SR must upload a photo, location, or both before completion.');
+          }
+          const reminder = form.elements.remindAt;
+          if (reminder) reminder.title = 'Optional reminder for the assigned task';
+        }
+      }
     }
     drawer.querySelector('[data-private-task-notes]').onclick = () => openEditor('.ffPrivateNoteDrawer',form=>form.elements.text.focus());
     function openHistory(task) {
@@ -152,11 +163,7 @@ window.FFH_REFERENCE_TASKS = (() => {
       find('[data-task-status]').onclick = () => openStatus(task);
       find('[data-task-open]').onclick = () => openHistory(task);
       find('[data-proof-view]')?.addEventListener('click',()=>window.FFH_OPEN_IMAGE?.(photo));
-      find('[data-task-comment]').onclick = () => openEditor('.ffPrivateNoteDrawer',form=>{
-        form.elements.text.value = task.title + '\n';
-        form.elements.text.focus();
-        form.elements.text.selectionStart = form.elements.text.selectionEnd = form.elements.text.value.length;
-      });
+      find('[data-task-comment]').onclick = () => openStatus(task);
       detail.querySelectorAll('[data-task-proof]').forEach(button=>{
         button.onclick = () => {
           if (originals.get(String(task.id))?.querySelector('.ffTaskPhoto')) {
@@ -206,7 +213,7 @@ window.FFH_REFERENCE_TASKS = (() => {
       const mineIds = new Set([String(viewerId), String(context.viewer?.id || ''), String(context.viewer?.staffId || '')].filter(Boolean));
       const scoped = tasks.filter(task=>{
         const day = task.due || String(task.created || '').slice(0,10);
-        return (state.scope === 'team' || mineIds.has(String(task.to)) || String(task.to).toLowerCase() === 'all') &&
+        return (state.scope === 'team' || mineIds.has(String(task.to))) &&
           (!state.from || day >= state.from) && (!state.to || day <= state.to);
       });
       const counters = [scoped.length,scoped.filter(completed).length,scoped.filter(progress).length,scoped.filter(overdue).length];
