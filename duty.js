@@ -197,7 +197,13 @@ async function renderTracking(){await refresh();if(!state?.can_track)return rend
  };
  fillStaff();
  zone.onchange=()=>{fillStaff();if(staff.value)refreshTeamMap(true).catch(error);};
- document.querySelectorAll('[data-track-open]').forEach(button=>button.onclick=()=>ctx.open?.(button.dataset.trackOpen));
+ document.querySelectorAll('[data-track-open]').forEach(button=>button.onclick=()=>{
+  const target=button.dataset.trackOpen,selected=staff.value;
+  if(target==='reports'||target==='outletHistory'){
+   return ctx.openTrackingDetail?.(target,{staff:selected,day:$('#ffTrackDate').value});
+  }
+  return ctx.open?.(target);
+ });
  if(!window.L){$('#ffDutyStatus').textContent='Map library could not load. Check your internet connection.';return;}
  map=L.map('ffDutyMap').setView([3.139,101.6869],11);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19}).addTo(map);mapLayer=L.layerGroup().addTo(map);const full=L.control({position:'topright'});full.onAdd=()=>{const button=L.DomUtil.create('button','ffMapFullscreen');button.type='button';button.id='ffMapFullscreen';button.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>';button.title='Full screen map';button.setAttribute('aria-label','Full screen map');L.DomEvent.disableClickPropagation(button);button.onclick=openTrackingFullscreen;return button;};full.addTo(map);setTimeout(()=>map?.invalidateSize(),100);
  function showSelection(){

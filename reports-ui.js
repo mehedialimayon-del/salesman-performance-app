@@ -201,5 +201,15 @@ async function assistantFile(name,range={}){
  return new File([X.write(wb,{bookType:'xlsx',type:'array',cellStyles:true})],'FieldForce-'+(name||'Full-Final').replace(/[^a-z0-9]+/gi,'-')+'-'+snap.filters.from+'-to-'+snap.filters.to+'.xlsx',{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 }
 window.FFH_REPORT_ASSISTANT={snapshot:assistantSnapshot,file:assistantFile,download:async file=>{if(!ctx.user())throw Error('Login required');return ffhSafeDownload(file,file.name);}};
-return {reports,shareFile,rows:name=>model().rows(name),view:name=>{detail=name;render();},exportWorkbook:()=>download(detail,q('#xls')||q('[data-report-export]'))};
+async function openTrackingPerformance({staff,day}){
+ const sid=ctx.user()?.id;
+ if(!sid)return;
+ owner=sid;detail='SR Performance';
+ filters={...defaults(),from:day||today(),to:day||today(),zone:'',sr:staff||''};
+ const activePage=ctx.page();
+ shell(back(detail)+'<div class="card" id="ffReportStatus" role="status">Loading SR performance…</div>');bindBack();
+ try{if(await refresh()&&ctx.page()===activePage&&ctx.user()?.id===sid)render();}
+ catch(err){status('SR performance could not load: '+err.message);}
+}
+return {reports,shareFile,openTrackingPerformance,rows:name=>model().rows(name),view:name=>{detail=name;render();},exportWorkbook:()=>download(detail,q('#xls')||q('[data-report-export]'))};
 };

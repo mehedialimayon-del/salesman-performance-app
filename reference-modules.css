@@ -526,3 +526,16 @@ html body.ffGlowOn #app .app.ffBlackGlow .ffRefOutletViewport :is([data-ref-outl
 #app .app:has(.ffRefAttendance) {--ff-ref-line:#e7831c;--ff-ref-font:'Roboto Condensed','Arial Narrow',Roboto,Arial,sans-serif;}
 .ffAttendanceActions {margin-top:.65em;}
 .ffRefAttendance #ffAttendanceFeedback:empty {display:none;}
+#app .app:has(.ffRefProposalPage) {--ff-ref-line:#e7831c;--ff-ref-font:'Roboto Condensed','Arial Narrow',Roboto,Arial,sans-serif;}
+#app .ffRefProposalPage {display:grid;gap:.65rem;width:100%;min-width:0;}
+.ffRefProposalPage .ffRefPanel h2 {margin:.35em .5em;font-size:1rem;}
+.ffProposalFilters button,.ffProposalCategoryPanel button {min-width:0;}
+.ffProposalCategoryPanel {padding:.35em;}
+.ffProposalCategoryPanel .ffManagerControlGrid {gap:.3em;}
+.ffProposalCategoryPanel button[aria-pressed=true],.ffProposalShortcuts button[aria-pressed=true] {border-color:#ffc34b!important;background:#6b3108!important;}
+.ffProposalStats button[aria-pressed=true] {outline:1px solid #ffc34b;}
+.ffProposalDetailGrid {display:grid;grid-template-columns:minmax(65px,27%) minmax(0,1fr);gap:.6rem;padding:.5rem;}
+.ffProposalDetailGrid img {width:100%;max-height:100px;object-fit:contain;}
+.ffProposalDetailGrid>div {min-width:0;overflow-wrap:anywhere;}
+.ffProposalDetailActions {display:flex;flex-wrap:wrap;gap:.35rem;}
+.ffRefProposalPage #ffProposalFeedback:empty {display:none;}

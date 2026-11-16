@@ -595,13 +595,18 @@ const FFH_PROPOSAL_TEMPLATES=[
   {key:'31',name:"SETIA HUB",asset:"proposal-assets/31_Setia_Hub.png"},
   {key:'32',name:"MR.D.I.Y.",asset:"proposal-assets/32_MR_DIY.png"}
 ];
+let ffProposalFilters={};
 async function proposals(){
+ const viewer=user?.id;if(!viewer)return;
+ if(ffProposalFilters.viewer!==viewer)ffProposalFilters={viewer,from:'',to:'',category:'',query:'',mine:false,id:'',fileState:''};
+ const filters=ffProposalFilters;
  currentPage='proposals';localStorage.setItem('ffh_last_page',currentPage);
  let cloud=[];
  try{
-  let {data,error}=await FFH_SUPABASE.from('ffh_proposals').select('id,name,category,logo_url,file_url,filename,created_date').order('created_at',{ascending:false});
-  if(!error&&Array.isArray(data)) cloud=data.map(x=>({id:String(x.id),name:x.name||'Proposal',category:x.category||'Proposal Form',logo:x.logo_url||'',file:x.file_url||'',filename:x.filename||'',date:x.created_date||today(),cloud:true}));
+  let {data,error}=await FFH_SUPABASE.from('ffh_proposals') .select('id,name,category,logo_url,file_url,filename,created_date,updated_at').order('created_at',{ascending:false});
+  if(!error&&Array.isArray(data)) cloud=data.map(x=>({id:String(x.id),name:x.name||'Proposal',category:x.category||'Proposal Form',logo:x.logo_url||'',file:x.file_url||'',filename:x.filename||'',date:x.created_date||'',updated:x.updated_at||'',cloud:true}));
  }catch(_){ cloud=(db.proposals||[]).filter(x=>x.cloud); }
+ if(user?.id!==viewer||currentPage!=='proposals')return;
  const norm=v=>String(v||'').toUpperCase().replace(/[^A-Z0-9]+/g,'');
  const aliases={
   '02':['KKSUPERMART','KKSUPERMARKET'], '03':['NSKGROCER','NSK'], '05':['AEONBIG','AEONBIGMALAYSIA'],
@@ -610,22 +615,88 @@ async function proposals(){
   '23':['KECOMART','KECOMARKET'], '32':['MRDIY','MRDIYALWAYSLOWPRICES']
  };
  const matchCloud=t=>cloud.find(x=>{let n=norm(x.name), a=[norm(t.name),...(aliases[t.key]||[])];return a.some(z=>z&&(n===z||n.includes(z)||z.includes(n)))});
- const defaults=FFH_PROPOSAL_TEMPLATES.map(t=>{let c=matchCloud(t);return {id:c?.id||('TPL'+t.key),templateKey:t.key,name:t.name,category:'Proposal Form',logo:t.asset,file:c?.file||'',filename:c?.filename||'',date:c?.date||'',cloud:!!c?.cloud,isTemplate:true}});
+ const defaults=FFH_PROPOSAL_TEMPLATES.map(t=>{let c=matchCloud(t);return {id:c?.id||('TPL'+t.key),templateKey:t.key,name:t.name,category:c?.category||'Proposal Form',logo:t.asset,file:c?.file||'',filename:c?.filename||'',date:c?.date||'',updated:c?.updated||'',cloud:!!c?.cloud,isTemplate:true}});
  const matched=new Set(defaults.filter(x=>x.cloud).map(x=>String(x.id)));
  const extras=cloud.filter(x=>!matched.has(String(x.id))).map(x=>({...x,isTemplate:false}));
- let list=[...defaults,...extras];
+ const list=[...defaults,...extras], canEdit=isMgr()&&ffhMay('proposals'),canUpload=isMgr()&&ffhMay('proposals')&&ffhMay('proposals','upload'),canDelete=isMgr()&&ffhMay('proposals','delete');
+ const categories=[...new Set(['Proposal Form','Listing Proposal','Promotion Proposal','CPO Plan','Sales Growth','New Outlet','Price Revision','Others',...list.map(item=>item.category)])];
+ const own=item=>{try{return new URL(item.file).pathname.split('/').slice(-4,-2).join('/')==='proposals/'+viewer;}catch{return false;}};
  db.proposals=list; try{save()}catch(_){}
- const actionHtml=x=>x.file?`<div class="ffProposalActions"><button class="secondary ffPropView" data-id="${esc(x.id)}">👁 VIEW PDF</button><button class="primary ffPropDownload" data-id="${esc(x.id)}">⬇ DOWNLOAD PDF</button>${isMgr()?`<button class="secondary ffPropEdit" data-id="${esc(x.id)}">✎ EDIT PDF</button>`:''}</div>`:`<div class="ffProposalActions ffNoPdf"><span>PDF not uploaded yet</span>${isMgr()?`<button class="primary ffPropEdit" data-id="${esc(x.id)}">＋ UPLOAD PDF</button>`:''}</div>`;
- const cards=list.map(x=>`<article class="ffProposalStrip" data-id="${esc(x.id)}">${isMgr()&&!x.isTemplate?`<button class="ffProposalDots delProposal" data-id="${esc(x.id)}" title="Delete">⋮</button>`:''}<div class="ffProposalVisual"><img loading="lazy" decoding="async" src="${esc(x.logo)}" alt="${esc(x.name)} Proposal Form" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="ffProposalGenerated" style="display:none"><b>${esc(x.name)}</b><span>PROPOSAL FORM</span></div></div>${actionHtml(x)}</article>`).join('');
- shell(back('Proposal Form')+`<section class="ffProposalPage"><div class="ffProposalHead"><div><p>${list.length} FORMS · VIEW · DOWNLOAD</p></div>${isMgr()?`<button class="primary ffTopAction" id="addProposalTop">＋ Add New</button>`:''}</div><div class="ffProposalStack">${cards}</div><div class="ffBottomQuote ffMotivationFooter"><span>“ Ready Forms · Faster Action · Bigger Business ”</span></div></section>`);bindBack();
  const byId=id=>list.find(x=>String(x.id)===String(id));
- const downloadPdf=async x=>{if(!x?.file)return alert('PDF not uploaded yet.');try{const r=await fetch(x.file);if(!r.ok)throw Error('HTTP '+r.status);const bytes=await r.arrayBuffer();if(new TextDecoder().decode(bytes.slice(0,5))!=='%PDF-')throw Error('The uploaded file is not a PDF');await ffhSafeDownload(new Blob([bytes],{type:'application/pdf'}),x.filename||((x.name||'proposal')+'.pdf'));}catch(e){alert('PDF download failed: '+e.message)}};
- qa('.ffPropView').forEach(b=>b.onclick=()=>{let x=byId(b.dataset.id);if(x?.file)window.open(x.file,'_blank','noopener');else alert('PDF not uploaded yet.')});
- qa('.ffPropDownload').forEach(b=>b.onclick=()=>downloadPdf(byId(b.dataset.id)));
- const uploadPdfModal=(x=null)=>{let isTemplate=!!x?.isTemplate,o=document.createElement('div');o.className='globalSearchOverlay';o.innerHTML=`<div class="globalSearchBox ffPremiumModal"><button type="button" class="ffModalBack">← Back</button><div class="cardTitle">${x?'Update':'Add'} Proposal PDF</div><form class="form" id="propForm"><label>Chain / Proposal Name<input name="name" value="${esc(x?.name||'')}" ${isTemplate?'readonly':''} placeholder="e.g. New Chain" required></label>${!isTemplate?`<label>Proposal Banner Image${x?' (optional — choose to replace)':''}<input name="logo" type="file" accept="image/*" ${x?'':'required'}></label>`:''}<label>PDF File<input name="pdf" type="file" accept="application/pdf" required></label><div class="notice">${isTemplate?'The premium banner is already fixed. Upload only the PDF.':'Upload one premium banner and its PDF. It will be saved to cloud.'}</div><button class="primary">${x?'UPDATE':'UPLOAD'} & PUBLISH</button><button type="button" class="secondary ffCloseModal">CANCEL</button></form></div>`;document.body.appendChild(o);let close=()=>o.remove();o.querySelector('.ffModalBack').onclick=close;o.querySelector('.ffCloseModal').onclick=close;o.onclick=e=>{if(e.target===o)close()};o.querySelector('#propForm').onsubmit=async e=>{e.preventDefault();let fd=new FormData(e.target),file=fd.get('pdf'),btn=e.target.querySelector('button.primary');try{btn.disabled=true;btn.textContent='UPLOADING…';let base=`proposals/${user.id}`,pdf=await ffhUploadPublicFile(file,base+'/pdf'),lg=x?.isTemplate?'':(x?.logo||'');if(!isTemplate){let logo=fd.get('logo');if(logo?.size)lg=await ffhUploadPublicFile(logo,base+'/covers')}let row={name:String(fd.get('name')||x?.name||'Proposal'),category:'Proposal Form',logo_url:lg,file_url:pdf,filename:file.name,created_date:today()};if(x?.cloud){let {error}=await FFH_SUPABASE.from('ffh_proposals').update(row).eq('id',x.id);if(error)throw error}else{let id=(crypto?.randomUUID?crypto.randomUUID():'P'+Date.now()+Math.random().toString(36).slice(2));let {error}=await FFH_SUPABASE.from('ffh_proposals').insert({id,...row});if(error)throw error}close();await proposals()}catch(err){alert('Proposal upload failed: '+(err?.message||err));btn.disabled=false;btn.textContent=(x?'UPDATE':'UPLOAD')+' & PUBLISH'}}};
- qa('.ffPropEdit').forEach(b=>b.onclick=()=>uploadPdfModal(byId(b.dataset.id)));
+ shell(back('Proposal Library')+`<section class="ffProposalPage ffRefProposalPage">
+  <form class="ffRefPanel ffRefFields ffProposalFilters" id="ffProposalFilter">
+   <label><span>From<input type="date" name="from" value="${esc(filters.from)}"></span></label>
+   <label><span>To<input type="date" name="to" value="${esc(filters.to)}"></span></label>
+   <label><span>Category<select name="category"><option value="">All categories</option>${categories.map(name=>`<option value="${esc(name)}" ${filters.category===name?'selected':''}>${esc(name)}</option>`).join('')}</select></span></label>
+   <button type="submit" class="secondary">Apply Filter</button>
+  </form>
+  <div class="ffRefExports ffProposalStats">${[['','Total Proposals','blue'],['file','PDF Available','green'],['missing','Awaiting PDF','gold']].map(([value,title,color])=>`<button type="button" class="ffRefMetric" data-color="${color}" data-proposal-status="${value}" aria-pressed="false"><span>${title}</span><strong>0</strong></button>`).join('')}</div>
+  <div class="ffRefExports ffProposalShortcuts">
+   ${canUpload?'<button type="button" class="primary ffTopAction" id="addProposalTop">＋ Add Proposal</button>':''}
+   <button type="button" class="secondary" data-proposal-scope="mine">My Proposals</button>
+   <button type="button" class="secondary" data-proposal-scope="team">Team Proposals</button>
+  </div>
+  <section class="ffRefPanel ffProposalCategoryPanel"><h2>Proposal Categories</h2><div class="ffManagerControlGrid">${categories.map(name=>`<button type="button" class="secondary" data-proposal-category="${esc(name)}">${esc(name)}</button>`).join('')}</div></section>
+  <section class="ffRefOutlet ffRefPanel"><div class="ffRefListHead"><h2 id="ffProposalCount">Proposal List</h2><label class="ffRefSearch"><input type="search" id="ffProposalSearch" aria-label="Search proposals" placeholder="Search proposals…" value="${esc(filters.query)}"></label></div>
+   <div class="ffRefOutletViewport"><table><thead><tr><th>Proposal</th><th>Category</th><th>Date</th><th>PDF</th></tr></thead><tbody id="ffProposalRows"></tbody></table></div>
+  </section>
+  <section class="ffRefPanel ffRefOutlet" id="ffProposalDetail" aria-live="polite"></section>
+  <div class="ffRefExports"><button type="button" class="ffRefButton" data-proposal-export="pdf">▤ Proposal Report (PDF)</button><button type="button" class="ffRefButton" data-proposal-export="xlsx">⇩ Export (Excel)</button></div>
+  <p id="ffProposalFeedback" role="status"></p>
+ </section>`);bindBack();
+ const downloadPdf=async x=>{if(!/^https:\/\//i.test(x?.file||''))return alert('The saved PDF link is unavailable.');try{const r=await fetch(x.file);if(!r.ok)throw Error('HTTP '+r.status);const bytes=await r.arrayBuffer();if(new TextDecoder().decode(bytes.slice(0,5))!=='%PDF-')throw Error('The uploaded file is not a PDF');await ffhSafeDownload(new Blob([bytes],{type:'application/pdf'}),x.filename||((x.name||'proposal')+'.pdf'));}catch(e){alert('PDF download failed: '+e.message)}};
+ let shown=[];
+ function draw(){
+  const term=filters.query.trim().toLowerCase();
+  const scoped=list.filter(x=>(!filters.mine||own(x))&&(!filters.from||x.date>=filters.from)&&(!filters.to||!!x.date&&x.date<=filters.to)
+   &&(!filters.category||x.category===filters.category)&&[x.name,x.category,x.filename].join(' ').toLowerCase().includes(term));
+  const count=[scoped.length,scoped.filter(x=>x.file).length,scoped.filter(x=>!x.file).length];
+  qa('[data-proposal-status]').forEach((button,i)=>{button.querySelector('strong').textContent=count[i];button.setAttribute('aria-pressed',String(button.dataset.proposalStatus===filters.fileState));});
+  qa('[data-proposal-scope]').forEach(button=>button.setAttribute('aria-pressed',String((button.dataset.proposalScope==='mine')===filters.mine)));
+  qa('[data-proposal-category]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.proposalCategory===filters.category)));
+  shown=scoped.filter(x=>!filters.fileState||(filters.fileState==='file'?!!x.file:!x.file));
+  q('#ffProposalCount').textContent='Proposal List ('+shown.length+')';
+  q('#ffProposalRows').innerHTML=shown.map(x=>`<tr><td><button type="button" class="secondary" data-proposal-id="${esc(x.id)}">${esc(x.name)}</button></td><td>${esc(x.category)}</td><td>${esc(x.date||'—')}</td><td>${x.file?'Available':'Awaiting PDF'}</td></tr>`).join('')||'<tr><td colspan="4">No proposals match these filters.</td></tr>';
+  qa('[data-proposal-id]').forEach(button=>button.onclick=()=>{filters.id=button.dataset.proposalId;showDetail(byId(filters.id));});
+  const item=shown.find(x=>x.id===filters.id)||shown[0];
+  filters.id=item?.id||'';showDetail(item);
+ }
+ function showDetail(item){
+  const detail=q('#ffProposalDetail');
+  if(!item){detail.innerHTML='<h2>Proposal Details</h2><p>No proposal selected.</p>';return;}
+  detail.innerHTML=`<h2>Proposal Details</h2><div class="ffProposalDetailGrid">
+   ${item.logo?`<img src="${esc(item.logo)}" alt="${esc(item.name)}" loading="lazy">`:''}
+   <div><b>${esc(item.name)}</b><p>${esc(item.category)} · ${esc(item.date||'No PDF recorded')}</p>
+   <div class="ffProposalDetailActions">${item.file?'<button type="button" class="secondary" data-pdf-view>View PDF</button><button type="button" class="secondary" data-pdf-dl>Download PDF</button>':''}
+   ${(item.file?canEdit:canUpload)?`<button type="button" class="secondary" data-pdf-edit>${item.file?'Edit Proposal':'Upload PDF'}</button>`:''}
+   ${canDelete&&item.cloud&&!item.isTemplate?'<button type="button" class="danger" data-proposal-delete>Move to Trash</button>':''}
+   </div><p class="miniStat">${item.updated?'Last updated · '+esc(new Date(item.updated).toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur'}))+' MYT':''}</p></div></div>`;
+  detail.querySelector('[data-pdf-view]')?.addEventListener('click',()=>{if(/^https:\/\//i.test(item.file))window.open(item.file,'_blank','noopener');else alert('The saved PDF link is unavailable.');});
+  detail.querySelector('[data-pdf-dl]')?.addEventListener('click',()=>downloadPdf(item));
+  detail.querySelector('[data-pdf-edit]')?.addEventListener('click',()=>uploadPdfModal(item));
+  detail.querySelector('[data-proposal-delete]')?.addEventListener('click',async()=>{
+   if(!confirm('Move this proposal to Trash?'))return;
+   const {data,error}=await FFH_SUPABASE.from('ffh_proposals').delete().eq('id',item.id).select('id');
+   if(error||!data?.length){q('#ffProposalFeedback').textContent=error?.message||'Delete permission is required.';return;}
+   await proposals();
+  });
+ }
+ const form=q('#ffProposalFilter'),search=q('#ffProposalSearch'),feedback=q('#ffProposalFeedback');
+ form.onsubmit=e=>{
+  e.preventDefault();const values=Object.fromEntries(new FormData(form));
+  if(values.from&&values.to&&values.from>values.to){feedback.textContent='Choose a valid date range.';return;}
+  Object.assign(filters,values);feedback.textContent='';draw();
+ };
+ search.oninput=()=>{filters.query=search.value;draw();};
+ qa('[data-proposal-status]').forEach(button=>button.onclick=()=>{filters.fileState=button.dataset.proposalStatus;draw();});
+ qa('[data-proposal-scope]').forEach(button=>button.onclick=()=>{filters.mine=button.dataset.proposalScope==='mine';draw();});
+ qa('[data-proposal-category]').forEach(button=>button.onclick=()=>{filters.category=filters.category===button.dataset.proposalCategory?'':button.dataset.proposalCategory;form.elements.category.value=filters.category;draw();});
+ qa('[data-proposal-export]').forEach(button=>button.onclick=()=>ffhReferenceExport(button,'Proposal Register',[
+  ['Proposal','Category','Date','PDF status'],...shown.map(item=>[item.name,item.category,item.date,item.file?'Available':'Awaiting PDF'])
+ ],feedback));
+ const uploadPdfModal=(x=null)=>{let isTemplate=!!x?.isTemplate,o=document.createElement('div');o.className='globalSearchOverlay';o.innerHTML=`<div class="globalSearchBox ffPremiumModal"><button type="button" class="ffModalBack">← Back</button><div class="cardTitle">${x?'Update':'Add'} Proposal PDF</div><form class="form" id="propForm"><label>Chain / Proposal Name<input name="name" value="${esc(x?.name||'')}" ${isTemplate?'readonly':''} placeholder="e.g. New Chain" required></label>${!isTemplate&&canUpload?`<label>Proposal Banner Image${x?' (optional — choose to replace)':''}<input name="logo" type="file" accept="image/*" ${x?'':'required'}></label>`:''}<label>Category<select name="category">${categories.map(name=>`<option value="${esc(name)}" ${name===(x?.category||'Proposal Form')?'selected':''}>${esc(name)}</option>`).join('')}</select></label>${canUpload?`<label>PDF File<input name="pdf" type="file" accept="application/pdf" ${x?.file?'':'required'}></label>`:''}<div class="notice">${isTemplate?'The premium banner is already fixed. Upload only the PDF.':'Upload one premium banner and its PDF. It will be saved to cloud.'}</div><button class="primary">${x?'UPDATE':'UPLOAD'} & PUBLISH</button><button type="button" class="secondary ffCloseModal">CANCEL</button></form></div>`;document.body.appendChild(o);let close=()=>o.remove();o.querySelector('.ffModalBack').onclick=close;o.querySelector('.ffCloseModal').onclick=close;o.onclick=e=>{if(e.target===o)close()};o.querySelector('#propForm').onsubmit=async e=>{e.preventDefault();let fd=new FormData(e.target),file=fd.get('pdf'),btn=e.target.querySelector('button.primary');try{btn.disabled=true;btn.textContent='UPLOADING…';let base=`proposals/${user.id}`,pdf=file?.size?await ffhUploadPublicFile(file,base+'/pdf'):x?.file,lg=x?.isTemplate?'':(x?.logo||'');if(!isTemplate){let logo=fd.get('logo');if(logo?.size)lg=await ffhUploadPublicFile(logo,base+'/covers')}let row={name:String(fd.get('name')||x?.name||'Proposal'),category:String(fd.get('category')||'Proposal Form'),logo_url:lg,file_url:pdf,filename:file?.size?file.name:x?.filename,created_date:x?.date||today(),updated_at:new Date().toISOString()};if(x?.cloud){let {error}=await FFH_SUPABASE.from('ffh_proposals').update(row).eq('id',x.id);if(error)throw error}else{let id=(crypto?.randomUUID?crypto.randomUUID():'P'+Date.now()+Math.random().toString(36).slice(2));let {error}=await FFH_SUPABASE.from('ffh_proposals').insert({id,...row});if(error)throw error}close();await proposals()}catch(err){alert('Proposal upload failed: '+(err?.message||err));btn.disabled=false;btn.textContent=(x?'UPDATE':'UPLOAD')+' & PUBLISH'}}};
  if(q('#addProposalTop'))q('#addProposalTop').onclick=()=>uploadPdfModal(null);
- qa('.delProposal').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();if(!confirm('Delete this proposal?'))return;let x=byId(b.dataset.id);if(x?.cloud){let {error}=await FFH_SUPABASE.from('ffh_proposals').delete().eq('id',x.id);if(error)return alert('Delete failed: '+error.message)}await proposals()});
+ draw();
 }
 function reports(){let names=['Executive Summary','SR Performance','Daily Sales','Delivered Sales','Outlet Wise','SKU Wise','Targets & Shortfall','Income Breakdown','Sales Commission','Product Incentives','Other Incentives','Zero Sales','CPO Execution','Promotion Execution','Route & Visits'];shell(back('Reports & Full Export')+`<div class="range"><input id="rf" type="date" value="${month()+'-01'}"><input id="rt" type="date" value="${today()}"></div><div class="card">${names.map((x,i)=>`<button class="listBtn reportBtn" data-r="${i}"><span><i class="ico">▥</i>${x}</span><b>›</b></button>`).join('')}</div><button class="primary premiumBtn" id="xls">DOWNLOAD FULL EXCEL WORKBOOK</button>`);bindBack();qa('.reportBtn').forEach(b=>b.onclick=()=>{navStack.push({name:'reports',view});currentPage='report:'+b.dataset.r;reportView(names[+b.dataset.r])});q('#xls').onclick=exportWorkbook}
 function reportIncomeFor(id,f,t){let setup=db.incomeSetup[id]||{},basic=+(setup.basic??rules.basic??0),fuel=+(setup.fuel??rules.fuel??0),house=+(setup.houseRent??rules.houseRent??0),d=rangeDelivered(id,f,t),m=(f||month()+'-01').slice(0,7),tar=target(id,m),a=tar?d/tar:0,comm=a<.8?d*.005:a<=1?d*.01:tar*.01+Math.max(0,d-tar)*.02,food=d>=rules.foodThreshold?rules.foodHigh:rules.foodLow,adj=(db.adjustments||[]).filter(x=>x.sr===id&&x.month===m),pos=adj.filter(x=>x.kind!=='Penalty').reduce((s,x)=>s+(+x.amount||0),0),pen=adj.filter(x=>x.kind==='Penalty').reduce((s,x)=>s+(+x.amount||0),0);return{basic,fuel,house,food,d,tar,comm,pos,pen,total:basic+fuel+house+(+food||0)+comm+pos-pen}}
@@ -648,7 +719,7 @@ function reportRows(name){let id=currentSr(),f=q('#rf')?.value||month()+'-01',t=
 }
 function reportView(name){let rows=reportRows(name);shell(back(name)+`<div class="card reportTable"><table>${rows.map((r,i)=>`<tr>${r.map(c=>i?`<td>${esc(c)}</td>`:`<th>${esc(c)}</th>`).join('')}</tr>`).join('')}</table></div>`);bindBack()}
 async function ffhReferenceExport(button, title, rows, status) {
- const kind = button.dataset.taskExport || button.dataset.outletExport || button.dataset.rewardExport || button.dataset.routeExport || button.dataset.attendanceExport;
+ const kind = button.dataset.taskExport || button.dataset.outletExport || button.dataset.rewardExport || button.dataset.routeExport || button.dataset.attendanceExport || button.dataset.proposalExport;
  const filename = 'FieldForce-' + title.replace(/[^a-z0-9]+/gi,'-') + '-' + today();
  button.disabled = true;
  status.textContent = '';
@@ -1447,7 +1518,9 @@ function ffhAppendClaimButtons(){const root=q('#ffIncomeExtras')||q('#app main')
 function ffhLocationTaskDialog(id,date,point){
  const overlay=document.createElement('div');overlay.className='globalSearchOverlay ffLocationTaskDialog';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Assign location task');overlay.innerHTML=`<section class="globalSearchBox"><button type="button" class="secondary" data-close>× Close</button><h2>Assign Location Task</h2><form class="form" id="taskForm"><label>Task<input name="title" required></label><label>Assign To<select name="to">${ffhVisiblePeople().filter(p=>p.active!==false).map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}</select></label><label>Due<input name="due" type="date"></label><label>Reminder date & time<input name="remindAt" type="datetime-local"></label><label>Priority<select name="priority"><option>Normal</option><option>High</option><option>Urgent</option></select></label><label>Outlet / place<input name="outletName"></label><label>Instructions<textarea name="description"></textarea></label><button type="button" class="secondary" id="ffTaskTargetGps">📍 ATTACH MY CURRENT LOCATION</button><div id="ffTaskTargetStatus" class="miniStat"></div><label>Proof required<select name="proofMode"><option value="none">None</option><option value="location">Location</option><option value="photo">Photo</option><option value="both">Location + photo</option></select></label><button class="primary">ASSIGN TASK</button></form></section>`;document.body.append(overlay);const close=window.FFH_OVERLAY(overlay,()=>overlay.remove());overlay.querySelector('[data-close]').onclick=close;const form=overlay.querySelector('form');form.elements.title.value='Location follow-up';form.elements.description.value='Please explain your work at this location on '+date;form.elements.to.value=id;form.dataset.trackingPopup='1';if(point)form.dataset.targetLocation=JSON.stringify({latitude:point.latitude,longitude:point.longitude,accuracy:point.accuracy_m});overlay.querySelector('#ffTaskTargetGps').onclick=()=>navigator.geolocation.getCurrentPosition(p=>{form.dataset.targetLocation=JSON.stringify({latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy:p.coords.accuracy});overlay.querySelector('#ffTaskTargetStatus').textContent='Location attached';},e=>alert(e.message),{enableHighAccuracy:true,timeout:20000});
 }
-const ffDuty=window.FFH_CREATE_DUTY({catalogue:async()=>{await ffhRefreshCatalogueCloud();return ffhCatalogueRows()},catalogueFile:async id=>{let result;await ffhExportCatalogue('pdf',null,id,null,null,true,async(blob,name)=>{result=new File([blob],name,{type:blob.type})});if(!result)throw Error('PDF generation cancelled');return result},reportFile:(...args)=>ffReports.shareFile(...args),download:ffhSafeDownload,exportFile:ffhReferenceExport,user:()=>user,page:()=>currentPage,setPage:p=>{currentPage=p},today,esc,shell,back,bindBack,home:()=>home(true),open:go,notice:ffhLiveNotice,task:ffhLocationTaskDialog});
+const ffDuty=window.FFH_CREATE_DUTY({catalogue:async()=>{await ffhRefreshCatalogueCloud();return ffhCatalogueRows()},catalogueFile:async id=>{let result;await ffhExportCatalogue('pdf',null,id,null,null,true,async(blob,name)=>{result=new File([blob],name,{type:blob.type})});if(!result)throw Error('PDF generation cancelled');return result},reportFile:(...args)=>ffReports.shareFile(...args),download:ffhSafeDownload,exportFile:ffhReferenceExport,user:()=>user,page:()=>currentPage,setPage:p=>{currentPage=p},today,esc,shell,back,bindBack,home:()=>home(true),open:go,openTrackingDetail:(module,scope)=>module==='reports'
+ ?navigate('report:'+window.FFH_REPORTS_CORE.names.indexOf('SR Performance'),()=>ffReports.openTrackingPerformance(scope))
+ :navigate('outletHistory',()=>ffPerformance.historyPage(scope)),notice:ffhLiveNotice,task:ffhLocationTaskDialog});
 // Capture every legacy module click before handlers can bypass the attendance gate.
 document.addEventListener('change',e=>{if(e.target.id==='ffDashboardZone'){ffhSelectedZone=e.target.value;view='ALL';ffhRenderHistoryPage(currentPage);}});
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!user)return;const allowed=['bh','profile','bell','bn','refresh','dots','lang','logout'];if(allowed.includes(b.id)||b.closest('#ffAttendanceForm,#ffChatForm')||['ffConfirmHome','ffResumeDuty','ffCheckout'].includes(b.id))return;if(ffDuty.gate(b.id==='orb'?'ai':b.dataset.page||currentPage)){e.preventDefault();e.stopImmediatePropagation();navigate('attendance',ffDuty.attendance);}},true);

@@ -97,7 +97,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   $('#ffApprovalType').onchange=draw;$('#ffApprovalStatus').onchange=draw;$('#ffApprovalSearch').oninput=draw;$('#ffApprovalReload').onclick=approvals;
   if($('#ffApprovalPermissions'))$('#ffApprovalPermissions').onclick=()=>ctx.open('access');if($('#ffIncomeApprovalPermissions'))$('#ffIncomeApprovalPermissions').onclick=()=>ctx.open('incomeLedger');draw();
  }
- async function historyPage(){
+ async function historyPage(selection={}){
   const id=me(), turn=++ticket;
   page('outletHistory','Outlet Management','<div class="card" role="status">Loading assigned outlets and history…</div>');
   let errors=[];try{await ctx.refreshStaff();await ctx.refreshOutlets();}catch(e){errors.push('Outlet access: '+e.message);}
@@ -122,7 +122,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   page('outletHistory','Outlet Management',`<section class="ffRefOutlet">
    <div class="ffRefPanel ffRefFields">
      <div class="ffRefOutletDates"><span>Date Range</span>
-      <div><input id="ffOutletHistoryFrom" type="date" aria-label="From date"><input id="ffOutletHistoryTo" type="date" aria-label="To date"></div>
+      <div><input id="ffOutletHistoryFrom" type="date" aria-label="From date" value="${E(selection.day||'')}"><input id="ffOutletHistoryTo" type="date" aria-label="To date" value="${E(selection.day||'')}"></div>
      </div>
      <label><span>Zone<select id="ffOutletZone">${selectOptions(zones.map(z=>[z,z]),'All permitted zones')}</select></span></label>
      <label><span>Sales Representative<select id="ffOutletStaff">${selectOptions(ids.map(id=>[id,who(id)]),'All SRs')}</select></span></label>
@@ -324,6 +324,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     ...filtered.map(({o})=>[o.name,o.code,o.category,who(o.sr),o.totalSku,lastVisit(o),state(o)])
    ],$('#ffOutletActionStatus'));
   }
+  if(selection.staff&&ids.includes(selection.staff)){$('#ffOutletStaff').value=selection.staff;fill();}
   const requested=previousOutlet;
   if(requested){const i=outlets.findIndex(o=>o.sr===requested.sr&&o.code===requested.code);if(i>=0&&filtered.some(item=>item.i===i)){select.value=String(i);draw();}}
  }
