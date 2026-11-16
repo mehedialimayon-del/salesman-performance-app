@@ -19,6 +19,9 @@ window.FFH_REFERENCE_TASKS = (() => {
 
   return function(root, tasks, viewerId, today, staffName, esc, exportFile, context) {
     const history = root.querySelector('.ffTaskList');
+    const assignmentFiles = window.FFH_TASK_ASSIGNMENT_FILES;
+    const attachmentLine = assignmentFiles?.attachmentLine || /(?:^|\r?\n)Assignment attachment:[ \t]*(https:\/\/[^\s]+)[ \t]*$/;
+    if (context.managing) assignmentFiles?.bind(root.querySelector('#taskForm'), viewerId, window.FFH_SUPABASE);
     const drawer = document.createElement('details');
     drawer.className = 'ffRefPanel ffRefManage ffRefTaskHistory';
     drawer.innerHTML = '<summary>Task history and review</summary><button type="button" class="secondary" data-private-task-notes>My private notepad</button>';
@@ -227,7 +230,6 @@ window.FFH_REFERENCE_TASKS = (() => {
       const dialog = document.createElement('dialog');
       dialog.className = 'ffTaskArtDialog ffInsetDialog';
       dialog.setAttribute('aria-label','Edit or reassign task');
-      const attachmentLine = /(?:^|\r?\n)Assignment attachment:[ \t]*(https:\/\/[^\s]+)[ \t]*$/;
       const description = String(task.description || '');
       const attachment = description.match(attachmentLine)?.[0] || '';
       dialog.innerHTML = '<header><b>Edit or reassign task</b><button type="button" aria-label="Close">×</button></header>'
@@ -311,9 +313,12 @@ window.FFH_REFERENCE_TASKS = (() => {
       for (const row of rows.querySelectorAll('[data-task-id]')) row.setAttribute('aria-selected',String(row.dataset.taskId === String(state.selected)));
       const photo = taskPhoto(task);
       const description = String(task?.description || '');
-      const attachmentLine = /(?:^|\r?\n)Assignment attachment:[ \t]*(https:\/\/[^\s]+)[ \t]*$/;
       const assignmentUrl = description.match(attachmentLine)?.[1];
       const instructions = assignmentUrl ? description.replace(attachmentLine, '').trimEnd() : description;
+      const privateAttachment = assignmentFiles?.privatePath.test(assignmentUrl || '');
+      const attachmentMarkup = privateAttachment
+        ? '<p><button type="button" class="secondary" data-assignment-download>Download assignment attachment</button><span role="status" data-assignment-feedback></span></p>'
+        : (assignmentUrl?.startsWith('https://') ? '<p><a href="' + esc(assignmentUrl) + '" target="_blank" rel="noopener noreferrer">View assignment attachment ↗</a></p>' : '');
       const photoMarkup = photo ? `<img src="${esc(photo)}" alt="Saved proof for ${esc(task.title)}">` : '<span>No saved photo</span>';
       detail.innerHTML = [
         slot(photo?'button':'div',`class="ffTaskArtSlot ffTaskArtPhoto" ${photo?'type="button" data-proof-view aria-label="View saved proof"':''}`,photoMarkup,29,1158,286,186),
@@ -323,7 +328,7 @@ window.FFH_REFERENCE_TASKS = (() => {
           ['Due Date',task?.due],['Priority',task ? task.priority || 'Normal' : '']
         ].map(([label,v])=>`<div><dt>${label}</dt><dd title="${esc(v || '')}">${esc(v || '—')}</dd></div>`).join(''),339,1189,326,143),
         slot('span',`class="ffTaskArtSlot ffTaskArtBadge" data-status="${esc(task ? completed(task) ? 'Done' : status(task) : '')}"`,esc(task ? status(task) : '—'),720,1098,185,36),
-        slot('div','class="ffTaskArtSlot ffTaskArtDescription"',esc(instructions)+(assignmentUrl?'<p><a href="'+esc(assignmentUrl)+'" target="_blank" rel="noopener noreferrer">View assignment attachment ↗</a></p>':''),29,1368,662,129),
+        slot('div','class="ffTaskArtSlot ffTaskArtDescription"',esc(instructions)+attachmentMarkup,29,1368,662,129),
         tap('data-task-status','Update Status',697,1156,212,46),
         tap('data-task-proof','Add Photo / Proof',697,1205,212,45),
         tap('data-task-comment','Add Comment',697,1255,212,43),
@@ -332,6 +337,15 @@ window.FFH_REFERENCE_TASKS = (() => {
       ].join('');
       for (const button of detail.querySelectorAll('button')) button.disabled = !task;
       if (!task) return;
+      const attachmentButton = find('[data-assignment-download]');
+      if (attachmentButton) attachmentButton.onclick = async () => {
+        attachmentButton.disabled = true;
+        const feedback = find('[data-assignment-feedback]');
+        feedback.textContent = '';
+        try { await assignmentFiles.download(assignmentUrl, window.FFH_SUPABASE); }
+        catch (error) { feedback.textContent = 'Download failed: ' + error.message; }
+        finally { attachmentButton.disabled = false; }
+      };
       find('[data-task-status]').onclick = () => openStatus(task);
       find('[data-task-open]').onclick = () => openTaskConversation(task,false);
       find('[data-proof-view]')?.addEventListener('click',()=>window.FFH_OPEN_IMAGE?.(photo));

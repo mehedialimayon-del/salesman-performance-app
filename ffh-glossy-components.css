@@ -244,3 +244,107 @@ html body #app .app main.wrap .ffTaskArtwork .ffTaskArtSlot.ffTaskArtTap {
   padding:0 .35em!important;
   border-radius:1.45cqw!important;
 }
+
+/* Use the same surfaces on ordinary module pages and their drill-downs. */
+html body #app .app main.wrap:not(:has(.ffTaskArtwork)) > .head.ffNoScreenBack h1 {
+  font-weight:850;
+  line-height:1.12;
+  overflow-wrap:anywhere;
+}
+html body #app .app main.wrap:not(:has(.ffTaskArtwork)) > .head.ffNoScreenBack h1 .ffHeadingAccent {
+  color:#ff871c!important;
+  -webkit-text-fill-color:#ff871c!important;
+}
+html body #app .app main.wrap:not(:has(.ffTaskArtwork)) > .head.ffNoScreenBack h1 .ffHeadingRest {
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+html body #app .app main.wrap:has(> .head.ffNoScreenBack):not(:has(.ffTaskArtwork))
+  :is(.card,.ffContactCard,.ffOfficeCard,.ffCampaignControls,.ffReferenceCampaign,.ffProposalCategoryPanel,.ffSkuDetailPanel,.ffAccessRow,.ffChatContactCard,.ffTrackingStatus),
+html body :is(.ffTaskArtDialog,.ffTaskModalBody,.ffInsetDialog,.ffPremiumModal) .ffTaskAssignAttachment {
+  background:var(--ff-gloss-panel)!important;
+  border:1px solid #f69330!important;
+  box-shadow:var(--ff-gloss-panel-shadow)!important;
+}
+html body #app .app main.wrap:has(> .head.ffNoScreenBack):not(:has(.ffTaskArtwork))
+  :is(.refKpi.greenPanel,.refKpi.orangePanel,.refKpi.bluePanel,.refKpi.redPanel,.refKpi.purplePanel,.ffSyncStat,#ffApprovalMetrics>button,.ffAttendanceMetrics>*) {
+  background:linear-gradient(#ffffff28,transparent 25%,transparent 80%,#ffffff13),
+    linear-gradient(var(--ff-gloss-top),var(--ff-gloss-base))!important;
+  border:1px solid var(--ff-gloss-edge)!important;
+  box-shadow:inset 0 0 .55em var(--ff-gloss-edge),0 0 .25em var(--ff-gloss-edge)!important;
+  color:#fff!important;
+}
+#app :is(.greenPanel,.ffSyncStat.synced,#ffApprovalMetrics>:nth-child(3),.ffAttendanceMetrics>:nth-child(1)) {
+  --ff-gloss-edge:var(--ff-gloss-green);
+  --ff-gloss-top:var(--ff-gloss-green-top);
+  --ff-gloss-base:var(--ff-gloss-green-base);
+}
+#app :is(.bluePanel,#ffApprovalMetrics>:nth-child(1)) {
+  --ff-gloss-edge:var(--ff-gloss-blue);
+  --ff-gloss-top:var(--ff-gloss-blue-top);
+  --ff-gloss-base:var(--ff-gloss-blue-base);
+}
+#app :is(.orangePanel,.ffSyncStat.pending,#ffApprovalMetrics>:nth-child(2),.ffAttendanceMetrics>:nth-child(2)) {
+  --ff-gloss-edge:var(--ff-gloss-gold);
+  --ff-gloss-top:var(--ff-gloss-gold-top);
+  --ff-gloss-base:var(--ff-gloss-gold-base);
+}
+#app :is(.redPanel,.ffSyncStat.failed,#ffApprovalMetrics>:nth-child(4),.ffAttendanceMetrics>:nth-child(3)) {
+  --ff-gloss-edge:var(--ff-gloss-red);
+  --ff-gloss-top:var(--ff-gloss-red-top);
+  --ff-gloss-base:var(--ff-gloss-red-base);
+}
+#app :is(.purplePanel,.ffAttendanceMetrics>:nth-child(4)) {
+  --ff-gloss-edge:var(--ff-gloss-purple);
+  --ff-gloss-top:var(--ff-gloss-purple-top);
+  --ff-gloss-base:var(--ff-gloss-purple-base);
+}
+
+html body #app .app main.wrap:has(> .head.ffNoScreenBack) table thead :is(th,td) {
+  background:var(--ff-gloss-table-head)!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  box-shadow:inset 0 1px #ffd17b;
+}
+html body #app .app main.wrap:has(> .head.ffNoScreenBack) table tbody tr:nth-child(odd) {
+  background:linear-gradient(90deg,#251407,#080603);
+}
+html body #app .app main.wrap:has(> .head.ffNoScreenBack) table tbody tr:nth-child(even) {
+  background:linear-gradient(90deg,#10201f,#050908);
+}
+html body #app .app main.wrap:has(> .head.ffNoScreenBack)
+  :is(.ffDashboardTabs,.ffRefRouteTabs,.ffCampaignControls,.ffContactToolbar,.ffManagerControlGrid,.ffProposalCategoryPanel,.ffApprovalControls,.ffAttendanceActions,.ffRefTrackActions)
+  button:not(.ffRefButton,.ffRefMetric,[role="switch"]) {
+  background:linear-gradient(#291307,#060504 75%,#100703)!important;
+  border-color:#ff9c2e!important;
+  box-shadow:inset 0 0 .45em #ff85294d,0 0 .25em #ff922566!important;
+}
+html body #app .app main.wrap:has(> .head.ffNoScreenBack)
+  :is(.ffDashboardTabs,.ffRefRouteTabs,.ffCampaignControls,.ffContactToolbar,.ffManagerControlGrid,.ffProposalCategoryPanel,.ffApprovalControls)
+  button:is(.on,.primary,[aria-pressed="true"],[aria-selected="true"]) {
+  background:var(--ff-gloss-active)!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  border-color:#ffe68f!important;
+  box-shadow:inset 0 0 .55em #fff29a,0 0 .34em #ff9800!important;
+}
+#app .ffTaskAssignAttachment {
+  border-radius:.8rem;
+  padding:.6rem;
+  margin:.45rem 0;
+  min-width:0;
+}
+#app .ffTaskAssignAttachment input {max-width:100%;}
+#app .ffTaskAssignAttachment [role="status"]:empty {display:none;}
+#app .ffTaskArtDescription [data-assignment-download] {
+  padding:.2em .45em!important;
+  background:#291307!important;
+  border:1px solid #ff9c2e!important;
+  border-radius:6px!important;
+  text-align:left;
+}
+#app .ffTaskArtDescription [data-assignment-feedback] {
+  display:block;
+  margin-top:.25em;
+  color:#ffbe82;
+}
