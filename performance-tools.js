@@ -91,7 +91,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   page('approvals','Approval Inbox','<div class="card" role="status">Loading your permitted requests…</div>');
   const inboxSources=[rows('ffh_tasks','created_at'),rpc('ffh_governance','state'),rpc('ffh_earnings','state'),rpc('ffh_claims_api','state'),ctx.refreshStaff()];
   // A stalled backend must not leave the inbox on its loading screen forever.
-  const limited=promise=>Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(Error('Request timed out. Tap REFRESH INBOX to retry.')),15000))]);
+  const limited=promise=>new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(Error('Request timed out. Tap REFRESH INBOX to retry.')),15000);Promise.resolve(promise).then(value=>{clearTimeout(timeout);resolve(value);},error=>{clearTimeout(timeout);reject(error);});});
   const results=await Promise.allSettled(inboxSources.map(limited));
   if(me()!==id||ticket!==turn||ctx.page()!=='approvals')return;
   const tasks=results[0].status==='fulfilled'?results[0].value:[],gov=results[1].status==='fulfilled'?results[1].value:{},earn=results[2].status==='fulfilled'?results[2].value:{},claims=results[3].status==='fulfilled'?results[3].value:{};
