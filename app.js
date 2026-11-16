@@ -634,7 +634,7 @@ async function proposals(){
   <div class="ffRefExports ffProposalShortcuts">
    ${canUpload?'<button type="button" class="primary ffTopAction" id="addProposalTop">＋ Add Proposal</button>':''}
    <button type="button" class="secondary" data-proposal-scope="mine">My Proposals</button>
-   <button type="button" class="secondary" data-proposal-scope="team">Team Proposals</button>
+   <button type="button" class="secondary" data-proposal-scope="team">Team Proposals</button><button type="button" class="secondary" id="ffProposalOrderHistory">Order History</button>
   </div>
   <section class="ffRefPanel ffProposalCategoryPanel"><h2>Proposal Categories</h2><div class="ffManagerControlGrid">${categories.map(name=>`<button type="button" class="secondary" data-proposal-category="${esc(name)}">${esc(name)}</button>`).join('')}</div></section>
   <section class="ffRefOutlet ffRefPanel"><div class="ffRefListHead"><h2 id="ffProposalCount">Proposal List</h2><label class="ffRefSearch"><input type="search" id="ffProposalSearch" aria-label="Search proposals" placeholder="Search proposals…" value="${esc(filters.query)}"></label></div>
@@ -644,6 +644,9 @@ async function proposals(){
   <div class="ffRefExports"><button type="button" class="ffRefButton" data-proposal-export="pdf">▤ Proposal Report (PDF)</button><button type="button" class="ffRefButton" data-proposal-export="xlsx">⇩ Export (Excel)</button></div>
   <p id="ffProposalFeedback" role="status"></p>
  </section>`);bindBack();
+ const orderChain=item=>({id:item.id,key:item.templateKey||'custom:'+item.id,name:item.name,image:item.logo,file:item.file,filename:item.filename,manage:canEdit});
+ q('.ffRefProposalPage').ffProposalRecords=list.map(orderChain);
+ q('#ffProposalOrderHistory').onclick=()=>window.FFH_PROPOSAL_ORDERS.openHistory();
  const downloadPdf=async x=>{if(!/^https:\/\//i.test(x?.file||''))return alert('The saved PDF link is unavailable.');try{const r=await fetch(x.file);if(!r.ok)throw Error('HTTP '+r.status);const bytes=await r.arrayBuffer();if(new TextDecoder().decode(bytes.slice(0,5))!=='%PDF-')throw Error('The uploaded file is not a PDF');await ffhSafeDownload(new Blob([bytes],{type:'application/pdf'}),x.filename||((x.name||'proposal')+'.pdf'));}catch(e){alert('PDF download failed: '+e.message)}};
  let shown=[];
  function draw(){
@@ -667,10 +670,11 @@ async function proposals(){
   detail.innerHTML=`<h2>Proposal Details</h2><div class="ffProposalDetailGrid">
    ${item.logo?`<img src="${esc(item.logo)}" alt="${esc(item.name)}" loading="lazy">`:''}
    <div><b>${esc(item.name)}</b><p>${esc(item.category)} · ${esc(item.date||'No PDF recorded')}</p>
-   <div class="ffProposalDetailActions">${item.file?'<button type="button" class="secondary" data-pdf-view>View PDF</button><button type="button" class="secondary" data-pdf-dl>Download PDF</button>':''}
+   <div class="ffProposalDetailActions"><button type="button" class="secondary" data-proposal-order>New Proposal Order</button>${item.file?'<button type="button" class="secondary" data-pdf-view>View PDF</button><button type="button" class="secondary" data-pdf-dl>Download PDF</button>':''}
    ${(item.file?canEdit:canUpload)?`<button type="button" class="secondary" data-pdf-edit>${item.file?'Edit Proposal':'Upload PDF'}</button>`:''}
    ${canDelete&&item.cloud&&!item.isTemplate?'<button type="button" class="danger" data-proposal-delete>Move to Trash</button>':''}
    </div><p class="miniStat">${item.updated?'Last updated · '+esc(new Date(item.updated).toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur'}))+' MYT':''}</p></div></div>`;
+  detail.querySelector('[data-proposal-order]').onclick=()=>window.FFH_PROPOSAL_ORDERS.openChain(orderChain(item));
   detail.querySelector('[data-pdf-view]')?.addEventListener('click',()=>{if(/^https:\/\//i.test(item.file))window.open(item.file,'_blank','noopener');else alert('The saved PDF link is unavailable.');});
   detail.querySelector('[data-pdf-dl]')?.addEventListener('click',()=>downloadPdf(item));
   detail.querySelector('[data-pdf-edit]')?.addEventListener('click',()=>uploadPdfModal(item));

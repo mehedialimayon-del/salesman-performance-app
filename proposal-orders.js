@@ -77,16 +77,18 @@ let scanning=false;const scannedSources=new Set();let nextScanTimer=null;
 async function autoBackfill(){
  if(scanning)return;
  const page=APP?.querySelector('.ffProposalPage');
- if(!page||!page.querySelector('.ffPropEdit'))return;
+ if(!page||!(page.ffProposalRecords?.some(chain=>chain.manage)||page.querySelector('.ffPropEdit')))return;
  scanning=true;
  let status=page.querySelector('.ffPoSyncStatus');
- if(!status){status=document.createElement('span');status.className='ffPoSyncStatus';status.setAttribute('role','status');page.querySelector('.ffProposalHead')?.append(status)}
+ if(!status){status=document.createElement('span');status.className='ffPoSyncStatus';status.setAttribute('role','status');(page.querySelector('.ffProposalHead')||page.querySelector('.ffProposalShortcuts'))?.append(status)}
  let ready=0,failed=0,attempted=0;
  try{
   await refreshFiles();
-  for(const card of [...page.querySelectorAll('.ffProposalStrip')]){
-   if(!APP?.contains(card))break;
-   const chain=chainFromCard(card),match=matchingFile(chain);
+  const chains=page.ffProposalRecords||[...page.querySelectorAll('.ffProposalStrip')].map(chainFromCard);
+  for(const chain of chains){
+   if(!APP?.contains(page))break;
+   if(!chain.manage)continue;
+   const match=matchingFile(chain);
    if(!match?.file_url||scannedSources.has(match.file_url))continue;
    chain.file=match.file_url;chain.manage=true;
    scannedSources.add(chain.file);
@@ -227,5 +229,5 @@ function enhance(){
 }
 function schedule(){if(!queue){queue=true;requestAnimationFrame(enhance)}}
 if(APP){new MutationObserver(schedule).observe(APP,{childList:true,subtree:true});schedule()}
-window.FFH_PROPOSAL_ORDERS={openHistory:showHistory,autoImportUploaded,autoBackfill,refreshPdf:(chain)=>{cache.delete(chain.key);return getTemplate(chain,{force:true})}};
+window.FFH_PROPOSAL_ORDERS={openHistory:showHistory,openChain:openComposer,autoImportUploaded,autoBackfill,refreshPdf:(chain)=>{cache.delete(chain.key);return getTemplate(chain,{force:true})}};
 })();
