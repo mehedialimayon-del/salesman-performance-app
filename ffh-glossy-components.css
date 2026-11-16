@@ -15,7 +15,7 @@
   --ff-gloss-gold:#ffc526;
   --ff-gloss-gold-top:#4b3300;
   --ff-gloss-gold-base:#1c1200;
-  --ff-gloss-table-head:linear-gradient(#ff9c00,#df4600);
+  --ff-gloss-table-head:linear-gradient(#ff9b00,#e64a00);
   --ff-gloss-active:linear-gradient(#ffbc2a,#ff7900 48%,#bd3a00);
   --ff-gloss-panel:linear-gradient(180deg,#190b03,#030303 3rem);
   --ff-gloss-panel-shadow:inset 0 0 .5em #ff8c2638,0 0 .34em #ff92254d;
@@ -25,8 +25,6 @@
   --ff-gloss-edge:#ff9c2e;
   --ff-gloss-top:#321302;
   --ff-gloss-base:#080402;
-  --ff-gloss-fill:linear-gradient(to bottom,#ffffff30,transparent 21%,transparent 79%,#ffffff15),linear-gradient(var(--ff-gloss-top),var(--ff-gloss-base));
-  --ff-gloss-shadow:inset 0 1px 2px #fff1, inset 0 0 .58em var(--ff-gloss-edge),0 0 .34em var(--ff-gloss-edge);
 }
 #app :is([data-color="green"],[data-status="Done"],[data-status="Active"],.ffTaskArtMetric[aria-label="Completed"],[data-task-export="pdf"],.ffDashboardFinish>.refKpis>.refKpi:nth-child(1)) {
   --ff-gloss-edge:var(--ff-gloss-green);
@@ -60,11 +58,11 @@
 }
 
 html body #app .app main.wrap :is(.ffRefButton,.ffRefMetric,.ffDashboardFinish>.refKpis>.refKpi),
-html body #app .app main.wrap .ffTaskArtwork :is(.ffTaskArtMetric,.ffTaskArtTap),
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtSlot:is(.ffTaskArtMetric,.ffTaskArtTap),
 html body #app .app main.wrap :is(.ffRefStatus,.ffTaskArtBadge) {
-  background:var(--ff-gloss-fill)!important;
+  background:linear-gradient(to bottom,#ffffff30,transparent 21%,transparent 79%,#ffffff15),linear-gradient(var(--ff-gloss-top),var(--ff-gloss-base))!important;
   border:1px solid var(--ff-gloss-edge)!important;
-  box-shadow:var(--ff-gloss-shadow)!important;
+  box-shadow:inset 0 1px 2px #fff1,inset 0 0 .58em var(--ff-gloss-edge),0 0 .34em var(--ff-gloss-edge)!important;
   color:#fff!important;
   -webkit-text-fill-color:#fff!important;
   text-shadow:0 1px 2px #000;
@@ -78,7 +76,7 @@ html body #app .app main.wrap :is(.ffRefMetric,.ffRefButton,.ffDashboardFinish>.
   -webkit-text-fill-color:#fff!important;
 }
 html body #app .app main.wrap .ffRefButton:is([aria-pressed="true"],#ffOutletJumpList),
-html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap:is([data-task-assign],[data-task-history],[aria-pressed="true"]) {
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtSlot.ffTaskArtTap:is([data-task-assign],[data-task-history],[aria-pressed="true"]) {
   background:var(--ff-gloss-active)!important;
   border-color:#ffe68f!important;
   box-shadow:inset 0 0 .65em #fff29a,0 0 .45em #ff9800!important;
@@ -127,7 +125,8 @@ html body #app .app main.wrap .ffRefFields :is(input,select,button) {
 }
 #app .ffTaskArtwork>.ffTaskArtHeading {pointer-events:none;}
 html body #app .app main.wrap .ffTaskArtwork .ffTaskArtHeading:first-of-type {
-  font-size:clamp(16px,5.5cqw,40px)!important;
+  font-size:clamp(16px,min(5.5cqw,3.65dvh),40px)!important;
+  line-height:1;
 }
 html body #app .app main.wrap .ffTaskArtwork .ffTaskArtHeading span {
   color:#fff!important;
@@ -138,9 +137,10 @@ html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap:not([data-task-expand
   align-items:center;
   justify-content:center;
   gap:.38em;
-  font-size:clamp(9px,2.75cqw,18px)!important;
+  font-size:clamp(8px,min(2.65cqw,1.7dvh),16px)!important;
   line-height:1.08!important;
   white-space:normal;
+  overflow:hidden;
 }
 html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap[data-task-category] {flex-direction:column;}
 #app .ffTaskArtTap[data-task-category]::before,
@@ -203,4 +203,34 @@ html body #app .app main.wrap .ffIncentiveArtwork .ffIncFigures small {
   background:linear-gradient(#0a2811,#020a03);
   border-color:var(--ff-gloss-green);
   box-shadow:inset 0 0 .4em #00ef5747;
+}
+
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtSlot.ffTaskArtMetric[aria-label] {
+  font-size:clamp(12px,min(4.6cqw,2.55dvh),26px)!important;
+  gap:.05em;
+}
+#app .ffTaskArtwork .ffTaskArtMetric::before,
+#app .ffTaskArtwork .ffTaskArtMetric::after {
+  font-size:clamp(8px,min(2.65cqw,1.6dvh),15px);
+}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap :is(.ffGlowButtonLabel,.ffGlowButtonLabel span) {
+  color:inherit!important;
+  -webkit-text-fill-color:currentColor!important;
+}
+html body #app .app main.wrap .ffTaskArtwork [data-task-expand] .ffGlowButtonLabel {
+  display:none!important;
+}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtSlot[data-task-expand] {
+  display:grid;
+  place-items:center;
+  font-size:0!important;
+}
+html body #app .app main.wrap .ffTaskArtwork #ffRefTaskDetailsBody .ffTaskArtTap:not(:last-child) {
+  font-size:clamp(7px,min(2.12cqw,1.43dvh),13px)!important;
+  white-space:nowrap;
+}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtRow button[data-task-row] {
+  background:none!important;
+  border:0!important;
+  box-shadow:none!important;
 }
