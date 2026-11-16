@@ -24,20 +24,20 @@ window.FFH_REFERENCE_INCOME = (() => {
     const entries = model.manager
       ? [...(model.seller ? [['Own route commission', model.ownCommission]] : []),
         ['Team sales commission', model.salesCommission], ['Positive growth commission', model.growthCommission]]
-      : [['Own route commission', model.ownCommission]];
+      : [['Own route commission', model.ownCommission], ...(model.srGrowth ? [['Growth bonus · RM 100 per full RM 5,000', model.growthCommission]] : [])];
     return `<template id="ffIncomeCommissionReport">
       <p class="ffCommissionTotal"><strong>${esc(money(model.comm))}</strong> · ${esc(monthLabel)}</p>
       <section class="ffRefPanel ffCommissionSection">
         <h3>Sales vs Target</h3>
         ${rate !== null ? `<progress aria-label="Sales target achieved" max="100" value="${Math.min(100, Math.max(0, rate))}"></progress>` : ''}
         <dl><div><dt>Delivered sales</dt><dd>${esc(money(model.d))}</dd></div><div><dt>Target</dt><dd>${model.t > 0 ? esc(money(model.t) + ' · ' + rate + '% reached') : 'Not set'}</dd></div>
-        ${model.previous != null ? `<div><dt>Previous month</dt><dd>${esc(money(model.previous))}</dd></div><div><dt>Positive growth</dt><dd>${esc(money(model.growth))}</dd></div>` : ''}</dl>
+        ${model.previous != null ? `<div><dt>${model.average ? 'Saved zone average' : 'Previous month'}</dt><dd>${esc(money(model.previous))}</dd></div><div><dt>Positive growth</dt><dd>${esc(money(model.growth))}</dd></div>` : ''}</dl>
       </section>
       <section class="ffRefPanel ffCommissionSection"><h3>Calculation</h3>
         <dl>${entries.map(([label, amount]) => `<div><dt>${label}</dt><dd>${amount == null ? 'Awaiting sales history' : esc(money(amount))}</dd></div>`).join('')}</dl>
       </section>
       <section class="ffRefPanel ffCommissionSection"><h3>Commission Rates</h3>
-        <dl>${rule.map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl>
+        <dl>${(model.average ? [['Team sales', '0.25%'], ['Above saved average', '0.75% on excess']] : rule).map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl>
       </section>
     </template>`;
   }
@@ -89,7 +89,7 @@ window.FFH_REFERENCE_INCOME = (() => {
         </section>
         <section class="ffRefPanel" id="ffIncomeRate">
           <h2><i aria-hidden="true">%</i> <em>Commission</em> Rate</h2>
-          <dl class="ffRefTiers" id="ffIncomeRates">${rule.map(([key, value]) => stat(esc(key), esc(value))).join('')}</dl>
+          <dl class="ffRefTiers" id="ffIncomeRates">${(model.average ? [['Team sales','0.25%'],['Above saved average','0.75%']] : rule).map(([key, value]) => stat(esc(key), esc(value))).join('')}</dl>
         </section>
       </div>
       <section class="ffRefPanel" id="ffIncomeRewardSummary">

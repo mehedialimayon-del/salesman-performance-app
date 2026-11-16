@@ -6,7 +6,7 @@ const c={db,people,allowedIds:['A','B','C','X'],viewerId:'M',currentMonth:'2026-
 let r=P.build(c,'M','2026-10');assert.equal(r.d,120000);assert.equal(r.previous,100000);assert.equal(r.salesCommission,300);assert.equal(r.growthCommission,14000);assert.equal(r.total,17480);assert.equal(r.ownCommission,0);assert.equal(r.basic,3000);
 const model=R.build(c,{from:'2026-10-01',to:'2026-10-20',sr:'A',chain:'MISSING',outlet:'',product:'',manager:'',zone:''});
 assert.deepEqual(model.incomeIds,['M']);const rows=model.rows('Income Breakdown');assert.equal(rows.length,2);assert.equal(rows[1][2],3000);assert.equal(rows[1][10],17480,'sales filters do not replace manager pay with SR payroll');
-const sr=R.build(c,{from:'2026-10-01',to:'2026-10-20',incomeStaff:'A'}).rows('Income Breakdown');assert.equal(sr.length,2);assert.equal(sr[1][2],2350);assert.equal(sr[1][6],400);assert.equal(sr[1][11],'SR');
+const sr=R.build(c,{from:'2026-10-01',to:'2026-10-20',incomeStaff:'A'}).rows('Income Breakdown');assert.equal(sr.length,2);assert.equal(sr[1][2],2350);assert.equal(sr[1][6],500);assert.equal(sr[1][13],100);assert.equal(sr[1][11],'SR');
 const noHistory=P.build({...c,baselines:[]},'M','2026-10');assert.equal(noHistory.growthCommission,null);assert.equal(noHistory.growthPending,true);assert.equal(noHistory.total,3480,'no invented growth payout without history');
 db.sales[0].deliveredAmount=10000;db.sales[1].deliveredAmount=10000;db.sales[2].deliveredAmount=10000;r=P.build(c,'M','2026-10');assert.equal(r.growthCommission,0);assert.equal(r.salesCommission,75);
 db.managerMonthlyRules['2026-10'].M.salesCommissionRate=0;db.managerMonthlyRules['2026-10'].M.growthCommissionRate=0;r=P.build(c,'M','2026-10');assert.equal(r.salesCommission,0);assert.equal(r.growthCommission,0);
@@ -51,3 +51,32 @@ assert.equal(hybrid.ownCommission,1000);
 assert.equal(hybrid.salesCommission,500);
 assert.equal(hybrid.comm,1500);
 console.log('PASS 80% SR boundary, over-target tier, and manager+SR own-route exclusion');
+
+const growthPeople=[{id:'M21954',can_manage:true,can_sell:true,zone:'Z',role:'MANAGER+SR'},{id:'A',can_sell:true,zone:'Z'},{id:'X',can_sell:true,zone:'X'}];
+const deliveredOn=(sr,date,deliveredAmount)=>({id:sr+date,sr,date,status:'Delivered',deliveredAmount});
+const growthDb={
+ sales:[deliveredOn('M21954','2026-11-01',100000),deliveredOn('A','2026-11-02',200000),deliveredOn('X','2026-11-01',1000000),deliveredOn('A','2026-10-01',190000)],
+ incomeMonthlySetup:{'2026-11':{M21954:{basic:1000},A:{basic:900}}},
+ managerMonthlyRules:{'2026-10':{M21954:{commission:{zoneAverage:275000,averageThrough:'2027-09'}}}},
+};
+const growthCtx={db:growthDb,people:growthPeople,viewerId:'M21954',target:()=>100000,currentMonth:'2026-11'};
+let result=P.build(growthCtx,'M21954','2026-11');
+assert.deepEqual(result.ids,['M21954','A'],'saved zone average uses the manager’s zone');
+assert.equal(result.ownCommission,1000);
+assert.equal(result.salesCommission,500);
+assert.equal(result.growthCommission,187.5);
+assert.equal(result.comm,1687.5);
+assert.equal(P.managerAverage(growthDb.managerMonthlyRules,'M21954','2027-09').amount,275000);
+assert.equal(P.managerAverage(growthDb.managerMonthlyRules,'M21954','2027-10'),null);
+assert.equal(P.managerAverage(growthDb.managerMonthlyRules,'M21954','2026-09'),null);
+result=P.build(growthCtx,'A','2026-11');
+assert.equal(result.growthCommission,200);
+assert.equal(result.previous,190000);
+growthDb.sales.find(row=>row.date==='2026-10-01').deliveredAmount=195000;
+assert.equal(P.build(growthCtx,'A','2026-11').growthCommission,100);
+growthDb.sales.find(row=>row.date==='2026-10-01').deliveredAmount=195000.01;
+assert.equal(P.build(growthCtx,'A','2026-11').growthCommission,0);
+assert.equal(P.build(growthCtx,'A','2026-11','2026-11-02').growthCommission,null);
+growthDb.sales.pop();
+assert.equal(P.build(growthCtx,'A','2026-11').growthPending,true);
+console.log('PASS full SR growth steps, missing history, own route separation, saved zone average and expiry');
