@@ -410,3 +410,56 @@ html body #app .app main.wrap .ffRouteAssignedTable button[data-finding] {
   #app .ffRefRouteTabs button {padding-inline:.24em;}
   #app .ffRefRouteActions .ffRefButton {font-size:clamp(9px,2.8vw,12px);padding:.32em .2em;}
 }
+
+.ffTaskArtworkPicker .ffPickerOption:nth-of-type(odd) {--ff-picker-edge:#00bfff;--ff-picker-fill:#062236;}
+.ffTaskArtworkPicker .ffPickerOption:nth-of-type(even) {--ff-picker-edge:#ff9c2e;--ff-picker-fill:#321302;}
+html body .ffTaskArtworkPicker .ffPickerRows .ffPickerOption {
+  background:linear-gradient(#ffffff12,transparent 28%),linear-gradient(var(--ff-picker-fill),#080504 85%)!important;
+  border-color:var(--ff-picker-edge)!important;
+  box-shadow:inset 0 0 .55em var(--ff-picker-fill),0 0 .27em var(--ff-picker-edge)!important;
+}
+html body .ffTaskArtworkPicker .ffPickerRows .ffPickerOption:is(.selected,[aria-pressed="true"]) {
+  border-color:#fff2a1!important;
+  outline:1px solid #fff2a1;
+  outline-offset:-3px;
+}
+html body #app .app main #ffTrackSummary {
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:clamp(3px,1vw,8px);
+}
+#app #ffTrackSummary .ffRefMetric {min-height:5em;min-width:0;padding:.35em .2em;font-size:clamp(9px,2.6vw,14px);}
+#app #ffTrackSummary .ffRefMetric[aria-pressed="true"] {outline:1px solid #fff;outline-offset:-3px;}
+#app .ffTrackingStatus {
+  padding:.2em .45em;
+  border:1px solid currentColor;
+  border-radius:99px;
+  background:#050505;
+  text-align:center;
+  box-shadow:inset 0 0 .36em #fff2;
+}
+#app .ffRefTrackRoster .ffTrackingStatus[data-tone="blue"] {color:#63d3ff;}
+#app .ffRefTrackRoster .ffTrackingStatus[data-tone="purple"] {color:#ee91f5;}
+html body #app .app main .ffMessenger :is(.ffChatHeader,.ffChatSearchBar,#ffChatTitle,.ffChatComposer) {
+  background:var(--ff-gloss-panel)!important;
+  border:1px solid #e58932!important;
+  box-shadow:var(--ff-gloss-panel-shadow)!important;
+  border-radius:.85rem;
+}
+html body #app .app main .ffMessenger .ffChatSearchBar {padding:.35rem;}
+html body #app .app main .ffMessenger #ffChatContacts .ffConversationRow {
+  margin:0 0 .32rem;
+  padding:.48rem .5rem!important;
+  min-height:3.85rem;
+  border:1px solid #a05726!important;
+  border-radius:.7rem!important;
+  color:#fff!important;
+  background:linear-gradient(110deg,#201108,#050504 66%,#120903)!important;
+  box-shadow:inset 0 0 .5rem #f8842929!important;
+}
+html body #app .app main .ffMessenger #ffChatContacts .ffConversationRow.ffConversationUnread {
+  border-color:#ffa641!important;
+  box-shadow:inset 0 0 .5rem #f8842966!important;
+}
+#app .ffMessenger .ffConversationAvatar {border:1px solid #ffc36e;}
+#app .ffMessenger .ffChatComposer {padding:.4rem;}
