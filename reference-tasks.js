@@ -129,11 +129,30 @@ window.FFH_REFERENCE_TASKS = (() => {
       }
     }
     drawer.querySelector('[data-private-task-notes]').onclick = () => openEditor('.ffPrivateNoteDrawer',form=>form.elements.text.focus());
-    function openHistory(task) {
-      drawer.open = true;
-      const row = originals.get(String(task?.id));
-      if (row?.hidden) history.querySelector('[data-history-clear]')?.click();
-      (row || drawer).scrollIntoView?.({block:'nearest'});
+    function openHistory() {
+      const dialog = document.createElement('dialog');
+      dialog.className = 'ffTaskArtDialog ffInsetDialog';
+      dialog.setAttribute('aria-label','Task History');
+      dialog.innerHTML = '<header><b>Task History</b><button type="button" aria-label="Close">×</button></header>'
+        + '<div class="ffTaskTimeline"></div><button type="button" class="secondary" data-private-notes>My private notepad</button>';
+      const list = dialog.querySelector('.ffTaskTimeline');
+      list.innerHTML = shown.map(task=>'<button type="button" class="secondary" data-history-task="'+esc(task.id)+'">'
+        +esc(task.title)+' · '+esc(status(task))+'</button>').join('') || '<p>No tasks match this selection.</p>';
+      dialog.querySelector('header button').onclick = () => dialog.close();
+      dialog.querySelector('[data-private-notes]').onclick = () => {
+        dialog.close();
+        drawer.querySelector('[data-private-task-notes]').click();
+      };
+      list.onclick = event => {
+        const button = event.target.closest('[data-history-task]');
+        const task = button && shown.find(item=>String(item.id)===button.dataset.historyTask);
+        if (!task) return;
+        dialog.close();
+        openTaskConversation(task,false);
+      };
+      dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+      root.append(dialog);
+      dialog.showModal();
     }
     function openTaskConversation(task, compose) {
       const dialog = document.createElement('dialog');
