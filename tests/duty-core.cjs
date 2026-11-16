@@ -14,3 +14,14 @@ for(const invalid of [{latitude:91},{longitude:181},{latitude:null},{accuracy_m:
  assert.equal(segments([p(0),p(60,invalid),p(120)]).length,0,'invalid fix must interrupt route');
 }
 console.log('Duty GPS stop/gap regression: PASS');
+{
+ const {attendanceDays}=require('../duty-core');
+ const records=[{duty_date:'2026-11-10',check_in:'2026-11-10T00:50:00Z'},
+  {duty_date:'2026-11-11',check_in:'2026-11-11T01:01:00Z'}];
+ const shift=duty_date=>({duty_date,day_type:'Working',starts_at:'09:00',ends_at:'18:00:00'});
+ const roster=[shift('2026-11-10'),shift('2026-11-11'),shift('2026-11-12'),
+  {duty_date:'2026-11-13',day_type:'Leave'},{duty_date:'2026-11-14',day_type:'Off'},shift('2026-11-16')];
+ const result=Object.fromEntries(attendanceDays(records,roster,'2026-11-16T02:00:00Z').map(r=>[r.duty_date,r.status]));
+ require('node:assert/strict').deepEqual(result,{'2026-11-16':'Scheduled','2026-11-14':'Off','2026-11-13':'Leave','2026-11-12':'Absent','2026-11-11':'Late','2026-11-10':'Present'});
+ console.log('PASS MYT roster: Present, Late, Absent, Leave, Off and in-progress shift');
+}

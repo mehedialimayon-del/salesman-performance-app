@@ -14,5 +14,26 @@ function stops(points){const out=[];let run=null,last=null;const finish=()=>{if(
  }finish();return out;
 }
 function segments(points){const lines=[];let line=[],last=null;const finish=()=>{if(line.length>1)lines.push(line);line=[];};for(const p of points){if(!valid(p,100)){finish();last=null;continue;}const time=Date.parse(p.captured_at);if(last&&(time<=Date.parse(last.captured_at)||time-Date.parse(last.captured_at)>180000))finish();line.push([Number(p.latitude),Number(p.longitude)]);last=p;}finish();return lines;}
-const api={distance,stops,segments};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.FFH_DUTY_CORE=api;
+function attendanceDays(records, roster, asOf){
+ const rows=new Map();
+ for(const entry of records){
+  const current=rows.get(entry.duty_date);
+  if(!current||(entry.check_in&&(!current.check_in||Date.parse(entry.check_in)<Date.parse(current.check_in))))rows.set(entry.duty_date,entry);
+ }
+ const planned=new Map(roster.map(entry=>[entry.duty_date,entry]));
+ const dates=[...new Set([...rows.keys(),...planned.keys()])].sort().reverse();
+ const myt=(date,time)=>Date.parse(date+'T'+(time?.length===5?time+':00':time)+'+08:00');
+ const time=Date.parse(asOf);
+ return dates.map(date=>{
+  const row=rows.get(date)||{duty_date:date}, shift=planned.get(date);
+  let status='—';
+  if(row.check_in)status=shift?.day_type==='Working'&&Date.parse(row.check_in)>myt(date,shift.starts_at)?'Late':'Present';
+  else if(shift?.day_type==='Leave'&&myt(date,'00:00:00')<=time)status='Leave';
+  else if(shift?.day_type==='Working'&&myt(date,shift.ends_at)<=time)status='Absent';
+  else if(shift?.day_type==='Working')status='Scheduled';
+  else if(shift?.day_type==='Off')status='Off';
+  return {...row,status};
+ });
+}
+const api={distance,stops,segments,attendanceDays};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.FFH_DUTY_CORE=api;
 })(typeof window!=='undefined'?window:globalThis);

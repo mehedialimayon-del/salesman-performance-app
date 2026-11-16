@@ -715,3 +715,18 @@ html body #app .app main .ffRefProposalPage button.ffProposalBanner {display:gri
 #app .ffAccessDecisions [data-status=Approved] {border-color:#57cc6e!important;background:#174b27!important;}
 #app .ffAccessDecisions [data-status=Rejected] {border-color:#eb7160!important;background:#641f1b!important;}
 #app .ffAccessActions button {min-width:0;white-space:normal;}
+
+#app .ffDashboardFinish>.dashHero {margin:.45rem 0;padding:.65rem;background:linear-gradient(135deg,#391808,#100b08 65%,#3a190b);border:1px solid #ff9237;border-radius:13px;color:#fff;}
+#app .ffDashboardFinish>.ffDashboardShortcuts {margin:.45rem 0;}
+#app .ffDashboardFinish>.refKpis,#app .ffDashboardMore .refKpis {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.48rem;}
+#app .ffDashboardFinish .refKpi {box-sizing:border-box;min-width:0;overflow-wrap:anywhere;}
+#app .ffDashboardFinish>.refKpis .refKpi {min-height:5.8rem;padding:.6rem;font-size:clamp(10px,2.9vw,14px);}
+#app .ffDashboardFinish>.refKpis .refKpi strong {font-size:clamp(17px,5vw,28px);line-height:1.13;}
+#app .ffDashboardMore {display:grid;gap:.55rem;margin-top:.75rem;min-width:0;}
+#app .ffDashboardMore h2 {margin:0;color:#ff8735;font-size:1.05rem;}
+#app .ffDashboardMore :is(.graphCard,.donutCard,.activityCard,.topOutletCard,.ffDashboardFocus) {min-width:0;margin:0;background:#0d0906;border:1px solid #b55f28;}
+#app .ffDashboardMore .dashTwo {margin:0;min-width:0;gap:.45rem;}
+#app .ffDashboardMore .chart {overflow:auto;}
+#app .ffAttendanceRoster {margin-top:.55rem;padding:.45rem;border:1px solid #b35f2c;border-radius:8px;}
+#app .ffAttendanceRoster summary {color:#ff9b4d;font-weight:750;}
+#app .ffAttendanceRoster :is(input,select) {min-width:0;max-width:100%;box-sizing:border-box;}

@@ -52,23 +52,31 @@ function attendanceHistory(){
  const host=$('#ffDutyStatus')?.closest('.card'),sid=user()?.id;
  if(!host||!sid)return;
  if(attendanceOwner!==sid){attendanceOwner=sid;attendanceMonth=date().slice(0,7);attendanceDay='';}
+ const owner=user().id==='M21954'||user().ownerAccess===true;
+ const directory=people.filter(p=>p.active!==false);
+ const editor=owner?`<details class="ffAttendanceRoster"><summary>Shift / Leave Roster</summary><form class="form" id="ffRosterForm">
+   <div class="two"><label>Staff<select name="staff_id" required>${[...new Map([{staff_id:sid,full_name:user().name},...directory].map(p=>[p.staff_id,p])).values()].map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name||p.staff_id)}</option>`).join('')}</select></label>
+   <label>Date<input type="date" name="duty_date" value="${E(date())}" required></label></div>
+   <label>Day type<select name="day_type"><option>Working</option><option>Leave</option><option>Off</option></select></label>
+   <div class="two" id="ffRosterTimes"><label>Shift starts (MYT)<input type="time" name="starts_at" required></label><label>Shift ends (MYT)<input type="time" name="ends_at" required></label></div>
+   <button type="submit" class="primary">Save roster day</button><p role="status"></p></form></details>`:'';
  const box=document.createElement('section');box.className='card ffHistoryPanel ffRefAttendance';
  box.innerHTML=`<div class="cardTitle">Attendance History</div><div class="two ffHistoryControls">
   <label>Month<input id="ffAttendanceMonth" type="month" value="${E(attendanceMonth)}"></label>
   <label>Date (optional)<input id="ffAttendanceDay" type="date" value="${E(attendanceDay)}"></label>
  </div><div class="ffAttendanceMetrics" aria-label="Attendance totals in selected period">
   <div data-tone="green"><span>Present</span><output id="ffAttendancePresent">—</output></div>
-  <div data-tone="amber"><span>Late</span><span aria-label="Shift start is unavailable">—</span></div>
-  <div data-tone="red"><span>Absent</span><span aria-label="Working day schedule is unavailable">—</span></div>
-  <div data-tone="violet"><span>Leave</span><span aria-label="Leave records are unavailable">—</span></div>
+  <div data-tone="amber"><span>Late</span><output id="ffAttendanceLate">—</output></div>
+  <div data-tone="red"><span>Absent</span><output id="ffAttendanceAbsent">—</output></div>
+  <div data-tone="violet"><span>Leave</span><output id="ffAttendanceLeave">—</output></div>
  </div><div id="ffAttendanceHistory" class="ffHistoryScroll" tabindex="0" aria-label="Attendance history"></div>
  <button class="secondary" id="ffAttendanceMore" hidden>LOAD MORE HISTORY</button>
  <div class="ffRefExports ffAttendanceActions">
   <button type="button" class="ffRefButton" data-attendance-export="pdf">▤ Report</button>
   <button type="button" class="ffRefButton" data-attendance-export="xlsx">⇩ Export (Excel)</button>
   <button type="button" class="ffRefButton" id="ffAttendanceSummary">▥ Monthly Summary</button>
- </div><p id="ffAttendanceFeedback" role="status"></p>`;
- host.after(box);let offset=0;const presentDays=new Set();
+ </div><p id="ffAttendanceFeedback" role="status"></p>${editor}`;
+ host.after(box);let offset=0;const attendanceRows=[];
  const stamp=v=>v?new Date(v).toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur'}):'';
  const records=async(month,day,start,size)=>{
   let query=sb.from('ffh_attendance').select('id,duty_date,check_in,check_out,shift_end').eq('staff_id',sid);
@@ -82,20 +90,58 @@ function attendanceHistory(){
   if(user()?.id!==sid)throw Error('Sign in again to view attendance.');
   return data||[];
  };
+ const roster=async(month,day)=>{
+  let query=sb.from('ffh_attendance_roster').select('duty_date,day_type,starts_at,ends_at').eq('staff_id',sid);
+  const next=new Date(month+'-01T00:00:00Z');next.setUTCMonth(next.getUTCMonth()+1);
+  query=day?query.eq('duty_date',day):query.gte('duty_date',month+'-01').lt('duty_date',next.toISOString().slice(0,10));
+  const {data,error}=await query.order('duty_date',{ascending:false}).range(0,49);
+  if(error)throw error;
+  return data||[];
+ };
+ const counts=entries=>Object.fromEntries(['Present','Late','Absent','Leave'].map(status=>[status,entries.filter(row=>row.status===status).length]));
  const load=async(append=false)=>{
-  const ticket=++historyVersion,list=box.querySelector('#ffAttendanceHistory'),present=box.querySelector('#ffAttendancePresent');
-  if(!append){presentDays.clear();present.value='—';}
+  const ticket=++historyVersion,list=box.querySelector('#ffAttendanceHistory'),month=attendanceMonth,day=attendanceDay;
+  if(!append){attendanceRows.length=0;box.querySelectorAll('.ffAttendanceMetrics output').forEach(output=>output.value='—');}
   try{
-   const rows=await records(attendanceMonth,attendanceDay,append?offset:0,50);
-   if(ticket!==historyVersion||!list.isConnected)return;
-   const html=rows.map(x=>`<article class="ffHistoryEntry"><b class="ffDateBadge">${E(x.duty_date)}</b><div>Check-in: <strong>${E(stamp(x.check_in)||'—')}</strong></div><div>Check-out: <strong>${E(stamp(x.check_out)||'Not checked out')}</strong></div></article>`).join('');
-   if(append)list.insertAdjacentHTML('beforeend',html);else list.innerHTML=html||'<p>No attendance in this period.</p>';
-   for(const row of rows)if(row.check_in)presentDays.add(row.duty_date);
-   present.value=String(presentDays.size)+(rows.length===50?'+':'');
+   const [rows,schedule]=await Promise.all([records(month,day,append?offset:0,50),roster(month,day).catch(()=>null)]);
+   if(ticket!==historyVersion||!list.isConnected||user()?.id!==sid)return;
+   attendanceRows.push(...rows);
+   const entries=core.attendanceDays(attendanceRows,schedule||[],new Date().toISOString());
+   const totals=counts(entries);
+   for(const [status,count] of Object.entries(totals))box.querySelector('#ffAttendance'+status).value=status==='Present'||schedule?.length?String(count):'—';
+   list.innerHTML=entries.map(x=>`<article class="ffHistoryEntry"><b class="ffDateBadge">${E(x.duty_date)}</b>
+    <div><strong>${E(x.status)}</strong></div>
+    <div>Check-in: <strong>${E(stamp(x.check_in)||'—')}</strong></div><div>Check-out: <strong>${E(stamp(x.check_out)||'—')}</strong></div></article>`).join('')||'<p>No attendance in this period.</p>';
    offset=(append?offset:0)+rows.length;
    box.querySelector('#ffAttendanceMore').hidden=rows.length<50;
   }catch(err){if(ticket===historyVersion&&list.isConnected)list.textContent='History could not load: '+err.message;}
  };
+ const form=box.querySelector('#ffRosterForm');
+ if(form){
+  const sync=()=>{
+   const working=form.elements.day_type.value==='Working';
+   form.querySelector('#ffRosterTimes').hidden=!working;
+   for(const key of ['starts_at','ends_at'])form.elements[key].disabled=!working;
+  };
+  form.elements.day_type.onchange=sync;
+  sync();
+  form.onsubmit=async event=>{
+   event.preventDefault();
+   if(user()?.id!==sid)return;
+   const button=event.submitter,feedback=form.querySelector('[role=status]');
+   const fields=Object.fromEntries(new FormData(form)),row={...fields,starts_at:fields.starts_at||null,ends_at:fields.ends_at||null,updated_at:new Date().toISOString(),updated_by:sid};
+   button.disabled=true;
+   try{
+    if(row.day_type==='Working'&&(!row.starts_at||!row.ends_at||row.starts_at>=row.ends_at))throw Error('Enter a shift end after its start.');
+    const {error}=await sb.from('ffh_attendance_roster').upsert(row,{onConflict:'staff_id,duty_date'});
+    if(error)throw error;
+    if(user()?.id!==sid||!form.isConnected)return;
+    feedback.textContent='Roster saved for '+row.duty_date+' MYT.';
+    if(row.staff_id===sid)await load();
+   }catch(error){feedback.textContent=error.message;}
+   finally{button.disabled=false;}
+  };
+ }
  const feedback=box.querySelector('#ffAttendanceFeedback');
  const run=(button,action,day)=>async()=>{
   button.disabled=true;
@@ -109,21 +155,21 @@ function attendanceHistory(){
    }
    if(!box.isConnected)return;
    feedback.textContent='';
-   await action(data,day||month);
+   const schedule=await roster(month,day).catch(()=>[]);
+   await action(core.attendanceDays(data,schedule,new Date().toISOString()),day||month);
   }catch(err){feedback.textContent=err.message;}
   finally{button.disabled=false;}
  };
  box.querySelectorAll('[data-attendance-export]').forEach(button=>{
   button.onclick=()=>run(button,(data,period)=>ctx.exportFile(button,'Attendance '+period,[
-   ['Date','Check-in (MYT)','Check-out (MYT)','Shift end (MYT)'],
-   ...data.map(row=>[row.duty_date,stamp(row.check_in),stamp(row.check_out),stamp(row.shift_end)])
+   ['Date','Status','Check-in (MYT)','Check-out (MYT)','Shift end (MYT)'],
+   ...data.map(row=>[row.duty_date,row.status,stamp(row.check_in),stamp(row.check_out),stamp(row.shift_end)])
   ],feedback),attendanceDay)();
  });
  const summary=box.querySelector('#ffAttendanceSummary');
  summary.onclick=run(summary,(data,period)=>{
-  const days=new Set(data.filter(row=>row.check_in).map(row=>row.duty_date));
-  const complete=data.filter(row=>row.check_in&&row.check_out).length;
-  feedback.textContent=period+' · '+days.size+' days checked in · '+complete+' shifts checked out · '+(data.length-complete)+' records without a completed checkout';
+  const totals=counts(data),checkedOut=data.filter(row=>row.check_in&&row.check_out).length;
+  feedback.textContent=period+' · '+Object.entries(totals).map(([label,value])=>label+' '+value).join(' · ')+' · '+checkedOut+' checked out';
  },'');
  box.querySelector('#ffAttendanceMonth').onchange=e=>{
   if(!e.target.value){e.target.value=attendanceMonth;return;}

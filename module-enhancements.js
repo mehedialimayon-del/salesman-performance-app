@@ -104,6 +104,37 @@
     page.querySelector('table')?.classList.add('ffProposalBanners');
   }
 
+  function arrangeDashboard() {
+    const main = app.querySelector('main:has(.ffDashboardTabs)');
+    const metrics = main?.querySelector('.refKpis');
+    if (!metrics || metrics.dataset.ffDashboardReady) return;
+    metrics.dataset.ffDashboardReady = 'true';
+    main.classList.add('ffDashboardFinish');
+    const hero = main.querySelector('.dashHero'), range = main.querySelector('.dashRange');
+    if (hero && range) hero.before(range);
+    const launch = document.createElement('nav');
+    launch.className = 'ffRefExports ffDashboardShortcuts';
+    launch.setAttribute('aria-label','Dashboard shortcuts');
+    for (const [page,label] of [['sales','Daily Sales'], ['zero','Zero Sales'], ['reports','Reports']]) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'ffRefButton';
+      button.textContent = label;
+      button.onclick = () => window.go?.(page);
+      launch.append(button);
+    }
+    metrics.before(launch);
+    const lower = document.createElement('section');
+    lower.className = 'ffDashboardMore';
+    const title = document.createElement('h2');
+    title.textContent = 'Sales & Outlet Details';
+    const moreMetrics = document.createElement('div');
+    moreMetrics.className = 'refKpis';
+    moreMetrics.append(...Array.from(metrics.children).slice(4));
+    lower.append(title,moreMetrics,...main.querySelectorAll('.dashTwo,.ffDashboardFocus'));
+    metrics.after(lower);
+  }
+
   function schedule() {
     if (queued) return;
     queued = true;
@@ -117,6 +148,7 @@
       if (notifications) inbox(notifications);
       const proposals = app.querySelector('.ffRefProposalPage');
       if (proposals) arrangeProposals(proposals);
+      arrangeDashboard();
     });
   }
   app.addEventListener('click', event => {
