@@ -31,5 +31,14 @@ const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require
  // Lost-response recovery never overwrites a delivered/corrected row.
  const vm=require('node:vm'),app=fs.readFileSync('app.js','utf8');let duplicate=true,existing={id:'S',sr_id:'SR1',sale_date:'2026-10-19',outlet_code:'O',outlet_name:'KK One',category:'KK',sku:'Mango',qty:1,price:0,order_amount:20,remarks:'',status:'Delivered',delivered_amount:20};
  const sandbox={today:()=> '2026-10-19',FFH_SUPABASE:{from:()=>{const r={insert:()=>r,select:()=>r,eq:()=>r,maybeSingle:async()=>({data:existing}),then:resolve=>resolve(duplicate?{error:{code:'23505'}}:{data:[{id:'S'}]})};return r;}}};vm.createContext(sandbox);vm.runInContext(app.slice(app.indexOf('async function ffhSaveSaleCloud('),app.indexOf('async function ffhSaveTaskCloud(')),sandbox);const sale={id:'S',sr:'SR1',date:'2026-10-19',outletCode:'O',outletName:'KK One',category:'KK',sku:'Mango',qty:1,orderAmount:20,status:'Pending Delivery'};await sandbox.ffhSaveSaleCloud(sale);assert.equal(sale.status,'Delivered');existing={...existing,sku:'Corrected'};await assert.rejects(sandbox.ffhSaveSaleCloud({...sale}),/conflict/);
+ // Malformed saved records must never be silently discarded or synced.
+ connected=false;id='SR1';
+ const storageKey='ffh_order_outbox_v1_SR1',before=w.localStorage.getItem(storageKey);
+ for(const invalid of ['{','[null]','[{"id":"damaged","actor":"SR1"}]']){
+  w.localStorage.setItem(storageKey,invalid);
+  ui.syncPage();assert(q('main').textContent.includes('Saved orders'),'corruption warning must be visible');
+  assert.equal(w.localStorage.getItem(storageKey),invalid,'corrupt local data must remain intact');
+ }
+ w.localStorage.setItem(storageKey,before);
  dom.window.close();console.log('PASS offline durable orders, reconnect, blocked retries, account isolation, scoped approval and history, partial failure, date filters and lost-response duplicate protection');
 })().catch(e=>{console.error(e);process.exit(1)});
