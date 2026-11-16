@@ -41,7 +41,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    for(const item of snapshot){
     if(me()!==id||!online())break;
     if(item.actor!==id||item.state==='Blocked'&&!manual)continue;
-    let failure=null,alreadySaved=false;
+    let failure=null;
     try{
      // A prior request may have reached the cloud before its response was lost.
      // Check the stable order ID before replaying it; never treat a failed lookup as absence.
@@ -49,7 +49,6 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
      if(lookupError)throw lookupError;
      if(existing){
       if(existing.sr_id!==item.order.sr)throw Object.assign(Error('Saved order ID belongs to a different staff member. Contact an administrator.'),{code:'ORDER_ID_CONFLICT'});
-      alreadySaved=true;
      }else await ctx.saveSale(item.order);
     }catch(e){failure=e;}
     // Never update a different account's cache after a session switch.
