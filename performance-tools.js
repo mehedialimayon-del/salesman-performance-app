@@ -45,10 +45,19 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     try{
      // A prior request may have reached the cloud before its response was lost.
      // Check the stable order ID before replaying it; never treat a failed lookup as absence.
-     const {data:existing,error:lookupError}=await sb.from('ffh_sales').select('id,sr_id').eq('id',item.id).maybeSingle();
+     const {data:existing,error:lookupError}=await sb.from('ffh_sales').select('id,sr_id,sale_date,outlet_name,sku,qty,order_amount').eq('id',item.id).maybeSingle();
      if(lookupError)throw lookupError;
      if(existing){
       if(existing.sr_id!==item.order.sr)throw Object.assign(Error('Saved order ID belongs to a different staff member. Contact an administrator.'),{code:'ORDER_ID_CONFLICT'});
+      // A matching ID is not sufficient: never discard an unsent order if its
+      // payload differs from the cloud row (even when the staff ID matches).
+      const order=item.order;
+      const sameText=(a,b)=>String(a??'').trim()===String(b??'').trim();
+      const sameNumber=(a,b)=>Number.isFinite(Number(a))&&Number.isFinite(Number(b))&&Math.abs(Number(a)-Number(b))<0.000001;
+      if(!sameText(existing.sale_date,order.date)||!sameText(existing.outlet_name,order.outletName)||
+         !sameText(existing.sku,order.sku)||!sameNumber(existing.qty,order.qty)||
+         !sameNumber(existing.order_amount,order.orderAmount))
+       throw Object.assign(Error('Cloud order ID already exists with different details. Saved order was kept for administrator review.'),{code:'ORDER_ID_CONFLICT'});
      }else await ctx.saveSale(item.order);
     }catch(e){failure=e;}
     // Never update a different account's cache after a session switch.
