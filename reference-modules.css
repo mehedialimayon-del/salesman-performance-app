@@ -539,3 +539,7 @@ html body.ffGlowOn #app .app.ffBlackGlow .ffRefOutletViewport :is([data-ref-outl
 .ffProposalDetailGrid>div {min-width:0;overflow-wrap:anywhere;}
 .ffProposalDetailActions {display:flex;flex-wrap:wrap;gap:.35rem;}
 .ffRefProposalPage #ffProposalFeedback:empty {display:none;}
+#app .ffChatSearchBar {display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.4rem;margin:.35rem 0;flex:none;}
+#app .ffChatSearchBar input {width:100%;min-width:0;}
+#app .ffChatSearchBar button {min-height:34px;font-size:.8rem;}
+#app .ffRefSync #ffSyncQueue {max-height:52dvh;overflow:auto;overscroll-behavior:contain;}
