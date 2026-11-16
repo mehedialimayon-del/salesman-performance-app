@@ -27,9 +27,9 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
  const retryable=e=>!e?.code&&(!e?.status||e.status>=500)||['PGRST000','PGRST001','PGRST002'].includes(e?.code);
  async function queueOrder(order) {
   const id=me();if(!id)throw Error('Login required');
-  if(!scopedIds().includes(order.sr))throw Error('Choose an assigned SR');
   if(!order||typeof order!=='object'||typeof order.id!=='string'||!order.id.trim())throw Error('Order ID is required before saving offline.');
   if(typeof order.sr!=='string'||!order.sr.trim())throw Error('Staff ID is required before saving offline.');
+  if(!scopedIds().includes(order.sr))throw Error('Choose an assigned SR');
   if(!order.outletName||!order.sku||!order.date||!Number.isFinite(Number(order.qty))||Number(order.qty)<=0||
      !Number.isFinite(Number(order.orderAmount))||Number(order.orderAmount)<0)
    throw Error('Complete the outlet, SKU, date, quantity and amount before saving offline.');
