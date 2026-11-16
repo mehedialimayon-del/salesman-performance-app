@@ -267,7 +267,35 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    $('#ffOutletIssue').onclick=()=>window.ffFindings?.outletFinding('Outlet issue',o);
    $('#ffOutletClosure')?.addEventListener('click',()=>window.ffFindings?.outletFinding('Outlet closure',o));
   };
-  $('#ffOutletHistorySearch').oninput=fill;for(const id of ['ffOutletZone','ffOutletStaff','ffOutletChain','ffOutletStatus'])$('#'+id).onchange=fill;select.onchange=draw;$('#ffOutletHistoryFrom').onchange=draw;$('#ffOutletHistoryTo').onchange=draw;$('#ffOutletHistoryReload').onclick=historyPage;$('#ffOutletVisitReport').onclick=()=>ctx.open?.('reports');$('#ffOutletManage')?.addEventListener('click',()=>edit(null));$('#ffOutletRequest')?.addEventListener('click',()=>window.ffFindings?.outletFinding('New outlet'));fill();
+  $('#ffOutletHistorySearch').oninput=fill;for(const id of ['ffOutletZone','ffOutletStaff','ffOutletChain','ffOutletStatus'])$('#'+id).onchange=fill;select.onchange=draw;$('#ffOutletHistoryFrom').onchange=draw;$('#ffOutletHistoryTo').onchange=draw;$('#ffOutletHistoryReload').onclick=historyPage;$('#ffOutletVisitReport').onclick=outletSummary;$('#ffOutletManage')?.addEventListener('click',()=>edit(null));$('#ffOutletRequest')?.addEventListener('click',()=>window.ffFindings?.outletFinding('New outlet'));fill();
+  function outletSummary(){
+   const from=$('#ffOutletHistoryFrom').value,to=$('#ffOutletHistoryTo').value;
+   const feedback=$('#ffOutletActionStatus');
+   if(from&&to&&from>to){feedback.textContent='From date must be on or before To date.';return;}
+   const summary=filtered.map(({o})=>{
+    const sameOutlet=row=>row.sr_id===o.sr&&(row.outlet_code?String(row.outlet_code)===String(o.code):
+     row.outlet_name===o.name&&outlets.filter(v=>v.sr===o.sr&&v.name===o.name).length===1);
+    const matches=data[0].filter(row=>sameOutlet(row)&&(!from||row.sale_date>=from)&&(!to||row.sale_date<=to));
+    const delivered=matches.filter(row=>row.status==='Delivered');
+    return [o.name,o.code,o.category,who(o.sr),delivered.reduce((sum,row)=>sum+(+row.delivered_amount||0),0),
+     matches.filter(row=>row.status==='Pending Delivery').reduce((sum,row)=>sum+(+row.order_amount||0),0),lastVisit(o),state(o)];
+   });
+   const columns=['Outlet','Code','Chain','Assigned SR','Delivered (RM)','Pending (RM)','Last Proof','Status'];
+   const overlay=document.createElement('div');overlay.className='globalSearchOverlay ffInsetDialog';
+   overlay.innerHTML=`<section class="globalSearchBox" role="dialog" aria-modal="true" aria-label="Outlet Summary Report">
+    <div class="row"><h2>Outlet Summary Report</h2><button type="button" class="secondary" data-close>Close</button></div>
+    <p>${E(from||'First record')} → ${E(to||'Latest record')} · ${summary.length} outlets</p>
+    <div class="ffRefOutletViewport"><table><thead><tr>${columns.map(v=>'<th>'+E(v)+'</th>').join('')}</tr></thead>
+    <tbody>${summary.map(row=>'<tr>'+row.map(v=>'<td>'+E(v??'')+'</td>').join('')+'</tr>').join('')}</tbody></table></div>
+    <div class="ffRefExports"><button type="button" class="ffRefButton" data-outlet-export="pdf">PDF</button>
+    <button type="button" class="ffRefButton" data-outlet-export="xlsx">Excel</button></div><p role="status"></p></section>`;
+   document.body.append(overlay);
+   const close=window.FFH_OVERLAY?.(overlay,()=>overlay.remove())||(()=>overlay.remove());
+   overlay.querySelector('[data-close]').onclick=close;
+   overlay.querySelectorAll('[data-outlet-export]').forEach(button=>button.onclick=()=>{
+    return ctx.exportFile(button,'Outlet Summary',[columns,...summary],overlay.querySelector('[role=status]'));
+   });
+  }
   const jump=(selector)=>$(selector)?.scrollIntoView({block:'start'});
   const selected=()=>select.value===''?null:outlets[Number(select.value)];
   const requireOutlet=action=>()=>{
@@ -297,7 +325,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    ],$('#ffOutletActionStatus'));
   }
   const requested=previousOutlet;
-  if(requested){const i=outlets.findIndex(o=>o.sr===requested.sr&&o.code===requested.code);if(i>=0){select.value=String(i);draw();}}
+  if(requested){const i=outlets.findIndex(o=>o.sr===requested.sr&&o.code===requested.code);if(i>=0&&filtered.some(item=>item.i===i)){select.value=String(i);draw();}}
  }
  window.addEventListener('online',()=>flush().catch(console.warn));
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)flush().catch(console.warn);});

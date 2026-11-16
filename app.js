@@ -35,6 +35,11 @@ const baseUsers=(D.users||[]).map(x=>({...x,display:x.name}));
 let U=db.users||baseUsers;db.users=U;window.FFH_SET_STAFF?.(U);const ffhStaffLabel=id=>window.FFH_STAFF_LABEL?.(id)||sr(id)?.name||id;const products=D.categoryProducts||{}, allProducts=[...new Set(Object.values(products).flat())];const catalogueProducts=()=>{const names=(db.catalogue||[]).map(x=>String(x.name||'').trim()).filter(Boolean);return [...new Set(names.length?names:allProducts)]};const outlets=id=>(db.companyRoster?.configured?(db.customOutlets?.[id]||[]):(db.customOutlets?.[id]?.length?db.customOutlets[id]:(D.outlets?.[id]||[]))).map(o=>({...o,totalSku:+o.totalSku||allProducts.length}));
 const rules=D.salaryRules||{basic:1700,fuel:300,houseRent:250,foodThreshold:50000,foodHigh:250,foodLow:100,zeroSalesHigh:200,zeroSalesLow:100};
 let ffhPermissions=[];const ffhMay=(module,verb='edit')=>{if(user?.id==='M21954')return true;if(user?.id==='PERVES_HIRA'&&module==='kb')return false;const direct=ffhPermissions.find(g=>g.module===module);if(direct)return !!direct['can_'+verb];const parent=module.startsWith('income_')?'income':null;return ffhPermissions.some(g=>(g.module===parent||(module!=='kb'&&g.module==='*'))&&g['can_'+verb]);};let ffhSelectedZone='ALL';const ffhVisiblePeople=()=>U.filter(x=>ffhSelectedZone==='ALL'||x.zone===ffhSelectedZone);const isMgr=()=>user?.mode==='MANAGER', srIds=()=>ffhVisiblePeople().filter(x=>x.active!==false).filter(x=>db.companyRoster?.configured?(x.can_sell&&(db.companyRoster.member_ids.includes(x.id)||x.can_manage)):(x.role==='SR'||x.role==='MANAGER+SR'||(db.sales||[]).some(s=>s.sr===x.id))).map(x=>x.id), sr=id=>U.find(x=>x.id===id), currentSr=()=>isMgr()?(view==='ALL'||(sr(view)?.can_manage&&!sr(view)?.can_sell)?null:view):user.id;
+const canSeeZone=zone=>Boolean(user&&zone&&(user.zone===zone||(isMgr()&&(
+ user.id==='M21954'||user.ownerAccess||user.accessAll||
+ user.accessibleZones?.includes('*')||user.accessibleZones?.includes(zone)||
+ U.some(person=>person.active!==false&&person.zone===zone&&person.manager_id===user.id)
+))));
 const ffhStaffId=v=>String(v||'').trim().toUpperCase();
 const ffhEmail=id=>ffhStaffId(id).toLowerCase()+'@fieldforce.app';
 async function ffhLoadStaff(){const {data,error}=await FFH_SUPABASE.from('ffh_profiles').select('staff_id,full_name,role,active,can_manage,can_sell,monthly_target,photo_url,zone_id,owner_access,designation,display_title,manager_id,team_name,route_name,access_all_zones,accessible_zones,company_staff_id,target_pending');if(error)throw error;const ownProfile=(data||[]).find(p=>p.staff_id===user?.id);if(user&&ownProfile){if(!ownProfile.active){await FFH_SUPABASE.auth.signOut({scope:'local'});localStorage.removeItem('ffh_session');user=null;db.sales=[];db.tasks=[];db.adjustments=[];login();return [];}user.ownerAccess=!!ownProfile.owner_access;user.designation=ownProfile.designation;user.name=ownProfile.full_name;user.displayTitle=ownProfile.display_title;user.zone=ownProfile.zone_id;user.companyStaffId=ownProfile.company_staff_id;user.accessAll=ownProfile.access_all_zones;user.accessibleZones=ownProfile.accessible_zones||[];user.can_manage=!!ownProfile.can_manage;user.can_sell=!!ownProfile.can_sell;if(!user.can_sell&&user.can_manage)user.mode='MANAGER';if(!user.can_manage&&user.can_sell){user.mode='SR';view=user.id;}}U=(data||[]).map(p=>({id:p.staff_id,name:p.full_name,display:p.full_name,role:p.can_sell?(p.can_manage?'MANAGER+SR':'SR'):'MANAGER',active:p.active,can_sell:!!p.can_sell,can_manage:!!p.can_manage,target:p.can_sell?Number(p.monthly_target??0):0,photo:p.photo_url||'',zone:p.zone_id,ownerAccess:p.owner_access,designation:p.designation,displayTitle:p.display_title,manager_id:p.manager_id,accessAll:p.access_all_zones,accessibleZones:p.accessible_zones||[],team:p.team_name,route:p.route_name,companyStaffId:p.company_staff_id,targetPending:p.target_pending}));if(user&&!U.some(p=>p.id===user.id))U.push({...user,role:user.can_sell?(user.can_manage?'MANAGER+SR':'SR'):'MANAGER'});if(user){const roster=await FFH_SUPABASE.rpc('ffh_company_roster',{action:'state',payload:{}});if(roster.error)throw roster.error;if(roster.data?.configured){db.companyRoster=roster.data;await ffhLoadAssignedOutlets();for(const p of U)p.managerLabel=roster.data.teams?.find(t=>t.zone_id===p.zone)?.manager_name;}}db.users=U;window.FFH_SET_STAFF?.(U);if(user){const grants=await FFH_SUPABASE.from('ffh_access_grants').select('module,can_edit,can_upload,can_delete').eq('staff_id',user.id);if(grants.error)throw grants.error;ffhPermissions=grants.data||[];if(currentPage==='control:kb'&&!ffhMay('kb'))control();}const allowedIds=new Set(U.map(p=>p.id));for(const key of ['sales','adjustments','cpo'])if(Array.isArray(db[key]))db[key]=db[key].filter(x=>allowedIds.has(x.sr));if(view!=='ALL'&&!allowedIds.has(view))view='ALL';return U;}
@@ -467,45 +472,80 @@ async function exportCpoExcel(type,selectedMonth,campaignId){
  }catch(e){console.error(e);alert('CPO Excel download failed: '+(e.message||e))}
 }
 function ffhBindOutletSearch(){const input=q('.ffOutletSearch');if(input)input.oninput=()=>{const term=input.value.trim().toLowerCase();qa('.ffOutletRow').forEach(row=>row.hidden=!row.textContent.toLowerCase().includes(term));};}
-let ffZeroState='zero';
+let ffZeroViewer='',ffZeroState='zero',ffZeroZones=[],ffZeroStaff=[],ffZeroSearch='';
 function zero(){
- const id = currentSr(), ids = id ? [id] : srIds();
- const assigned = ids.flatMap(sid => outlets(sid).map(o => ({...o,sr:sid})));
- const sales = globalThis.ffDaily ? FFH_DAILY_CORE.coverageRows(ffDaily.data(),ids) : db.sales;
- const rows = FFH_OUTLET_COMPARISON.build({outlets:assigned,sales,asOf:today()});
- const recovery = rows.filter(o => o.zero), number = n => n.toLocaleString('en-MY');
- const metric = (icon,label,n,color) => `<div class="ffRefMetric" data-color="${color}"><i aria-hidden="true">${icon}</i><span>${label}</span><strong>${number(n)}</strong></div>`;
- shell(back('Zero Sales') + `<section class="ffRefZero">
-   ${isMgr() ? scopeBar() : ''}
-   <div class="ffRefExports">${metric('▣','Assigned Outlets',rows.length,'gold')}${metric('⊘','Zero Sales',recovery.length,'red')}${metric('▥','Sales Outlets',rows.length-recovery.length,'green')}</div>
-   <label class="ffRefPanel ffRefSearch"><i aria-hidden="true">⌕</i><input type="search" class="ffOutletSearch" aria-label="Search outlets" placeholder="Search outlet name / code…"></label>
-   <div class="ffRefZeroTitle"><h2 id="ffZeroListTitle"></h2><button type="button" id="ffZeroRecovery" class="ffRefButton"><i aria-hidden="true">◎</i> Recovery Plan</button></div>
-   <div class="ffRefPanel" id="ffZeroResults"></div>
-   <label class="ffRefPanel ffRefSearch">Outlet coverage<select id="ffZeroStatus"><option value="zero">Zero sales</option><option value="all">All outlets</option><option value="covered">Covered outlets</option></select></label>
+ if(ffZeroViewer!==user.id){
+  ffZeroViewer=user.id;ffZeroState='zero';ffZeroSearch='';
+  ffZeroZones=ffhSelectedZone==='ALL'?[]:[ffhSelectedZone];
+  ffZeroStaff=currentSr()?[currentSr()]:[];
+ }
+ const sellable=p=>db.companyRoster?.configured
+  ? p.can_sell&&(db.companyRoster.member_ids.includes(p.id)||p.can_manage)
+  : p.role==='SR'||p.role==='MANAGER+SR'||(db.sales||[]).some(sale=>sale.sr===p.id);
+ const people=isMgr()?U.filter(p=>p.active!==false&&canSeeZone(p.zone)&&sellable(p)):[user];
+ const zones=[...new Set(people.map(p=>p.zone).filter(Boolean))].sort();
+ ffZeroZones=ffZeroZones.filter(zone=>zones.includes(zone));
+ const zonePeople=people.filter(p=>!ffZeroZones.length||ffZeroZones.includes(p.zone));
+ ffZeroStaff=ffZeroStaff.filter(id=>zonePeople.some(p=>p.id===id));
+ const ids=zonePeople.filter(p=>!ffZeroStaff.length||ffZeroStaff.includes(p.id)).map(p=>p.id);
+ const assigned=ids.flatMap(sid=>outlets(sid).map(o=>({...o,sr:sid})));
+ const sales=globalThis.ffDaily?FFH_DAILY_CORE.coverageRows(ffDaily.data(),ids):db.sales;
+ const rows=FFH_OUTLET_COMPARISON.build({outlets:assigned,sales,asOf:today()});
+ const recovery=rows.filter(o=>o.zero),number=n=>n.toLocaleString('en-MY');
+ const zoneName=zone=>zone==='PRIMARY'?'KL Zone':zone;
+ const label=(selected,lookup,all,plural)=>!selected.length?all:selected.length===1?lookup(selected[0]):selected.length+' '+plural;
+ const zoneLabel=isMgr()?label(ffZeroZones,zoneName,'All permitted zones','zones'):zoneName(user.zone)||'My zone';
+ const staffLabel=isMgr()?label(ffZeroStaff,id=>sr(id)?.name||id,'All permitted SRs','SRs'):user.name;
+ const metric=(value,icon,title,n,color)=>`<button type="button" class="ffRefMetric" data-zero-view="${value}" data-color="${color}" aria-pressed="false"><i aria-hidden="true">${icon}</i><span>${title}</span><strong>${number(n)}</strong></button>`;
+ shell(back('Zero Sales')+`<section class="ffRefZero">
+  <div class="ffRefPanel ffRefFields ffZeroFilters">
+   <div><span>Zone</span><button type="button" id="ffZeroZone" class="secondary" ${isMgr()?'':'disabled'}>${esc(zoneLabel)}</button></div>
+   <div><span>Sales Representative</span><button type="button" id="ffZeroStaff" class="secondary" ${isMgr()?'':'disabled'}>${esc(staffLabel)}</button></div>
+  </div>
+  <div class="ffRefExports">${metric('all','▣','Assigned Outlets',rows.length,'gold')}${metric('zero','⊘','Zero Sales',recovery.length,'red')}${metric('covered','▥','Sales Outlets',rows.length-recovery.length,'green')}</div>
+  <label class="ffRefPanel ffRefSearch"><i aria-hidden="true">⌕</i><input type="search" class="ffOutletSearch" aria-label="Search outlets" placeholder="Search outlet name / code…" value="${esc(ffZeroSearch)}"></label>
+  <div class="ffRefZeroTitle"><h2 id="ffZeroListTitle"></h2><button type="button" id="ffZeroRecovery" class="ffRefButton"><i aria-hidden="true">◎</i> Recovery Plan</button></div>
+  <div class="ffRefPanel" id="ffZeroResults"></div>
+  <label class="ffRefPanel ffRefSearch">Outlet coverage<select id="ffZeroStatus"><option value="zero">Zero sales</option><option value="all">All outlets</option><option value="covered">Covered outlets</option></select></label>
  </section>`);
  bindBack();
- bindScope(zero);
- const input = q('.ffOutletSearch'), category = q('#ffZeroStatus');
- const details = o => `<dl><div><dt>This MTD</dt><dd>${rm(o.current)}</dd></div><div><dt>Last MTD</dt><dd>${rm(o.previous)}</dd></div><div><dt>Change</dt><dd>${o.delta>0?'+':''}${rm(o.delta)}${o.percent===null?'':' · '+o.percent+'%'}</dd></div><div><dt>To match last full month</dt><dd>${rm(o.remaining)}</dd></div></dl>`;
+ const input=q('.ffOutletSearch'),category=q('#ffZeroStatus');
+ const choose=(title,items,selected,onSelect)=>window.FFH_PICK_ITEM({title,items,selected,multiple:true,taskArtwork:true,onSelect});
+ q('#ffZeroZone').onclick=()=>choose('Select Zone',zones.map(value=>({value,label:zoneName(value)})),ffZeroZones,value=>{
+  ffZeroZones=value;ffZeroStaff=[];zero();
+ });
+ q('#ffZeroStaff').onclick=()=>choose('Select Staff / SR',zonePeople.map(p=>({value:p.id,label:p.name})),ffZeroStaff,value=>{
+  ffZeroStaff=value;zero();
+ });
+ const details=o=>`<dl><div><dt>This MTD</dt><dd>${rm(o.current)}</dd></div><div><dt>Last MTD</dt><dd>${rm(o.previous)}</dd></div><div><dt>Change</dt><dd>${o.delta>0?'+':''}${rm(o.delta)}${o.percent===null?'':' · '+o.percent+'%'}</dd></div><div><dt>To match last full month</dt><dd>${rm(o.remaining)}</dd></div></dl>`;
  function draw(){
-   const term = input.value.trim().toLowerCase();
-   const list = rows.filter(o => (ffZeroState==='all' || (ffZeroState==='zero' ? o.zero : !o.zero)) && [o.name,o.code,o.category,sr(o.sr)?.name].join(' ').toLowerCase().includes(term));
-   q('#ffZeroListTitle').textContent = (ffZeroState==='zero' ? 'Zero Sales Outlets' : ffZeroState==='all' ? 'Assigned Outlets' : 'Sales Outlets') + ' (' + number(list.length) + ')';
-   q('#ffZeroResults').innerHTML = list.map(o => `<details class="ffRefZeroOutlet"><summary><i aria-hidden="true">▣</i><span><b>${esc(o.name)}</b><small><em>${esc(o.code)}</em> · ${esc(sr(o.sr)?.name || o.sr)}</small></span><strong class="${o.zero?'zeroBadge':'green'}">${o.zero?'ZERO':'DONE'}</strong><i aria-hidden="true">›</i></summary>${details(o)}</details>`).join('') ||
-     '<p class="ffRefHint">No outlets match this view.</p>';
+  category.value=ffZeroState;
+  qa('[data-zero-view]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.zeroView===ffZeroState)));
+  ffZeroSearch=input.value;
+  const term=ffZeroSearch.trim().toLowerCase();
+  const list=rows.filter(o=>(ffZeroState==='all'||(ffZeroState==='zero'?o.zero:!o.zero))&&[o.name,o.code,o.category,sr(o.sr)?.name].join(' ').toLowerCase().includes(term));
+  q('#ffZeroListTitle').textContent=(ffZeroState==='zero'?'Zero Sales Outlets':ffZeroState==='all'?'Assigned Outlets':'Sales Outlets')+' ('+number(list.length)+')';
+  q('#ffZeroResults').innerHTML=list.map(o=>`<details class="ffRefZeroOutlet"><summary><i aria-hidden="true">▣</i><span><b>${esc(o.name)}</b><small><em>${esc(o.code)}</em> · ${esc(sr(o.sr)?.name||o.sr)}</small></span><strong class="${o.zero?'zeroBadge':'green'}">${o.zero?'ZERO':'DONE'}</strong><i aria-hidden="true">›</i></summary>${details(o)}</details>`).join('')
+   ||'<p class="ffRefHint">No outlets match this view.</p>';
  }
- category.value = ffZeroState;
- input.oninput = draw;
- category.onchange = () => { ffZeroState = category.value; draw(); };
- q('#ffZeroRecovery').onclick = () => {
-   const {el,close} = ffhInsetPopup('Recovery Plan', '<p>Zero-sales outlets by sales needed to match last month.</p>' +
-     (recovery.length ? '<ol>' + [...recovery].sort((a,b) => b.remaining-a.remaining).map(o =>
-       '<li><b>'+esc(o.name)+'</b> · '+esc(sr(o.sr)?.name || o.sr)+' · '+rm(o.remaining)+'</li>').join('') + '</ol>' : '<p>No zero-sales outlets in this selection.</p>') +
-     '<button type="button" class="secondary" data-route-plan>Open Route Plan</button>');
-   el.querySelector('[data-route-plan]').onclick = () => { close(); setTimeout(() => { if (currentPage==='zero') go('route'); },100); };
+ input.oninput=draw;
+ category.onchange=()=>{ffZeroState=category.value;draw();};
+ qa('[data-zero-view]').forEach(button=>button.onclick=()=>{ffZeroState=button.dataset.zeroView;draw();});
+ q('#ffZeroRecovery').onclick=()=>{
+  const ranked=[...recovery].sort((a,b)=>b.remaining-a.remaining);
+  const {el,close}=ffhInsetPopup('Recovery Plan','<p>Zero-sales outlets by sales needed to match last month.</p>'
+   +(ranked.length?'<ol class="ffZeroRecoveryList">'+ranked.map((o,i)=>'<li><b>'+esc(o.name)+'</b> · '+esc(sr(o.sr)?.name||o.sr)+' · '+rm(o.remaining)
+    +' <button type="button" class="secondary" data-recovery-outlet="'+i+'">Plan follow-up</button></li>').join('')+'</ol>':'<p>No zero-sales outlets in this selection.</p>')
+   +'<button type="button" class="secondary" data-route-plan>Open Route Plan</button>');
+  el.querySelector('[data-route-plan]').onclick=()=>{close();setTimeout(()=>{if(currentPage==='zero')go('route');},100);};
+  el.querySelectorAll('[data-recovery-outlet]').forEach(button=>button.onclick=()=>{
+   const outlet=ranked[Number(button.dataset.recoveryOutlet)];close();
+   setTimeout(()=>{if(currentPage==='zero')window.ffFindings.recovery(outlet);},100);
+  });
  };
  draw();
 }
+
 function route(){if(window.ffFindings)return window.ffFindings.open('route');let id=currentSr(),ids=id?[id]:srIds(),rows=[];ids.forEach(sid=>outlets(sid).forEach(o=>rows.push({...o,sr:sid,srName:ffhStaffLabel(sid)})));let salesBy={};db.sales.filter(x=>ids.includes(x.sr)&&x.status==='Delivered'&&String(x.date||'').startsWith(month())&&(+x.deliveredAmount>0||+x.qty>0)).forEach(x=>salesBy[x.sr+'|'+(x.outletCode||x.outletName)]=(salesBy[x.sr+'|'+(x.outletCode||x.outletName)]||0)+(+x.deliveredAmount||0));let sorted=rows.slice().sort((a,b)=>(salesBy[a.sr+'|'+a.code]||0)-(salesBy[b.sr+'|'+b.code]||0));shell(back('Route & Zero-Sales Focus')+'<section class="ffOutletBoard">'+(isMgr()?scopeBar():'')+`<div class="kpis"><div class="kpi"><span>Assigned Outlets</span><strong>${rows.length}</strong></div><div class="kpi"><span>Zero Sales</span><strong class="red">${zeroCount(id)}</strong></div></div><div class="card ffOutletList"><input class="ffOutletSearch" aria-label="Search outlets" placeholder="Search outlet, code, chain or SR…"><div class="cardTitle">${id?'Individual Outlet Status':'All SR — Combined Outlet Status'}</div><div class="ffOutletRows">${sorted.length?sorted.map(o=>{let k=o.sr+'|'+o.code,v=salesBy[k]||0;return`<div class="row ffOutletRow"><div><b>${o.name}</b><div class="miniStat">${o.code} · ${o.category}${isMgr()?' · '+esc(o.srName):''}</div></div><span class="${v?'green':'zeroBadge'}">${v?rm(v):'ZERO'}</span></div>`}).join(''):'<div class="empty">No outlet assigned.</div>'}</div></div></section>`);bindBack();bindScope(route);ffhBindOutletSearch()}function tasks(){window.ffFindings?.attachInbox();const canSeeZone=zone=>user.ownerAccess||user.accessAll||user.accessibleZones?.includes('*')||zone===user.zone||user.accessibleZones?.includes(zone);
  const permittedPeople=U.filter(p=>p.active!==false&&(p.id===user.id||canSeeZone(p.zone)));
  const taskZone=ffhSelectedZone==='ALL'||canSeeZone(ffhSelectedZone)?ffhSelectedZone:user.zone;
@@ -608,7 +648,7 @@ function reportRows(name){let id=currentSr(),f=q('#rf')?.value||month()+'-01',t=
 }
 function reportView(name){let rows=reportRows(name);shell(back(name)+`<div class="card reportTable"><table>${rows.map((r,i)=>`<tr>${r.map(c=>i?`<td>${esc(c)}</td>`:`<th>${esc(c)}</th>`).join('')}</tr>`).join('')}</table></div>`);bindBack()}
 async function ffhReferenceExport(button, title, rows, status) {
- const kind = button.dataset.taskExport || button.dataset.outletExport || button.dataset.rewardExport;
+ const kind = button.dataset.taskExport || button.dataset.outletExport || button.dataset.rewardExport || button.dataset.routeExport || button.dataset.attendanceExport;
  const filename = 'FieldForce-' + title.replace(/[^a-z0-9]+/gi,'-') + '-' + today();
  button.disabled = true;
  status.textContent = '';
@@ -841,7 +881,108 @@ function bindCatalogueZoom(){
  qa('.skuMenuBtn').forEach(b=>b.onclick=e=>{e.stopPropagation();openSkuMenu(b.dataset.id)});
  qa('.ffUploadProductImage').forEach(b=>b.onclick=e=>{e.stopPropagation();openSkuMenu(b.dataset.id)})
 }
-function control(){if(!isMgr())return home(true);currentPage='control';if(!isMgr()&&!ffhMay('kb'))return home();shell(back('Manager Control Center')+`<div class="card">${[['☁️','Sync Existing Data to Cloud','migration'],['👥','Company Zones & Teams','roster'],['👥','Staff, Zones, Access & Trash','users'],['🎯','Target & Income Setup','target'],['📍','Outlet Excel / Assignment','outlets'],['💰','Manager Income','mgrincome'],['🏆','Incentive & Penalty','income'],['📸','CPO / Promotion Campaign','cpo'],['✓','Task Assignment','tasks'],['📚','Proposal PDF Publish','proposals'],['🔔','Notification Timing','notify'],['🧠','AI Knowledge Base','kb']].filter(x=>x[2]==='roster'?true:x[2]==='users'?(user.id==='M21954'||user.ownerAccess):ffhMay(({migration:'settings',target:'income',outlets:'outlets',mgrincome:'income',income:'income',cpo:'cpo',tasks:'tasks',proposals:'proposals',notify:'notifications',kb:'kb'})[x[2]])).map((x,i)=>`<button class="listBtn ctl ${['premiumBtn','tealBtn','blueBtn','purpleBtn'][i%4]}" data-x="${x[2]}" style="margin:7px 0;padding:12px;border-radius:11px"><span><i class="ico">${x[0]}</i>${x[1]}</span><b>›</b></button>`).join('')}</div>`);bindBack();qa('.ctl').forEach(b=>b.onclick=()=>{navStack.push({name:'control',view});currentPage='control:'+b.dataset.x;controlPage(b.dataset.x)})}
+let ffManagerControlScope={};
+function control(){
+ if(!isMgr())return home(true);
+ currentPage='control';
+ if(ffManagerControlScope.viewer!==user.id)ffManagerControlScope={viewer:user.id,from:month()+'-01',to:today(),zone:''};
+ const scope=ffManagerControlScope;
+ const people=U.filter(p=>p.active!==false&&canSeeZone(p.zone)&&(db.companyRoster?.configured
+  ?p.can_sell&&(db.companyRoster.member_ids.includes(p.id)||p.can_manage)
+  :['SR','MANAGER+SR'].includes(p.role)||(db.sales||[]).some(row=>row.sr===p.id)));
+ const zones=[...new Set(people.map(p=>p.zone).filter(Boolean))].sort();
+ if(!zones.includes(scope.zone))scope.zone='';
+ const filtered=people.filter(p=>!scope.zone||p.zone===scope.zone);
+ const ids=filtered.map(p=>p.id),delivery=ffhScopedSales(ids).filter(row=>row.status==='Delivered'&&inRange(ffhSaleDay(row),scope.from,scope.to));
+ const totals=new Map(),visits=new Set();
+ for(const row of delivery){
+  totals.set(row.sr,(totals.get(row.sr)||0)+(+row.deliveredAmount||0));
+  if(row.outletCode||row.outletName)visits.add(row.sr+'|'+(row.outletCode||row.outletName));
+ }
+ const staffRows=filtered.map(p=>{
+  const assigned=outlets(p.id),sold=assigned.filter(outlet=>visits.has(p.id+'|'+(outlet.code||outlet.name))).length;
+  const goal=target(p.id,scope.to.slice(0,7)),sales=totals.get(p.id)||0;
+  return {p,assigned:assigned.length,sold,goal,sales,ach:goal?Math.round(sales*1000/goal)/10:null};
+ }).sort((a,b)=>b.sales-a.sales);
+ const assigned=staffRows.reduce((sum,row)=>sum+row.assigned,0);
+ const sold=staffRows.reduce((sum,row)=>sum+row.sold,0);
+ const sales=staffRows.reduce((sum,row)=>sum+row.sales,0),goal=staffRows.reduce((sum,row)=>sum+row.goal,0);
+ const percentage=goal?Math.round(sales*1000/goal)/10:0;
+ const pending=db.tasks.filter(item=>ids.includes(item.to)&&item.status==='Pending Review').length;
+ const money=val=>rm(val);
+ const metric=(title,value,color)=>`<div class="ffRefMetric" data-color="${color}"><span>${title}</span><strong>${esc(value)}</strong></div>`;
+ const quick=(title,icon,page,color,direct=false)=>`<button type="button" class="ffRefButton ctl" data-color="${color}" data-x="${page}" ${direct?'data-open-module':''}><i aria-hidden="true">${icon}</i><span>${title}</span></button>`;
+ const owner=user.id==='M21954'||user.ownerAccess;
+ const sections=[
+  ['Staff & Access',[
+   ['👥','Company Zones & Teams','roster',true],['👥','Staff, Zones, Access & Trash','users',owner],
+   ['⌖','SR Tracking Settings','tracking',owner,true]
+  ]],
+  ['Field Operations',[
+   ['📍','Outlet Excel / Assignment','outlets',ffhMay('outlets')],['▣','Outlet Management','outletHistory',true,true],
+   ['⌖','Route Plan & Findings','route',true,true],['✓','Task Assignment','tasks',ffhMay('tasks')],
+   ['📸','CPO / Promotion Campaign','cpo',ffhMay('cpo')],['▣','Meeting / Notice','briefings',true,true]
+  ]],
+  ['Sales, Income & Reports',[
+   ['🎯','Target & Income Setup','target',ffhMay('income')],['💰','Manager Income','mgrincome',ffhMay('income')],
+   ['🏆','Incentive & Penalty','income',ffhMay('income')],['▦','Reports & Export','reports',true,true]
+  ]],
+  ['Content & Settings',[
+   ['📚','Proposal PDF Publish','proposals',ffhMay('proposals')],['◆','Catalogue','catalogue',ffhMay('catalogue'),true],
+   ['🔔','Notification Timing','notify',ffhMay('notifications')],['🧠','AI Knowledge Base','kb',ffhMay('kb')],
+   ['☁️','Sync Existing Data to Cloud','migration',ffhMay('settings')]
+  ]]
+ ];
+ shell(back('Manager Control')+`<section class="ffRefManagerControl">
+  <form class="ffRefPanel ffRefFields ffManagerScope" id="ffManagerScope">
+   <label><span>From<input type="date" name="from" value="${esc(scope.from)}" required></span></label>
+   <label><span>To<input type="date" name="to" value="${esc(scope.to)}" required></span></label>
+   <label><span>Zone / Team<select name="zone"><option value="">All permitted zones</option>${zones.map(zone=>`<option value="${esc(zone)}" ${zone===scope.zone?'selected':''}>${esc(zone==='PRIMARY'?'KL Zone':zone)}</option>`).join('')}</select></span></label>
+   <button type="submit" class="secondary">Apply Filter</button><p role="status"></p>
+  </form>
+  <div class="ffManagerControlQuick">
+   ${quick('Team Management','♙','roster','green')}
+   ${ffhMay('income')?quick('Target Setting','◎','target','blue'):''}
+   ${ffhMay('tasks')?quick('Task Assignment','✓','tasks','gold'):''}
+   ${quick('Approval Centre','▣','approvals','purple',true)}
+   <button type="button" class="ffRefButton" data-color="red" id="ffManagerConfig"><i aria-hidden="true">⚙</i><span>App Configuration</span></button>
+  </div>
+  <section class="ffRefPanel"><div class="ffRefZeroTitle"><h2>Team Overview</h2><button type="button" class="secondary ctl" data-x="roster">View Team</button></div>
+   <div class="ffManagerOverview"><strong>${percentage}%</strong><dl>
+    <div><dt>Team achievement</dt><dd>${percentage}%</dd></div>
+    <div><dt>Target · ${esc(scope.to.slice(0,7))}</dt><dd>${money(goal)}</dd></div>
+    <div><dt>Delivered sales</dt><dd>${money(sales)}</dd></div>
+    <div><dt>Active sales staff</dt><dd>${ids.length}</dd></div>
+   </dl></div>
+   <div class="ffRefReportKpis">${metric('Total Sales',money(sales),'green')}${metric('Sales Outlets',sold,'blue')}${metric('Assigned Outlets',assigned,'gold')}${metric('Zero Sales',Math.max(0,assigned-sold),'red')}</div>
+  </section>
+  <section class="ffRefPanel ffRefOutlet"><div class="ffRefZeroTitle"><h2>SR Performance (${ids.length})</h2><button class="secondary ctl" type="button" data-open-module data-x="reports">View Reports</button></div>
+   <div class="ffRefOutletViewport"><table><thead><tr><th>Staff</th><th>Outlets</th><th>Sales</th><th>Achievement</th></tr></thead>
+   <tbody>${staffRows.map(({p,assigned,sales,ach})=>`<tr><td>${esc(p.name)}</td><td>${assigned}</td><td>${money(sales)}</td><td>${ach===null?'—':ach+'%'}</td></tr>`).join('')||'<tr><td colspan="4">No staff in this selection.</td></tr>'}</tbody></table></div>
+  </section>
+  <section class="ffRefPanel"><div class="ffRefZeroTitle"><h2>Approval Centre</h2><button type="button" class="secondary ctl" data-open-module data-x="approvals">View All</button></div>
+   <div class="ffRefExports">${metric('Task Reviews',pending,'purple')}${metric('Inbox Approvals',ffhHomeCounts.owner===user.id?ffhHomeCounts.approvals:'—','blue')}</div>
+  </section>
+  <h2>Manager Actions</h2><div id="ffManagerSettings"></div>
+  ${sections.map(([title,entries])=>{
+  const permitted=entries.filter(entry=>entry[3]);
+  return permitted.length?`<section class="ffRefPanel"><h2>${esc(title)}</h2><div class="ffManagerControlGrid">${permitted.map(([icon,label,page,allowed,openModule])=>
+   `<button type="button" class="ffRefButton ctl" data-x="${page}" ${openModule?'data-open-module':''}><i aria-hidden="true">${icon}</i><span>${esc(label)}</span></button>`).join('')}</div></section>`:'';
+ }).join('')}</section>`);
+ bindBack();
+ q('#ffManagerScope').onsubmit=event=>{
+  event.preventDefault();
+  const values=Object.fromEntries(new FormData(event.currentTarget));
+  if(values.from>values.to){event.currentTarget.querySelector('[role=status]').textContent='Choose a valid date range.';return;}
+  Object.assign(scope,values);control();
+ };
+ q('#ffManagerConfig').onclick=()=>q('#ffManagerSettings').scrollIntoView({block:'start',behavior:'smooth'});
+ qa('.ctl').forEach(button=>button.onclick=()=>{
+  const page=button.dataset.x;
+  if(button.hasAttribute('data-open-module')){go(page);return;}
+  navStack.push({name:'control',view});currentPage='control:'+page;controlPage(page);
+ });
+}
 
 
 async function ffhFindCatalogueCloud(x){
@@ -1288,7 +1429,7 @@ const ffEarnings=window.FFH_CREATE_EARNINGS({db,rules,user:()=>user,month:income
 const ffMonthly=window.FFH_CREATE_MONTHLY_INCOME({sb:FFH_SUPABASE,db,user:()=>user,people:()=>U,esc,may:ffhMay,month:incomeMonth,today,target,planning:planningTarget,shell,back,bindBack,setPage:p=>currentPage=p,refresh:()=>ffEarnings.refresh()});
 const ffHomeStatus=window.FFH_CREATE_HOME_STATUS({sb:FFH_SUPABASE,user:()=>user,esc,today,shell,back,bindBack,navigate,status:ffhRefreshHomeStatuses,priorities:ffhLoadHomeCounts,uploadPublic:ffhUploadPublicFile,downloadBlob:ffhSafeDownload,setPage:p=>currentPage=p});
 window.FFH_PAGE_CONTEXT={may:ffhMay,sr,esc,sb:FFH_SUPABASE,month:incomeMonth,refresh:()=>ffEarnings.refresh(),income,historyHtml:(...args)=>ffEarnings.historyHtml(...args),bindHistory:()=>ffEarnings.bindActions(income),advanced:id=>ffMonthly.open(id,incomeMonth())};
-window.ffFindings=window.FFH_CREATE_FINDINGS?.({changed:()=>{updateTaskBadges();ffhRefreshHomeStatuses();if(currentPage==='tasks')tasks();else if(currentPage?.startsWith('findings:'))window.ffFindings.open(currentPage.split(':')[1]);},sb:FFH_SUPABASE,user:()=>user,people:()=>U,esc,shell,back,bindBack,page:()=>currentPage,setPage:p=>currentPage=p,outlets:()=>srIds().flatMap(id=>outlets(id).map(o=>({...o,sr:id}))),categories:()=>[...new Set(ffhCatalogueRows().map(x=>x.category))],upload:ffhUploadPublicFile,pdf:opts=>window.FFH_EXPORT_PDF({...opts,download:ffhSafeDownload}),updateBadges:updateTaskBadges});
+window.ffFindings=window.FFH_CREATE_FINDINGS?.({changed:()=>{updateTaskBadges();ffhRefreshHomeStatuses();if(currentPage==='tasks')tasks();else if(currentPage?.startsWith('findings:'))window.ffFindings.open(currentPage.split(':')[1]);},sb:FFH_SUPABASE,user:()=>user,people:()=>U,esc,shell,back,bindBack,page:()=>currentPage,setPage:p=>currentPage=p,scopePeople:()=>U.filter(p=>p.id===user?.id||(isMgr()&&canSeeZone(p.zone))),outlets:()=>U.filter(p=>p.id===user?.id||(isMgr()&&canSeeZone(p.zone))).flatMap(p=>outlets(p.id).map(o=>({...o,sr:p.id}))),exportFile:ffhReferenceExport,categories:()=>[...new Set(ffhCatalogueRows().map(x=>x.category))],upload:ffhUploadPublicFile,pdf:opts=>window.FFH_EXPORT_PDF({...opts,download:ffhSafeDownload}),updateBadges:updateTaskBadges});
 const ffWorkBoard=window.FFH_CREATE_WORK_BOARD({sb:FFH_SUPABASE,user:()=>user,people:()=>U,esc,today,shell,back,bindBack,navigate,setPage:p=>currentPage=p,may:ffhMay,page:()=>currentPage,rows:()=>ffBriefingRows,refresh:ffhBriefingRefresh,unread:ffNoticeUnread,read:ffhNoticeRead,editor:ffhBriefingEditor,save:ffhBriefingSave,task:item=>ffhTaskFromBriefing(item,item.description),incentive:item=>navigate('incomeLedger',async()=>{await ffEarnings.ledger();const f=q('#ffEntryForm');if(f){f.elements.kind.value='Incentive';f.elements.reason.value='Notice: '+item.id+' · '+item.description;f.closest('details').open=true;}}),penalty:item=>navigate('incomeLedger',async()=>{await ffEarnings.ledger();const f=q('#ffEntryForm');if(f){f.elements.kind.value='Penalty';f.elements.reason.value='Notice: '+item.id+' · '+item.description;f.closest('details').open=true;}})});
 
 globalThis.ffDaily=window.FFH_CREATE_DAILY?.({sb:FFH_SUPABASE,db,outlets,user:()=>user,people:()=>U,staff:sr,isMgr,may:ffhMay,today,esc,shell,back,bindBack,page:()=>currentPage,setPage:p=>{currentPage=p},navigate,refreshPeople:ffhLoadStaff,refreshEarnings:()=>ffEarnings.refresh(),xlsx:ffhEnsureXlsx,download:(...args)=>ffhSafeDownload(...args),legacy:()=>{ffhLegacySales();q('#newTab').hidden=true;renderPending(currentSr());},syncPage:()=>ffPerformance.syncPage()});
@@ -1306,7 +1447,7 @@ function ffhAppendClaimButtons(){const root=q('#ffIncomeExtras')||q('#app main')
 function ffhLocationTaskDialog(id,date,point){
  const overlay=document.createElement('div');overlay.className='globalSearchOverlay ffLocationTaskDialog';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Assign location task');overlay.innerHTML=`<section class="globalSearchBox"><button type="button" class="secondary" data-close>× Close</button><h2>Assign Location Task</h2><form class="form" id="taskForm"><label>Task<input name="title" required></label><label>Assign To<select name="to">${ffhVisiblePeople().filter(p=>p.active!==false).map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}</select></label><label>Due<input name="due" type="date"></label><label>Reminder date & time<input name="remindAt" type="datetime-local"></label><label>Priority<select name="priority"><option>Normal</option><option>High</option><option>Urgent</option></select></label><label>Outlet / place<input name="outletName"></label><label>Instructions<textarea name="description"></textarea></label><button type="button" class="secondary" id="ffTaskTargetGps">📍 ATTACH MY CURRENT LOCATION</button><div id="ffTaskTargetStatus" class="miniStat"></div><label>Proof required<select name="proofMode"><option value="none">None</option><option value="location">Location</option><option value="photo">Photo</option><option value="both">Location + photo</option></select></label><button class="primary">ASSIGN TASK</button></form></section>`;document.body.append(overlay);const close=window.FFH_OVERLAY(overlay,()=>overlay.remove());overlay.querySelector('[data-close]').onclick=close;const form=overlay.querySelector('form');form.elements.title.value='Location follow-up';form.elements.description.value='Please explain your work at this location on '+date;form.elements.to.value=id;form.dataset.trackingPopup='1';if(point)form.dataset.targetLocation=JSON.stringify({latitude:point.latitude,longitude:point.longitude,accuracy:point.accuracy_m});overlay.querySelector('#ffTaskTargetGps').onclick=()=>navigator.geolocation.getCurrentPosition(p=>{form.dataset.targetLocation=JSON.stringify({latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy:p.coords.accuracy});overlay.querySelector('#ffTaskTargetStatus').textContent='Location attached';},e=>alert(e.message),{enableHighAccuracy:true,timeout:20000});
 }
-const ffDuty=window.FFH_CREATE_DUTY({catalogue:async()=>{await ffhRefreshCatalogueCloud();return ffhCatalogueRows()},catalogueFile:async id=>{let result;await ffhExportCatalogue('pdf',null,id,null,null,true,async(blob,name)=>{result=new File([blob],name,{type:blob.type})});if(!result)throw Error('PDF generation cancelled');return result},reportFile:(...args)=>ffReports.shareFile(...args),download:ffhSafeDownload,user:()=>user,page:()=>currentPage,setPage:p=>{currentPage=p},today,esc,shell,back,bindBack,home:()=>home(true),open:go,notice:ffhLiveNotice,task:ffhLocationTaskDialog});
+const ffDuty=window.FFH_CREATE_DUTY({catalogue:async()=>{await ffhRefreshCatalogueCloud();return ffhCatalogueRows()},catalogueFile:async id=>{let result;await ffhExportCatalogue('pdf',null,id,null,null,true,async(blob,name)=>{result=new File([blob],name,{type:blob.type})});if(!result)throw Error('PDF generation cancelled');return result},reportFile:(...args)=>ffReports.shareFile(...args),download:ffhSafeDownload,exportFile:ffhReferenceExport,user:()=>user,page:()=>currentPage,setPage:p=>{currentPage=p},today,esc,shell,back,bindBack,home:()=>home(true),open:go,notice:ffhLiveNotice,task:ffhLocationTaskDialog});
 // Capture every legacy module click before handlers can bypass the attendance gate.
 document.addEventListener('change',e=>{if(e.target.id==='ffDashboardZone'){ffhSelectedZone=e.target.value;view='ALL';ffhRenderHistoryPage(currentPage);}});
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!user)return;const allowed=['bh','profile','bell','bn','refresh','dots','lang','logout'];if(allowed.includes(b.id)||b.closest('#ffAttendanceForm,#ffChatForm')||['ffConfirmHome','ffResumeDuty','ffCheckout'].includes(b.id))return;if(ffDuty.gate(b.id==='orb'?'ai':b.dataset.page||currentPage)){e.preventDefault();e.stopImmediatePropagation();navigate('attendance',ffDuty.attendance);}},true);

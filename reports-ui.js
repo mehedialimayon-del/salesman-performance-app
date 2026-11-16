@@ -1,7 +1,7 @@
 /* Reports share one immutable, authenticated snapshot and one filter state. */
 window.FFH_CREATE_REPORTS=function(ctx){'use strict';
 const {q,qa,esc,month,today,currentSr,shell,back,bindBack,outlets,db,rules,FFH_SUPABASE,ffhSharedGet,ffEarnings,ffhEnsureXlsx,ffhSafeDownload}=ctx;
-const R=window.FFH_REPORTS_CORE;let filters=null,owner=null,context=null,request=0,detail=null,loaded='',filtersOpen=false;
+const R=window.FFH_REPORTS_CORE;let filters=null,owner=null,context=null,request=0,detail=null,loaded='',filtersOpen=false,reportType='';
 const defaults=()=>({from:month()+'-01',to:today(),zone:ctx.zone()==='ALL'?'':ctx.zone(),manager:'',sr:currentSr()||'',chain:'',outlet:'',product:'',incomeStaff:ctx.user()?.id||''});
 const reportKey=id=>'ffh_recent_reports_'+id;
 function recent(){
@@ -20,14 +20,23 @@ function openReport(name,range){
  ctx.setPage('report:'+R.names.indexOf(name));
  render();
 }
-function bindRecent(){
+function bindRecent(pdf){
  const field=q('#ffRecentSearch');
  if(!field)return;
- const data=recent();let all=false;
+ let all=false;
  function draw(){
+   const data=recent();
    const matches=data.map((r,i)=>({r,i})).filter(({r})=>r.name.toLowerCase().includes(field.value.trim().toLowerCase()));
-   q('#ffRecentRows').innerHTML=matches.slice(0,all?20:5).map(({r,i})=>`<tr><td>${esc(r.name)}</td><td>${esc(r.filters.from)} – ${esc(r.filters.to)}</td><td>${esc(ctx.user()?.name||owner)}</td><td><button type="button" class="secondary" data-recent-report="${i}">View ›</button></td></tr>`).join('')||'<tr><td colspan="4">No recent reports match.</td></tr>';
-   qa('[data-recent-report]').forEach(b=>b.onclick=()=>{const row=data[Number(b.dataset.recentReport)];if(row)openReport(row.name,row.filters);});
+   q('#ffRecentRows').innerHTML=matches.slice(0,all?20:5).map(({r,i})=>`<tr><td><button type="button" class="secondary" data-recent-report="${i}" data-recent-action="view">${esc(r.name)}</button></td><td>${esc(r.filters.from)} – ${esc(r.filters.to)}</td><td>${esc(ctx.user()?.name||owner)}</td><td><div class="ffRecentActions"><button type="button" class="secondary" data-recent-report="${i}" data-recent-action="excel">Excel</button><button type="button" class="secondary" data-recent-report="${i}" data-recent-action="pdf">PDF</button><button type="button" class="secondary" data-recent-report="${i}" data-recent-action="remove" aria-label="Remove ${esc(r.name)} from recent reports">×</button></div></td></tr>`).join('')||'<tr><td colspan="4">No recent reports match.</td></tr>';
+   qa('[data-recent-report]').forEach(button=>button.onclick=()=>{
+     const i=Number(button.dataset.recentReport),row=data[i];
+     if(!row)return;
+     if(button.dataset.recentAction==='pdf')return pdf(button,row.name,row.filters);
+     if(button.dataset.recentAction==='excel')return download(row.name,button,row.filters);
+     if(button.dataset.recentAction==='view')return openReport(row.name,row.filters);
+     try{localStorage.setItem(reportKey(owner),JSON.stringify(data.filter((_,index)=>index!==i)));draw();}
+     catch{status('Could not remove this entry from recent reports.');}
+   });
    q('#ffRecentAll').hidden=matches.length<=5;
    q('#ffRecentAll').textContent=all?'Show Latest Five':'View All Reports';
  }
@@ -100,7 +109,7 @@ function render(){
   +'<option value="" '+(!filters.sr&&!filters.manager?'selected':'')+'>COMBINED · ALL SELECTED SRs</option>'
   +(quickManagers.length?'<optgroup label="MANAGERS · TEAM TOTAL">'+quickManagers.map(p=>'<option value="TEAM:'+esc(p.id)+'" '+(filters.manager===p.id&&!filters.sr?'selected':'')+'>'+esc(p.name)+' · '+esc(p.id)+'</option>').join('')+'</optgroup>':'')
   +(quickSrs.length?'<optgroup label="SALES REPRESENTATIVES">'+quickSrs.map(p=>'<option value="'+esc(p.id)+'" '+(filters.sr===p.id?'selected':'')+'>'+esc(p.name)+' · '+esc(p.id)+' · '+esc(p.zone||'')+'</option>').join('')+'</optgroup>':'')
-  +'</select></label></div>';
+  +'</select></label>'+(!detail?'<label>Report Type<select id="ffReportType"><option value="">All reports</option>'+R.names.map((name,i)=>'<option value="'+i+'" '+(String(i)===reportType?'selected':'')+'>'+esc(name)+'</option>').join('')+'</select></label>':'')+'</div>';
  const table=detail?m.rows(detail):null;const scopeLabel=['Income Breakdown','Sales Commission'].includes(detail)?m.incomeScope:filters.sr?(context.people.find(p=>p.id===filters.sr)?.name||filters.sr)+' · '+filters.sr:m.ids.length+' selected SR(s)';
  const stat = (icon,label,value,color) => `<div class="ffRefMetric" data-color="${color}"><i aria-hidden="true">${icon}</i><span>${label}</span><strong>${esc(value)}</strong></div>`;
  const money = value => 'RM ' + value.toLocaleString('en-MY',{maximumFractionDigits:2});
@@ -112,7 +121,6 @@ function render(){
  </div>`;
  const reportIcons = ['◕','◉','▥','▧','▣','▦','◎','▤','%','◆','★','⊘','⚑','⚑','⌖'];
  const choices = `<section class="ffRefPanel ffRefReportChoices"><h2>Generate Report</h2>
-   <label class="ffRefSearch">Report Type<select id="ffReportType"><option value="">All reports</option>${R.names.map((name,i)=>`<option value="${i}">${esc(name)}</option>`).join('')}</select></label>
    <div class="ffRefReportGrid">${R.names.map((name,i)=>`<div class="ffRefReportTile" data-report-tile="${i}"><button type="button" class="ffRefButton reportBtn" data-r="${i}" aria-label="View ${esc(name)}"><i aria-hidden="true">${reportIcons[i]}</i><span>${esc(name)}</span></button><button type="button" class="secondary" data-report-export="${esc(name)}" aria-label="Download ${esc(name)} Excel">Excel</button></div>`).join('')}</div>
  </section>`;
  const recentPanel=`<section class="ffRefPanel ffRefOutlet ffRecentReports"><div class="ffRefZeroTitle"><h2>Recent Reports</h2></div>
@@ -130,39 +138,42 @@ function render(){
  };
  q('#ffReportReset').onclick=()=>{filters={...defaults(),zone:'',sr:''};render();};
  q('#ffReportReload').onclick=async e=>{e.target.disabled=true;status('Loading authenticated cloud records…');try{remember();if(await refresh())render();}catch(err){status('Refresh failed: '+err.message+' · Previous snapshot remains dated above.');if(e.target.isConnected)e.target.disabled=false;}};
- if(q('#ffReportType'))q('#ffReportType').onchange=e=>{
-   qa('[data-report-tile]').forEach(tile=>tile.hidden=!!e.target.value && tile.dataset.reportTile!==e.target.value);
- };
- async function pdf(button,name){
-   const period={...filters};
+ if(q('#ffReportType')){
+   const applyReportType=()=>{qa('[data-report-tile]').forEach(tile=>tile.hidden=reportType!==''&&tile.dataset.reportTile!==reportType);};
+   q('#ffReportType').onchange=e=>{reportType=e.target.value;applyReportType();};
+   applyReportType();
+ }
+ async function pdf(button,name,range){
+   const period=range?{...defaults(),...range}:{...filters};
    button.disabled=true;
    try {
-     const [head,...data]=model().rows(name), articles=[], pageSize=30;
+     const exportModel=R.build(context,period), [head,...data]=exportModel.rows(name),articles=[],pageSize=30;
+     const reportScope=['Income Breakdown','Sales Commission'].includes(name)?exportModel.incomeScope:exportModel.ids.length+' selected SR(s)';
      for(let i=0;i<Math.max(1,data.length);i+=pageSize){
        const table=[head,...data.slice(i,i+pageSize)].map((row,r)=>'<tr>'+row.map(value=>{
          const tag=r?'td':'th';
          return '<'+tag+'>'+esc(value??'')+'</'+tag+'>';
        }).join('')+'</tr>').join('');
-       articles.push('<h1>'+esc(name)+'</h1><p>'+esc(scopeLabel)+' · '+esc(period.from)+' → '+esc(period.to)+'</p><table border="1" cellspacing="0" cellpadding="5">'+table+'</table>');
+       articles.push('<h1>'+esc(name)+'</h1><p>'+esc(reportScope)+' · '+esc(period.from)+' → '+esc(period.to)+'</p><table border="1" cellspacing="0" cellpadding="5">'+table+'</table>');
      }
      await window.FFH_EXPORT_PDF({title:name,filename:'FieldForce-'+name.replace(/[^a-z0-9]+/gi,'-')+'-'+period.from+'-to-'+period.to+'.pdf',
        download:ffhSafeDownload,articles});
    } catch(err) {status('PDF download failed: '+err.message);} finally {button.disabled=false;}
  }
  if(q('#ffReportPdf'))q('#ffReportPdf').onclick=e=>pdf(e.currentTarget,detail);
- q('#ffReportPdfBottom').onclick=e=>{remember();return pdf(e.currentTarget,detail||R.names[0]);};
- q('#ffReportExportBottom').onclick=e=>download(detail,e.currentTarget);
+ q('#ffReportPdfBottom').onclick=e=>{remember();return pdf(e.currentTarget,detail||R.names[Number(reportType)]||R.names[0]);};
+ q('#ffReportExportBottom').onclick=e=>download(detail||(reportType!==''?R.names[Number(reportType)]:null),e.currentTarget);
  q('#ffReportSchedule').onclick=scheduleReport;
- bindRecent();
+ bindRecent(pdf);
  qa('.reportBtn').forEach(b=>b.onclick=()=>{remember();openReport(R.names[+b.dataset.r]);});
  if(q('#ffReportAll'))q('#ffReportAll').onclick=()=>{remember();detail=null;ctx.setPage('reports');render();};
  qa('[data-report-export]').forEach(b=>b.onclick=()=>download(b.dataset.reportExport,b));if(q('#xls'))q('#xls').onclick=e=>download(null,e.target);
  window.FFH_REPORT_PRESENTATION?.bind?.(q('.ffReports'));
  const reportRoot=q('.ffReports'),openedPage=ctx.page();const showTop=()=>{if(!reportRoot?.isConnected||ctx.page()!==openedPage)return;const scroll=document.scrollingElement||document.documentElement;scroll.scrollTop=0;const wrap=reportRoot.closest('.wrap');if(wrap)wrap.scrollTop=0;};showTop();if(window.requestAnimationFrame)window.requestAnimationFrame(showTop);
 }
-async function download(name,button){
+async function download(name,button,range){
  const label=button?.textContent;try{
-  remember();if(name&&!R.names.includes(name))throw Error('Unknown report.');const m=model(),chosen=name?[name]:R.names,exportFilters={...filters},scope=name&&['Income Breakdown','Sales Commission'].includes(name)?'-Staff-'+exportFilters.incomeStaff:exportFilters.sr?'-SR-'+exportFilters.sr:'-Selected-SRs',scopeLabel=name&&['Income Breakdown','Sales Commission'].includes(name)?m.incomeScope:exportFilters.sr?(context.people.find(p=>p.id===exportFilters.sr)?.name||exportFilters.sr)+' · '+exportFilters.sr:m.ids.length+' selected SR(s)';
+  if(!range)remember();if(name&&!R.names.includes(name))throw Error('Unknown report.');const exportFilters=range?{...defaults(),...range}:{...filters},m=R.build(context,exportFilters),chosen=name?[name]:R.names,scope=name&&['Income Breakdown','Sales Commission'].includes(name)?'-Staff-'+exportFilters.incomeStaff:exportFilters.sr?'-SR-'+exportFilters.sr:'-Selected-SRs',scopeLabel=name&&['Income Breakdown','Sales Commission'].includes(name)?m.incomeScope:exportFilters.sr?(context.people.find(p=>p.id===exportFilters.sr)?.name||exportFilters.sr)+' · '+exportFilters.sr:m.ids.length+' selected SR(s)';
   if(button){button.disabled=true;button.textContent='GENERATING EXCEL…';}
   const XLSX=await ffhEnsureXlsx(),wb=XLSX.utils.book_new();
   for(const n of chosen){let ws;if(window.FFH_REPORT_PRESENTATION)ws=window.FFH_REPORT_PRESENTATION.sheet(XLSX,n,m,exportFilters,['Income Breakdown','Sales Commission'].includes(n)?m.incomeScope:scopeLabel);else{const rows=m.rows(n);ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=(rows[0]||[]).map((_,i)=>({wch:Math.min(46,Math.max(14,...rows.slice(0,150).map(r=>String(r[i]??'').length+2)))}));ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:Math.max(0,rows.length-1),c:(rows[0]?.length||1)-1}})};}XLSX.utils.book_append_sheet(wb,ws,n.slice(0,31));}
@@ -171,7 +182,7 @@ async function download(name,button){
   status(saved?.saved?'✓ Excel saved: '+saved.filename+' · '+saved.location+' · '+new Date(saved.savedAt||Date.now()).toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur'})+' MYT':'Excel download sent to your browser: '+saved?.filename+' · Check Downloads.');
  }catch(err){status('Excel download failed: '+err.message);alert('Excel download failed: '+err.message);}finally{if(button?.isConnected){button.disabled=false;button.textContent=label;}}
 }
-const reports=async function(fromSync=false){if(owner!==ctx.user()?.id){owner=ctx.user()?.id;filters=defaults();context=null;detail=null;}else if(!ctx.page().startsWith('report:'))detail=null;const page=ctx.page();shell(back('Reports & Full Export')+'<div class="card" id="ffReportStatus" role="status">Loading authenticated cloud reports…</div>');bindBack();try{if(await refresh()&&ctx.page()===page)render();}catch(err){status('Reports could not load: '+err.message);const el=q('#ffReportStatus');if(el)el.insertAdjacentHTML('afterend','<button class="secondary" id="ffReportRetry">RETRY</button>');if(q('#ffReportRetry'))q('#ffReportRetry').onclick=()=>reports();}};
+const reports=async function(fromSync=false){if(owner!==ctx.user()?.id){owner=ctx.user()?.id;filters=defaults();context=null;detail=null;reportType='';}else if(!ctx.page().startsWith('report:'))detail=null;const page=ctx.page();shell(back('Reports & Full Export')+'<div class="card" id="ffReportStatus" role="status">Loading authenticated cloud reports…</div>');bindBack();try{if(await refresh()&&ctx.page()===page)render();}catch(err){status('Reports could not load: '+err.message);const el=q('#ffReportStatus');if(el)el.insertAdjacentHTML('afterend','<button class="secondary" id="ffReportRetry">RETRY</button>');if(q('#ffReportRetry'))q('#ffReportRetry').onclick=()=>reports();}};
 async function shareFile(name,kind,range={}){if(!R.names.includes(name))throw Error('Unknown report');owner=ctx.user()?.id;filters={...defaults(),...range};if(!await refresh())throw Error('Session changed; retry');const m=model(),rows=m.rows(name),filename='FieldForce-'+name.replace(/[^a-z0-9]+/gi,'-')+'-'+filters.from+'-'+filters.to;if(kind==='excel'){const XLSX=await ffhEnsureXlsx(),wb=XLSX.utils.book_new();const ws=window.FFH_REPORT_PRESENTATION?window.FFH_REPORT_PRESENTATION.sheet(XLSX,name,m,filters,m.incomeScope||'Selected team'):XLSX.utils.aoa_to_sheet(rows);XLSX.utils.book_append_sheet(wb,ws,name.slice(0,31));return new File([XLSX.write(wb,{bookType:'xlsx',type:'array',cellStyles:true})],filename+'.xlsx',{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});}let file;await window.FFH_EXPORT_PDF({title:name,articles:['<h1>'+esc(name)+'</h1><p>'+esc(filters.from)+' → '+esc(filters.to)+'</p><table border="1" cellspacing="0" cellpadding="4">'+rows.map((r,i)=>'<tr>'+r.map(v=>'<'+(i?'td':'th')+'>'+esc(v??'')+'</'+(i?'td':'th')+'>').join('')+'</tr>').join('')+'</table>'],filename:filename+'.pdf',download:async(blob,n)=>file=new File([blob],n,{type:'application/pdf'})});if(!file)throw Error('PDF generation cancelled');return file;}
 /* Read-only assistant access uses the same authenticated snapshot and report core. */
 async function assistantSnapshot(range={}){

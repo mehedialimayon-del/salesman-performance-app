@@ -495,3 +495,34 @@ html body.ffGlowOn #app .app.ffBlackGlow .ffRefOutletViewport :is([data-ref-outl
 #app .ffRefTasks .ffRefOutletViewport th:first-child { width:5%; }
 #app .ffRefTasks .ffRefOutletViewport th:nth-child(2) { width:26%; }
 #app .ffRefTasks .ffRefOutletViewport th:nth-child(4) { width:19%; }
+
+.ffRefRouteActions {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.4em;}
+.ffRefRoute :is(#ffFindingRows,#ffRouteAssigned) {max-height:24dvh;overflow:auto;overscroll-behavior:contain;}
+.ffRoutePopupList {display:grid;gap:.35rem;max-height:60dvh;overflow:auto;}
+.ffRoutePopupList article {display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.5rem;border-bottom:1px solid #784013;}
+.ffRoutePopupList article a {color:#ffa347;}
+.ffZeroFilters>div {min-width:0;display:grid;gap:.3em;}
+.ffZeroFilters button {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ffRefZero [data-zero-view][aria-pressed=true] {outline:1px solid #fff4bf;outline-offset:1px;}
+#ffZeroResults {max-height:52dvh;overflow:auto;overscroll-behavior:contain;}
+.ffZeroRecoveryList li {margin-block:.55em;}
+.ffRecentActions {display:flex;flex-wrap:wrap;gap:.3em;}
+#app .ffRecentReports .ffRecentActions button {min-width:0;padding:.3em .45em;font-size:inherit;}
+#app .app:has(.ffRefManagerControl) {--ff-ref-line:#e7831c;--ff-ref-font:'Roboto Condensed','Arial Narrow',Roboto,Arial,sans-serif;}
+.ffRefManagerControl {display:grid;gap:.75rem;padding:.35rem;}
+.ffRefManagerControl section {padding:.65rem;}
+.ffRefManagerControl h2 {margin:0 0 .55rem;color:#ffad27;font-size:1rem;}
+.ffManagerControlGrid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem;}
+@media(max-width:360px) {.ffManagerControlGrid {grid-template-columns:repeat(2,minmax(0,1fr));}}
+.ffManagerScope [role=status] {grid-column:1/-1;margin:0;}
+.ffManagerScope [role=status]:empty {display:none;}
+.ffManagerControlQuick {display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:.35em;}
+#app .ffManagerControlQuick button {font-size:clamp(9px,2.4vw,13px);}
+.ffManagerOverview {display:grid;grid-template-columns:5em 1fr;align-items:center;gap:.7rem;margin:.4rem 0;}
+.ffManagerOverview>strong {border:2px solid #66bc34;border-radius:50%;aspect-ratio:1;display:grid;place-items:center;color:#a4f374;font-size:1.05rem;}
+.ffManagerOverview dl {margin:0;min-width:0;}
+.ffManagerOverview dl div {display:flex;justify-content:space-between;gap:.4em;padding:.18em 0;}
+.ffManagerOverview dd {margin:0;text-align:right;}
+#app .app:has(.ffRefAttendance) {--ff-ref-line:#e7831c;--ff-ref-font:'Roboto Condensed','Arial Narrow',Roboto,Arial,sans-serif;}
+.ffAttendanceActions {margin-top:.65em;}
+.ffRefAttendance #ffAttendanceFeedback:empty {display:none;}

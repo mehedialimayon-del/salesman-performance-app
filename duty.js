@@ -40,12 +40,83 @@ function renderAttendance(){disposeMap();shell('attendance',`<div class="card ff
  showToday();window.requestAnimationFrame(showToday);
 
 }
-let attendanceMonth='',attendanceDay='',historyVersion=0;
+let attendanceOwner='',attendanceMonth='',attendanceDay='',historyVersion=0;
 function attendanceHistory(){
- const host=$('#ffDutyStatus')?.closest('.card');if(!host)return;attendanceMonth=attendanceMonth||date().slice(0,7);
- const box=document.createElement('section');box.className='card ffHistoryPanel';box.innerHTML=`<div class="cardTitle">Check-in / Check-out History</div><div class="two ffHistoryControls"><label>Month<input id="ffAttendanceMonth" type="month" value="${E(attendanceMonth)}"></label><label>Date (optional)<input id="ffAttendanceDay" type="date" value="${E(attendanceDay)}"></label></div><div id="ffAttendanceHistory" class="ffHistoryScroll" tabindex="0" aria-label="Attendance history"></div><button class="secondary" id="ffAttendanceMore" hidden>LOAD MORE HISTORY</button>`;host.after(box);let offset=0;
- const load=async(append=false)=>{const ticket=++historyVersion,list=$('#ffAttendanceHistory');if(!list)return;try{let query=sb.from('ffh_attendance').select('id,duty_date,check_in,check_out,shift_end').eq('staff_id',user().id);if(attendanceDay)query=query.eq('duty_date',attendanceDay);else{const next=new Date(attendanceMonth+'-01T00:00:00Z');next.setUTCMonth(next.getUTCMonth()+1);query=query.gte('duty_date',attendanceMonth+'-01').lt('duty_date',next.toISOString().slice(0,10));}const {data,error}=await query.order('duty_date',{ascending:false}).order('check_in',{ascending:false}).range(append?offset:0,(append?offset:0)+49);if(error)throw error;if(ticket!==historyVersion||!list.isConnected)return;const rows=data||[],fmt=v=>v?new Date(v).toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur'}):'Not checked out';const html=rows.map(x=>`<article class="ffHistoryEntry"><b class="ffDateBadge">${E(x.duty_date)}</b><div>Check-in: <strong>${E(fmt(x.check_in))}</strong></div><div>Check-out: <strong>${E(fmt(x.check_out))}</strong></div></article>`).join('');if(append)list.insertAdjacentHTML('beforeend',html);else list.innerHTML=html||'<p>No attendance in this period.</p>';offset=(append?offset:0)+rows.length;$('#ffAttendanceMore').hidden=rows.length<50;}catch(e){if(list.isConnected)list.textContent='History could not load: '+e.message;}};
- $('#ffAttendanceMonth').onchange=e=>{attendanceMonth=e.target.value;attendanceDay='';$('#ffAttendanceDay').value='';void load()};$('#ffAttendanceDay').onchange=e=>{attendanceDay=e.target.value;void load()};$('#ffAttendanceMore').onclick=()=>load(true);void load();
+ const host=$('#ffDutyStatus')?.closest('.card'),sid=user()?.id;
+ if(!host||!sid)return;
+ if(attendanceOwner!==sid){attendanceOwner=sid;attendanceMonth=date().slice(0,7);attendanceDay='';}
+ const box=document.createElement('section');box.className='card ffHistoryPanel ffRefAttendance';
+ box.innerHTML=`<div class="cardTitle">Attendance History</div><div class="two ffHistoryControls">
+  <label>Month<input id="ffAttendanceMonth" type="month" value="${E(attendanceMonth)}"></label>
+  <label>Date (optional)<input id="ffAttendanceDay" type="date" value="${E(attendanceDay)}"></label>
+ </div><div id="ffAttendanceHistory" class="ffHistoryScroll" tabindex="0" aria-label="Attendance history"></div>
+ <button class="secondary" id="ffAttendanceMore" hidden>LOAD MORE HISTORY</button>
+ <div class="ffRefExports ffAttendanceActions">
+  <button type="button" class="ffRefButton" data-attendance-export="pdf">▤ Report</button>
+  <button type="button" class="ffRefButton" data-attendance-export="xlsx">⇩ Export (Excel)</button>
+  <button type="button" class="ffRefButton" id="ffAttendanceSummary">▥ Monthly Summary</button>
+ </div><p id="ffAttendanceFeedback" role="status"></p>`;
+ host.after(box);let offset=0;
+ const stamp=v=>v?new Date(v).toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur'}):'';
+ const records=async(month,day,start,size)=>{
+  let query=sb.from('ffh_attendance').select('id,duty_date,check_in,check_out,shift_end').eq('staff_id',sid);
+  if(day)query=query.eq('duty_date',day);
+  else{
+   const next=new Date(month+'-01T00:00:00Z');next.setUTCMonth(next.getUTCMonth()+1);
+   query=query.gte('duty_date',month+'-01').lt('duty_date',next.toISOString().slice(0,10));
+  }
+  const {data,error}=await query.order('duty_date',{ascending:false}).order('check_in',{ascending:false}).range(start,start+size-1);
+  if(error)throw error;
+  if(user()?.id!==sid)throw Error('Sign in again to view attendance.');
+  return data||[];
+ };
+ const load=async(append=false)=>{
+  const ticket=++historyVersion,list=box.querySelector('#ffAttendanceHistory');
+  try{
+   const rows=await records(attendanceMonth,attendanceDay,append?offset:0,50);
+   if(ticket!==historyVersion||!list.isConnected)return;
+   const html=rows.map(x=>`<article class="ffHistoryEntry"><b class="ffDateBadge">${E(x.duty_date)}</b><div>Check-in: <strong>${E(stamp(x.check_in)||'—')}</strong></div><div>Check-out: <strong>${E(stamp(x.check_out)||'Not checked out')}</strong></div></article>`).join('');
+   if(append)list.insertAdjacentHTML('beforeend',html);else list.innerHTML=html||'<p>No attendance in this period.</p>';
+   offset=(append?offset:0)+rows.length;
+   box.querySelector('#ffAttendanceMore').hidden=rows.length<50;
+  }catch(err){if(ticket===historyVersion&&list.isConnected)list.textContent='History could not load: '+err.message;}
+ };
+ const feedback=box.querySelector('#ffAttendanceFeedback');
+ const run=(button,action,day)=>async()=>{
+  button.disabled=true;
+  feedback.textContent='Loading attendance…';
+  const month=attendanceMonth;
+  try{
+   const data=[];
+   for(let start=0;;start+=100){
+    const batch=await records(month,day,start,100);data.push(...batch);
+    if(batch.length<100)break;
+   }
+   if(!box.isConnected)return;
+   feedback.textContent='';
+   await action(data,day||month);
+  }catch(err){feedback.textContent=err.message;}
+  finally{button.disabled=false;}
+ };
+ box.querySelectorAll('[data-attendance-export]').forEach(button=>{
+  button.onclick=()=>run(button,(data,period)=>ctx.exportFile(button,'Attendance '+period,[
+   ['Date','Check-in (MYT)','Check-out (MYT)','Shift end (MYT)'],
+   ...data.map(row=>[row.duty_date,stamp(row.check_in),stamp(row.check_out),stamp(row.shift_end)])
+  ],feedback),attendanceDay)();
+ });
+ const summary=box.querySelector('#ffAttendanceSummary');
+ summary.onclick=run(summary,(data,period)=>{
+  const days=new Set(data.filter(row=>row.check_in).map(row=>row.duty_date));
+  const complete=data.filter(row=>row.check_in&&row.check_out).length;
+  feedback.textContent=period+' · '+days.size+' days checked in · '+complete+' shifts checked out · '+(data.length-complete)+' records without a completed checkout';
+ },'');
+ box.querySelector('#ffAttendanceMonth').onchange=e=>{
+  if(!e.target.value){e.target.value=attendanceMonth;return;}
+  attendanceMonth=e.target.value;attendanceDay='';box.querySelector('#ffAttendanceDay').value='';void load();
+ };
+ box.querySelector('#ffAttendanceDay').onchange=e=>{attendanceDay=e.target.value;void load();};
+ box.querySelector('#ffAttendanceMore').onclick=()=>load(true);
+ void load();
 }
 async function compress(file){const img=await createImageBitmap(file);const scale=Math.min(1,640/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);img.close();const b=await new Promise(r=>c.toBlob(r,'image/jpeg',.65));if(!b||b.size>250000)throw Error('Photo is too large; choose a smaller image');return b;}
 function disposeMap(){closeFullMap?.();refreshTeamMap=null;generation++;if(map){map.remove();map=null;}mapLayer=null;}
