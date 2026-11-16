@@ -16,3 +16,23 @@
 .ffRefSync #ffSyncQueue .card{overflow-wrap:anywhere;margin:6px 0}
 .ffRefSync #ffSyncQueue [hidden]{display:none!important}
 @media(max-height:700px){.ffRefSync{height:calc(100dvh - 150px)}}
+
+/* Offline Sync premium layout: keep actions visible, scroll only saved orders. */
+.ffRefSync{gap:8px;border:1px solid #b9500c;border-radius:16px;background:#080808;padding:9px;box-sizing:border-box;box-shadow:inset 0 1px 0 #ff741744}
+.ffRefSync>.ffPerformanceIntro{border:1px solid #ff7417;border-radius:12px;background:#11100f;padding:10px}
+.ffRefSync>.ffPerformanceIntro .cardTitle{color:#ff7417;font-weight:800;letter-spacing:.02em}
+.ffRefSync .ffRefExports>.ffRefMetric{min-width:0;border:1px solid #7b370f;border-radius:10px;background:#17110d;padding:8px 4px;box-sizing:border-box}
+.ffRefSync .ffRefExports>.ffRefMetric span{font-size:10px;line-height:1.2;overflow-wrap:anywhere}
+.ffRefSync #ffSyncRetry{min-height:42px;border-radius:10px;background:#e9610b;color:#fff;font-weight:800;letter-spacing:.02em}
+.ffRefSync #ffSyncRetry:focus-visible,.ffRefSync :is(input,select):focus-visible{outline:2px solid #fff;outline-offset:2px}
+.ffRefSync #ffSyncRetry:disabled{opacity:.55;cursor:wait}
+.ffRefSync>.ffRefFields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;border:1px solid #66310f;border-radius:11px;padding:8px;background:#14100e}
+.ffRefSync>.ffRefFields label,.ffRefSync>.ffRefFields span{display:block;min-width:0;color:#fff}
+.ffRefSync>.ffRefFields :is(select,input){width:100%;min-width:0;min-height:38px;box-sizing:border-box;margin-top:4px;background:#090909;color:#fff;border:1px solid #a84d12;border-radius:8px;padding:6px}
+.ffRefSync #ffSyncQueue{border:1px solid #5b2c12;border-radius:11px;background:#0c0a09;padding:5px 7px 14px}
+.ffRefSync #ffSyncQueue .card{background:#17120f;border:1px solid #8f451b;border-left:3px solid #ff7417;border-radius:10px;padding:9px}
+.ffRefSync #ffSyncQueue .ffPerformanceStatus{color:#fff;background:#46220e;border-color:#e96a17}
+.ffRefSync #ffSyncQueue .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between}
+.ffRefSync #ffSyncQueue p{margin:6px 0;overflow-wrap:anywhere}
+@media(max-width:380px){.ffRefSync{padding:6px;gap:6px}.ffRefSync>.ffPerformanceIntro{padding:7px}.ffRefSync>.ffRefFields{gap:5px;padding:6px}.ffRefSync>.ffRefFields :is(select,input){font-size:12px;padding:4px}.ffRefSync .ffRefExports>.ffRefMetric{padding:6px 2px}}
+@media(max-height:740px){.ffRefSync>.ffPerformanceIntro>p:not(.miniStat):not(#ffSyncMessage){display:none}.ffRefSync>.ffPerformanceIntro{padding:7px}.ffRefSync .ffRefExports>.ffRefMetric{padding:5px 3px}.ffRefSync #ffSyncRetry{min-height:38px}}
