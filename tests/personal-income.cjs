@@ -39,7 +39,7 @@ assert.deepEqual(P.performanceScopes({...scopeInput,viewerId:'A'},'B','2026-11',
 console.log('PASS personal, assigned-SR and company targets use distinct scopes; no cross-SR income access');
 
 // Commission boundaries: 80% is the first 1% tier; over-target sales earn 2% only on excess.
-assert.equal(E.commission(79999,100000),399.99);
+assert.equal(E.commission(79999,100000),400);
 assert.equal(E.commission(80000,100000),800);
 assert.equal(E.commission(100000,100000),1000);
 assert.equal(E.commission(120000,100000),1400);
