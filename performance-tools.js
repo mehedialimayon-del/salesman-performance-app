@@ -104,7 +104,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
       <div class="ffSyncSettingsBody"><p>Connection: ${online()?'Online':'Offline'} · Last confirmed send: ${last?E(stamp(last)):'Not recorded on this phone'}</p>
         <div class="ffRefFields"><label>Order status<select id="ffSyncState"><option value="">All queued orders</option><option value="waiting">Waiting to send</option><option value="blocked">Needs attention</option></select></label>
         <label>Search<input type="search" id="ffSyncSearch" placeholder="Outlet, SKU or staff"></label></div>
-        <div id="ffSyncQueue">${list.map(x=>`<article class="card" data-queued-order="${E(x.id)}"><div class="row"><b>${E(x.order.outletName)}</b><span class="ffPerformanceStatus">${E(x.state==='Blocked'?'Needs attention':'Saved · waiting to send')}</span></div><p>${E(x.order.sku)} · ${E(x.order.qty)} cartons · ${ctx.rm(x.order.orderAmount)}</p><p>${E(who(x.order.sr))} · ${E(x.order.date)}</p><p class="miniStat">Saved ${E(stamp(x.queuedAt))} · ${E(x.id)}</p>${x.error?`<p role="status">${E(x.error)}</p>`:''}</article>`).join('')||'<div class="card empty">No orders waiting to send on this phone.</div>'}<p id="ffSyncNoMatch" hidden>No orders match these filters.</p></div>
+        <div id="ffSyncQueue">${list.map((x,i)=>`<article class="card ffSyncHistoryCard" data-tone="${x.state==='Blocked'?'red':['blue','violet','teal','amber'][i%4]}" data-queued-order="${E(x.id)}"><div class="row"><b>${E(x.order.outletName)}</b><span class="ffPerformanceStatus">${E(x.state==='Blocked'?'Needs attention':'Saved · waiting to send')}</span></div><p>${E(x.order.sku)} · ${E(x.order.qty)} cartons · ${ctx.rm(x.order.orderAmount)}</p><p>${E(who(x.order.sr))} · ${E(x.order.date)}</p><p class="miniStat">Saved ${E(stamp(x.queuedAt))} · ${E(x.id)}</p>${x.error?`<p role="status">${E(x.error)}</p>`:''}</article>`).join('')||'<div class="card empty">No orders waiting to send on this phone.</div>'}<p id="ffSyncNoMatch" hidden>No orders match these filters.</p></div>
       </div>
     </details>
     <div class="ffSyncSafety"><i aria-hidden="true">ⓘ</i><span>Sign in online first. This screen does not enable offline sign-in. Keep app data until pending orders are sent.</span></div>
@@ -123,7 +123,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    $('#ffSyncNoMatch').hidden=!list.length||count>0;
   };
   search.oninput=apply;state.onchange=apply;apply();
-  if(window.ffDaily){const main=document.querySelector('#app main');if(main){main.insertAdjacentHTML('beforeend',window.ffDaily.outboxHtml());window.ffDaily.bindOutbox();}}
+  if(window.ffDaily){const queue=$('.ffSyncSettingsBody');if(queue){queue.insertAdjacentHTML('beforeend',window.ffDaily.outboxHtml());window.ffDaily.bindOutbox();}}
   $('#ffSyncRetry').onclick=async e=>{e.target.disabled=true;try{await ctx.refreshStaff();await flush(true);}catch(err){if($('#ffSyncMessage'))$('#ffSyncMessage').textContent=err.message;}finally{if(e.target.isConnected)e.target.disabled=false;}};
  }
  async function approvals(){
