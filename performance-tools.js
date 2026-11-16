@@ -1,5 +1,8 @@
 /* Performance helpers reuse existing authenticated APIs and their permissions. */
 window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
+ window.FFH_OPEN_DASHBOARD_SHORTCUT = page => {
+  if (page === 'sales' || page === 'zero' || page === 'reports') ctx.open(page);
+ };
  'use strict';
  const $=s=>document.querySelector(s), E=ctx.esc, sb=ctx.sb;
  let flushing=null, ticket=0, lastHistory=null, syncFilter={},syncSettingsOpen=false;

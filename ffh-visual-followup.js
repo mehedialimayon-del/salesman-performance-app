@@ -76,7 +76,7 @@
      const button=document.createElement('button');
      button.type='button';button.className='ffRefButton';
      button.textContent=name;button.dataset.page=module;
-     button.onclick=()=>window.go?.(module);
+     button.onclick=()=>window.FFH_OPEN_DASHBOARD_SHORTCUT?.(module);
      actions.append(button);
     }
     hero.after(actions);
