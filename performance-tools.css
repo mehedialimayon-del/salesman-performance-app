@@ -15,4 +15,4 @@
 .ffRefSync #ffSyncQueue{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#ff7417 #18120e;padding:2px 3px 12px}
 .ffRefSync #ffSyncQueue .card{overflow-wrap:anywhere;margin:6px 0}
 .ffRefSync #ffSyncQueue [hidden]{display:none!important}
-@media(max-height:700px){.ffRefSync{height:calc(100dvh - 150px)}.ffRefSync>.ffPerformanceIntro p:nth-of-type(2){display:none}}
+@media(max-height:700px){.ffRefSync{height:calc(100dvh - 150px)}}
