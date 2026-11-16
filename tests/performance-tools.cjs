@@ -9,9 +9,16 @@ const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require
  const ctx={sb,user:()=>({id}),isMgr:()=>manager,ids:()=>manager?['SR1']:['SR1','SR2'],staff:x=>({name:x}),outlets:()=>[{code:'same',name:'KK One',category:'KK'}],may:()=>grant,esc,rm:x=>'RM '+Number(x||0).toFixed(2),page:()=>page,setPage:p=>page=p,shell:s=>w.document.querySelector('main').innerHTML=s,back:t=>'<h1>'+esc(t)+'</h1>',bindBack(){},refreshStaff:async()=>{if(failPermission)throw Error('Permission unavailable');},refreshOutlets:async()=>{},saveSale:async x=>{saves++;if(failSave)throw failSave;x.cloudConfirmed=true;},acceptSale:x=>accepted.push(x),open:(p,row)=>opened.push([p,row]),reviewTask:async(id,status)=>reviewed.push([id,status])};
  w.eval(fs.readFileSync('performance-tools.js','utf8'));const ui=w.FFH_CREATE_PERFORMANCE_TOOLS(ctx),q=s=>w.document.querySelector(s),tick=()=>new Promise(r=>setTimeout(r,15));
  const order={id:'S-one',sr:'SR1',outletName:'KK One',sku:'Mango',qty:1,date:'2026-10-19',orderAmount:20};
- assert.equal((await ui.queueOrder(order)).pending,true);assert.equal(saves,0);assert.equal(accepted.length,0);ui.syncPage();assert(q('main').textContent.includes('1 order(s) waiting'));
+ await assert.rejects(ui.queueOrder(null),/Order ID is required/);
+ await assert.rejects(ui.queueOrder({}),/Order ID is required/);
+ await assert.rejects(ui.queueOrder({...order,id:''}),/Order ID is required/);
+ await assert.rejects(ui.queueOrder({...order,qty:-1}),/Complete the outlet/);
+ await assert.rejects(ui.queueOrder({...order,outletName:''}),/Complete the outlet/);
+ assert.equal(w.localStorage.getItem('ffh_order_outbox_v1_SR1'),null,'invalid drafts must never be stored');
+ assert.equal((await ui.queueOrder(order)).pending,true);assert.equal(saves,0);assert.equal(accepted.length,0);ui.syncPage();assert.equal(q('.ffSyncStat.pending strong').textContent,'1');assert(q('#ffSyncQueue').textContent.includes('Saved · waiting to send'));
  // A new instance can recover persisted drafts, with no Sales achievement before cloud confirmation.
  const recovered=w.FFH_CREATE_PERFORMANCE_TOOLS(ctx);connected=true;await recovered.flush();assert.equal(saves,1);assert.equal(accepted.length,1);assert.equal(JSON.parse(w.localStorage.getItem('ffh_order_outbox_v1_SR1')).length,0);
+ assert.equal(q('#ffSyncQueue'),null,'sync UI is only rendered when opened');recovered.syncPage();assert(q('#ffSyncQueue').textContent.includes('Synced to cloud'));assert.equal(q('.ffSyncStat.synced strong').textContent,'1');
  failSave=Error('Network unavailable');assert.equal((await ui.queueOrder({...order,id:'S-two'})).pending,true);assert.equal(accepted.length,1);failSave=Object.assign(Error('Attendance required'),{code:'42501'});await ui.flush(true);const calls=saves;await ui.flush();assert.equal(saves,calls,'permission failures never auto retry');ui.syncPage();assert(q('main').textContent.includes('Needs attention'));failSave=null;await ui.flush(true);assert.equal(accepted.length,2);
  connected=false;await ui.queueOrder({...order,id:'S-three'});id='SR2';ui.syncPage();assert(!q('main').textContent.includes('Mango'),'different account cannot see the previous account outbox');connected=true;await ui.flush();assert.equal(accepted.length,2);id='SR1';await ui.flush();assert.equal(accepted.length,3);
  await assert.rejects(ui.queueOrder({...order,id:'foreign',sr:'SR2'}),/assigned SR/);
