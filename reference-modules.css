@@ -546,3 +546,14 @@ html body.ffGlowOn #app .app.ffBlackGlow .ffRefOutletViewport :is([data-ref-outl
 .ffDailyPeriodActions {display:flex;flex-wrap:wrap;gap:.35rem;margin:.4rem 0;}
 #ffRefCpoFilterStatus {grid-column:1/-1;margin:0;}
 #ffRefCpoFilterStatus:empty {display:none;}
+
+/* Tracking roster: readable staff identity and actions on narrow Android screens. */
+#app .ffRefTrackRoster{min-width:0;max-width:100%;overflow:hidden}
+#app .ffRefTrackRoster [data-tracking-staff]{box-sizing:border-box;min-width:0;max-width:100%;align-items:center;overflow-wrap:anywhere;word-break:normal;min-height:48px}
+#app .ffRefTrackRoster [data-tracking-staff]:nth-of-type(odd){background:linear-gradient(90deg,#2b170c,#100d0b)}
+#app .ffRefTrackRoster [data-tracking-staff]:nth-of-type(even){background:linear-gradient(90deg,#19202b,#0b0e14)}
+#app .ffRefTrackRoster [data-tracking-staff] :is(span,b,small,strong){min-width:0;overflow-wrap:anywhere}
+#app .ffRefTrackRoster [data-tracking-staff]:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+#app .ffTrackingCard .ffRefTrackingFields{min-width:0}
+#app .ffTrackingCard .ffRefTrackingFields>*{min-width:0;max-width:100%}
+@media(max-width:390px){#app .ffRefTrackRoster [data-tracking-staff]{gap:.35em;padding:.55em .35em}#app .ffTrackingCard .ffRefTrackingFields{gap:5px}}
