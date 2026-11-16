@@ -7,4 +7,10 @@ assert.equal(stops([p(0),p(60,{accuracy_m:200}),p(120)]).length,0,'poor fixes mu
 assert.equal(stops([p(0),p(600)]).length,0,'tracking gap must not fabricate dwell time');
 assert.equal(segments([p(0),p(60),p(600),p(660)]).length,2,'do not join routes across gaps');
 assert.equal(stops([p(0),p(60),p(120,{latitude:3.15}),p(180,{latitude:3.15})]).length,2);
+assert.equal(stops([p(0),p(60),p(30),p(120)]).length,0,'out-of-order timestamps must not create a false stop');
+assert.equal(segments([p(0),p(60),p(30),p(120)]).length,2,'out-of-order timestamps split route lines');
+for(const invalid of [{latitude:91},{longitude:181},{latitude:null},{accuracy_m:null},{accuracy_m:-1},{accuracy_m:'invalid'},{captured_at:'invalid'},{speed_mps:-2}]){
+ assert.equal(stops([p(0),p(60,invalid),p(120)]).length,0,'invalid fix must interrupt stop');
+ assert.equal(segments([p(0),p(60,invalid),p(120)]).length,0,'invalid fix must interrupt route');
+}
 console.log('Duty GPS stop/gap regression: PASS');
