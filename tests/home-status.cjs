@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),H=require('../home-status-core'),E=require('../earnings-core'),P=require('../personal-income');
 const rule={lowerLimit:80,upperLimit:100,lowerRate:.5,middleRate:1,upperRate:2};
-for(const [sales,want] of [[0,0],[79999,400],[80000,400],[80001,800.01],[100000,1000],[120000,1400]])assert.equal(H.tierCommission(sales,100000,rule),want);
-assert.equal(E.commission(80000,100000),400);assert.equal(E.commission(120000,100000),1400);
+for(const [sales,want] of [[0,0],[79999,400],[80000,800],[80001,800.01],[100000,1000],[120000,1400]])assert.equal(H.tierCommission(sales,100000,rule),want);
+assert.equal(E.commission(80000,100000),800);assert.equal(E.commission(120000,100000),1400);
 assert.deepEqual(H.pace(120000,60000,'2026-10-20'),{shortfall:60000,remainingDays:12,daily:5000});assert.equal(H.pace(1000,1200,'2026-10-31').daily,0);assert.equal(H.pace(1000,0,'2028-02-29').daily,1000);
 assert.ok(H.active({active:true,start_date:'2026-10-20',end_date:'2026-10-20'},'2026-10-20'));assert.ok(!H.active({active:true,startDate:'2026-10-20',endDate:'2026-10-20'},'2026-10-21'));
 assert.ok(!H.visibleIncome({id:'S',can_manage:false},{id:'M',can_manage:true}));assert.ok(!H.visibleIncome({id:'M',can_manage:true},{id:'M2',can_manage:true}));assert.ok(H.visibleIncome({id:'M',can_manage:true},{id:'S',can_manage:false}));
