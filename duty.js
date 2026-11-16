@@ -162,11 +162,12 @@ async function renderTracking(){await refresh();if(!state?.can_track)return rend
      if(!point||Date.now()-Date.parse(point.captured_at)>180000)return 'No Location';
      return 'On Field';
    };
-   const labels=[['⌖','Total SR','gold',selected.length],['●','On Field','green',selected.filter(p=>state(p)==='On Field').length],['Ⅱ','Not Started','gold',selected.filter(p=>state(p)==='Not Started').length],['⚠','No Location','red',selected.filter(p=>state(p)==='No Location').length]];
+   const labels=[['⌖','Total SR','gold',selected.length],['●','On Field','green',selected.filter(p=>state(p)==='On Field').length],['Ⅱ','Not Started','red',selected.filter(p=>state(p)==='Not Started').length],['⚠','No Location','red',selected.filter(p=>state(p)==='No Location').length]];
    $('#ffTrackSummary').innerHTML=labels.map(([icon,label,color,n])=>`<div class="ffRefMetric" data-color="${color}"><i aria-hidden="true">${icon}</i><strong>${n}</strong><span>${label}</span></div>`).join('');
    $('#ffTrackRoster').innerHTML=selected.map(p=>{
-     const point=latest.get(p.staff_id);
-     return `<button type="button" class="ffRefRouteAssignment" data-tracking-staff="${E(p.staff_id)}"><b>${E(p.full_name)}${point?`<small>Last update: ${E(new Date(point.captured_at).toLocaleTimeString('en-MY',{timeZone:'Asia/Kuala_Lumpur',hour:'2-digit',minute:'2-digit'}))}</small>`:''}</b><span>${E(state(p))}</span><span aria-hidden="true">›</span></button>`;
+     const point=latest.get(p.staff_id), status=state(p);
+     const tone=status==='On Field'?'green':status==='Shift Ended'?'orange':'red';
+     return `<button type="button" class="ffRefRouteAssignment" data-tracking-staff="${E(p.staff_id)}"><span class="ffTrackingPortrait" aria-hidden="true">${E(p.full_name?.trim().charAt(0)||'•')}</span><b>${E(p.full_name)}${point?`<small>Last update: ${E(new Date(point.captured_at).toLocaleTimeString('en-MY',{timeZone:'Asia/Kuala_Lumpur',hour:'2-digit',minute:'2-digit'}))}</small>`:''}</b><span class="ffTrackingStatus" data-tone="${tone}">${E(status)}</span><span aria-hidden="true">›</span></button>`;
    }).join('')||'<p class="ffRefHint">No staff in this selection.</p>';
    document.querySelectorAll('[data-tracking-staff]').forEach(button=>button.onclick=()=>{
      staff.value=button.dataset.trackingStaff;

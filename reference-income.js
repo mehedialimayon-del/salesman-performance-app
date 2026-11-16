@@ -19,6 +19,29 @@ window.FFH_REFERENCE_INCOME = (() => {
     ];
   }
 
+  function commissionDetails(model, monthLabel, rule, esc, money) {
+    const rate = model.t > 0 ? Math.round(100 * model.d / model.t) : null;
+    const entries = model.manager
+      ? [...(model.seller ? [['Own route commission', model.ownCommission]] : []),
+        ['Team sales commission', model.salesCommission], ['Positive growth commission', model.growthCommission]]
+      : [['Own route commission', model.ownCommission]];
+    return `<template id="ffIncomeCommissionReport">
+      <p class="ffCommissionTotal"><strong>${esc(money(model.comm))}</strong> · ${esc(monthLabel)}</p>
+      <section class="ffRefPanel ffCommissionSection">
+        <h3>Sales vs Target</h3>
+        ${rate !== null ? `<progress aria-label="Sales target achieved" max="100" value="${Math.min(100, Math.max(0, rate))}"></progress>` : ''}
+        <dl><div><dt>Delivered sales</dt><dd>${esc(money(model.d))}</dd></div><div><dt>Target</dt><dd>${model.t > 0 ? esc(money(model.t) + ' · ' + rate + '% reached') : 'Not set'}</dd></div>
+        ${model.previous != null ? `<div><dt>Previous month</dt><dd>${esc(money(model.previous))}</dd></div><div><dt>Positive growth</dt><dd>${esc(money(model.growth))}</dd></div>` : ''}</dl>
+      </section>
+      <section class="ffRefPanel ffCommissionSection"><h3>Calculation</h3>
+        <dl>${entries.map(([label, amount]) => `<div><dt>${label}</dt><dd>${amount == null ? 'Awaiting sales history' : esc(money(amount))}</dd></div>`).join('')}</dl>
+      </section>
+      <section class="ffRefPanel ffCommissionSection"><h3>Commission Rates</h3>
+        <dl>${rule.map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl>
+      </section>
+    </template>`;
+  }
+
   function render({model, performance = model, salesScopes = [], month, monthLabel, people, rule, earned, pending, campaignImages, canEdit, request, esc, money}) {
     const rows = breakdown(model);
     const percent = performance.t > 0 ? Math.round(100 * performance.d / performance.t) : null;
@@ -27,6 +50,7 @@ window.FFH_REFERENCE_INCOME = (() => {
     const stat = (key, value) => `<div><dt>${key}</dt><dd>${value}</dd></div>`;
     const campaign = item => `<article class="ffRefPanel ffRefReward">${campaignImages.has(item.offerId) ? `<img src="${esc(campaignImages.get(item.offerId))}" alt="">` : ''}<div><b>${esc(item.title)}</b><dl>${stat('Target', esc(item.target + ' ' + item.unit))}${stat('Achievement', esc(item.qty + ' ' + item.unit))}${stat('Earned', esc(item.earnedDate || monthLabel))}${stat('Incentive', money(item.amount))}</dl></div></article>`;
     return `<section class="ffRefIncome" aria-label="Personal Income">
+      ${commissionDetails(model, monthLabel, rule, esc, money)}
       <div class="ffRefPanel ffRefFields">
         <label><i aria-hidden="true">▦</i><span>Month &amp; Year<input id="ffIncomeMonth" type="month" required value="${esc(month)}"></span></label>
         <label><i aria-hidden="true">▱</i><span>SR / Staff<select id="ffReferenceIncomeStaff" data-ff-picker="native" data-ff-staff-label="compact">${people.map(p => `<option value="${esc(p.id)}" ${p.id === model.id ? 'selected' : ''}>${esc(p.name)} (${esc(p.id)})</option>`).join('')}</select></span></label>

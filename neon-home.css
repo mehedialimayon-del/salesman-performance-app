@@ -601,7 +601,7 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     max-height: none !important;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) .homeGrid > .module[data-home-artwork] {
+  html body #app[data-home-artwork-loaded] .app[data-neon-ready]:has(.homeGrid) .homeGrid > .module[data-home-artwork] {
     border: 0 !important;
     border-radius: 0 !important;
     background: url('home-assets/modules-reference.webp') var(--home-art-x) var(--home-art-y) / 400% 500% no-repeat !important;
@@ -609,7 +609,7 @@ html body #app .app:has(.homeGrid) :is(.module,.iconBtn,#ffHomeAlarm,.ffIdentity
     outline: 0;
   }
 
-  html body #app .app[data-neon-ready]:has(.homeGrid) .homeGrid > .module[data-home-artwork] > :is(.mi, .moduleTitle) {
+  html body #app[data-home-artwork-loaded] .app[data-neon-ready]:has(.homeGrid) .homeGrid > .module[data-home-artwork] > :is(.mi, .moduleTitle) {
     opacity: 0;
   }
 

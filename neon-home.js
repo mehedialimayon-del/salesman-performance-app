@@ -3,6 +3,11 @@
 
   const root = document.getElementById('app');
   let refreshing = false;
+  const artwork=new Image();
+  const showArtwork=()=>{if(artwork.naturalWidth)root?.setAttribute('data-home-artwork-loaded','');};
+  artwork.addEventListener('load',showArtwork,{once:true});
+  artwork.src='home-assets/modules-reference.webp';
+  if(artwork.complete)showArtwork();
   const vectors = {
     sync: 'M6 18a4 4 0 0 1-.8-7.9 6 6 0 0 1 11.6-1.4A4.7 4.7 0 0 1 18 18M9 19v-6m-2 2 2-2 2 2m4-1v7m-2-2 2 2 2-2',
     approval: 'M13 5H5a2 2 0 0 0-2 2v13a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1v-8M7 12l4 4L22 4',

@@ -99,7 +99,7 @@ window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect,task
        avatar.append(img);
       }
       button.append(avatar);
-      detail.textContent=staff.can_manage?'(Manager)':'(Manager: '+managerName+')';
+      detail.textContent=staff.can_manage?'(Manager)':'Manager: '+managerName+(displayId(owner)||managerId?' · '+(displayId(owner)||managerId):'');
       body.append(identity,detail);
      }else body.append(detail,fine);
     }

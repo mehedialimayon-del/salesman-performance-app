@@ -45,16 +45,24 @@ window.FFH_REFERENCE_TASKS = (() => {
     const value = (id,label,x,y,w,h) =>
       slot('button',`type="button" id="${id}" aria-label="${label}" class="ffTaskArtSlot ffTaskArtValue"`,'',x,y,w,h);
 
+    const heading = (title,x,y,w,h) => slot('b','class="ffTaskArtSlot ffTaskArtHeading"',title,x,y,w,h);
     panel.innerHTML = [
-      value('ffTaskArtDate','Date Range',170,134,249,38),
-      value('ffTaskArtZone','Zone',604,134,255,38),
-      value('ffTaskArtAssignee','Assigned To',146,214,272,38),
+      heading('Tasks &amp; Actions',22,18,880,54),
+      heading('Date Range',26,95,390,28),heading('Zone',504,95,390,28),
+      heading('Assigned To',26,179,390,28),heading('Task Status',504,179,390,28),
+      heading('Task Categories',25,513,500,44),
+      heading('Task List',25,705,194,40),
+      slot('div','class="ffTaskArtSlot ffTaskArtTableHead"', ['#','Task Title','Outlet','Assigned To','Due Date','Status'].map(v=>'<span>'+v+'</span>').join(''),24,763,886,36),
+      heading('Task Details',26,1094,520,42),
+      value('ffTaskArtDate','Date Range',25,127,409,44),
+      value('ffTaskArtZone','Zone',504,127,398,44),
+      value('ffTaskArtAssignee','Assigned To',25,211,409,44),
       slot('select','id="ffRefTasksStatus" data-ff-picker="native" class="ffTaskArtSlot" aria-label="Task Status"',[
         '<option value="">All Status</option><option value="done">Completed</option>',
         '<option value="progress">In Progress</option><option value="overdue">Overdue</option>'
-      ].join(''),605,214,261,40),
+      ].join(''),504,211,398,44),
       ...[130,357,580,803].map((x,i)=>slot('strong',
-        `class="ffTaskArtSlot ffTaskArtMetric" aria-label="${['Total Tasks','Completed','In Progress','Overdue'][i]}"`,'',x-55,360,110,47)),
+        `class="ffTaskArtSlot ffTaskArtMetric" aria-label="${['Total Tasks','Completed','In Progress','Overdue'][i]}"`,'',x-101,296,202,110)),
       tap('data-task-assign','Assign New Task',16,425,374,64),
       tap('data-task-scope="mine"','My Tasks',403,426,244,59),
       tap('data-task-scope="team"','Team Tasks',661,426,257,59),

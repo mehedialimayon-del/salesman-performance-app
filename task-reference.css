@@ -21,7 +21,7 @@ html body #app .app > main.wrap.ffTaskPage:has(.ffTaskArtwork) {
   position:relative;
   width:100%;
   height:100%;
-  background:#020100 url("task-assets/tasks-body-reference.webp") center top / 100% 100% no-repeat;
+  background:#020100;
   color:#fff;
   font:650 2.43cqw/1.14 'Arial Narrow',Roboto,Arial,sans-serif;
   overflow:hidden;
@@ -98,9 +98,6 @@ html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffTaskArtwork :is(button,inp
   background:transparent!important;border:0!important;box-shadow:none!important;
 }
 html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffTaskArtwork .ffTaskArtRow button {position:static!important;}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffTaskArtwork .ffTaskArtTap {
-  color:transparent!important;-webkit-text-fill-color:transparent!important;
-}
 #app .ffTaskArtwork .ffTaskArtMetric {color:#fff!important;-webkit-text-fill-color:#fff!important;}
 .ffTaskArtworkPicker .ffPickerOption {
   background:linear-gradient(145deg,#1a0d02,#050403)!important;
@@ -273,3 +270,29 @@ html body #app .app main.wrap .ffTaskArtwork button[data-task-scope][aria-presse
 .ffTaskArtworkPicker .ffPickerText > :is(.ffScopeStaffName,.ffTaskPickerIdentity,.ffScopeStaffManager) {
   display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
+
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtSlot:not(.ffTaskArtRow *) {
+  font-size:clamp(9px,2.55cqw,15px)!important;
+}
+html body #app .app main.wrap .ffTaskArtwork :is(.ffTaskArtTap,.ffTaskArtValue,#ffRefTasksStatus,input.ffTaskArtSlot) {
+  opacity:1!important;color:white!important;-webkit-text-fill-color:white!important;
+  background:linear-gradient(#2d1506,#080402)!important;border:1px solid #d97421!important;
+  border-radius:1.45cqw!important;box-shadow:inset 0 0 6px #ed721957!important;
+  padding:0 .5em!important;
+}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtCount {border:0!important;background:none!important;box-shadow:none!important;}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtHeading {color:#ff992d;font-size:clamp(10px,3.35cqw,20px)!important;line-height:1.2;}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtHeading:first-child {font-size:clamp(14px,5cqw,30px)!important;}
+html body #app .app main.wrap .ffTaskArtwork button[data-task-expand] {font-size:0!important;}
+#app .ffTaskArtwork button[data-task-expand]::after {content:'⛶';font-size:clamp(10px,3cqw,18px);color:#fff;}
+#app .ffTaskArtwork .ffTaskArtTableHead {display:grid;grid-template-columns:5% 29% 20% 17% 11% 18%;align-items:center;background:#a54b07;border-radius:6px 6px 0 0;text-align:center;}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtMetric {background:#061a2d;border:1px solid #29a5fa;border-radius:8px;font-size:clamp(12px,4.1cqw,24px)!important;align-content:center;gap:0.2em;}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtMetric[aria-label="Completed"] {background:#082607;border-color:#55d144;}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtMetric[aria-label="In Progress"] {background:#3a2108;border-color:#ed9f26;}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtMetric[aria-label="Overdue"] {background:#3a0b07;border-color:#fc5d43;}
+#app .ffTaskArtwork .ffTaskArtMetric::before {content:attr(aria-label);font-size:clamp(9px,2.55cqw,15px);}
+#app .ffTaskArtwork :is(.ffTaskArtRows,.ffTaskArtPhoto,.ffTaskArtDescription) {background:#120904;border:1px solid #995518;}
+html body #app .app main.wrap .ffTaskArtwork [data-task-proof]:last-child {border-style:dashed!important;}
+html body #app .app main.wrap .ffTaskArtwork [data-task-export="pdf"] {background:linear-gradient(#145827,#072916)!important;border-color:#63dc62!important;}
+html body #app .app main.wrap .ffTaskArtwork [data-task-export="xlsx"] {background:linear-gradient(#10475c,#072431)!important;border-color:#42c7f5!important;}
+html body #app .app main.wrap .ffTaskArtwork :is([data-task-history],[data-task-assign]) {background:linear-gradient(#bc4d05,#703004)!important;border-color:#ff9b40!important;}

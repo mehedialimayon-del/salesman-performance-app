@@ -84,7 +84,7 @@
  function pickers(){
   for(const row of document.querySelectorAll('.ffItemPicker .ffPickerOption')){
    // Zone picker already renders the manager portrait; never insert a second one.
-   if(row.classList.contains('ffZoneManagerRow')){row.querySelector(':scope > .ffPickerAvatar')?.remove();continue;}
+   if(row.classList.contains('ffZoneManagerRow')||row.querySelector(':scope > .ffTaskPickerAvatar')){row.querySelector(':scope > .ffPickerAvatar')?.remove();continue;}
    const text=row.querySelector('strong,.ffPickerText')?.textContent||row.querySelector('span:not(.ffPickerAvatar)')?.textContent||'';
    const p=person(row.dataset.staffId)||byName(text)||[...avatars.values()].find(x=>text.includes(x.staff_id));
    if(!p)continue;
@@ -111,7 +111,11 @@
    }else patchAvatar(old,p.staff_id,'ffSelectStaffAvatar ffStaffCircle');
   }
  }
- function render(){scheduled=false;if(!pickId())return;own();dashboard();accountCards();chat();pickers();}
+ function render(){scheduled=false;if(!pickId())return;own();dashboard();accountCards();chat();pickers();
+  for(const portrait of app.querySelectorAll('[data-tracking-staff] .ffTrackingPortrait')){
+   const id=portrait.closest('[data-tracking-staff]').dataset.trackingStaff;
+   if(person(id))patchAvatar(portrait,id,'ffTrackingPortrait ffStaffCircle');
+  }}
  function queue(){if(scheduled)return;scheduled=true;requestAnimationFrame(render);}
  async function refresh(force=false){
   const id=pickId();if(!id||!sb()?.rpc)return;
