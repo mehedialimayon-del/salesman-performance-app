@@ -20,7 +20,8 @@ const ffhZoneManagers=async()=>{
  })().finally(()=>{FFH_ZONE_PICKER_CACHE.inflight=null;});
  return FFH_ZONE_PICKER_CACHE.inflight;
 };
-window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect,taskArtwork=false}){
+window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect,taskArtwork=false,multiple=false}){
+ const selectedValues=new Set(multiple?(Array.isArray(selected)?selected:(selected&&selected!=='ALL'?[selected]:[])):[]);
  items=items.map(item=>window.FFH_STAFF_ITEM?.(item)||item);
  const isZonePicker=/\bzone\b/i.test(String(title)) && !/assig(n|nee)/i.test(String(title));
  const isScopeStaffPicker=/select\s*(sr|staff)|sales representative/i.test(String(title));
@@ -33,6 +34,14 @@ window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect,task
  const close=window.FFH_OVERLAY?window.FFH_OVERLAY(ov,()=>ov.remove()):()=>ov.remove();
  ov.querySelector('.globalSearchBox > .row button').onclick=close;
  const list=ov.querySelector('.ffPickerRows');
+ if(multiple){
+  const actions=document.createElement('div');
+  actions.className='row ffPickerActions';
+  actions.innerHTML='<button type="button" data-clear>All permitted</button><button type="button" data-apply>Apply filter</button>';
+  list.before(actions);
+  actions.querySelector('[data-clear]').onclick=()=>{selectedValues.clear();draw();};
+  actions.querySelector('[data-apply]').onclick=()=>{close();onSelect([...selectedValues]);};
+ }
  function draw(){
   if(!ov.isConnected)return;
   list.replaceChildren();
@@ -50,7 +59,10 @@ window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect,task
    const manager=isZonePicker?managers.get(String(item.value).toUpperCase()):null;
    const button=document.createElement('button');
    button.type='button';
-   button.className='ffPickerOption'+(isZonePicker?' ffZoneManagerRow':'')+(String(item.value)===String(selected)?' selected':'');
+   const value=String(item.value);
+   const active=multiple?selectedValues.has(value):value===String(selected);
+   button.className='ffPickerOption'+(isZonePicker?' ffZoneManagerRow':'')+(active?' selected':'');
+   if(multiple)button.setAttribute('aria-pressed',String(active));
    button.dataset.staffId=String(item.value);
    const body=document.createElement('span');body.className='ffPickerText';
    const label=document.createElement('strong');label.textContent=isZonePicker&&String(item.value).toUpperCase()==='PRIMARY'?'KL ZONE':item.label;body.append(label);
@@ -121,7 +133,12 @@ window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect,task
      const detail=document.createElement('small');detail.textContent=item.detail;body.append(detail);
    }
    button.append(body);
-   button.onclick=()=>{close();onSelect(item.value,item);};
+   button.onclick=()=>{
+    if(!multiple){close();onSelect(item.value,item);return;}
+    if(selectedValues.has(value))selectedValues.delete(value);else selectedValues.add(value);
+    button.classList.toggle('selected',selectedValues.has(value));
+    button.setAttribute('aria-pressed',String(selectedValues.has(value)));
+   };
    list.append(button);
   }
   if(!rows.length)list.textContent='No matching items.';

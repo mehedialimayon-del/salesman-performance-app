@@ -133,7 +133,57 @@ window.FFH_REFERENCE_TASKS = (() => {
       drawer.open = true;
       const row = originals.get(String(task?.id));
       if (row?.hidden) history.querySelector('[data-history-clear]')?.click();
-      (row || drawer).scrollIntoView({block:'nearest'});
+      (row || drawer).scrollIntoView?.({block:'nearest'});
+    }
+    function openTaskConversation(task, compose) {
+      const dialog = document.createElement('dialog');
+      dialog.className = 'ffTaskArtDialog ffInsetDialog';
+      dialog.setAttribute('aria-label', compose ? 'Task Comments' : 'Task History');
+      dialog.innerHTML = '<header><b></b><button type="button" aria-label="Close">×</button></header>'
+        + '<div class="ffTaskTimeline" aria-live="polite"></div>'
+        + (compose ? '<form><label>Comment<textarea name="comment" maxlength="2000" required></textarea></label><button type="submit">Save comment</button></form>' : '')
+        + '<p role="status"></p>';
+      dialog.querySelector('header b').textContent = task.title;
+      dialog.querySelector('header button').onclick = () => dialog.close();
+      dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+      root.append(dialog);
+      dialog.showModal();
+      const cloud = window.FFH_SUPABASE;
+      const feedback = dialog.querySelector('[role="status"]');
+      const list = dialog.querySelector('.ffTaskTimeline');
+      const format = value => value ? new Date(value).toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur'}) : '';
+      const render = async () => {
+        feedback.textContent = 'Loading…';
+        try {
+          const comments = cloud.from('ffh_task_comments').select('author_staff_id,body,created_at')
+            .eq('task_id',task.id).order('created_at',{ascending:false}).limit(100);
+          const [messages, history] = await Promise.all([comments, compose ? {data:[]} : cloud.rpc('ffh_task_status_history',{task:task.id})]);
+          if (messages.error || history.error) throw messages.error || history.error;
+          const entries = [
+            ...(messages.data || []).map(comment=>({at:comment.created_at,by:compactName(comment.author_staff_id),text:comment.body})),
+            ...(history.data || []).map(event=>({at:event.occurred_at,by:event.actor_name || 'FieldForce Hub',text:[event.action,event.status].filter(Boolean).join(' · ')}))
+          ].sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+          list.innerHTML = entries.map(entry=>'<article><b>'+esc(entry.by)+'</b><small>'+esc(format(entry.at))+'</small><p>'+esc(entry.text)+'</p></article>').join('')
+            || '<p>'+(compose ? 'No comments yet.' : 'No recorded changes yet. Current status: '+esc(status(task)))+'</p>';
+          feedback.textContent = '';
+        } catch (error) { feedback.textContent = 'Could not load task history: '+error.message; }
+      };
+      const form = dialog.querySelector('form');
+      if (form) form.onsubmit = async event => {
+        event.preventDefault();
+        const input = form.elements.comment, button = form.querySelector('button');
+        const body = input.value.trim();
+        if (!body || button.disabled) return;
+        button.disabled = true;
+        try {
+          const {error} = await cloud.from('ffh_task_comments').insert({task_id:task.id,body});
+          if (error) throw error;
+          input.value = '';
+          await render();
+        } catch (error) { feedback.textContent = 'Could not save comment: '+error.message; }
+        finally { button.disabled = false; }
+      };
+      render();
     }
     function taskPhoto(task) {
       try {
@@ -141,6 +191,66 @@ window.FFH_REFERENCE_TASKS = (() => {
         return url.protocol === 'https:' ? url.href : '';
       } catch { return ''; }
     }
+    function openTaskEdit(task) {
+      const dialog = document.createElement('dialog');
+      dialog.className = 'ffTaskArtDialog ffInsetDialog';
+      dialog.setAttribute('aria-label','Edit or reassign task');
+      const attachmentLine = /(?:^|\r?\n)Assignment attachment:[ \t]*(https:\/\/[^\s]+)[ \t]*$/;
+      const description = String(task.description || '');
+      const attachment = description.match(attachmentLine)?.[0] || '';
+      dialog.innerHTML = '<header><b>Edit or reassign task</b><button type="button" aria-label="Close">×</button></header>'
+        + '<form><label>Task title<input name="title" required></label><label>Assigned to<select name="assignee" required></select></label>'
+        + '<label>Outlet<input name="outlet"></label><label>Due date<input name="due" type="date"></label>'
+        + '<label>Priority<select name="priority"><option>Normal</option><option>High</option><option>Urgent</option></select></label>'
+        + '<label>Instructions<textarea name="description"></textarea></label>'
+        + '<p>Reassigning opens the task for the new assignee to submit their own proof.</p>'
+        + '<button type="submit">Save task</button><p role="status"></p></form>';
+      const close = () => dialog.close();
+      dialog.querySelector('header button').onclick = close;
+      dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+      root.append(dialog);
+      dialog.showModal();
+      const cloud = window.FFH_SUPABASE;
+      const form = dialog.querySelector('form'), fields = form.elements;
+      const submit = form.querySelector('button[type="submit"]'), feedback = form.querySelector('[role="status"]');
+      fields.title.value = task.title;
+      fields.outlet.value = task.outletName || '';
+      fields.due.value = task.due || '';
+      fields.priority.value = task.priority || 'Normal';
+      fields.description.value = description.replace(attachmentLine,'').trimEnd();
+      fields.assignee.add(new Option(staffName(task.to),task.to,true,true));
+      feedback.textContent = 'Loading assignable staff…';
+      cloud.rpc('ffh_task_recipients').then(({data,error})=>{
+        if(error){feedback.textContent = 'Staff list unavailable: '+error.message;return;}
+        for(const person of data || []) {
+          if(person.staff_id!==task.to) fields.assignee.add(new Option(person.name+' · '+person.staff_id+' · '+person.zone_id,person.staff_id));
+        }
+        feedback.textContent = '';
+      }).catch(error=>{feedback.textContent = 'Staff list unavailable: '+error.message;});
+      form.onsubmit = async event => {
+        event.preventDefault();
+        if (submit.disabled || !fields.title.value.trim()) return;
+        submit.disabled = true;
+        const assignee = fields.assignee.value;
+        const patch = {
+          title:fields.title.value.trim(),assigned_to:assignee,outlet_name:fields.outlet.value.trim() || null,
+          due_date:fields.due.value || null,priority:fields.priority.value,description:fields.description.value.trim()+attachment,
+          updated_at:new Date().toISOString()
+        };
+        if (assignee!==task.to) Object.assign(patch,{status:'Open',done_at:null,proof_photo_url:null,proof_location:null,reviewed_by:null,reviewed_at:null});
+        try {
+          let request = cloud.from('ffh_tasks').update(patch).eq('id',task.id).eq('assigned_to',task.to).eq('status',task.status);
+          if (task.updatedAt) request = request.eq('updated_at',task.updatedAt);
+          const {data,error} = await request.select('id');
+          if (error) throw error;
+          if (!data?.length) throw new Error('Task changed or your account cannot edit it. Refresh and try again.');
+          close();
+          await context.refreshTasks();
+        } catch (error) { feedback.textContent = 'Could not save task: '+error.message; }
+        finally { submit.disabled = false; }
+      };
+    }
+
     function openStatus(task) {
       const row = originals.get(String(task.id));
       if (!row) return;
@@ -154,6 +264,12 @@ window.FFH_REFERENCE_TASKS = (() => {
       dialog.append(row);
       dialog.addEventListener('close',()=>{if(marker.isConnected)marker.replaceWith(row);dialog.remove();},{once:true});
       dialog.querySelector('button').onclick = () => dialog.close();
+      if (context.canEditTask && task.to!=='ALL') {
+        const edit = document.createElement('button');
+        edit.type = 'button';edit.className = 'secondary';edit.textContent = 'Edit / Reassign';
+        edit.onclick = () => {dialog.close();openTaskEdit(task);};
+        dialog.append(edit);
+      }
       root.append(dialog);
       dialog.showModal();
     }
@@ -162,7 +278,10 @@ window.FFH_REFERENCE_TASKS = (() => {
       state.selected = task?.id ?? null;
       for (const row of rows.querySelectorAll('[data-task-id]')) row.setAttribute('aria-selected',String(row.dataset.taskId === String(state.selected)));
       const photo = taskPhoto(task);
-      const assignmentUrl = (()=>{try{const match=String(task?.description||'').match(/(?:^|\\n)Assignment attachment:\\s*(https:\/\/\\S+)/);const u=new URL(task?.assignmentAttachmentUrl||match?.[1]);return u.protocol==='https:'?u.href:'';}catch{return '';}})();
+      const description = String(task?.description || '');
+      const attachmentLine = /(?:^|\r?\n)Assignment attachment:[ \t]*(https:\/\/[^\s]+)[ \t]*$/;
+      const assignmentUrl = description.match(attachmentLine)?.[1];
+      const instructions = assignmentUrl ? description.replace(attachmentLine, '').trimEnd() : description;
       const photoMarkup = photo ? `<img src="${esc(photo)}" alt="Saved proof for ${esc(task.title)}">` : '<span>No saved photo</span>';
       detail.innerHTML = [
         slot(photo?'button':'div',`class="ffTaskArtSlot ffTaskArtPhoto" ${photo?'type="button" data-proof-view aria-label="View saved proof"':''}`,photoMarkup,29,1158,286,186),
@@ -172,7 +291,7 @@ window.FFH_REFERENCE_TASKS = (() => {
           ['Due Date',task?.due],['Priority',task ? task.priority || 'Normal' : '']
         ].map(([label,v])=>`<div><dt>${label}</dt><dd title="${esc(v || '')}">${esc(v || '—')}</dd></div>`).join(''),339,1189,326,143),
         slot('span','class="ffTaskArtSlot ffTaskArtBadge"',esc(task ? status(task) : '—'),720,1098,185,36),
-        slot('div','class="ffTaskArtSlot ffTaskArtDescription"',esc(task?.description || '')+(assignmentUrl?'<p><a href="'+esc(assignmentUrl)+'" target="_blank" rel="noopener noreferrer">View assignment attachment ↗</a></p>':''),29,1368,662,129),
+        slot('div','class="ffTaskArtSlot ffTaskArtDescription"',esc(instructions)+(assignmentUrl?'<p><a href="'+esc(assignmentUrl)+'" target="_blank" rel="noopener noreferrer">View assignment attachment ↗</a></p>':''),29,1368,662,129),
         tap('data-task-status','Update Status',697,1156,212,46),
         tap('data-task-proof','Add Photo / Proof',697,1205,212,45),
         tap('data-task-comment','Add Comment',697,1255,212,43),
@@ -182,9 +301,9 @@ window.FFH_REFERENCE_TASKS = (() => {
       for (const button of detail.querySelectorAll('button')) button.disabled = !task;
       if (!task) return;
       find('[data-task-status]').onclick = () => openStatus(task);
-      find('[data-task-open]').onclick = () => openHistory(task);
+      find('[data-task-open]').onclick = () => openTaskConversation(task,false);
       find('[data-proof-view]')?.addEventListener('click',()=>window.FFH_OPEN_IMAGE?.(photo));
-      find('[data-task-comment]').onclick = () => openStatus(task);
+      find('[data-task-comment]').onclick = () => openTaskConversation(task,true);
       detail.querySelectorAll('[data-task-proof]').forEach(button=>{
         button.onclick = () => {
           if (originals.get(String(task.id))?.querySelector('.ffTaskPhoto')) {
@@ -198,30 +317,26 @@ window.FFH_REFERENCE_TASKS = (() => {
 
     function showScope() {
       const {viewer, people} = context;
-      const permitsAll = viewer.ownerAccess || viewer.accessAll || viewer.accessibleZones?.includes('*');
-      const permitted = new Set([viewer.zone,...(viewer.accessibleZones || [])]);
-      const eligible = people.filter(person => person.active !== false && (permitsAll || permitted.has(person.zone)));
+      const eligible = people.filter(person=>person.active !== false);
       const zoneName = zone => zone === 'PRIMARY' ? 'KL Zone' : zone;
-      const groups = [...new Set(eligible.map(person=>person.zone).filter(Boolean))].sort();
-      const zone = context.managing ? context.zone : viewer.zone;
-      const zoneButton = find('#ffTaskArtZone'), staffButton = find('#ffTaskArtAssignee');
-      const zoneItems = [{value:'ALL',label:'All permitted zones'},...groups.map(value=>({value,label:zoneName(value)}))];
-      const combined = zone === 'ALL' ? 'Combined · All Zones' : 'Combined · ' + zoneName(zone || viewer.zone || 'Zone');
-      const zonePeople = eligible.filter(p=>zone==='ALL'||p.zone===zone).sort((a,b)=>a.name.localeCompare(b.name));
-      const staffItems = [{value:'ALL',label:combined},...zonePeople.map(p=>({value:p.id,label:p.id===viewerId&&p.can_sell?p.name+' · My Route':p.name}))];
-      const zoneLabel = zone === 'ALL' ? 'All permitted zones' : zoneName(zone || 'My zone');
-      const staffLabel = context.managing ? staffItems.find(item=>item.value===context.selected)?.label || combined : compactName(viewerId);
-      for (const [button,label,selected,items,title,onSelect] of [
-        [zoneButton,zoneLabel,zone,zoneItems,'Select Zone',context.selectZone],
-        [staffButton,staffLabel,context.selected,staffItems,'Select Staff / SR',context.selectPerson]
-      ]) {
-        button.textContent = label;
-        button.title = label;
+      const zones = [...new Set(eligible.map(person=>person.zone).filter(Boolean))].sort();
+      const selectedZones = state.zones ?? (context.zone === 'ALL' ? [] : [context.zone]);
+      const selectedStaff = state.staff ?? (context.selected === 'ALL' ? [] : [context.selected]);
+      const zonePeople = eligible.filter(person=>!selectedZones.length||selectedZones.includes(person.zone));
+      const set = (selector,title,choices,selection,label,onSelect) => {
+        const button = find(selector);
+        button.textContent = button.title = label;
         button.disabled = !context.managing;
         button.onclick = () => {
-          window.FFH_PICK_ITEM({title,selected,items,onSelect,taskArtwork:true});
+          window.FFH_PICK_ITEM({title,selected:selection,items:choices,onSelect,taskArtwork:true,multiple:true});
         };
-      }
+      };
+      set('#ffTaskArtZone','Select Zone',zones.map(value=>({value,label:zoneName(value)})),selectedZones,
+        !context.managing ? zoneName(viewer.zone) : selectedZones.length===1 ? zoneName(selectedZones[0]) : selectedZones.length ? selectedZones.length+' zones' : 'All permitted zones',
+        selection=>{state.zones=selection;state.staff=[];state.scope='team';draw();});
+      set('#ffTaskArtAssignee','Select Staff / SR',zonePeople.map(person=>({value:person.id,label:person.name})),selectedStaff,
+        !context.managing ? compactName(viewerId) : selectedStaff.length===1 ? compactName(selectedStaff[0]) : selectedStaff.length ? selectedStaff.length+' staff' : 'All permitted staff',
+        selection=>{state.staff=selection;state.scope='team';draw();});
     }
     const shortDate = value => value ? value.slice(8,10)+'/'+value.slice(5,7)+'/'+value.slice(0,4) : '';
     function draw() {
@@ -231,10 +346,19 @@ window.FFH_REFERENCE_TASKS = (() => {
       const dateText = [shortDate(state.from),shortDate(state.to)].filter(Boolean).join(' – ');
       find('#ffTaskArtDate').textContent = dateText || 'All dates';
       showScope();
+      highlight('[data-task-scope]',button=>button.dataset.taskScope===state.scope);
+      const zoneByAssignee = new Map(context.people.map(person=>[person.id,person.zone]));
       const mineIds = new Set([String(viewerId), String(context.viewer?.id || ''), String(context.viewer?.staffId || '')].filter(Boolean));
       const scoped = tasks.filter(task=>{
         const day = task.due || String(task.created || '').slice(0,10);
-        return (state.scope === 'team' || mineIds.has(String(task.to))) &&
+        let inScope = (context.teamTask?.(task) ?? true);
+        if (state.scope === 'mine') inScope = mineIds.has(String(task.to));
+        else if (context.managing && (state.zones || state.staff)) {
+          const zones = state.zones ?? (context.zone === 'ALL' ? [] : [context.zone]);
+          inScope = (!zones.length || zones.includes(zoneByAssignee.get(task.to)) || task.to==='ALL')
+            && (!state.staff?.length || state.staff.includes(task.to) || task.to==='ALL');
+        }
+        return inScope &&
           (!state.from || day >= state.from) && (!state.to || day <= state.to);
       });
       const counters = [scoped.length,scoped.filter(completed).length,scoped.filter(progress).length,scoped.filter(overdue).length];

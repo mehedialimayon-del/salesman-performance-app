@@ -262,3 +262,9 @@ html body #app .app main.wrap .ffTaskArtwork button[data-task-scope][aria-presse
  border-color:#ffe8a0;
  box-shadow:inset 0 0 1.2cqw #fff6c688,0 0 2cqw #ff912e;
 }
+
+#app .ffTaskTimeline {overflow:auto;max-height:50dvh;overscroll-behavior:contain;}
+#app .ffTaskTimeline article {border-bottom:1px solid #774019;padding:.6rem 0;}
+#app .ffTaskTimeline small {display:block;color:#ffbd82;}
+#app .ffTaskTimeline p {white-space:pre-wrap;overflow-wrap:anywhere;}
+#app .ffTaskArtDialog textarea {display:block;width:100%;min-height:6rem;box-sizing:border-box;}

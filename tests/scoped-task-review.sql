@@ -5,6 +5,7 @@ insert into public.ffh_profiles(staff_id,full_name,role,zone_id,auth_user_id,act
 ('QA_REVIEW_MANAGER','QA review manager','MANAGER','QA_REVIEW_A','00000000-0000-0000-0000-000000009001',true,true,true,false),
 ('QA_REVIEW_SR','QA review SR','SR','QA_REVIEW_A','00000000-0000-0000-0000-000000009002',true,true,false,true),
 ('QA_REVIEW_FOREIGN','QA foreign SR','SR','QA_REVIEW_B','00000000-0000-0000-0000-000000009003',true,true,false,true);
+update public.ffh_profiles set manager_id='QA_REVIEW_MANAGER' where staff_id='QA_REVIEW_SR';
 insert into public.ffh_access_grants(staff_id,module,can_edit) values('QA_REVIEW_MANAGER','tasks',true);
 insert into public.ffh_tasks(id,title,assigned_to,given_by,given_by_id,status,proof_mode) values('QA_SCOPED_REVIEW_TASK','Rollback QA review','QA_REVIEW_SR','QA Manager','QA_REVIEW_MANAGER','Pending Review','location');
 select set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000009001","role":"authenticated"}',true);
