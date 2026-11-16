@@ -458,14 +458,22 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    const key=brand(o)?.[0];
    if(!key){result.textContent='No proposal template is linked to this chain.';return;}
    try{
-    const {data,error}=await sb.from('ffh_proposal_item_templates').select('lines,source_pdf_url').eq('chain_key',key).maybeSingle();
-    if(error)throw error;
-    const lines=Array.isArray(data?.lines)?[...new Map(data.lines.filter(row=>String(row?.code||'').trim()).map(row=>[String(row.code).trim(),row])).values()]:[];
-    const sameBiscuitVersion=key==='01'&&/\/(?:1790191455404-lpy3gt|1790185318847-e1yd7w)-giant-propose-order-form-biscuit\.new\.pdf(?:$|\?)/i.test(data?.source_pdf_url||'');
-    const catalogueCode=row=>{
-     const code=String(row.code||'').trim();
-     return key==='01'?(giantBiscuitProposal.get(code)?.[0]||code):code;
-    };
+    const templateKeys=key==='01'?['01','01-chill']:[key];
+    const templates=await Promise.all(templateKeys.map(async templateKey=>{
+     const {data,error}=await sb.from('ffh_proposal_item_templates').select('lines,source_pdf_url,chain_name').eq('chain_key',templateKey).maybeSingle();
+     if(error)throw error;
+     return {key:templateKey,data};
+    }));
+    const listed=new Map();
+    for(const {key:sourceKey,data} of templates){
+     const sameBiscuitVersion=sourceKey==='01'&&/\/(?:1790191455404-lpy3gt|1790185318847-e1yd7w)-giant-propose-order-form-biscuit\.new\.pdf(?:$|\?)/i.test(data?.source_pdf_url||'');
+     for(const row of Array.isArray(data?.lines)?data.lines:[]){
+      const code=String(row?.code||'').trim();
+      if(code&&!listed.has(code))listed.set(code,{...row,code,sourceKey,sameBiscuitVersion});
+     }
+    }
+    const lines=[...listed.values()];
+    const catalogueCode=row=>String(row.catalogue_code||(row.sourceKey==='01'?giantBiscuitProposal.get(row.code)?.[0]:null)||row.code).trim();
     const codes=[...new Set(lines.map(catalogueCode))];
     const products=new Map();
     for(let i=0;i<codes.length;i+=80){
@@ -477,16 +485,18 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     if(me()!==id||!popup.isConnected)return;
     const local=new Map(typeof window.ffhCatalogueRows==='function'?window.ffhCatalogueRows().map(product=>[String(product.itemCode),product]):[]);
     result.innerHTML=`<p>${lines.length} SKUs in the cloud proposal${Number(o.totalSku)>lines.length?` · ${E(o.totalSku)} recorded for this outlet. The remaining SKUs need the updated proposal.`:''}</p>
+     ${templates.filter(({data})=>https(data?.source_pdf_url)).map(({key,data})=>`<a class="ffOutletProposalLink" href="${E(data.source_pdf_url)}" target="_blank" rel="noopener noreferrer">${E(key==='01'?'Giant Biscuit Proposal':data.chain_name||'Proposal source')} ↗</a>`).join('')}
      <div class="ffOutletCatalog">${lines.map(line=>{
       const code=catalogueCode(line),product=products.get(code),cached=local.get(code);
       const savedImage=String(cached?.image||''),image=https(product?.image_url||savedImage)||(/^catalogue-assets\/[\w./% -]+$/i.test(savedImage)?savedImage:'');
       const piece=product?.piece_price??(cached?.piecePrice>0?cached.piecePrice:null);
       const carton=product?.carton_price??(cached?.cartonPrice>0?cached.cartonPrice:null);
-      const proposalCost=sameBiscuitVersion?giantBiscuitProposal.get(String(line.code))?.[1]:null;
+      const proposalCost=Number.isFinite(line.carton_cost)?line.carton_cost:line.sameBiscuitVersion?giantBiscuitProposal.get(line.code)?.[1]:null;
       return `<article>${image?`<img src="${E(image)}" loading="lazy" alt="">`:''}<div><b>${E(product?.name||cached?.name||line.name||line.code)}</b>
        <small>${E(String(line.code))}${code!==String(line.code)?' · Catalogue '+E(code):''}</small>
        <span>${product||cached?`Catalogue · Piece ${piece==null?'—':ctx.rm(piece)} · Carton ${carton==null?'—':ctx.rm(carton)}`:'Catalogue match unavailable'}
-       ${proposalCost==null?'':`<small>Proposal carton cost · ${ctx.rm(proposalCost)}</small>`}</span></div></article>`;
+       ${proposalCost==null?'':`<small>Proposal carton cost · ${ctx.rm(proposalCost)}</small>`}</span>
+       ${line.note?`<small class="ffRefHint">${E(line.note)}</small>`:''}</div></article>`;
      }).join('')||'<p>No SKUs saved for this proposal.</p>'}</div>`;
    }catch(error){if(popup.isConnected&&me()===id)result.textContent=error.message||'Could not load the listing.';}
   });

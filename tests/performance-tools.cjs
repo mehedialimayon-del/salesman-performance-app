@@ -42,12 +42,13 @@ const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require
  table.ffh_outlets.push({id:'o3',sr_id:'SR1',outlet_code:'GIANT',outlet_name:'Giant Test',category:'Giant Hypermarket',total_sku:19,active:true},
   {id:'o4',sr_id:'SR1',outlet_code:'CLOSED',outlet_name:'Closed Test',category:'Giant Hypermarket',active:false});
  table.ffh_proposal_item_templates=[{chain_key:'01',source_pdf_url:'https://assets.example/1790191455404-lpy3gt-giant-propose-order-form-biscuit.new.pdf',
-  lines:[{code:'4216819',name:'Orange'},{code:'4216819',name:'Orange'}]}];
+  lines:[{code:'4216819',name:'Orange'},{code:'4216819',name:'Orange'}]},
+  {chain_key:'01-chill',chain_name:'Giant Hypermarket Chiller',source_pdf_url:'https://assets.example/chill.pdf',lines:[{code:'4175201',name:'Basil Seed Mango',catalogue_code:'105641',carton_cost:58.8}]}];
  const originalFrom=sb.from,upserts=[];
  sb.from=tableName=>{
   const query=originalFrom(tableName);
   if(tableName==='ffh_catalogue_products'){
-   query.in=(field,values)=>{assert.deepEqual(Array.from(values),['102208']);return query;};
+   query.in=(field,values)=>{assert.deepEqual(Array.from(values),['102208','105641']);return query;};
    query.then=resolve=>resolve({data:[{item_code:'102208',name:'Bisk Club Orange',piece_price:1.25,carton_price:85,image_url:'https://assets.example/orange.jpg'}]});
   }
   if(tableName==='ffh_outlets')query.upsert=async rows=>{upserts.push(Array.from(rows));return {error:null};};
@@ -59,9 +60,10 @@ const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require
  const giant=[...w.document.querySelectorAll('[data-ref-outlet]')].find(button=>button.textContent.includes('Giant Test'));
  q('#ffOutletHistorySelect').value=giant.dataset.refOutlet;q('#ffOutletHistorySelect').onchange();
  q('#ffOutletListing').click();await tick();
- assert.match(q('[data-sku-result]').textContent,/1 SKUs.*19 recorded/s);
+ assert.match(q('[data-sku-result]').textContent,/2 SKUs.*19 recorded/s);
  assert.match(q('[data-sku-result]').textContent,/Catalogue 102208/);
  assert.match(q('[data-sku-result]').textContent,/RM 76.80/);
+ assert.match(q('[data-sku-result]').textContent,/Basil Seed Mango.*RM 58.80/s);
  q('.ffOutletDialog [data-close]').click();
  q('#ffOutletHistoryFrom').value='2026-10-01';q('#ffOutletHistoryTo').value='2026-10-31';
  q('#ffOutletPerformance').click();q('[data-perf="zero"]').click();
