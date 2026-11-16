@@ -1,4 +1,4 @@
-/* FieldForce task graphics are the original reference. Live controls occupy its data slots. */
+/* The Tasks layout follows the proportions of the design reference. */
 html body #app .app > main.wrap.ffTaskPage:has(.ffTaskArtwork) {
   display:block!important;
   flex:1 1 0!important;
@@ -44,13 +44,6 @@ html body #app .app main.wrap .ffTaskArtwork :is(button,input,select) {
 #app .ffTaskArtwork .ffTaskArtMetric {
   display:grid;place-items:center;font-size:5cqw;font-weight:850;line-height:1;
 }
-#app .ffTaskArtwork .ffTaskArtTap {opacity:0;}
-#app .ffTaskArtwork .ffTaskArtTap:is(:focus-visible,:active,[aria-pressed="true"][data-task-category]) {
-  opacity:1;color:transparent!important;-webkit-text-fill-color:transparent!important;
-  background:#ff9a271c!important;
-  border:1px solid #ffeaa2!important;border-radius:2cqw!important;
-  box-shadow:inset 0 0 1.4cqw #ffae34!important;
-}
 #app .ffTaskArtwork :is(button,input,select):focus-visible {outline:2px solid #ffd082;outline-offset:-2px;}
 #app .ffTaskArtwork .ffTaskArtRows {
   overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#f69d38 #070504;
@@ -82,7 +75,6 @@ html body #app .app main.wrap .ffTaskArtwork :is(button,input,select) {
 #app .ffTaskArtwork .ffTaskArtHint:empty {display:none;}
 body:has(.ffTaskArtwork) :is(#orb,#nudge,#aiHello) {display:none!important;}
 #app .ffTaskArtwork #ffRefTaskDetailsBody {display:contents;}
-#app .ffTaskArtwork [data-task-scope][aria-pressed="true"]:not([data-task-scope="team"]) {opacity:1;color:transparent!important;-webkit-text-fill-color:transparent!important;background:#ff9a2726!important;border:1px solid #ffeaa2!important;border-radius:2cqw!important;}
 #app .ffTaskArtDialog {
   position:fixed;inset:0;margin:auto;
   padding:1em;width:min(440px,calc(100vw - 24px));max-height:75dvh;
@@ -92,13 +84,6 @@ body:has(.ffTaskArtwork) :is(#orb,#nudge,#aiHello) {display:none!important;}
 #app .ffTaskArtDialog header {display:flex;justify-content:space-between;align-items:center;margin-bottom:.55em;}
 #app .ffTaskArtDialog label {display:block;margin-bottom:.45em;}
 #app .ffTaskArtDialog label input {display:block;width:100%;color-scheme:dark;}
-/* Keep live controls transparent so the supplied icons and borders show through. */
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffTaskArtwork :is(button,input,select) {
-  position:absolute!important;
-  background:transparent!important;border:0!important;box-shadow:none!important;
-}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffTaskArtwork .ffTaskArtRow button {position:static!important;}
-#app .ffTaskArtwork .ffTaskArtMetric {color:#fff!important;-webkit-text-fill-color:#fff!important;}
 .ffTaskArtworkPicker .ffPickerOption {
   background:linear-gradient(145deg,#1a0d02,#050403)!important;
   border:1px solid #ed8a22!important;
@@ -114,8 +99,6 @@ html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffTaskArtwork .ffTaskArtRow 
 }
 html body #app .app>main.wrap.ffTaskPage:has(.ffTaskArtwork) > :is(.head,.ffTaskScope) {display:none!important;}
 html body #app .app>main.wrap.ffTaskPage:has(.ffTaskArtwork)>.ffTaskComposer:not([open]) {display:none!important;}
-html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap {font-size:0!important;}
-html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap>* {visibility:hidden!important;}
 html body #app .app main.wrap .ffTaskArtwork .ffTaskArtRows button {color:#fff!important;-webkit-text-fill-color:#fff!important;}
 html body #app .app main.wrap .ffTaskArtwork .ffTaskArtMetric,
 html body #app .app main.wrap .ffTaskArtwork .ffTaskArtMetric * {color:#fff!important;-webkit-text-fill-color:#fff!important;}
@@ -182,84 +165,6 @@ html body #app .app>main.wrap.ffTaskPage:has(.ffTaskArtwork)>:is(.ffTaskRefHisto
 }
 #app .ffTaskArtDialog {overflow-y:auto;overscroll-behavior:contain;}
 
-/* Task category buttons: artwork's orange first tile is not a default selection.
-   Cover each baked tile with a real interactive, state-driven surface. */
-html body #app .app main.wrap .ffTaskArtwork button[data-task-category] {
-  opacity:1!important;
-  overflow:visible!important;
-  isolation:isolate;
-  outline:none!important;
-}
-html body #app .app main.wrap .ffTaskArtwork button[data-task-category]::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:1;
-  border-radius:1.5cqw;
-  background:linear-gradient(160deg,#241307 0%,#080604 55%,#030303 100%);
-  border:1px solid #f7a341;
-  box-shadow:inset 0 0 1.3cqw #ff7c1733,0 0 .8cqw #ff9a294d;
-}
-html body #app .app main.wrap .ffTaskArtwork button[data-task-category]::after {
-  content:attr(aria-label);
-  position:absolute;
-  z-index:2;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:.3cqw;
-  color:#fff;
-  -webkit-text-fill-color:#fff;
-  white-space:normal;
-  font:750 2.3cqw/1.1 Arial,Roboto,sans-serif;
-}
-html body #app .app main.wrap .ffTaskArtwork button[data-task-category][aria-pressed="true"]::before {
-  background:linear-gradient(155deg,#ffb326,#ff7500 65%,#b94400);
-  border-color:#ffe58d;
-  box-shadow:inset 0 0 1.5cqw #fff7a4aa,0 0 2cqw #ff9b24;
-}
-html body #app .app main.wrap .ffTaskArtwork button[data-task-category]:focus-visible::before {
-  outline:2px solid #fff0b0;
-  outline-offset:1px;
-}
-
-/* Interactive scope controls overlay the reference image, with state-driven surfaces. */
-html body #app .app main.wrap .ffTaskArtwork button[data-task-scope] {
- opacity:1!important;
- font-size:0!important;
- position:absolute!important;
- isolation:isolate;
-}
-html body #app .app main.wrap .ffTaskArtwork button[data-task-scope]::before {
- content:"";
- position:absolute;
- inset:0;
- border:1px solid #f99d34;
- border-radius:2cqw;
- background:linear-gradient(135deg,#1a0d04,#060404);
- box-shadow:inset 0 0 1.2cqw #ff7a193d,0 0 .8cqw #ff92264a;
- z-index:1;
-}
-html body #app .app main.wrap .ffTaskArtwork button[data-task-scope]::after {
- content:attr(aria-label);
- position:absolute;
- inset:0;
- display:flex;
- align-items:center;
- justify-content:center;
- z-index:2;
- font:800 2.8cqw/1 Arial,sans-serif;
- color:white;
- -webkit-text-fill-color:white;
-}
-html body #app .app main.wrap .ffTaskArtwork button[data-task-scope][aria-pressed="true"]::before {
- background:linear-gradient(150deg,#ffbb35,#ff7900 70%,#a73e00);
- border-color:#ffe8a0;
- box-shadow:inset 0 0 1.2cqw #fff6c688,0 0 2cqw #ff912e;
-}
-
 #app .ffTaskTimeline {overflow:auto;max-height:50dvh;overscroll-behavior:contain;}
 #app .ffTaskTimeline article {border-bottom:1px solid #774019;padding:.6rem 0;}
 #app .ffTaskTimeline small {display:block;color:#ffbd82;}
@@ -292,7 +197,3 @@ html body #app .app main.wrap .ffTaskArtwork .ffTaskArtMetric[aria-label="In Pro
 html body #app .app main.wrap .ffTaskArtwork .ffTaskArtMetric[aria-label="Overdue"] {background:#3a0b07;border-color:#fc5d43;}
 #app .ffTaskArtwork .ffTaskArtMetric::before {content:attr(aria-label);font-size:clamp(9px,2.55cqw,15px);}
 #app .ffTaskArtwork :is(.ffTaskArtRows,.ffTaskArtPhoto,.ffTaskArtDescription) {background:#120904;border:1px solid #995518;}
-html body #app .app main.wrap .ffTaskArtwork [data-task-proof]:last-child {border-style:dashed!important;}
-html body #app .app main.wrap .ffTaskArtwork [data-task-export="pdf"] {background:linear-gradient(#145827,#072916)!important;border-color:#63dc62!important;}
-html body #app .app main.wrap .ffTaskArtwork [data-task-export="xlsx"] {background:linear-gradient(#10475c,#072431)!important;border-color:#42c7f5!important;}
-html body #app .app main.wrap .ffTaskArtwork :is([data-task-history],[data-task-assign]) {background:linear-gradient(#bc4d05,#703004)!important;border-color:#ff9b40!important;}

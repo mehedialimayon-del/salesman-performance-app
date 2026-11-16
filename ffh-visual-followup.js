@@ -74,7 +74,7 @@
     actions.className='ffDashboardActions ffRefExports';
     for(const [name,module] of [['Daily Sales','sales'],['Zero Sales','zero'],['Reports','reports']]){
      const button=document.createElement('button');
-     button.type='button';button.className='secondary';
+     button.type='button';button.className='ffRefButton';
      button.textContent=name;button.dataset.page=module;
      button.onclick=()=>window.go?.(module);
      actions.append(button);

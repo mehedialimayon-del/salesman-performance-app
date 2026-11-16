@@ -46,14 +46,19 @@ window.FFH_REFERENCE_TASKS = (() => {
       slot('button',`type="button" id="${id}" aria-label="${label}" class="ffTaskArtSlot ffTaskArtValue"`,'',x,y,w,h);
 
     const heading = (title,x,y,w,h) => slot('b','class="ffTaskArtSlot ffTaskArtHeading"',title,x,y,w,h);
+    const frame = (x,y,w,h) => slot('div','class="ffTaskArtSlot ffTaskArtFrame" aria-hidden="true"','',x,y,w,h);
     panel.innerHTML = [
-      heading('Tasks &amp; Actions',22,18,880,54),
+      frame(14,83,906,186),
+      frame(14,500,906,185),
+      frame(14,694,906,383),
+      frame(14,1082,906,520),
+      heading('Tasks &amp; <span>Actions</span>',22,18,880,54),
       heading('Date Range',26,95,390,28),heading('Zone',504,95,390,28),
       heading('Assigned To',26,179,390,28),heading('Task Status',504,179,390,28),
-      heading('Task Categories',25,513,500,44),
-      heading('Task List',25,705,194,40),
-      slot('div','class="ffTaskArtSlot ffTaskArtTableHead"', ['#','Task Title','Outlet','Assigned To','Due Date','Status'].map(v=>'<span>'+v+'</span>').join(''),24,763,886,36),
-      heading('Task Details',26,1094,520,42),
+      heading('Task <span>Categories</span>',25,513,500,44),
+      heading('Task <span>List</span>',25,705,194,40),
+      slot('div','class="ffTaskArtSlot ffTaskArtTableHead"', ['#','Task Title','Outlet / Location','Assigned To','Due Date','Status'].map(v=>'<span>'+v+'</span>').join(''),24,763,886,36),
+      heading('Task <span>Details</span>',26,1094,520,42),
       value('ffTaskArtDate','Date Range',25,127,409,44),
       value('ffTaskArtZone','Zone',504,127,398,44),
       value('ffTaskArtAssignee','Assigned To',25,211,409,44),
@@ -317,7 +322,7 @@ window.FFH_REFERENCE_TASKS = (() => {
           ['Outlet',task?.outletName],['Assigned To',task ? compactName(task.to) : ''],
           ['Due Date',task?.due],['Priority',task ? task.priority || 'Normal' : '']
         ].map(([label,v])=>`<div><dt>${label}</dt><dd title="${esc(v || '')}">${esc(v || '—')}</dd></div>`).join(''),339,1189,326,143),
-        slot('span','class="ffTaskArtSlot ffTaskArtBadge"',esc(task ? status(task) : '—'),720,1098,185,36),
+        slot('span',`class="ffTaskArtSlot ffTaskArtBadge" data-status="${esc(task ? completed(task) ? 'Done' : status(task) : '')}"`,esc(task ? status(task) : '—'),720,1098,185,36),
         slot('div','class="ffTaskArtSlot ffTaskArtDescription"',esc(instructions)+(assignmentUrl?'<p><a href="'+esc(assignmentUrl)+'" target="_blank" rel="noopener noreferrer">View assignment attachment ↗</a></p>':''),29,1368,662,129),
         tap('data-task-status','Update Status',697,1156,212,46),
         tap('data-task-proof','Add Photo / Proof',697,1205,212,45),

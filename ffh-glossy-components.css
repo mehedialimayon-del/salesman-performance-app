@@ -1,0 +1,206 @@
+/* Palette and orange table header shared with the SOA dashboard. */
+:root {
+  --ff-gloss-red:#ff2929;
+  --ff-gloss-red-top:#4c0606;
+  --ff-gloss-red-base:#130000;
+  --ff-gloss-blue:#00bfff;
+  --ff-gloss-blue-top:#003151;
+  --ff-gloss-blue-base:#000b1b;
+  --ff-gloss-green:#00ef57;
+  --ff-gloss-green-top:#00472b;
+  --ff-gloss-green-base:#00140b;
+  --ff-gloss-purple:#ff45f5;
+  --ff-gloss-purple-top:#501054;
+  --ff-gloss-purple-base:#17001d;
+  --ff-gloss-gold:#ffc526;
+  --ff-gloss-gold-top:#4b3300;
+  --ff-gloss-gold-base:#1c1200;
+  --ff-gloss-table-head:linear-gradient(#ff9c00,#df4600);
+  --ff-gloss-active:linear-gradient(#ffbc2a,#ff7900 48%,#bd3a00);
+  --ff-gloss-panel:linear-gradient(180deg,#190b03,#030303 3rem);
+  --ff-gloss-panel-shadow:inset 0 0 .5em #ff8c2638,0 0 .34em #ff92254d;
+}
+
+#app {
+  --ff-gloss-edge:#ff9c2e;
+  --ff-gloss-top:#321302;
+  --ff-gloss-base:#080402;
+  --ff-gloss-fill:linear-gradient(to bottom,#ffffff30,transparent 21%,transparent 79%,#ffffff15),linear-gradient(var(--ff-gloss-top),var(--ff-gloss-base));
+  --ff-gloss-shadow:inset 0 1px 2px #fff1, inset 0 0 .58em var(--ff-gloss-edge),0 0 .34em var(--ff-gloss-edge);
+}
+#app :is([data-color="green"],[data-status="Done"],[data-status="Active"],.ffTaskArtMetric[aria-label="Completed"],[data-task-export="pdf"],.ffDashboardFinish>.refKpis>.refKpi:nth-child(1)) {
+  --ff-gloss-edge:var(--ff-gloss-green);
+  --ff-gloss-top:var(--ff-gloss-green-top);
+  --ff-gloss-base:var(--ff-gloss-green-base);
+}
+#app :is([data-color="blue"],[data-status="In Progress"],.ffTaskArtMetric[aria-label="Total Tasks"],[data-task-export="xlsx"],[data-task-proof]) {
+  --ff-gloss-edge:var(--ff-gloss-blue);
+  --ff-gloss-top:var(--ff-gloss-blue-top);
+  --ff-gloss-base:var(--ff-gloss-blue-base);
+}
+#app :is([data-color="gold"],.ffTaskArtMetric[aria-label="In Progress"],.ffDashboardFinish>.refKpis>.refKpi:nth-child(2)) {
+  --ff-gloss-edge:var(--ff-gloss-gold);
+  --ff-gloss-top:var(--ff-gloss-gold-top);
+  --ff-gloss-base:var(--ff-gloss-gold-base);
+}
+#app :is([data-color="red"],[data-status="Overdue"],[data-status="Rejected"],[data-status="Issue"],.ffTaskArtMetric[aria-label="Overdue"],.ffDashboardFinish>.refKpis>.refKpi:nth-child(3)) {
+  --ff-gloss-edge:var(--ff-gloss-red);
+  --ff-gloss-top:var(--ff-gloss-red-top);
+  --ff-gloss-base:var(--ff-gloss-red-base);
+}
+#app :is([data-color="purple"],[data-task-comment],.ffDashboardFinish>.refKpis>.refKpi:nth-child(4)) {
+  --ff-gloss-edge:var(--ff-gloss-purple);
+  --ff-gloss-top:var(--ff-gloss-purple-top);
+  --ff-gloss-base:var(--ff-gloss-purple-base);
+}
+#app [data-task-open] {
+  --ff-gloss-edge:#47e7ea;
+  --ff-gloss-top:#003337;
+  --ff-gloss-base:#001416;
+}
+
+html body #app .app main.wrap :is(.ffRefButton,.ffRefMetric,.ffDashboardFinish>.refKpis>.refKpi),
+html body #app .app main.wrap .ffTaskArtwork :is(.ffTaskArtMetric,.ffTaskArtTap),
+html body #app .app main.wrap :is(.ffRefStatus,.ffTaskArtBadge) {
+  background:var(--ff-gloss-fill)!important;
+  border:1px solid var(--ff-gloss-edge)!important;
+  box-shadow:var(--ff-gloss-shadow)!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  text-shadow:0 1px 2px #000;
+}
+html body #app .app main.wrap :is(.ffRefMetric,.ffRefButton)>i {
+  color:var(--ff-gloss-edge)!important;
+  -webkit-text-fill-color:var(--ff-gloss-edge)!important;
+}
+html body #app .app main.wrap :is(.ffRefMetric,.ffRefButton,.ffDashboardFinish>.refKpis>.refKpi) :is(span,strong,small) {
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+html body #app .app main.wrap .ffRefButton:is([aria-pressed="true"],#ffOutletJumpList),
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap:is([data-task-assign],[data-task-history],[aria-pressed="true"]) {
+  background:var(--ff-gloss-active)!important;
+  border-color:#ffe68f!important;
+  box-shadow:inset 0 0 .65em #fff29a,0 0 .45em #ff9800!important;
+}
+html body #app .app main.wrap .ffRefButton:is([aria-pressed="true"],#ffOutletJumpList)>i {
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+html body #app .app main.wrap :is(.ffRefPanel,.ffTaskArtFrame,.ffIncRow) {
+  background:var(--ff-gloss-panel)!important;
+  border:1px solid #f69330!important;
+  box-shadow:var(--ff-gloss-panel-shadow)!important;
+}
+html body #app .app main.wrap :is(.ffRefPanel,.ffReportGroup,.ffRefOutletViewport,.ffTrackingCard) thead :is(th,td),
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTableHead {
+  background:var(--ff-gloss-table-head)!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  font-weight:800;
+  text-shadow:0 1px 2px #572000;
+  box-shadow:inset 0 1px #ffd17b;
+}
+html body #app .app main.wrap :is(.ffRefPanel,.ffReportGroup,.ffRefOutletViewport,.ffTrackingCard) tbody tr:nth-child(odd)>td {
+  background:linear-gradient(90deg,#251407,#080603)!important;
+}
+html body #app .app main.wrap :is(.ffRefPanel,.ffReportGroup,.ffRefOutletViewport,.ffTrackingCard) tbody tr:nth-child(even)>td {
+  background:linear-gradient(90deg,#10201f,#050908)!important;
+}
+html body #app .app main.wrap :is(.ffRefPanel,.ffReportGroup,.ffRefOutletViewport,.ffTrackingCard) tbody tr:is([aria-selected="true"],:has([aria-pressed="true"]))>td {
+  background:linear-gradient(90deg,#512b08,#170c03)!important;
+}
+html body #app .app main.wrap :is(.ffRefPanel,.ffReportGroup,.ffRefOutletViewport,.ffTrackingCard) tbody td {
+  color:#fff!important;
+  border-bottom:1px solid #f59b414d!important;
+}
+html body #app .app main.wrap .ffRefFields {
+  gap:.3em .6em;
+  padding:.38em .55em;
+}
+html body #app .app main.wrap .ffRefFields :is(input,select,button) {
+  min-height:28px;
+}
+#app .ffTaskArtFrame {
+  pointer-events:none;
+  border-radius:2cqw;
+}
+#app .ffTaskArtwork>.ffTaskArtHeading {pointer-events:none;}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtHeading:first-of-type {
+  font-size:clamp(16px,5.5cqw,40px)!important;
+}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtHeading span {
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap:not([data-task-expand]) {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.38em;
+  font-size:clamp(9px,2.75cqw,18px)!important;
+  line-height:1.08!important;
+  white-space:normal;
+}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap[data-task-category] {flex-direction:column;}
+#app .ffTaskArtTap[data-task-category]::before,
+#app .ffTaskArtMetric::after,
+#app .ffTaskArtTap:is([data-task-assign],[data-task-status],[data-task-proof],[data-task-history],[data-task-open],[data-task-comment],[data-task-export])::before {
+  content:var(--ff-task-icon,"");
+  line-height:1;
+  color:var(--ff-gloss-edge);
+  -webkit-text-fill-color:var(--ff-gloss-edge);
+  font-size:1.25em;
+}
+#app .ffTaskArtMetric::after {order:-1;font-size:.88em;}
+#app .ffTaskArtMetric[aria-label="Total Tasks"] {--ff-task-icon:"▣";}
+#app .ffTaskArtMetric[aria-label="Completed"] {--ff-task-icon:"✔";}
+#app .ffTaskArtMetric[aria-label="In Progress"] {--ff-task-icon:"⟳";}
+#app .ffTaskArtMetric[aria-label="Overdue"] {--ff-task-icon:"⚠";}
+#app [data-task-category="0"] {--ff-task-icon:"▤";}
+#app [data-task-category="1"] {--ff-task-icon:"⚑";}
+#app [data-task-category="2"] {--ff-task-icon:"▣";}
+#app [data-task-category="3"] {--ff-task-icon:"▥";}
+#app [data-task-category="4"] {--ff-task-icon:"⚠";}
+#app [data-task-category="5"] {--ff-task-icon:"⌖";}
+#app [data-task-category="6"] {--ff-task-icon:"⋯";}
+#app [data-task-assign] {--ff-task-icon:"+";}
+#app [data-task-status] {--ff-task-icon:"✎";}
+#app [data-task-proof] {--ff-task-icon:"▧";}
+#app [data-task-comment] {--ff-task-icon:"▤";}
+#app [data-task-open] {--ff-task-icon:"▣";}
+#app [data-task-history] {--ff-task-icon:"⟲";}
+#app [data-task-export] {--ff-task-icon:"↓";}
+#app .ffTaskArtwork .ffTaskArtRows {background:#050504;border-color:#f79c4466;}
+#app .ffTaskArtwork .ffTaskArtRow:nth-child(odd) {background:linear-gradient(90deg,#341a08,#080503);}
+#app .ffTaskArtwork .ffTaskArtRow:nth-child(even) {background:linear-gradient(90deg,#0e2d2c,#040807);}
+#app .ffTaskArtwork .ffTaskArtRow[aria-selected="true"] {background:linear-gradient(90deg,#57310c,#170c03);}
+#app .ffTaskArtBadge {border-radius:2em;}
+#app .ffTaskArtwork .ffTaskArtTap:disabled {opacity:.5!important;}
+
+#app .ffDashboardFinish>.ffDashboardActions {margin:.45rem 0;}
+html body #app .app main.wrap .ffTaskArtwork #ffRefTaskDetailsBody [data-task-proof]:last-child {
+  flex-direction:column;
+  background:#050505!important;
+  border:1px dashed #fff!important;
+  box-shadow:none!important;
+}
+#app .ffTaskArtwork #ffRefTaskDetailsBody [data-task-proof]:last-child::before {
+  content:"+";
+  font-size:2em;
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+}
+html body #app .app main.wrap .ffIncentiveArtwork button.ffIncRow {
+  background:var(--ff-gloss-panel)!important;
+  border-color:#f69330!important;
+  box-shadow:var(--ff-gloss-panel-shadow)!important;
+}
+html body #app .app main.wrap .ffIncentiveArtwork button.ffIncRow:nth-child(even) {
+  background:linear-gradient(180deg,#15212a,#050709)!important;
+}
+html body #app .app main.wrap .ffIncentiveArtwork .ffIncFigures small {
+  background:linear-gradient(#0a2811,#020a03);
+  border-color:var(--ff-gloss-green);
+  box-shadow:inset 0 0 .4em #00ef5747;
+}

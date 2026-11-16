@@ -11,18 +11,18 @@
 #ffhSoaRoot .soaProfileMain div{color:#fff!important}
 #ffhSoaRoot .soaProfileExtra small{color:#ffab35!important}
 #ffhSoaRoot .soaDashboard .soaMetric{border-width:2px!important;box-shadow:0 0 12px currentColor!important}
-#ffhSoaRoot .soaDashboard .soaMetric:nth-child(1){border-color:#ff2929!important;color:#ff2929!important;background:linear-gradient(#4c0606,#130000)!important}
-#ffhSoaRoot .soaDashboard .soaMetric:nth-child(2){border-color:#00bfff!important;color:#00bfff!important;background:linear-gradient(#003151,#000b1b)!important}
-#ffhSoaRoot .soaDashboard .soaMetric:nth-child(3){border-color:#00ef57!important;color:#00ef57!important;background:linear-gradient(#00472b,#00140b)!important}
-#ffhSoaRoot .soaDashboard .soaMetric:nth-child(4){border-color:#ff45f5!important;color:#ff45f5!important;background:linear-gradient(#501054,#17001d)!important}
-#ffhSoaRoot .soaDashboard .soaMetric:nth-child(5){border-color:#ffc526!important;color:#ffc526!important;background:linear-gradient(#4b3300,#1c1200)!important}
+#ffhSoaRoot .soaDashboard .soaMetric:nth-child(1){border-color:var(--ff-gloss-red,#ff2929)!important;color:var(--ff-gloss-red,#ff2929)!important;background:linear-gradient(var(--ff-gloss-red-top,#4c0606),var(--ff-gloss-red-base,#130000))!important}
+#ffhSoaRoot .soaDashboard .soaMetric:nth-child(2){border-color:var(--ff-gloss-blue,#00bfff)!important;color:var(--ff-gloss-blue,#00bfff)!important;background:linear-gradient(var(--ff-gloss-blue-top,#003151),var(--ff-gloss-blue-base,#000b1b))!important}
+#ffhSoaRoot .soaDashboard .soaMetric:nth-child(3){border-color:var(--ff-gloss-green,#00ef57)!important;color:var(--ff-gloss-green,#00ef57)!important;background:linear-gradient(var(--ff-gloss-green-top,#00472b),var(--ff-gloss-green-base,#00140b))!important}
+#ffhSoaRoot .soaDashboard .soaMetric:nth-child(4){border-color:var(--ff-gloss-purple,#ff45f5)!important;color:var(--ff-gloss-purple,#ff45f5)!important;background:linear-gradient(var(--ff-gloss-purple-top,#501054),var(--ff-gloss-purple-base,#17001d))!important}
+#ffhSoaRoot .soaDashboard .soaMetric:nth-child(5){border-color:var(--ff-gloss-gold,#ffc526)!important;color:var(--ff-gloss-gold,#ffc526)!important;background:linear-gradient(var(--ff-gloss-gold-top,#4b3300),var(--ff-gloss-gold-base,#1c1200))!important}
 #ffhSoaRoot .soaMetric strong,#ffhSoaRoot .soaMetric small,#ffhSoaRoot .soaMetricIcon{color:white!important;text-shadow:0 1px 2px #000!important}
 #ffhSoaRoot .soaQuickActions button{background:linear-gradient(#fff,#f2f2f2 65%,#ddd)!important;color:#080808!important;border:2px solid #ff6900!important;border-radius:15px!important;box-shadow:0 0 10px #ff8d00!important;font-weight:900!important;font-size:clamp(8px,2vw,12px)!important;text-shadow:none!important}
 #ffhSoaRoot #soaResults{border:2px solid #ff9400!important;border-radius:19px!important;background:linear-gradient(120deg,#211108,#050505 65%)!important;box-shadow:0 0 13px #ff8500!important;min-height:190px!important}
 #ffhSoaRoot .soaTableHeading{color:white!important;font-weight:900!important}
 #ffhSoaRoot .soaTableHeading span{background:linear-gradient(#ffae1b,#de4c00)!important;border-radius:12px!important;color:#fff!important;padding:6px!important}
 #ffhSoaRoot .soaTableTools input{background:#101010!important;border:1px solid #ff8800!important;border-radius:9px!important;color:#fff!important}
-#ffhSoaRoot .soaPremiumTable th{background:linear-gradient(#ff9c00,#df4600)!important;color:white!important;position:sticky!important;top:0!important;z-index:2!important}
+#ffhSoaRoot .soaPremiumTable th{background:var(--ff-gloss-table-head,linear-gradient(#ff9c00,#df4600))!important;color:white!important;position:sticky!important;top:0!important;z-index:2!important}
 #ffhSoaRoot .soaPremiumTable td{background:#070707!important;color:white!important;border:1px solid #555!important}
 #ffhSoaRoot .soaTableWrap{overflow:auto!important;min-height:100px!important}
 #ffhSoaRoot .soaActions button{background:linear-gradient(#201309,#060606)!important;border:2px solid #ff9500!important;box-shadow:0 0 10px #ff8600!important;border-radius:13px!important;color:white!important}

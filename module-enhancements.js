@@ -112,18 +112,6 @@
     main.classList.add('ffDashboardFinish');
     const hero = main.querySelector('.dashHero'), range = main.querySelector('.dashRange');
     if (hero && range) hero.before(range);
-    const launch = document.createElement('nav');
-    launch.className = 'ffRefExports ffDashboardShortcuts';
-    launch.setAttribute('aria-label','Dashboard shortcuts');
-    for (const [page,label] of [['sales','Daily Sales'], ['zero','Zero Sales'], ['reports','Reports']]) {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'ffRefButton';
-      button.textContent = label;
-      button.onclick = () => window.go?.(page);
-      launch.append(button);
-    }
-    metrics.before(launch);
     const lower = document.createElement('section');
     lower.className = 'ffDashboardMore';
     const title = document.createElement('h2');
