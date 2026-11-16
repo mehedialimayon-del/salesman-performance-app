@@ -132,7 +132,15 @@
        select.required=true;select.disabled=false;
        note.textContent=matched.length+' of '+scoped.length+' permitted staff · Assignment does not grant dashboard, location, or private chat access.';
        updateManagerIdentity();
-       window.FFH_STYLE_SELECT?.(select,{title:'Assign task to'});
+       window.FFH_STYLE_SELECT?.(select,{
+         title:'Select Staff / SR',taskArtwork:true,
+         staff:id=>{
+           const record=people.find(person=>person.staff_id===id);
+           if(!record)return null;
+           const manager=zoneManagers.find(person=>person.zone_id===record.zone_id);
+           return {...record,companyStaffId:record.login_id,managerLabel:manager?.manager_name};
+         }
+       });
      }
      // Keep the All active staff filter available for every logged-in role.
      scope.addEventListener('change',render);

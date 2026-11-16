@@ -67,7 +67,7 @@ window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect,task
    const body=document.createElement('span');body.className='ffPickerText';
    const label=document.createElement('strong');label.textContent=isZonePicker&&String(item.value).toUpperCase()==='PRIMARY'?'KL ZONE':item.label;body.append(label);
    if(isScopeStaffPicker){
-    const staff=window.FFH_STAFF_PROFILE?.(String(item.value).replace(/^TEAM:/,''));
+    const staff=window.FFH_STAFF_PROFILE?.(String(item.value).replace(/^TEAM:/,'')) || item.staff;
     if(staff){
      label.className='ffScopeStaffName';label.textContent=(String(staff.companyStaffId||staff.company_staff_id||staff.id||staff.staff_id||'')+' · '+String(staff.name||staff.full_name||item.label||'')).trim();
      const managerId=String(staff.manager_id||'');
@@ -91,7 +91,7 @@ window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect,task
       const avatar=document.createElement('span');
       avatar.className='ffTaskPickerAvatar';
       avatar.textContent=label.textContent.trim().charAt(0)||'?';
-      const url=ffhZonePhotoUrl(staff.photo||staff.photo_url);
+      const url=ffhZonePhotoUrl(staff.photo||staff.photo_url||window.FFH_STAFF_PHOTOS?.find?.(item.value)?.photo_url);
       if(url){
        const img=document.createElement('img');
        img.alt='';img.loading='lazy';img.src=url;
@@ -99,6 +99,7 @@ window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect,task
        avatar.append(img);
       }
       button.append(avatar);
+      detail.textContent=staff.can_manage?'(Manager)':'(Manager: '+managerName+')';
       body.append(identity,detail);
      }else body.append(detail,fine);
     }
@@ -153,6 +154,6 @@ window.FFH_PICK_ITEM=function({title='Select',items=[],selected='',onSelect,task
  }
  return close;
 };
-window.FFH_STYLE_SELECT=function(select,{title='Select',detail}={}){if(!select||select.dataset.ffPicker)return;select.dataset.ffPicker='1';const button=document.createElement('button');button.type='button';button.className='ffSelectTrigger';const sync=()=>{button.textContent=select.selectedOptions?.[0]?.textContent||title;button.disabled=select.disabled;};sync();select.hidden=true;select.after(button);select.addEventListener('change',sync);new MutationObserver(sync).observe(select,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['disabled','hidden','selected']});button.onclick=()=>window.FFH_PICK_ITEM({title,selected:select.value,items:[...select.options].filter(o=>!o.disabled&&!o.hidden).map(o=>({value:o.value,label:o.textContent,detail:detail?.(o)||''})),onSelect:value=>{select.value=value;select.dispatchEvent(new Event('change',{bubbles:true}));sync();}});};
+window.FFH_STYLE_SELECT=function(select,{title='Select',detail,taskArtwork=false,staff}={}){if(!select||select.dataset.ffPicker)return;select.dataset.ffPicker='1';const button=document.createElement('button');button.type='button';button.className='ffSelectTrigger';const sync=()=>{button.textContent=select.selectedOptions?.[0]?.textContent||title;button.disabled=select.disabled;};sync();select.hidden=true;select.after(button);select.addEventListener('change',sync);new MutationObserver(sync).observe(select,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['disabled','hidden','selected']});button.onclick=()=>window.FFH_PICK_ITEM({title,taskArtwork,selected:select.value,items:[...select.options].filter(o=>!o.disabled&&!o.hidden).map(o=>({value:o.value,label:o.textContent,detail:detail?.(o)||'',staff:staff?.(o.value)})),onSelect:value=>{select.value=value;select.dispatchEvent(new Event('change',{bubbles:true}));sync();}});};
 /* Multi-select keeps the original form options and field name intact. */
 window.FFH_STYLE_MULTI_SELECT=function(select,{title='Choose items'}={}){if(!select||select.dataset.ffPicker)return;select.dataset.ffPicker='1';const trigger=document.createElement('button');trigger.type='button';trigger.className='ffSelectTrigger';const sync=()=>{const n=select.selectedOptions.length;trigger.textContent=n?n+' selected · edit selection':'Choose SRs · search names';trigger.disabled=select.disabled;};sync();select.hidden=true;select.after(trigger);select.addEventListener('change',sync);new MutationObserver(sync).observe(select,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['disabled','hidden','selected']});trigger.onclick=()=>{const ov=document.createElement('div');ov.className='globalSearchOverlay ffItemPicker ffMultiPicker';ov.innerHTML='<section class="globalSearchBox"><div class="row"><h2></h2><button type="button" class="secondary" data-close>Done ✓</button></div><input class="ffPickerSearch" placeholder="Search name…"><div class="ffMultiTools"><span></span><button type="button" class="secondary" data-clear>Clear selection</button></div><div class="ffPickerRows"></div></section>';ov.querySelector('h2').textContent=title;document.body.append(ov);ov.style.setProperty('z-index',String(Math.max(26000,...[...document.querySelectorAll('.globalSearchOverlay,.ffTaskModalBackdrop,.ffPhotoViewer')].map(el=>parseInt(getComputedStyle(el).zIndex)||0))+1),'important');const close=window.FFH_OVERLAY?window.FFH_OVERLAY(ov,()=>ov.remove()):()=>ov.remove();ov.querySelector('[data-close]').onclick=close;const status=()=>ov.querySelector('.ffMultiTools span').textContent=select.selectedOptions.length+' selected',draw=()=>{const box=ov.querySelector('.ffPickerRows'),term=ov.querySelector('input').value.toLowerCase();box.replaceChildren();for(const option of select.options){if(option.disabled||option.hidden||!option.textContent.toLowerCase().includes(term))continue;const label=document.createElement('label');label.className='ffPickerOption ffMultiOption';label.dataset.staffId=String(option.value);const check=document.createElement('input');check.type='checkbox';check.checked=option.selected;const name=document.createElement('span');name.textContent=option.textContent;label.append(check,name);check.onchange=()=>{option.selected=check.checked;select.dispatchEvent(new Event('change',{bubbles:true}));status();};box.append(label);}status();};ov.querySelector('[data-clear]').onclick=()=>{for(const option of select.options)option.selected=false;select.dispatchEvent(new Event('change',{bubbles:true}));draw();};ov.querySelector('.ffPickerSearch').oninput=draw;draw();};};
