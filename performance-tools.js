@@ -157,7 +157,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
  async function approvals(){
   const id=me(), turn=++ticket;
   page('approvals','Approval Inbox','<div class="card" role="status">Loading your permitted requests…</div>');
-  const inboxSources=[rows('ffh_tasks','created_at'),rpc('ffh_governance','state'),rpc('ffh_earnings','state'),rpc('ffh_claims_api','state'),ctx.refreshStaff()];
+  const inboxSources=[rows('ffh_tasks','created_at'),rpc('ffh_governance','state'),rpc('ffh_earnings','state'),rpc('ffh_claims_api','state'),ctx.refreshStaff(),rows('ffh_outlet_closures','created_at')];
   // A stalled backend must not leave the inbox on its loading screen forever.
   const limited=promise=>new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(Error('Request timed out. Tap REFRESH INBOX to retry.')),15000);Promise.resolve(promise).then(value=>{clearTimeout(timeout);resolve(value);},error=>{clearTimeout(timeout);reject(error);});});
   const results=await Promise.allSettled(inboxSources.map(limited));
@@ -171,7 +171,12 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   (gov.requests||[]).forEach(x=>items.push({kind:'Access / correction',id:x.id,staff:x.staff_id,title:x.module+' · '+x.action,detail:x.reason+' · Record '+x.record_id,status:x.status,date:x.created_at,reviewer:x.reviewed_by,reviewedAt:x.reviewed_at,can:false,open:'access',raw:x}));
   (earn.entries||[]).forEach(x=>items.push({kind:'Incentive / penalty',id:x.id,staff:x.staff_id,title:x.kind+' · '+ctx.rm(x.amount),detail:x.reason,status:x.status,date:x.created_at||x.entry_date,reviewer:x.approved_by,reviewedAt:x.reviewed_at,can:false,open:'incomeLedger',raw:x}));
   (claims.claims||[]).forEach(x=>items.push({kind:'Existing claim',id:x.id,staff:x.owner_staff_id,title:x.title,detail:x.kind,status:x.status,date:x.created_at,reviewer:x.reviewer_staff_id,reviewedAt:x.reviewed_at,can:false,open:'claim:'+x.id,raw:x}));
-  const errors=results.map((x,i)=>x.status==='rejected'?['Tasks','Access requests','Income requests','Claims','Permissions'][i]+': '+x.reason.message:'').filter(Boolean);
+  const closureRequests=results[5].status==='fulfilled'?results[5].value:[];
+  for(const x of closureRequests)items.push({kind:'Outlet closure',staff:x.requested_by,title:x.outlet_name+' · '+x.outlet_code,
+   detail:[x.reason,x.review_reason,x.effective_on?'Reports exclude outlet activity from '+x.effective_on+' MYT':''].filter(Boolean).join(' · '),
+   status:x.status,date:x.created_at,reviewer:x.reviewed_by,reviewedAt:x.reviewed_at,closure:x,
+   canClose:permissionsFresh&&ctx.may('outlets')&&(allowed.has(x.outlet_sr_id)||x.outlet_sr_id===id)&&x.status==='Pending'});
+  const errors=results.map((x,i)=>x.status==='rejected'?['Tasks','Access requests','Income requests','Claims','Permissions','Outlet closure'][i]+': '+x.reason.message:'').filter(Boolean);
   page('approvals','Approval Inbox',`<div class="card ffPerformanceIntro ffApprovalControls"><div class="two"><label>Status<select id="ffApprovalStatus"><option value="pending">Waiting for review</option><option value="approved">Approved / done</option><option value="returned">Returned / rejected</option><option value="all">All history</option></select></label><label>Search<input id="ffApprovalSearch" placeholder="Staff, outlet, task or request"></label></div><button class="secondary" id="ffApprovalReload">REFRESH INBOX</button>${id==='M21954'?'<button class="secondary" id="ffApprovalPermissions">STAFF / TASK ACCESS SETTINGS</button><button class="secondary" id="ffIncomeApprovalPermissions">INCOME APPROVAL SETTINGS</button>':''}${errors.map(s=>`<p role="alert">${E(s)} · Some requests could not load.</p>`).join('')}</div><p id="ffApprovalCount" role="status"></p><div id="ffApprovalList"></div><div class="ffApprovalHelp"><p>You see only requests allowed by your existing access. SRs can follow their submissions. Task review needs Manager access plus Tasks Edit; income review needs separate approval permission. Claims keep their assigned reviewer. Access decisions stay with the owner / delegated administrator.</p><p>Approving an access request records a decision. An authorized administrator must separately change the actual permissions.</p></div>`);
   const inbox=$('.ffApprovalControls');
   inbox.insertAdjacentHTML('afterend',`<div class="ffRefReportKpis" id="ffApprovalMetrics">
@@ -182,7 +187,12 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   </div>`);
   const categories=[...new Set(items.map(x=>x.kind))];
   inbox.querySelector('.two').insertAdjacentHTML('beforeend',`<label>Request Type<select id="ffApprovalType"><option value="">All request types</option>${categories.map(kind=>`<option>${E(kind)}</option>`).join('')}</select></label>`);
-  const draw=()=>{const kind=$('#ffApprovalType').value,term=$('#ffApprovalSearch').value.trim().toLowerCase(),state=$('#ffApprovalStatus').value;const states={pending:['Pending','Pending Review','Submitted'],approved:['Approved','Done'],returned:['Returned','Rejected']};const shown=items.filter(x=>(!kind||x.kind===kind)&&(!states[state]||states[state].includes(x.status))).filter(x=>!term||[x.kind,x.title,x.detail,who(x.staff),x.staff].join(' ').toLowerCase().includes(term)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));$('#ffApprovalCount').textContent=shown.length+' request(s)';$('#ffApprovalList').innerHTML=shown.map((x,i)=>`<article class="card"><div class="row"><b>${E(x.title)}</b><span class="ffPerformanceStatus">${E(x.status)}</span></div><p>${E(x.kind)} · ${E(who(x.staff))}</p><p>${E(x.detail)}</p><p class="miniStat">Submitted / updated ${E(stamp(x.date))}</p>${x.reviewedAt?`<p class="miniStat">Reviewed ${E(stamp(x.reviewedAt))} · ${E(who(x.reviewer))}</p>`:x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${safePhoto(x.photo)}${x.location?`<p class="miniStat">Location proof: ${E(x.location.latitude)}, ${E(x.location.longitude)} · ${E(stamp(x.location.capturedAt))}</p>`:''}${x.can?`<button class="primary ffInboxDecision" data-index="${i}" data-status="Done">APPROVE TASK</button><button class="secondary ffInboxDecision" data-index="${i}" data-status="Rejected">RETURN TASK</button>`:''}${x.open?`<button class="secondary ffInboxOpen" data-index="${i}">OPEN REQUEST / REVIEW</button>`:''}</article>`).join('')||'<div class="card empty">No requests match this selection.</div>';bindPhotos();document.querySelectorAll('.ffInboxOpen').forEach(b=>b.onclick=()=>{const x=shown[+b.dataset.index];ctx.open(x.open,x.raw);});document.querySelectorAll('.ffInboxDecision').forEach(b=>b.onclick=async()=>{const request=shown[+b.dataset.index];if(!request||!request.can||b.disabled)return;const controls=[...document.querySelectorAll('.ffInboxDecision')].filter(el=>el.dataset.index===b.dataset.index);controls.forEach(el=>el.disabled=true);try{await ctx.reviewTask(request.id,b.dataset.status);await approvals();}catch(e){alert(e.message);controls.forEach(el=>el.disabled=false);}});};
+  const draw=()=>{const kind=$('#ffApprovalType').value,term=$('#ffApprovalSearch').value.trim().toLowerCase(),state=$('#ffApprovalStatus').value;const states={pending:['Pending','Pending Review','Submitted'],approved:['Approved','Done'],returned:['Returned','Rejected']};const shown=items.filter(x=>(!kind||x.kind===kind)&&(!states[state]||states[state].includes(x.status))).filter(x=>!term||[x.kind,x.title,x.detail,who(x.staff),x.staff].join(' ').toLowerCase().includes(term)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));$('#ffApprovalCount').textContent=shown.length+' request(s)';$('#ffApprovalList').innerHTML=shown.map((x,i)=>`<article class="card"><div class="row"><b>${E(x.title)}</b><span class="ffPerformanceStatus">${E(x.status)}</span></div><p>${E(x.kind)} · ${E(who(x.staff))}</p><p>${E(x.detail)}</p><p class="miniStat">Submitted / updated ${E(stamp(x.date))}</p>${x.reviewedAt?`<p class="miniStat">Reviewed ${E(stamp(x.reviewedAt))} · ${E(who(x.reviewer))}</p>`:x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${safePhoto(x.photo)}${x.location?`<p class="miniStat">Location proof: ${E(x.location.latitude)}, ${E(x.location.longitude)} · ${E(stamp(x.location.capturedAt))}</p>`:''}${x.can?`<button class="primary ffInboxDecision" data-index="${i}" data-status="Done">APPROVE TASK</button><button class="secondary ffInboxDecision" data-index="${i}" data-status="Rejected">RETURN TASK</button>`:''}${x.canClose?`<button type="button" class="primary" data-review-closure="${i}">Review closure</button>`:''}${x.open?`<button class="secondary ffInboxOpen" data-index="${i}">OPEN REQUEST / REVIEW</button>`:''}</article>`).join('')||'<div class="card empty">No requests match this selection.</div>';bindPhotos();document.querySelectorAll('.ffInboxOpen').forEach(b=>b.onclick=()=>{const x=shown[+b.dataset.index];ctx.open(x.open,x.raw);});document.querySelectorAll('.ffInboxDecision').forEach(b=>b.onclick=async()=>{const request=shown[+b.dataset.index];if(!request||!request.can||b.disabled)return;const controls=[...document.querySelectorAll('.ffInboxDecision')].filter(el=>el.dataset.index===b.dataset.index);controls.forEach(el=>el.disabled=true);try{await ctx.reviewTask(request.id,b.dataset.status);await approvals();}catch(e){alert(e.message);controls.forEach(el=>el.disabled=false);}});
+   document.querySelectorAll('[data-review-closure]').forEach(button=>button.onclick=()=>{
+    const request=shown[Number(button.dataset.reviewClosure)];
+    if(request?.canClose)reviewClosure(request.closure);
+   });
+  };
   $('#ffApprovalType').onchange=draw;$('#ffApprovalStatus').onchange=draw;$('#ffApprovalSearch').oninput=draw;$('#ffApprovalReload').onclick=approvals;
   if($('#ffApprovalPermissions'))$('#ffApprovalPermissions').onclick=()=>ctx.open('access');if($('#ffIncomeApprovalPermissions'))$('#ffIncomeApprovalPermissions').onclick=()=>ctx.open('incomeLedger');draw();
  }
@@ -222,6 +232,46 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   const close=window.FFH_OVERLAY?.(overlay,()=>overlay.remove())||(()=>overlay.remove());
   overlay.querySelector('[data-close]').onclick=close;
   return overlay;
+ }
+ async function submitClosure(action,target,reason){
+  const {data,error}=await sb.rpc('ffh_outlet_closure',{action,request_id:target,reason_text:reason});
+  if(error)throw Error(error.message);
+  return data;
+ }
+ function reviewClosure(request){
+  const actor=me(), overlay=outletDialog('Review outlet closure',`<p><strong>${E(request.outlet_name)}</strong> · ${E(request.outlet_code)}</p>
+    <p>${E(request.reason)}</p><p>Approval hides the outlet and blocks new sales immediately. Report exclusions apply from the following day (MYT).</p>
+    <form class="form"><label>Decision note (required for rejection)<textarea name="reason" maxlength="1000"></textarea></label>
+    <div class="two"><button class="primary" name="decision" value="approve">Approve closure</button><button class="secondary" name="decision" value="reject">Reject closure</button></div><p role="status"></p></form>`);
+  const form=overlay.querySelector('form'), status=overlay.querySelector('[role=status]');
+  form.onsubmit=async event=>{
+   event.preventDefault();
+   if(me()!==actor||!ctx.may('outlets'))return;
+   const action=event.submitter.value,reason=form.elements.reason.value.trim();
+   if(action==='reject'&&!reason){status.textContent='Enter the rejection reason.';return;}
+   const buttons=form.querySelectorAll('button');buttons.forEach(b=>b.disabled=true);
+   try{
+    await submitClosure(action,request.id,reason);
+    if(me()!==actor||!overlay.isConnected)return;
+    overlay.querySelector('[data-close]').click();
+    if(ctx.page()==='approvals')await approvals();
+   }catch(error){status.textContent=error.message;buttons.forEach(b=>b.disabled=false);}
+  };
+ }
+ function requestClosure(outlet){
+  const actor=me(),overlay=outletDialog('Request outlet closure',`<p><strong>${E(outlet.name)}</strong> · ${E(outlet.code)}</p>
+    <form class="form"><label>Reason<textarea name="reason" required maxlength="1000"></textarea></label>
+    <button type="submit" class="primary">Send for approval</button><p role="status"></p></form>`);
+  const form=overlay.querySelector('form'),status=overlay.querySelector('[role=status]');
+  form.onsubmit=async event=>{
+   event.preventDefault();
+   if(me()!==actor)return;
+   const button=event.submitter;button.disabled=true;
+   try{
+    await submitClosure('request',outlet.id,form.elements.reason.value.trim());
+    if(me()===actor&&overlay.isConnected)status.textContent='Request submitted. Check Approval Inbox for the decision.';
+   }catch(error){status.textContent=error.message;button.disabled=false;}
+  };
  }
  async function historyPage(selection={}){
   const id=me(), turn=++ticket;
@@ -396,7 +446,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     </div><div class="ffRefOutletDetailsActions">
     ${canEdit?'<button type="button" class="ffRefButton" id="ffOutletEdit">Edit / Update Listing</button>':''}
     <button type="button" class="ffRefButton" id="ffOutletIssue">Report Issue</button>
-    ${canEdit?'':'<button type="button" class="ffRefButton" id="ffOutletClosure">Request Closure</button>'}
+    ${o.active?'<button type="button" class="ffRefButton" id="ffOutletClosure">Request Closure</button>':''}
    <button type="button" class="ffRefButton" id="ffOutletViewActivity">◷ Visit / Activity History</button>
    </div></div></section><details id="ffOutletActivity" class="ffRefPanel ffRefManage"><summary>Outlet Activity (${events.length})</summary>
    <p>${skus.size} delivered SKU(s) in selected dates</p>${[...skus].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([sku,amount])=>`<p>${E(sku)} · ${ctx.rm(amount)}</p>`).join('')}
@@ -404,7 +454,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    $('#ffOutletViewActivity').onclick=()=>{const activity=$('#ffOutletActivity');activity.open=!activity.open;if(activity.open)activity.scrollIntoView({block:'nearest'});};
    $('#ffOutletEdit')?.addEventListener('click',()=>edit(o));
    $('#ffOutletIssue').onclick=()=>window.ffFindings?.outletFinding('Outlet issue',o);
-   $('#ffOutletClosure')?.addEventListener('click',()=>window.ffFindings?.outletFinding('Outlet closure',o));
+   $('#ffOutletClosure')?.addEventListener('click',()=>requestClosure(o));
   };
   const fillStaff=()=>{
    const staff=$('#ffOutletStaff'),old=staff.value,zone=$('#ffOutletZone').value;
@@ -599,7 +649,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     ${o?.active?'<button type="button" class="secondary" data-closure-request>Request closure</button>':''}
     <button type="button" class="secondary" data-inactive-list>View inactive outlets</button>`);
    popup.querySelector('[data-closure-request]')?.addEventListener('click',()=>{
-    popup.querySelector('[data-close]').click();window.ffFindings?.outletFinding('Outlet closure',o);
+    popup.querySelector('[data-close]').click();requestClosure(o);
    });
    popup.querySelector('[data-inactive-list]').onclick=()=>{
     popup.querySelector('[data-close]').click();$('#ffOutletStatus').value='Inactive';fill();jump('#ffOutletCount');

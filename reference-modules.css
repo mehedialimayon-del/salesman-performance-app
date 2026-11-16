@@ -676,3 +676,23 @@ html body #app .app main.wrap:has(#manualOutlet) :is(.card,.outletGroup,label,.f
 html body #app .app main.wrap :is(#outForm,#manualOutlet) :is(input,select,.ffSelectTrigger) {min-width:0;max-width:100%;width:100%;box-sizing:border-box;}
 html body #app .app main.wrap :is(#outForm,#manualOutlet) .ffSelectTrigger {display:flex!important;align-items:center;gap:.35rem;}
 html body #app .app main.wrap :is(#outForm,#manualOutlet) .ffSelectTrigger .ffSelectStaffLabel {white-space:normal;overflow-wrap:anywhere;}
+
+#app .ffRefProposalPage {gap:.55rem;}
+#app .ffRefProposalPage .ffProposalBanners thead {display:none;}
+#app .ffRefProposalPage .ffProposalBanners tbody tr td {padding:.26rem;border:0;}
+#app .ffRefProposalPage .ffProposalBanners td[hidden] {display:none!important;}
+#app .ffRefProposalPage .ffRefOutletViewport:has(.ffProposalBanners) {max-height:min(66dvh,48rem);}
+html body #app .app main .ffRefProposalPage button.ffProposalBanner {display:grid!important;place-items:center;box-sizing:border-box;width:100%!important;max-width:100%;min-height:0!important;aspect-ratio:2.68/1;padding:0!important;overflow:hidden;border:1px solid #e48338!important;border-radius:11px!important;background:#190c05!important;}
+#app .ffProposalBanner img {display:block;width:100%;height:100%;object-fit:contain;}
+#app .ffProposalCategoryPanel button,#app .ffProposalShortcuts button {background:linear-gradient(145deg,#142b42,#090a0d);border-color:#63a0c7;}
+#app .ffProposalCategoryPanel button:nth-child(even),#app .ffProposalShortcuts button:nth-child(even) {background:linear-gradient(145deg,#48200d,#140904);border-color:#e5863d;}
+#app .ffRefProposalPage .ffProposalDetailActions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
+#app .ffRefProposalPage .ffProposalDetailActions button {min-width:0;white-space:normal;}
+#app .ffCataloguePage :is(.productCard,.categoryTile),#app .ffCatalogueInner .productCard {min-width:0;border-color:#ef8136;box-shadow:inset 0 0 12px #e76e2022,0 2px 7px #e76e202d;}
+#app :is(.ffCataloguePage,.ffCatalogueInner) .productCard:nth-child(even) {background:linear-gradient(155deg,#112334,#070709 65%)!important;}
+#app :is(.ffCataloguePage,.ffCatalogueInner) .productCard:nth-child(odd) {background:linear-gradient(155deg,#331807,#080605 65%)!important;}
+#app .ffContactCategories button {min-width:0;overflow-wrap:anywhere;box-shadow:inset 0 0 12px #ff842022,0 2px 8px #ed70212b!important;}
+@media(max-width:440px) {
+ #app .ffDashboardFrame>.dashRange {gap:.3rem;padding:.2rem 0!important;}
+ #app .ffDashboardFrame>.dashRange :is(input,button,.ffSelectTrigger) {min-height:32px!important;min-width:0;padding:.25em .45em!important;}
+}

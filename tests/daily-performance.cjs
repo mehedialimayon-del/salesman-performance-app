@@ -20,3 +20,14 @@ model=R.build(context,{from:'2026-10-20',to:'2026-10-20',zone:'A'});assert.equal
 const cmp=Compare.build({month:'2026-10',asOf:'2026-10-20',today:'2026-10-20',ids:people.filter(D.seller).map(p=>p.id),people,sales:D.rows(c,people.filter(D.seller).map(p=>p.id)),baselines:[],target:()=>50000,planning:()=>50000});assert.equal(cmp.current,8000,'dashboard includes synthetic zone total once');
 const over={...c,updates:[update('later','S1',100,200)]};s=D.summary(over,['S1'],'2026-10-20','2026-10-20');assert.equal(s.ordered,100,'delivery of older orders does not inflate today keyed sales');assert.equal(s.delivered,200);
 console.log('PASS daily totals replace legacy lines; product and zone no double count; own/team income; signed quantity and PO events; expiry; zero/new SR; report/dashboard integration');
+{
+ const closed={status:'Approved',outlet_sr_id:'S1',outlet_code:'X',effective_on:'2026-10-21'};
+ const sale=(sr,date,amount)=>({sr,date,outletCode:'X',status:'Delivered',deliveredAmount:amount,orderAmount:amount,qty:5});
+ const fixture={people,sales:[sale('S1','2026-10-20',100),sale('S1','2026-10-21',200),sale('S2','2026-10-21',300)],closures:[closed]};
+ assert.equal(D.summary(fixture,['S1','S2'],'2026-10-20','2026-10-21').delivered,400);
+ assert.equal(D.coverageRows(fixture,['S1']).length,1);
+ const incentive={sr:'S1',startDate:'2026-10-01',endDate:'2026-10-31',groups:[{mode:'sales',target:200,reward:50}]};
+ assert.equal(D.rewards(fixture,[incentive],'S1','2026-10',E).length,0);
+ assert.equal(D.summary({...fixture,closures:[{...closed,status:'Rejected'}]},['S1'],'2026-10-21','2026-10-21').delivered,200);
+ console.log('PASS approved outlet cutoff preserves pre-closure sales, isolates duplicate codes across SRs and excludes linked incentive sales');
+}

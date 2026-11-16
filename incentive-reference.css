@@ -1,68 +1,31 @@
-/* Original Incentives body sits between the shared LIVE ticker and navigation. */
-html body #app .app>main.wrap:has(>.ffIncentiveArtwork) {
-  width:100%!important;max-width:760px!important;margin:0 auto!important;padding:0!important;
-  height:auto!important;min-height:0!important;flex:1 1 0!important;overflow:auto!important;
-  container-type:inline-size;
-}
-#app main:has(>.ffIncentiveArtwork)>.head {display:none!important;}
-#app .ffIncentiveArtwork {
-  position:relative;height:100%;min-height:0;width:100%;color:white;
-  background:#030201 url('incentive-assets/incentive-reference.webp') center/100% 100% no-repeat;
-  font:650 2.55cqw/1.1 'Arial Narrow',Roboto,Arial,sans-serif;
-}
-#app .ffIncentiveArtwork .ffIncSlot {position:absolute;box-sizing:border-box;min-width:0;}
-html body #app .app main .ffIncentiveArtwork :is(button,input,select).ffIncSlot {
-  margin:0!important;padding:0 .25em!important;min-width:0!important;min-height:0!important;
-  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
-  color:#fff!important;-webkit-text-fill-color:#fff!important;font:inherit!important;
-}
-#app .ffIncentiveArtwork .ffIncSlot:is(select,input) {appearance:none;color-scheme:dark;}
-#app .ffIncentiveArtwork option {background:#110801;color:white;}
-#app .ffIncentiveArtwork .ffIncMetric {
-  display:grid;place-items:center;line-height:1;white-space:nowrap;font-size:3.45cqw;
-}
-#app .ffIncentiveArtwork button.ffIncTap {opacity:0;}
-#app .ffIncentiveArtwork .ffIncTap:is(:focus-visible,:active,[aria-pressed=true]) {
-  opacity:1;outline:1px solid #ffe48c;outline-offset:-2px;box-shadow:inset 0 0 1em #f90!important;
-  color:transparent!important;-webkit-text-fill-color:transparent!important;
-}
-#app .ffIncentiveArtwork .ffIncTap * {visibility:hidden;}
-#app .ffIncentiveArtwork .ffIncTally {font-size:3.65cqw;font-weight:800;}
-#app .ffIncentiveArtwork .ffIncRows {overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#fa921e #080403;}
-html body #app .app main .ffIncentiveArtwork button.ffIncRow {
-  width:100%;min-height:32.5%;display:grid;grid-template-columns:23% minmax(0,1fr) 23% 4%;
-  align-items:center;gap:.45em;text-align:left;margin:0 0 .45em!important;padding:.45em!important;
-  border:1px solid #d98228!important;border-radius:2.5cqw!important;background:linear-gradient(115deg,#221004,#030201 50%)!important;
-  box-shadow:inset 0 0 .7em #c9651b55!important;color:#fff!important;font:inherit!important;
-}
-#app .ffIncRow .ffIncCover {height:100%;min-height:4.6em;overflow:hidden;border-radius:.75em;background:#100803;display:grid;place-items:center;}
-#app .ffIncCover img {width:100%;height:100%;max-height:16cqw;object-fit:contain;display:block;}
-#app .ffIncRow b {display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#app .ffIncRow small {display:block;font-size:.83em;line-height:1.15;color:white;}
-#app .ffIncRow .ffIncFigures {display:grid;gap:.3em;}
-#app .ffIncFigures small {border:1px solid #45ba47;border-radius:.65em;padding:.35em;white-space:nowrap;}
-#app .ffIncRow .ffIncArrow {color:#ff890e;font-size:1.9em;}
-#app .ffIncentiveArtwork .ffIncSummary,#app .ffIncentiveArtwork .ffIncTop {margin:0;display:grid;align-content:stretch;overflow:auto;}
-#app .ffIncSummary div,#app .ffIncTop li {display:flex;align-items:center;justify-content:space-between;gap:.5em;border-bottom:1px solid #623e1e;padding:.11em .2em;}
-#app .ffIncSummary dd {margin:0;}
-#app .ffIncTop {padding:0;list-style:none;}
-#app .ffIncTop span {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#app .ffIncTop strong {white-space:nowrap;color:#ffb039;}
-#app .ffIncEmpty {text-align:center;padding:1em;}
-#app .ffIncNotice {top:99%;left:3%;right:3%;color:#fff6cf;background:#100603;z-index:1;}
+#app .ffIncentiveArtwork {display:grid;gap:.5rem;padding:.4rem;min-width:0;color:#fff;background:#050403;font:650 clamp(10px,2.8vw,14px)/1.25 var(--ff-ref-font);}
+#app .ffIncFilters {padding:.45rem;gap:.35rem;}
+#app .ffIncFilters :is(input,select) {box-sizing:border-box;min-width:0;width:100%;min-height:32px!important;padding:.24em .45em!important;}
+#app .ffIncMetrics strong {white-space:normal;overflow-wrap:anywhere;}
+#app .ffIncTabs button[aria-pressed=true] {background:linear-gradient(#ff9e29,#a64007)!important;border-color:#ffd076!important;color:#fff!important;}
+#app .ffIncListing header {display:flex;align-items:center;justify-content:space-between;gap:.4rem;padding:.4rem;}
+#app .ffIncListing header h2 {margin:0;font-size:1.15em;min-width:0;}
+#app .ffIncRows {min-height:12rem;max-height:42dvh;overflow:auto;overscroll-behavior:contain;padding:.35rem;scrollbar-color:#ed7c29 #080403;}
+#app .ffIncEmpty {text-align:center;margin:0;padding:1.2em;}
+html body #app .app main .ffIncentiveArtwork button.ffIncRow {display:grid;grid-template-columns:22% minmax(0,1fr) minmax(4rem,24%) auto;align-items:center;gap:.35em;text-align:left;width:100%;margin:0 0 .45em!important;padding:.45rem!important;border:1px solid #527a9f!important;border-radius:10px!important;background:#122334!important;color:#fff!important;font:inherit!important;}
+html body #app .app main .ffIncentiveArtwork button.ffIncRow:nth-child(even) {background:#31190b!important;border-color:#a75724!important;}
+#app .ffIncRow small {display:block;font-size:.86em;overflow-wrap:anywhere;}
+#app .ffIncCover img {display:block;width:100%;max-height:5.5rem;object-fit:contain;border-radius:7px;}
+#app .ffIncFigures {display:grid;gap:.25em;}
+#app .ffIncFigures small {padding:.3em;border:1px solid #4fa15b;border-radius:6px;}
+#app .ffIncArrow {color:#ff9a37;}
+#app .ffIncSummaries {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem;}
+#app .ffIncSummaries section {padding:.38rem;min-width:0;}
+#app .ffIncSummaries h2 {font-size:1.05em;margin:0 0 .4em;}
+#app :is(.ffIncSummary,.ffIncTop) {margin:0;padding:0;list-style:none;}
+#app .ffIncSummary div,#app .ffIncTop li {display:flex;justify-content:space-between;gap:.3em;padding:.22em;border-bottom:1px solid #673c20;overflow-wrap:anywhere;}
+#app .ffIncSummary dd {margin:0;text-align:right;color:#ffb071;}
+#app .ffIncNotice {margin:0;color:#ffca8d;}
 #app .ffIncNotice:empty {display:none;}
 #app .ffIncEditor :is(fieldset,.ffRewardGroup) {border:1px solid #d67921;border-radius:10px;padding:10px;margin:8px 0;min-width:0;}
 #app .ffIncEditor #ffRewardPosterPreview img {max-height:220px;object-fit:contain;width:100%;background:#080402;border-radius:8px;}
 #app .ffIncHistory {color:white;background:#120903;border:1px solid #ff9127;border-radius:10px;width:min(94vw,620px);max-height:80dvh;margin:auto;}
 #app .ffIncHistory::backdrop {background:#000b;}
 body:has(.ffIncentiveArtwork) :is(#orb,#nudge,#aiHello) {display:none!important;}
-#app .ffIncNoEdit {background:#030201;border-radius:1.5em;}
 #app .ffRewardGroup label:has(select[data-k=skus]) {min-width:0;}
 #app .ffRewardGroup label:has(select[data-k=skus]) .ffSelectTrigger {width:100%;}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffIncentiveArtwork button.ffIncTap {
-  background:transparent!important;border:0!important;box-shadow:none!important;
-  color:transparent!important;-webkit-text-fill-color:transparent!important;font-size:0!important;
-}
-html body.ffGlowOn #app .app.ffBlackGlow main.wrap .ffIncentiveArtwork button.ffIncTap:is(:active,:focus-visible,[aria-pressed=true]) {
-  outline:1px solid #ffe46c!important;outline-offset:-2px;
-}

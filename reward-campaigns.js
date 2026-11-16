@@ -34,30 +34,36 @@ function list(){
  const filters=lastFilters.get(viewer.id)||{month:ctx.today().slice(0,7),zone:manager?(viewer.zone||''):(viewer.zone||''),staff:'',scheme:'',search:'',view:'product'};
  if(filters.zone&&!zones.includes(filters.zone))filters.zone='';
  lastFilters.set(viewer.id,filters);
- const slot=(tag,attrs,body,x,y,w,h)=>`<${tag} ${attrs} style="left:${x/7.16}%;top:${(y-157)/12.11}%;width:${w/7.16}%;height:${h/12.11}%">${body}</${tag}>`;
- const tap=(attrs,label,x,y,w,h)=>slot('button',`type="button" class="ffIncSlot ffIncTap" ${attrs} aria-label="${label}"`,label,x,y,w,h);
- const select=(id,label,x,y,w,h)=>slot('select',`id="${id}" aria-label="${label}" class="ffIncSlot" data-ff-picker="native"`,'',x,y,w,h);
+ const button=(attrs,label)=>`<button type="button" class="ffRefButton" ${attrs}>${label}</button>`;
+ const select=(id,label)=>`<label><span>${label}<select id="${id}" data-ff-picker="native"></select></span></label>`;
  const opts=(values,all)=>'<option value="">'+E(all)+'</option>'+values.map(([value,label])=>`<option value="${E(value)}">${E(label)}</option>`).join('');
  const zoneName=z=>z==='PRIMARY'?'KL Zone':z;
  ctx.shell(ctx.back('Incentives')+`<section class="ffRewardDetail ffIncentiveArtwork" aria-label="Incentives">
-   <input id="ffRewardMonth" type="month" aria-label="Month" class="ffIncSlot" style="left:14.6%;top:8.14%;width:30.4%;height:3.1%" value="${E(filters.month)}">
-   ${select('ffRewardZone','Zone',457,256,209,36)}
-   ${select('ffRewardStaff','Sales Representative',104,329,223,34)}
-   ${select('ffRewardProduct','Product / Scheme',456,329,214,34)}
-   ${[97,273,448,626].map((x,i)=>slot('strong',`class="ffIncSlot ffIncMetric" aria-label="${['SR Target','Total Sales','Achievement','Total Incentive'][i]}"`,'',x-80,458,160,34)).join('')}
-   ${tap('data-reward-view="staff"','SR Incentive',10,514,216,51)}
-   ${tap('data-reward-view="product"','Product Incentive',237,514,241,51)}
-   ${tap('data-reward-view="rules"','Scheme &amp; Rules',487,514,216,51)}
-   <input id="ffRewardSearch" type="search" aria-label="Search product, SKU or category" placeholder="Search product (SKU / name / category)…" value="${E(filters.search)}" class="ffIncSlot" style="left:11.6%;top:35.1%;width:84%;height:3%">
-   ${slot('span','id="ffRewardHeading" class="ffIncSlot ffIncTally" aria-live="polite"','',425,645,86,31)}
-   ${may()?tap('id="ffRewardCreate"','Add Scheme',545,639,161,43):slot('span','class="ffIncSlot ffIncNoEdit" aria-hidden="true"','',545,639,161,43)}
-   ${slot('div','id="ffRewardRows" class="ffIncSlot ffIncRows" tabindex="0" aria-label="Incentive schemes"','',10,691,694,389)}
-   ${slot('dl','id="ffRewardSummary" class="ffIncSlot ffIncSummary"','',74,1136,265,150)}
-   ${slot('ol','id="ffRewardTop" class="ffIncSlot ffIncTop"','',404,1138,294,145)}
-   ${tap('data-reward-export="xlsx"','Download Excel',10,1305,226,52)}
-   ${tap('data-reward-export="pdf"','Download PDF',250,1305,216,52)}
-   ${tap('id="ffRewardHistory"','Incentive History',484,1305,221,52)}
-   <p id="ffRewardFeedback" class="ffIncSlot ffIncNotice" role="status"></p>
+   <div class="ffRefPanel ffRefFields ffIncFilters">
+    <label><span>Month<input id="ffRewardMonth" type="month" value="${E(filters.month)}"></span></label>
+    ${select('ffRewardZone','Zone')}${select('ffRewardStaff','Sales Representative')}${select('ffRewardProduct','Product / Scheme')}
+   </div>
+   <div class="ffRefReportKpis ffIncMetrics">
+    ${[['◎','SR Target','green'],['▥','Total Sales','gold'],['%','Achievement','blue'],['◆','Total Incentive','red']].map(([icon,label,color])=>
+    `<div class="ffRefMetric" data-color="${color}"><i aria-hidden="true">${icon}</i><span>${label}</span><strong class="ffIncMetric"></strong></div>`).join('')}
+   </div>
+   <div class="ffRefExports ffIncTabs">
+    ${button('data-reward-view="staff"','SR Incentive')}${button('data-reward-view="product"','Product Incentive')}${button('data-reward-view="rules"','Scheme &amp; Rules')}
+   </div>
+   <label class="ffRefSearch"><i aria-hidden="true">⌕</i><input id="ffRewardSearch" type="search" aria-label="Search product, SKU or category" placeholder="Search product (SKU / name / category)…" value="${E(filters.search)}"></label>
+   <section class="ffRefPanel ffIncListing">
+    <header><h2><span id="ffRewardViewTitle">Product-wise Incentive Scheme</span> <small id="ffRewardHeading" aria-live="polite"></small></h2>
+     ${may()?button('id="ffRewardCreate"','＋ Add Scheme'):''}</header>
+    <div id="ffRewardRows" class="ffIncRows" tabindex="0" aria-label="Incentive schemes"></div>
+   </section>
+   <div class="ffIncSummaries">
+    <section class="ffRefPanel"><h2>Product Incentive Summary</h2><dl id="ffRewardSummary" class="ffIncSummary"></dl></section>
+    <section class="ffRefPanel"><h2>Top Incentive Products</h2><ol id="ffRewardTop" class="ffIncTop"></ol></section>
+   </div>
+   <footer class="ffRefExports">
+    ${button('data-reward-export="xlsx" data-color="green"','Download Excel')}${button('data-reward-export="pdf" data-color="blue"','Download PDF')}${button('id="ffRewardHistory"','Incentive History')}
+   </footer>
+   <p id="ffRewardFeedback" class="ffIncNotice" role="status"></p>
  </section>`);
  ctx.bindBack();
  const month=$('#ffRewardMonth'),zone=$('#ffRewardZone'),staff=$('#ffRewardStaff'),scheme=$('#ffRewardProduct'),search=$('#ffRewardSearch');
@@ -111,6 +117,7 @@ function list(){
    const amount=n=>C.round(n).toLocaleString('en-MY');
    const sum=(rr,key)=>rr.reduce((n,r)=>n+r[key],0);
    document.querySelectorAll('.ffIncMetric').forEach((el,i)=>{el.textContent=[money(target),money(sales),stat(sales,target),money(earned)][i];});
+   $('#ffRewardViewTitle').textContent={staff:'SR Incentive',product:'Product-wise Incentive Scheme',rules:'Scheme & Rules'}[filters.view];
    $('#ffRewardHeading').textContent='('+rows.length+')';
    $('#ffRewardRows').innerHTML=rows.map(({x,g,label,sku,earned,got,goal})=>`<button type="button" class="ffIncRow ffRewardCover" data-reward="${E(x.id)}">
      <span class="ffIncCover">${safeImage(x.image)||'<small>No cover photo</small>'}</span>

@@ -78,6 +78,32 @@
     new MutationObserver(filter).observe(panel,{subtree:true,attributes:true,attributeFilter:['class']});
   }
 
+  function arrangeProposals(page) {
+    const table = page.querySelector('#ffProposalRows');
+    if (!table) return;
+    const records = new Map((page.ffProposalRecords || []).map(item => [String(item.id), item]));
+    for (const button of table.querySelectorAll('[data-proposal-id]')) {
+      if (button.classList.contains('ffProposalBanner')) continue;
+      const record = records.get(button.dataset.proposalId);
+      if (!record) continue;
+      const label = button.textContent;
+      button.classList.add('ffProposalBanner');
+      button.setAttribute('aria-label', label + (record.file ? ' · PDF available' : ' · Awaiting PDF'));
+      const cells = button.closest('tr').cells;
+      cells[0].colSpan = 4;
+      for (const cell of Array.from(cells).slice(1)) cell.hidden = true;
+      if (record.image && /^(https:\/\/|proposal-assets\/)/i.test(record.image)) {
+        const image = document.createElement('img');
+        image.src = record.image;
+        image.alt = label;
+        image.loading = 'lazy';
+        button.replaceChildren(image);
+      }
+      button.addEventListener('click', () => page.querySelector('#ffProposalDetail')?.scrollIntoView({block:'nearest',behavior:'smooth'}));
+    }
+    page.querySelector('table')?.classList.add('ffProposalBanners');
+  }
+
   function schedule() {
     if (queued) return;
     queued = true;
@@ -89,6 +115,8 @@
       }
       const notifications = app.querySelector('.ffNotificationPage .ffInboxScroller');
       if (notifications) inbox(notifications);
+      const proposals = app.querySelector('.ffRefProposalPage');
+      if (proposals) arrangeProposals(proposals);
     });
   }
   app.addEventListener('click', event => {
