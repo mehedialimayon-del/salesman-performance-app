@@ -253,7 +253,7 @@ window.FFH_REFERENCE_TASKS = (() => {
         const assignee = fields.assignee.value;
         const patch = {
           title:fields.title.value.trim(),assigned_to:assignee,outlet_name:fields.outlet.value.trim() || null,
-          due_date:fields.due.value || null,priority:fields.priority.value,description:fields.description.value.trim()+attachment,
+          due_date:fields.due.value || null,priority:fields.priority.value,description:[fields.description.value.trim(),attachment.trim()].filter(Boolean).join('\n'),
           updated_at:new Date().toISOString()
         };
         if (assignee!==task.to) Object.assign(patch,{status:'Open',done_at:null,proof_photo_url:null,proof_location:null,reviewed_by:null,reviewed_at:null});
