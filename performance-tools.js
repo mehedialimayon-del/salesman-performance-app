@@ -2,7 +2,7 @@
 window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
  'use strict';
  const $=s=>document.querySelector(s), E=ctx.esc, sb=ctx.sb;
- let flushing=null, ticket=0, lastHistory=null, syncFilter={};
+ let flushing=null, ticket=0, lastHistory=null, syncFilter={},syncSettingsOpen=false;
  const me=()=>ctx.user()?.id;
  const key=id=>'ffh_order_outbox_v1_'+id;
  const read=id=>{const raw=localStorage.getItem(key(id));if(!raw)return [];let rows;try{rows=JSON.parse(raw);}catch(e){throw Error('Saved orders could not be read. Keep app data and contact Ayon.');}if(!Array.isArray(rows))throw Error('Saved orders could not be read. Keep app data and contact Ayon.');return rows;};
@@ -87,7 +87,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   const last=localStorage.getItem('ffh_order_sync_time_'+id);
   if(syncFilter.owner!==id)syncFilter={owner:id,status:'',query:''};
   const pending=list.filter(x=>x.state!=='Blocked').length,failed=list.length-pending;
-  const syncedHistory=history(id),visibleOrders=[...list,...syncedHistory];
+  const syncedHistory=history(id).filter(x=>!list.some(p=>p.id===x.id)),visibleOrders=[...list,...syncedHistory];
   const syncCountKey='ffh_order_sync_count_'+id;
   const synced=Math.max(syncedHistory.length,Number(localStorage.getItem(syncCountKey))||0);
   page('offlineSync','Offline Sync',`<div class="ffRefSync ffSyncReference">
@@ -106,9 +106,9 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     </div>
     <button id="ffSyncRetry" class="ffSyncNow" ${flushing||!online()?'disabled':''}><span aria-hidden="true">⟳</span> ${flushing?'SENDING…':'Sync Now'}</button>
     <p id="ffSyncMessage" role="status" aria-live="polite"></p>
-    <details class="ffSyncSettings"><summary><span aria-hidden="true">⚙</span> Sync Settings <b aria-hidden="true">›</b></summary>
+    <details class="ffSyncSettings" ${syncSettingsOpen?'open':''}><summary><span aria-hidden="true">⚙</span> Sync Settings <b aria-hidden="true">›</b></summary>
       <div class="ffSyncSettingsBody"><p>Connection: ${online()?'Online':'Offline'} · Last confirmed send: ${last?E(stamp(last)):'Not recorded on this phone'}</p>
-        <div class="ffRefFields"><label>Order status<select id="ffSyncState"><option value="">All queued orders</option><option value="waiting">Waiting to send</option><option value="blocked">Needs attention</option><option value="synced">Synced history</option></select></label>
+        <div class="ffRefFields"><label>Order status<select id="ffSyncState"><option value="">All orders &amp; history</option><option value="waiting">Waiting to send</option><option value="blocked">Needs attention</option><option value="synced">Synced history</option></select></label>
         <label>Search<input type="search" id="ffSyncSearch" placeholder="Outlet, SKU or staff"></label></div>
         <div id="ffSyncQueue">${visibleOrders.map((x,i)=>`<article class="card ffSyncHistoryCard" data-tone="${x.state==='Blocked'?'red':x.state==='Synced'?'teal':['blue','violet','teal','amber'][i%4]}" data-queued-order="${E(x.id)}"><div class="row"><b>${E(x.order.outletName)}</b><span class="ffPerformanceStatus">${E(x.state==='Blocked'?'Needs attention':x.state==='Synced'?'Synced to cloud':'Saved · waiting to send')}</span></div><p>${E(x.order.sku)} · ${E(x.order.qty)} cartons · ${ctx.rm(x.order.orderAmount)}</p><p>${E(who(x.order.sr))} · ${E(x.order.date)}</p><p class="miniStat">${x.state==='Synced'?'Synced '+E(stamp(x.syncedAt)):'Saved '+E(stamp(x.queuedAt))} · ${E(x.id)}</p>${x.error?`<p role="status">${E(x.error)}</p>`:''}</article>`).join('')||'<div class="card empty">No orders waiting to send on this phone.</div>'}<p id="ffSyncNoMatch" hidden>No orders match these filters.</p></div>
       </div>
@@ -129,8 +129,9 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    $('#ffSyncNoMatch').hidden=!visibleOrders.length||count>0;
   };
   search.oninput=apply;state.onchange=apply;apply();
+  const settings=$('.ffSyncSettings');settings.addEventListener('toggle',()=>{if(settings.isConnected)syncSettingsOpen=settings.open;});
   if(window.ffDaily){const queue=$('.ffSyncSettingsBody');if(queue){queue.insertAdjacentHTML('beforeend',window.ffDaily.outboxHtml());window.ffDaily.bindOutbox();}}
-  $('#ffSyncRetry').onclick=async e=>{e.target.disabled=true;try{await ctx.refreshStaff();await flush(true);}catch(err){if($('#ffSyncMessage'))$('#ffSyncMessage').textContent=err.message;}finally{if(e.target.isConnected)e.target.disabled=false;}};
+  $('#ffSyncRetry').onclick=async e=>{e.target.disabled=true;const message=$('#ffSyncMessage');if(message)message.textContent='Checking saved orders…';try{await ctx.refreshStaff();await flush(true);if(ctx.page()==='offlineSync'){const current=read(id);const status=$('#ffSyncMessage');if(status)status.textContent=current.length?`${current.length} order(s) still require attention. Open Sync Settings for details.`:'All saved orders on this phone have been checked.';}}catch(err){const status=$('#ffSyncMessage');if(status)status.textContent=err.message;}finally{if(e.target.isConnected)e.target.disabled=false;}};
  }
  async function approvals(){
   const id=me(), turn=++ticket;
