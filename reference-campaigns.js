@@ -21,7 +21,7 @@ window.FFH_REFERENCE_CAMPAIGNS = function(root, campaigns, executions, ids, offe
   </div>
   <div class="ffRefPanel ffRefFields">
    <label><span>Activity status<select id="ffRefCpoStatus"><option value="">All statuses</option><option value="Active">Running</option><option>Upcoming</option><option>Expired</option></select></span></label>
-   <label><span>Activity<input id="ffRefCpoSearch" type="search" placeholder="Search activity or product…"></span></label>
+   <label><span>Activity<input id="ffRefCpoSearch" type="search" placeholder="Search activity or product…"></span></label><label><span>From<input type="date" id="ffRefCpoFrom"></span></label><label><span>To<input type="date" id="ffRefCpoTo"></span></label><p role="status" id="ffRefCpoFilterStatus"></p>
   </div>`;
   header.after(toolbar);
   const table = document.createElement('section');
@@ -30,17 +30,22 @@ window.FFH_REFERENCE_CAMPAIGNS = function(root, campaigns, executions, ids, offe
   body.prepend(table);
   const status = toolbar.querySelector('#ffRefCpoStatus'), search = toolbar.querySelector('#ffRefCpoSearch');
   const cards = [...body.querySelectorAll('.ffReferenceCampaign')];
+  const from=toolbar.querySelector('#ffRefCpoFrom'),to=toolbar.querySelector('#ffRefCpoTo'),feedback=toolbar.querySelector('#ffRefCpoFilterStatus');
   function filter() {
+    if(from.value&&to.value&&from.value>to.value){feedback.textContent='Choose a valid date range.';return;}
+    feedback.textContent='';
     const term = search.value.trim().toLowerCase();
     const visible = campaigns.map((c,i)=>({c,i})).filter(({c})=>(!status.value||offerStatus(c)===status.value) &&
-      [c.title,c.product,c.category].join(' ').toLowerCase().includes(term));
+      [c.title,c.product,c.category].join(' ').toLowerCase().includes(term) &&
+      (!from.value||!(c.endDate||c.date)||String(c.endDate||c.date).slice(0,10)>=from.value) &&
+      (!to.value||!(c.startDate||c.date)||String(c.startDate||c.date).slice(0,10)<=to.value));
     const indexes = new Set(visible.map(x=>x.i));
     cards.forEach((card,i)=>card.classList.toggle('ffRefCampaignFiltered',!indexes.has(i)));
     table.querySelector('tbody').innerHTML = visible.map(({c,i})=>`<tr><td><button type="button" class="secondary" data-ref-campaign="${i}">${esc(c.title)}</button></td><td>${esc(c.startDate||c.date||'')} – ${esc(c.endDate||'')}</td><td>${esc(c.product||'—')}</td><td>${esc(offerStatus(c)==='Active'?'Running':offerStatus(c))}</td></tr>`).join('') ||
       '<tr><td colspan="4">No activities match these filters.</td></tr>';
     table.querySelectorAll('[data-ref-campaign]').forEach(button=>button.onclick=()=>cards[Number(button.dataset.refCampaign)]?.scrollIntoView({block:'start',behavior:'smooth'}));
   }
-  status.onchange=search.oninput=filter;
+  status.onchange=search.oninput=from.onchange=to.onchange=filter;
   toolbar.querySelectorAll('[data-campaign-go]').forEach(button=>button.onclick=()=>{
     const page=button.dataset.campaignGo;
     if(page==='activities')table.scrollIntoView({block:'nearest',behavior:'smooth'});

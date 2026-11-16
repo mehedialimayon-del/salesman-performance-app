@@ -67,7 +67,21 @@
    }
   }
   const hero=main.querySelector('.dashHero');
-  if(hero)managerIdentity(hero);
+  if(hero){
+   managerIdentity(hero);
+   if(!main.querySelector('.ffDashboardActions')){
+    const actions=document.createElement('div');
+    actions.className='ffDashboardActions ffRefExports';
+    for(const [name,module] of [['Daily Sales','sales'],['Zero Sales','zero'],['Reports','reports']]){
+     const button=document.createElement('button');
+     button.type='button';button.className='secondary';
+     button.textContent=name;button.dataset.page=module;
+     button.onclick=()=>window.go?.(module);
+     actions.append(button);
+    }
+    hero.after(actions);
+   }
+  }
  }
  function enhance(){
   scheduled=false;

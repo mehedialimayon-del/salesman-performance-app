@@ -543,3 +543,6 @@ html body.ffGlowOn #app .app.ffBlackGlow .ffRefOutletViewport :is([data-ref-outl
 #app .ffChatSearchBar input {width:100%;min-width:0;}
 #app .ffChatSearchBar button {min-height:34px;font-size:.8rem;}
 #app .ffRefSync #ffSyncQueue {max-height:52dvh;overflow:auto;overscroll-behavior:contain;}
+.ffDailyPeriodActions {display:flex;flex-wrap:wrap;gap:.35rem;margin:.4rem 0;}
+#ffRefCpoFilterStatus {grid-column:1/-1;margin:0;}
+#ffRefCpoFilterStatus:empty {display:none;}

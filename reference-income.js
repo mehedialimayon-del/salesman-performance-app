@@ -3,9 +3,15 @@ window.FFH_REFERENCE_INCOME = (() => {
   const headings = ['#', 'Particulars', 'Basis', 'Amount (RM)'];
 
   function breakdown(model) {
-    const salary = model.basic + model.fuel + model.house + model.food + model.fixed;
+    const allowances = [
+      ['▤', 'Fuel allowance', 'Approved monthly allowance', model.fuel],
+      ['▤', 'Housing allowance', 'Approved monthly allowance', model.house],
+      ['▤', 'Food allowance', 'Applicable food allowance', model.food],
+      ['▤', 'Other fixed allowance', 'Monthly setup', model.fixed]
+    ];
     return [
-      ['▣', 'Basic Salary', 'Fixed (monthly)', salary],
+      ['▣', 'Basic Salary', 'Fixed (monthly)', model.basic],
+      ...allowances.filter(row => Number(row[3])),
       ['%', 'Sales Commission', 'Delivered sales', model.comm],
       ['◆', 'Incentive (Campaign)', 'Earned rewards', model.bonus],
       ['◆', 'Incentive (Adjustment)', 'Approved adjustments', model.pos],
@@ -27,7 +33,7 @@ window.FFH_REFERENCE_INCOME = (() => {
       </div>
       <div class="ffRefFive">
         ${metric('▣', 'Total Income', model.total, 'green')}
-        ${metric('▤', 'Salary', rows[0][3], 'blue')}
+        ${metric('▤', 'Salary & Allowances', model.basic + model.fuel + model.house + model.food + model.fixed, 'blue')}
         ${metric('%', 'Commission', model.comm, 'gold')}
         ${metric('◆', 'Incentive', model.pos + model.bonus, 'purple')}
         ${metric('⊖', 'Deduction', model.pen, 'red')}
