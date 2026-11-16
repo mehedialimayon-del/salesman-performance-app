@@ -21,6 +21,16 @@ const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require
  recovered.syncPage();assert(q('#ffSyncQueue').textContent.includes('Synced to cloud'));assert.equal(q('.ffSyncStat.synced strong').textContent,'1');
  failSave=Error('Network unavailable');assert.equal((await ui.queueOrder({...order,id:'S-two'})).pending,true);assert.equal(accepted.length,1);failSave=Object.assign(Error('Attendance required'),{code:'42501'});await ui.flush(true);const calls=saves;await ui.flush();assert.equal(saves,calls,'permission failures never auto retry');ui.syncPage();assert(q('main').textContent.includes('Needs attention'));failSave=null;await ui.flush(true);assert.equal(accepted.length,2);
  connected=false;await ui.queueOrder({...order,id:'S-three'});id='SR2';ui.syncPage();assert(!q('main').textContent.includes('Mango'),'different account cannot see the previous account outbox');connected=true;await ui.flush();assert.equal(accepted.length,2);id='SR1';await ui.flush();assert.equal(accepted.length,3);
+ // Manual Sync must stop if login changes while permission refresh is awaited.
+ connected=false;id='SR1';await ui.queueOrder({...order,id:'S-session-switch'});
+ connected=true;ui.syncPage();
+ const previousRefresh=ctx.refreshStaff,saveCountBeforeSwitch=saves;
+ ctx.refreshStaff=async()=>{id='SR2';};
+ q('#ffSyncRetry').click();await tick();
+ assert.equal(saves,saveCountBeforeSwitch,'Sync Now must not upload a prior account after switching sessions');
+ assert.equal(JSON.parse(w.localStorage.getItem('ffh_order_outbox_v1_SR1')).some(x=>x.id==='S-session-switch'),true,'unsent order must remain saved');
+ ctx.refreshStaff=previousRefresh;id='SR1';await ui.flush();
+ assert.equal(JSON.parse(w.localStorage.getItem('ffh_order_outbox_v1_SR1')).some(x=>x.id==='S-session-switch'),false,'saved order should sync on restored session');
  await assert.rejects(ui.queueOrder({...order,id:'foreign',sr:'SR2'}),/assigned SR/);
  await ui.approvals();assert.equal(w.document.querySelectorAll('.ffInboxDecision').length,0,'SR cannot self approve');assert(!q('main').textContent.includes('Foreign task'));assert(q('main').textContent.includes('Check display'));
  manager=true;id='MANAGER';grant=true;await ui.approvals();assert.equal(w.document.querySelectorAll('.ffInboxDecision').length,2);q('.ffInboxDecision').click();await tick();assert.deepEqual(reviewed,[['t1','Done']]);
