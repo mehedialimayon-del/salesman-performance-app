@@ -37,6 +37,47 @@ const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require
  grant=false;await ui.approvals();assert.equal(w.document.querySelectorAll('.ffInboxDecision').length,0);grant=true;failPermission=true;await ui.approvals();assert.equal(w.document.querySelectorAll('.ffInboxDecision').length,0,'refresh failure must hide direct review');failPermission=false;
  manager=false;id='SR1';await ui.historyPage();q('#ffOutletHistorySelect').value='0';q('#ffOutletHistorySelect').dispatchEvent(new w.Event('change'));assert(q('#ffOutletHistoryDetail').textContent.includes('RM 25.00'));assert(!q('#ffOutletHistoryDetail').textContent.includes('Secret SKU'));assert(q('#ffOutletHistoryDetail').textContent.includes('Display proof'));assert(q('#ffOutletHistoryDetail').textContent.includes('Check display'));
  q('#ffOutletHistoryFrom').value='2026-10-19';q('#ffOutletHistoryFrom').dispatchEvent(new w.Event('change'));assert(q('#ffOutletHistoryDetail').textContent.includes('No recorded activity'));q('#ffOutletHistoryTo').value='2026-10-01';q('#ffOutletHistoryTo').dispatchEvent(new w.Event('change'));assert(q('#ffOutletHistoryDetail').textContent.includes('From date'));
+ // Keep each SR's outlets contiguous and open the selected proposal and performance.
+ manager=true;id='MANAGER';ctx.ids=()=>['SR1','SR2'];grant=true;
+ table.ffh_outlets.push({id:'o3',sr_id:'SR1',outlet_code:'GIANT',outlet_name:'Giant Test',category:'Giant Hypermarket',total_sku:19,active:true},
+  {id:'o4',sr_id:'SR1',outlet_code:'CLOSED',outlet_name:'Closed Test',category:'Giant Hypermarket',active:false});
+ table.ffh_proposal_item_templates=[{chain_key:'01',source_pdf_url:'https://assets.example/1790191455404-lpy3gt-giant-propose-order-form-biscuit.new.pdf',
+  lines:[{code:'4216819',name:'Orange'},{code:'4216819',name:'Orange'}]}];
+ const originalFrom=sb.from,upserts=[];
+ sb.from=tableName=>{
+  const query=originalFrom(tableName);
+  if(tableName==='ffh_catalogue_products'){
+   query.in=(field,values)=>{assert.deepEqual(Array.from(values),['102208']);return query;};
+   query.then=resolve=>resolve({data:[{item_code:'102208',name:'Bisk Club Orange',piece_price:1.25,carton_price:85,image_url:'https://assets.example/orange.jpg'}]});
+  }
+  if(tableName==='ffh_outlets')query.upsert=async rows=>{upserts.push(Array.from(rows));return {error:null};};
+  return query;
+ };
+ await ui.historyPage();
+ assert.deepEqual([...w.document.querySelectorAll('[data-outlet-staff]')].map(row=>row.dataset.outletStaff),['SR1','SR2']);
+ assert.equal(q('#ffOutletHistoryRows').textContent.includes('Closed Test'),false);
+ const giant=[...w.document.querySelectorAll('[data-ref-outlet]')].find(button=>button.textContent.includes('Giant Test'));
+ q('#ffOutletHistorySelect').value=giant.dataset.refOutlet;q('#ffOutletHistorySelect').onchange();
+ q('#ffOutletListing').click();await tick();
+ assert.match(q('[data-sku-result]').textContent,/1 SKUs.*19 recorded/s);
+ assert.match(q('[data-sku-result]').textContent,/Catalogue 102208/);
+ assert.match(q('[data-sku-result]').textContent,/RM 76.80/);
+ q('.ffOutletDialog [data-close]').click();
+ q('#ffOutletHistoryFrom').value='2026-10-01';q('#ffOutletHistoryTo').value='2026-10-31';
+ q('#ffOutletPerformance').click();q('[data-perf="zero"]').click();
+ assert.match(q('[data-perf-rows]').textContent,/Giant Test/);
+ assert.doesNotMatch(q('[data-perf-rows]').textContent,/Closed Test/);
+ q('.ffOutletDialog [data-close]').click();
+ q('#ffOutletMap').click();assert.match(q('.ffOutletDialog a').href,/google.com\/maps\/search.*Giant/);q('.ffOutletDialog [data-close]').click();
+ q('#ffOutletImport').click();
+ const form=q('.ffOutletDialog form');
+ let dataRows=[['code','name','category','totalSku'],['010','Example','Giant Hypermarket','19'],['010','Duplicate','Other','0']];
+ w.ffhEnsureXlsx=async()=>({read:()=>({SheetNames:['Outlets'],Sheets:{Outlets:{}}}),utils:{sheet_to_json:()=>dataRows}});
+ Object.defineProperty(form.elements.file,'files',{value:[{name:'outlets.xlsx',size:200,arrayBuffer:async()=>new ArrayBuffer(0)}]});
+ const submit={preventDefault(){},submitter:form.querySelector('button[type=submit]')};
+ await form.onsubmit(submit);assert.equal(upserts.length,0);assert.match(form.querySelector('[role=status]').textContent,/Duplicate/);
+ dataRows.pop();await form.onsubmit(submit);assert.equal(upserts.length,1);assert.equal(upserts[0][0].sr_id,'SR1');assert.equal(upserts[0][0].outlet_code,'010');
+ sb.from=originalFrom;manager=false;id='SR1';
  failHistory=true;await ui.historyPage();assert(q('main').textContent.includes('History is incomplete'));failPermission=true;await ui.historyPage();assert.equal(q('#ffOutletHistorySelect'),null,'no cache fallback when access refresh fails');
  // Lost-response recovery never overwrites a delivered/corrected row.
  const vm=require('node:vm'),app=fs.readFileSync('app.js','utf8');let duplicate=true,existing={id:'S',sr_id:'SR1',sale_date:'2026-10-19',outlet_code:'O',outlet_name:'KK One',category:'KK',sku:'Mango',qty:1,price:0,order_amount:20,remarks:'',status:'Delivered',delivered_amount:20};

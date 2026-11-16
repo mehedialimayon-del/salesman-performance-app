@@ -186,6 +186,43 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   $('#ffApprovalType').onchange=draw;$('#ffApprovalStatus').onchange=draw;$('#ffApprovalSearch').oninput=draw;$('#ffApprovalReload').onclick=approvals;
   if($('#ffApprovalPermissions'))$('#ffApprovalPermissions').onclick=()=>ctx.open('access');if($('#ffIncomeApprovalPermissions'))$('#ffIncomeApprovalPermissions').onclick=()=>ctx.open('incomeLedger');draw();
  }
+ const outletBrands=[
+  ['01','Giant_Hypermarket',/^giant/],['02','KK_Super_Mart',/^kksuper/],['03','NSK_Grocer',/^nsk/],
+  ['04','MYDIN',/^mydin/],['08','The_Store',/^thestore/],['14','Jaya_Grocer',/^jayagrocer/],
+  ['16','TF_Value_Mart',/^tfvaluemart/],['32','MR_DIY',/^mrdiy/]
+ ];
+ const brand=o=>outletBrands.find(([, ,match])=>[o.category,o.name].some(name=>match.test(String(name||'').toLowerCase().replace(/[^a-z0-9]/g,''))));
+ const https=url=>/^https:\/\//i.test(url||'')?url:'';
+ // Giant uses retailer item codes. These catalogue codes and costs were verified
+ // against the published biscuit proposal's barcode and pack size.
+ const giantBiscuitProposal=new Map([
+  ['4216819',['102208',76.80]],['4216836',['102209',76.80]],['4216818',['102210',76.80]],
+  ['4216810',['102211',76.80]],['4216834',['102267',187.20]],['4216838',['107676',57.60]],
+  ['4216839',['107677',57.60]],['4216840',['107678',57.60]],['4216841',['107679',57.60]]
+ ]);
+ const staffPortrait=id=>{
+  const profile=window.FFH_STAFF_PHOTOS?.find(id), url=https(profile?.photo_url||ctx.staff(id)?.photo);
+  return `<span class="ffOutletPortrait" data-ff-staff-avatar="${E(id)}" aria-hidden="true">${url?`<img src="${E(url)}" loading="lazy" alt="">`:E(who(id).trim().charAt(0)||'•')}</span>`;
+ };
+ const managerLabel=id=>{
+  const person=ctx.staff(id), mgr=person?.manager_id;
+  return person?.managerLabel|| (mgr ? [who(mgr),mgr].join(' · ') : '');
+ };
+ const outletLogo=o=>{
+  const chain=brand(o),src=chain?'proposal-assets/'+chain[0]+'_'+chain[1]+'.png':
+   /^econsave/i.test(o.category||o.name)?'https://econsave.com.my/wp-content/uploads/2019/11/EconsaveLogo-FA.png':'';
+  return src?`<img class="ffOutletBrand" src="${E(src)}" loading="lazy" referrerpolicy="no-referrer" alt="">`:'';
+ };
+ function outletDialog(title,body){
+  const overlay=document.createElement('div');
+  overlay.className='globalSearchOverlay ffInsetDialog ffOutletDialog';
+  overlay.innerHTML=`<section class="globalSearchBox" role="dialog" aria-modal="true" aria-label="${E(title)}">
+  <header class="row"><h2>${E(title)}</h2><button type="button" class="secondary" data-close>Close</button></header>${body}</section>`;
+  document.body.append(overlay);
+  const close=window.FFH_OVERLAY?.(overlay,()=>overlay.remove())||(()=>overlay.remove());
+  overlay.querySelector('[data-close]').onclick=close;
+  return overlay;
+ }
  async function historyPage(selection={}){
   const id=me(), turn=++ticket;
   page('outletHistory','Outlet Management','<div class="card" role="status">Loading assigned outlets and history…</div>');
@@ -209,7 +246,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   const chains=[...new Set(outlets.map(o=>o.category).filter(Boolean))].sort();
   const selectOptions=(values,label)=>'<option value="">'+label+'</option>'+values.map(([value,text])=>`<option value="${E(value)}">${E(text)}</option>`).join('');
   page('outletHistory','Outlet Management',`<section class="ffRefOutlet">
-   <div class="ffRefPanel ffRefFields">
+   <div class="ffRefPanel ffRefFields ffOutletCompactFilters">
      <div class="ffRefOutletDates"><span>Date Range</span>
       <div><input id="ffOutletHistoryFrom" type="date" aria-label="From date" value="${E(selection.day||'')}"><input id="ffOutletHistoryTo" type="date" aria-label="To date" value="${E(selection.day||'')}"></div>
      </div>
@@ -236,7 +273,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
      <label class="ffRefSearch"><i aria-hidden="true">⌕</i><input type="search" id="ffOutletHistorySearch" aria-label="Search outlets" placeholder="Search outlet / code / chain"></label>
     </header>
     <details class="ffRefOutletFilters ffRefManage"><summary>Outlet status / select by name</summary>
-    <label class="ffRefSearch">Outlet status<select id="ffOutletStatus"><option value="">All statuses</option><option>Active</option><option>Inactive</option><option>Issue</option></select></label>
+    <label class="ffRefSearch">Outlet status<select id="ffOutletStatus"><option value="">Active and issues</option><option>Active</option><option>Inactive</option><option>Issue</option></select></label>
     <label class="ffRefSearch">Assigned Outlet<select id="ffOutletHistorySelect"></select></label></details>
     <div class="ffRefOutletViewport"><table><thead><tr><th>Outlet</th><th>Chain</th><th>SR</th><th>Listing</th><th>Last Proof</th><th>Status</th></tr></thead><tbody id="ffOutletHistoryRows"></tbody></table></div>
    </section>
@@ -268,17 +305,27 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   const fill=()=>{
    const term=$('#ffOutletHistorySearch').value.trim().toLowerCase(),old=select.value;
    const zone=$('#ffOutletZone').value,staff=$('#ffOutletStaff').value,chain=$('#ffOutletChain').value,status=$('#ffOutletStatus').value;
-   const list=outlets.map((o,i)=>({o,i})).filter(({o})=>(!zone||ctx.staff(o.sr)?.zone===zone)&&(!staff||staff===o.sr)&&(!chain||chain===o.category)&&(!status||status===state(o))&&
+   const scoped=outlets.map((o,i)=>({o,i})).filter(({o})=>(!zone||ctx.staff(o.sr)?.zone===zone)&&(!staff||staff===o.sr)&&(!chain||chain===o.category)&&
     (!term||[o.name,o.code,o.category,who(o.sr)].join(' ').toLowerCase().includes(term)));
+   const list=scoped.filter(({o})=>status?status===state(o):o.active)
+    .sort((a,b)=>who(a.o.sr).localeCompare(who(b.o.sr))||a.o.sr.localeCompare(b.o.sr)||a.o.name.localeCompare(b.o.name));
    filtered=list;
-   const counts=[list.length,list.filter(({o})=>o.active).length,list.filter(({o})=>!o.active).length,list.filter(({o})=>onIssue(o)).length];
+   const counts=[scoped.length,scoped.filter(({o})=>o.active).length,scoped.filter(({o})=>!o.active).length,scoped.filter(({o})=>onIssue(o)).length];
    document.querySelectorAll('.ffRefOutlet > .ffRefReportKpis .ffRefMetric strong').forEach((el,i)=>{el.textContent=counts[i];});
    $('#ffOutletCount').textContent='Outlet List ('+list.length+')';
    select.innerHTML=selectOptions(list.map(({o,i})=>[i,o.name+' ('+o.code+') · '+who(o.sr)]),'Choose an outlet');
    select.value=list.some(v=>String(v.i)===old)?old:list.length?String(list[0].i):'';
    if(select.value)draw();else $('#ffOutletHistoryDetail').innerHTML='<section class="ffRefPanel"><h2>Outlet Details</h2><p class="ffRefHint">No outlet selected.</p></section>';
-   $('#ffOutletHistoryRows').innerHTML=list.map(({o,i})=>`<tr><td><button class="secondary" type="button" data-ref-outlet="${i}">${E(o.name)}<small>${E(o.code)}</small></button></td><td>${E(o.category||'—')}</td><td>${E(who(o.sr))}</td><td>${E(o.totalSku??'—')}</td><td>${E(lastVisit(o))}</td><td><span class="ffRefStatus" data-status="${state(o)}">${state(o)}</span></td></tr>`).join('')||
-     '<tr><td colspan="6">No outlets match this selection.</td></tr>';
+   let group='', groupIndex=0;
+   $('#ffOutletHistoryRows').innerHTML=list.map(({o,i})=>{
+    const groupStart=group!==o.sr;
+    group=o.sr;
+    if(groupStart)groupIndex++;
+    const manager=managerLabel(o.sr);
+    return (groupStart?`<tr class="ffOutletGroup" data-tone="${groupIndex%2?'blue':'orange'}" data-outlet-staff="${E(o.sr)}"><th colspan="6" scope="rowgroup">${staffPortrait(o.sr)}<span><b>${E(who(o.sr))}</b> · ${E(o.sr)}${manager?`<small>Manager · ${E(manager)}</small>`:''}</span></th></tr>`:'')+
+    `<tr class="ffOutletRecord"><td><button class="secondary" type="button" data-ref-outlet="${i}" aria-pressed="${String(select.value===String(i))}">${outletLogo(o)}<span>${E(o.name)}<small>${E(o.code)}</small></span></button></td>
+     <td>${E(o.category||'—')}</td><td>${E(o.sr)}</td><td>${E(o.totalSku??'—')}</td><td>${E(lastVisit(o))}</td><td><span class="ffRefStatus" data-status="${state(o)}">${state(o)}</span></td></tr>`;
+   }).join('')||'<tr><td colspan="6">No outlets match this selection.</td></tr>';
    document.querySelectorAll('[data-ref-outlet]').forEach(button=>button.onclick=()=>{
      select.value=button.dataset.refOutlet;
      draw();
@@ -320,13 +367,15 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   }
   const draw=()=>{
    const o=outlets[+select.value];if(select.value===''||!o)return;
+   document.querySelectorAll('[data-ref-outlet]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.refOutlet===select.value)));
    lastHistory={sr:o.sr,code:o.code};const from=$('#ffOutletHistoryFrom').value,to=$('#ffOutletHistoryTo').value;
    if(from&&to&&from>to){$('#ffOutletHistoryDetail').textContent='From date must be before To date.';return;}
    const range=d=>(!from||String(d||'').slice(0,10)>=from)&&(!to||String(d||'').slice(0,10)<=to);
    const match=r=>r.sr_id===o.sr&&(r.outlet_code?String(r.outlet_code)===String(o.code):r.outlet_name===o.name&&outlets.filter(v=>v.sr===o.sr&&v.name===o.name).length===1);
-   const sales=data[0].filter(match).filter(r=>range(r.sale_date)),events=[];
+   const saleDay=r=>window.FFH_DAILY_CORE?.deliveryDay({date:r.sale_date,deliveredAt:r.delivered_at,status:r.status})||r.sale_date;
+   const sales=data[0].filter(match).filter(r=>range(saleDay(r))),events=[];
    let total=0,pending=0;const skus=new Map();
-   sales.forEach(r=>{if(r.status==='Delivered'){total+=+r.delivered_amount||0;if(r.sku)skus.set(r.sku,(skus.get(r.sku)||0)+(+r.delivered_amount||0));}else if(r.status==='Pending Delivery')pending+=+r.order_amount||0;events.push({date:r.sale_date,title:r.status+' · '+(r.sku||'Daily outlet summary'),detail:(+r.qty||0)+' cartons · Order '+ctx.rm(r.order_amount)+' · Delivered '+ctx.rm(r.delivered_amount),remarks:r.remarks});});
+   sales.forEach(r=>{if(r.status==='Delivered'){total+=+r.delivered_amount||0;if(r.sku)skus.set(r.sku,(skus.get(r.sku)||0)+(+r.delivered_amount||0));}else if(r.status==='Pending Delivery')pending+=+r.order_amount||0;events.push({date:saleDay(r),title:r.status+' · '+(r.sku||'Daily outlet summary'),detail:(+r.qty||0)+' cartons · Order '+ctx.rm(r.order_amount)+' · Delivered '+ctx.rm(r.delivered_amount),remarks:r.remarks});});
    data[1].filter(r=>r.assigned_to===o.sr&&r.outlet_name===o.name&&outlets.filter(v=>v.sr===o.sr&&v.name===o.name).length===1).filter(r=>range(r.created_date||r.created_at)).forEach(r=>events.push({date:r.created_date||r.created_at,title:'Task · '+r.title+' · '+r.status,detail:r.description,remarks:r.reviewed_at?'Reviewed '+stamp(r.reviewed_at):'',photo:r.proof_photo_url}));
    data[2].filter(match).filter(r=>range(r.execution_date)).forEach(r=>events.push({date:r.execution_date,title:'CPO / Promotion · '+r.status,detail:r.remarks,photo:r.photo_url}));
    data[5].filter(r=>String(r.payload?.outlet_code)===String(o.code)&&r.payload?.outlet_staff_id===o.sr&&range(r.created_at)).forEach(r=>events.push({date:r.created_at.slice(0,10),title:r.category+' · '+r.title,detail:r.payload.description,photo:r.payload.photo}));
@@ -334,10 +383,11 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    $('#ffOutletHistoryDetail').innerHTML=`<section class="card ffRefPanel">
     <header class="ffRefListHead"><h2>▣ Outlet Details</h2><div><span class="ffRefStatus" data-status="${state(o)}">${state(o)}</span></div></header>
     <div class="ffRefOutletDetailBody"><div>
-     <h3>${E(o.name)}</h3><dl>
+     <h3>${outletLogo(o)}${E(o.name)}</h3><dl>
       <div><dt>Chain</dt><dd>${E(o.category||'—')}</dd></div>
       <div><dt>Outlet Code</dt><dd>${E(o.code)}</dd></div>
-      <div><dt>Assigned SR</dt><dd>${E(who(o.sr))}</dd></div>
+      <div><dt>Assigned SR</dt><dd>${staffPortrait(o.sr)} ${E(who(o.sr))}</dd></div>
+      <div><dt>Manager / Zone</dt><dd>${E([managerLabel(o.sr),ctx.staff(o.sr)?.zone].filter(Boolean).join(' · ')||'—')}</dd></div>
       <div><dt>Listing / SKU</dt><dd>${E(o.totalSku??'—')}</dd></div>
       <div><dt>Last Proof</dt><dd>${E(lastVisit(o))}</dd></div>
       <div><dt>Delivered</dt><dd>${ctx.rm(total)}</dd></div>
@@ -356,7 +406,16 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    $('#ffOutletIssue').onclick=()=>window.ffFindings?.outletFinding('Outlet issue',o);
    $('#ffOutletClosure')?.addEventListener('click',()=>window.ffFindings?.outletFinding('Outlet closure',o));
   };
-  $('#ffOutletHistorySearch').oninput=fill;for(const id of ['ffOutletZone','ffOutletStaff','ffOutletChain','ffOutletStatus'])$('#'+id).onchange=fill;select.onchange=draw;$('#ffOutletHistoryFrom').onchange=draw;$('#ffOutletHistoryTo').onchange=draw;$('#ffOutletHistoryReload').onclick=historyPage;$('#ffOutletVisitReport').onclick=outletSummary;$('#ffOutletManage')?.addEventListener('click',()=>edit(null));$('#ffOutletRequest')?.addEventListener('click',()=>window.ffFindings?.outletFinding('New outlet'));fill();
+  const fillStaff=()=>{
+   const staff=$('#ffOutletStaff'),old=staff.value,zone=$('#ffOutletZone').value;
+   const visible=ids.filter(sid=>!zone||ctx.staff(sid)?.zone===zone);
+   staff.innerHTML=selectOptions(visible.map(sid=>[sid,who(sid)]),'All SRs');
+   staff.value=visible.includes(old)?old:'';
+   fill();
+  };
+  $('#ffOutletHistorySearch').oninput=fill;
+  $('#ffOutletZone').onchange=fillStaff;
+  for(const filter of ['ffOutletStaff','ffOutletChain','ffOutletStatus'])$('#'+filter).onchange=fill;select.onchange=draw;$('#ffOutletHistoryFrom').onchange=draw;$('#ffOutletHistoryTo').onchange=draw;$('#ffOutletHistoryReload').onclick=historyPage;$('#ffOutletVisitReport').onclick=outletSummary;$('#ffOutletManage')?.addEventListener('click',()=>edit(null));$('#ffOutletRequest')?.addEventListener('click',()=>window.ffFindings?.outletFinding('New outlet'));fill();
   function outletSummary(){
    const from=$('#ffOutletHistoryFrom').value,to=$('#ffOutletHistoryTo').value;
    const feedback=$('#ffOutletActionStatus');
@@ -393,18 +452,156 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    else {$('#ffOutletActionStatus').textContent='Select an outlet first.';jump('#ffOutletCount');}
   };
   $('#ffOutletJumpList').onclick=()=>{jump('#ffOutletCount');$('#ffOutletHistorySearch').focus({preventScroll:true});};
-  $('#ffOutletListing').onclick=requireOutlet(o=>canEdit?edit(o):jump('#ffOutletHistoryDetail'));
+  $('#ffOutletListing').onclick=requireOutlet(async o=>{
+   const popup=outletDialog('Listing / SKU',`<p>${outletLogo(o)} ${E(o.name)} · ${E(o.code)}</p><div data-sku-result role="status">Loading proposal SKUs…</div>`);
+   const result=popup.querySelector('[data-sku-result]');
+   const key=brand(o)?.[0];
+   if(!key){result.textContent='No proposal template is linked to this chain.';return;}
+   try{
+    const {data,error}=await sb.from('ffh_proposal_item_templates').select('lines,source_pdf_url').eq('chain_key',key).maybeSingle();
+    if(error)throw error;
+    const lines=Array.isArray(data?.lines)?[...new Map(data.lines.filter(row=>String(row?.code||'').trim()).map(row=>[String(row.code).trim(),row])).values()]:[];
+    const sameBiscuitVersion=key==='01'&&/\/(?:1790191455404-lpy3gt|1790185318847-e1yd7w)-giant-propose-order-form-biscuit\.new\.pdf(?:$|\?)/i.test(data?.source_pdf_url||'');
+    const catalogueCode=row=>{
+     const code=String(row.code||'').trim();
+     return key==='01'?(giantBiscuitProposal.get(code)?.[0]||code):code;
+    };
+    const codes=[...new Set(lines.map(catalogueCode))];
+    const products=new Map();
+    for(let i=0;i<codes.length;i+=80){
+     const {data:catalogue,error}=await sb.from('ffh_catalogue_products').select('item_code,name,piece_price,carton_price,image_url')
+      .eq('active',true).in('item_code',codes.slice(i,i+80)).order('id');
+     if(error)throw error;
+     for(const product of catalogue||[])if(!products.has(String(product.item_code)))products.set(String(product.item_code),product);
+    }
+    if(me()!==id||!popup.isConnected)return;
+    const local=new Map(typeof window.ffhCatalogueRows==='function'?window.ffhCatalogueRows().map(product=>[String(product.itemCode),product]):[]);
+    result.innerHTML=`<p>${lines.length} SKUs in the cloud proposal${Number(o.totalSku)>lines.length?` · ${E(o.totalSku)} recorded for this outlet. The remaining SKUs need the updated proposal.`:''}</p>
+     <div class="ffOutletCatalog">${lines.map(line=>{
+      const code=catalogueCode(line),product=products.get(code),cached=local.get(code);
+      const savedImage=String(cached?.image||''),image=https(product?.image_url||savedImage)||(/^catalogue-assets\/[\w./% -]+$/i.test(savedImage)?savedImage:'');
+      const piece=product?.piece_price??(cached?.piecePrice>0?cached.piecePrice:null);
+      const carton=product?.carton_price??(cached?.cartonPrice>0?cached.cartonPrice:null);
+      const proposalCost=sameBiscuitVersion?giantBiscuitProposal.get(String(line.code))?.[1]:null;
+      return `<article>${image?`<img src="${E(image)}" loading="lazy" alt="">`:''}<div><b>${E(product?.name||cached?.name||line.name||line.code)}</b>
+       <small>${E(String(line.code))}${code!==String(line.code)?' · Catalogue '+E(code):''}</small>
+       <span>${product||cached?`Catalogue · Piece ${piece==null?'—':ctx.rm(piece)} · Carton ${carton==null?'—':ctx.rm(carton)}`:'Catalogue match unavailable'}
+       ${proposalCost==null?'':`<small>Proposal carton cost · ${ctx.rm(proposalCost)}</small>`}</span></div></article>`;
+     }).join('')||'<p>No SKUs saved for this proposal.</p>'}</div>`;
+   }catch(error){if(popup.isConnected&&me()===id)result.textContent=error.message||'Could not load the listing.';}
+  });
   const openActivity=()=>{const activity=$('#ffOutletActivity');if(activity){activity.open=true;jump('#ffOutletActivity');}else jump('#ffOutletHistoryDetail');};
   $('#ffOutletVisits').onclick=requireOutlet(openActivity);
   $('#ffOutletTopIssue').onclick=requireOutlet(o=>window.ffFindings?.outletFinding('Outlet issue',o));
   $('#ffOutletAssignment').onclick=()=>{if(canEdit)ctx.manageOutlets();else{select.closest('details').open=true;select.focus();}};
-  $('#ffOutletImport')?.addEventListener('click',()=>ctx.manageOutlets());
-  $('#ffOutletPerformance').onclick=requireOutlet(()=>jump('#ffOutletHistoryDetail'));
-  $('#ffOutletTopClosure').onclick=requireOutlet(o=>canEdit?edit(o):window.ffFindings?.outletFinding('Outlet closure',o));
-  $('#ffOutletMap').onclick=requireOutlet(o=>{
-   const query=encodeURIComponent([o.name,o.category,'Malaysia'].filter(Boolean).join(' '));
-   window.open('https://www.google.com/maps/search/?api=1&query='+query,'_blank','noopener');
+  $('#ffOutletImport')?.addEventListener('click',()=>{
+   const popup=outletDialog('Bulk Import (Excel)',`<form class="form">
+    <label>Sales Representative<select name="staff" required>${selectOptions(ids.map(sid=>[sid,who(sid)]),'Choose SR')}</select></label>
+    <label>Excel or CSV file<input name="file" type="file" required accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label>
+    <p>Columns: code, name, category and totalSku. The first sheet is imported. Matching outlet codes are updated for this SR.</p>
+    <button type="submit" class="primary">Import outlets</button><p role="status"></p></form>`);
+   const form=popup.querySelector('form'),feedback=form.querySelector('[role=status]');
+   form.elements.staff.value=selected()?.sr||$('#ffOutletStaff').value||'';
+   form.onsubmit=async e=>{
+    e.preventDefault();
+    const button=e.submitter, staff=form.elements.staff.value, file=form.elements.file.files[0];
+    if(!file||!ids.includes(staff)||me()!==id)return;
+    button.disabled=true;
+    try{
+     if(!/\.(xlsx|csv)$/i.test(file.name))throw Error('Choose an Excel (.xlsx) or CSV file.');
+     if(file.size>10*1024*1024)throw Error('Choose a file of 10 MB or less.');
+     if(typeof window.ffhEnsureXlsx!=='function')throw Error('Excel reader is unavailable. Refresh and retry.');
+     const workbookAPI=await window.ffhEnsureXlsx();
+     const bytes=await file.arrayBuffer();
+     const workbook=workbookAPI.read(bytes,{type:'array'});
+     const sheet=workbook.Sheets[workbook.SheetNames[0]];
+     const [head,...records]=workbookAPI.utils.sheet_to_json(sheet,{header:1,raw:false,defval:'',blankrows:false});
+     const columns=(head||[]).map(text=>String(text).toLowerCase().replace(/[^a-z]/g,''));
+     const fields={code:columns.indexOf('code'),name:columns.indexOf('name'),category:columns.indexOf('category'),totalSku:columns.indexOf('totalsku')};
+     if(Object.values(fields).some(index=>index<0))throw Error('Required headers: code, name, category, totalSku.');
+     if(!records.length||records.length>2000)throw Error('Include 1 to 2,000 outlet rows.');
+     const seen=new Set();
+     const payload=records.map((row,index)=>{
+      const value=key=>String(row[fields[key]]??'').trim(),outlet_code=value('code'),outlet_name=value('name'),category=value('category');
+      const count=value('totalSku'),total_sku=Number(count);
+      if(!outlet_code||outlet_code.length>120||!outlet_name||outlet_name.length>250||!category||category.length>160||!count||!Number.isInteger(total_sku)||total_sku<0||total_sku>999999)throw Error('Check the code, name, category and SKU count on row '+(index+2)+'.');
+      if(seen.has(outlet_code))throw Error('Duplicate outlet code on row '+(index+2)+'.');
+      seen.add(outlet_code);
+      return {sr_id:staff,outlet_code,outlet_name,category,total_sku,updated_at:new Date().toISOString()};
+     });
+     if(me()!==id||!ctx.may('outlets')||!scopedIds().includes(staff)||!popup.isConnected)return;
+     const {error}=await sb.from('ffh_outlets').upsert(payload,{onConflict:'sr_id,outlet_code',defaultToNull:false});
+     if(error)throw Error(error.message);
+     if(me()!==id||!popup.isConnected)return;
+     popup.querySelector('[data-close]').click();
+     if(ctx.page()==='outletHistory')await historyPage({staff});
+     if($('#ffOutletActionStatus'))$('#ffOutletActionStatus').textContent=payload.length+' outlets imported for '+who(staff)+'.';
+    }catch(error){if(popup.isConnected)feedback.textContent=error.message;}
+    finally{button.disabled=false;}
+   };
   });
+  $('#ffOutletPerformance').onclick=()=>{
+   if(result[0].status==='rejected'){
+    outletDialog('Outlet Performance','<p>Sales could not load. Refresh Outlet Management and try again.</p>');
+    return;
+   }
+   const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kuala_Lumpur',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+   const to=$('#ffOutletHistoryTo').value||today;
+   const from=$('#ffOutletHistoryFrom').value||to.slice(0,7)+'-01';
+   if(from>to){outletDialog('Outlet Performance','<p>From date must be on or before To date.</p>');return;}
+   const previous=date=>{
+    const [year,month,day]=date.split('-').map(Number), last=new Date(Date.UTC(year,month-1,0)).getUTCDate();
+    return new Date(Date.UTC(year,month-2,Math.min(day,last))).toISOString().slice(0,10);
+   };
+   const beforeFrom=previous(from),beforeTo=previous(to),current=selected();
+   const scoped=filtered.filter(({o})=>o.active).map(({o})=>{
+    const unique=outlets.filter(v=>v.sr===o.sr&&v.name===o.name).length===1;
+    const matched=data[0].filter(row=>row.sr_id===o.sr&&row.status==='Delivered'&&
+      (row.outlet_code?String(row.outlet_code)===String(o.code):unique&&row.outlet_name===o.name));
+    const period=(start,end)=>matched.filter(row=>{
+     const date=window.FFH_DAILY_CORE?.deliveryDay({date:row.sale_date,deliveredAt:row.delivered_at,status:row.status})||row.sale_date;
+     return date>=start&&date<=end;
+    });
+    const sum=rows=>rows.reduce((n,row)=>n+(+row.delivered_amount||0),0);
+    const previousRows=period(beforeFrom,beforeTo), delivered=sum(period(from,to));
+    return {o,delivered,before:previousRows.length?sum(previousRows):null};
+   });
+   const popup=outletDialog('Outlet Performance',`<p>${E(from)} → ${E(to)} · Prior period ${E(beforeFrom)} → ${E(beforeTo)}</p>
+    <div class="ffOutletPerfTabs"><button class="secondary" data-perf="selected" type="button">Selected outlet</button>
+    <button class="secondary" data-perf="top" type="button">Top outlets</button>
+    <button class="secondary" data-perf="zero" type="button">Zero sales</button>
+    <button class="secondary" data-perf="focus" type="button">Focus outlets</button></div><div class="ffOutletPerfList" data-perf-rows></div>`);
+   const drawPerformance=mode=>{
+    const selection=scoped.filter(row=>mode==='selected'?row.o===current:mode==='zero'?row.delivered<=0:mode==='focus'?row.delivered>0&&row.before!==null&&row.delivered<row.before:true)
+     .sort((a,b)=>mode==='focus'?a.delivered-a.before-(b.delivered-b.before):b.delivered-a.delivered);
+    popup.querySelectorAll('[data-perf]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.perf===mode)));
+    popup.querySelector('[data-perf-rows]').innerHTML=selection.map(({o,delivered,before})=>`<article>
+     <h3>${outletLogo(o)} ${E(o.name)}</h3><p>${staffPortrait(o.sr)} ${E([who(o.sr),managerLabel(o.sr),ctx.staff(o.sr)?.zone].filter(Boolean).join(' · '))}</p>
+     <dl><div><dt>Delivered</dt><dd>${ctx.rm(delivered)}</dd></div><div><dt>Prior period</dt><dd>${before===null?'—':ctx.rm(before)}</dd></div>
+     <div><dt>Difference</dt><dd>${before===null?'—':ctx.rm(delivered-before)}</dd></div></dl></article>`).join('')||'<p>No outlets match this view.</p>';
+   };
+   popup.querySelectorAll('[data-perf]').forEach(b=>b.onclick=()=>drawPerformance(b.dataset.perf));
+   drawPerformance(current?'selected':'top');
+  };
+  $('#ffOutletTopClosure').onclick=()=>{
+   const o=selected();
+   const popup=outletDialog('Outlet Closure / Inactive',`<p>${o?E(o.name):'Select an outlet to request closure.'}</p>
+    ${o?.active?'<button type="button" class="secondary" data-closure-request>Request closure</button>':''}
+    <button type="button" class="secondary" data-inactive-list>View inactive outlets</button>`);
+   popup.querySelector('[data-closure-request]')?.addEventListener('click',()=>{
+    popup.querySelector('[data-close]').click();window.ffFindings?.outletFinding('Outlet closure',o);
+   });
+   popup.querySelector('[data-inactive-list]').onclick=()=>{
+    popup.querySelector('[data-close]').click();$('#ffOutletStatus').value='Inactive';fill();jump('#ffOutletCount');
+   };
+  };
+  $('#ffOutletMap').onclick=()=>{
+   const mapLink=o=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([o.name,o.category,'Malaysia'].filter(Boolean).join(' '));
+   const current=selected();
+   const options=current?[current,...filtered.map(({o})=>o).filter(o=>o!==current)]:filtered.map(({o})=>o);
+   outletDialog('Outlet Mapping',`<div class="ffOutletCatalog">${options.map(o=>`<article>${outletLogo(o)}<div><b>${E(o.name)}</b><small>${E([o.code,who(o.sr)].join(' · '))}</small>
+    <a rel="noopener noreferrer" target="_blank" href="${E(mapLink(o))}">Open in Google Maps</a></div></article>`).join('')||'<p>No outlets match your selected scope.</p>'}</div>`);
+  };
   $('#ffOutletJumpHistory').onclick=requireOutlet(openActivity);
   $('#ffOutletQuickRequest')?.addEventListener('click',()=>$('#ffOutletRequest').click());
   for(const button of document.querySelectorAll('[data-outlet-export]')){

@@ -646,3 +646,33 @@ body .ffItemPicker.ffScopeStaffPicker .ffPickerText:only-child {grid-column:1/-1
 #app .ffAttendanceMetrics [data-tone=red] {--attendance-tone:#ff655d;}
 #app .ffAttendanceMetrics [data-tone=violet] {--attendance-tone:#c985f0;}
 #app .ffAttendanceMetrics>div>*:first-child {color:var(--attendance-tone);font-size:.85em;}
+
+#app .ffRefOutlet .ffOutletCompactFilters {gap:.28em .45em;padding:.36em .48em;}
+#app .ffOutletCompactFilters :is(label,.ffRefOutletDates) {min-width:0;margin:0;font-size:.93em;}
+html body #app .app main .ffOutletCompactFilters :is(input,select,.ffSelectTrigger) {box-sizing:border-box;min-width:0;min-height:32px!important;height:auto!important;max-width:100%;width:100%;padding:.32em .45em!important;font:650 1em/1.1 var(--ff-ref-font)!important;}
+#app .ffRefOutlet .ffRefOutletViewport {max-height:min(52dvh,32em);}
+#app .ffRefOutlet .ffOutletGroup th {background:#11283d;color:#fff;border-bottom:1px solid #4e88a4;padding:.45em;text-align:left;}
+#app .ffRefOutlet .ffOutletGroup[data-tone=orange] th {background:#442211;border-color:#8b4b25;}
+.ffOutletGroup th>span {display:inline-block;vertical-align:middle;margin-left:.35em;}
+.ffOutletGroup small {display:block;color:#ffd2a6;}
+.ffOutletPortrait {display:inline-grid;place-items:center;width:1.9em;height:1.9em;flex:none;overflow:hidden;border:1px solid #f48630;border-radius:50%;color:#fff;vertical-align:middle;background:#171313;}
+.ffOutletPortrait img {width:100%;height:100%;object-fit:cover;}
+.ffOutletBrand {width:3.1em;height:2.2em;flex:none;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:.35em;}
+#app .ffRefOutlet [data-ref-outlet][aria-pressed=true] {box-shadow:inset 0 0 0 1px #ff922b!important;}
+html body .ffOutletDialog .globalSearchBox {min-width:0;max-width:min(52rem,calc(100vw - 24px));background:#100c08;border-color:#e47527;color:#fff;}
+.ffOutletDialog :is(.ffOutletPerfList,.ffOutletCatalog) {display:grid;gap:.55rem;max-height:65dvh;overflow:auto;}
+.ffOutletDialog :is(.ffOutletPerfList,.ffOutletCatalog)>article {padding:.55rem;color:#fff;background:#122436;border:1px solid #416987;border-radius:8px;overflow-wrap:anywhere;}
+.ffOutletDialog :is(.ffOutletPerfList,.ffOutletCatalog)>article:nth-child(even) {background:#321a0b;border-color:#a05427;}
+.ffOutletDialog .ffOutletCatalog article {display:flex;align-items:center;gap:.6rem;}
+.ffOutletDialog .ffOutletCatalog article>img:not(.ffOutletBrand) {width:56px;height:56px;flex:none;object-fit:contain;border-radius:5px;}
+.ffOutletDialog .ffOutletCatalog article :is(small,span,a) {display:block;margin-top:.22em;}
+.ffOutletDialog a {color:#ffad62;}
+.ffOutletDialog .ffOutletPerfTabs {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem;margin:.6rem 0;}
+.ffOutletPerfTabs button[aria-pressed=true] {background:#883800!important;color:#fff;}
+.ffOutletPerfList h3,.ffOutletPerfList p,.ffOutletPerfList dl {margin:.25em 0;}
+.ffOutletPerfList dl>div {display:flex;justify-content:space-between;gap:.55em;}
+.ffOutletPerfList dd {margin:0;text-align:right;}
+html body #app .app main.wrap:has(#manualOutlet) :is(.card,.outletGroup,label,.form) {min-width:0;max-width:100%;box-sizing:border-box;overflow-wrap:anywhere;}
+html body #app .app main.wrap :is(#outForm,#manualOutlet) :is(input,select,.ffSelectTrigger) {min-width:0;max-width:100%;width:100%;box-sizing:border-box;}
+html body #app .app main.wrap :is(#outForm,#manualOutlet) .ffSelectTrigger {display:flex!important;align-items:center;gap:.35rem;}
+html body #app .app main.wrap :is(#outForm,#manualOutlet) .ffSelectTrigger .ffSelectStaffLabel {white-space:normal;overflow-wrap:anywhere;}
