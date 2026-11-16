@@ -37,10 +37,12 @@ async function main() {
   feature.bind(form, 'MTEST', cloud);
   assert.equal(form.querySelectorAll('[name=ffAssignmentFile]').length, 1);
   assert.equal(form.elements.proofMode.value, 'Photo');
-  form.addEventListener('submit', event => {
+  window.document.addEventListener('submit', event => {
+    if (event.target !== form) return;
     event.preventDefault();
+    event.stopImmediatePropagation();
     submittedDescriptions.push(form.elements.description.value);
-  });
+  },true);
 
   form.requestSubmit(submit);
   assert.deepEqual(submittedDescriptions, ['Check shelving']);
@@ -50,6 +52,7 @@ async function main() {
   form.requestSubmit(submit);
   assert.match(form.querySelector('[role=status]').textContent,/supported file/);
   assert.equal(uploadCalls.length, 0);
+  assert.equal(submittedDescriptions.length,1,'invalid attachment does not reach the cloud task handler');
 
   const file = new window.File(['test'], 'instructions.PDF', {type:'application/pdf'});
   setFile(file);

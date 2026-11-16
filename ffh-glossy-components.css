@@ -348,3 +348,65 @@ html body #app .app main.wrap:has(> .head.ffNoScreenBack)
   margin-top:.25em;
   color:#ffbe82;
 }
+
+#app main .ffScopeIdentity {
+  display:flex;
+  grid-column:1/-1;
+  align-items:center;
+  gap:.5rem;
+  min-width:0;
+  padding:.3rem .42rem;
+  border-bottom:1px solid #ff932953;
+  text-align:left;
+}
+#app main .ffScopeIdentity strong,#app main .ffScopeIdentity small {
+  display:block;
+  color:#fff;
+  font-size:clamp(10px,2.8vw,14px);
+  overflow-wrap:anywhere;
+}
+#app main .ffScopeIdentity small {color:#ffc887;font-size:.87em;}
+#app main .ffScopeIdentityPhoto {
+  position:relative;
+  flex:0 0 clamp(29px,8vw,40px);
+  aspect-ratio:1;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border:1px solid #ffac42;
+  border-radius:50%;
+  color:#ffc887;
+  background:#221006;
+}
+#app main .ffScopeIdentityPhoto img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+#app .ffTaskArtwork #ffTaskArtAssignee img {
+  flex:0 0 auto;
+  width:auto;
+  height:86%;
+  aspect-ratio:1;
+  margin-right:.35em;
+  border-radius:50%;
+  border:1px solid #ffaa47;
+}
+#app .ffRefRouteTabs button i {display:block;margin-bottom:.18em;font-size:1.35em;line-height:1;}
+#app .ffRefRoute .ffRefRouteTabs button {min-width:0;white-space:normal;overflow-wrap:normal;}
+#app .ffRouteAssignedTable {width:100%;table-layout:fixed;font:inherit;border-spacing:0;}
+#app .ffRouteAssignedTable :is(th,td) {padding:.32em;overflow-wrap:anywhere;text-align:left;}
+#app .ffRouteAssignedTable th {position:sticky;top:0;z-index:1;}
+html body #app .app main.wrap .ffRouteAssignedTable button[data-finding] {
+  display:block;
+  width:100%;
+  height:auto;
+  min-height:0;
+  text-align:left;
+  padding:.25em .1em!important;
+  margin:0;
+  border:0!important;
+  box-shadow:none!important;
+  background:none!important;
+}
+@media (max-width:420px) {
+  #app .ffRefRoute {gap:.45em;}
+  #app .ffRefRouteTabs button {padding-inline:.24em;}
+  #app .ffRefRouteActions .ffRefButton {font-size:clamp(9px,2.8vw,12px);padding:.32em .2em;}
+}

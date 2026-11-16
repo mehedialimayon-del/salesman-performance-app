@@ -377,12 +377,22 @@ window.FFH_REFERENCE_TASKS = (() => {
           window.FFH_PICK_ITEM({title,selected:selection,items:choices,onSelect,taskArtwork:true,multiple:true});
         };
       };
-      set('#ffTaskArtZone','Select Zone',zones.map(value=>({value,label:zoneName(value)})),selectedZones,
+      set('#ffTaskArtZone','Select Zone',zones.map(value=>({value,label:value===viewer.zone?'My zone · '+zoneName(value):zoneName(value)})),selectedZones,
         !context.managing ? zoneName(viewer.zone) : selectedZones.length===1 ? zoneName(selectedZones[0]) : selectedZones.length ? selectedZones.length+' zones' : 'All permitted zones',
         selection=>{state.zones=selection;state.staff=[];state.scope='team';draw();});
-      set('#ffTaskArtAssignee','Select Staff / SR',zonePeople.map(person=>({value:person.id,label:person.name})),selectedStaff,
+      set('#ffTaskArtAssignee','Select SR or Manager',zonePeople.map(person=>({value:person.id,label:person.name,detail:person.role||''})),selectedStaff,
         !context.managing ? compactName(viewerId) : selectedStaff.length===1 ? compactName(selectedStaff[0]) : selectedStaff.length ? selectedStaff.length+' staff' : 'All permitted staff',
         selection=>{state.staff=selection;state.scope='team';draw();});
+      const id=selectedStaff.length===1?selectedStaff[0]:!context.managing?viewerId:'';
+      const identity=window.FFH_STAFF_PHOTOS?.find(id)||window.FFH_STAFF_PROFILE?.(id);
+      const photo=identity?.photo_url||identity?.photo;
+      if(id&&typeof photo==='string'&&/^https:\/\//i.test(photo)){
+        const image=new Image();
+        image.src=photo;
+        image.alt='';
+        image.addEventListener('error',()=>image.remove(),{once:true});
+        find('#ffTaskArtAssignee').prepend(image);
+      }
     }
     const shortDate = value => value ? value.slice(8,10)+'/'+value.slice(5,7)+'/'+value.slice(0,4) : '';
     function draw() {

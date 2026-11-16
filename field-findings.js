@@ -1,6 +1,13 @@
 window.FFH_CREATE_FINDINGS=function(ctx){'use strict';
 const E=ctx.esc,$=s=>document.querySelector(s);let rows=[],owner='',kind='route',ticket=0,subscription=null,subOwner='';
 const me=()=>ctx.user(),name=id=>ctx.people().find(p=>p.id===id)?.name||id;
+const zoneName=zone=>zone==='PRIMARY'?'KL Zone':zone;
+const routeViews=new Map();
+function findingFeedback(message) {
+ const line=$('#ffFindingStatus')||$('#ffRouteStatus')||$('.ffFindings [role="status"]');
+ if(line){line.textContent=message;return;}
+ popup('Finding unavailable','<p role="alert">'+E(message)+'</p>');
+}
 const safe=url=>{if(!url||typeof url!=='string')return '';try{const u=new URL(url,location.href);return u.protocol==='https:'||u.origin===location.origin?u.href:'';}catch{return '';}};
 const outletIssueTypes=['Expired product','Damaged product','Buyer concern','Sales stopped','New outlet','New listing','Display / availability','Other'];
 const types=['Route assignment','Outlet issue','Outlet closure','Overstock','Slow moving stock','Damage / Expiry','New outlet','Missing product','Price / Promotion','Display / Availability','Other'];
@@ -16,15 +23,17 @@ function draw(){
  if(kind!=='route')return drawCompetitor(list);
  const scopedOutlets=ctx.outlets();
  const people=(ctx.scopePeople?.()||ctx.people()).filter(p=>p.active!==false),zones=[...new Set(people.map(p=>p.zone).filter(Boolean))].sort();
+ const account=me(), ownZone=account?.zone;
+ const view=routeViews.get(account?.id)||{zone:'',staff:'',tab:'all',query:'',date:''};
  const status=(row,id)=>row.states?.[id]?.status||'Pending';
  const isNew=x=>x.category==='New outlet';
  const metric=(icon,label,color)=>`<div class="ffRefMetric" data-color="${color}"><i aria-hidden="true">${icon}</i><span>${label}</span><strong></strong></div>`;
  page('Route Plan',`<div class="ffRefRoute">
    <div class="ffRefPanel ffRefFields">
-    <label><span>Zone<select id="ffRouteZone"><option value="">All permitted zones</option>${zones.map(z=>`<option value="${E(z)}">${E(z)}</option>`).join('')}</select></span></label>
-    <label><span>Sales Representative<select id="ffRouteStaff"></select></span></label>
+    <label><span>Zone<select id="ffRouteZone"><option value="">All permitted zones</option>${zones.map(z=>`<option value="${E(z)}">${E(z===ownZone?'My zone · '+zoneName(z):zoneName(z))}</option>`).join('')}</select></span></label>
+    <label><span>SR / Manager<select id="ffRouteStaff" data-ff-staff-label="compact"></select></span></label>
    </div>
-   <div class="ffFindingToolbar ffRefRouteTabs">${[['all','Route Findings'],['assigned','Assigned Routes'],['issues','Route Issues'],['new','New Outlet']].map(([value,label])=>`<button type="button" class="secondary" data-route-view="${value}" aria-pressed="${value==='all'}">${label}</button>`).join('')}</div>
+   <div class="ffFindingToolbar ffRefRouteTabs">${[['all','⌖','Route Findings'],['assigned','☷','Assigned Routes'],['issues','⚠','Route Issues'],['new','▣','New Outlet']].map(([value,icon,label])=>`<button type="button" class="secondary" data-route-view="${value}" aria-pressed="${value===view.tab}"><i aria-hidden="true">${icon}</i><span>${label}</span></button>`).join('')}</div>
    <div class="ffRefReportKpis">${metric('▣','Total Outlets','green')}${metric('⌖','New Findings','gold')}${metric('⚠','Route Issues','red')}${metric('◷','Pending Action','blue')}</div>
    <label class="ffRefPanel ffRefSearch"><i aria-hidden="true">⌕</i><input id="ffFindingSearch" type="search" placeholder="Search outlet / code / location…" aria-label="Search route findings"></label>
    <div class="ffRefZeroTitle"><h2>Route Findings</h2><button class="primary" id="ffFindingNew">＋ Add Finding</button></div>
@@ -32,28 +41,47 @@ function draw(){
    <div class="ffRefZeroTitle"><h2>Assigned Route &amp; Action</h2><button type="button" class="secondary" id="ffRouteAssign">Assign Route</button></div>
    <div class="ffRefPanel" id="ffRouteAssigned"></div>
    <div class="ffRefRouteActions">
-    <button type="button" class="ffRefButton" id="ffRouteMap">⌖ Route Map</button>
-    <button type="button" class="ffRefButton" id="ffRoutePdf" data-route-export="pdf">▤ Route Report</button>
-    <button type="button" class="ffRefButton" id="ffRouteExcel" data-route-export="xlsx">⇩ Export (Excel)</button>
-    <button type="button" class="ffRefButton" id="ffRouteCalendar">◷ Route Calendar</button>
+    <button type="button" class="ffRefButton" id="ffRouteMap" data-color="gold">⌖ Route Map</button>
+    <button type="button" class="ffRefButton" id="ffRoutePdf" data-color="red" data-route-export="pdf">▤ Route Report</button>
+    <button type="button" class="ffRefButton" id="ffRouteExcel" data-color="green" data-route-export="xlsx">⇩ Export (Excel)</button>
+    <button type="button" class="ffRefButton" id="ffRouteCalendar" data-color="blue">◷ Route Calendar</button>
    </div><p class="ffRefHint" id="ffRouteStatus" role="status"></p>
    <div class="ffFindingToolbar"><button class="secondary" id="ffFindingTrash">♲ Trash</button><label>Finding date<input id="ffFindingDate" type="date"></label></div>
  </div>`);
  const z=$('#ffRouteZone'),staff=$('#ffRouteStaff'),search=$('#ffFindingSearch'),d=$('#ffFindingDate');
- let active='all', shown=[], selectedOutlets=[];
+ z.value=zones.includes(view.zone)?view.zone:'';
+ search.value=view.query;
+ d.value=view.date;
+ let shown=[], selectedOutlets=[];
  const peopleInZone=()=>people.filter(p=>!z.value||p.zone===z.value);
- const fill=()=>{staff.innerHTML='<option value="">All SRs</option>'+peopleInZone().map(p=>`<option value="${E(p.id)}">${E(p.name)}</option>`).join('');};
+ const manager=p=>p.can_manage||String(p.role||'').includes('MANAGER');
+ const fill=selected=>{
+  const scoped=peopleInZone();
+  const options=rows=>rows.map(p=>`<option value="${E(p.id)}">${E(p.name||p.id)}</option>`).join('');
+  const representatives=scoped.filter(p=>!manager(p)), managers=scoped.filter(manager);
+  staff.innerHTML='<option value="">All permitted staff</option>'
+   +(representatives.length?'<optgroup label="Sales representatives">'+options(representatives)+'</optgroup>':'')
+   +(managers.length?'<optgroup label="Managers">'+options(managers)+'</optgroup>':'');
+  staff.value=scoped.some(p=>p.id===selected)?selected:'';
+ };
  const refreshView=()=>{
-  const peopleIds=new Set(peopleInZone().map(p=>p.id)), permitted=id=>staff.value?staff.value===id:!z.value||peopleIds.has(id);
+  const peopleIds=new Set(peopleInZone().map(p=>p.id));
+  const selected=people.find(p=>p.id===staff.value);
+  const team=selected&&manager(selected)?new Set(peopleInZone().filter(p=>p.manager_id===selected.id).map(p=>p.id)):null;
+  const permitted=id=>staff.value?staff.value===id||team?.has(id):!z.value||peopleIds.has(id);
   const query=search.value.toLowerCase().trim();
+  Object.assign(view,{zone:z.value,staff:staff.value,query:search.value,date:d.value});
+  routeViews.set(account?.id,view);
   const relevant=list.filter(x=>(permitted(x.owner_staff_id)||x.recipients.some(permitted))&&(!d.value||x.created_at.slice(0,10)===d.value)&&[x.title,x.category,x.payload?.outlet_name,x.payload?.outlet_code,x.payload?.description,name(x.owner_staff_id)].join(' ').toLowerCase().includes(query));
   const assignments=relevant.flatMap(x=>x.recipients.filter(permitted).map(id=>[x,id]));
   selectedOutlets=scopedOutlets.filter(o=>!o.sr||permitted(o.sr));
   const counts=[new Set(selectedOutlets.map(o=>JSON.stringify([o.sr,o.code||o.name]))).size,relevant.filter(isNew).length,relevant.filter(x=>!isNew(x)&&x.category!=='Route assignment').length,assignments.filter(([x,id])=>status(x,id)!=='Done').length];
   document.querySelectorAll('.ffRefRoute .ffRefMetric strong').forEach((el,i)=>el.textContent=counts[i]);
-  shown=relevant.filter(x=>active==='all'||(active==='new'?isNew(x):active==='issues'?(!isNew(x)&&x.category!=='Route assignment'):x.recipients.some(permitted)));
+  shown=relevant.filter(x=>view.tab==='all'||(view.tab==='new'?isNew(x):view.tab==='issues'?(!isNew(x)&&x.category!=='Route assignment'):x.recipients.some(permitted)));
   $('#ffFindingRows').innerHTML=shown.map(card).join('')||'<p class="ffRefHint">No route findings match these filters.</p>';
-  $('#ffRouteAssigned').innerHTML=assignments.map(([x,id])=>`<button type="button" class="ffRefRouteAssignment" data-finding="${E(x.id)}"><b>${E(x.payload?.outlet_name||x.title)}</b><span>${E(name(id))}</span><small>${E(status(x,id))}</small><span aria-hidden="true">›</span></button>`).join('')||'<p class="ffRefHint">No assigned follow-ups.</p>';
+  $('#ffRouteAssigned').innerHTML='<table class="ffRouteAssignedTable"><thead><tr><th>Outlet / Location</th><th>Assigned To</th><th>Issue / Action</th><th>Status</th></tr></thead><tbody>'+
+    (assignments.map(([x,id])=>`<tr><td><button type="button" data-finding="${E(x.id)}">${E(x.payload?.outlet_name||x.title)}</button></td><td>${E(name(id))}</td><td>${E(x.category||x.title)}</td><td><span class="ffRefStatus" data-status="${E(status(x,id))}">${E(status(x,id))}</span></td></tr>`).join('')||
+     '<tr><td colspan="4">No assigned follow-ups match this selection.</td></tr>')+'</tbody></table>';
   bindCards();
  };
  $('#ffFindingNew').onclick=()=>editor();
@@ -83,25 +111,25 @@ function draw(){
  staff.onchange=d.onchange=refreshView;
  search.oninput=refreshView;
  document.querySelectorAll('[data-route-view]').forEach(button=>button.onclick=()=>{
-  active=button.dataset.routeView;
+  view.tab=button.dataset.routeView;
   document.querySelectorAll('[data-route-view]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
   refreshView();
  });
- fill();
+ fill(view.staff);
  refreshView();
 }
 function drawCompetitor(list){page(kind==='route'?'Route Findings':'Competitor Findings',`<div class="ffFindingToolbar"><button class="primary" id="ffFindingNew">＋ ${kind==='route'?'Add market finding':'Add competitor product'}</button><button class="secondary" id="ffFindingTrash">♲ Trash</button></div><p class="ffFindingIntro">${kind==='route'?'Record outlet conditions, overstock and market opportunities.':'Products missing from our range · prices, origin, process and market demand.'}</p><div class="ffFindingFilters"><input id="ffFindingSearch" type="search" placeholder="Search product, outlet, category or staff…"><input id="ffFindingDate" type="date" aria-label="Finding date"></div><div id="ffFindingRows">${list.map(card).join('')||'<p>No findings yet. Add your first market observation.</p>'}</div>`);$('#ffFindingNew').onclick=()=>editor();$('#ffFindingTrash').onclick=()=>bin();const filter=()=>{const term=$('#ffFindingSearch').value.toLowerCase(),day=$('#ffFindingDate').value;$('#ffFindingRows').innerHTML=list.filter(x=>(!day||x.created_at.slice(0,10)===day)&&JSON.stringify([x.title,x.category,x.payload,name(x.owner_staff_id)]).toLowerCase().includes(term)).map(card).join('')||'<p>No matching findings.</p>';bindCards();};$('#ffFindingSearch').oninput=$('#ffFindingDate').onchange=filter;bindCards();}
 function bindCards(root=document){root.querySelectorAll('[data-finding]').forEach(b=>b.onclick=()=>detail(b.dataset.finding));}
 function editor(item=null){const d=item?.payload||{},competitor=(item?.kind||kind)==='competitor',input=(key,label,type='text')=>`<label>${label}<input name="${key}" type="${type}" ${type==='number'?'min="0" step=".01"':''} value="${E(d[key]??'')}"></label>`,people=ctx.people().filter(p=>p.active!==false),outlets=ctx.outlets();
 const {el,close}=popup(competitor?'Competitor product finding':'Route / market finding',`<form class="form" id="ffFindingForm"><label>${competitor?'Product name':'Finding title'}<input name="title" value="${E(item?.title||'')}" maxlength="200" required></label><label>Category<select name="category">${(competitor?ctx.categories():types).map(c=>`<option ${item?.category===c?'selected':''}>${E(c)}</option>`).join('')}</select></label>${!competitor&&(item?.category==='Outlet issue'||d.issue_type)?`<label>Issue type<select name="issue_type" required><option value="">Choose issue type</option>${outletIssueTypes.map(type=>`<option ${d.issue_type===type?'selected':''}>${E(type)}</option>`).join('')}</select></label>`:''}${!competitor?`<label>Outlet<select name="outlet"><option value="">Choose outlet or enter a new market</option>${outlets.map((o,i)=>`<option value="${i}" ${d.outlet_code===o.code&&(!d.outlet_staff_id||d.outlet_staff_id===o.sr)?'selected':''}>${E(o.name)} · ${E(o.code)}</option>`).join('')}</select></label>`:''}<div class="two">${input('outlet_name',competitor?'Store / market observed':'Outlet / market name')}${input('outlet_code','Outlet code')}${competitor?[input('brand','Brand / company'),input('pack','Pack / carton size'),input('origin','Country of origin'),input('wholesale_price','Company → retailer wholesale RM','number'),input('retail_price','Retailer → consumer price RM','number'),input('cartons_sold','Cartons sold / observed demand','number'),input('sales_period','Sales period / source of estimate')].join(''):input('quantity','Observed stock quantity','number')}${input('due_date','Follow-up due date','date')}</div>${competitor?`<label>Manufacturing / production process<textarea name="process">${E(d.process||'')}</textarea></label>`:''}<label>${competitor?'Product description / why we should develop it':'Finding details / action required'}<textarea name="description" required>${E(d.description||'')}</textarea></label><label>Product / outlet photo<input name="photo" type="file" accept="image/*"></label>${competitor?'<label>Label / production information photo<input name="process_photo" type="file" accept="image/*"></label>':''}<label>Assign reviewers / follow-up task<select name="recipients" multiple>${people.map(p=>`<option value="${E(p.id)}" ${item?.recipients.includes(p.id)?'selected':''}>${E(p.name)} · ${E(p.displayTitle||p.role||'')}</option>`).join('')}</select></label><p class="miniStat">Viewing marks it read. Assigned work stays pending until the reviewer marks it complete.</p><button class="primary" type="submit">SAVE & ASSIGN FINDING</button><p role="status"></p></form>`);const f=el.querySelector('form');f.elements.outlet?.addEventListener('change',()=>{const o=outlets[+f.elements.outlet.value];if(f.elements.outlet.value!==''&&o){f.elements.outlet_name.value=o.name;f.elements.outlet_code.value=o.code;}});window.FFH_STYLE_MULTI_SELECT?.(f.elements.recipients,{title:'Assign finding reviewers'});
-f.onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{const v=new FormData(f),details={...d};const outletValue=v.get('outlet');if(outletValue!==null&&outletValue!==''){const outlet=outlets[Number(outletValue)];if(outlet?.sr)details.outlet_staff_id=outlet.sr;}for(const [k,val]of v)if(!['title','category','recipients','outlet','photo','process_photo'].includes(k))details[k]=val;for(const field of ['photo','process_photo'])if(v.get(field)?.size)details[field]=await ctx.upload(v.get(field),'findings/'+me().id);const {data,error}=await ctx.sb.rpc('ffh_save_finding',{payload:{id:item?.id,version:item?.updated_at,kind:item?.kind||kind,title:v.get('title'),category:v.get('category'),details,recipients:v.getAll('recipients')}});if(error)throw error;close();await refresh();await detail(data);}catch(err){el.querySelector('[role=status]').textContent=err.message;}finally{if(b.isConnected)b.disabled=false;}};}
+f.onsubmit=async e=>{e.preventDefault();const b=e.submitter;if(b)b.disabled=true;try{const v=new FormData(f),details={...d};const outletValue=v.get('outlet');if(outletValue!==null&&outletValue!==''){const outlet=outlets[Number(outletValue)];if(outlet?.sr)details.outlet_staff_id=outlet.sr;}for(const [k,val]of v)if(!['title','category','recipients','outlet','photo','process_photo'].includes(k))details[k]=val;for(const field of ['photo','process_photo'])if(v.get(field)?.size)details[field]=await ctx.upload(v.get(field),'findings/'+me().id);const {data,error}=await ctx.sb.rpc('ffh_save_finding',{payload:{id:item?.id,version:item?.updated_at,kind:item?.kind||kind,title:v.get('title'),category:v.get('category'),details,recipients:v.getAll('recipients')}});if(error)throw error;close();await refresh();await detail(data);}catch(err){el.querySelector('[role=status]').textContent=err.message;}finally{if(b?.isConnected)b.disabled=false;}};}
 const fields=x=>Object.entries(x.payload||{}).filter(([k,v])=>!['photo','process_photo'].includes(k)&&v!==''&&v!==null&&v!==undefined);
 const labels={issue_type:'Issue type',outlet_name:'Store / outlet',outlet_code:'Outlet code',brand:'Brand / company',pack:'Pack / carton size',origin:'Country of origin',wholesale_price:'Company → retailer wholesale (RM)',retail_price:'Retailer → consumer price (RM)',cartons_sold:'Cartons sold / demand',sales_period:'Sales period / source',process:'Production process',description:'Description / action',due_date:'Follow-up due',quantity:'Observed quantity'};
-async function detail(id){let x=mine().find(x=>x.id===id);if(!x){await refresh();x=mine().find(x=>x.id===id);}if(!x)return alert('Finding is unavailable or outside your access.');kind=x.kind;
+async function detail(id){let x=mine().find(x=>x.id===id);if(!x){await refresh();x=mine().find(x=>x.id===id);}if(!x)return findingFeedback('Finding is unavailable or outside your access.');kind=x.kind;
 if(x.recipients.includes(me().id)&&!x.states?.[me().id]?.read_at){const {error}=await ctx.sb.rpc('ffh_finding_receipt',{finding_id:x.id,complete:false});if(error)console.warn(error.message);else{await refresh();x=mine().find(r=>r.id===id)||x;}}
 const own=x.owner_staff_id===me().id;page(x.kind==='competitor'?'Competitor Finding':'Route Finding',`<div class="ffFindingToolbar"><button class="secondary" id="ffFindingList">‹ ALL FINDINGS</button><button class="primary" id="ffFindingPdf">↓ PDF</button>${own?'<button class="secondary" id="ffFindingEdit">Edit / Assign</button><button class="danger" id="ffFindingDelete">Delete</button>':''}</div><article class="card ffFindingDetails"><small>${E(x.category)} · ${E(x.created_at.slice(0,10))}</small><h2>${E(x.title)}</h2><p>Found by ${E(name(x.owner_staff_id))}</p>${['photo','process_photo'].filter(k=>safe(x.payload[k])).map(k=>`<img src="${E(safe(x.payload[k]))}" alt="${k==='photo'?'Product / outlet photo':'Label / production information'}">`).join('')}<dl>${fields(x).map(([k,v])=>`<div><dt>${E(labels[k]||k)}</dt><dd>${E(v)}</dd></div>`).join('')}</dl></article><section class="card"><h3>Assigned follow-up</h3>${x.recipients.map(id=>`<p><b>${E(name(id))}</b> · <span class="${x.states?.[id]?.status==='Done'?'green':'ffPendingPill'}">${E(x.states?.[id]?.status||'Pending')}</span> <small>${x.states?.[id]?.read_at?'✓ Read':'Unread'}</small></p>`).join('')||'<p>No reviewers assigned.</p>'}${x.recipients.includes(me().id)&&x.states?.[me().id]?.status!=='Done'?'<button class="primary" id="ffFindingDone">MARK MY FOLLOW-UP COMPLETE</button>':''}<p role="status" id="ffFindingStatus"></p></section>`);$('#ffFindingList').onclick=()=>open(kind);$('#ffFindingPdf').onclick=async e=>{const button=e.currentTarget;button.disabled=true;try{await ctx.pdf({title:x.title,filename:'Finding-'+x.id+'.pdf',articles:[`<h1>${E(x.title)}</h1><p>${E(x.category)} · ${E(name(x.owner_staff_id))} · ${E(x.created_at.slice(0,10))}</p>${fields(x).map(([k,v])=>`<h3>${E(labels[k]||k)}</h3><p style="white-space:pre-wrap">${E(v)}</p>`).join('')}${['photo','process_photo'].filter(k=>safe(x.payload[k])).map(k=>`<img src="${E(safe(x.payload[k]))}">`).join('')}<h3>Follow-up</h3>${x.recipients.map(id=>`<p>${E(name(id))} · ${E(x.states?.[id]?.status||'Pending')}</p>`).join('')}`]});}catch(err){$('#ffFindingStatus').textContent=err.message;}finally{if(button.isConnected)button.disabled=false;}};
-$('#ffFindingEdit')?.addEventListener('click',()=>editor(x));$('#ffFindingDelete')?.addEventListener('click',async()=>{if(!confirm('Move this finding to Trash? You can restore it later.'))return;const {data,error}=await ctx.sb.from('ffh_findings').delete().eq('id',x.id).select('id');if(error||!data?.length)return alert(error?.message||'Finding was not deleted');await open(kind);});$('#ffFindingDone')?.addEventListener('click',async()=>{const {error}=await ctx.sb.rpc('ffh_finding_receipt',{finding_id:x.id,complete:true});if(error)return alert(error.message);await refresh();await detail(id);});}
-async function bin(){const {data,error}=await ctx.sb.rpc('ffh_owned_bin',{action:'list',entity:'ffh_findings'});if(error)return alert(error.message);const {el,close}=popup('Findings · Trash Bin',(data||[]).map(x=>`<article class="ffBinRow"><b>${E(x.title)}</b><small>${E(x.deleted_at)}</small><button class="primary" data-bin="restore" data-id="${x.id}">UNDO</button><button class="danger" data-bin="purge" data-id="${x.id}">PERMANENT DELETE</button></article>`).join('')||'<p>Trash Bin is empty.</p>');el.querySelectorAll('[data-bin]').forEach(b=>b.onclick=async()=>{if(b.dataset.bin==='purge'&&!confirm('Permanently delete this finding? This cannot be undone.'))return;const {error}=await ctx.sb.rpc('ffh_owned_bin',{action:b.dataset.bin,entity:'ffh_findings',item_id:+b.dataset.id});if(error)return alert(error.message);close();await refresh();draw();await bin();});}
+$('#ffFindingEdit')?.addEventListener('click',()=>editor(x));$('#ffFindingDelete')?.addEventListener('click',async()=>{if(!confirm('Move this finding to Trash? You can restore it later.'))return;const {data,error}=await ctx.sb.from('ffh_findings').delete().eq('id',x.id).select('id');if(error||!data?.length)return findingFeedback(error?.message||'Finding was not deleted');await open(kind);});$('#ffFindingDone')?.addEventListener('click',async()=>{const {error}=await ctx.sb.rpc('ffh_finding_receipt',{finding_id:x.id,complete:true});if(error)return findingFeedback(error.message);await refresh();await detail(id);});}
+async function bin(){const {data,error}=await ctx.sb.rpc('ffh_owned_bin',{action:'list',entity:'ffh_findings'});if(error)return findingFeedback(error.message);const {el,close}=popup('Findings · Trash Bin',(data||[]).map(x=>`<article class="ffBinRow"><b>${E(x.title)}</b><small>${E(x.deleted_at)}</small><button class="primary" data-bin="restore" data-id="${x.id}">UNDO</button><button class="danger" data-bin="purge" data-id="${x.id}">PERMANENT DELETE</button></article>`).join('')||'<p>Trash Bin is empty.</p>');el.querySelectorAll('[data-bin]').forEach(b=>b.onclick=async()=>{if(b.dataset.bin==='purge'&&!confirm('Permanently delete this finding? This cannot be undone.'))return;const {error}=await ctx.sb.rpc('ffh_owned_bin',{action:b.dataset.bin,entity:'ffh_findings',item_id:+b.dataset.id});if(error)return findingFeedback(error.message);close();await refresh();draw();await bin();});}
 async function attachInbox(){try{await refresh();const root=document.querySelector('.ffTaskList');if(!root||document.querySelector('#ffFindingInbox'))return;const list=pending();if(!list.length)return;const section=document.createElement('section');section.id='ffFindingInbox';section.className='card';section.innerHTML='<h3>Findings · Pending follow-up ('+list.length+')</h3>'+list.map(card).join('');root.before(section);bindCards(section);ctx.updateBadges?.();}catch(e){console.warn('Finding inbox',e.message);}}
 return{open,refresh,detail,attachInbox,recovery:outlet=>editor({kind:'route',category:'Route assignment',
  title:('Zero Sales Recovery · '+outlet.name).slice(0,200),

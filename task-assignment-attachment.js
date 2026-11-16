@@ -5,14 +5,14 @@ window.FFH_TASK_ASSIGNMENT_FILES = (() => {
   const allowed = /\.(jpe?g|png|webp|gif|heic|heif|avif|pdf|docx?|xlsx?)$/i;
   const privatePath = /^task-assignments\/[a-z0-9._-]+\/[a-z0-9-]+\.[a-z0-9]+$/;
   const attachmentLine = /(?:^|\r?\n)Assignment attachment:[ \t]*(https:\/\/[^\s]+|task-assignments\/[^\s]+)[ \t]*$/;
-  const forms = new WeakSet();
+  const forms = new WeakMap();
+  document.addEventListener('submit',event=>forms.get(event.target)?.(event),true);
 
   function bind(form, viewerId, cloud) {
     if (!form || !viewerId || !cloud || forms.has(form)) return;
     const proof = form.elements.proofMode?.closest('label');
     const description = form.elements.description;
     if (!proof || !description) return;
-    forms.add(form);
 
     const section = document.createElement('section');
     section.className = 'ffTaskAssignAttachment';
@@ -25,7 +25,7 @@ window.FFH_TASK_ASSIGNMENT_FILES = (() => {
     let uploaded;
     let sending = false;
     let resuming = false;
-    form.addEventListener('submit', async event => {
+    forms.set(form, async event => {
       if (resuming) return;
       const file = input.files?.[0];
       if (!file) {
@@ -77,7 +77,7 @@ window.FFH_TASK_ASSIGNMENT_FILES = (() => {
         sending = false;
         if (submit?.isConnected && !submitted) submit.disabled = previousDisabled;
       }
-    },true);
+    });
   }
 
   async function download(path, cloud) {
