@@ -9,3 +9,14 @@
 #ffAttendanceToday .notice{overflow-wrap:anywhere}
 .ffHistoryPanel .ffHistoryControls>*{min-width:0}
 .ffHistoryPanel .ffHistoryControls input{min-width:0;max-width:100%;box-sizing:border-box}
+
+/* Attendance: keep today's action accessible while history scrolls within its own panel. */
+#ffAttendanceToday{position:relative;z-index:1;min-width:0;max-width:100%;background:#090705;border:1px solid #e7831c;border-radius:14px;padding:10px;box-sizing:border-box;color:#fff}
+#ffAttendanceToday :is(button,input,select,textarea){max-width:100%;box-sizing:border-box}
+#ffAttendanceToday :is(.primary,.secondary):focus-visible{outline:2px solid #fff;outline-offset:2px}
+.ffHistoryPanel{min-width:0;max-width:100%;overflow:hidden;border:1px solid #e7831c;border-radius:14px;background:#090705;color:#fff}
+.ffHistoryPanel .ffHistoryControls{display:flex;flex-wrap:wrap;gap:8px;min-width:0;padding:8px}
+.ffHistoryPanel .ffHistoryControls>*{flex:1 1 130px;max-width:100%;box-sizing:border-box}
+.ffHistoryPanel :is(table,.tableWrap){max-width:100%}
+.ffHistoryPanel .tableWrap{overflow:auto;overscroll-behavior:contain;scrollbar-color:#ff7417 #18120e}
+@media(max-width:480px){#ffAttendanceToday{padding:8px}.ffHistoryPanel .ffHistoryControls{gap:6px}}
