@@ -68,6 +68,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
      // Cloud save has succeeded. Remove the outbox record before updating the
      // in-memory UI so a local rendering error cannot resend a confirmed order.
      write(id,current.filter(x=>x.id!==item.id));
+     try{const countKey='ffh_order_sync_count_'+id;localStorage.setItem(countKey,String((Number(localStorage.getItem(countKey))||0)+1));}catch(error){console.warn('Could not store sync count',error);}
      try{ctx.acceptSale(item.order);}catch(error){console.warn('Cloud order saved; local sales view needs refresh',error);}
      try{localStorage.setItem('ffh_order_sync_time_'+id,new Date().toISOString());}catch(error){console.warn('Could not store last sync time',error);}
     }
@@ -80,14 +81,34 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   try{list=read(id);}catch(e){return page('offlineSync','Offline Sync',`<div class="card" role="alert">${E(e.message)}</div>`);}
   const last=localStorage.getItem('ffh_order_sync_time_'+id);
   if(syncFilter.owner!==id)syncFilter={owner:id,status:'',query:''};
-  page('offlineSync','Offline Sync',`<div class="ffRefSync"><div class="card ffPerformanceIntro"><div class="cardTitle">${online()?'Connection available':'Offline · saved on this phone'}</div><p>New orders are saved here before sending. Only cloud-confirmed orders enter Sales. Delivery confirmation, attendance, photo proof and approvals require a connection.</p><p>Sign in online first. This screen does not enable offline sign-in. Keep app data until pending orders are sent.</p><div class="ffRefExports">
-   ${metric('⇅','Connection',online()?'green':'red',online()?'Online':'Offline')}
-   ${metric('◷','Waiting to Send','gold',list.filter(x=>x.state!=='Blocked').length)}
-   ${metric('⚠','Needs Attention','red',list.filter(x=>x.state==='Blocked').length)}
-  </div><p class="miniStat">${list.length} order(s) waiting · Last order sent: ${last?E(stamp(last)):'No confirmed send on this phone'}</p><button id="ffSyncRetry" class="primary" ${flushing||!online()?'disabled':''}>${flushing?'SENDING…':'RETRY / SEND SAVED ORDERS'}</button><p id="ffSyncMessage" role="status"></p></div><div class="ffRefPanel ffRefFields">
-   <label><span>Order status<select id="ffSyncState"><option value="">All queued orders</option><option value="waiting">Waiting to send</option><option value="blocked">Needs attention</option></select></span></label>
-   <label><span>Search<input type="search" id="ffSyncSearch" placeholder="Outlet, SKU or staff"></span></label></div>
-   <div id="ffSyncQueue">${list.map(x=>`<article class="card" data-queued-order="${E(x.id)}"><div class="row"><b>${E(x.order.outletName)}</b><span class="ffPerformanceStatus">${E(x.state==='Blocked'?'Needs attention':'Saved · waiting to send')}</span></div><p>${E(x.order.sku)} · ${E(x.order.qty)} cartons · ${ctx.rm(x.order.orderAmount)}</p><p>${E(who(x.order.sr))} · ${E(x.order.date)}</p><p class="miniStat">Saved ${E(stamp(x.queuedAt))} · ${E(x.id)}</p>${x.error?`<p role="status">${E(x.error)}</p>`:''}</article>`).join('')||'<div class="card empty">No new orders waiting to send on this phone.</div>'}<p id="ffSyncNoMatch" hidden>No orders match these filters.</p></div></div>`);
+  const pending=list.filter(x=>x.state!=='Blocked').length,failed=list.length-pending;
+  const syncCountKey='ffh_order_sync_count_'+id;
+  const synced=Math.max(0,Number(localStorage.getItem(syncCountKey))||0);
+  page('offlineSync','Offline Sync',`<div class="ffRefSync ffSyncReference">
+    <div class="ffSyncHero" aria-hidden="true"><div class="ffSyncCloud">☁<span>↑↓</span></div><div class="ffSyncPhone">↻</div><div class="ffSyncHeroBase"></div></div>
+    <h2 class="ffSyncHeadline">Work Offline · <em>Sync Later</em></h2>
+    <div class="ffSyncBenefits">
+      <div><i aria-hidden="true">▱</i><span>Create orders offline. Attendance and proof require a connection.</span></div>
+      <div><i aria-hidden="true">☁</i><span>Saved orders can sync automatically when internet is available.</span></div>
+      <div><i aria-hidden="true">⬡</i><span>Only cloud-confirmed orders enter Sales &amp; Reports.</span></div>
+      <div><i aria-hidden="true">ⓘ</i><span>Delivery confirmation, attendance, photo proof and approvals require a connection.</span></div>
+    </div>
+    <div class="ffSyncStats" aria-label="Offline sync summary">
+      <div class="ffSyncStat pending"><i aria-hidden="true">▤</i><strong>${pending}</strong><span>Pending</span></div>
+      <div class="ffSyncStat synced"><i aria-hidden="true">☁</i><strong>${synced}</strong><span>Synced</span></div>
+      <div class="ffSyncStat failed"><i aria-hidden="true">⚠</i><strong>${failed}</strong><span>Failed</span></div>
+    </div>
+    <button id="ffSyncRetry" class="ffSyncNow" ${flushing||!online()?'disabled':''}><span aria-hidden="true">⟳</span> ${flushing?'SENDING…':'Sync Now'}</button>
+    <p id="ffSyncMessage" role="status" aria-live="polite"></p>
+    <details class="ffSyncSettings"><summary><span aria-hidden="true">⚙</span> Sync Settings <b aria-hidden="true">›</b></summary>
+      <div class="ffSyncSettingsBody"><p>Connection: ${online()?'Online':'Offline'} · Last confirmed send: ${last?E(stamp(last)):'Not recorded on this phone'}</p>
+        <div class="ffRefFields"><label>Order status<select id="ffSyncState"><option value="">All queued orders</option><option value="waiting">Waiting to send</option><option value="blocked">Needs attention</option></select></label>
+        <label>Search<input type="search" id="ffSyncSearch" placeholder="Outlet, SKU or staff"></label></div>
+        <div id="ffSyncQueue">${list.map(x=>`<article class="card" data-queued-order="${E(x.id)}"><div class="row"><b>${E(x.order.outletName)}</b><span class="ffPerformanceStatus">${E(x.state==='Blocked'?'Needs attention':'Saved · waiting to send')}</span></div><p>${E(x.order.sku)} · ${E(x.order.qty)} cartons · ${ctx.rm(x.order.orderAmount)}</p><p>${E(who(x.order.sr))} · ${E(x.order.date)}</p><p class="miniStat">Saved ${E(stamp(x.queuedAt))} · ${E(x.id)}</p>${x.error?`<p role="status">${E(x.error)}</p>`:''}</article>`).join('')||'<div class="card empty">No orders waiting to send on this phone.</div>'}<p id="ffSyncNoMatch" hidden>No orders match these filters.</p></div>
+      </div>
+    </details>
+    <div class="ffSyncSafety"><i aria-hidden="true">ⓘ</i><span>Sign in online first. This screen does not enable offline sign-in. Keep app data until pending orders are sent.</span></div>
+  </div>`);
   const state=$('#ffSyncState'),search=$('#ffSyncSearch'),byId=new Map(list.map(record=>[record.id,record]));
   state.value=syncFilter.status;search.value=syncFilter.query;
   const apply=()=>{
