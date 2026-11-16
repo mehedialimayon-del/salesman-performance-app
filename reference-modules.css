@@ -557,3 +557,29 @@ html body.ffGlowOn #app .app.ffBlackGlow .ffRefOutletViewport :is([data-ref-outl
 #app .ffTrackingCard .ffRefTrackingFields{min-width:0}
 #app .ffTrackingCard .ffRefTrackingFields>*{min-width:0;max-width:100%}
 @media(max-width:390px){#app .ffRefTrackRoster [data-tracking-staff]{gap:.35em;padding:.55em .35em}#app .ffTrackingCard .ffRefTrackingFields{gap:5px}}
+
+/* Approval Inbox: premium fixed-screen review workspace. */
+#app .app:has(.ffApprovalControls) main{display:flex;flex-direction:column;min-height:0}
+#app .ffApprovalControls{flex:0 0 auto;margin:0 0 7px;padding:10px;border:1px solid #e66b17;border-radius:13px;background:#101010;box-shadow:inset 0 1px 0 #ff741733}
+#app .ffApprovalControls>.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+#app .ffApprovalControls>.two label{min-width:0;margin:0;color:#fff;font-weight:650}
+#app .ffApprovalControls>.two label:last-child{grid-column:auto}
+#app .ffApprovalControls>.two :is(input,select){display:block;width:100%;min-width:0;box-sizing:border-box;min-height:38px;margin-top:5px;padding:6px 8px;border:1px solid #a94a11;border-radius:9px;background:#080808;color:#fff}
+#app .ffApprovalControls>button{min-height:36px;margin:7px 5px 0 0;padding:7px 10px;border:1px solid #e66b17;border-radius:9px;background:#27150d;color:#fff;font-weight:750;white-space:normal}
+#app .ffApprovalControls>button:first-of-type{background:#e9610b}
+#app .ffApprovalControls :is(input,select,button):focus-visible,#app #ffApprovalList button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#app #ffApprovalMetrics{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:0 0 7px}
+#app #ffApprovalMetrics>*{min-width:0;padding:7px 4px;border:1px solid #8a3c12;border-radius:10px;background:#18110d;overflow-wrap:anywhere}
+#app #ffApprovalMetrics strong{font-size:clamp(13px,3vw,20px);color:#fff}
+#app #ffApprovalMetrics span{font-size:10px;line-height:1.2;color:#fff}
+#app #ffApprovalCount{flex:0 0 auto;margin:0 0 5px;color:#ff7417;font-weight:800}
+#app #ffApprovalList{flex:1 1 auto;min-height:130px;overflow-y:auto;overscroll-behavior:contain;scrollbar-color:#ff7417 #101010;padding:2px 4px 10px}
+#app #ffApprovalList>.card{margin:5px 0;padding:10px;border:1px solid #9c4615;border-left:3px solid #ff7417;border-radius:11px;background:#14100e;color:#fff}
+#app #ffApprovalList>.card .row{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap}
+#app #ffApprovalList>.card :is(p,b){overflow-wrap:anywhere}
+#app #ffApprovalList .ffPerformanceStatus{background:#40200f;color:#fff;border-color:#e66b17}
+#app #ffApprovalList button{min-height:35px;border-radius:9px}
+#app .ffApprovalHelp{flex:0 0 auto;max-height:85px;overflow-y:auto;border-top:1px solid #743713;padding:5px 8px;font-size:11px;color:#fff}
+#app .ffApprovalHelp p{margin:3px 0;line-height:1.35}
+@media(max-width:390px){#app .ffApprovalControls{padding:7px}#app .ffApprovalControls>.two{gap:5px}#app #ffApprovalMetrics{grid-template-columns:repeat(2,minmax(0,1fr))}#app .ffApprovalControls>button{font-size:11px}}
+@media(min-height:560px){#app .app:has(.ffApprovalControls) main{height:calc(100dvh - 185px);overflow:hidden}}
