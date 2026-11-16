@@ -696,3 +696,22 @@ html body #app .app main .ffRefProposalPage button.ffProposalBanner {display:gri
  #app .ffDashboardFrame>.dashRange {gap:.3rem;padding:.2rem 0!important;}
  #app .ffDashboardFrame>.dashRange :is(input,button,.ffSelectTrigger) {min-height:32px!important;min-width:0;padding:.25em .45em!important;}
 }
+
+#app .ffAccessPanel {min-width:0;padding:.55rem;display:grid;gap:.5rem;}
+#app .ffAccessPanel h2 {margin:0;color:#ff873a;}
+#app .ffAccessFilters {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem;}
+#app .ffAccessFilters :is(label,input,select,.ffSelectTrigger) {min-width:0;max-width:100%;min-height:32px;margin:0;}
+#app .ffAccessMetrics button {min-width:0;white-space:normal;padding:.3rem!important;}
+#app .ffAccessMetrics button[aria-pressed=true] {outline:1px solid #ffd294;}
+#app .ffAccessState {display:flex;align-items:center;gap:.45rem;}
+#app .ffAccessRows {display:grid;gap:.3rem;max-height:55dvh;overflow:auto;overscroll-behavior:contain;}
+#app .ffAccessRows .ffAccessRow {display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.4rem;overflow-wrap:anywhere;padding:.48rem;border:1px solid #ba6a31;border-radius:9px;background:#201307;color:#fff;}
+#app .ffAccessRows .ffAccessRow:nth-child(even) {background:#142434;border-color:#557a9c;}
+#app .ffAccessRows .ffAccessRow[hidden] {display:none!important;}
+#app .ffAccessRow :is(small,p) {margin:.15rem 0;display:block;font-size:.82em;}
+#app .ffAccessRow small {color:#ffc088;}
+#app .ffAccessDecisions {display:grid;gap:.24rem;}
+#app .ffAccessDecisions button {min-height:32px;min-width:0;font-size:10px;}
+#app .ffAccessDecisions [data-status=Approved] {border-color:#57cc6e!important;background:#174b27!important;}
+#app .ffAccessDecisions [data-status=Rejected] {border-color:#eb7160!important;background:#641f1b!important;}
+#app .ffAccessActions button {min-width:0;white-space:normal;}

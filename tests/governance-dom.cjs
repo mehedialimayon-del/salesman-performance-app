@@ -6,14 +6,27 @@ async function setup(owner){
  const row={operation:'UPDATE',table_name:'ffh_sales',actor_name:'<script>bad</script>',actor:'S100',actor_zone:'KL',occurred_at:'2026-10-18',row_key:{id:'S1'},before_data:{qty:1},after_data:{qty:2}};
  let failRestore=false,confirm=true;
  w.alert=s=>alerts.push(s);w.confirm=()=>confirm;
- const q=s=>w.document.querySelector(s),state={profiles:[],zones:[],grants:[],zone_access:[],requests:[],outlets:[]};
+ const q=s=>w.document.querySelector(s),state={profiles:[],zones:[],grants:[],zone_access:[],requests:[
+ {id:'R1',staff_id:'S100',action:'edit',module:'sales',record_id:'S1',reason:'Correct order',status:'Pending',created_at:'2026-10-14T17:00:00Z'},
+ {id:'R2',staff_id:'S200',action:'delete',module:'outlets',record_id:'O1',reason:'Duplicate outlet',status:'Approved',created_at:'2026-10-16T00:00:00Z'},
+ {id:'R3',staff_id:'S100',action:'delete',module:'sales',record_id:'S2',reason:'Incorrect entry',status:'Rejected',created_at:'2026-10-15T00:00:00Z'}],outlets:[]};
  const ctx={user:()=>({id:owner?'M21954':'S100'}),FFH_SUPABASE:{rpc:async(n,b)=>{calls.push(b);if(b.action==='restore'&&failRestore)return {error:{message:'Restore conflict'}};return {data:b.action==='state'?state:b.action==='history'?(b.payload.offset===0?Array.from({length:1000},()=>row):[row]):b.action==='trash'?[{id:7,table_name:'ffh_sales',row_key:{id:'S1'},deleted_by:'S100',deleted_at:'2026-10-18'}]:{ok:true}};}},shell:s=>q('main').innerHTML=s,back:t=>'<h1>'+t+'</h1>',esc:s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),bindBack(){},q,qa:s=>[...w.document.querySelectorAll(s)],setPage(){},ffhLoadCloud:async()=>calls.push({action:'refresh'})};
  w.eval(source);await w.FFH_CREATE_ACCOUNTS(ctx)();
  return {w,q,calls,alerts,close:()=>dom.window.close(),setFailure:v=>failRestore=v,setConfirm:v=>confirm=v};
 }
 const tick=()=>new Promise(r=>setTimeout(r,10));
 (async()=>{
- const a=await setup(true);await a.q('#ffHistory').onclick();assert.equal(a.q('script'),null);assert.ok(a.q('summary').textContent.includes('<script>bad</script>'));
+ const a=await setup(true);
+ assert.equal(a.q('[data-access-tab=""] strong').textContent,'3');
+ a.q('#ffAccessFrom').value='2026-10-15';a.q('#ffAccessTo').value='2026-10-15';a.q('#ffAccessFrom').onchange();
+ assert.equal(a.q('[data-access-tab=""] strong').textContent,'2','request dates use MYT');
+ a.q('[data-access-tab="Rejected"]').click();
+ assert.equal(a.q('#ffAccessRequestCount').textContent,'1 request(s)');
+ a.q('#ffAccessType').value='edit';a.q('#ffAccessType').onchange();
+ assert.equal(a.q('#ffAccessRequestCount').textContent,'0 request(s)');
+ a.q('[data-access-history]').click();
+ assert.equal(a.q('#ffAccessRequestCount').textContent,'1 request(s)');
+ await a.q('#ffHistory').onclick();assert.equal(a.q('script'),null);assert.ok(a.q('summary').textContent.includes('<script>bad</script>'));
  assert.equal(a.calls.at(-1).payload.offset,0);await a.q('#ffHistoryMore').onclick();assert.equal(a.calls.at(-1).payload.offset,1000);assert.equal(a.w.document.querySelectorAll('details').length,1001);
  a.q('#ffHistoryMonth').value='2026-09';a.q('#ffHistoryMonth').dispatchEvent(new a.w.Event('change'));await tick();assert.equal(a.calls.at(-1).payload.month,'2026-09');assert.equal(a.calls.at(-1).payload.offset,0);
  await a.q('#ffHistoryBack').onclick();await a.q('#ffTrash').onclick();assert.ok(a.q('[data-action=restore]'));
