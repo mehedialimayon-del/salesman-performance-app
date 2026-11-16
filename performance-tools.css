@@ -35,4 +35,4 @@
 .ffRefSync #ffSyncQueue .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between}
 .ffRefSync #ffSyncQueue p{margin:6px 0;overflow-wrap:anywhere}
 @media(max-width:380px){.ffRefSync{padding:6px;gap:6px}.ffRefSync>.ffPerformanceIntro{padding:7px}.ffRefSync>.ffRefFields{gap:5px;padding:6px}.ffRefSync>.ffRefFields :is(select,input){font-size:12px;padding:4px}.ffRefSync .ffRefExports>.ffRefMetric{padding:6px 2px}}
-@media(max-height:740px){.ffRefSync>.ffPerformanceIntro>p:not(.miniStat):not(#ffSyncMessage){display:none}.ffRefSync>.ffPerformanceIntro{padding:7px}.ffRefSync .ffRefExports>.ffRefMetric{padding:5px 3px}.ffRefSync #ffSyncRetry{min-height:38px}}
+@media(max-height:740px){.ffRefSync>.ffPerformanceIntro{padding:7px}.ffRefSync .ffRefExports>.ffRefMetric{padding:5px 3px}.ffRefSync #ffSyncRetry{min-height:38px}}
