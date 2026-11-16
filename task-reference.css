@@ -179,7 +179,7 @@ html body #app .app>main.wrap.ffTaskPage:has(.ffTaskArtwork)>:is(.ffTaskRefHisto
 html body #app .app main.wrap .ffTaskArtwork .ffTaskArtSlot:not(.ffTaskArtRow *) {
   font-size:clamp(9px,2.55cqw,15px)!important;
 }
-html body #app .app main.wrap .ffTaskArtwork :is(.ffTaskArtTap,.ffTaskArtValue,#ffRefTasksStatus,input.ffTaskArtSlot) {
+html body #app .app main.wrap .ffTaskArtwork :is(.ffTaskArtValue,#ffRefTasksStatus,input.ffTaskArtSlot) {
   opacity:1!important;color:white!important;-webkit-text-fill-color:white!important;
   background:linear-gradient(#2d1506,#080402)!important;border:1px solid #d97421!important;
   border-radius:1.45cqw!important;box-shadow:inset 0 0 6px #ed721957!important;

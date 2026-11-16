@@ -142,7 +142,11 @@ html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap:not([data-task-expand
   white-space:normal;
   overflow:hidden;
 }
-html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap[data-task-category] {flex-direction:column;}
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtTap[data-task-category] {
+  flex-direction:column;
+  font-size:clamp(8px,min(2.45cqw,1.52dvh),14px)!important;
+  gap:.12em;
+}
 #app .ffTaskArtTap[data-task-category]::before,
 #app .ffTaskArtMetric::after,
 #app .ffTaskArtTap:is([data-task-assign],[data-task-status],[data-task-proof],[data-task-history],[data-task-open],[data-task-comment],[data-task-export])::before {
@@ -233,4 +237,10 @@ html body #app .app main.wrap .ffTaskArtwork .ffTaskArtRow button[data-task-row]
   background:none!important;
   border:0!important;
   box-shadow:none!important;
+}
+
+html body #app .app main.wrap .ffTaskArtwork .ffTaskArtSlot.ffTaskArtTap {
+  min-width:0;
+  padding:0 .35em!important;
+  border-radius:1.45cqw!important;
 }
