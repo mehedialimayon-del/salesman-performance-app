@@ -28,6 +28,11 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
  async function queueOrder(order) {
   const id=me();if(!id)throw Error('Login required');
   if(!scopedIds().includes(order.sr))throw Error('Choose an assigned SR');
+  if(!order||typeof order!=='object'||typeof order.id!=='string'||!order.id.trim())throw Error('Order ID is required before saving offline.');
+  if(typeof order.sr!=='string'||!order.sr.trim())throw Error('Staff ID is required before saving offline.');
+  if(!order.outletName||!order.sku||!order.date||!Number.isFinite(Number(order.qty))||Number(order.qty)<=0||
+     !Number.isFinite(Number(order.orderAmount))||Number(order.orderAmount)<0)
+   throw Error('Complete the outlet, SKU, date, quantity and amount before saving offline.');
   const all=read(id), record={id:order.id,actor:id,order:{...order,cloudConfirmed:false},queuedAt:new Date().toISOString(),state:'Pending',error:''};
   if(all.some(x=>x.id===order.id))throw Error('This order is already saved. Open Offline Sync.');
   // Persist before attempting the network; a storage failure must never claim a saved draft.
