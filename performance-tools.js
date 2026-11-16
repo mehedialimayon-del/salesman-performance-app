@@ -7,6 +7,10 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
  const key=id=>'ffh_order_outbox_v1_'+id;
  const read=id=>{const raw=localStorage.getItem(key(id));if(!raw)return [];let rows;try{rows=JSON.parse(raw);}catch(e){throw Error('Saved orders could not be read. Keep app data and contact Ayon.');}if(!Array.isArray(rows))throw Error('Saved orders could not be read. Keep app data and contact Ayon.');return rows;};
  const write=(id,rows)=>localStorage.setItem(key(id),JSON.stringify(rows));
+ const historyKey=id=>'ffh_order_sync_history_v1_'+id;
+ const history=id=>{try{const rows=JSON.parse(localStorage.getItem(historyKey(id))||'[]');return Array.isArray(rows)?rows.filter(x=>x&&x.id&&x.order).slice(0,30):[];}catch{return [];}};
+ const recordSynced=(id,item)=>{try{const previous=history(id).filter(x=>x.id!==item.id);localStorage.setItem(historyKey(id),JSON.stringify([{id:item.id,order:item.order,queuedAt:item.queuedAt,syncedAt:new Date().toISOString(),state:'Synced'},...previous].slice(0,30)));}catch(error){console.warn('Could not save local sync history',error);}};
+
  const online=()=>navigator.onLine!==false;
  const scopedIds=()=>ctx.isMgr()?ctx.ids():[me()];
  const who=id=>ctx.staff(id)?.name||id||'';
@@ -68,6 +72,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
      // Cloud save has succeeded. Remove the outbox record before updating the
      // in-memory UI so a local rendering error cannot resend a confirmed order.
      write(id,current.filter(x=>x.id!==item.id));
+     recordSynced(id,item);
      try{const countKey='ffh_order_sync_count_'+id;localStorage.setItem(countKey,String((Number(localStorage.getItem(countKey))||0)+1));}catch(error){console.warn('Could not store sync count',error);}
      try{ctx.acceptSale(item.order);}catch(error){console.warn('Cloud order saved; local sales view needs refresh',error);}
      try{localStorage.setItem('ffh_order_sync_time_'+id,new Date().toISOString());}catch(error){console.warn('Could not store last sync time',error);}
@@ -82,8 +87,9 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   const last=localStorage.getItem('ffh_order_sync_time_'+id);
   if(syncFilter.owner!==id)syncFilter={owner:id,status:'',query:''};
   const pending=list.filter(x=>x.state!=='Blocked').length,failed=list.length-pending;
+  const syncedHistory=history(id),visibleOrders=[...list,...syncedHistory];
   const syncCountKey='ffh_order_sync_count_'+id;
-  const synced=Math.max(0,Number(localStorage.getItem(syncCountKey))||0);
+  const synced=Math.max(syncedHistory.length,Number(localStorage.getItem(syncCountKey))||0);
   page('offlineSync','Offline Sync',`<div class="ffRefSync ffSyncReference">
     <div class="ffSyncHero" aria-hidden="true"><div class="ffSyncCloud">☁<span>↑↓</span></div><div class="ffSyncPhone">↻</div><div class="ffSyncHeroBase"></div></div>
     <h2 class="ffSyncHeadline">Work Offline · <em>Sync Later</em></h2>
@@ -102,25 +108,25 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     <p id="ffSyncMessage" role="status" aria-live="polite"></p>
     <details class="ffSyncSettings"><summary><span aria-hidden="true">⚙</span> Sync Settings <b aria-hidden="true">›</b></summary>
       <div class="ffSyncSettingsBody"><p>Connection: ${online()?'Online':'Offline'} · Last confirmed send: ${last?E(stamp(last)):'Not recorded on this phone'}</p>
-        <div class="ffRefFields"><label>Order status<select id="ffSyncState"><option value="">All queued orders</option><option value="waiting">Waiting to send</option><option value="blocked">Needs attention</option></select></label>
+        <div class="ffRefFields"><label>Order status<select id="ffSyncState"><option value="">All queued orders</option><option value="waiting">Waiting to send</option><option value="blocked">Needs attention</option><option value="synced">Synced history</option></select></label>
         <label>Search<input type="search" id="ffSyncSearch" placeholder="Outlet, SKU or staff"></label></div>
-        <div id="ffSyncQueue">${list.map((x,i)=>`<article class="card ffSyncHistoryCard" data-tone="${x.state==='Blocked'?'red':['blue','violet','teal','amber'][i%4]}" data-queued-order="${E(x.id)}"><div class="row"><b>${E(x.order.outletName)}</b><span class="ffPerformanceStatus">${E(x.state==='Blocked'?'Needs attention':'Saved · waiting to send')}</span></div><p>${E(x.order.sku)} · ${E(x.order.qty)} cartons · ${ctx.rm(x.order.orderAmount)}</p><p>${E(who(x.order.sr))} · ${E(x.order.date)}</p><p class="miniStat">Saved ${E(stamp(x.queuedAt))} · ${E(x.id)}</p>${x.error?`<p role="status">${E(x.error)}</p>`:''}</article>`).join('')||'<div class="card empty">No orders waiting to send on this phone.</div>'}<p id="ffSyncNoMatch" hidden>No orders match these filters.</p></div>
+        <div id="ffSyncQueue">${visibleOrders.map((x,i)=>`<article class="card ffSyncHistoryCard" data-tone="${x.state==='Blocked'?'red':x.state==='Synced'?'teal':['blue','violet','teal','amber'][i%4]}" data-queued-order="${E(x.id)}"><div class="row"><b>${E(x.order.outletName)}</b><span class="ffPerformanceStatus">${E(x.state==='Blocked'?'Needs attention':x.state==='Synced'?'Synced to cloud':'Saved · waiting to send')}</span></div><p>${E(x.order.sku)} · ${E(x.order.qty)} cartons · ${ctx.rm(x.order.orderAmount)}</p><p>${E(who(x.order.sr))} · ${E(x.order.date)}</p><p class="miniStat">${x.state==='Synced'?'Synced '+E(stamp(x.syncedAt)):'Saved '+E(stamp(x.queuedAt))} · ${E(x.id)}</p>${x.error?`<p role="status">${E(x.error)}</p>`:''}</article>`).join('')||'<div class="card empty">No orders waiting to send on this phone.</div>'}<p id="ffSyncNoMatch" hidden>No orders match these filters.</p></div>
       </div>
     </details>
     <div class="ffSyncSafety"><i aria-hidden="true">ⓘ</i><span>Sign in online first. This screen does not enable offline sign-in. Keep app data until pending orders are sent.</span></div>
   </div>`);
-  const state=$('#ffSyncState'),search=$('#ffSyncSearch'),byId=new Map(list.map(record=>[record.id,record]));
+  const state=$('#ffSyncState'),search=$('#ffSyncSearch'),byId=new Map(visibleOrders.map(record=>[record.id,record]));
   state.value=syncFilter.status;search.value=syncFilter.query;
   const apply=()=>{
    syncFilter.status=state.value;syncFilter.query=search.value;
    const term=search.value.trim().toLowerCase();let count=0;
    document.querySelectorAll('[data-queued-order]').forEach(card=>{
-    const row=byId.get(card.dataset.queuedOrder),blocked=row.state==='Blocked';
-    card.hidden=(state.value==='waiting'&&blocked)||(state.value==='blocked'&&!blocked)||
+    const row=byId.get(card.dataset.queuedOrder),blocked=row.state==='Blocked',syncedRow=row.state==='Synced';
+    card.hidden=(state.value==='waiting'&&(blocked||syncedRow))||(state.value==='blocked'&&!blocked)||(state.value==='synced'&&!syncedRow)||
      ![row.order.outletName,row.order.sku,who(row.order.sr),row.order.sr,row.id].join(' ').toLowerCase().includes(term);
     if(!card.hidden)count++;
    });
-   $('#ffSyncNoMatch').hidden=!list.length||count>0;
+   $('#ffSyncNoMatch').hidden=!visibleOrders.length||count>0;
   };
   search.oninput=apply;state.onchange=apply;apply();
   if(window.ffDaily){const queue=$('.ffSyncSettingsBody');if(queue){queue.insertAdjacentHTML('beforeend',window.ffDaily.outboxHtml());window.ffDaily.bindOutbox();}}
