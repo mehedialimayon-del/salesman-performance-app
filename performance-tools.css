@@ -2,3 +2,17 @@
 
 .ffPerformanceShortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:14px 0}.ffPerformanceShortcuts .module{min-width:0;min-height:105px;padding:12px 7px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;border:1px solid #ff741755;border-radius:16px;background:#1d1815}.ffPerformanceShortcuts .mi{font-size:24px;color:#ff994f}.ffPerformanceShortcuts .moduleTitle{font-size:12px;line-height:1.3;overflow-wrap:anywhere}
 .ffPerformanceIntro{min-width:0;max-width:100%}.ffPerformanceIntro label{display:block;min-width:0;margin:10px 0;font-size:12px;color:#d8c4b4}.ffPerformanceIntro input,.ffPerformanceIntro select{display:block;width:100%;min-width:0;max-width:100%;margin-top:6px;padding:10px;border:1px solid #4e4138;border-radius:10px;background:#14110f;color:#fff}.ffPerformanceIntro .two{grid-template-columns:repeat(2,minmax(0,1fr))}.ffPerformanceIntro button{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+
+/* Offline Sync: fixed-size controls with an independently scrolling order queue. */
+.ffRefSync{display:flex;flex-direction:column;gap:10px;min-width:0;max-width:100%;height:calc(100dvh - 185px);min-height:280px;overflow:hidden}
+.ffRefSync>.ffPerformanceIntro,.ffRefSync>.ffRefFields{flex:0 0 auto;min-width:0;margin:0}
+.ffRefSync>.ffPerformanceIntro{padding:10px}
+.ffRefSync>.ffPerformanceIntro p{font-size:11px;line-height:1.35;margin:5px 0}
+.ffRefSync .ffRefExports{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;min-width:0}
+.ffRefSync .ffRefExports>*{min-width:0;overflow-wrap:anywhere}
+.ffRefSync .ffRefExports strong{font-size:clamp(12px,3.4vw,18px)}
+.ffRefSync #ffSyncRetry{width:100%;margin:5px 0}
+.ffRefSync #ffSyncQueue{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#ff7417 #18120e;padding:2px 3px 12px}
+.ffRefSync #ffSyncQueue .card{overflow-wrap:anywhere;margin:6px 0}
+.ffRefSync #ffSyncQueue [hidden]{display:none!important}
+@media(max-height:700px){.ffRefSync{height:calc(100dvh - 150px)}.ffRefSync>.ffPerformanceIntro p:nth-of-type(2){display:none}}
