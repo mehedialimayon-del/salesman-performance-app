@@ -48,9 +48,11 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     const current=read(id), found=current.find(x=>x.id===item.id);if(!found)continue;
     if(failure){found.state=retryable(failure)?'Pending':'Blocked';found.error=String(failure.message||failure);found.lastAttempt=new Date().toISOString();write(id,current);}
     else {
-     ctx.acceptSale(item.order);
+     // Cloud save has succeeded. Remove the outbox record before updating the
+     // in-memory UI so a local rendering error cannot resend a confirmed order.
      write(id,current.filter(x=>x.id!==item.id));
-     localStorage.setItem('ffh_order_sync_time_'+id,new Date().toISOString());
+     try{ctx.acceptSale(item.order);}catch(error){console.warn('Cloud order saved; local sales view needs refresh',error);}
+     try{localStorage.setItem('ffh_order_sync_time_'+id,new Date().toISOString());}catch(error){console.warn('Could not store last sync time',error);}
     }
    }
   })().finally(()=>{flushing=null;if(ctx.page()==='offlineSync')syncPage();});
