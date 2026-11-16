@@ -5,7 +5,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
  let flushing=null, ticket=0, lastHistory=null, syncFilter={},syncSettingsOpen=false;
  const me=()=>ctx.user()?.id;
  const key=id=>'ffh_order_outbox_v1_'+id;
- const read=id=>{const raw=localStorage.getItem(key(id));if(!raw)return [];let rows;try{rows=JSON.parse(raw);}catch(e){throw Error('Saved orders could not be read. Keep app data and contact Ayon.');}if(!Array.isArray(rows))throw Error('Saved orders could not be read. Keep app data and contact Ayon.');return rows;};
+ const read=id=>{const raw=localStorage.getItem(key(id));if(!raw)return [];let rows;try{rows=JSON.parse(raw);}catch(e){throw Error('Saved orders could not be read. Keep app data and contact Ayon.');}if(!Array.isArray(rows)||rows.some(x=>!x||typeof x!=='object'||typeof x.id!=='string'||!x.id||typeof x.actor!=='string'||!x.actor||!x.order||typeof x.order!=='object'||typeof x.order.sr!=='string'||!x.order.sr))throw Error('Saved orders contain invalid data. Keep app data and contact an administrator; nothing has been deleted.');return rows;};
  const write=(id,rows)=>localStorage.setItem(key(id),JSON.stringify(rows));
  const historyKey=id=>'ffh_order_sync_history_v1_'+id;
  const history=id=>{try{const rows=JSON.parse(localStorage.getItem(historyKey(id))||'[]');return Array.isArray(rows)?rows.filter(x=>x&&x.id&&x.order).slice(0,30):[];}catch{return [];}};
