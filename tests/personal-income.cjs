@@ -37,3 +37,17 @@ assert.deepEqual(salesScopes.map(({id,ids,d,t})=>({id,ids,d,t})),[
 assert.deepEqual(P.performanceScopes({...scopeInput,viewerId:'A'},'A','2026-11','2026-11-15').map(x=>x.id),['own']);
 assert.deepEqual(P.performanceScopes({...scopeInput,viewerId:'A'},'B','2026-11','2026-11-15'),[]);
 console.log('PASS personal, assigned-SR and company targets use distinct scopes; no cross-SR income access');
+
+// Commission boundaries: 80% is the first 1% tier; over-target sales earn 2% only on excess.
+assert.equal(E.commission(79999,100000),399.99);
+assert.equal(E.commission(80000,100000),800);
+assert.equal(E.commission(100000,100000),1000);
+assert.equal(E.commission(120000,100000),1400);
+// Manager with own route: own route earns SR commission; manager base excludes own route.
+const hybridPeople=[{id:'H',name:'Hybrid',role:'MANAGER+SR',zone:'Z',can_manage:true,can_sell:true},{id:'S',name:'Staff',role:'SR',zone:'Z',can_sell:true}];
+const hybridDb={sales:[{id:'h-sale',sr:'H',date:'2026-10-02',status:'Delivered',deliveredAmount:100000},{id:'s-sale',sr:'S',date:'2026-10-02',status:'Delivered',deliveredAmount:200000}],incomeMonthlySetup:{'2026-10':{H:{basic:0}}},managerMonthlyRules:{'2026-10':{H:{salesCommissionRate:.25,growthCommissionRate:0}}},adjustments:[],incentives:[]};
+const hybrid=P.build({db:hybridDb,people:hybridPeople,viewerId:'H',allowedIds:['H','S'],currentMonth:'2026-10',today:'2026-10-20',baselines:[],target:()=>100000,outlets:()=>[],rules:{},earnings:E},'H','2026-10');
+assert.equal(hybrid.ownCommission,1000);
+assert.equal(hybrid.salesCommission,500);
+assert.equal(hybrid.comm,1500);
+console.log('PASS 80% SR boundary, over-target tier, and manager+SR own-route exclusion');
