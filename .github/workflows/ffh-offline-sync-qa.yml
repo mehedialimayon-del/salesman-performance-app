@@ -1,0 +1,25 @@
+name: Offline Sync Regression QA
+on:
+  push:
+    paths:
+      - 'performance-tools.js'
+      - 'tests/performance-tools.cjs'
+      - '.github/workflows/ffh-offline-sync-qa.yml'
+  pull_request:
+    paths:
+      - 'performance-tools.js'
+      - 'tests/performance-tools.cjs'
+  workflow_dispatch:
+jobs:
+  offline-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Offline Sync and permission regression
+        run: node tests/performance-tools.cjs
