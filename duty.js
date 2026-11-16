@@ -28,7 +28,14 @@ function startWeb(){if(!active()||native())return;if(watchSession===state.attend
 async function startTracking(){if(!active())throw Error('Check in before starting duty tracking');if(native()){const {data,error}=await sb.auth.getSession();if(error||!data?.session)throw Error('Sign in again');native().startDuty(JSON.stringify({attendance_id:state.attendance.id,shift_end:state.attendance.shift_end,access_token:data.session.access_token,refresh_token:data.session.refresh_token}));}else startWeb();}
 function gate(target){return !!(user()&&user().id!=='PERVES_HIRA'&&state?.settings?.attendance_required&&!state.attendance&&!['home','attendance','profile','notifications','login','contacts','contactEdit'].includes(target));}
 function shell(title,html){ctx.setPage(title);ctx.shell(ctx.back(title==='attendance'?'Attendance':title==='tracking'?'SR Tracking':'Live Communication')+html);ctx.bindBack();}
-function renderAttendance(){disposeMap();shell('attendance',`<div class="card ffAttendanceToday" id="ffAttendanceToday"><div class="cardTitle">Today’s Attendance · আজকের উপস্থিতি</div><p>${E(user()?.name||'')} · ${date()} MYT</p><div class="notice">Work-hours GPS · Stops at checkout.</div>${state?.attendance?`<p class="notice" role="status">Attendance already saved today · আজকের উপস্থিতি দেওয়া হয়েছে।</p><div class="row"><span>Check-in</span><b>${E(new Date(state.attendance.check_in).toLocaleString('en-MY'))}</b></div><div class="row"><span>Status</span><b>${active()?'ON DUTY':'DUTY ENDED'}</b></div><p class="miniStat">${native()?'Native Android tracking available':'Browser GPS works while the app is active; screen-off history can have gaps.'}</p>${active()?'<button class="primary" id="ffResumeDuty">RESUME DUTY</button><button class="secondary" id="ffCheckout">CHECK OUT</button>':''}`:`<p class="miniStat">আজকের উপস্থিতি দিতে নিচের GIVE ATTENDANCE বাটনে চাপুন।</p><form class="form" id="ffAttendanceForm"><label>Attendance photo (optional)<input type="file" name="photo" accept="image/*" capture="user"></label><label><input type="checkbox" name="consent" required ${localStorage.getItem('ffh_duty_consent_v1')==='accepted'?'checked':''}> Work-hours location tracking</label><button class="primary" type="submit">GIVE ATTENDANCE</button></form>`}<div id="ffDutyStatus" role="status" class="notice"></div></div>`);
+function renderAttendance(){
+ disposeMap();
+ const me=user(), staff=people.find(person=>person.staff_id===me?.id);
+ const name=staff?.full_name||me?.name||'';
+ const zone=staff?.zone_name||staff?.zone_id||me?.zone||'';
+ const staffLine=[staff?.designation||me?.mode,me?.id,zone].filter(Boolean).join(' · ');
+ const identity=`<section class="ffAttendanceIdentity"><span class="ffAttendancePortrait" data-ff-staff-avatar="${E(me?.id||'')}" aria-hidden="true">${E(name.trim().charAt(0)||'•')}</span><div><h2>${E(name)}</h2><p>${E(staffLine)}</p></div><time datetime="${date()}">${date()} MYT</time></section>`;
+ shell('attendance',identity+`<div class="card ffAttendanceToday" id="ffAttendanceToday"><div class="cardTitle">Today’s Attendance · আজকের উপস্থিতি</div><div class="notice">Work-hours GPS · Stops at checkout.</div>${state?.attendance?`<p class="notice" role="status">Attendance already saved today · আজকের উপস্থিতি দেওয়া হয়েছে।</p><div class="row"><span>Check-in</span><b>${E(new Date(state.attendance.check_in).toLocaleString('en-MY'))}</b></div><div class="row"><span>Status</span><b>${active()?'ON DUTY':'DUTY ENDED'}</b></div><p class="miniStat">${native()?'Native Android tracking available':'Browser GPS works while the app is active; screen-off history can have gaps.'}</p>${active()?'<div class="ffAttendanceShiftActions"><button class="primary" id="ffResumeDuty">Resume duty</button><button class="secondary" id="ffCheckout">Check out</button></div>':''}`:`<p class="miniStat">আজকের উপস্থিতি দিতে নিচের Check in বাটনে চাপুন।</p><form class="form" id="ffAttendanceForm"><label>Attendance photo (optional)<input type="file" name="photo" accept="image/*" capture="user"></label><label><input type="checkbox" name="consent" required ${localStorage.getItem('ffh_duty_consent_v1')==='accepted'?'checked':''}> Work-hours location tracking</label><button class="primary ffAttendanceCheckIn" type="submit">Check in</button></form>`}<div id="ffDutyStatus" role="status" class="notice"></div></div>`);
  if($('#ffAttendanceForm'))$('#ffAttendanceForm').onsubmit=async e=>{e.preventDefault();const button=e.submitter;button.disabled=true;try{if(!e.target.elements.consent.checked)throw Error('Accept the work-hours tracking disclosure');$('#ffDutyStatus').textContent='Getting GPS…';const location=await fix();let photo_path=null;const file=e.target.elements.photo.files[0];if(file){const blob=await compress(file);photo_path=user().id+'/'+crypto.randomUUID()+'.jpg';const {error}=await sb.storage.from('ffh-attendance').upload(photo_path,blob,{contentType:'image/jpeg'});if(error)throw error;}localStorage.setItem('ffh_duty_consent_v1','accepted');await rpc('checkin',{...location,photo_path,consent_version:'duty-location-v1',tracking_mode:native()?'android':'web'});await refresh();await startTracking();renderAttendance();$('#ffDutyStatus').textContent='Attendance saved. Duty tracking requested.';}catch(err){error(err);button.disabled=false;}};
  if($('#ffResumeDuty'))$('#ffResumeDuty').onclick=()=>startTracking().then(()=>{$('#ffDutyStatus').textContent='Tracking requested; check the phone tracking notification.'}).catch(error);
  if($('#ffCheckout'))$('#ffCheckout').onclick=async()=>{try{await rpc('checkout');stopWeb();native()?.stopDuty();await refresh();renderAttendance();}catch(e){error(e)}};
@@ -49,6 +56,11 @@ function attendanceHistory(){
  box.innerHTML=`<div class="cardTitle">Attendance History</div><div class="two ffHistoryControls">
   <label>Month<input id="ffAttendanceMonth" type="month" value="${E(attendanceMonth)}"></label>
   <label>Date (optional)<input id="ffAttendanceDay" type="date" value="${E(attendanceDay)}"></label>
+ </div><div class="ffAttendanceMetrics" aria-label="Attendance totals in selected period">
+  <div data-tone="green"><span>Present</span><output id="ffAttendancePresent">—</output></div>
+  <div data-tone="amber"><span>Late</span><span aria-label="Shift start is unavailable">—</span></div>
+  <div data-tone="red"><span>Absent</span><span aria-label="Working day schedule is unavailable">—</span></div>
+  <div data-tone="violet"><span>Leave</span><span aria-label="Leave records are unavailable">—</span></div>
  </div><div id="ffAttendanceHistory" class="ffHistoryScroll" tabindex="0" aria-label="Attendance history"></div>
  <button class="secondary" id="ffAttendanceMore" hidden>LOAD MORE HISTORY</button>
  <div class="ffRefExports ffAttendanceActions">
@@ -56,7 +68,7 @@ function attendanceHistory(){
   <button type="button" class="ffRefButton" data-attendance-export="xlsx">⇩ Export (Excel)</button>
   <button type="button" class="ffRefButton" id="ffAttendanceSummary">▥ Monthly Summary</button>
  </div><p id="ffAttendanceFeedback" role="status"></p>`;
- host.after(box);let offset=0;
+ host.after(box);let offset=0;const presentDays=new Set();
  const stamp=v=>v?new Date(v).toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur'}):'';
  const records=async(month,day,start,size)=>{
   let query=sb.from('ffh_attendance').select('id,duty_date,check_in,check_out,shift_end').eq('staff_id',sid);
@@ -71,12 +83,15 @@ function attendanceHistory(){
   return data||[];
  };
  const load=async(append=false)=>{
-  const ticket=++historyVersion,list=box.querySelector('#ffAttendanceHistory');
+  const ticket=++historyVersion,list=box.querySelector('#ffAttendanceHistory'),present=box.querySelector('#ffAttendancePresent');
+  if(!append){presentDays.clear();present.value='—';}
   try{
    const rows=await records(attendanceMonth,attendanceDay,append?offset:0,50);
    if(ticket!==historyVersion||!list.isConnected)return;
    const html=rows.map(x=>`<article class="ffHistoryEntry"><b class="ffDateBadge">${E(x.duty_date)}</b><div>Check-in: <strong>${E(stamp(x.check_in)||'—')}</strong></div><div>Check-out: <strong>${E(stamp(x.check_out)||'Not checked out')}</strong></div></article>`).join('');
    if(append)list.insertAdjacentHTML('beforeend',html);else list.innerHTML=html||'<p>No attendance in this period.</p>';
+   for(const row of rows)if(row.check_in)presentDays.add(row.duty_date);
+   present.value=String(presentDays.size)+(rows.length===50?'+':'');
    offset=(append?offset:0)+rows.length;
    box.querySelector('#ffAttendanceMore').hidden=rows.length<50;
   }catch(err){if(ticket===historyVersion&&list.isConnected)list.textContent='History could not load: '+err.message;}

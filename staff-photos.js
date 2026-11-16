@@ -49,9 +49,9 @@
  function accountCards(){
   // Zone staff cards are not .row elements. Reconcile by immutable staff ID,
   // not by name or list index; reusing the shared photo store preserves zoom.
-  for(const avatar of document.querySelectorAll('.ffTeamAvatar[data-ff-staff-avatar]')){
+  for(const avatar of document.querySelectorAll(':is(.ffTeamAvatar,.ffAttendancePortrait)[data-ff-staff-avatar]')){
    const id=avatar.dataset.ffStaffAvatar;
-   if(id)patchAvatar(avatar,id,'ffTeamAvatar ffStaffCircle');
+   if(id&&(avatar.classList.contains('ffTeamAvatar')||person(id)))patchAvatar(avatar,id,'ffStaffCircle');
   }
   for(const button of document.querySelectorAll('.ffEditAccount,.ffReplaceAccount')){
    const id=button.dataset.id,row=button.closest('.row');if(!row||!id||!person(id))continue;

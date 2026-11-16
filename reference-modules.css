@@ -628,3 +628,21 @@ body .ffItemPicker.ffScopeStaffPicker .ffPickerText:only-child {grid-column:1/-1
 #app .ffRefTrackRoster .ffTrackingStatus {color:#ff655d;}
 #app .ffRefTrackRoster .ffTrackingStatus[data-tone=green] {color:#65ec63;}
 #app .ffRefTrackRoster .ffTrackingStatus[data-tone=orange] {color:#ffc366;}
+
+#app .ffAttendanceIdentity {display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.55rem;padding:.6rem;margin-bottom:.55rem;border:1px solid #ff842b;border-radius:13px;background:linear-gradient(115deg,#040b17,#15110f 62%,#331203);box-shadow:inset 0 0 10px #396b964f,0 0 7px #df64193d;}
+#app .ffAttendanceIdentity h2 {font-size:clamp(14px,4.1vw,21px);margin:0;overflow-wrap:anywhere;color:#fff;}
+#app .ffAttendanceIdentity p,#app .ffAttendanceIdentity time {font-size:clamp(10px,2.8vw,13px);margin:0;color:#ffc18b;}
+#app .ffAttendanceIdentity time {text-align:right;}
+#app .ffAttendancePortrait {display:grid;place-items:center;width:clamp(37px,11vw,56px);height:clamp(37px,11vw,56px);border:1px solid #ff842b;border-radius:50%;overflow:hidden;color:#fff;background:#172537;}
+#app .ffAttendancePortrait img {width:100%;height:100%;object-fit:cover;}
+#app .ffAttendanceShiftActions,#app .ffAttendanceMetrics {display:grid;gap:.35rem;}
+#app .ffAttendanceShiftActions {grid-template-columns:repeat(2,minmax(0,1fr));}
+#app #ffAttendanceToday :is(.ffAttendanceCheckIn,#ffResumeDuty) {background:#0f3a23!important;border-color:#4fce79!important;color:#fff!important;}
+#app #ffAttendanceToday #ffCheckout {background:#69300b!important;border-color:#ff8b2d!important;color:#fff!important;}
+#app .ffAttendanceMetrics {grid-template-columns:repeat(4,minmax(0,1fr));margin:.5rem 0;}
+#app .ffAttendanceMetrics>div {display:grid;text-align:center;gap:.15rem;padding:.35rem .1rem;background:#101010;border:1px solid var(--attendance-tone);border-radius:8px;color:#fff;}
+#app .ffAttendanceMetrics [data-tone=green] {--attendance-tone:#53da70;}
+#app .ffAttendanceMetrics [data-tone=amber] {--attendance-tone:#ffad40;}
+#app .ffAttendanceMetrics [data-tone=red] {--attendance-tone:#ff655d;}
+#app .ffAttendanceMetrics [data-tone=violet] {--attendance-tone:#c985f0;}
+#app .ffAttendanceMetrics>div>*:first-child {color:var(--attendance-tone);font-size:.85em;}

@@ -6,6 +6,7 @@
     ['#ffIncomeBreakdown', 'Income breakdown'],
     ['#ffIncomeRewardSummary', 'Incentive summary'],
     ['#ffIncomeRate', 'Commission rates'],
+    ['.ffRefAttendance', 'Attendance history'],
     ['#ffSyncQueue', 'Offline orders'],
     ['.ffRefTrackRoster', 'Team status']
   ];
