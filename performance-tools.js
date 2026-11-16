@@ -136,7 +136,23 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   search.oninput=apply;state.onchange=apply;apply();
   const settings=$('.ffSyncSettings');settings.addEventListener('toggle',()=>{if(settings.isConnected)syncSettingsOpen=settings.open;});
   if(window.ffDaily){const queue=$('.ffSyncSettingsBody');if(queue){queue.insertAdjacentHTML('beforeend',window.ffDaily.outboxHtml());window.ffDaily.bindOutbox();}}
-  $('#ffSyncRetry').onclick=async e=>{e.target.disabled=true;const message=$('#ffSyncMessage');if(message)message.textContent='Checking saved orders…';try{await ctx.refreshStaff();await flush(true);if(ctx.page()==='offlineSync'){const current=read(id);const status=$('#ffSyncMessage');if(status)status.textContent=current.length?`${current.length} order(s) still require attention. Open Sync Settings for details.`:'All saved orders on this phone have been checked.';}}catch(err){const status=$('#ffSyncMessage');if(status)status.textContent=err.message;}finally{if(e.target.isConnected)e.target.disabled=false;}};
+  $('#ffSyncRetry').onclick=async e=>{
+   const button=e.currentTarget||e.target;
+   button.disabled=true;
+   const message=$('#ffSyncMessage');if(message)message.textContent='Checking saved orders…';
+   try{
+    await ctx.refreshStaff();
+    // An account switch during an awaited permission refresh must never sync
+    // another account's outbox or display the previous user's order counts.
+    if(me()!==id)return;
+    await flush(true);
+    if(me()!==id||ctx.page()!=='offlineSync')return;
+    const current=read(id),status=$('#ffSyncMessage');
+    if(status)status.textContent=current.length?`${current.length} order(s) still require attention. Open Sync Settings for details.`:'All saved orders on this phone have been checked.';
+   }catch(err){
+    if(me()===id&&ctx.page()==='offlineSync'){const status=$('#ffSyncMessage');if(status)status.textContent=err.message;}
+   }finally{if(button.isConnected)button.disabled=false;}
+  };
  }
  async function approvals(){
   const id=me(), turn=++ticket;
