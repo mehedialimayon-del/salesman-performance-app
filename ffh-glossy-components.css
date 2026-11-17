@@ -658,3 +658,26 @@ html body #app .app main.wrap .ffTrackingScreen #ffDutyMap {height:clamp(200px,4
 #app .ffDutyMapPopup {display:grid;grid-template-columns:30px minmax(0,1fr);align-items:center;gap:.45rem}
 #app .ffDutyMapPopup .ffDutyMapAvatar {display:grid;place-items:center;width:30px;height:30px;overflow:hidden;border-radius:50%;background:#fff0da}
 #app .ffDutyMapPopup .ffDutyMapAvatar img {width:100%;height:100%;object-fit:cover}
+
+
+/* Compact approval header and review workspace, November 2026 */
+#app .ffApprovalScreen .ffApprovalTitle{display:flex;align-items:center;gap:8px;padding:9px 12px;min-height:54px}
+#app .ffApprovalScreen .ffApprovalTitle>svg{width:26px;height:26px}
+#app .ffApprovalScreen .ffApprovalTitle h1{font-size:clamp(17px,4.2vw,25px);flex:1;min-width:0;white-space:nowrap}
+#app .ffApprovalHeaderTools{display:flex;gap:3px;align-items:center;flex:none}
+#app .ffApprovalHeaderTools button{width:clamp(29px,8vw,42px);height:36px;display:grid;place-items:center;background:#0b0908;color:#ff991c;border:1px solid #e86d18;border-radius:10px;padding:5px;box-shadow:0 0 7px #f70a}
+#app .ffApprovalHeaderTools button svg{width:18px;height:18px}
+#app .ffApprovalScreen .ffApprovalControls{padding:5px 9px;margin:5px 0}
+#app .ffApprovalScreen .ffApprovalControls>.two{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+#app .ffApprovalScreen .ffApprovalControls .two>label:nth-child(3){display:none}
+#app .ffApprovalScreen .ffApprovalControls .two>label:nth-child(2){order:1}
+#app .ffApprovalScreen .ffApprovalControls .two>.ffApprovalDateControl{order:2}
+#app .ffApprovalScreen .ffApprovalControls .two>label:nth-child(1){order:3}
+#app .ffApprovalScreen .ffApprovalControls .two :is(label,.ffApprovalDateControl)>span{display:none}
+html body #app .app main.wrap .ffApprovalScreen .ffApprovalControls :is(select,input,button){height:37px!important;min-height:37px!important;padding:4px 6px!important;font-size:12px!important;max-width:100%;min-width:0}
+#app .ffApprovalScreen .ffApprovalAdmin{display:block;margin:6px 0}
+#app .ffApprovalScreen .ffApprovalAdmin #ffApprovalReward{width:100%;min-height:46px;background:linear-gradient(120deg,#ff6900,#ff9d13);color:white;font-size:16px;font-weight:850;border-radius:12px}
+#app .ffApprovalScreen #ffApprovalRecent{max-height:320px;overflow:auto;min-height:150px}
+.ffApprovalDialog .ffApprovalMenu{display:grid;gap:10px;padding:12px 0}
+.ffApprovalDialog .ffApprovalMenu button{min-height:48px;text-align:left}
+@media(max-width:390px){#app .ffApprovalScreen .ffApprovalTitle{padding:7px 5px;gap:4px}#app .ffApprovalScreen .ffApprovalTitle h1{font-size:16px}#app .ffApprovalHeaderTools button{width:29px;height:31px}#app .ffApprovalScreen .ffApprovalTitle>svg{width:20px}}
