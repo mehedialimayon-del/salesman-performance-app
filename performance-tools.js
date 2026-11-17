@@ -235,7 +235,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   $('#ffApprovalStatus').value=filters.status;
   $('#ffApprovalType').value=categories.includes(filters.type)?filters.type:'';
   $('#ffApprovalSearch').value=filters.search;
-  const myItems=items.filter(x=>x.staff===id).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  const myItems=items.filter(x=>x.staff===id||(ctx.isMgr()&&allowed.has(x.staff))).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
   const formatDate=value=>value?new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Kuala_Lumpur'}).format(new Date(value)):'';
   const dateKey=value=>{
    const date=new Date(value);
@@ -273,7 +273,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   };
   function recentRow(x,index){
    const color=states.approved.includes(x.status)?'green':states.returned.includes(x.status)?'red':'gold';
-   return `<button type="button" class="secondary ffApprovalRecentRow" data-approval-recent="${index}"><i aria-hidden="true">${color==='green'?'✓':color==='red'?'↩':'◷'}</i><span><b>${E(x.title)}</b><small>${E(x.detail||x.kind)}</small></span><span><strong class="ffRefStatus" data-color="${color}">${E(x.status)}</strong><small>${E(formatDate(dateKey(x.date)))}</small></span><span aria-hidden="true">›</span></button>`;
+   return `<button type="button" class="secondary ffApprovalRecentRow" data-approval-recent="${index}"><i aria-hidden="true">${color==='green'?'✓':color==='red'?'↩':'◷'}</i><span><b>${E(x.title)}</b><small>${E(who(x.staff))} · ${E(x.staff||'')} · ${E(x.detail||x.kind)}</small></span><span><strong class="ffRefStatus" data-color="${color}">${E(x.status)}</strong><small>${E(formatDate(dateKey(x.date)))}</small></span><span aria-hidden="true">›</span></button>`;
   }
   function bindRecent(root){
    root.querySelectorAll('[data-approval-recent]').forEach(button=>button.onclick=()=>{
