@@ -697,3 +697,11 @@ html body #app .app main.wrap .ffApprovalScreen .ffApprovalControls :is(select,i
 .ffApprovalDialog .ffRewardWorkflow span{border:1px solid #b65c1e;border-radius:8px;padding:12px 4px;text-align:center;font-size:11px}
 .ffApprovalDialog .ffRewardButtons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 @media(max-width:420px){.ffApprovalDialog .ffRewardProof{grid-template-columns:repeat(2,minmax(0,1fr))}.ffApprovalDialog .ffRewardButtons button{font-size:12px;padding:8px 3px}}
+
+
+/* Read-only audit trail for income approval decisions */
+.ffApprovalDialog .ffApprovalAudit{margin:12px 0;border-top:1px solid #d46b1e;padding-top:10px}
+.ffApprovalDialog .ffApprovalAudit h3{color:#ff8d1b;font-size:15px;margin:0 0 8px}
+.ffApprovalDialog .ffApprovalAudit article{background:#130d09;border:1px solid #824014;border-radius:9px;margin:6px 0;padding:9px;color:#fff}
+.ffApprovalDialog .ffApprovalAudit article small{display:block;opacity:.8;margin-top:4px}
+.ffApprovalDialog .ffApprovalAudit article p{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
