@@ -681,3 +681,19 @@ html body #app .app main.wrap .ffApprovalScreen .ffApprovalControls :is(select,i
 .ffApprovalDialog .ffApprovalMenu{display:grid;gap:10px;padding:12px 0}
 .ffApprovalDialog .ffApprovalMenu button{min-height:48px;text-align:left}
 @media(max-width:390px){#app .ffApprovalScreen .ffApprovalTitle{padding:7px 5px;gap:4px}#app .ffApprovalScreen .ffApprovalTitle h1{font-size:16px}#app .ffApprovalHeaderTools button{width:29px;height:31px}#app .ffApprovalScreen .ffApprovalTitle>svg{width:20px}}
+
+
+/* Reward and Penalty form: matching approval visual language */
+.ffApprovalDialog:has(.ffRewardForm){width:min(96vw,780px);max-height:85dvh;overflow:auto;background:#0a0807;border:1px solid #f18421;box-shadow:0 0 20px #ff780044;color:#fff}
+.ffApprovalDialog .ffRewardForm{display:grid;gap:10px}
+.ffApprovalDialog .ffRewardSection{border:1px solid #b65c1e;border-radius:13px;padding:10px;background:linear-gradient(160deg,#190e08,#080808)}
+.ffApprovalDialog .ffRewardSection h3{font-size:15px;color:#ff8a1a;margin:0 0 10px;border-bottom:1px solid #844015;padding-bottom:5px}
+.ffApprovalDialog .ffRewardTypes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ffApprovalDialog .ffRewardTypes label{border:1px solid #f18421;border-radius:12px;padding:12px 7px;background:#160d08;font-weight:700}
+.ffApprovalDialog .ffRewardProof{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.ffApprovalDialog .ffRewardProof label,.ffApprovalDialog .ffRewardProof button{font-size:12px;border:1px solid #ed811b;border-radius:9px;padding:9px 3px;text-align:center;background:#130d09;color:white;cursor:pointer}
+.ffApprovalDialog .ffRewardProof input{position:absolute;width:1px;height:1px;opacity:0}
+.ffApprovalDialog .ffRewardWorkflow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.ffApprovalDialog .ffRewardWorkflow span{border:1px solid #b65c1e;border-radius:8px;padding:12px 4px;text-align:center;font-size:11px}
+.ffApprovalDialog .ffRewardButtons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media(max-width:420px){.ffApprovalDialog .ffRewardProof{grid-template-columns:repeat(2,minmax(0,1fr))}.ffApprovalDialog .ffRewardButtons button{font-size:12px;padding:8px 3px}}
