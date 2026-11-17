@@ -588,6 +588,7 @@ function addTrackingPin(person,point,tone,status){
 let mapLoading=false,pendingMap=false,currentLocation=null;
 async function loadMap(fit=false){
  if(!map||page()!=='tracking')return;
+ if(!fit&&mapLayer?.getLayers?.().some(layer=>layer.isPopupOpen?.()))return;
  const staff=$('#ffTrackStaff').value,day=$('#ffTrackDate').value;
  if(!staff)return refreshTeamMap?.(fit);
  if(!fit)refreshTeamMap?.(false)?.catch(error);

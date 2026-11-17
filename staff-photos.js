@@ -14,8 +14,8 @@
   if(container.dataset.ffProfileSource===url&&container.dataset.ffProfileStaff===String(id||''))return;
   container.dataset.ffProfileSource=url;container.dataset.ffProfileStaff=String(id||'');
   const img=container.querySelector(':scope > img.ffStaffPhoto');
-  if(url&&!broken.has(url)){let image=img;if(!image){container.replaceChildren();image=document.createElement('img');image.className='ffStaffPhoto zoomable';image.loading='lazy';container.append(image);}
-   image.src=url;image.dataset.fullSrc=fullPhoto(url);image.alt=name+' profile photo';image.title='Tap to enlarge photo';image.onerror=()=>{broken.add(url);if(image.isConnected){container.dataset.ffProfileSource='';patchAvatar(container,id,classes);}};container.classList.add('ffHasStaffPhoto');
+  if(url&&!broken.has(url)){const zoomable=!container.classList.contains('ffDutyMapAvatar');let image=img;if(!image){container.replaceChildren();image=document.createElement('img');image.className=zoomable?'ffStaffPhoto zoomable':'ffStaffPhoto';image.loading='lazy';container.append(image);}
+   image.src=url;image.dataset.fullSrc=fullPhoto(url);image.alt=name+' profile photo';if(zoomable)image.title='Tap to enlarge photo';image.onerror=()=>{broken.add(url);if(image.isConnected){container.dataset.ffProfileSource='';patchAvatar(container,id,classes);}};container.classList.add('ffHasStaffPhoto');
   }else{container.replaceChildren();container.textContent=initial;container.classList.remove('ffHasStaffPhoto');}
   container.classList.add(...classes.split(' '));
  }
