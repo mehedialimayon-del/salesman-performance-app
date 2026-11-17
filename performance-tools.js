@@ -172,7 +172,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   const taskReview=permissionsFresh&&ctx.isMgr()&&ctx.may('tasks');
   const allowed=new Set(scopedIds()), items=[];
   tasks.filter(x=>x.assigned_to===id||ctx.isMgr()&&allowed.has(x.assigned_to)).filter(x=>['Pending Review','Done','Rejected'].includes(x.status)).forEach(x=>items.push({kind:'Task proof',id:x.id,staff:x.assigned_to,title:x.title,detail:x.description||'',status:x.status,date:x.updated_at||x.created_at,photo:x.proof_photo_url,location:x.proof_location,reviewer:x.reviewed_by,reviewedAt:x.reviewed_at,can:taskReview&&x.status==='Pending Review'&&x.assigned_to!==id,raw:x}));
-  (gov.requests||[]).forEach(x=>items.push({kind:'Access / correction',id:x.id,staff:x.staff_id,title:x.module+' · '+x.action,detail:x.reason+' · Record '+x.record_id,status:x.status,date:x.created_at,reviewer:x.reviewed_by,reviewedAt:x.reviewed_at,can:false,open:'access',raw:x}));
+  (gov.requests||[]).forEach(x=>items.push({kind:'Access / correction',id:x.id,staff:x.staff_id,title:x.module+' · '+x.action,detail:x.reason+' · Record '+x.record_id,status:x.status,date:x.created_at,reviewer:x.reviewed_by,reviewedAt:x.reviewed_at,can:false,canGovern:permissionsFresh&&x.module==='sales'&&x.status==='Pending'&&x.staff_id!==id&&(id==='M21954'||x.reviewer_staff_id===id&&ctx.isMgr()&&allowed.has(x.staff_id)&&ctx.may('sales')),open:'access',raw:x}));
   (earn.entries||[]).forEach(x=>items.push({kind:'Incentive / penalty',id:x.id,staff:x.staff_id,title:x.kind+' · '+ctx.rm(x.amount),detail:x.reason,status:x.status,date:x.created_at||x.entry_date,reviewer:x.approved_by,reviewedAt:x.reviewed_at,can:false,open:'incomeLedger',raw:x}));
   (claims.claims||[]).forEach(x=>items.push({kind:'Existing claim',id:x.id,staff:x.owner_staff_id,title:x.title,detail:x.kind,status:x.status,date:x.created_at,reviewer:x.reviewer_staff_id,reviewedAt:x.reviewed_at,can:false,open:'claim:'+x.id,raw:x}));
   const closureRequests=results[5].status==='fulfilled'?results[5].value:[];
@@ -294,7 +294,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    const title=quickActions.find(action=>action[0]===kind)[1];
    const dialog=approvalDialog(title,`<form class="form">
     ${kind==='outlet'?'<label>Outlet name or code<input name="record_id" maxlength="120" required></label>':'<label>Module<select name="module" required>'+[['tasks','Tasks'],['outlets','Outlets'],['sales','Sales'],['catalogue','Catalogue'],['routes','Route Plan'],['reports','Reports'],['contacts','Contacts'],['income','Income'],['proposals','Proposal Library']].map(([value,label])=>`<option value="${value}">${label}</option>`).join('')+'</select></label>'}
-    ${kind==='new'?'<label>Record ID<input name="record_id" maxlength="120" required></label><label>Action<select name="action"><option value="edit">Edit</option><option value="delete">Delete</option></select></label>':kind==='permission'?'<label>Permission needed<select name="permission"><option>View</option><option>Edit</option><option>Upload</option><option>Delete</option></select></label>':''}
+    ${kind==='new'?'<label>Action<select name="action"><option value="edit">Edit</option><option value="delete">Delete</option></select></label>':kind==='permission'?'<label>Permission needed<select name="permission"><option>View</option><option>Edit</option><option>Upload</option><option>Delete</option></select></label>':''}
     <label>Reason<textarea name="reason" maxlength="1000" required></textarea></label>
     <button type="submit" class="primary">Submit request</button><p role="status"></p>
    </form>`);
@@ -305,13 +305,13 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     const values=Object.fromEntries(new FormData(form));
     const reason=values.reason.trim(), record=values.record_id?.trim();
     const feedback=form.querySelector('[role=status]');
-    if(!reason||(kind!=='permission'&&!record)){feedback.textContent='Complete the request details before submitting.';return;}
+    if(!reason||(kind==='outlet'&&!record)){feedback.textContent='Complete the request details before submitting.';return;}
     submit.disabled=true;
     try{
      await rpc('ffh_governance','request',{
       module:kind==='outlet'?'outlets':values.module,
       action:kind==='new'?values.action:'edit',
-      record_id:kind==='permission'?'permission:'+values.permission.toLowerCase():record,
+      record_id:kind==='permission'?'permission:'+values.permission.toLowerCase():kind==='new'?'request:'+id+':'+crypto.randomUUID():record,
       reason:kind==='new'?reason:kind==='permission'?values.permission+' permission: '+reason:'Outlet access: '+reason
      });
      if(dialog.open&&id===me()&&ctx.page()==='approvals'){dialog.close();await approvals();}
@@ -343,7 +343,22 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    });
    dateButton();
    const shown=filtered.filter(x=>!states[state]||states[state].includes(x.status)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
-   $('#ffApprovalCount').textContent=shown.length+' request(s)';$('#ffApprovalList').innerHTML=shown.map((x,i)=>`<article class="card"><div class="row"><b>${E(x.title)}</b><span class="ffPerformanceStatus">${E(x.status)}</span></div><p>${E(x.kind)} · ${E(who(x.staff))}</p><p>${E(x.detail)}</p><p class="miniStat">Submitted / updated ${E(stamp(x.date))}</p>${x.reviewedAt?`<p class="miniStat">Reviewed ${E(stamp(x.reviewedAt))} · ${E(who(x.reviewer))}</p>`:x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${safePhoto(x.photo)}${x.location?`<p class="miniStat">Location proof: ${E(x.location.latitude)}, ${E(x.location.longitude)} · ${E(stamp(x.location.capturedAt))}</p>`:''}${x.can?`<button class="primary ffInboxDecision" data-index="${i}" data-status="Done">APPROVE TASK</button><button class="secondary ffInboxDecision" data-index="${i}" data-status="Rejected">RETURN TASK</button>`:''}${x.canClose?`<button type="button" class="primary" data-review-closure="${i}">Review closure</button>`:''}${x.open?`<button class="secondary ffInboxOpen" data-index="${i}">OPEN REQUEST / REVIEW</button>`:''}</article>`).join('')||'<div class="ffApprovalEmpty">'+icon('empty')+'<span>No requests match this selection.</span></div>';bindPhotos();document.querySelectorAll('.ffInboxOpen').forEach(b=>b.onclick=()=>{const x=shown[+b.dataset.index];ctx.open(x.open,x.raw);});document.querySelectorAll('.ffInboxDecision').forEach(b=>b.onclick=async()=>{const request=shown[+b.dataset.index];if(!request||!request.can||b.disabled)return;if(!window.confirm(b.dataset.status==='Done'?'Confirm approval of this task?':'Confirm returning/rejecting this task?'))return;const controls=[...document.querySelectorAll('.ffInboxDecision')].filter(el=>el.dataset.index===b.dataset.index);controls.forEach(el=>el.disabled=true);try{await ctx.reviewTask(request.id,b.dataset.status);await approvals();}catch(e){alert(e.message);controls.forEach(el=>el.disabled=false);}});
+   $('#ffApprovalCount').textContent=shown.length+' request(s)';$('#ffApprovalList').innerHTML=shown.map((x,i)=>`<article class="card"><div class="row"><b>${E(x.title)}</b><span class="ffPerformanceStatus">${E(x.status)}</span></div><p>${E(x.kind)} · ${E(who(x.staff))}</p><p>${E(x.detail)}</p><p class="miniStat">Submitted / updated ${E(stamp(x.date))}</p>${x.reviewedAt?`<p class="miniStat">Reviewed ${E(stamp(x.reviewedAt))} · ${E(who(x.reviewer))}</p>`:x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${safePhoto(x.photo)}${x.location?`<p class="miniStat">Location proof: ${E(x.location.latitude)}, ${E(x.location.longitude)} · ${E(stamp(x.location.capturedAt))}</p>`:''}${x.can?`<button class="primary ffInboxDecision" data-index="${i}" data-status="Done">APPROVE TASK</button><button class="secondary ffInboxDecision" data-index="${i}" data-status="Rejected">RETURN TASK</button>`:''}${x.canGovern?`<button type="button" class="primary" data-govern-review="${i}">Approve / Reject Request</button>`:''}${x.canClose?`<button type="button" class="primary" data-review-closure="${i}">Review closure</button>`:''}${x.open?`<button class="secondary ffInboxOpen" data-index="${i}">OPEN REQUEST / REVIEW</button>`:''}</article>`).join('')||'<div class="ffApprovalEmpty">'+icon('empty')+'<span>No requests match this selection.</span></div>';bindPhotos();document.querySelectorAll('.ffInboxOpen').forEach(b=>b.onclick=()=>{const x=shown[+b.dataset.index];ctx.open(x.open,x.raw);});document.querySelectorAll('.ffInboxDecision').forEach(b=>b.onclick=async()=>{const request=shown[+b.dataset.index];if(!request||!request.can||b.disabled)return;if(!window.confirm(b.dataset.status==='Done'?'Confirm approval of this task?':'Confirm returning/rejecting this task?'))return;const controls=[...document.querySelectorAll('.ffInboxDecision')].filter(el=>el.dataset.index===b.dataset.index);controls.forEach(el=>el.disabled=true);try{await ctx.reviewTask(request.id,b.dataset.status);await approvals();}catch(e){alert(e.message);controls.forEach(el=>el.disabled=false);}});
+   document.querySelectorAll('[data-govern-review]').forEach(button=>button.onclick=()=>{
+    const request=shown[Number(button.dataset.governReview)];
+    if(!request?.canGovern||id!==me())return;
+    const dialog=approvalDialog('Review request',`<p>${E(who(request.staff))} · ${E(request.title)}</p><p>${E(request.detail)}</p><form class="form"><label>Decision<select name="status"><option value="Approved">Approve</option><option value="Rejected">Reject</option></select></label><label>Review note (required for rejection)<textarea name="note" maxlength="1000"></textarea></label><button class="primary" type="submit">Confirm decision</button><p role="status"></p></form>`);
+    const form=dialog.querySelector('form');
+    form.onsubmit=async event=>{
+     event.preventDefault();
+     const values=Object.fromEntries(new FormData(form)),status=form.querySelector('[role=status]');
+     if(values.status==='Rejected'&&!values.note.trim()){status.textContent='Enter a reason for rejection.';return;}
+     if(!window.confirm('Confirm '+values.status.toLowerCase()+' for this request?'))return;
+     const submit=form.querySelector('[type=submit]');submit.disabled=true;
+     try{await rpc('ffh_governance','review_request',{id:request.id,status:values.status});dialog.close();if(me()===id&&ctx.page()==='approvals')await approvals();}
+     catch(error){status.textContent=error.message;submit.disabled=false;}
+    };
+   });
    document.querySelectorAll('[data-review-closure]').forEach(button=>button.onclick=()=>{
     const request=shown[Number(button.dataset.reviewClosure)];
     if(request?.canClose)reviewClosure(request.closure);
