@@ -280,7 +280,9 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     const x=myItems[Number(button.dataset.approvalRecent)];
     const history=button.closest('dialog');
     history?.close();
-    approvalDialog(x.title,`<p>${E(x.kind)} · ${E(x.status)}</p><p>${E(x.detail)}</p><p>${E(stamp(x.date))}</p>${x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${safePhoto(x.photo)}`);
+    const historyEvents=x.kind==='Incentive / penalty'?(earn.events||[]).filter(event=>event.entry_id===x.id):[];
+    const audit=historyEvents.length?`<section class="ffApprovalAudit"><h3>Decision History</h3>${historyEvents.map(event=>`<article><strong>${E(event.action)}</strong> · ${E(who(event.actor))}<small>${E(stamp(event.created_at))}</small><p>${E(event.reason||'No note')}</p></article>`).join('')}</section>`:'';
+    approvalDialog(x.title,`<p>${E(x.kind)} · ${E(x.status)}</p><p>${E(x.detail)}</p><p>${E(stamp(x.date))}</p>${x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${audit}${safePhoto(x.photo)}`);
     bindPhotos();
    });
   }
