@@ -347,12 +347,12 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    document.querySelectorAll('[data-govern-review]').forEach(button=>button.onclick=()=>{
     const request=shown[Number(button.dataset.governReview)];
     if(!request?.canGovern||id!==me())return;
-    const dialog=approvalDialog('Review request',`<p>${E(who(request.staff))} · ${E(request.title)}</p><p>${E(request.detail)}</p><form class="form"><label>Decision<select name="status"><option value="Approved">Approve</option><option value="Rejected">Reject</option></select></label><label>Review note (required for rejection)<textarea name="note" maxlength="1000"></textarea></label><button class="primary" type="submit">Confirm decision</button><p role="status"></p></form>`);
+    const dialog=approvalDialog('Review request',`<p>${E(who(request.staff))} · ${E(request.title)}</p><p>${E(request.detail)}</p><form class="form"><label>Decision<select name="status"><option value="Approved">Approve</option><option value="Rejected">Reject</option></select></label><label>Review note (required for rejection)<textarea name="note" maxlength="1000"></textarea></label><button class="primary" type="submit">Confirm approval</button><p role="status"></p></form>`);
     const form=dialog.querySelector('form');
     form.onsubmit=async event=>{
      event.preventDefault();
      const values=Object.fromEntries(new FormData(form)),status=form.querySelector('[role=status]');
-     if(values.status==='Rejected'&&!values.note.trim()){status.textContent='Enter a reason for rejection.';return;}
+     if(values.status==='Rejected'){status.textContent='Rejection is unavailable here until the server can persist the rejection reason. Open the request management page instead.';return;}
      if(!window.confirm('Confirm '+values.status.toLowerCase()+' for this request?'))return;
      const submit=form.querySelector('[type=submit]');submit.disabled=true;
      try{await rpc('ffh_governance','review_request',{id:request.id,status:values.status});dialog.close();if(me()===id&&ctx.page()==='approvals')await approvals();}
@@ -367,7 +367,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   $('#ffApprovalType').onchange=draw;$('#ffApprovalStatus').onchange=draw;$('#ffApprovalSearch').oninput=draw;
   $('#ffApprovalReward').onclick=()=>{
    const staffIds=[...new Set([id,...scopedIds()])].filter(Boolean);
-   const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kuala_Lumpur',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+   const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Kuala_Lumpur',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
    const formHtml=`<form class="form ffRewardForm">
     <div class="ffRewardTypes"><label><input type="radio" name="kind" value="Incentive" checked> 🏆 Incentive / Reward</label><label><input type="radio" name="kind" value="Penalty"> ⚠ Penalty / Deduction</label></div>
     <section class="ffRewardSection"><h3>02 · Assignment & Basic Details</h3>
@@ -390,22 +390,22 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    </form>`;
    const dialog=approvalDialog('Reward & Penalty',formHtml),form=dialog.querySelector('form'),status=form.querySelector('[role=status]');
    const draftKey='ffh_reward_draft_'+id;
-   try{const saved=JSON.parse(sessionStorage.getItem(draftKey)||'null');if(saved&&typeof saved==='object')for(const [key,value] of Object.entries(saved)){const control=form.elements.namedItem(key);if(control&&key!=='kind'&&typeof value==='string')control.value=value;else if(key==='kind'){const radio=form.querySelector(`[name="kind"][value="${value==='Penalty'?'Penalty':'Incentive'}"]`);if(radio)radio.checked=true;}}}catch{}
+   try{const saved=JSON.parse(sessionStorage.getItem(draftKey)||'null');if(saved&&typeof saved==='object')for(const [key,value] of Object.entries(saved)){const control=form.elements.namedItem(key);if(control&&key!=='kind'&&control.type!=='file'&&typeof value==='string')control.value=value;else if(key==='kind'){const radio=form.querySelector(`[name="kind"][value="${value==='Penalty'?'Penalty':'Incentive'}"]`);if(radio)radio.checked=true;}}}catch{}
    const proofInputs=[...form.querySelectorAll('input[type=file]')];
    const selectedProofs=()=>proofInputs.flatMap(input=>[...input.files]);
    const proofStatus=form.querySelector('[data-proof-status]');
    proofInputs.forEach(input=>input.onchange=()=>{proofStatus.textContent=selectedProofs().length+' file(s) selected · submission unavailable until proof storage is connected';});
    form.querySelector('[data-task-proof]').onclick=()=>{status.textContent='Task proof linking is not connected yet. No file has been uploaded.';};
-   const values=()=>Object.fromEntries(new FormData(form));
-   form.querySelector('[data-draft]').onclick=()=>{try{sessionStorage.setItem(draftKey,JSON.stringify(values()));status.textContent='Draft saved on this device for this session.';}catch(error){status.textContent=error.message;}};
+   const values=()=>Object.fromEntries([...new FormData(form)].filter(([key])=>!['camera','gallery','document'].includes(key)));
+   form.querySelector('[data-draft]').onclick=()=>{try{sessionStorage.setItem(draftKey,JSON.stringify(values()));status.textContent=selectedProofs().length?'Text draft saved. Selected files cannot be saved in a session draft.':'Draft saved on this device for this session.';}catch(error){status.textContent=error.message;}};
    form.querySelector('[data-preview]').onclick=()=>{if(!form.reportValidity())return;const v=values();approvalDialog('Reward Preview',`<p>${E(v.kind)} · ${E(who(v.staff_id))}</p><p>RM ${E(v.amount)} · ${E(v.entry_date)}</p><p>${E(v.category)}: ${E(v.reason)}</p>`);};
    form.onsubmit=async event=>{
     event.preventDefault();if(id!==me()||!form.reportValidity())return;
     if(selectedProofs().length){status.textContent='Proof upload is not connected. Remove selected files before submitting, or save a draft.';return;}
-    const v=values();if(!staffIds.includes(v.staff_id)||!Number.isFinite(Number(v.amount))||Number(v.amount)<=0){status.textContent='Invalid staff or amount.';return;}
+    const v=values();if(!staffIds.includes(v.staff_id)||!Number.isFinite(Number(v.amount))||Number(v.amount)<=0||Number(v.amount)>1000000||v.entry_date>today||!v.reason.trim()){status.textContent='Invalid staff or amount.';return;}
     if(!window.confirm('Submit '+v.kind+' for '+who(v.staff_id)+'? Authorized income approvers may approve immediately.'))return;
     const button=form.querySelector('[type=submit]');button.disabled=true;
-    try{await rpc('ffh_earnings','propose',{staff_id:v.staff_id,entry_date:v.entry_date,kind:v.kind,amount:Number(v.amount),reason:v.category+': '+v.reason.trim()});sessionStorage.removeItem(draftKey);dialog.close();if(me()===id&&ctx.page()==='approvals')await approvals();}
+    try{await rpc('ffh_earnings','propose',{staff_id:v.staff_id,entry_date:v.entry_date,kind:v.kind,amount:Number(v.amount),reason:v.category+(v.outlet?.trim()?' · Outlet/Route: '+v.outlet.trim():'')+': '+v.reason.trim()});sessionStorage.removeItem(draftKey);dialog.close();if(me()===id&&ctx.page()==='approvals')await approvals();}
     catch(error){status.textContent=error.message;button.disabled=false;}
    };
   };
