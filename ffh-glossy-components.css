@@ -558,3 +558,100 @@ html body #app .app main.wrap .ffApprovalScreen .ffApprovalRecentRow,.ffApproval
 .ffApprovalDialog .form :is(label,input,select,textarea) {display:block;width:100%;box-sizing:border-box;}
 .ffApprovalDialog .form label {margin:.4rem 0;}
 .ffApprovalDialog .form [type=submit] {background:#a84e00;}
+
+/* Attendance and SR Tracking share the existing SOA gloss and app chrome. */
+#app .ffDutyScreen {
+  display:grid;
+  gap:.65rem;
+  touch-action:pan-y;
+  overscroll-behavior:contain;
+  color:#fff;
+}
+#app .ffDutyScreen [hidden] {display:none!important}
+#app .ffDutyScreen :is(.ffDutyHeading,.ffAttendanceIdentity,.ffAttendanceToday,.ffRefAttendance,.ffTrackingCard,.ffRefTrackRoster,#ffDutyMap) {
+  border:1px solid #ff8d25;
+  border-radius:1rem;
+  box-shadow:inset 0 0 .58em #e36f2370,0 0 .45em #ff780042;
+  background:linear-gradient(167deg,#251306,#060402 48%,#020202);
+}
+#app .ffDutyScreen :is(.ffDutyHeading,.ffAttendanceIdentity) {margin:0;padding:.6rem .8rem}
+#app .ffDutyHeading {
+  display:flex;
+  align-items:center;
+  gap:.65rem;
+  background:radial-gradient(ellipse at 75% 102%,#ff9f17 0,transparent 37%),linear-gradient(#200d03,#030303)!important;
+}
+#app .ffDutyHeading h1,#app .ffDutyHeading i {margin:0;font-size:clamp(1.32rem,5.5vw,2.45rem);line-height:1.1}
+#app .ffDutyScreen :is(.ffDutyHeading b,.ffDutyHeading i,.ffAttendanceToday h2 b,.ffDutyTodayGrid i) {color:#ff961f}
+#app .ffDutyScreen .ffAttendanceIdentity {display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.6rem}
+#app .ffDutyScreen .ffAttendanceIdentity h2 {margin:0;font-size:clamp(.83rem,3.5vw,1.5rem);line-height:1.15}
+#app .ffDutyScreen .ffAttendanceIdentity p,#app .ffDutyScreen .ffAttendanceIdentity time {margin:.2rem 0 0;font-size:clamp(.58rem,2.3vw,.9rem)}
+#app .ffDutyScreen .ffAttendancePortrait {width:clamp(37px,11vw,72px);height:auto;aspect-ratio:1}
+#app .ffDutyScreen :is(.ffAttendanceToday,.ffRefAttendance,.ffTrackingCard) {margin:0;padding:.6rem;min-width:0}
+#app .ffDutyScreen .ffAttendanceToday h2 {margin:0 0 .6rem;font-size:clamp(.84rem,3.35vw,1.38rem)}
+#app .ffDutyTodayGrid {display:grid;grid-template-columns:2.1fr repeat(3,1fr);gap:.3rem}
+#app .ffDutyTodayGrid article {
+  display:grid;align-content:center;justify-items:center;gap:.24em;min-width:0;text-align:center;padding:.45em .15em;
+  border-radius:.7rem;border:1px solid #a15b24;background:linear-gradient(#341a0a,#060302);
+  font-size:clamp(.58rem,2.45vw,1.06rem);
+}
+#app .ffDutyTodayGrid i {font-size:1.75em;font-style:normal;line-height:1}
+#app .ffDutyTodayGrid b {color:#70fb85}
+#app .ffDutyStatusRow {display:flex;align-items:center;justify-content:space-between;gap:.35rem;border-top:1px solid #6d3c1d;padding:.45rem .18rem;font-size:clamp(.68rem,2.7vw,1rem)}
+#app .ffDutyStatusRow:first-of-type {margin-top:.55rem}
+#app .ffDutyStatusRow b {text-align:right;color:#78f386}
+#app .ffDutyScreen #ffDutyStatus:empty {display:none}
+#app .ffDutyTiles {display:grid;gap:.4rem;grid-template-columns:repeat(4,minmax(0,1fr))}
+#app .ffDutyTiles button {display:grid;justify-items:center;align-content:center;min-width:0;min-height:4.15rem;padding:.35rem .1rem;line-height:1.08;font-size:clamp(.63rem,2.55vw,1.07rem);white-space:normal;overflow-wrap:anywhere}
+#app .ffDutyTiles button i {font-style:normal;font-size:1.6em;line-height:1.05;margin-bottom:.18em}
+#app .ffDutyTiles button small {font-size:.8em;margin-top:.2em}
+#app .ffDutyTiles button:disabled {opacity:.67}
+#app .ffDutyScreen .ffHistoryControls {margin:.45rem 0;display:grid;gap:.35rem;grid-template-columns:repeat(2,minmax(0,1fr))}
+#app .ffDutyScreen .ffHistoryControls :is(input,select) {display:block;width:100%;min-width:0;font-size:clamp(.62rem,2.55vw,.95rem);min-height:32px;padding:.2rem}
+#app .ffDutyScreen .ffHistoryControls label {font-size:.75rem;min-width:0}
+#app .ffDutyScreen .ffAttendanceMetrics {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.25rem;margin:.45rem 0 .65rem}
+#app .ffDutyScreen .ffAttendanceMetrics div {display:grid;align-content:center;text-align:center;min-width:0;padding:.4rem .05rem;border-radius:.65rem;font-size:clamp(.57rem,2.3vw,.88rem);background:linear-gradient(var(--ff-gloss-top),var(--ff-gloss-base));border:1px solid var(--ff-gloss-edge);box-shadow:inset 0 0 .48em var(--ff-gloss-edge)}
+#app .ffDutyScreen .ffAttendanceMetrics output {font-size:1.45em;font-weight:800;color:#fff}
+#app .ffDutyScreen .ffAttendanceMetrics [data-tone=green] {--ff-gloss-edge:#36e35b;--ff-gloss-top:#064927}
+#app .ffDutyScreen .ffAttendanceMetrics [data-tone=amber] {--ff-gloss-edge:#ffbd28;--ff-gloss-top:#654500}
+#app .ffDutyScreen .ffAttendanceMetrics [data-tone=red] {--ff-gloss-edge:#ff4859;--ff-gloss-top:#530813}
+#app .ffDutyScreen .ffAttendanceMetrics [data-tone=violet] {--ff-gloss-edge:#e141f5;--ff-gloss-top:#450c5d}
+#app .ffDutyScreen .ffAttendanceMetrics [data-tone=blue] {--ff-gloss-edge:#28bdff;--ff-gloss-top:#092e58}
+#app .ffDutyHistoryDetails {margin-top:.6rem}
+#app .ffTrackingIntro {margin:.1rem 0 .5rem;color:white;font-size:clamp(.67rem,2.8vw,.95rem)}
+#app .ffTrackingScreen .ffRefTrackingFields {display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) 2rem;gap:.3rem;align-items:end;margin:.5rem 0;padding:0;background:none;border:0;box-shadow:none}
+#app .ffTrackingScreen .ffRefTrackingFields label {display:grid;gap:.2rem;min-width:0;font-size:clamp(.56rem,2.6vw,.9rem)}
+#app .ffTrackingScreen .ffRefTrackingFields :is(select,input) {font-size:clamp(.54rem,2.35vw,.95rem);width:100%;min-width:0;min-height:32px;padding:.24rem}
+#app .ffTrackingScreen .ffRefTrackingFields button {padding:.25rem 0;min-height:32px}
+#app .ffTrackingScreen #ffTrackSummary {display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.3rem;margin:.55rem 0}
+#app .ffTrackingScreen #ffTrackSummary .ffRefMetric {font-size:clamp(.49rem,2.05vw,.92rem);min-height:5.7em;line-height:1.05;white-space:normal}
+#app .ffTrackingScreen #ffTrackSummary .ffRefMetric strong {font-size:1.6em}
+#app [data-color=cyan] {--ff-gloss-edge:#24eaff;--ff-gloss-top:#014453;--ff-gloss-base:#031318}
+#app .ffTrackingSplit {display:grid;grid-template-columns:1fr 1fr;gap:.4rem;align-items:stretch}
+#app .ffTrackingScreen #ffDutyMap {height:clamp(220px,57vw,410px);z-index:0;touch-action:none;overflow:hidden}
+#app .ffTrackingScreen .ffRefTrackRoster {min-width:0;padding:.3rem;margin:0;overflow:auto}
+#app .ffTrackRosterHead {display:flex;gap:.25rem;align-items:center;justify-content:space-between}
+#app .ffTrackRosterHead h2 {font-size:clamp(.55rem,2.25vw,1rem);margin:.25rem 0}
+#app .ffTrackRosterHead button {font-size:clamp(.49rem,1.85vw,.85rem);padding:.23rem;white-space:nowrap}
+#app #ffTrackRoster {display:grid;gap:.3rem;margin-top:.35rem;max-height:clamp(190px,51vw,375px);overflow:auto;padding:.15rem}
+#app #ffTrackRoster .ffTrackPerson {display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;text-align:left;gap:.25rem;padding:.32rem .2rem;min-width:0;min-height:2rem;font-size:clamp(.53rem,2.1vw,.9rem);line-height:1.15;white-space:normal;overflow-wrap:anywhere}
+#app .ffTrackPerson small {display:block;font-size:.82em;font-weight:normal}
+#app .ffTrackPerson .ffTrackingPortrait {width:clamp(21px,6vw,42px);height:auto;aspect-ratio:1}
+#app .ffTrackPerson .ffTrackingStatus {white-space:normal;text-align:center;font-size:.82em}
+#app .ffTrackingScreen .ffTrackingPrimary {grid-template-columns:repeat(5,minmax(0,1fr));margin-top:.55rem}
+#app .ffTrackingScreen .ffTrackingSecondary {grid-template-columns:repeat(6,minmax(0,1fr));margin-top:.55rem}
+#app .ffTrackingScreen .ffDutyTiles button {min-height:3.65rem;font-size:clamp(.52rem,2.1vw,.95rem)}
+#app .ffTrackingPin {display:grid;place-items:center;width:32px;height:32px;color:white;background:var(--ff-gloss-edge,#ffa72e);border-radius:50% 50% 50% 12%;transform:rotate(-45deg);box-shadow:0 1px 4px #0008;border:1px solid white}
+#app .ffTrackingPin>span {display:grid;place-items:center;transform:rotate(45deg);width:24px;height:24px;overflow:hidden;border-radius:50%;background:#251605}
+#app .ffTrackingPin img {width:100%;height:100%;object-fit:cover}
+#app .ffTrackingScreen .ffMapActions {margin-top:.55rem}
+#app .ffDutyScreen :is(button,select,input) {touch-action:manipulation}
+#app .ffTrackExport {display:flex;gap:.5rem}
+html:has(.ffDutyScreen),body:has(.ffDutyScreen),#app:has(.ffDutyScreen) {touch-action:pan-y;overscroll-behavior:none}
+html body #app .app main.wrap:has(.ffDutyScreen) {touch-action:pan-y;overscroll-behavior:contain}
+html body #app .ffDutyScreen .ffHistoryControls {position:static;z-index:auto}
+#app .ffAttendanceTeamCards:not(:empty) {grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.4rem;max-height:15rem;overflow:auto;padding:.25rem}
+#app .ffAttendanceTeamCards button {display:grid;grid-template-columns:auto minmax(0,1fr);text-align:left;align-items:center;gap:.15rem .4rem;padding:.35rem;font-size:.74rem;white-space:normal}
+#app .ffAttendanceTeamCards small {grid-column:2}
+#app .ffAttendanceTeamCards .ffTrackingPortrait {grid-row:span 2;width:30px;height:30px}
+html body #app .app main.wrap .ffTrackingScreen #ffDutyMap {height:clamp(200px,49vw,410px)!important;margin:0!important}

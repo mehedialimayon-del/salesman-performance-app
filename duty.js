@@ -8,7 +8,7 @@ const $=s=>document.querySelector(s),E=ctx.esc,user=()=>ctx.user(),date=()=>ctx.
 async function rpc(action,payload={}){const {data,error}=await sb.rpc('ffh_duty',{action,payload});if(error)throw Error(error.message);return data;}
 const active=()=>state?.attendance&&!state.attendance.check_out&&Date.parse(state.attendance.shift_end)>Date.now();
 const error=err=>{const el=$('#ffDutyStatus')||$('#ffChatStatus');if(el)el.textContent=err.message||String(err);else alert(err.message||String(err));};
-async function refresh(){if(!user())return;const next=await rpc('state');const changed=state?.can_track!==next.can_track;state=next;if(!active())stopWeb();if(changed&&page()==='home')ctx.home();if(changed&&page()==='tracking'&&!state.can_track){disposeMap();renderAttendance();}if(page()==='home')updateHome();}
+async function refresh(){if(!user())return;const next=await rpc('state');const changed=state?.can_track!==next.can_track;state=next;if(!active())stopWeb();if(changed&&page()==='home')ctx.home();if(page()==='home')updateHome();}
 function updateHome(){const b=$('[data-page="tracking"]');if(b)b.hidden=!state?.can_track;const a=$('[data-page="attendance"] small');const chat=$('[data-page="communication"] small');if(chat)chat.textContent=lastUnread?lastUnread+' unread messages':'Private staff messages';const tile=$('[data-page="communication"]');if(tile){tile.querySelectorAll('.ffChatUnreadBadge').forEach(x=>x.remove());if(lastUnread)tile.insertAdjacentHTML('beforeend','<span class="moduleBadge ffChatUnreadBadge">'+lastUnread+'</span>');}const attendanceTile=$('[data-page="attendance"]');if(attendanceTile){attendanceTile.querySelectorAll('.ffAttendancePendingBadge').forEach(x=>x.remove());if(state&&!state.attendance)attendanceTile.insertAdjacentHTML('beforeend','<span class="ffStatusBadge ffStatusWarn ffAttendancePendingBadge">!</span>');}if(a)a.textContent=state?.attendance?'Checked in '+new Date(state.attendance.check_in).toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'}):'Required before work';}
 async function init(){await shutdown();await refresh();people=await rpc('directory');channel=sb.channel('ffh-duty-'+user().id)
  .on('postgres_changes',{event:'*',schema:'public',table:'ffh_live_messages'},()=>loadMessages().catch(error))
@@ -27,18 +27,80 @@ function fix(){return new Promise((resolve,reject)=>{if(!navigator.geolocation)r
 function startWeb(){if(!active()||native())return;if(watchSession===state.attendance.id)return;stopWeb();watchSession=state.attendance.id;const sid=watchSession;watch=navigator.geolocation.watchPosition(async p=>{if(!active()||watchSession!==sid){stopWeb();return;}if(Date.now()-lastSent<15000||p.coords.accuracy>100)return;lastSent=Date.now();try{await rpc('point',{attendance_id:sid,latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy_m:p.coords.accuracy,captured_at:new Date(p.timestamp).toISOString(),speed_mps:p.coords.speed,source:'web'})}catch(e){console.warn('Location upload:',e);}},e=>{console.warn('GPS stopped:',e);if($('#ffDutyStatus'))$('#ffDutyStatus').textContent='Location unavailable: '+e.message},{enableHighAccuracy:true,maximumAge:0,timeout:30000});}
 async function startTracking(){if(!active())throw Error('Check in before starting duty tracking');if(native()){const {data,error}=await sb.auth.getSession();if(error||!data?.session)throw Error('Sign in again');native().startDuty(JSON.stringify({attendance_id:state.attendance.id,shift_end:state.attendance.shift_end,access_token:data.session.access_token,refresh_token:data.session.refresh_token}));}else startWeb();}
 function gate(target){return !!(user()&&user().id!=='PERVES_HIRA'&&state?.settings?.attendance_required&&!state.attendance&&!['home','attendance','profile','notifications','login','contacts','contactEdit'].includes(target));}
-function shell(title,html){ctx.setPage(title);ctx.shell(ctx.back(title==='attendance'?'Attendance':title==='tracking'?'SR Tracking':'Live Communication')+html);ctx.bindBack();}
-function renderAttendance(){
- disposeMap();
+const viewport=document.querySelector('meta[name="viewport"]');
+const defaultViewport=viewport?.content;
+const inDutyScreen=()=>!!$('.ffDutyScreen');
+if(viewport&&$('#app')){
+ new MutationObserver(()=>{
+  const content=inDutyScreen()?defaultViewport+',maximum-scale=1,user-scalable=no':defaultViewport;
+  if(viewport.content!==content)viewport.content=content;
+ }).observe($('#app'),{childList:true});
+}
+for(const event of ['touchstart','touchmove']){
+ document.addEventListener(event,e=>{if(inDutyScreen()&&e.touches.length>1)e.preventDefault();},{passive:false,capture:true});
+}
+function shell(title,html){ctx.setPage(title);ctx.shell((title==='communication'?ctx.back('Live Communication'):'')+html);ctx.bindBack();}
+const mytTime=value=>value?new Date(value).toLocaleTimeString('en-MY',{timeZone:'Asia/Kuala_Lumpur',hour:'2-digit',minute:'2-digit'}):'—';
+const staffZone=p=>p.zone_name||p.zone_id||'';
+const dutyTiles=(items,attribute)=>items.map(([key,icon,label,mini,tone])=>`<button type="button" class="ffRefButton" data-color="${tone||'amber'}" ${attribute}="${key}"><i aria-hidden="true">${icon}</i><span>${label}</span>${mini?`<small>${mini}</small>`:''}</button>`).join('');
+const dutyHeading=(icon,first,last)=>`<div class="ffDutyHeading"><i aria-hidden="true">${icon}</i><h1><b>${first}</b> ${last}</h1></div>`;
+function dutyIdentity(){
  const me=user(), staff=people.find(person=>person.staff_id===me?.id);
  const name=staff?.full_name||me?.name||'';
- const zone=staff?.zone_name||staff?.zone_id||me?.zone||'';
- const staffLine=[staff?.designation||me?.mode,me?.id,zone].filter(Boolean).join(' · ');
- const identity=`<section class="ffAttendanceIdentity"><span class="ffAttendancePortrait" data-ff-staff-avatar="${E(me?.id||'')}" aria-hidden="true">${E(name.trim().charAt(0)||'•')}</span><div><h2>${E(name)}</h2><p>${E(staffLine)}</p></div><time datetime="${date()}">${date()} MYT</time></section>`;
- shell('attendance',identity+`<div class="card ffAttendanceToday" id="ffAttendanceToday"><div class="cardTitle">Today’s Attendance · আজকের উপস্থিতি</div><div class="notice">Work-hours GPS · Stops at checkout.</div>${state?.attendance?`<p class="notice" role="status">Attendance already saved today · আজকের উপস্থিতি দেওয়া হয়েছে।</p><div class="row"><span>Check-in</span><b>${E(new Date(state.attendance.check_in).toLocaleString('en-MY'))}</b></div><div class="row"><span>Status</span><b>${active()?'ON DUTY':'DUTY ENDED'}</b></div><p class="miniStat">${native()?'Native Android tracking available':'Browser GPS works while the app is active; screen-off history can have gaps.'}</p>${active()?'<div class="ffAttendanceShiftActions"><button class="primary" id="ffResumeDuty">Resume duty</button><button class="secondary" id="ffCheckout">Check out</button></div>':''}`:`<p class="miniStat">আজকের উপস্থিতি দিতে নিচের Check in বাটনে চাপুন।</p><form class="form" id="ffAttendanceForm"><label>Attendance photo (optional)<input type="file" name="photo" accept="image/*" capture="user"></label><label><input type="checkbox" name="consent" required ${localStorage.getItem('ffh_duty_consent_v1')==='accepted'?'checked':''}> Work-hours location tracking</label><button class="primary ffAttendanceCheckIn" type="submit">Check in</button></form>`}<div id="ffDutyStatus" role="status" class="notice"></div></div>`);
+ const zone=staff?staffZone(staff):me?.zone||'';
+ const staffLine=[staff?.display_title||staff?.designation||me?.mode,me?.id,zone].filter(Boolean).join(' · ');
+ const stamp=new Date(date()+'T12:00:00+08:00').toLocaleDateString('en-GB',{timeZone:'Asia/Kuala_Lumpur',weekday:'short',day:'numeric',month:'short',year:'numeric'});
+ return `<section class="ffAttendanceIdentity"><span class="ffAttendancePortrait" data-ff-staff-avatar="${E(me?.id||'')}" aria-hidden="true">${E(name.trim().charAt(0)||'•')}</span><div><h2>${E(name)}</h2><p>${E(staffLine)}</p></div><time datetime="${E(date())}">${E(stamp)}</time></section>`;
+}
+function workHours(a){
+ if(!a)return '—';
+ const end=Math.min(Date.parse(a.check_out||a.shift_end),Date.now());
+ const ongoing=a.break_started_at?Math.max(0,(end-Date.parse(a.break_started_at))/1000):0;
+ const minutes=Math.floor(Math.max(0,(end-Date.parse(a.check_in))/1000-(a.break_seconds||0)-ongoing)/60);
+ return Math.floor(minutes/60)+' h '+minutes%60+' m';
+}
+function renderAttendance(){
+ disposeMap();
+ const now=state?.attendance, onBreak=active()&&now?.break_started_at;
+ const status=onBreak?'ON BREAK':active()?'DUTY ENGAGED':now?'DUTY ENDED':'AWAITING CHECK-IN';
+ shell('attendance',`<div class="ffDutyScreen">${dutyHeading('☑','Attendance','')}${dutyIdentity()}
+ <div class="card ffAttendanceToday" id="ffAttendanceToday">
+  <h2><b>✓ Today’s Attendance</b> · আজকের উপস্থিতি</h2>
+  <div class="ffDutyTodayGrid">
+   <article class="ffRefMetric" ${now?'aria-label="Attendance already saved today"':''} data-color="${now?'green':'gold'}"><i aria-hidden="true">${now?'✓':'◷'}</i><strong>${now?'Attendance Saved':'Check-In Required'}</strong><small>${now?'আজকের উপস্থিতি নেওয়া হয়েছে':'আজকের উপস্থিতি দিন'}</small></article>
+   <article><i aria-hidden="true">◷</i><span>Check-in</span><b>${E(mytTime(now?.check_in))}</b></article>
+   <article><i aria-hidden="true">⚑</i><span>Work Hours</span><b>${E(workHours(now))}</b></article>
+   <article><i aria-hidden="true">⌖</i><span>Location (GPS)</span><b>${now?.latitude!=null?'✓':'—'}</b></article>
+  </div>
+  <div class="ffDutyStatusRow"><span>▣ &nbsp; Status</span><b>${status}</b></div>
+  <div class="ffDutyStatusRow"><span>⌖ &nbsp; GPS Tracking</span><b>${active()?(native()?'Work hours (Android)':'Work hours (browser)'):'Inactive'}</b></div>
+  ${now?'':`<form class="form" id="ffAttendanceForm" hidden><label>Attendance photo (optional)<input type="file" name="photo" accept="image/*" capture="user"></label><label><input type="checkbox" name="consent" required ${localStorage.getItem('ffh_duty_consent_v1')==='accepted'?'checked':''}> Work-hours location tracking · stops at checkout</label><button class="primary ffAttendanceCheckIn" type="submit">Check in</button></form>`}
+  <div id="ffDutyStatus" role="status" class="notice"></div>
+ </div><div class="ffDutyShift ffDutyTiles">${dutyTiles([
+  ['check-in','⇥','Check-In','প্রবেশ','green'],['check-out','⇤','Check-Out','প্রস্থান','gold'],
+  ['break','♨','Break','বিরতি','blue'],['on-duty','⌖','On Duty','কাজে আছি','purple']
+ ],'data-duty-shift')}</div></div>`);
  if($('#ffAttendanceForm'))$('#ffAttendanceForm').onsubmit=async e=>{e.preventDefault();const button=e.submitter;button.disabled=true;try{if(!e.target.elements.consent.checked)throw Error('Accept the work-hours tracking disclosure');$('#ffDutyStatus').textContent='Getting GPS…';const location=await fix();let photo_path=null;const file=e.target.elements.photo.files[0];if(file){const blob=await compress(file);photo_path=user().id+'/'+crypto.randomUUID()+'.jpg';const {error}=await sb.storage.from('ffh-attendance').upload(photo_path,blob,{contentType:'image/jpeg'});if(error)throw error;}localStorage.setItem('ffh_duty_consent_v1','accepted');await rpc('checkin',{...location,photo_path,consent_version:'duty-location-v1',tracking_mode:native()?'android':'web'});await refresh();await startTracking();renderAttendance();$('#ffDutyStatus').textContent='Attendance saved. Duty tracking requested.';}catch(err){error(err);button.disabled=false;}};
- if($('#ffResumeDuty'))$('#ffResumeDuty').onclick=()=>startTracking().then(()=>{$('#ffDutyStatus').textContent='Tracking requested; check the phone tracking notification.'}).catch(error);
- if($('#ffCheckout'))$('#ffCheckout').onclick=async()=>{try{await rpc('checkout');stopWeb();native()?.stopDuty();await refresh();renderAttendance();}catch(e){error(e)}};
+ document.querySelectorAll('[data-duty-shift]').forEach(button=>{
+  const action=button.dataset.dutyShift;
+  button.disabled=action==='check-in'?!!now:!active()||(action==='break'&&!!onBreak);
+  button.onclick=async()=>{
+   if(action==='check-in'){
+    const form=$('#ffAttendanceForm');form.hidden=false;form.scrollIntoView?.({block:'nearest'});form.elements.consent.focus();return;
+   }
+   button.disabled=true;
+   try{
+    if(action==='check-out'){
+     await rpc('checkout');stopWeb();native()?.stopDuty();
+    }else if(action==='break'||onBreak){
+     const {error:failure}=await sb.rpc('ffh_set_duty_break',{on_break:action==='break'});
+     if(failure)throw failure;
+    }else await startTracking();
+    await refresh();if(page()==='attendance')renderAttendance();
+   }catch(err){error(err);}
+   finally{if(button.isConnected)button.disabled=false;}
+  };
+ });
  attendanceHistory();
  // The Home tile is near the bottom of a long page. Do not carry that
  // document scroll into Attendance and leave only History on screen.
@@ -53,22 +115,27 @@ function attendanceHistory(){
  if(!host||!sid)return;
  if(attendanceOwner!==sid){attendanceOwner=sid;attendanceMonth=date().slice(0,7);attendanceDay='';}
  const owner=user().id==='M21954'||user().ownerAccess===true;
- const directory=people.filter(p=>p.active!==false);
+ const staffDirectory=people.filter(p=>p.active!==false);
+ let directory=staffDirectory.filter(p=>p.staff_id===sid);
  const editor=owner?`<details class="ffAttendanceRoster"><summary>Shift / Leave Roster</summary><form class="form" id="ffRosterForm">
-   <div class="two"><label>Staff<select name="staff_id" required>${[...new Map([{staff_id:sid,full_name:user().name},...directory].map(p=>[p.staff_id,p])).values()].map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name||p.staff_id)}</option>`).join('')}</select></label>
+   <div class="two"><label>Staff<select name="staff_id" required>${[...new Map([{staff_id:sid,full_name:user().name},...staffDirectory].map(p=>[p.staff_id,p])).values()].map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name||p.staff_id)}</option>`).join('')}</select></label>
    <label>Date<input type="date" name="duty_date" value="${E(date())}" required></label></div>
    <label>Day type<select name="day_type"><option>Working</option><option>Leave</option><option>Off</option></select></label>
    <div class="two" id="ffRosterTimes"><label>Shift starts (MYT)<input type="time" name="starts_at" required></label><label>Shift ends (MYT)<input type="time" name="ends_at" required></label></div>
    <button type="submit" class="primary">Save roster day</button><p role="status"></p></form></details>`:'';
  const box=document.createElement('section');box.className='card ffHistoryPanel ffRefAttendance';
- box.innerHTML=`<div class="cardTitle">Attendance History</div><div class="two ffHistoryControls">
+ box.innerHTML=`<div class="cardTitle">This Month Summary · মাসিক সারাংশ</div><div class="two ffHistoryControls">
   <label>Month<input id="ffAttendanceMonth" type="month" value="${E(attendanceMonth)}"></label>
   <label>Date (optional)<input id="ffAttendanceDay" type="date" value="${E(attendanceDay)}"></label>
+ <label>View<select id="ffAttendanceScope"><option value="own">My Attendance</option><option value="all">Combined · Permitted staff</option></select></label>
+ <label hidden id="ffAttendanceStaffLabel">Staff<select id="ffAttendanceStaff"><option value="">All staff in selection</option></select></label>
+  <div id="ffAttendanceTeamCards" class="ffAttendanceTeamCards"></div>
  </div><div class="ffAttendanceMetrics" aria-label="Attendance totals in selected period">
   <div data-tone="green"><span>Present</span><output id="ffAttendancePresent">—</output></div>
   <div data-tone="amber"><span>Late</span><output id="ffAttendanceLate">—</output></div>
   <div data-tone="red"><span>Absent</span><output id="ffAttendanceAbsent">—</output></div>
   <div data-tone="violet"><span>Leave</span><output id="ffAttendanceLeave">—</output></div>
+  <div data-tone="blue"><span>Total Days</span><output id="ffAttendanceTotal">—</output></div>
  </div><div id="ffAttendanceHistory" class="ffHistoryScroll" tabindex="0" aria-label="Attendance history"></div>
  <button class="secondary" id="ffAttendanceMore" hidden>LOAD MORE HISTORY</button>
  <div class="ffRefExports ffAttendanceActions">
@@ -76,9 +143,50 @@ function attendanceHistory(){
   <button type="button" class="ffRefButton" data-attendance-export="xlsx">⇩ Export (Excel)</button>
   <button type="button" class="ffRefButton" id="ffAttendanceSummary">▥ Monthly Summary</button>
  </div><p id="ffAttendanceFeedback" role="status"></p>${editor}`;
- host.after(box);let offset=0;const attendanceRows=[];
+ const screen=host.closest('.ffDutyScreen');
+ screen.append(box);
+ const extras=document.createElement('div');extras.className='ffDutyTiles ffDutyQuick';
+ extras.innerHTML=dutyTiles([
+  ['history','☷','Attendance History','উপস্থিতির ইতিহাস'],['leave','⊞','Leave Request','ছুটির আবেদন'],
+  ['schedule','▦','My Schedule','আমার শিডিউল'],['team','♟','Team Attendance','টিমের উপস্থিতি'],
+  ['locations','⌖','Location Log','অবস্থানের রেকর্ড'],['export','▤','Report & Export','রিপোর্ট (PDF/Excel)'],
+  ['policy','◫','Policy & Rules','নীতি ও নির্দেশনা'],['settings','⚙','Settings','সেটিংস']
+ ],'data-duty-open');
+ box.querySelector('.ffAttendanceMetrics').after(extras);
+ const details=document.createElement('div');details.className='ffDutyHistoryDetails';details.hidden=true;
+ while(extras.nextSibling)details.append(extras.nextSibling);
+ extras.after(details);
+ let offset=0;const attendanceRows=[];
  const stamp=v=>v?new Date(v).toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur'}):'';
+ const scope=box.querySelector('#ffAttendanceScope'), staffFilter=box.querySelector('#ffAttendanceStaff');
+ const scopePeople=()=>directory.filter(p=>scope.value==='all'||staffZone(p)===scope.value);
+ const matchStaff=id=>(!staffFilter.value||staffFilter.value===id)&&scopePeople().some(p=>p.staff_id===id);
+ sb.rpc('ffh_attendance_team').then(({data})=>{
+  if(!Array.isArray(data)||!scope.isConnected)return;
+  directory=staffDirectory.filter(p=>data.includes(p.staff_id));
+  scope.insertAdjacentHTML('beforeend',[...new Set(directory.map(staffZone).filter(Boolean))].sort().map(zone=>`<option value="${E(zone)}">${E(zone)}</option>`).join(''));
+  if(scope.value!=='own')scope.onchange();
+ });
+
+ const periodEnd=month=>new Date(Date.UTC(+month.slice(0,4),+month.slice(5),0)).toISOString().slice(0,10);
+ const merged=(rows,schedule)=>{
+  const ids=new Set([...rows,...schedule].map(row=>row.staff_id||sid));
+  return [...ids].flatMap(id=>core.attendanceDays(rows.filter(row=>(row.staff_id||sid)===id),
+   schedule.filter(row=>(row.staff_id||sid)===id),new Date().toISOString()).map(row=>({...row,staff_id:id})))
+   .sort((a,b)=>b.duty_date.localeCompare(a.duty_date)||a.staff_id.localeCompare(b.staff_id));
+ };
  const records=async(month,day,start,size)=>{
+  if(scope.value!=='own'){
+   const out=[],requested={from_day:day||month+'-01',to_day:day||periodEnd(month)};
+   const query=sb.rpc('ffh_attendance_summary',requested).order('duty_date',{ascending:false}).order('staff_id');
+   for(let i=0;;i+=500){
+    const {data,error}=await query.range(i,i+499);
+    if(error)throw error;
+    out.push(...(data||[]).filter(row=>matchStaff(row.staff_id)));
+    if((data||[]).length<500)break;
+   }
+   return out.slice(start,start+size);
+  }
   let query=sb.from('ffh_attendance').select('id,duty_date,check_in,check_out,shift_end').eq('staff_id',sid);
   if(day)query=query.eq('duty_date',day);
   else{
@@ -91,29 +199,48 @@ function attendanceHistory(){
   return data||[];
  };
  const roster=async(month,day)=>{
-  let query=sb.from('ffh_attendance_roster').select('duty_date,day_type,starts_at,ends_at').eq('staff_id',sid);
+  let query=sb.from('ffh_attendance_roster').select('staff_id,duty_date,day_type,starts_at,ends_at');
+  if(scope.value==='own')query=query.eq('staff_id',sid);
   const next=new Date(month+'-01T00:00:00Z');next.setUTCMonth(next.getUTCMonth()+1);
   query=day?query.eq('duty_date',day):query.gte('duty_date',month+'-01').lt('duty_date',next.toISOString().slice(0,10));
-  const {data,error}=await query.order('duty_date',{ascending:false}).range(0,49);
-  if(error)throw error;
-  return data||[];
+  const out=[];
+  const ordered=query.order('duty_date',{ascending:false}).order('staff_id');
+  for(let i=0;;i+=500){
+   const {data,error}=await ordered.range(i,i+499);
+   if(error)throw error;
+   out.push(...(data||[]));
+   if((data||[]).length<500)break;
+  }
+  return scope.value==='own'?out:out.filter(row=>matchStaff(row.staff_id));
  };
  const counts=entries=>Object.fromEntries(['Present','Late','Absent','Leave'].map(status=>[status,entries.filter(row=>row.status===status).length]));
  const load=async(append=false)=>{
   const ticket=++historyVersion,list=box.querySelector('#ffAttendanceHistory'),month=attendanceMonth,day=attendanceDay;
   if(!append){attendanceRows.length=0;box.querySelectorAll('.ffAttendanceMetrics output').forEach(output=>output.value='—');}
   try{
-   const [rows,schedule]=await Promise.all([records(month,day,append?offset:0,50),roster(month,day).catch(()=>null)]);
+   const [rows,schedule]=await Promise.all([records(month,day,append?offset:0,scope.value==='own'?50:10000),roster(month,day).catch(()=>null)]);
    if(ticket!==historyVersion||!list.isConnected||user()?.id!==sid)return;
    attendanceRows.push(...rows);
-   const entries=core.attendanceDays(attendanceRows,schedule||[],new Date().toISOString());
+   const entries=merged(attendanceRows,schedule||[]);
+   box.querySelector('#ffAttendanceTotal').value=String(entries.filter(row=>row.check_in||row.status==='Absent'||row.status==='Leave').length);
    const totals=counts(entries);
    for(const [status,count] of Object.entries(totals))box.querySelector('#ffAttendance'+status).value=status==='Present'||schedule?.length?String(count):'—';
+   const teamCards=box.querySelector('#ffAttendanceTeamCards');
+   teamCards.innerHTML=scope.value==='own'||scope.value==='all'&&!staffFilter.value?'':scopePeople()
+    .filter(p=>!staffFilter.value||p.staff_id===staffFilter.value)
+    .sort((a,b)=>Number(!!b.can_manage)-Number(!!a.can_manage)||a.full_name.localeCompare(b.full_name))
+    .map(p=>{
+     const rows=entries.filter(row=>row.staff_id===p.staff_id), totals=counts(rows);
+     return `<button type="button" class="ffRefButton" data-team-staff="${E(p.staff_id)}"><span class="ffTrackingPortrait" data-ff-staff-avatar="${E(p.staff_id)}">${E(p.full_name.charAt(0))}</span><b>${E(p.full_name)}</b><small>${p.can_manage?'Manager':'SR'} · ${totals.Present} present · ${totals.Late} late</small></button>`;
+    }).join('');
+   teamCards.querySelectorAll('button').forEach(button=>button.onclick=()=>{
+    staffFilter.value=staffFilter.value===button.dataset.teamStaff?'':button.dataset.teamStaff;void load();
+   });
    list.innerHTML=entries.map(x=>`<article class="ffHistoryEntry"><b class="ffDateBadge">${E(x.duty_date)}</b>
-    <div><strong>${E(x.status)}</strong></div>
+    <div><strong>${E(x.status)}</strong>${scope.value==='own'?'':' · '+E(directory.find(p=>p.staff_id===x.staff_id)?.full_name||x.staff_id)}</div>
     <div>Check-in: <strong>${E(stamp(x.check_in)||'—')}</strong></div><div>Check-out: <strong>${E(stamp(x.check_out)||'—')}</strong></div></article>`).join('')||'<p>No attendance in this period.</p>';
    offset=(append?offset:0)+rows.length;
-   box.querySelector('#ffAttendanceMore').hidden=rows.length<50;
+   box.querySelector('#ffAttendanceMore').hidden=scope.value!=='own'||rows.length<50;
   }catch(err){if(ticket===historyVersion&&list.isConnected)list.textContent='History could not load: '+err.message;}
  };
  const form=box.querySelector('#ffRosterForm');
@@ -137,7 +264,7 @@ function attendanceHistory(){
     if(error)throw error;
     if(user()?.id!==sid||!form.isConnected)return;
     feedback.textContent='Roster saved for '+row.duty_date+' MYT.';
-    if(row.staff_id===sid)await load();
+    await load();
    }catch(error){feedback.textContent=error.message;}
    finally{button.disabled=false;}
   };
@@ -150,20 +277,21 @@ function attendanceHistory(){
   try{
    const data=[];
    for(let start=0;;start+=100){
-    const batch=await records(month,day,start,100);data.push(...batch);
-    if(batch.length<100)break;
+    const size=scope.value==='own'?100:10000;
+    const batch=await records(month,day,start,size);data.push(...batch);
+    if(batch.length<size)break;
    }
    if(!box.isConnected)return;
    feedback.textContent='';
    const schedule=await roster(month,day).catch(()=>[]);
-   await action(core.attendanceDays(data,schedule,new Date().toISOString()),day||month);
+   await action(merged(data,schedule),day||month);
   }catch(err){feedback.textContent=err.message;}
   finally{button.disabled=false;}
  };
  box.querySelectorAll('[data-attendance-export]').forEach(button=>{
   button.onclick=()=>run(button,(data,period)=>ctx.exportFile(button,'Attendance '+period,[
-   ['Date','Status','Check-in (MYT)','Check-out (MYT)','Shift end (MYT)'],
-   ...data.map(row=>[row.duty_date,row.status,stamp(row.check_in),stamp(row.check_out),stamp(row.shift_end)])
+   ['Staff','Date','Status','Check-in (MYT)','Check-out (MYT)','Shift end (MYT)'],
+   ...data.map(row=>[directory.find(p=>p.staff_id===row.staff_id)?.full_name||row.staff_id,row.duty_date,row.status,stamp(row.check_in),stamp(row.check_out),stamp(row.shift_end)])
   ],feedback),attendanceDay)();
  });
  const summary=box.querySelector('#ffAttendanceSummary');
@@ -171,6 +299,49 @@ function attendanceHistory(){
   const totals=counts(data),checkedOut=data.filter(row=>row.check_in&&row.check_out).length;
   feedback.textContent=period+' · '+Object.entries(totals).map(([label,value])=>label+' '+value).join(' · ')+' · '+checkedOut+' checked out';
  },'');
+ const reveal=target=>{details.hidden=false;target?.scrollIntoView?.({block:'nearest'});};
+ scope.onchange=()=>{
+  box.querySelector('#ffAttendanceStaffLabel').hidden=scope.value==='own';
+  staffFilter.innerHTML='<option value="">All staff in selection</option>'+scopePeople().sort((a,b)=>Number(!!b.can_manage)-Number(!!a.can_manage)).map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name)}${p.can_manage?' · Manager':''}</option>`).join('');
+  void load();
+ };
+ staffFilter.onchange=()=>void load();
+ extras.querySelectorAll('button').forEach(button=>button.onclick=()=>{
+  const target=button.dataset.dutyOpen;
+  if(target==='history')return reveal(box.querySelector('#ffAttendanceHistory'));
+  if(target==='team'){reveal(scope);scope.value='all';scope.onchange();scope.focus();return;}
+  if(target==='export')return reveal(box.querySelector('.ffAttendanceActions'));
+  if(target==='locations'){renderTracking(sid,attendanceDay||date()).catch(error);return;}
+  if(target==='schedule'){
+   const d=chatDialog('My Schedule','<div role="status">Loading schedule…</div>');
+   sb.from('ffh_attendance_roster').select('duty_date,day_type,starts_at,ends_at').eq('staff_id',sid)
+    .gte('duty_date',attendanceMonth+'-01').lte('duty_date',periodEnd(attendanceMonth)).order('duty_date').then(({data,error:failure})=>{
+     d.el.querySelector('[role=status]').innerHTML=failure?E(failure.message):(data||[]).map(r=>`<p>${E(r.duty_date)} · ${E(r.day_type)} ${E(r.starts_at? r.starts_at.slice(0,5)+'–'+r.ends_at.slice(0,5)+' MYT':'')}</p>`).join('')||'No roster days recorded for this month.';
+    });
+   return;
+  }
+  if(target==='leave'){
+   const d=chatDialog('Leave Request',`<form class="form"><label>Date<input name="day" type="date" value="${E(date())}" required></label><label>Reason<textarea name="reason" required maxlength="600"></textarea></label><button class="primary" type="submit">Submit leave request</button><p role="status"></p></form>`);
+   d.el.querySelector('form').onsubmit=async event=>{
+    event.preventDefault();const form=event.target, submit=event.submitter, notice=form.querySelector('[role=status]');
+    submit.disabled=true;
+    try{
+     const day=form.elements.day.value,reason=form.elements.reason.value.trim();
+     if(!reason)throw Error('Enter the reason for leave.');
+     const {error:failure}=await sb.rpc('ffh_governance',{action:'request',payload:{action:'edit',module:'attendance',record_id:day,reason:'Leave request · '+day+' · '+reason}});
+     if(failure)throw failure;
+     notice.textContent='Submitted for review in Approval Inbox.';
+    }catch(err){notice.textContent=err.message;submit.disabled=false;}
+   };
+   return;
+  }
+  if(target==='settings'){
+   const editor=box.querySelector('.ffAttendanceRoster');
+   if(editor){editor.open=true;reveal(editor);return;}
+   chatDialog('Attendance Settings',`<p>Required check-in: ${state?.settings?.attendance_required?'On':'Off'}</p><p>Tracking: ${native()?'Android':'Web'} · precise location required during check-in.</p>`);return;
+  }
+  chatDialog('Policy & Rules','<ul><li>Allow work-hours GPS before checking in.</li><li>Tracking ends at checkout or shift end. Breaks are deducted from work hours.</li><li>Late and absent status use the saved roster for your shift.</li></ul>');
+ });
  box.querySelector('#ffAttendanceMonth').onchange=e=>{
   if(!e.target.value){e.target.value=attendanceMonth;return;}
   attendanceMonth=e.target.value;attendanceDay='';box.querySelector('#ffAttendanceDay').value='';void load();
@@ -184,31 +355,75 @@ function disposeMap(){closeFullMap?.();refreshTeamMap=null;generation++;if(map){
 function openTrackingFullscreen(){
  if(closeFullMap){closeFullMap();return;}if(!map)return;const target=$('#ffDutyMap'),marker=document.createComment('tracking-map'),overlay=document.createElement('div');target.before(marker);overlay.className='ffMapFullOverlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Full screen tracking map');overlay.innerHTML='<button class="ffMapFullClose" type="button">× Back to tracking</button>';document.body.append(overlay);overlay.append(target);const close=window.FFH_OVERLAY(overlay,()=>{marker.replaceWith(target);overlay.remove();closeFullMap=null;map?.invalidateSize();});closeFullMap=close;overlay.querySelector('button').onclick=close;requestAnimationFrame(()=>map?.invalidateSize());
 }
-async function renderTracking(){await refresh();if(!state?.can_track)return renderAttendance();disposeMap();shell('tracking',`<div class="card ffTrackingCard"><p class="miniStat">Live location, visit status and daily field activity</p><div class="ffRefPanel ffRefFields ffRefTrackingFields"><label><span>Date<input id="ffTrackDate" type="date" value="${date()}" max="${date()}"></span></label><label><span>Zone<select id="ffTrackZone"><option value="">All permitted zones</option></select></span></label><label><span>SR / Team<select id="ffTrackStaff"></select></span></label></div><div id="ffTrackSummary" class="ffRefReportKpis" aria-live="polite"></div><div id="ffDutyMap" style="height:380px;border-radius:16px;margin-top:12px"></div><div id="ffDutyStatus" class="notice" role="status"></div><div class="ffMapActions"><button class="primary" id="ffMapMessage">MESSAGE SELECTED SR</button><button class="secondary" id="ffMapTask">＋ ASSIGN LOCATION TASK</button></div><section class="ffRefPanel ffRefTrackRoster"><h2>Team Status</h2><div id="ffTrackRoster" aria-live="polite"></div></section><div class="ffRefExports ffRefTrackActions"><button type="button" class="ffRefButton" data-track-open="route">Route Plan</button><button type="button" class="ffRefButton" data-track-open="outletHistory">Visit Log</button><button type="button" class="ffRefButton" data-track-open="reports">SR Performance</button></div><div id="ffStopList"></div><div id="ffAttendanceProof"></div></div>${user().id==='M21954'?`<details class="card ffTrackingAccess"><summary>⚙ Tracking viewing access <small>Choose viewers & permitted SRs</small></summary><div class="ffTrackingAccessBody"><p class="miniStat">OFF: only your account sees the manager map. SR always sees their own attendance and tracking status.</p><label><input type="checkbox" id="ffShareTracking" ${state.settings.tracking_shared?'checked':''}> Enable assigned viewers</label><form class="form" id="ffTrackingGrant"><label>Viewer<select name="viewer">${people.filter(p=>p.staff_id!==user().id).map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name)} · ${E(p.role)}</option>`).join('')}</select></label><label>SRs this viewer can see<select name="targets" multiple>${people.map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name)}</option>`).join('')}</select></label><button class="secondary">SAVE VIEWING ASSIGNMENT</button><p class="miniStat">Select no SRs to revoke this viewer's access.</p></form></div></details>`:''}`);
- const {data:rows,error:err}=await sb.from('ffh_attendance').select('staff_id').order('duty_date',{ascending:false}).limit(500);if(err)throw err;
- const visible=new Set((rows||[]).map(r=>r.staff_id));if(user().id==='M21954'||user().ownerAccess)people.forEach(p=>visible.add(p.staff_id));else{const {data:g}=await sb.from('ffh_tracking_grants').select('target_staff_ids').eq('viewer_staff_id',user().id).maybeSingle();(g?.target_staff_ids||[]).forEach(id=>visible.add(id));}
- const roster=people.filter(p=>visible.has(p.staff_id)), staff=$('#ffTrackStaff'), zone=$('#ffTrackZone');
- const group=p=>p.zone_name||p.zone_id||'';
+async function renderTracking(initialStaff='',initialDay=date()){
+ await refresh();disposeMap();
+ let trackingRows=[],trackingPoints=[],selectedStops=[];
+ shell('tracking',`<div class="ffDutyScreen ffTrackingScreen">
+ ${dutyHeading('⌖','SR','Tracking')}
+ <div class="card ffTrackingCard">
+ <p class="ffTrackingIntro">⌖ &nbsp; Live location, visit status, route and daily field activity</p>
+ ${dutyIdentity()}
+ <div class="ffRefPanel ffRefFields ffRefTrackingFields">
+  <label>Date<input id="ffTrackDate" type="date" value="${E(initialDay)}" max="${date()}"></label>
+  <label>Zone<select id="ffTrackZone"><option value="">All permitted zones</option></select></label>
+  <label>SR / Team<select id="ffTrackStaff"></select></label>
+  <button type="button" id="ffTrackSearch" class="ffRefButton" aria-label="Refresh tracking">⌕</button>
+ </div>
+ <div id="ffTrackSummary" class="ffRefReportKpis" aria-live="polite"></div>
+ <div class="ffTrackingSplit">
+  <div id="ffDutyMap"></div>
+  <section class="ffRefPanel ffRefTrackRoster"><div class="ffTrackRosterHead"><h2 id="ffTrackRosterTitle">SR Live Status</h2><button type="button" id="ffTrackViewAll" class="ffRefButton">View All</button></div><div id="ffTrackRoster" aria-live="polite"></div></section>
+ </div>
+ <div id="ffDutyStatus" class="notice" role="status"></div>
+ <div class="ffDutyTiles ffTrackingPrimary">${dutyTiles([
+  ['route','◫','Route Plan'],['outletHistory','▦','Visit Log'],['assign','⊞','Assign Task'],['reports','▥','SR Performance'],['live','⌁','Live Report']
+ ],'data-track-open')}</div>
+ <div class="ffDutyTiles ffTrackingSecondary">${dutyTiles([
+  ['geo','⌖','Geo Fence'],['coverage','▤','Outlet Coverage'],['distance','⌁','Distance & Travel'],
+  ['idle','◷','Idle Alert'],['proof','▧','Visit Proof'],['export','⇩','Export Report']
+ ],'data-track-open')}</div>
+ <div class="ffMapActions"><button class="primary" id="ffMapMessage">MESSAGE SELECTED SR</button><button hidden type="button" id="ffMapTask">Assign location task</button></div>
+ <div id="ffStopList" hidden></div><div id="ffAttendanceProof" hidden></div></div></div>${user().id==='M21954'?`<details class="card ffTrackingAccess"><summary>⚙ Tracking viewing access <small>Choose viewers & permitted SRs</small></summary><div class="ffTrackingAccessBody"><p class="miniStat">OFF: only your account sees the manager map. SR always sees their own attendance and tracking status.</p><label><input type="checkbox" id="ffShareTracking" ${state.settings.tracking_shared?'checked':''}> Enable assigned viewers</label><form class="form" id="ffTrackingGrant"><label>Viewer<select name="viewer">${people.filter(p=>p.staff_id!==user().id).map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name)} · ${E(p.role)}</option>`).join('')}</select></label><label>SRs this viewer can see<select name="targets" multiple>${people.map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name)}</option>`).join('')}</select></label><button class="secondary">SAVE VIEWING ASSIGNMENT</button><p class="miniStat">Select no SRs to revoke this viewer's access.</p></form></div></details>`:''}`);
+ const sid=user().id, staff=$('#ffTrackStaff'), zone=$('#ffTrackZone');
+ const {data:permitted,error:scopeError}=await sb.rpc('ffh_attendance_team');
+ if(!staff.isConnected)return;
+ const visible=new Set([sid,...(Array.isArray(permitted)?permitted:[])]);
+ const own=people.find(p=>p.staff_id===sid)||{staff_id:sid,full_name:user().name,zone_name:user().zone};
+ const roster=[own,...people.filter(p=>p.staff_id!==sid&&visible.has(p.staff_id))];
+ const group=staffZone;
  zone.insertAdjacentHTML('beforeend',[...new Set(roster.map(group).filter(Boolean))].sort().map(z=>`<option value="${E(z)}">${E(z)}</option>`).join(''));
  const filtered=()=>roster.filter(p=>!zone.value||group(p)===zone.value);
  function fillStaff(){
-   const before=staff.value;
-   staff.innerHTML='<option value="">All permitted SRs</option>'+filtered().map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name)}</option>`).join('');
+   const before=staff.value||initialStaff;
+   staff.innerHTML='<option value="">All permitted team</option>'+filtered().map(p=>`<option value="${E(p.staff_id)}">${E(p.staff_id===sid?'My location · '+p.full_name:p.full_name)}</option>`).join('');
    if(filtered().some(p=>p.staff_id===before))staff.value=before;
    staff.dispatchEvent(new Event('change'));
  }
- let teamRequest=0, lastTeamLoad=0, trackingStatus='';
+ let teamRequest=0, lastTeamLoad=0, trackingStatus='', showAll=false;
  async function teamStatus(fit=false){
-   const ticket=++teamRequest, day=$('#ffTrackDate').value, selected=filtered();
-   const {data,error:attendanceError}=await sb.from('ffh_attendance').select('id,staff_id,check_in,check_out,shift_end').eq('duty_date',day);
+   const ticket=++teamRequest, day=$('#ffTrackDate').value;
+   if(!day)return;
+   const selected=filtered().filter(p=>!staff.value||p.staff_id===staff.value);
+   const [summary,sharedRows,proofs]=await Promise.all([
+    sb.rpc('ffh_attendance_summary',{from_day:day,to_day:day}),
+    sb.from('ffh_attendance').select('id,staff_id,check_in,check_out,shift_end').eq('duty_date',day),
+    sb.from('ffh_campaign_executions').select('sr_id,outlet_name,proof_location').eq('execution_date',day)
+   ]);
    if(ticket!==teamRequest||!staff.isConnected)return;
-   if(attendanceError)throw Error(attendanceError.message);
-   const byId=new Map((data||[]).map(a=>[a.staff_id,a])), latest=new Map(), attended=selected.filter(p=>byId.has(p.staff_id));
+   if(sharedRows.error)throw Error(sharedRows.error.message);
+   const byId=new Map([...(Array.isArray(summary.data)?summary.data:[]),...(sharedRows.data||[])].map(a=>[a.staff_id,a]));
+   const latest=new Map(), attended=selected.filter(p=>byId.get(p.staff_id)?.id);
+   const outlets=new Map();
+   for(const proof of (Array.isArray(proofs.data)?proofs.data:[])){
+    if(!proof.proof_location)continue;
+    if(!outlets.has(proof.sr_id))outlets.set(proof.sr_id,[]);
+    outlets.get(proof.sr_id).push(proof);
+   }
    let incomplete=false;
    for(let start=0;start<attended.length;start+=8){
      if(ticket!==teamRequest||!staff.isConnected)return;
      const items=await Promise.all(attended.slice(start,start+8).map(async p=>{
-       const result=await sb.from('ffh_location_points').select('latitude,longitude,accuracy_m,captured_at')
+       const result=await sb.from('ffh_location_points').select('latitude,longitude,accuracy_m,speed_mps,captured_at')
          .eq('attendance_id',byId.get(p.staff_id).id).order('captured_at',{ascending:false}).limit(1);
        if(result.error)incomplete=true;
        return [p.staff_id,result.data?.[0]];
@@ -221,36 +436,48 @@ async function renderTracking(){await refresh();if(!state?.can_track)return rend
      if(!a)return 'Not Started';
      if(a.check_out||Date.parse(a.shift_end)<=Date.now())return 'Shift Ended';
      if(!point||Date.now()-Date.parse(point.captured_at)>180000)return 'No Location';
-     return 'On Field';
+     const atOutlet=(outlets.get(p.staff_id)||[]).some(({proof_location:proof})=>
+      Number.isFinite(proof.latitude)&&Number.isFinite(proof.longitude)&&
+      Math.abs(Date.parse(point.captured_at)-Date.parse(proof.capturedAt))<=600000&&core.distance(point,proof)<=100);
+     if((point.speed_mps??0)>=2)return 'In Transit';
+     return atOutlet?'At Outlet':'On Field';
    };
    const labels=[
      ['⌖','Total SR','gold',''],
      ['●','On Field','green','On Field'],
+     ['⌖','At Outlet','blue','At Outlet'],
+     ['◷','In Transit','gold','In Transit'],
      ['Ⅱ','Not Started','red','Not Started'],
      ['⚠','No Location','purple','No Location'],
-     ['◷','Shift Ended','blue','Shift Ended']
+     ['⚑','Shift Ended','cyan','Shift Ended']
    ];
-   const summary=$('#ffTrackSummary'), rosterPanel=$('#ffTrackRoster');
-   summary.innerHTML=labels.map(([icon,label,color,filter])=>{
+   const summaryPanel=$('#ffTrackSummary'), rosterPanel=$('#ffTrackRoster'), viewAll=$('#ffTrackViewAll');
+   trackingRows=selected.map(p=>({person:p,status:state(p),point:latest.get(p.staff_id),attendance:byId.get(p.staff_id)}));
+   summaryPanel.innerHTML=labels.map(([icon,label,color,filter])=>{
      const count=filter?selected.filter(p=>state(p)===filter).length:selected.length;
      return `<button type="button" class="ffRefMetric" data-color="${color}" data-track-status="${filter}" aria-pressed="${trackingStatus===filter}"><i aria-hidden="true">${icon}</i><strong>${count}</strong><span>${label}</span></button>`;
    }).join('');
    function renderRoster(){
      const matching=trackingStatus?selected.filter(person=>state(person)===trackingStatus):selected;
-     rosterPanel.innerHTML=matching.map(p=>{
+     const shown=showAll?matching:matching.slice(0,5);
+     $('#ffTrackRosterTitle').textContent='SR Live Status ('+shown.length+'/'+matching.length+')';
+     viewAll.hidden=matching.length<=5;
+     viewAll.textContent=showAll?'Show 5':'View All ('+matching.length+') →';
+     viewAll.onclick=()=>{showAll=!showAll;renderRoster();};
+     rosterPanel.innerHTML=shown.map(p=>{
        const point=latest.get(p.staff_id), status=state(p);
        const tone=labels.find(label=>label[3]===status)[2];
        const time=point?new Date(point.captured_at).toLocaleTimeString('en-MY',{timeZone:'Asia/Kuala_Lumpur',hour:'2-digit',minute:'2-digit'}):'';
-       return `<button type="button" class="ffRefRouteAssignment" data-tracking-staff="${E(p.staff_id)}"><span class="ffTrackingPortrait" aria-hidden="true">${E(p.full_name?.trim().charAt(0)||'•')}</span><b>${E(p.full_name)}${time?`<small>Last update: ${E(time)}</small>`:''}</b><span class="ffTrackingStatus" data-tone="${tone}">${E(status)}</span><span aria-hidden="true">›</span></button>`;
+       return `<button type="button" class="ffRefButton ffTrackPerson" data-color="${tone}" data-tracking-staff="${E(p.staff_id)}"><span class="ffTrackingPortrait" data-ff-staff-avatar="${E(p.staff_id)}" aria-hidden="true">${E(p.full_name?.trim().charAt(0)||'•')}</span><b>${E(p.full_name)}<small>${E(group(p))}</small></b><span class="ffTrackingStatus">${E(status)}<small>${E(time||'—')}</small></span><span aria-hidden="true">›</span></button>`;
      }).join('')||'<p class="ffRefHint">No staff in this selection.</p>';
      rosterPanel.querySelectorAll('[data-tracking-staff]').forEach(button=>button.onclick=()=>{
        staff.value=button.dataset.trackingStaff;
        staff.dispatchEvent(new Event('change'));
      });
    }
-   summary.querySelectorAll('[data-track-status]').forEach(button=>button.onclick=()=>{
+   summaryPanel.querySelectorAll('[data-track-status]').forEach(button=>button.onclick=()=>{
      trackingStatus=button.dataset.trackStatus;
-     summary.querySelectorAll('[data-track-status]').forEach(card=>card.setAttribute('aria-pressed',String(card===button)));
+     summaryPanel.querySelectorAll('[data-track-status]').forEach(card=>card.setAttribute('aria-pressed',String(card===button)));
      renderRoster();
    });
    renderRoster();
@@ -260,15 +487,13 @@ async function renderTracking(){await refresh();if(!state?.can_track)return rend
      for(const p of selected){
        const point=latest.get(p.staff_id);
        if(!point||!Number.isFinite(point.latitude)||!Number.isFinite(point.longitude))continue;
-       const coordinate=[point.latitude,point.longitude], color=state(p)==='On Field'?'#58fa21':state(p)==='Shift Ended'?'#ffb025':'#ff4848';
+       const coordinate=[point.latitude,point.longitude], tone=labels.find(label=>label[3]===state(p))[2];
        coordinates.push(coordinate);
-       const label=document.createElement('span');
-       label.textContent=p.full_name+' · '+state(p);
-       L.circleMarker(coordinate,{radius:9,color,weight:3,fillOpacity:.85}).bindTooltip(label).addTo(mapLayer)
-         .on('click',()=>{staff.value=p.staff_id;staff.dispatchEvent(new Event('change'));});
+       addTrackingPin(p,point,tone,state(p));
+
      }
      if(fit&&coordinates.length)map.fitBounds(L.latLngBounds(coordinates),{padding:[24,24],maxZoom:15});
-     $('#ffDutyStatus').textContent=incomplete?'Some location records could not load.':coordinates.length?
+     $('#ffDutyStatus').textContent=incomplete||summary.error||scopeError?'Some records could not load.':coordinates.length?
        coordinates.length+' recorded locations. Select a pin or staff member for their route.':'No location records for this team and date.';
    }
  }
@@ -278,25 +503,60 @@ async function renderTracking(){await refresh();if(!state?.can_track)return rend
    await teamStatus(fit);
  };
  fillStaff();
- zone.onchange=()=>{fillStaff();if(staff.value)refreshTeamMap(true).catch(error);};
+ zone.onchange=()=>{trackingStatus='';showAll=false;fillStaff();};
+ function reportRows(){
+  return [['Staff','Zone','Status','Check-in (MYT)','Last GPS (MYT)'],
+   ...trackingRows.map(r=>[r.person.full_name,group(r.person),r.status,mytTime(r.attendance?.check_in),mytTime(r.point?.captured_at)])];
+ }
+ const reveal=target=>{target.hidden=false;target.scrollIntoView?.({block:'nearest'});};
  document.querySelectorAll('[data-track-open]').forEach(button=>button.onclick=()=>{
-  const target=button.dataset.trackOpen,selected=staff.value;
-  if(target==='reports'||target==='outletHistory'){
-   return ctx.openTrackingDetail?.(target,{staff:selected,day:$('#ffTrackDate').value});
+  const target=button.dataset.trackOpen,selected=staff.value,day=$('#ffTrackDate').value;
+  if(target==='reports'||target==='outletHistory'||target==='coverage'){
+   return ctx.openTrackingDetail?.(target==='reports'?'reports':'outletHistory',{staff:selected,day});
   }
-  return ctx.open?.(target);
+  if(target==='route')return ctx.open?.('route');
+  if(!trackingRows.length&&target!=='assign')return error(Error('No tracking records in this selection.'));
+  if(target==='live'||target==='export'){
+   const rows=reportRows();
+   const d=chatDialog(target==='live'?'Live Report':'Export Tracking Report',`<p>${E(day)} · ${rows.length-1} staff</p><div class="ffTrackExport"><button type="button" class="ffRefButton" data-attendance-export="pdf">PDF</button><button type="button" class="ffRefButton" data-attendance-export="xlsx">Excel</button></div><p role="status"></p>${target==='live'?rows.slice(1).map(r=>`<p>${E(r[0])} · ${E(r[2])} · ${E(r[4])}</p>`).join(''):''}`);
+   d.el.querySelectorAll('[data-attendance-export]').forEach(action=>action.onclick=()=>ctx.exportFile(action,'SR Tracking '+day,rows,d.el.querySelector('[role=status]')));
+   return;
+  }
+  if(!selected){staff.focus();return error(Error('Choose an SR to open '+button.textContent.trim()+'.'));}
+  if(target==='assign')return $('#ffMapTask').click();
+  if(target==='proof')return ctx.openTrackingDetail?.('outletHistory',{staff:selected,day});
+  if(target==='geo'){
+   const proof=$('#ffAttendanceProof');
+   if(proof.childNodes.length)return reveal(proof);
+   return error(Error('No recorded attendance area for this staff and date.'));
+  }
+  if(target==='idle'){
+   const stops=$('#ffStopList');
+   if(selectedStops.length)return reveal(stops);
+   return error(Error('No sustained stops in the available GPS points.'));
+  }
+  if(target==='distance'){
+   const metres=core.segments(trackingPoints).reduce((sum,line)=>sum+line.slice(1).reduce((part,p,i)=>part+core.distance(
+     {latitude:line[i][0],longitude:line[i][1]},{latitude:p[0],longitude:p[1]}),0),0);
+   chatDialog('Distance & Travel',`<p>${trackingPoints.length<2?'Insufficient GPS points to calculate travel.':(metres/1000).toFixed(2)+' km across continuous GPS segments'}</p>`);
+  }
  });
+ $('#ffTrackSearch').onclick=()=>showSelection();
+ const detailHost=$('#ffStopList');
+ detailHost.addEventListener('ff-route-data',event=>{trackingPoints=event.detail.points;selectedStops=event.detail.stops;});
  if(!window.L){$('#ffDutyStatus').textContent='Map library could not load. Check your internet connection.';return;}
- map=L.map('ffDutyMap').setView([3.139,101.6869],11);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19}).addTo(map);mapLayer=L.layerGroup().addTo(map);const full=L.control({position:'topright'});full.onAdd=()=>{const button=L.DomUtil.create('button','ffMapFullscreen');button.type='button';button.id='ffMapFullscreen';button.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>';button.title='Full screen map';button.setAttribute('aria-label','Full screen map');L.DomEvent.disableClickPropagation(button);button.onclick=openTrackingFullscreen;return button;};full.addTo(map);setTimeout(()=>map?.invalidateSize(),100);
+ map=L.map('ffDutyMap',{touchZoom:false,doubleClickZoom:false,scrollWheelZoom:false}).setView([3.139,101.6869],11);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19}).addTo(map);mapLayer=L.layerGroup().addTo(map);const full=L.control({position:'topright'});full.onAdd=()=>{const button=L.DomUtil.create('button','ffMapFullscreen');button.type='button';button.id='ffMapFullscreen';button.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>';button.title='Full screen map';button.setAttribute('aria-label','Full screen map');L.DomEvent.disableClickPropagation(button);button.onclick=openTrackingFullscreen;return button;};full.addTo(map);setTimeout(()=>map?.invalidateSize(),100);
  function showSelection(){
-   currentLocation=null;
+   currentLocation=null;trackingPoints=[];selectedStops=[];trackingRows=[];mapLayer?.clearLayers();
+   $('#ffStopList').hidden=$('#ffAttendanceProof').hidden=true;
+   $('#ffStopList').replaceChildren();$('#ffAttendanceProof').replaceChildren();
    const selected=!!staff.value;
    $('#ffMapMessage').disabled=$('#ffMapTask').disabled=!selected;
-   if(!selected){$('#ffStopList').replaceChildren();$('#ffAttendanceProof').replaceChildren();}
-   loadMap(true).catch(error);
+   refreshTeamMap(true).catch(error);
+   if(selected)loadMap(true).catch(error);
  }
- staff.onchange=showSelection;
- $('#ffTrackDate').onchange=()=>{showSelection();if(staff.value)refreshTeamMap(true).catch(error);};
+ staff.onchange=()=>{trackingStatus='';showAll=false;showSelection();};
+ $('#ffTrackDate').onchange=showSelection;
  $('#ffMapMessage').onclick=()=>{const to=$('#ffTrackStaff').value;const text=prompt('Message this SR about this location:','ভাই, আপনি এই জায়গায় কী কাজ করছেন?');if(text?.trim())send(to,text,{date:$('#ffTrackDate').value,...(currentLocation||{})}).then(()=>{$('#ffDutyStatus').textContent='Message saved and notification queued.'}).catch(error)};
  $('#ffMapTask').onclick=()=>ctx.task($('#ffTrackStaff').value,$('#ffTrackDate').value,currentLocation);
  if($('#ffShareTracking'))$('#ffShareTracking').onchange=async e=>{try{await rpc('access',{shared:e.target.checked});await refresh();$('#ffDutyStatus').textContent='Viewing access updated.';}catch(err){e.target.checked=!e.target.checked;error(err)}};
@@ -305,11 +565,23 @@ async function renderTracking(){await refresh();if(!state?.can_track)return rend
  window.FFH_STYLE_SELECT?.($('#ffTrackStaff'),{title:'Choose SR'});window.FFH_STYLE_SELECT?.($('#ffTrackingGrant [name=viewer]'),{title:'Choose viewer'});window.FFH_STYLE_MULTI_SELECT?.($('#ffTrackingGrant [name=targets]'),{title:'SRs this viewer can see'});
  showSelection();
 }
+function addTrackingPin(person,point,tone,status){
+ const pin=document.createElement('span');pin.className='ffTrackingPin';pin.dataset.color=tone;
+ const portrait=document.createElement('span');portrait.dataset.ffStaffAvatar=person.staff_id;
+ portrait.textContent=person.full_name?.trim().charAt(0)||'•';pin.append(portrait);
+ const label=document.createElement('span');
+ label.textContent=[person.full_name,staffZone(person),status,mytTime(point.captured_at)].filter(Boolean).join(' · ');
+ return L.marker([point.latitude,point.longitude],{
+  icon:L.divIcon({className:'ffTrackingMarker',html:pin,iconSize:[35,40],iconAnchor:[17,39],popupAnchor:[0,-38]}),
+  title:person.full_name
+ }).addTo(mapLayer).bindPopup(label);
+}
 let mapLoading=false,pendingMap=false,currentLocation=null;
 async function loadMap(fit=false){
  if(!map||page()!=='tracking')return;
  const staff=$('#ffTrackStaff').value,day=$('#ffTrackDate').value;
  if(!staff)return refreshTeamMap?.(fit);
+ if(!fit)refreshTeamMap?.(false)?.catch(error);
  if(mapLoading){if(fit)pendingMap=true;return;}
  mapLoading=true;const gen=generation;
  try{
@@ -318,10 +590,11 @@ async function loadMap(fit=false){
  if(gen!==generation||!map||page()!=='tracking'||$('#ffTrackStaff').value!==staff||$('#ffTrackDate').value!==day)return;
  mapLayer.clearLayers();const stopRows=core.stops(points);for(const line of core.segments(points))L.polyline(line,{color:'#ff7417',weight:3}).addTo(mapLayer);
  for(const stop of stopRows){const marker=L.circleMarker([stop.latitude,stop.longitude],{radius:stop.minutes>=5?7:4,color:'#ffac54',fillOpacity:.9}).addTo(mapLayer);marker.bindTooltip((stop.minutes>=5?stop.minutes+' min · ':'')+new Date(stop.start).toLocaleTimeString('en-MY'),{permanent:stop.minutes>=5,direction:'top'});}
- const last=points.at(-1);currentLocation=last||null;if(last){L.circleMarker([last.latitude,last.longitude],{radius:9,color:'#55cafa',fillOpacity:.7}).bindTooltip('Last recorded location').addTo(mapLayer);L.circle([last.latitude,last.longitude],{radius:last.accuracy_m,color:'#55cafa',weight:1,fillOpacity:.08}).addTo(mapLayer);if(fit)map.setView([last.latitude,last.longitude],15);}
+ const last=points.at(-1);currentLocation=last||null;if(last){const person=people.find(p=>p.staff_id===staff)||{staff_id:staff,full_name:user().name};addTrackingPin(person,last,'blue','Last recorded location');L.circle([last.latitude,last.longitude],{radius:last.accuracy_m,color:'#55cafa',weight:1,fillOpacity:.08}).addTo(mapLayer);if(fit)map.setView([last.latitude,last.longitude],15);}
  $('#ffDutyStatus').textContent=!a?'No attendance on this date.':!last?'Attendance saved; no route points received.':`${a.check_out?'Checked out':'Shift ends '+new Date(a.shift_end).toLocaleTimeString('en-MY')} · Last GPS ${new Date(last.captured_at).toLocaleString('en-MY')} · ±${Math.round(last.accuracy_m)} m${Date.now()-Date.parse(last.captured_at)>180000?' · LOCATION STALE / TRACKING GAP':''}`;
+ $('#ffStopList').dispatchEvent(new CustomEvent('ff-route-data',{detail:{points,stops:stopRows}}));
  $('#ffStopList').innerHTML='<div class="cardTitle">Estimated Stops</div>'+stopRows.map(s=>`<div class="row"><span>${E(new Date(s.start).toLocaleTimeString('en-MY'))}</span><b>${s.minutes} min</b></div>`).join('');
- const proof=$('#ffAttendanceProof');proof.innerHTML=a?`<div class="miniStat">Daily starting point: ${a.latitude.toFixed(5)}, ${a.longitude.toFixed(5)} · ${a.daily_home_residence?'Manager-marked home area':'Attendance area; residence unconfirmed'}</div>${user().id==='M21954'||user().ownerAccess||user().mode==='MANAGER'?`<label><input type="checkbox" id="ffDayReturnAlert" ${a.daily_home_enabled?'checked':''}> Alert on return to this area today</label><label><input type="checkbox" id="ffDayHome" ${a.daily_home_residence?'checked':''}> Mark this as home for ${E(day)}</label><button class="secondary" id="ffSaveDayHome">SAVE DAILY AREA</button>`:''}`:'';if(a&&$('#ffSaveDayHome')){$('#ffSaveDayHome').onclick=async()=>{try{await rpc('daily_home',{attendance_id:a.id,enabled:$('#ffDayReturnAlert').checked,residence:$('#ffDayHome').checked});$('#ffDutyStatus').textContent='Daily reference saved for '+day;}catch(e){error(e)}};}if(a?.photo_path){const {data,error}=await sb.storage.from('ffh-attendance').createSignedUrl(a.photo_path,60);if(!error&&gen===generation&&proof.isConnected){const img=document.createElement('img');img.src=data.signedUrl;img.alt='Attendance photo';img.style.cssText='max-width:180px;border-radius:12px';proof.appendChild(img);}}
+ const proof=$('#ffAttendanceProof');proof.innerHTML=a&&a.latitude!=null&&a.longitude!=null?`<div class="miniStat">Daily starting point: ${a.latitude.toFixed(5)}, ${a.longitude.toFixed(5)} · ${a.daily_home_residence?'Manager-marked home area':'Attendance area; residence unconfirmed'}</div>${user().id==='M21954'||user().ownerAccess||user().mode==='MANAGER'?`<label><input type="checkbox" id="ffDayReturnAlert" ${a.daily_home_enabled?'checked':''}> Alert on return to this area today</label><label><input type="checkbox" id="ffDayHome" ${a.daily_home_residence?'checked':''}> Mark this as home for ${E(day)}</label><button class="secondary" id="ffSaveDayHome">SAVE DAILY AREA</button>`:''}`:'';if(a&&$('#ffSaveDayHome')){$('#ffSaveDayHome').onclick=async()=>{try{await rpc('daily_home',{attendance_id:a.id,enabled:$('#ffDayReturnAlert').checked,residence:$('#ffDayHome').checked});$('#ffDutyStatus').textContent='Daily reference saved for '+day;}catch(e){error(e)}};}if(a?.photo_path){const {data,error}=await sb.storage.from('ffh-attendance').createSignedUrl(a.photo_path,60);if(!error&&gen===generation&&proof.isConnected){const img=document.createElement('img');img.src=data.signedUrl;img.alt='Attendance photo';img.style.cssText='max-width:180px;border-radius:12px';proof.appendChild(img);}}
  }finally{mapLoading=false;if(pendingMap){pendingMap=false;loadMap(true).catch(error);}}}
 let contactZone='',chatAttachment=null;
 const chatMedia=window.FFH_CREATE_CHAT_MEDIA?.({sb,user,download:(...args)=>ctx.download(...args),error});
