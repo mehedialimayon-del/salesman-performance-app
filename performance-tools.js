@@ -211,17 +211,14 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   const states={pending:['Pending','Pending Review','Submitted'],approved:['Approved','Done'],returned:['Returned','Rejected']};
   const metrics=[['all','▤','All Requests','blue'],['pending','◷','Waiting','gold'],['approved','✓','Approved','green'],['returned','↩','Returned / Rejected','red']];
   page('approvals','Approval Inbox',`<section class="ffApprovalScreen">
-   <div class="ffApprovalTitle">${icon('inbox')}<h1><em>Approval</em> Inbox</h1>${icon('inbox')}</div>
+   <div class="ffApprovalTitle">${icon('inbox')}<h1><em>Approval</em> Inbox</h1><div class="ffApprovalHeaderTools"><button type="button" id="ffApprovalSearchToggle" aria-label="Search requests">${icon('search')}</button><button type="button" id="ffApprovalHeaderDate" aria-label="Select date">${icon('calendar')}</button><button type="button" id="ffApprovalHeaderStatus" aria-label="Filter status">${icon('settings')}</button><button type="button" id="ffApprovalMore" aria-label="More approval settings">⋮</button></div></div>
    <div class="card ffPerformanceIntro ffApprovalControls"><div class="two">
     <label><span>${icon('settings')} Status</span><select id="ffApprovalStatus"><option value="pending">Waiting for review</option><option value="approved">Approved / done</option><option value="returned">Returned / rejected</option><option value="all">All history</option></select></label>
     <label><span>${icon('search')} Search</span><input id="ffApprovalSearch" type="search" placeholder="Staff, outlet, task or request"></label>
     <label><span>${icon('types')} Request Type</span><select id="ffApprovalType"><option value="">All request types</option>${categories.map(kind=>`<option>${E(kind)}</option>`).join('')}</select></label>
     <div class="ffApprovalDateControl"><span>${icon('calendar')} Date Range</span><button type="button" id="ffApprovalDates" class="secondary">All dates ${icon('calendar')}</button></div>
    </div>${errors.map(s=>`<p role="alert">${E(s)} · Some requests could not load.</p>`).join('')}</div>
-   <div class="ffApprovalAdmin">
-    <button type="button" class="secondary" id="ffApprovalReload">${icon('refresh')}<span>Refresh Inbox</span></button>
-    ${id==='M21954'?'<button type="button" class="secondary" id="ffApprovalPermissions">'+icon('staff')+'<span>Staff / Task Access Settings</span></button><button type="button" class="secondary" id="ffIncomeApprovalPermissions">'+icon('money')+'<span>Income Approval Settings</span></button>':''}
-   </div>
+   <div class="ffApprovalAdmin"><button type="button" class="primary" id="ffApprovalReward">${icon('incentive')}<span>Reward &amp; Penalty</span></button></div>
    <div class="ffRefReportKpis" id="ffApprovalMetrics">${metrics.map(([key,glyph,label,tone])=>`<button type="button" data-approval-status="${key}" class="ffRefMetric" data-color="${tone}" aria-pressed="${key==='pending'}"><i aria-hidden="true">${glyph}</i><span>${label}</span><strong></strong></button>`).join('')}</div>
    <section class="ffApprovalPanel"><header><h2>${icon('bolt')} Quick Actions for SR</h2><button type="button" class="secondary" id="ffApprovalAllActions">View All →</button></header>
     <div class="ffApprovalQuick">${quickActions.map(action=>actionButton(...action)).join('')}</div>
@@ -287,7 +284,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     bindPhotos();
    });
   }
-  $('#ffApprovalRecent').innerHTML=myItems.length?recentRow(myItems[0],0):'<p class="ffRefHint">No requests submitted yet.</p>';
+  $('#ffApprovalRecent').innerHTML=myItems.length?myItems.slice(0,5).map(recentRow).join(''):'<p class="ffRefHint">No requests submitted yet.</p>';
   bindRecent(inbox);
   $('#ffApprovalHistory').onclick=()=>{
    const dialog=approvalDialog('My Request History',myItems.length?myItems.map(recentRow).join(''):'<p>No requests submitted yet.</p>');
@@ -346,14 +343,25 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    });
    dateButton();
    const shown=filtered.filter(x=>!states[state]||states[state].includes(x.status)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
-   $('#ffApprovalCount').textContent=shown.length+' request(s)';$('#ffApprovalList').innerHTML=shown.map((x,i)=>`<article class="card"><div class="row"><b>${E(x.title)}</b><span class="ffPerformanceStatus">${E(x.status)}</span></div><p>${E(x.kind)} · ${E(who(x.staff))}</p><p>${E(x.detail)}</p><p class="miniStat">Submitted / updated ${E(stamp(x.date))}</p>${x.reviewedAt?`<p class="miniStat">Reviewed ${E(stamp(x.reviewedAt))} · ${E(who(x.reviewer))}</p>`:x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${safePhoto(x.photo)}${x.location?`<p class="miniStat">Location proof: ${E(x.location.latitude)}, ${E(x.location.longitude)} · ${E(stamp(x.location.capturedAt))}</p>`:''}${x.can?`<button class="primary ffInboxDecision" data-index="${i}" data-status="Done">APPROVE TASK</button><button class="secondary ffInboxDecision" data-index="${i}" data-status="Rejected">RETURN TASK</button>`:''}${x.canClose?`<button type="button" class="primary" data-review-closure="${i}">Review closure</button>`:''}${x.open?`<button class="secondary ffInboxOpen" data-index="${i}">OPEN REQUEST / REVIEW</button>`:''}</article>`).join('')||'<div class="ffApprovalEmpty">'+icon('empty')+'<span>No requests match this selection.</span></div>';bindPhotos();document.querySelectorAll('.ffInboxOpen').forEach(b=>b.onclick=()=>{const x=shown[+b.dataset.index];ctx.open(x.open,x.raw);});document.querySelectorAll('.ffInboxDecision').forEach(b=>b.onclick=async()=>{const request=shown[+b.dataset.index];if(!request||!request.can||b.disabled)return;const controls=[...document.querySelectorAll('.ffInboxDecision')].filter(el=>el.dataset.index===b.dataset.index);controls.forEach(el=>el.disabled=true);try{await ctx.reviewTask(request.id,b.dataset.status);await approvals();}catch(e){alert(e.message);controls.forEach(el=>el.disabled=false);}});
+   $('#ffApprovalCount').textContent=shown.length+' request(s)';$('#ffApprovalList').innerHTML=shown.map((x,i)=>`<article class="card"><div class="row"><b>${E(x.title)}</b><span class="ffPerformanceStatus">${E(x.status)}</span></div><p>${E(x.kind)} · ${E(who(x.staff))}</p><p>${E(x.detail)}</p><p class="miniStat">Submitted / updated ${E(stamp(x.date))}</p>${x.reviewedAt?`<p class="miniStat">Reviewed ${E(stamp(x.reviewedAt))} · ${E(who(x.reviewer))}</p>`:x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${safePhoto(x.photo)}${x.location?`<p class="miniStat">Location proof: ${E(x.location.latitude)}, ${E(x.location.longitude)} · ${E(stamp(x.location.capturedAt))}</p>`:''}${x.can?`<button class="primary ffInboxDecision" data-index="${i}" data-status="Done">APPROVE TASK</button><button class="secondary ffInboxDecision" data-index="${i}" data-status="Rejected">RETURN TASK</button>`:''}${x.canClose?`<button type="button" class="primary" data-review-closure="${i}">Review closure</button>`:''}${x.open?`<button class="secondary ffInboxOpen" data-index="${i}">OPEN REQUEST / REVIEW</button>`:''}</article>`).join('')||'<div class="ffApprovalEmpty">'+icon('empty')+'<span>No requests match this selection.</span></div>';bindPhotos();document.querySelectorAll('.ffInboxOpen').forEach(b=>b.onclick=()=>{const x=shown[+b.dataset.index];ctx.open(x.open,x.raw);});document.querySelectorAll('.ffInboxDecision').forEach(b=>b.onclick=async()=>{const request=shown[+b.dataset.index];if(!request||!request.can||b.disabled)return;if(!window.confirm(b.dataset.status==='Done'?'Confirm approval of this task?':'Confirm returning/rejecting this task?'))return;const controls=[...document.querySelectorAll('.ffInboxDecision')].filter(el=>el.dataset.index===b.dataset.index);controls.forEach(el=>el.disabled=true);try{await ctx.reviewTask(request.id,b.dataset.status);await approvals();}catch(e){alert(e.message);controls.forEach(el=>el.disabled=false);}});
    document.querySelectorAll('[data-review-closure]').forEach(button=>button.onclick=()=>{
     const request=shown[Number(button.dataset.reviewClosure)];
     if(request?.canClose)reviewClosure(request.closure);
    });
   };
-  $('#ffApprovalType').onchange=draw;$('#ffApprovalStatus').onchange=draw;$('#ffApprovalSearch').oninput=draw;$('#ffApprovalReload').onclick=approvals;
-  if($('#ffApprovalPermissions'))$('#ffApprovalPermissions').onclick=()=>ctx.open('access');if($('#ffIncomeApprovalPermissions'))$('#ffIncomeApprovalPermissions').onclick=()=>ctx.open('incomeLedger');draw();
+  $('#ffApprovalType').onchange=draw;$('#ffApprovalStatus').onchange=draw;$('#ffApprovalSearch').oninput=draw;
+  $('#ffApprovalReward').onclick=()=>ctx.open('incomeLedger');
+  $('#ffApprovalSearchToggle').onclick=()=>{$('#ffApprovalSearch').focus();};
+  $('#ffApprovalHeaderDate').onclick=()=>$('#ffApprovalDates').click();
+  $('#ffApprovalHeaderStatus').onclick=()=>$('#ffApprovalStatus').focus();
+  $('#ffApprovalMore').onclick=()=>{
+   const dialog=approvalDialog('Approval Inbox Settings',`<div class="ffApprovalMenu"><button type="button" class="secondary" data-refresh>Refresh Inbox</button><button type="button" class="secondary" data-type>Request Type Filter</button>${id==='M21954'?'<button type="button" class="secondary" data-staff>Staff / Task Access Settings</button><button type="button" class="secondary" data-income>Income Approval Settings</button>':''}</div>`);
+   dialog.querySelector('[data-refresh]').onclick=()=>{dialog.close();approvals();};
+   dialog.querySelector('[data-type]').onclick=()=>{dialog.close();$('#ffApprovalType').focus();};
+   if(dialog.querySelector('[data-staff]'))dialog.querySelector('[data-staff]').onclick=()=>{dialog.close();ctx.open('access');};
+   if(dialog.querySelector('[data-income]'))dialog.querySelector('[data-income]').onclick=()=>{dialog.close();ctx.open('incomeLedger');};
+  };
+  draw();
  }
  const outletBrands=[
   ['01','Giant_Hypermarket',/^giant/],['02','KK_Super_Mart',/^kksuper/],['03','NSK_Grocer',/^nsk/],
