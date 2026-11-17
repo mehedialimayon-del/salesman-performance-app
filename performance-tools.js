@@ -367,22 +367,41 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   $('#ffApprovalType').onchange=draw;$('#ffApprovalStatus').onchange=draw;$('#ffApprovalSearch').oninput=draw;
   $('#ffApprovalReward').onclick=()=>{
    const staffIds=[...new Set([id,...scopedIds()])].filter(Boolean);
+   const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kuala_Lumpur',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
    const formHtml=`<form class="form ffRewardForm">
-    <div class="ffRewardTypes"><label><input type="radio" name="kind" value="Incentive" checked> Incentive / Reward</label><label><input type="radio" name="kind" value="Penalty"> Penalty / Deduction</label></div>
-    <div class="two"><label>Select Staff *<select name="staff_id" required><option value="">Choose Staff / SR</option>${staffIds.map(staff=>`<option value="${E(staff)}">${E(who(staff))} · ${E(staff)}</option>`).join('')}</select></label><label>Action Date *<input type="date" name="entry_date" required max="${new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kuala_Lumpur'})}"></label></div>
-    <div class="two"><label>Category *<select name="category" required><option value="">Select category</option><option>Performance</option><option>Sales Target</option><option>Outlet Visit</option><option>Attendance</option><option>Other</option></select></label><label>Amount (RM) *<input type="number" name="amount" min="0.01" step="0.01" required placeholder="0.00"></label></div>
-    <label>Details / Reason *<textarea name="reason" maxlength="500" required placeholder="Performance, task, outlet visit or reason"></textarea></label>
-    <p class="ffRefHint">Approval is enforced by existing income permissions. Authorized income approvers may cause immediate approval on submission. Proof attachments, refund and appeals remain available in the existing Income Ledger workflow.</p>
-    <div class="ffRewardButtons"><button type="button" class="secondary" data-draft>Save as Draft</button><button type="button" class="secondary" data-preview>Preview</button><button type="submit" class="primary">Submit</button></div><p role="status"></p>
+    <div class="ffRewardTypes"><label><input type="radio" name="kind" value="Incentive" checked> 🏆 Incentive / Reward</label><label><input type="radio" name="kind" value="Penalty"> ⚠ Penalty / Deduction</label></div>
+    <section class="ffRewardSection"><h3>02 · Assignment & Basic Details</h3>
+     <div class="two"><label>Select Staff *<select name="staff_id" required><option value="">Choose Staff / SR</option>${staffIds.map(staff=>`<option value="${E(staff)}">${E(who(staff))} · ${E(staff)}</option>`).join('')}</select></label><label>Outlet / Route (Optional)<input name="outlet" maxlength="120" placeholder="Outlet or route"></label></div>
+     <div class="two"><label>Assigned Approver <select name="approver" disabled><option>Income approval permissions apply</option></select></label><label>Action Date *<input type="date" name="entry_date" value="${today}" required max="${today}"></label></div>
+    </section>
+    <section class="ffRewardSection"><h3>03 · Performance Action Details</h3>
+     <div class="two"><label>Category *<select name="category" required><option value="">Select category</option><option>Performance</option><option>Sales Target</option><option>Outlet Visit</option><option>Attendance</option><option>Other</option></select></label><label>Amount (RM) *<input type="number" name="amount" min="0.01" step="0.01" required placeholder="0.00"></label></div>
+     <label>Details / Reason *<textarea name="reason" maxlength="500" required placeholder="Performance, task, outlet visit or reason"></textarea></label>
+    </section>
+    <section class="ffRewardSection"><h3>04 · Proof / Attachment (Optional)</h3>
+     <div class="ffRewardProof"><label class="secondary">📷 Camera<input type="file" name="camera" accept="image/*" capture="environment"></label><label class="secondary">▧ Gallery<input type="file" name="gallery" accept="image/*"></label><label class="secondary">▤ PDF / File<input type="file" name="document" accept="application/pdf,image/*"></label><button type="button" class="secondary" data-task-proof>Task Proof</button></div><small data-proof-status>No attachment selected</small>
+    </section>
+    <section class="ffRewardSection"><h3>05 · Approval Workflow & Notification</h3>
+     <div class="ffRewardWorkflow"><span>Assigned approver</span><span>Approval</span><span>Appeal</span><span>Income impact</span></div>
+     <label><input type="checkbox" name="notify" checked disabled> Notifications follow the existing server workflow</label>
+     <p class="ffRefHint">The current server may approve entries immediately when submitted by an authorized income approver. Attachment upload, approver assignment and appeals are not yet supported by this form; selecting a file will block submission rather than silently discard proof.</p>
+    </section>
+    <div class="ffRewardButtons"><button type="button" class="secondary" data-draft>Save as Draft</button><button type="button" class="secondary" data-preview>Preview</button><button type="submit" class="primary">Submit for Approval</button></div><p role="status"></p>
    </form>`;
    const dialog=approvalDialog('Reward & Penalty',formHtml),form=dialog.querySelector('form'),status=form.querySelector('[role=status]');
    const draftKey='ffh_reward_draft_'+id;
    try{const saved=JSON.parse(sessionStorage.getItem(draftKey)||'null');if(saved&&typeof saved==='object')for(const [key,value] of Object.entries(saved)){const control=form.elements.namedItem(key);if(control&&key!=='kind'&&typeof value==='string')control.value=value;else if(key==='kind'){const radio=form.querySelector(`[name="kind"][value="${value==='Penalty'?'Penalty':'Incentive'}"]`);if(radio)radio.checked=true;}}}catch{}
+   const proofInputs=[...form.querySelectorAll('input[type=file]')];
+   const selectedProofs=()=>proofInputs.flatMap(input=>[...input.files]);
+   const proofStatus=form.querySelector('[data-proof-status]');
+   proofInputs.forEach(input=>input.onchange=()=>{proofStatus.textContent=selectedProofs().length+' file(s) selected · submission unavailable until proof storage is connected';});
+   form.querySelector('[data-task-proof]').onclick=()=>{status.textContent='Task proof linking is not connected yet. No file has been uploaded.';};
    const values=()=>Object.fromEntries(new FormData(form));
    form.querySelector('[data-draft]').onclick=()=>{try{sessionStorage.setItem(draftKey,JSON.stringify(values()));status.textContent='Draft saved on this device for this session.';}catch(error){status.textContent=error.message;}};
    form.querySelector('[data-preview]').onclick=()=>{if(!form.reportValidity())return;const v=values();approvalDialog('Reward Preview',`<p>${E(v.kind)} · ${E(who(v.staff_id))}</p><p>RM ${E(v.amount)} · ${E(v.entry_date)}</p><p>${E(v.category)}: ${E(v.reason)}</p>`);};
    form.onsubmit=async event=>{
     event.preventDefault();if(id!==me()||!form.reportValidity())return;
+    if(selectedProofs().length){status.textContent='Proof upload is not connected. Remove selected files before submitting, or save a draft.';return;}
     const v=values();if(!staffIds.includes(v.staff_id)||!Number.isFinite(Number(v.amount))||Number(v.amount)<=0){status.textContent='Invalid staff or amount.';return;}
     if(!window.confirm('Submit '+v.kind+' for '+who(v.staff_id)+'? Authorized income approvers may approve immediately.'))return;
     const button=form.querySelector('[type=submit]');button.disabled=true;
