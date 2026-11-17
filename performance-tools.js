@@ -6,6 +6,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
  'use strict';
  const $=s=>document.querySelector(s), E=ctx.esc, sb=ctx.sb;
  let flushing=null, ticket=0, lastHistory=null, syncFilter={},syncSettingsOpen=false;
+ const approvalFilters=new Map();
  const me=()=>ctx.user()?.id;
  const key=id=>'ffh_order_outbox_v1_'+id;
  const read=id=>{const raw=localStorage.getItem(key(id));if(!raw)return [];let rows;try{rows=JSON.parse(raw);}catch(e){throw Error('Saved orders could not be read. Keep app data and contact Ayon.');}if(!Array.isArray(rows)||rows.some(x=>!x||typeof x!=='object'||typeof x.id!=='string'||!x.id||typeof x.actor!=='string'||!x.actor||!x.order||typeof x.order!=='object'||typeof x.order.sr!=='string'||!x.order.sr))throw Error('Saved orders contain invalid data. Keep app data and contact an administrator; nothing has been deleted.');return rows;};
@@ -180,17 +181,172 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    status:x.status,date:x.created_at,reviewer:x.reviewed_by,reviewedAt:x.reviewed_at,closure:x,
    canClose:permissionsFresh&&ctx.may('outlets')&&(allowed.has(x.outlet_sr_id)||x.outlet_sr_id===id)&&x.status==='Pending'});
   const errors=results.map((x,i)=>x.status==='rejected'?['Tasks','Access requests','Income requests','Claims','Permissions','Outlet closure'][i]+': '+x.reason.message:'').filter(Boolean);
-  page('approvals','Approval Inbox',`<div class="card ffPerformanceIntro ffApprovalControls"><div class="two"><label>Status<select id="ffApprovalStatus"><option value="pending">Waiting for review</option><option value="approved">Approved / done</option><option value="returned">Returned / rejected</option><option value="all">All history</option></select></label><label>Search<input id="ffApprovalSearch" placeholder="Staff, outlet, task or request"></label></div><button class="secondary" id="ffApprovalReload">REFRESH INBOX</button>${id==='M21954'?'<button class="secondary" id="ffApprovalPermissions">STAFF / TASK ACCESS SETTINGS</button><button class="secondary" id="ffIncomeApprovalPermissions">INCOME APPROVAL SETTINGS</button>':''}${errors.map(s=>`<p role="alert">${E(s)} · Some requests could not load.</p>`).join('')}</div><p id="ffApprovalCount" role="status"></p><div id="ffApprovalList"></div><div class="ffApprovalHelp"><p>You see only requests allowed by your existing access. SRs can follow their submissions. Task review needs Manager access plus Tasks Edit; income review needs separate approval permission. Claims keep their assigned reviewer. Access decisions stay with the owner / delegated administrator.</p><p>Approving an access request records a decision. An authorized administrator must separately change the actual permissions.</p></div>`);
-  const inbox=$('.ffApprovalControls');
-  inbox.insertAdjacentHTML('afterend',`<div class="ffRefReportKpis" id="ffApprovalMetrics">
-   ${metric('▤','All Requests','blue',items.length)}
-   ${metric('◷','Waiting','gold',items.filter(x=>['Pending','Pending Review','Submitted'].includes(x.status)).length)}
-   ${metric('✓','Approved','green',items.filter(x=>['Approved','Done'].includes(x.status)).length)}
-   ${metric('↩','Returned / Rejected','red',items.filter(x=>['Returned','Rejected'].includes(x.status)).length)}
-  </div>`);
+  const icons={
+   inbox:'<path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2M8 4V2h8v5H8zM8 14l3 3 5-6"/>',
+   settings:'<path d="M4 7h16M4 17h16M8 3v8m8 2v8"/><circle cx="8" cy="7" r="2"/><circle cx="16" cy="17" r="2"/>',
+   search:'<circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/>',
+   types:'<path d="m12 2 10 5-10 5-10-5zM2 12l10 5 10-5M2 17l10 5 10-5"/>',
+   calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6m10-6v6M3 11h18m-14 4h2m3 0h2m3 0h2"/>',
+   refresh:'<path d="M20 10a8 8 0 1 0-1 8m-2-9 4 2 1-5M4 14a8 8 0 0 0 1 4"/>',
+   staff:'<circle cx="9" cy="7" r="4"/><path d="M2 21v-4c0-5 14-5 14 0v4zM18 7h5m-2.5-2.5v5"/>',
+   money:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 4 16 4 16 0V5M4 10c0 4 16 4 16 0M4 15c0 4 16 4 16 0"/>',
+   add:'<path d="M13 3H5v18h14v-9M8 12h7m-7 4h7M17 4v6m-3-3h6"/>',
+   outlet:'<path d="M3 21h18M5 21V9h5V3h7v18m-5-13h2m-2 5h2m-2 5h2M7 13h1m-1 4h1"/>',
+   key:'<circle cx="16" cy="8" r="5"/><path d="m12 12-9 9v-4l3-3h3v-3"/>',
+   incentive:'<path d="m3 13 10-10h8v8L11 21zM9 15l6-6M9 10h.01M15 15h.01"/>',
+   claim:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M15 8h-5v4h4v4H9m3-10v12"/>',
+   document:'<path d="M14 3H5v18h14V8zM14 3v5h5M8 12h8m-8 4h8"/>',
+   bolt:'<path d="M14 2 4 14h7l-1 8 10-12h-7z"/>',
+   history:'<path d="M4 21h16M6 17v-4m5 4V9m5 8V5m4 12V2"/>',
+   empty:'<path d="M3 13l3-8h12l3 8v7H3zM3 13h5l2 4h4l2-4h5"/>',
+   info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/>'
+  };
+  const icon=name=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
+  const actionButton=(key,label,glyph)=>`<button type="button" class="secondary" data-approval-action="${key}">${icon(glyph)}<span>${label}</span></button>`;
+  const quickActions=[
+   ['new','New Request','add'],['outlet','Outlet Access','outlet'],['permission','Permission Request','key'],
+   ['incentive','Incentive Claim','incentive'],['expense','Expense Claim','claim'],['document','Document Upload','document']
+  ];
   const categories=[...new Set(items.map(x=>x.kind))];
-  inbox.querySelector('.two').insertAdjacentHTML('beforeend',`<label>Request Type<select id="ffApprovalType"><option value="">All request types</option>${categories.map(kind=>`<option>${E(kind)}</option>`).join('')}</select></label>`);
-  const draw=()=>{const kind=$('#ffApprovalType').value,term=$('#ffApprovalSearch').value.trim().toLowerCase(),state=$('#ffApprovalStatus').value;const states={pending:['Pending','Pending Review','Submitted'],approved:['Approved','Done'],returned:['Returned','Rejected']};const shown=items.filter(x=>(!kind||x.kind===kind)&&(!states[state]||states[state].includes(x.status))).filter(x=>!term||[x.kind,x.title,x.detail,who(x.staff),x.staff].join(' ').toLowerCase().includes(term)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));$('#ffApprovalCount').textContent=shown.length+' request(s)';$('#ffApprovalList').innerHTML=shown.map((x,i)=>`<article class="card"><div class="row"><b>${E(x.title)}</b><span class="ffPerformanceStatus">${E(x.status)}</span></div><p>${E(x.kind)} · ${E(who(x.staff))}</p><p>${E(x.detail)}</p><p class="miniStat">Submitted / updated ${E(stamp(x.date))}</p>${x.reviewedAt?`<p class="miniStat">Reviewed ${E(stamp(x.reviewedAt))} · ${E(who(x.reviewer))}</p>`:x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${safePhoto(x.photo)}${x.location?`<p class="miniStat">Location proof: ${E(x.location.latitude)}, ${E(x.location.longitude)} · ${E(stamp(x.location.capturedAt))}</p>`:''}${x.can?`<button class="primary ffInboxDecision" data-index="${i}" data-status="Done">APPROVE TASK</button><button class="secondary ffInboxDecision" data-index="${i}" data-status="Rejected">RETURN TASK</button>`:''}${x.canClose?`<button type="button" class="primary" data-review-closure="${i}">Review closure</button>`:''}${x.open?`<button class="secondary ffInboxOpen" data-index="${i}">OPEN REQUEST / REVIEW</button>`:''}</article>`).join('')||'<div class="card empty">No requests match this selection.</div>';bindPhotos();document.querySelectorAll('.ffInboxOpen').forEach(b=>b.onclick=()=>{const x=shown[+b.dataset.index];ctx.open(x.open,x.raw);});document.querySelectorAll('.ffInboxDecision').forEach(b=>b.onclick=async()=>{const request=shown[+b.dataset.index];if(!request||!request.can||b.disabled)return;const controls=[...document.querySelectorAll('.ffInboxDecision')].filter(el=>el.dataset.index===b.dataset.index);controls.forEach(el=>el.disabled=true);try{await ctx.reviewTask(request.id,b.dataset.status);await approvals();}catch(e){alert(e.message);controls.forEach(el=>el.disabled=false);}});
+  const states={pending:['Pending','Pending Review','Submitted'],approved:['Approved','Done'],returned:['Returned','Rejected']};
+  const metrics=[['all','▤','All Requests','blue'],['pending','◷','Waiting','gold'],['approved','✓','Approved','green'],['returned','↩','Returned / Rejected','red']];
+  page('approvals','Approval Inbox',`<section class="ffApprovalScreen">
+   <div class="ffApprovalTitle">${icon('inbox')}<h1><em>Approval</em> Inbox</h1>${icon('inbox')}</div>
+   <div class="card ffPerformanceIntro ffApprovalControls"><div class="two">
+    <label><span>${icon('settings')} Status</span><select id="ffApprovalStatus"><option value="pending">Waiting for review</option><option value="approved">Approved / done</option><option value="returned">Returned / rejected</option><option value="all">All history</option></select></label>
+    <label><span>${icon('search')} Search</span><input id="ffApprovalSearch" type="search" placeholder="Staff, outlet, task or request"></label>
+    <label><span>${icon('types')} Request Type</span><select id="ffApprovalType"><option value="">All request types</option>${categories.map(kind=>`<option>${E(kind)}</option>`).join('')}</select></label>
+    <div class="ffApprovalDateControl"><span>${icon('calendar')} Date Range</span><button type="button" id="ffApprovalDates" class="secondary">All dates ${icon('calendar')}</button></div>
+   </div>${errors.map(s=>`<p role="alert">${E(s)} · Some requests could not load.</p>`).join('')}</div>
+   <div class="ffApprovalAdmin">
+    <button type="button" class="secondary" id="ffApprovalReload">${icon('refresh')}<span>Refresh Inbox</span></button>
+    ${id==='M21954'?'<button type="button" class="secondary" id="ffApprovalPermissions">'+icon('staff')+'<span>Staff / Task Access Settings</span></button><button type="button" class="secondary" id="ffIncomeApprovalPermissions">'+icon('money')+'<span>Income Approval Settings</span></button>':''}
+   </div>
+   <div class="ffRefReportKpis" id="ffApprovalMetrics">${metrics.map(([key,glyph,label,tone])=>`<button type="button" data-approval-status="${key}" class="ffRefMetric" data-color="${tone}" aria-pressed="${key==='pending'}"><i aria-hidden="true">${glyph}</i><span>${label}</span><strong></strong></button>`).join('')}</div>
+   <section class="ffApprovalPanel"><header><h2>${icon('bolt')} Quick Actions for SR</h2><button type="button" class="secondary" id="ffApprovalAllActions">View All →</button></header>
+    <div class="ffApprovalQuick">${quickActions.map(action=>actionButton(...action)).join('')}</div>
+   </section>
+   <section class="ffApprovalPanel"><header><h2>${icon('history')} My Recent Requests</h2><button type="button" class="secondary" id="ffApprovalHistory">View History →</button></header>
+    <div id="ffApprovalRecent"></div>
+   </section>
+   <p id="ffApprovalCount" role="status"></p><div id="ffApprovalList"></div>
+   <aside class="ffApprovalHelp">${icon('info')}<ul><li>You see only requests allowed by your existing access.</li><li>SRs can follow their submissions.</li><li>Task review requires Manager access plus Tasks Edit.</li><li>Income review requires separate approval permission.</li><li>Claims stay with their assigned reviewer.</li><li>An authorized administrator applies permission changes after review.</li></ul></aside>
+  </section>`);
+  const inbox=$('.ffApprovalScreen');
+  const filters=approvalFilters.get(id)||{status:'pending',type:'',search:'',from:'',to:''};
+  approvalFilters.set(id,filters);
+  $('#ffApprovalStatus').value=filters.status;
+  $('#ffApprovalType').value=categories.includes(filters.type)?filters.type:'';
+  $('#ffApprovalSearch').value=filters.search;
+  const myItems=items.filter(x=>x.staff===id).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  const formatDate=value=>value?new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Kuala_Lumpur'}).format(new Date(value)):'';
+  const dateKey=value=>{
+   const date=new Date(value);
+   return value&&!Number.isNaN(date.valueOf())?new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Kuala_Lumpur'}).format(date):'';
+  };
+  const matchesDate=x=>{
+   const day=dateKey(x.date);
+   return (!filters.from&&!filters.to)||Boolean(day&&(!filters.from||day>=filters.from)&&(!filters.to||day<=filters.to));
+  };
+  const dateButton=()=>{
+   const {from,to}=filters;
+   $('#ffApprovalDates').innerHTML=`<span>${!from&&!to?'All dates':from===to?formatDate(from):[formatDate(from),formatDate(to)].filter(Boolean).join(' – ')}</span>${icon('calendar')}`;
+  };
+  function approvalDialog(title,body){
+   const dialog=document.createElement('dialog');
+   dialog.className='ffApprovalDialog';
+   dialog.setAttribute('aria-label',title);
+   dialog.innerHTML=`<header><h2>${E(title)}</h2><button type="button" class="secondary" data-close>Close</button></header>${body}`;
+   document.body.append(dialog);
+   dialog.querySelector('[data-close]').onclick=()=>dialog.close();
+   dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+   dialog.showModal();
+   return dialog;
+  }
+  $('#ffApprovalDates').onclick=()=>{
+   const dialog=approvalDialog('Date Range',`<form class="form"><label>From<input type="date" name="from" value="${E(filters.from)}"></label><label>To<input type="date" name="to" value="${E(filters.to)}"></label><button type="submit" class="primary">Apply</button><button type="button" class="secondary" data-date-clear>All dates</button><p role="alert"></p></form>`);
+   const form=dialog.querySelector('form');
+   form.onsubmit=event=>{
+    event.preventDefault();
+    const {from,to}=Object.fromEntries(new FormData(form));
+    if(from&&to&&from>to){form.querySelector('[role=alert]').textContent='From date must be on or before To date.';return;}
+    Object.assign(filters,{from,to});dialog.close();draw();
+   };
+   form.querySelector('[data-date-clear]').onclick=()=>{Object.assign(filters,{from:'',to:''});dialog.close();draw();};
+  };
+  function recentRow(x,index){
+   const color=states.approved.includes(x.status)?'green':states.returned.includes(x.status)?'red':'gold';
+   return `<button type="button" class="secondary ffApprovalRecentRow" data-approval-recent="${index}"><i aria-hidden="true">${color==='green'?'✓':color==='red'?'↩':'◷'}</i><span><b>${E(x.title)}</b><small>${E(x.detail||x.kind)}</small></span><span><strong class="ffRefStatus" data-color="${color}">${E(x.status)}</strong><small>${E(formatDate(dateKey(x.date)))}</small></span><span aria-hidden="true">›</span></button>`;
+  }
+  function bindRecent(root){
+   root.querySelectorAll('[data-approval-recent]').forEach(button=>button.onclick=()=>{
+    const x=myItems[Number(button.dataset.approvalRecent)];
+    const history=button.closest('dialog');
+    history?.close();
+    approvalDialog(x.title,`<p>${E(x.kind)} · ${E(x.status)}</p><p>${E(x.detail)}</p><p>${E(stamp(x.date))}</p>${x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${safePhoto(x.photo)}`);
+    bindPhotos();
+   });
+  }
+  $('#ffApprovalRecent').innerHTML=myItems.length?recentRow(myItems[0],0):'<p class="ffRefHint">No requests submitted yet.</p>';
+  bindRecent(inbox);
+  $('#ffApprovalHistory').onclick=()=>{
+   const dialog=approvalDialog('My Request History',myItems.length?myItems.map(recentRow).join(''):'<p>No requests submitted yet.</p>');
+   bindRecent(dialog);
+  };
+  function openRequest(kind){
+   const title=quickActions.find(action=>action[0]===kind)[1];
+   const dialog=approvalDialog(title,`<form class="form">
+    ${kind==='outlet'?'<label>Outlet name or code<input name="record_id" maxlength="120" required></label>':'<label>Module<select name="module" required>'+[['tasks','Tasks'],['outlets','Outlets'],['sales','Sales'],['catalogue','Catalogue'],['routes','Route Plan'],['reports','Reports'],['contacts','Contacts'],['income','Income'],['proposals','Proposal Library']].map(([value,label])=>`<option value="${value}">${label}</option>`).join('')+'</select></label>'}
+    ${kind==='new'?'<label>Record ID<input name="record_id" maxlength="120" required></label><label>Action<select name="action"><option value="edit">Edit</option><option value="delete">Delete</option></select></label>':kind==='permission'?'<label>Permission needed<select name="permission"><option>View</option><option>Edit</option><option>Upload</option><option>Delete</option></select></label>':''}
+    <label>Reason<textarea name="reason" maxlength="1000" required></textarea></label>
+    <button type="submit" class="primary">Submit request</button><p role="status"></p>
+   </form>`);
+   const form=dialog.querySelector('form'),submit=form.querySelector('[type=submit]');
+   form.onsubmit=async event=>{
+    event.preventDefault();
+    if(submit.disabled||id!==me())return;
+    const values=Object.fromEntries(new FormData(form));
+    const reason=values.reason.trim(), record=values.record_id?.trim();
+    const feedback=form.querySelector('[role=status]');
+    if(!reason||(kind!=='permission'&&!record)){feedback.textContent='Complete the request details before submitting.';return;}
+    submit.disabled=true;
+    try{
+     await rpc('ffh_governance','request',{
+      module:kind==='outlet'?'outlets':values.module,
+      action:kind==='new'?values.action:'edit',
+      record_id:kind==='permission'?'permission:'+values.permission.toLowerCase():record,
+      reason:kind==='new'?reason:kind==='permission'?values.permission+' permission: '+reason:'Outlet access: '+reason
+     });
+     if(dialog.open&&id===me()&&ctx.page()==='approvals'){dialog.close();await approvals();}
+    }catch(error){feedback.textContent=error.message;}
+    finally{submit.disabled=false;}
+   };
+  }
+  function bindQuick(root){
+   root.querySelectorAll('[data-approval-action]').forEach(button=>button.onclick=()=>{
+    const key=button.dataset.approvalAction;
+    button.closest('dialog')?.close();
+    if(key==='incentive')return ctx.open('incentive');
+    if(key==='expense')return ctx.open('claims');
+    if(key==='document')return typeof window.FFH_OPEN_CLAIM_DOCUMENT==='function'?window.FFH_OPEN_CLAIM_DOCUMENT():ctx.open('claims');
+    openRequest(key);
+   });
+  }
+  bindQuick(inbox);
+  $('#ffApprovalAllActions').onclick=()=>bindQuick(approvalDialog('Quick Actions for SR',`<div class="ffApprovalQuick">${quickActions.map(action=>actionButton(...action)).join('')}</div>`));
+  const draw=()=>{
+   const kind=$('#ffApprovalType').value,term=$('#ffApprovalSearch').value.trim().toLowerCase(),state=$('#ffApprovalStatus').value;
+   Object.assign(filters,{type:kind,search:$('#ffApprovalSearch').value,status:state});
+   const filtered=items.filter(matchesDate).filter(x=>(!kind||x.kind===kind)&&(!term||[x.kind,x.title,x.detail,who(x.staff),x.staff].join(' ').toLowerCase().includes(term)));
+   inbox.querySelectorAll('[data-approval-status]').forEach(button=>{
+    const key=button.dataset.approvalStatus;
+    button.setAttribute('aria-pressed',String(key===state));
+    button.querySelector('strong').textContent=filtered.filter(x=>!states[key]||states[key].includes(x.status)).length;
+    button.onclick=()=>{$('#ffApprovalStatus').value=key;draw();};
+   });
+   dateButton();
+   const shown=filtered.filter(x=>!states[state]||states[state].includes(x.status)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+   $('#ffApprovalCount').textContent=shown.length+' request(s)';$('#ffApprovalList').innerHTML=shown.map((x,i)=>`<article class="card"><div class="row"><b>${E(x.title)}</b><span class="ffPerformanceStatus">${E(x.status)}</span></div><p>${E(x.kind)} · ${E(who(x.staff))}</p><p>${E(x.detail)}</p><p class="miniStat">Submitted / updated ${E(stamp(x.date))}</p>${x.reviewedAt?`<p class="miniStat">Reviewed ${E(stamp(x.reviewedAt))} · ${E(who(x.reviewer))}</p>`:x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${safePhoto(x.photo)}${x.location?`<p class="miniStat">Location proof: ${E(x.location.latitude)}, ${E(x.location.longitude)} · ${E(stamp(x.location.capturedAt))}</p>`:''}${x.can?`<button class="primary ffInboxDecision" data-index="${i}" data-status="Done">APPROVE TASK</button><button class="secondary ffInboxDecision" data-index="${i}" data-status="Rejected">RETURN TASK</button>`:''}${x.canClose?`<button type="button" class="primary" data-review-closure="${i}">Review closure</button>`:''}${x.open?`<button class="secondary ffInboxOpen" data-index="${i}">OPEN REQUEST / REVIEW</button>`:''}</article>`).join('')||'<div class="ffApprovalEmpty">'+icon('empty')+'<span>No requests match this selection.</span></div>';bindPhotos();document.querySelectorAll('.ffInboxOpen').forEach(b=>b.onclick=()=>{const x=shown[+b.dataset.index];ctx.open(x.open,x.raw);});document.querySelectorAll('.ffInboxDecision').forEach(b=>b.onclick=async()=>{const request=shown[+b.dataset.index];if(!request||!request.can||b.disabled)return;const controls=[...document.querySelectorAll('.ffInboxDecision')].filter(el=>el.dataset.index===b.dataset.index);controls.forEach(el=>el.disabled=true);try{await ctx.reviewTask(request.id,b.dataset.status);await approvals();}catch(e){alert(e.message);controls.forEach(el=>el.disabled=false);}});
    document.querySelectorAll('[data-review-closure]').forEach(button=>button.onclick=()=>{
     const request=shown[Number(button.dataset.reviewClosure)];
     if(request?.canClose)reviewClosure(request.closure);

@@ -1,10 +1,16 @@
 const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require('jsdom');
 (async()=>{
  const dom=new JSDOM('<main></main>',{url:'https://example.test',runScripts:'outside-only'}),w=dom.window;
+ const requests=[];
+ w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
+ w.HTMLDialogElement.prototype.close=function(){this.open=false;this.dispatchEvent(new w.Event('close'));};
  let id='SR1',manager=false,grant=false,connected=false,page='',failPermission=false,failHistory=false,failSave=null,saves=0,accepted=[],opened=[],reviewed=[];
  Object.defineProperty(w.navigator,'onLine',{get:()=>connected});
  const table={ffh_outlets:[{id:'o1',sr_id:'SR1',outlet_code:'same',outlet_name:'KK One',category:'KK',active:true},{id:'o2',sr_id:'SR2',outlet_code:'same',outlet_name:'KK One',category:'KK',active:true}],ffh_sales:[{id:'sale',sr_id:'SR1',outlet_code:'same',outlet_name:'KK One',sale_date:'2026-10-18',sku:'Mango',status:'Delivered',delivered_amount:25,order_amount:30,qty:2},{id:'other',sr_id:'SR2',outlet_code:'same',outlet_name:'KK One',sale_date:'2026-10-18',sku:'Secret SKU',status:'Delivered',delivered_amount:99999}],ffh_tasks:[{id:'t1',assigned_to:'SR1',title:'Check display',outlet_name:'KK One',status:'Pending Review',created_at:'2026-10-18',proof_photo_url:'https://example.test/proof.jpg'},{id:'t2',assigned_to:'SR2',title:'Foreign task',status:'Pending Review'}],ffh_campaign_executions:[{id:'c1',sr_id:'SR1',outlet_code:'same',outlet_name:'KK One',execution_date:'2026-10-17',status:'Done',remarks:'Display proof'}]};
- const sb={from:t=>{const q={select:()=>q,order:()=>q,eq:(field,value)=>{q._field=field;q._value=value;return q;},maybeSingle:async()=>({data:(table[t]||[]).find(row=>row[q._field]===q._value)||null,error:null}),range:async()=>failHistory?{error:Error('Offline history')}:{data:table[t]||[]}};return q;},rpc:async(name)=>({data:name==='ffh_governance'?{requests:[{id:'r1',staff_id:id,module:'sales',action:'edit',record_id:'sale',reason:'Correction',status:'Pending'}]}:name==='ffh_earnings'?{entries:[]}: {claims:[]}})};
+ const sb={from:t=>{const q={select:()=>q,order:()=>q,eq:(field,value)=>{q._field=field;q._value=value;return q;},maybeSingle:async()=>({data:(table[t]||[]).find(row=>row[q._field]===q._value)||null,error:null}),range:async()=>failHistory?{error:Error('Offline history')}:{data:table[t]||[]}};return q;},rpc:async(name,args)=>{
+  if(name==='ffh_governance'&&args?.action==='request')requests.push({...args.payload});
+  return {data:name==='ffh_governance'?{requests:[{id:'r1',staff_id:id,module:'sales',action:'edit',record_id:'sale',reason:'Correction',status:'Pending'}]}:name==='ffh_earnings'?{entries:[]}: {claims:[]}};
+ }};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const ctx={sb,user:()=>({id}),isMgr:()=>manager,ids:()=>manager?['SR1']:['SR1','SR2'],staff:x=>({name:x}),outlets:()=>[{code:'same',name:'KK One',category:'KK'}],may:()=>grant,esc,rm:x=>'RM '+Number(x||0).toFixed(2),page:()=>page,setPage:p=>page=p,shell:s=>w.document.querySelector('main').innerHTML=s,back:t=>'<h1>'+esc(t)+'</h1>',bindBack(){},refreshStaff:async()=>{if(failPermission)throw Error('Permission unavailable');},refreshOutlets:async()=>{},saveSale:async x=>{saves++;if(failSave)throw failSave;x.cloudConfirmed=true;},acceptSale:x=>accepted.push(x),open:(p,row)=>opened.push([p,row]),reviewTask:async(id,status)=>reviewed.push([id,status])};
  w.eval(fs.readFileSync('performance-tools.js','utf8'));const ui=w.FFH_CREATE_PERFORMANCE_TOOLS(ctx),q=s=>w.document.querySelector(s),tick=()=>new Promise(r=>setTimeout(r,15));
@@ -33,6 +39,29 @@ const fs=require('node:fs'),assert=require('node:assert/strict'),{JSDOM}=require
  assert.equal(JSON.parse(w.localStorage.getItem('ffh_order_outbox_v1_SR1')).some(x=>x.id==='S-session-switch'),false,'saved order should sync on restored session');
  await assert.rejects(ui.queueOrder({...order,id:'foreign',sr:'SR2'}),/assigned SR/);
  await ui.approvals();assert.equal(w.document.querySelectorAll('.ffInboxDecision').length,0,'SR cannot self approve');assert(!q('main').textContent.includes('Foreign task'));assert(q('main').textContent.includes('Check display'));
+ assert.equal(w.document.querySelectorAll('.ffApprovalScreen [data-approval-action]').length,6);
+ assert.equal(w.document.querySelectorAll('[data-approval-status]').length,4);
+ q('[data-approval-status="approved"]').click();assert.match(q('#ffApprovalList').textContent,/No requests/);
+ q('[data-approval-status="pending"]').click();assert.match(q('#ffApprovalList').textContent,/Check display/);
+ q('#ffApprovalDates').click();let dialog=q('dialog');
+ dialog.querySelector('[name=from]').value='2026-10-19';dialog.querySelector('[name=to]').value='2026-10-31';
+ dialog.querySelector('form').dispatchEvent(new w.Event('submit',{cancelable:true}));
+ assert.match(q('#ffApprovalList').textContent,/No requests/);
+ q('#ffApprovalDates').click();q('[data-date-clear]').click();assert.match(q('#ffApprovalList').textContent,/Check display/);
+ q('#ffApprovalHistory').click();assert.match(q('dialog').textContent,/Check display/);q('dialog [data-close]').click();
+ q('#ffApprovalAllActions').click();assert.equal(q('dialog').querySelectorAll('[data-approval-action]').length,6);q('dialog [data-close]').click();
+ for(const key of ['new','outlet','permission']){
+  q('[data-approval-action="'+key+'"]').click();
+  const form=q('dialog form');
+  if(form.elements.record_id) form.elements.record_id.value='SALE-1';
+  form.elements.reason.value='Test request';
+  form.dispatchEvent(new w.Event('submit',{cancelable:true}));await tick();
+ }
+ assert.deepEqual(requests.map(request=>[request.module,request.record_id]),[['tasks','SALE-1'],['outlets','SALE-1'],['tasks','permission:view']]);
+ q('[data-approval-action=incentive]').click();assert.equal(opened.at(-1)[0],'incentive');
+ q('[data-approval-action=expense]').click();assert.equal(opened.at(-1)[0],'claims');
+ let uploads=0;w.FFH_OPEN_CLAIM_DOCUMENT=()=>{uploads++;};q('[data-approval-action=document]').click();assert.equal(uploads,1);
+
  manager=true;id='MANAGER';grant=true;await ui.approvals();assert.equal(w.document.querySelectorAll('.ffInboxDecision').length,2);q('.ffInboxDecision').click();await tick();assert.deepEqual(reviewed,[['t1','Done']]);
  grant=false;await ui.approvals();assert.equal(w.document.querySelectorAll('.ffInboxDecision').length,0);grant=true;failPermission=true;await ui.approvals();assert.equal(w.document.querySelectorAll('.ffInboxDecision').length,0,'refresh failure must hide direct review');failPermission=false;
  manager=false;id='SR1';await ui.historyPage();q('#ffOutletHistorySelect').value='0';q('#ffOutletHistorySelect').dispatchEvent(new w.Event('change'));assert(q('#ffOutletHistoryDetail').textContent.includes('RM 25.00'));assert(!q('#ffOutletHistoryDetail').textContent.includes('Secret SKU'));assert(q('#ffOutletHistoryDetail').textContent.includes('Display proof'));assert(q('#ffOutletHistoryDetail').textContent.includes('Check display'));
