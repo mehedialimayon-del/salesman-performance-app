@@ -383,7 +383,7 @@ async function renderTracking(initialStaff='',initialDay=date()){
   ['idle','◷','Idle Alert'],['proof','▧','Visit Proof'],['export','⇩','Export Report']
  ],'data-track-open')}</div>
  <div class="ffMapActions"><button class="primary" id="ffMapMessage">MESSAGE SELECTED SR</button><button hidden type="button" id="ffMapTask">Assign location task</button></div>
- <div id="ffStopList" hidden></div><div id="ffAttendanceProof" hidden></div></div></div>${user().id==='M21954'?`<details class="card ffTrackingAccess"><summary>⚙ Tracking viewing access <small>Choose viewers & permitted SRs</small></summary><div class="ffTrackingAccessBody"><p class="miniStat">OFF: only your account sees the manager map. SR always sees their own attendance and tracking status.</p><label><input type="checkbox" id="ffShareTracking" ${state.settings.tracking_shared?'checked':''}> Enable assigned viewers</label><form class="form" id="ffTrackingGrant"><label>Viewer<select name="viewer">${people.filter(p=>p.staff_id!==user().id).map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name)} · ${E(p.role)}</option>`).join('')}</select></label><label>SRs this viewer can see<select name="targets" multiple>${people.map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name)}</option>`).join('')}</select></label><button class="secondary">SAVE VIEWING ASSIGNMENT</button><p class="miniStat">Select no SRs to revoke this viewer's access.</p></form></div></details>`:''}`);
+ <div id="ffStopList" hidden></div><div id="ffAttendanceProof" hidden></div></div></div>${user().id==='M21954'?`<details class="card ffTrackingAccess"><summary>⚙ Tracking viewing access <small>Choose viewers & permitted SRs</small></summary><div class="ffTrackingAccessBody"><p class="miniStat">Team filters use attendance permissions. The map follows the existing GPS record permissions.</p><label><input type="checkbox" id="ffShareTracking" ${state.settings.tracking_shared?'checked':''}> Enable assigned viewers</label><form class="form" id="ffTrackingGrant"><label>Viewer<select name="viewer">${people.filter(p=>p.staff_id!==user().id).map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name)} · ${E(p.role)}</option>`).join('')}</select></label><label>SRs this viewer can see<select name="targets" multiple>${people.map(p=>`<option value="${E(p.staff_id)}">${E(p.full_name)}</option>`).join('')}</select></label><button class="secondary">SAVE VIEWING ASSIGNMENT</button><p class="miniStat">Select no SRs to revoke this viewer's access.</p></form></div></details>`:''}`);
  const sid=user().id, staff=$('#ffTrackStaff'), zone=$('#ffTrackZone');
  const {data:permitted,error:scopeError}=await sb.rpc('ffh_attendance_team');
  if(!staff.isConnected)return;
@@ -395,6 +395,7 @@ async function renderTracking(initialStaff='',initialDay=date()){
  const filtered=()=>roster.filter(p=>!zone.value||group(p)===zone.value);
  function fillStaff(){
    const before=staff.value||initialStaff;
+   initialStaff='';
    staff.innerHTML='<option value="">All permitted team</option>'+filtered().map(p=>`<option value="${E(p.staff_id)}">${E(p.staff_id===sid?'My location · '+p.full_name:p.full_name)}</option>`).join('');
    if(filtered().some(p=>p.staff_id===before))staff.value=before;
    staff.dispatchEvent(new Event('change'));
@@ -567,14 +568,22 @@ async function renderTracking(initialStaff='',initialDay=date()){
 }
 function addTrackingPin(person,point,tone,status){
  const pin=document.createElement('span');pin.className='ffTrackingPin';pin.dataset.color=tone;
- const portrait=document.createElement('span');portrait.dataset.ffStaffAvatar=person.staff_id;
- portrait.textContent=person.full_name?.trim().charAt(0)||'•';pin.append(portrait);
+ const avatar=()=>{
+  const portrait=document.createElement('span');
+  portrait.className='ffDutyMapAvatar';
+  portrait.dataset.ffStaffAvatar=person.staff_id;
+  portrait.textContent=person.full_name?.trim().charAt(0)||'•';
+  return portrait;
+ };
+ pin.append(avatar());
+ const popup=document.createElement('div');popup.className='ffDutyMapPopup';popup.append(avatar());
  const label=document.createElement('span');
  label.textContent=[person.full_name,staffZone(person),status,mytTime(point.captured_at)].filter(Boolean).join(' · ');
+ popup.append(label);
  return L.marker([point.latitude,point.longitude],{
   icon:L.divIcon({className:'ffTrackingMarker',html:pin,iconSize:[35,40],iconAnchor:[17,39],popupAnchor:[0,-38]}),
   title:person.full_name
- }).addTo(mapLayer).bindPopup(label);
+ }).addTo(mapLayer).bindPopup(popup);
 }
 let mapLoading=false,pendingMap=false,currentLocation=null;
 async function loadMap(fit=false){
