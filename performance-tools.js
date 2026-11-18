@@ -439,6 +439,9 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    form.querySelector('[data-official-preview]').onclick=()=>{
     if(!form.reportValidity())return;
     const v=values(),financial=['incentive','penalty','expense'].includes(selected);
+    const selectedFile=file.files[0];
+    if(selectedFile&&(!supportedProof.has(selectedFile.type)||selectedFile.size>10*1024*1024)){status.textContent='Remove the unsupported or oversized attachment before previewing.';return;}
+    if(financial&&(!/^\d{4}-(0[1-9]|1[0-2])$/.test(v.period)||v.period>month)){status.textContent='Choose a valid period up to the current month.';return;}
     const preview=form.querySelector('[data-official-preview-panel]');
     preview.innerHTML=`<h3>Request Preview</h3><p><strong>${E(types.find(x=>x[0]===selected)[2])}</strong> · ${E(who(id))} (${E(id)})</p><p>${E(v.category)}${financial?` · ${E(v.related)} · ${E(v.period)} · RM ${E(v.amount)}`:''}</p><p>${E(v.reason)}</p><p>Reviewer: Owner / Authorized Reviewer</p><p>${file.files.length?'Attachment selected but cannot be submitted until storage is connected.':'No attachment selected.'}</p>`;
     preview.hidden=false;preview.scrollIntoView({block:'nearest',behavior:'smooth'});
@@ -449,10 +452,10 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     if(submit.disabled||id!==me()||!form.reportValidity())return;
     const v=values(),proof=file.files[0];
     if(proof){status.textContent=!supportedProof.has(proof.type)?'Unsupported file type. Use JPG, PNG, WebP or PDF.':proof.size>10*1024*1024?'File exceeds 10 MB.':'Secure proof upload is not connected yet. Use Remove Attachment to submit without proof.';return;}
-    if(v.staff_id!==id||v.approver!=='M21954'||v.period>month){status.textContent='Invalid staff, approver or period.';return;}
+    if(v.staff_id!==id||v.approver!=='M21954'||(['incentive','penalty','expense'].includes(selected)&&(!/^\d{4}-(0[1-9]|1[0-2])$/.test(v.period)||v.period>month))){status.textContent='Invalid staff, approver or period.';return;}
     if(!v.reason.trim()){status.textContent='Reason is required.';return;}
     if(['incentive','penalty','expense'].includes(selected)&&(!Number.isFinite(Number(v.amount))||Number(v.amount)<=0||Number(v.amount)>1000000)){status.textContent='Enter a valid amount.';return;}
-    const reason=`${types.find(x=>x[0]===selected)[2]} | Staff: ${id} | Category: ${v.category} | Related: ${v.related} | Period: ${v.period} | Amount RM: ${v.amount||'N/A'} | ${v.reason.trim()}`;
+    const reason=`${types.find(x=>x[0]===selected)[2]} | Staff: ${id} | Category: ${v.category} | Related: ${['incentive','penalty','expense'].includes(selected)?v.related:'N/A'} | Period: ${['incentive','penalty','expense'].includes(selected)?v.period:'N/A'} | Amount RM: ${['incentive','penalty','expense'].includes(selected)?v.amount:'N/A'} | ${v.reason.trim()}`;
     if(!window.confirm('Submit this official request under your own staff ID? Approval does not automatically change income or permissions.'))return;
     submit.disabled=true;
     try{
