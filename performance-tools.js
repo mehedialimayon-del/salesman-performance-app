@@ -385,7 +385,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
      <h3>♧ Proof / Attachment (Optional)</h3>
      <label class="ffOfficialDrop">☁ Tap to Add File / Document<input name="proof" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"><small>Photo (Camera/Gallery) | PDF · Maximum 10 MB</small></label><small data-official-proof role="status">No attachment selected</small><button type="button" class="secondary ffOfficialClearProof" data-official-clear-proof hidden>Remove Attachment</button>
      <section class="ffOfficialPreviewPanel" data-official-preview-panel hidden aria-live="polite"></section>
-     <div class="ffOfficialActions"><button type="button" class="secondary" data-official-draft>Save as Draft</button><button type="button" class="secondary" data-official-preview>Preview</button><button type="submit" class="primary">Submit Request</button></div><p role="status"></p>
+     <div class="ffOfficialActions"><button type="button" class="secondary" data-official-draft>Save as Draft</button><button type="button" class="secondary" data-official-discard>Discard Draft</button><button type="button" class="secondary" data-official-preview>Preview</button><button type="submit" class="primary">Submit Request</button></div><p role="status"></p>
     </form>`);
    dialog.classList.add('ffOfficialDialog');
    const form=dialog.querySelector('form'),status=form.querySelector('[role=status]'),file=form.elements.namedItem('proof');
@@ -428,8 +428,13 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    form.addEventListener('input',event=>{if(event.target!==file)previewPanel.hidden=true;});
    form.addEventListener('change',()=>{previewPanel.hidden=true;});
    const values=()=>Object.fromEntries([...new FormData(form)].filter(([key])=>key!=='proof'));
-   try{const draft=JSON.parse(sessionStorage.getItem(draftKey)||'null');if(draft?.type){setType(draft.type);for(const [key,value] of Object.entries(draft.values||{})){const field=form.elements.namedItem(key);if(field&&typeof value==='string'&&field.type!=='file')field.value=value;}form.elements.namedItem('reason').dispatchEvent(new Event('input'));}}catch{}
+   try{const draft=JSON.parse(sessionStorage.getItem(draftKey)||'null');if(draft?.type&&types.some(x=>x[0]===draft.type)){setType(draft.type);for(const [key,value] of Object.entries(draft.values||{})){const field=form.elements.namedItem(key);if(field&&typeof value==='string'&&field.type!=='file')field.value=value;}form.elements.namedItem('reason').dispatchEvent(new Event('input'));}}catch{}
    form.querySelector('[data-official-draft]').onclick=()=>{try{sessionStorage.setItem(draftKey,JSON.stringify({type:selected,values:values()}));status.textContent=file.files.length?'Text draft saved on this device for this session; attachment is not stored.':'Text draft saved on this device for this session.';}catch(error){status.textContent=error.message;}};
+   form.querySelector('[data-official-discard]').onclick=()=>{
+    if(!sessionStorage.getItem(draftKey)){status.textContent='No saved draft to discard.';return;}
+    if(!window.confirm('Discard the saved draft on this device? Your current form will remain unchanged.'))return;
+    try{sessionStorage.removeItem(draftKey);status.textContent='Saved draft discarded. Current form is unchanged.';}catch(error){status.textContent=error.message;}
+   };
    form.querySelector('[data-official-preview]').onclick=()=>{
     if(!form.reportValidity())return;
     const v=values(),financial=['incentive','penalty','expense'].includes(selected);
