@@ -325,7 +325,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
      <div class="two"><label><span data-official-type-label>Incentive Type *</span><select name="category" required><option value="">Select Incentive Type</option><option>Sales Target</option><option>Performance</option><option>Campaign</option><option>Attendance</option><option>Other</option></select></label><label>Related To *<select name="related" required><option value="">Select Related To</option><option>Sales</option><option>Activity</option><option>Target</option><option>Outlet</option><option>Other</option></select></label></div>
      <div class="two"><label><span data-official-amount-label>Incentive Amount (RM) *</span><input name="amount" type="number" min="0.01" max="1000000" step="0.01" required placeholder="0.00"></label><label>Period / Month *<input name="period" type="month" max="${month}" value="${month}" required></label></div>
      <h3>♙ Staff & Approval</h3>
-     <div class="two"><label>Request for (Staff / SR) *<select name="staff_id" required>${staffOptions}</select></label><label>Forward to (Approver) *<select name="approver" required><option value="M21954">Owner / Authorized Reviewer</option></select></label></div>
+     <div class="two"><label>Request for (Staff / SR) *<select name="staff_id" required>${staffOptions}</select></label><label>Forward to (Approver) *<select name="approver" required><option value="M21954">Owner (current governance reviewer)</option></select></label></div>
      <h3>▤ Request Reason & Details</h3>
      <label>Reason / Description *<textarea name="reason" maxlength="500" required placeholder="Describe your request with details (target, performance, campaign etc.)"></textarea><small data-official-count>0 / 500</small></label>
      <h3>♧ Proof / Attachment (Optional)</h3>
@@ -342,6 +342,9 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     dialog.querySelector('[data-official-amount-label]').textContent=key==='penalty'?'Penalty Amount (RM) *':'Amount (RM) *';
     dialog.querySelectorAll('[data-official-type]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.officialType===key)));
     const financial=['incentive','penalty','expense'].includes(key);
+    const category=form.elements.namedItem('category');
+    const labels={incentive:['Sales Target','Performance','Campaign','Attendance','Other'],penalty:['Attendance','Outlet Visit','Performance','Policy','Other'],access:['Outlet Access','System Access','Staff Access','Other'],permission:['View','Edit','Upload','Delete','Other'],expense:['Transport','Entertainment','Meals','Other'],other:['General Request','Document','Support','Other']};
+    const previous=category.value;category.innerHTML='<option value="">Select '+title.replace(' Request','')+' Type</option>'+labels[key].map(x=>'<option>'+E(x)+'</option>').join('');if(labels[key].includes(previous))category.value=previous;
     form.elements.namedItem('amount').required=financial;
     form.elements.namedItem('amount').closest('label').hidden=!financial;
    };
@@ -358,6 +361,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     if(proof){status.textContent=proof.size>10*1024*1024?'File exceeds 10 MB.':'Proof storage is not connected yet. Remove the attachment before submitting.';return;}
     if(![...new Set([id,...scopedIds()])].includes(v.staff_id)||v.approver!=='M21954'||v.period>month){status.textContent='Invalid staff, approver or period.';return;}
     if(!v.reason.trim()){status.textContent='Reason is required.';return;}
+    if(['incentive','penalty','expense'].includes(selected)&&(!Number.isFinite(Number(v.amount))||Number(v.amount)<=0||Number(v.amount)>1000000)){status.textContent='Enter a valid amount.';return;}
     const reason=`${types.find(x=>x[0]===selected)[2]} | Staff: ${v.staff_id} | Category: ${v.category} | Related: ${v.related} | Period: ${v.period} | Amount RM: ${v.amount||'N/A'} | ${v.reason.trim()}`;
     if(!window.confirm('Submit this official request for review? This does not directly post income.'))return;
     const submit=form.querySelector('[type=submit]');submit.disabled=true;
@@ -378,7 +382,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    });
   }
   bindQuick(inbox);
-  const extraQuick=inbox.querySelector('.ffOfficialQuick');if(extraQuick)bindQuick(extraQuick);
+
   $('#ffApprovalAllActions').onclick=()=>bindQuick(approvalDialog('Quick Actions for SR',`<div class="ffApprovalQuick">${quickActions.map(action=>actionButton(...action)).join('')}</div>`));
   const draw=()=>{
    const kind=$('#ffApprovalType').value,term=$('#ffApprovalSearch').value.trim().toLowerCase(),state=$('#ffApprovalStatus').value;
