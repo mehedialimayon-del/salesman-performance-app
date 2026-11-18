@@ -818,3 +818,5 @@ html body #app .app main.wrap .ffApprovalScreen .ffApprovalControls :is(select,i
 .ffOfficialDialog .ffOfficialPreviewPanel h3{margin:0 0 9px;color:#ff9e18}
 .ffOfficialDialog .ffOfficialPreviewPanel p{margin:7px 0;line-height:1.4}
 .ffOfficialDialog .ffOfficialPreviewPanel[hidden]{display:none!important}
+
+.ffOfficialDialog .ffOfficialClearProof:not([hidden]){display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:7px 14px;margin:7px 0 10px;border:1.5px solid #ff8b12;border-radius:12px;background:linear-gradient(150deg,#291305,#080605);color:#fff;box-shadow:0 0 8px #ff820066;font-weight:700}.ffOfficialDialog .ffOfficialClearProof[hidden]{display:none!important}
