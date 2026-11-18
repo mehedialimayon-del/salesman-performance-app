@@ -348,17 +348,21 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    const dialog=approvalDialog(title,`<form class="form">
     ${kind==='outlet'?'<label>Outlet name or code<input name="record_id" maxlength="120" required></label>':'<label>Module<select name="module" required>'+[['tasks','Tasks'],['outlets','Outlets'],['sales','Sales'],['catalogue','Catalogue'],['routes','Route Plan'],['reports','Reports'],['contacts','Contacts'],['income','Income'],['proposals','Proposal Library']].map(([value,label])=>`<option value="${value}">${label}</option>`).join('')+'</select></label>'}
     ${kind==='permission'?'<label>Permission needed<select name="permission"><option>View</option><option>Edit</option><option>Upload</option><option>Delete</option></select></label>':''}
+    <label data-sales-approver hidden>Forward Sales Request To<select name="reviewer_staff_id"><option value="M21954">Owner</option>${gov.my_manager?.staff_id&&gov.my_manager.staff_id!=='M21954'?'<option value="'+E(gov.my_manager.staff_id)+'">'+E(gov.my_manager.full_name||gov.my_manager.staff_id)+' (My Manager)</option>':''}</select><small>Only sales requests can be assigned to a zonal manager. Other requests go to Owner.</small></label>
     <label>Reason<textarea name="reason" maxlength="1000" required></textarea></label>
     <button type="submit" class="primary">Submit request</button><p role="status"></p>
    </form>`);
    const form=dialog.querySelector('form'),submit=form.querySelector('[type=submit]');
+   const reviewerField=form.elements.namedItem('reviewer_staff_id'),moduleField=form.elements.namedItem('module');
+   const syncReviewer=()=>{const sales=kind==='permission'&&moduleField?.value==='sales';reviewerField.closest('label').hidden=!sales;reviewerField.disabled=!sales;if(!sales)reviewerField.value='M21954';};
+   moduleField?.addEventListener('change',syncReviewer);syncReviewer();
    form.onsubmit=async event=>{
     event.preventDefault();if(submit.disabled||id!==me())return;
     const values=Object.fromEntries(new FormData(form)),reason=values.reason.trim(),record=values.record_id?.trim(),feedback=form.querySelector('[role=status]');
     if(!reason||(kind==='outlet'&&!record)){feedback.textContent='Complete the request details before submitting.';return;}
     submit.disabled=true;
     try{
-     await rpc('ffh_governance','request',{module:kind==='outlet'?'outlets':values.module,action:'edit',record_id:kind==='permission'?'permission:'+values.permission.toLowerCase():record,reason:kind==='permission'?values.permission+' permission: '+reason:'Outlet access: '+reason});
+     await rpc('ffh_governance','request',{module:kind==='outlet'?'outlets':values.module,action:'edit',record_id:kind==='permission'?'permission:'+values.permission.toLowerCase():record,reason:kind==='permission'?values.permission+' permission: '+reason:'Outlet access: '+reason,reviewer_staff_id:kind==='permission'&&values.module==='sales'&&values.reviewer_staff_id===gov.my_manager?.staff_id?values.reviewer_staff_id:'M21954'});
      if(dialog.open&&id===me()&&ctx.page()==='approvals'){dialog.close();await approvals();}
     }catch(error){feedback.textContent=error.message;}finally{submit.disabled=false;}
    };
