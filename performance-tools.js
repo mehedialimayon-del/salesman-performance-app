@@ -358,7 +358,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
      <h3>▤ Request Reason & Details</h3>
      <label>Reason / Description *<textarea name="reason" maxlength="500" required placeholder="Describe your request with details (target, performance, campaign etc.)"></textarea><small data-official-count>0 / 500</small></label>
      <h3>♧ Proof / Attachment (Optional)</h3>
-     <label class="ffOfficialDrop">☁ Tap to Add File / Document<input name="proof" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"><small>Photo (Camera/Gallery) | PDF · Maximum 10 MB</small></label><small data-official-proof>No attachment selected</small>
+     <label class="ffOfficialDrop">☁ Tap to Add File / Document<input name="proof" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"><small>Photo (Camera/Gallery) | PDF · Maximum 10 MB</small></label><small data-official-proof role="status">No attachment selected</small><button type="button" class="secondary ffOfficialClearProof" data-official-clear-proof hidden>Remove Attachment</button>
      <section class="ffOfficialPreviewPanel" data-official-preview-panel hidden aria-live="polite"></section>
      <div class="ffOfficialActions"><button type="button" class="secondary" data-official-draft>Save as Draft</button><button type="button" class="secondary" data-official-preview>Preview</button><button type="submit" class="primary">Submit Request</button></div><p role="status"></p>
     </form>`);
@@ -387,7 +387,18 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    dialog.querySelectorAll('[data-official-type]').forEach(b=>b.onclick=()=>setType(b.dataset.officialType));
    setType('incentive');
    form.elements.namedItem('reason').oninput=()=>dialog.querySelector('[data-official-count]').textContent=form.elements.namedItem('reason').value.length+' / 500';
-   file.onchange=()=>dialog.querySelector('[data-official-proof]').textContent=file.files[0]?file.files[0].name+' · Upload is not connected; remove file before submitting.':'No attachment selected';
+   const clearProof=dialog.querySelector('[data-official-clear-proof]');
+   const proofMessage=dialog.querySelector('[data-official-proof]');
+   const supportedProof=new Set(['image/jpeg','image/png','image/webp','application/pdf']);
+   file.onchange=()=>{
+    const selectedFile=file.files[0];
+    if(!selectedFile){proofMessage.textContent='No attachment selected';clearProof.hidden=true;return;}
+    clearProof.hidden=false;
+    if(!supportedProof.has(selectedFile.type)){proofMessage.textContent='Unsupported file. Select JPG, PNG, WebP or PDF.';return;}
+    if(selectedFile.size>10*1024*1024){proofMessage.textContent='File exceeds 10 MB. Please select a smaller file.';return;}
+    proofMessage.textContent=selectedFile.name+' · '+(selectedFile.size/1024/1024).toFixed(2)+' MB · Secure upload is not yet enabled. Remove file to submit this request.';
+   };
+   clearProof.onclick=()=>{file.value='';file.onchange();};
    const values=()=>Object.fromEntries([...new FormData(form)].filter(([key])=>key!=='proof'));
    try{const draft=JSON.parse(sessionStorage.getItem(draftKey)||'null');if(draft?.type){setType(draft.type);for(const [key,value] of Object.entries(draft.values||{})){const field=form.elements.namedItem(key);if(field&&typeof value==='string'&&field.type!=='file')field.value=value;}form.elements.namedItem('reason').dispatchEvent(new Event('input'));}}catch{}
    form.querySelector('[data-official-draft]').onclick=()=>{try{sessionStorage.setItem(draftKey,JSON.stringify({type:selected,values:values()}));status.textContent=file.files.length?'Text draft saved; attachment is not stored.':'Draft saved on this device for this session.';}catch(error){status.textContent=error.message;}};
@@ -401,7 +412,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    form.onsubmit=async event=>{
     event.preventDefault();if(id!==me()||!form.reportValidity())return;
     const v=values(),proof=file.files[0];
-    if(proof){status.textContent=proof.size>10*1024*1024?'File exceeds 10 MB.':'Proof storage is not connected yet. Remove the attachment before submitting.';return;}
+    if(proof){status.textContent=!supportedProof.has(proof.type)?'Unsupported file type. Use JPG, PNG, WebP or PDF.':proof.size>10*1024*1024?'File exceeds 10 MB.':'Secure proof upload is not connected yet. Use Remove Attachment to submit without proof.';return;}
     if(v.staff_id!==id||v.approver!=='M21954'||v.period>month){status.textContent='Invalid staff, approver or period.';return;}
     if(!v.reason.trim()){status.textContent='Reason is required.';return;}
     if(['incentive','penalty','expense'].includes(selected)&&(!Number.isFinite(Number(v.amount))||Number(v.amount)<=0||Number(v.amount)>1000000)){status.textContent='Enter a valid amount.';return;}
