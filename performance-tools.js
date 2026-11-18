@@ -224,7 +224,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     <div class="ffApprovalQuick">${quickActions.map(action=>actionButton(...action)).join('')}</div>
    </section>
    <section class="ffApprovalPanel ffApprovalRequestPanel"><header><h2>${icon('history')} My Access &amp; Requests</h2><button type="button" class="secondary" id="ffApprovalHistory">View History →</button></header>
-    <div id="ffApprovalRecent"></div>
+    <div class="ffApprovalRequestTabs" role="group" aria-label="Filter my requests"><button type="button" data-request-tab="all" aria-pressed="true">All</button><button type="button" data-request-tab="pending" aria-pressed="false">Pending</button><button type="button" data-request-tab="approved" aria-pressed="false">Approved</button><button type="button" data-request-tab="returned" aria-pressed="false">Rejected</button></div><div id="ffApprovalRecent"></div>
    </section>
    <p id="ffApprovalCount" role="status"></p><div id="ffApprovalList"></div>
    <aside class="ffApprovalHelp">${icon('info')}<ul><li>You see only requests allowed by your existing access.</li><li>SRs can follow their submissions.</li><li>Task review requires Manager access plus Tasks Edit.</li><li>Income review requires separate approval permission.</li><li>Claims stay with their assigned reviewer.</li><li>An authorized administrator applies permission changes after review.</li></ul></aside>
@@ -286,8 +286,20 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     bindPhotos();
    });
   }
-  $('#ffApprovalRecent').innerHTML=myItems.length?myItems.slice(0,5).map(recentRow).join(''):'<p class="ffRefHint">No requests submitted yet.</p>';
-  bindRecent(inbox);
+  let requestTab='all';
+  const renderRecent=()=>{
+   const tabs={all:myItems,pending:myItems.filter(x=>states.pending.includes(x.status)),approved:myItems.filter(x=>states.approved.includes(x.status)),returned:myItems.filter(x=>states.returned.includes(x.status))};
+   inbox.querySelectorAll('[data-request-tab]').forEach(button=>{
+    const key=button.dataset.requestTab;
+    button.textContent=({all:'All',pending:'Pending',approved:'Approved',returned:'Rejected'})[key]+' ('+tabs[key].length+')';
+    button.setAttribute('aria-pressed',String(requestTab===key));
+    button.onclick=()=>{requestTab=key;renderRecent();};
+   });
+   const visible=tabs[requestTab];
+   $('#ffApprovalRecent').innerHTML=visible.length?visible.slice(0,5).map(x=>recentRow(x,myItems.indexOf(x))).join(''):'<p class="ffRefHint">No requests in this status.</p>';
+   bindRecent(inbox);
+  };
+  renderRecent();
   $('#ffApprovalHistory').onclick=()=>{
    const dialog=approvalDialog('My Request History',myItems.length?myItems.map(recentRow).join(''):'<p>No requests submitted yet.</p>');
    bindRecent(dialog);
