@@ -811,3 +811,10 @@ html body #app .app main.wrap .ffApprovalScreen .ffApprovalControls :is(select,i
 .ffOfficialDialog .ffOfficialTabs button[aria-pressed=true]{border:2px solid #ffcf47!important;box-shadow:0 0 13px #ff8a00,inset 0 0 9px #ffe08288!important}
 .ffOfficialDialog .ffOfficialForm h3{border:1.5px solid #ff8b14!important;box-shadow:inset 0 0 7px #ff87003d!important}
 @media(max-width:420px){.ffApprovalScreen>.ffApprovalTitle{padding:8px!important}.ffApprovalScreen>.ffApprovalTitle h1{font-size:19px!important}.ffApprovalScreen>.ffApprovalTitle .ffApprovalHeaderTools{gap:4px}.ffApprovalScreen #ffApprovalReward{grid-template-columns:43px minmax(0,1fr) 19px!important;padding:10px!important}.ffApprovalScreen #ffApprovalReward>svg{width:36px!important;height:36px!important}.ffApprovalScreen #ffApprovalReward>span{font-size:23px!important}.ffApprovalScreen>.ffOfficialQuick{gap:5px!important}.ffApprovalScreen>.ffOfficialQuick button{min-height:93px!important;font-size:9px!important}}
+
+
+/* Inline request preview avoids stacked modal and keeps reference black/orange theme */
+.ffOfficialDialog .ffOfficialPreviewPanel:not([hidden]){display:block;margin:10px 0;padding:12px 14px;border:1.5px solid #ff9316;border-radius:15px;background:linear-gradient(150deg,#291205,#080605);color:#fff;box-shadow:0 0 10px #ff840055,inset 0 0 8px #ff8b002e;overflow-wrap:anywhere}
+.ffOfficialDialog .ffOfficialPreviewPanel h3{margin:0 0 9px;color:#ff9e18}
+.ffOfficialDialog .ffOfficialPreviewPanel p{margin:7px 0;line-height:1.4}
+.ffOfficialDialog .ffOfficialPreviewPanel[hidden]{display:none!important}
