@@ -705,3 +705,43 @@ html body #app .app main.wrap .ffApprovalScreen .ffApprovalControls :is(select,i
 .ffApprovalDialog .ffApprovalAudit article{background:#130d09;border:1px solid #824014;border-radius:9px;margin:6px 0;padding:9px;color:#fff}
 .ffApprovalDialog .ffApprovalAudit article small{display:block;opacity:.8;margin-top:4px}
 .ffApprovalDialog .ffApprovalAudit article p{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+
+
+/* Approval Inbox: reference layout, November 2026 */
+.ffApprovalScreen .ffApprovalAdmin{margin:12px 0 10px}
+.ffApprovalScreen #ffApprovalReward{position:relative;width:100%;min-height:94px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:linear-gradient(180deg,#562700 0%,#1b0b02 72%,#0b0603 100%);border:2px solid #ff8b0b;border-radius:20px;color:#fff;box-shadow:0 0 11px #ff7c00, inset 0 0 16px #ff820075;text-shadow:0 1px 2px #000;font-weight:800}
+.ffApprovalScreen #ffApprovalReward>svg{position:absolute;left:25%;top:13px;width:35px;height:35px;color:#ff9b12}
+.ffApprovalScreen #ffApprovalReward>span{font-size:clamp(22px,5vw,30px)}
+.ffApprovalScreen #ffApprovalReward>small{font-size:11px;font-weight:500;color:#e9d3bf}
+.ffApprovalScreen #ffApprovalReward>b{position:absolute;right:15px;top:19px;font-size:44px}
+.ffApprovalScreen .ffOfficialQuick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0 12px}
+.ffApprovalScreen .ffOfficialQuick button{min-width:0;min-height:103px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:8px 3px;background:linear-gradient(145deg,#291307,#070605);border:1px solid #ff8210;border-radius:17px;box-shadow:inset 0 0 8px #ff7a004a,0 0 6px #ff7a0055;color:#fff;font-size:12px;font-weight:700;text-align:center}
+.ffApprovalScreen .ffOfficialQuick svg{height:30px;width:30px;color:#ffa312}
+.ffApprovalScreen .ffApprovalPanel:has(.ffApprovalQuick){display:none}
+.ffApprovalScreen .ffApprovalControls{display:none}
+.ffApprovalScreen .ffApprovalTitle{min-height:62px}
+.ffApprovalScreen .ffApprovalTitle>svg{width:32px;height:32px}
+.ffApprovalScreen .ffApprovalTitle h1{font-size:clamp(19px,4.5vw,27px)}
+.ffApprovalScreen .ffApprovalTitle .ffApprovalHeaderTools{margin-left:auto}
+.ffApprovalScreen .ffRefReportKpis{margin:10px 0}
+.ffApprovalDialog.ffOfficialDialog{width:min(95vw,920px);max-height:88dvh;overflow-y:auto;padding:13px;background:linear-gradient(155deg,#1c0c04,#030303 50%,#170903);border:2px solid #ff850c;border-radius:24px;box-shadow:0 0 22px #ff8000aa,inset 0 0 12px #ff8a0055;color:#fff}
+.ffOfficialDialog>header{border-bottom:1px solid #e77b18;padding-bottom:10px}
+.ffOfficialDialog>header h2{font-size:24px;color:#fff}
+.ffOfficialDialog .ffOfficialIntro{font-size:12px;margin:4px 0 12px;color:#fff}
+.ffOfficialDialog .ffOfficialTabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin:12px 0}
+.ffOfficialDialog .ffOfficialTabs button{min-width:0;min-height:95px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:7px 3px;border:1px solid #ff8b0d;border-radius:14px;background:linear-gradient(160deg,#291305,#080706);color:#fff;font-size:12px;font-weight:800}
+.ffOfficialDialog .ffOfficialTabs button[aria-pressed=true]{background:linear-gradient(#ffb000,#e75a00);box-shadow:0 0 13px #ff8d00;color:#fff}
+.ffOfficialDialog .ffOfficialTabs button span{font-size:27px;color:#ffae15}
+.ffOfficialDialog .ffOfficialTabs button[aria-pressed=true] span{color:#fff}
+.ffOfficialDialog .ffOfficialForm{display:grid;gap:10px}
+.ffOfficialDialog .ffOfficialForm h3{font-size:16px;color:#fff;margin:8px 0 0;padding:7px 13px;border:1px solid #b75d11;border-radius:15px;background:linear-gradient(90deg,#42210c,#0c0806)}
+.ffOfficialDialog .ffOfficialForm label{color:#fff;font-size:13px;font-weight:700}
+.ffOfficialDialog .ffOfficialForm input:not([type=file]),.ffOfficialDialog .ffOfficialForm select,.ffOfficialDialog .ffOfficialForm textarea{background:#120d0a;color:#fff;border:1px solid #ff8511;border-radius:13px;min-height:42px;box-shadow:inset 0 0 7px #ff7c0040}
+.ffOfficialDialog .ffOfficialForm textarea{min-height:85px}
+.ffOfficialDialog .ffOfficialDrop{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90px;border:2px dashed #ff8b0d;border-radius:15px;background:#160b05;text-align:center}
+.ffOfficialDialog .ffOfficialDrop input{max-width:90%;font-size:11px}
+.ffOfficialDialog .ffOfficialDrop small{font-size:10px;color:#ddd}
+.ffOfficialDialog .ffOfficialActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:7px}
+.ffOfficialDialog .ffOfficialActions button{min-height:48px;border-radius:13px;border:1px solid #ff8b0d;font-size:13px;font-weight:800}
+.ffOfficialDialog .ffOfficialActions button[type=submit]{background:linear-gradient(#ffad00,#ff6500);color:#fff}
+@media(max-width:600px){.ffOfficialDialog .ffOfficialTabs{grid-template-columns:repeat(3,minmax(0,1fr))}.ffOfficialDialog .ffOfficialTabs button{min-height:76px;font-size:11px}.ffApprovalScreen #ffApprovalReward>svg{left:10%}.ffApprovalScreen .ffOfficialQuick button{font-size:10px;min-height:86px}.ffApprovalScreen .ffOfficialQuick svg{height:24px;width:24px}}
