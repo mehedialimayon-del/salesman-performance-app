@@ -209,7 +209,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   ];
   const categories=[...new Set(items.map(x=>x.kind))];
   const states={pending:['Pending','Pending Review','Submitted'],approved:['Approved','Done'],returned:['Returned','Rejected']};
-  const metrics=[['all','▤','All Requests','blue'],['pending','◷','Waiting','gold'],['approved','✓','Approved','green'],['returned','↩','Returned / Rejected','red']];
+  const metrics=[['all','▤','All Requests','blue'],['pending','◷','Pending','gold'],['approved','✓','Approved','green'],['returned','✕','Rejected','red']];
   page('approvals','Approval Inbox',`<section class="ffApprovalScreen">
    <div class="ffApprovalTitle">${icon('inbox')}<h1><em>Approval</em> Inbox</h1><div class="ffApprovalHeaderTools"><button type="button" id="ffApprovalSearchToggle" aria-label="Search requests">${icon('search')}</button><button type="button" id="ffApprovalHeaderDate" aria-label="Select date">${icon('calendar')}</button><button type="button" id="ffApprovalHeaderStatus" aria-label="Filter status">${icon('settings')}</button><button type="button" id="ffApprovalMore" aria-label="More approval settings">⋮</button></div></div>
    <div class="card ffPerformanceIntro ffApprovalControls"><div class="two">
@@ -218,12 +218,12 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     <label><span>${icon('types')} Request Type</span><select id="ffApprovalType"><option value="">All request types</option>${categories.map(kind=>`<option>${E(kind)}</option>`).join('')}</select></label>
     <div class="ffApprovalDateControl"><span>${icon('calendar')} Date Range</span><button type="button" id="ffApprovalDates" class="secondary">All dates ${icon('calendar')}</button></div>
    </div>${errors.map(s=>`<p role="alert">${E(s)} · Some requests could not load.</p>`).join('')}</div>
-   <div class="ffApprovalAdmin"><button type="button" class="primary" id="ffApprovalReward">${icon('add')}<span>New Request</span><small>Create a new request (Incentive, Penalty, Access, Permission, Expense &amp; More)</small><b aria-hidden="true">›</b></button></div><div class="ffOfficialQuick">${[['outlet','Outlet Access','outlet'],['permission','Permission Request','key'],['expense','Expense Claim','claim'],['document','Documents Upload','document']].map(action=>actionButton(...action)).join('')}</div>
+   <div class="ffApprovalAdmin"><button type="button" class="primary" id="ffApprovalReward">${icon('add')}<span>New Request</span><small>Create a new request (Incentive, Penalty, Access, Permission, Expense &amp; More)</small><b aria-hidden="true">›</b></button></div><div class="ffOfficialQuick">${[['outlet','Outlet Access','outlet'],['permission','Permission Request','key'],['expense','Expense Claim','claim'],['buyer','Buyer Bill','claim'],['document','Documents Upload','document']].map(action=>actionButton(...action)).join('')}</div>
    <div class="ffRefReportKpis" id="ffApprovalMetrics">${metrics.map(([key,glyph,label,tone])=>`<button type="button" data-approval-status="${key}" class="ffRefMetric" data-color="${tone}" aria-pressed="${key==='pending'}"><i aria-hidden="true">${glyph}</i><span>${label}</span><strong></strong></button>`).join('')}</div>
    <section class="ffApprovalPanel"><header><h2>${icon('bolt')} Quick Actions for SR</h2><button type="button" class="secondary" id="ffApprovalAllActions">View All →</button></header>
     <div class="ffApprovalQuick">${quickActions.map(action=>actionButton(...action)).join('')}</div>
    </section>
-   <section class="ffApprovalPanel"><header><h2>${icon('history')} My Recent Requests</h2><button type="button" class="secondary" id="ffApprovalHistory">View History →</button></header>
+   <section class="ffApprovalPanel ffApprovalRequestPanel"><header><h2>${icon('history')} My Access &amp; Requests</h2><button type="button" class="secondary" id="ffApprovalHistory">View History →</button></header>
     <div id="ffApprovalRecent"></div>
    </section>
    <p id="ffApprovalCount" role="status"></p><div id="ffApprovalList"></div>
@@ -376,7 +376,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     const key=button.dataset.approvalAction;
     button.closest('dialog')?.close();
     if(key==='incentive')return ctx.open('incentive');
-    if(key==='expense')return ctx.open('claims');
+    if(key==='expense'||key==='buyer')return ctx.open('claims');
     if(key==='document')return typeof window.FFH_OPEN_CLAIM_DOCUMENT==='function'?window.FFH_OPEN_CLAIM_DOCUMENT():ctx.open('claims');
     openRequest(key);
    });
