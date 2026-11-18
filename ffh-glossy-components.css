@@ -782,3 +782,32 @@ html body #app .app main.wrap .ffApprovalScreen .ffApprovalControls :is(select,i
 .ffApprovalScreen .ffApprovalRequestPanel .ffApprovalRecentRow small{font-size:11px}
 
 .ffApprovalDialog .ffRecentActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.ffApprovalDialog .ffRecentActions button{flex:1 1 130px;min-height:43px;border-radius:12px;border:1px solid #ff9014;box-shadow:0 0 8px #ff800055;font-weight:700}
+
+
+/* Screenshot fidelity pass — Approval Inbox only, preserve fixed app chrome */
+.ffApprovalScreen{--ff-ember:#ff8a00;--ff-glow:0 0 7px #ff8a00a8,0 0 17px #ff6b0047}
+.ffApprovalScreen>.ffApprovalTitle{min-height:70px!important;padding:9px 12px!important;background:linear-gradient(180deg,#2a1004 0%,#080604 58%,#1b0a04 100%)!important;border:2px solid #ff8b12!important;box-shadow:var(--ff-glow),inset 0 0 13px #ff7b0044!important}
+.ffApprovalScreen>.ffApprovalTitle h1{font-size:clamp(19px,4.2vw,29px)!important;white-space:nowrap!important;letter-spacing:-.4px}
+.ffApprovalScreen>.ffApprovalTitle h1 em{color:#ff8a13!important;font-style:normal}
+.ffApprovalScreen>.ffApprovalTitle .ffApprovalHeaderTools{display:flex;gap:6px;flex-shrink:0}
+.ffApprovalScreen>.ffApprovalTitle .ffApprovalHeaderTools button{width:clamp(37px,9vw,51px)!important;height:clamp(37px,9vw,51px)!important;min-width:0!important;border:1.5px solid #ff8b10!important;border-radius:14px!important;background:linear-gradient(145deg,#231105,#070606)!important;box-shadow:0 0 9px #ff880088,inset 0 0 7px #ff85002e!important;color:#ffa014!important}
+.ffApprovalScreen>.ffApprovalControls{display:none!important}
+.ffApprovalScreen>.ffApprovalAdmin{margin:13px 0 14px!important}
+.ffApprovalScreen #ffApprovalReward{display:grid!important;grid-template-columns:56px minmax(0,1fr) 30px!important;grid-template-rows:auto auto!important;align-content:center!important;column-gap:7px!important;min-height:103px!important;padding:13px 15px!important;text-align:left!important;background:linear-gradient(180deg,#67300b,#b34b04 48%,#9c3c00 78%,#4c1b03)!important;border:2px solid #ffb22a!important;border-radius:22px!important;box-shadow:0 0 10px #ff8500,0 0 19px #ff850088,inset 0 3px 11px #ffc1658a,inset 0 -9px 13px #4d1200!important}
+.ffApprovalScreen #ffApprovalReward>svg{position:static!important;grid-column:1!important;grid-row:1/3!important;justify-self:center!important;align-self:center!important;width:44px!important;height:44px!important;color:#ffb621!important;filter:drop-shadow(0 0 4px #ff9500)}
+.ffApprovalScreen #ffApprovalReward>span{grid-column:2!important;grid-row:1!important;align-self:end!important;font-size:clamp(23px,5vw,31px)!important;line-height:1.05!important;text-align:center!important;text-shadow:0 2px 3px #000!important}
+.ffApprovalScreen #ffApprovalReward>small{grid-column:2!important;grid-row:2!important;align-self:start!important;max-width:100%!important;text-align:center!important;font-size:clamp(9px,2.1vw,12px)!important;line-height:1.25!important;color:#fff!important}
+.ffApprovalScreen #ffApprovalReward>b{position:static!important;grid-column:3!important;grid-row:1/3!important;align-self:center!important;justify-self:center!important;font-size:43px!important;color:#fff!important}
+.ffApprovalScreen>.ffOfficialQuick{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:8px!important;margin:13px 0 15px!important}
+.ffApprovalScreen>.ffOfficialQuick button{min-height:114px!important;border:2px solid #ff8a12!important;border-radius:17px!important;background:linear-gradient(145deg,#321304,#090605 65%,#160a05)!important;box-shadow:var(--ff-glow),inset 0 0 14px #ff7d0033!important;font-size:clamp(9px,2.3vw,13px)!important;line-height:1.15!important}
+.ffApprovalScreen>.ffOfficialQuick button svg{width:clamp(24px,6vw,36px)!important;height:clamp(24px,6vw,36px)!important;color:#ffad16!important;filter:drop-shadow(0 0 5px #ff880099)}
+.ffApprovalScreen>.ffRefReportKpis{gap:8px!important;margin:12px 0!important}
+.ffApprovalScreen>.ffRefReportKpis .ffRefMetric{min-height:136px!important;border:2px solid currentColor!important;border-radius:18px!important;box-shadow:0 0 12px currentColor,inset 0 0 16px #0009!important}
+.ffApprovalScreen>.ffRefReportKpis .ffRefMetric i{font-size:34px!important}
+.ffApprovalScreen>.ffRefReportKpis .ffRefMetric strong{font-size:clamp(22px,5vw,30px)!important}
+.ffApprovalScreen>.ffApprovalRequestPanel{margin-top:12px!important;min-height:340px!important;border-radius:21px!important;border:2px solid #ff8a14!important;background:linear-gradient(165deg,#2a1207,#080605 58%,#1d0b04)!important;box-shadow:var(--ff-glow),inset 0 0 16px #ff760022!important}
+.ffApprovalScreen>.ffApprovalRequestPanel #ffApprovalRecent{min-height:250px!important;max-height:440px!important}
+.ffApprovalScreen>.ffApprovalRequestPanel .ffApprovalRecentRow{min-height:83px!important;border:1.5px solid #ff8c19!important;box-shadow:inset 0 0 9px #ff7a002a!important}
+.ffOfficialDialog .ffOfficialTabs button[aria-pressed=true]{border:2px solid #ffcf47!important;box-shadow:0 0 13px #ff8a00,inset 0 0 9px #ffe08288!important}
+.ffOfficialDialog .ffOfficialForm h3{border:1.5px solid #ff8b14!important;box-shadow:inset 0 0 7px #ff87003d!important}
+@media(max-width:420px){.ffApprovalScreen>.ffApprovalTitle{padding:8px!important}.ffApprovalScreen>.ffApprovalTitle h1{font-size:19px!important}.ffApprovalScreen>.ffApprovalTitle .ffApprovalHeaderTools{gap:4px}.ffApprovalScreen #ffApprovalReward{grid-template-columns:43px minmax(0,1fr) 19px!important;padding:10px!important}.ffApprovalScreen #ffApprovalReward>svg{width:36px!important;height:36px!important}.ffApprovalScreen #ffApprovalReward>span{font-size:23px!important}.ffApprovalScreen>.ffOfficialQuick{gap:5px!important}.ffApprovalScreen>.ffOfficialQuick button{min-height:93px!important;font-size:9px!important}}
