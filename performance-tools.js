@@ -346,7 +346,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    const types=[['incentive','🏆','Incentive Request'],['penalty','▤','Penalty Request'],['access','▣','Access Request'],['permission','⚿','Permission Request'],['expense','▧','Expense Claim'],['other','▦','Other Request']];
    const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Kuala_Lumpur'}).format(new Date());
    const month=today.slice(0,7);
-   const staffOptions=[...new Set([id,...scopedIds()])].filter(Boolean).map(staff=>`<option value="${E(staff)}" ${staff===id?'selected':''}>${E(who(staff))} · ${E(staff)}</option>`).join('');
+   const staffOptions=`<option value="${E(id)}" selected>${E(who(id))} · ${E(id)}</option>`;
    const dialog=approvalDialog('New Request',`<div class="ffOfficialIntro">Create a new official request (Incentive, Penalty, Access, Permission, Expense & More)</div>
     <div class="ffOfficialTabs">${types.map(([key,glyph,label],i)=>`<button type="button" data-official-type="${key}" aria-pressed="${i===0}"><span>${glyph}</span>${label}</button>`).join('')}</div>
     <form class="form ffOfficialForm">
@@ -354,7 +354,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
      <div class="two"><label><span data-official-type-label>Incentive Type *</span><select name="category" required><option value="">Select Incentive Type</option><option>Sales Target</option><option>Performance</option><option>Campaign</option><option>Attendance</option><option>Other</option></select></label><label>Related To *<select name="related" required><option value="">Select Related To</option><option>Sales</option><option>Activity</option><option>Target</option><option>Outlet</option><option>Other</option></select></label></div>
      <div class="two"><label><span data-official-amount-label>Incentive Amount (RM) *</span><input name="amount" type="number" min="0.01" max="1000000" step="0.01" required placeholder="0.00"></label><label>Period / Month *<input name="period" type="month" max="${month}" value="${month}" required></label></div>
      <h3>♙ Staff & Approval</h3>
-     <div class="two"><label>Request for (Staff / SR) *<select name="staff_id" required>${staffOptions}</select></label><label>Forward to (Approver) *<select name="approver" required><option value="M21954">Owner (current governance reviewer)</option></select></label></div>
+     <div class="two"><label>Request for (Staff / SR) *<select name="staff_id" required>${staffOptions}</select><small>Requests are submitted under your own signed-in staff ID.</small></label><label>Forward to (Approver) *<select name="approver" required><option value="M21954">Owner (current governance reviewer)</option></select></label></div>
      <h3>▤ Request Reason & Details</h3>
      <label>Reason / Description *<textarea name="reason" maxlength="500" required placeholder="Describe your request with details (target, performance, campaign etc.)"></textarea><small data-official-count>0 / 500</small></label>
      <h3>♧ Proof / Attachment (Optional)</h3>
@@ -388,11 +388,11 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     event.preventDefault();if(id!==me()||!form.reportValidity())return;
     const v=values(),proof=file.files[0];
     if(proof){status.textContent=proof.size>10*1024*1024?'File exceeds 10 MB.':'Proof storage is not connected yet. Remove the attachment before submitting.';return;}
-    if(![...new Set([id,...scopedIds()])].includes(v.staff_id)||v.approver!=='M21954'||v.period>month){status.textContent='Invalid staff, approver or period.';return;}
+    if(v.staff_id!==id||v.approver!=='M21954'||v.period>month){status.textContent='Invalid staff, approver or period.';return;}
     if(!v.reason.trim()){status.textContent='Reason is required.';return;}
     if(['incentive','penalty','expense'].includes(selected)&&(!Number.isFinite(Number(v.amount))||Number(v.amount)<=0||Number(v.amount)>1000000)){status.textContent='Enter a valid amount.';return;}
-    const reason=`${types.find(x=>x[0]===selected)[2]} | Staff: ${v.staff_id} | Category: ${v.category} | Related: ${v.related} | Period: ${v.period} | Amount RM: ${v.amount||'N/A'} | ${v.reason.trim()}`;
-    if(!window.confirm('Submit this official request for review? This does not directly post income.'))return;
+    const reason=`${types.find(x=>x[0]===selected)[2]} | Staff: ${id} | Category: ${v.category} | Related: ${v.related} | Period: ${v.period} | Amount RM: ${v.amount||'N/A'} | ${v.reason.trim()}`;
+    if(!window.confirm('Submit this official request under your own staff ID? Approval does not automatically change income or permissions.'))return;
     const submit=form.querySelector('[type=submit]');submit.disabled=true;
     try{
      await rpc('ffh_governance','request',{module:['incentive','penalty','expense'].includes(selected)?'income':selected==='access'?'outlets':selected==='permission'?'tasks':'reports',action:'edit',record_id:'request:'+id+':'+crypto.randomUUID(),reason,reviewer_staff_id:'M21954'});
