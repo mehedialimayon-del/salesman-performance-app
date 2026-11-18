@@ -419,10 +419,13 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     if(selectedFile.size>10*1024*1024){proofMessage.textContent='File exceeds 10 MB. Please select a smaller file.';return;}
     proofMessage.textContent=selectedFile.name+' · '+(selectedFile.size/1024/1024).toFixed(2)+' MB · Secure upload is not yet enabled. Remove file to submit this request.';
    };
-   clearProof.onclick=()=>{file.value='';file.onchange();};
+   clearProof.onclick=()=>{file.value='';file.onchange();form.querySelector('[data-official-preview-panel]').hidden=true;};
+   const previewPanel=form.querySelector('[data-official-preview-panel]');
+   form.addEventListener('input',event=>{if(event.target!==file)previewPanel.hidden=true;});
+   form.addEventListener('change',()=>{previewPanel.hidden=true;});
    const values=()=>Object.fromEntries([...new FormData(form)].filter(([key])=>key!=='proof'));
    try{const draft=JSON.parse(sessionStorage.getItem(draftKey)||'null');if(draft?.type){setType(draft.type);for(const [key,value] of Object.entries(draft.values||{})){const field=form.elements.namedItem(key);if(field&&typeof value==='string'&&field.type!=='file')field.value=value;}form.elements.namedItem('reason').dispatchEvent(new Event('input'));}}catch{}
-   form.querySelector('[data-official-draft]').onclick=()=>{try{sessionStorage.setItem(draftKey,JSON.stringify({type:selected,values:values()}));status.textContent=file.files.length?'Text draft saved; attachment is not stored.':'Draft saved on this device for this session.';}catch(error){status.textContent=error.message;}};
+   form.querySelector('[data-official-draft]').onclick=()=>{try{sessionStorage.setItem(draftKey,JSON.stringify({type:selected,values:values()}));status.textContent=file.files.length?'Text draft saved on this device for this session; attachment is not stored.':'Text draft saved on this device for this session.';}catch(error){status.textContent=error.message;}};
    form.querySelector('[data-official-preview]').onclick=()=>{
     if(!form.reportValidity())return;
     const v=values(),financial=['incentive','penalty','expense'].includes(selected);
@@ -431,7 +434,9 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     preview.hidden=false;preview.scrollIntoView({block:'nearest',behavior:'smooth'});
    };
    form.onsubmit=async event=>{
-    event.preventDefault();if(id!==me()||!form.reportValidity())return;
+    event.preventDefault();
+    const submit=form.querySelector('[type=submit]');
+    if(submit.disabled||id!==me()||!form.reportValidity())return;
     const v=values(),proof=file.files[0];
     if(proof){status.textContent=!supportedProof.has(proof.type)?'Unsupported file type. Use JPG, PNG, WebP or PDF.':proof.size>10*1024*1024?'File exceeds 10 MB.':'Secure proof upload is not connected yet. Use Remove Attachment to submit without proof.';return;}
     if(v.staff_id!==id||v.approver!=='M21954'||v.period>month){status.textContent='Invalid staff, approver or period.';return;}
@@ -439,7 +444,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     if(['incentive','penalty','expense'].includes(selected)&&(!Number.isFinite(Number(v.amount))||Number(v.amount)<=0||Number(v.amount)>1000000)){status.textContent='Enter a valid amount.';return;}
     const reason=`${types.find(x=>x[0]===selected)[2]} | Staff: ${id} | Category: ${v.category} | Related: ${v.related} | Period: ${v.period} | Amount RM: ${v.amount||'N/A'} | ${v.reason.trim()}`;
     if(!window.confirm('Submit this official request under your own staff ID? Approval does not automatically change income or permissions.'))return;
-    const submit=form.querySelector('[type=submit]');submit.disabled=true;
+    submit.disabled=true;
     try{
      await rpc('ffh_governance','request',{module:['incentive','penalty','expense'].includes(selected)?'income':selected==='access'?'outlets':selected==='permission'?'tasks':'reports',action:'edit',record_id:'request:'+id+':'+crypto.randomUUID(),reason,reviewer_staff_id:'M21954'});
      sessionStorage.removeItem(draftKey);dialog.close();if(id===me()&&ctx.page()==='approvals')await approvals();
