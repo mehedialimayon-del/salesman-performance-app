@@ -780,3 +780,5 @@ html body #app .app main.wrap .ffApprovalScreen .ffApprovalControls :is(select,i
 .ffApprovalScreen .ffApprovalRequestPanel .ffApprovalRecentRow>span:nth-child(3){text-align:right}
 .ffApprovalScreen .ffApprovalRequestPanel .ffApprovalRecentRow>i{font-size:23px;color:#ff9a14}
 .ffApprovalScreen .ffApprovalRequestPanel .ffApprovalRecentRow small{font-size:11px}
+
+.ffApprovalDialog .ffRecentActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.ffApprovalDialog .ffRecentActions button{flex:1 1 130px;min-height:43px;border-radius:12px;border:1px solid #ff9014;box-shadow:0 0 8px #ff800055;font-weight:700}
