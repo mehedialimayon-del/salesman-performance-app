@@ -434,13 +434,25 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
   };
   $('#ffApprovalType').onchange=draw;$('#ffApprovalStatus').onchange=draw;$('#ffApprovalSearch').oninput=draw;
   $('#ffApprovalReward').onclick=()=>openOfficialRequest();
-  $('#ffApprovalSearchToggle').onclick=()=>{$('#ffApprovalSearch').focus();};
+  $('#ffApprovalSearchToggle').onclick=()=>{
+   const dialog=approvalDialog('Search Requests',`<form class="form"><label>Search staff, outlet, task or request<input type="search" name="term" placeholder="Type to search" value="${E($('#ffApprovalSearch').value)}" autofocus></label><button class="primary" type="submit">Apply Search</button><button class="secondary" type="button" data-clear>Clear Search</button></form>`);
+   const form=dialog.querySelector('form');form.onsubmit=e=>{e.preventDefault();$('#ffApprovalSearch').value=form.elements.namedItem('term').value;draw();dialog.close();};
+   dialog.querySelector('[data-clear]').onclick=()=>{$('#ffApprovalSearch').value='';draw();dialog.close();};
+   form.elements.namedItem('term').focus();
+  };
   $('#ffApprovalHeaderDate').onclick=()=>$('#ffApprovalDates').click();
-  $('#ffApprovalHeaderStatus').onclick=()=>$('#ffApprovalStatus').focus();
+  $('#ffApprovalHeaderStatus').onclick=()=>{
+   const dialog=approvalDialog('Filter by Status',`<div class="ffApprovalMenu">${[['all','All Requests'],['pending','Waiting for Review'],['approved','Approved'],['returned','Returned / Rejected']].map(([value,label])=>`<button type="button" class="secondary" data-status-value="${value}" aria-pressed="${$('#ffApprovalStatus').value===value}">${label}</button>`).join('')}</div>`);
+   dialog.querySelectorAll('[data-status-value]').forEach(button=>button.onclick=()=>{$('#ffApprovalStatus').value=button.dataset.statusValue;draw();dialog.close();});
+  };
   $('#ffApprovalMore').onclick=()=>{
    const dialog=approvalDialog('Approval Inbox Settings',`<div class="ffApprovalMenu"><button type="button" class="secondary" data-refresh>Refresh Inbox</button><button type="button" class="secondary" data-type>Request Type Filter</button>${id==='M21954'?'<button type="button" class="secondary" data-staff>Staff / Task Access Settings</button><button type="button" class="secondary" data-income>Income Approval Settings</button>':''}</div>`);
    dialog.querySelector('[data-refresh]').onclick=()=>{dialog.close();approvals();};
-   dialog.querySelector('[data-type]').onclick=()=>{dialog.close();$('#ffApprovalType').focus();};
+   dialog.querySelector('[data-type]').onclick=()=>{
+    dialog.close();
+    const filter=approvalDialog('Filter Request Type',`<div class="ffApprovalMenu">${[['','All Request Types'],...categories.map(value=>[value,value])].map(([value,label])=>`<button type="button" class="secondary" data-type-value="${E(value)}">${E(label)}</button>`).join('')}</div>`);
+    filter.querySelectorAll('[data-type-value]').forEach(button=>button.onclick=()=>{$('#ffApprovalType').value=button.dataset.typeValue;draw();filter.close();});
+   };
    if(dialog.querySelector('[data-staff]'))dialog.querySelector('[data-staff]').onclick=()=>{dialog.close();ctx.open('access');};
    if(dialog.querySelector('[data-income]'))dialog.querySelector('[data-income]').onclick=()=>{dialog.close();ctx.open('incomeLedger');};
   };
