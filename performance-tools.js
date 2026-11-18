@@ -282,7 +282,26 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     history?.close();
     const historyEvents=x.kind==='Incentive / penalty'?(earn.events||[]).filter(event=>event.entry_id===x.id):[];
     const audit=historyEvents.length?`<section class="ffApprovalAudit"><h3>Decision History</h3>${historyEvents.map(event=>`<article><strong>${E(event.action)}</strong> · ${E(who(event.actor))}<small>${E(stamp(event.created_at))}</small><p>${E(event.reason||'No note')}</p></article>`).join('')}</section>`:'';
-    approvalDialog(x.title,`<p>${E(x.kind)} · ${E(x.status)}</p><p>${E(x.detail)}</p><p>${E(stamp(x.date))}</p>${x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${audit}${safePhoto(x.photo)}`);
+    const actions=`${x.canGovern?'<button type="button" class="primary" data-recent-govern>Review Request</button>':''}${x.canIncomeReview?'<button type="button" class="primary" data-recent-income>Review Income</button>':''}${x.can?'<button type="button" class="primary" data-recent-task="Done">Approve Task</button><button type="button" class="secondary" data-recent-task="Rejected">Return Task</button>':''}`;
+    const detail=approvalDialog(x.title,`<p>${E(x.kind)} · ${E(x.status)}</p><p>${E(x.detail)}</p><p>${E(stamp(x.date))}</p>${x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${audit}${safePhoto(x.photo)}<div class="ffRecentActions">${actions}</div>`);
+    detail.querySelectorAll('[data-recent-task]').forEach(control=>control.onclick=async()=>{
+     if(!x.can||id!==me()||control.disabled)return;
+     if(!window.confirm(control.dataset.recentTask==='Done'?'Approve this task?':'Return this task?'))return;
+     detail.querySelectorAll('[data-recent-task]').forEach(button=>button.disabled=true);
+     try{await ctx.reviewTask(x.id,control.dataset.recentTask);detail.close();await approvals();}catch(error){alert(error.message);detail.querySelectorAll('[data-recent-task]').forEach(button=>button.disabled=false);}
+    });
+    const openReview=kind=>{
+     detail.close();
+     $('#ffApprovalStatus').value='all';$('#ffApprovalSearch').value='';$('#ffApprovalType').value='';Object.assign(filters,{from:'',to:''});draw();
+     const index=items.filter(matchesDate).filter(item=>item.id===x.id).length;
+     if(!index){alert('This request is not available in the current review list.');return;}
+     const target=[...$('#ffApprovalList').querySelectorAll(kind==='income'?'[data-income-review]':'[data-govern-review]')].find(button=>{
+      const cards=[...$('#ffApprovalList').children],card=button.closest('article');return card&&cards.indexOf(card)>=0&&card.textContent.includes(x.title);
+     });
+     if(target)target.click();else alert('Review is not available for this request.');
+    };
+    detail.querySelector('[data-recent-govern]')?.addEventListener('click',()=>openReview('govern'));
+    detail.querySelector('[data-recent-income]')?.addEventListener('click',()=>openReview('income'));
     bindPhotos();
    });
   }
