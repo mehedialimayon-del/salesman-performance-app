@@ -283,7 +283,7 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
     const historyEvents=x.kind==='Incentive / penalty'?(earn.events||[]).filter(event=>event.entry_id===x.id):[];
     const audit=historyEvents.length?`<section class="ffApprovalAudit"><h3>Decision History</h3>${historyEvents.map(event=>`<article><strong>${E(event.action)}</strong> · ${E(who(event.actor))}<small>${E(stamp(event.created_at))}</small><p>${E(event.reason||'No note')}</p></article>`).join('')}</section>`:'';
     const actions=`${x.canGovern?'<button type="button" class="primary" data-recent-govern>Review Request</button>':''}${x.canIncomeReview?'<button type="button" class="primary" data-recent-income>Review Income</button>':''}${x.can?'<button type="button" class="primary" data-recent-task="Done">Approve Task</button><button type="button" class="secondary" data-recent-task="Rejected">Return Task</button>':''}`;
-    const detail=approvalDialog(x.title,`<p>${E(x.kind)} · ${E(x.status)}</p><p>${E(x.detail)}</p><p>${E(stamp(x.date))}</p>${x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${audit}${safePhoto(x.photo)}<div class="ffRecentActions">${actions}</div>`);
+    const detail=approvalDialog(x.title,`<p>${E(x.kind)} · ${E(x.status)}</p><p>${E(x.detail)}</p><p>${E(stamp(x.date))}</p>${x.reviewer?`<p>Reviewer: ${E(who(x.reviewer))}</p>`:''}${audit}${safePhoto(x.photo)}<div class="ffRecentActions">${actions}${states.returned.includes(x.status)&&x.staff===id&&x.kind==='Change request'?'<button type="button" class="secondary" data-recent-appeal>Revise &amp; Resubmit</button>':''}</div>`);
     detail.querySelectorAll('[data-recent-task]').forEach(control=>control.onclick=async()=>{
      if(!x.can||id!==me()||control.disabled)return;
      if(!window.confirm(control.dataset.recentTask==='Done'?'Approve this task?':'Return this task?'))return;
@@ -298,6 +298,27 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
      const target=[...$('#ffApprovalList').querySelectorAll(kind==='income'?'[data-income-review]':'[data-govern-review]')].find(button=>button.closest('article')?.dataset.approvalRequestId===String(x.id));
      if(target)target.click();else alert('Review is not available for this request.');
     };
+    detail.querySelector('[data-recent-appeal]')?.addEventListener('click',()=>{
+     if(x.staff!==me()||!states.returned.includes(x.status))return;
+     detail.close();
+     const formDialog=approvalDialog('Revise & Resubmit',`<p>Original request: ${E(x.id)} · ${E(x.title)}</p><p>Previous decision: ${E(x.status)}</p><form class="form"><label>Corrected reason and details *<textarea name="reason" required maxlength="1000" placeholder="Explain the correction and why the request should be reviewed again"></textarea></label><button type="submit" class="primary">Submit Revised Request</button><p role="status" aria-live="polite"></p></form>`);
+     const form=formDialog.querySelector('form'),submit=form.querySelector('[type=submit]'),feedback=form.querySelector('[role=status]');
+     form.onsubmit=async event=>{
+      event.preventDefault();if(!form.reportValidity()||submit.disabled||me()!==id)return;
+      const correction=form.elements.namedItem('reason').value.trim();
+      if(correction.length<10){feedback.textContent='Please explain the correction in at least 10 characters.';return;}
+      if(!window.confirm('Submit a new review request? The original rejected record will remain unchanged.'))return;
+      submit.disabled=true;
+      try{
+       const raw=x.raw||{};
+       const module=raw.module;
+       const action=raw.action;
+       if(!module||!['edit','delete'].includes(action))throw Error('Original request details are unavailable. Please create a new request.');
+       await rpc('ffh_governance','request',{module,action,record_id:raw.record_id||'',reviewer_staff_id:raw.reviewer_staff_id||'M21954',reason:'Resubmission of rejected request '+x.id+' | '+correction});
+       formDialog.close();if(me()===id&&ctx.page()==='approvals')await approvals();
+      }catch(error){feedback.textContent=error.message;}finally{submit.disabled=false;}
+     };
+    });
     detail.querySelector('[data-recent-govern]')?.addEventListener('click',()=>openReview('govern'));
     detail.querySelector('[data-recent-income]')?.addEventListener('click',()=>openReview('income'));
     bindPhotos();
