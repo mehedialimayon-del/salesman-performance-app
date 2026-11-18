@@ -359,13 +359,15 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
      <label>Reason / Description *<textarea name="reason" maxlength="500" required placeholder="Describe your request with details (target, performance, campaign etc.)"></textarea><small data-official-count>0 / 500</small></label>
      <h3>♧ Proof / Attachment (Optional)</h3>
      <label class="ffOfficialDrop">☁ Tap to Add File / Document<input name="proof" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"><small>Photo (Camera/Gallery) | PDF · Maximum 10 MB</small></label><small data-official-proof>No attachment selected</small>
+     <section class="ffOfficialPreviewPanel" data-official-preview-panel hidden aria-live="polite"></section>
      <div class="ffOfficialActions"><button type="button" class="secondary" data-official-draft>Save as Draft</button><button type="button" class="secondary" data-official-preview>Preview</button><button type="submit" class="primary">Submit Request</button></div><p role="status"></p>
     </form>`);
    dialog.classList.add('ffOfficialDialog');
    const form=dialog.querySelector('form'),status=form.querySelector('[role=status]'),file=form.elements.namedItem('proof');
    const draftKey='ffh_official_request_draft_'+id;let selected='incentive';
    const setType=key=>{
-    selected=key;const title=types.find(x=>x[0]===key)?.[2]||'Other Request';
+    selected=key;const existingPreview=form.querySelector('[data-official-preview-panel]');if(existingPreview)existingPreview.hidden=true;
+    const title=types.find(x=>x[0]===key)?.[2]||'Other Request';
     dialog.querySelector('[data-official-heading]').textContent=title+' Details';
     dialog.querySelector('[data-official-type-label]').textContent=key==='penalty'?'Penalty Type *':'Request Type *';
     dialog.querySelector('[data-official-amount-label]').textContent=key==='penalty'?'Penalty Amount (RM) *':'Amount (RM) *';
@@ -389,7 +391,13 @@ window.FFH_CREATE_PERFORMANCE_TOOLS = function(ctx) {
    const values=()=>Object.fromEntries([...new FormData(form)].filter(([key])=>key!=='proof'));
    try{const draft=JSON.parse(sessionStorage.getItem(draftKey)||'null');if(draft?.type){setType(draft.type);for(const [key,value] of Object.entries(draft.values||{})){const field=form.elements.namedItem(key);if(field&&typeof value==='string'&&field.type!=='file')field.value=value;}form.elements.namedItem('reason').dispatchEvent(new Event('input'));}}catch{}
    form.querySelector('[data-official-draft]').onclick=()=>{try{sessionStorage.setItem(draftKey,JSON.stringify({type:selected,values:values()}));status.textContent=file.files.length?'Text draft saved; attachment is not stored.':'Draft saved on this device for this session.';}catch(error){status.textContent=error.message;}};
-   form.querySelector('[data-official-preview]').onclick=()=>{if(!form.reportValidity())return;const v=values();approvalDialog('Request Preview',`<p>${E(types.find(x=>x[0]===selected)[2])} · ${E(who(v.staff_id))}</p><p>${E(v.category)} · ${E(v.related)} · ${E(v.period)}</p><p>${E(v.amount||'No amount')}</p><p>${E(v.reason)}</p>`);};
+   form.querySelector('[data-official-preview]').onclick=()=>{
+    if(!form.reportValidity())return;
+    const v=values(),financial=['incentive','penalty','expense'].includes(selected);
+    const preview=form.querySelector('[data-official-preview-panel]');
+    preview.innerHTML=`<h3>Request Preview</h3><p><strong>${E(types.find(x=>x[0]===selected)[2])}</strong> · ${E(who(id))} (${E(id)})</p><p>${E(v.category)}${financial?` · ${E(v.related)} · ${E(v.period)} · RM ${E(v.amount)}`:''}</p><p>${E(v.reason)}</p><p>Reviewer: Owner / Authorized Reviewer</p><p>${file.files.length?'Attachment selected but cannot be submitted until storage is connected.':'No attachment selected.'}</p>`;
+    preview.hidden=false;preview.scrollIntoView({block:'nearest',behavior:'smooth'});
+   };
    form.onsubmit=async event=>{
     event.preventDefault();if(id!==me()||!form.reportValidity())return;
     const v=values(),proof=file.files[0];
